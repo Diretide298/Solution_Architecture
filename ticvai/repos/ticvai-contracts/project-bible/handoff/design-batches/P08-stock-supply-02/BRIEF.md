@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-105` | Stock & Supply | D | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
+| `BO-105` | Stock & Supply | A | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | C | 3 | 27 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
 | `BO-138` | Production Execution & Batch Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-139` | Wastage, Spoilage, Returns & Write-Off | C | 21 | 6 | 5 | 15 | 1 | 0 | — | notStarted (generated) |

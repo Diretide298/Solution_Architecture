@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1184` | Transport Routes & Stops | A | 27 | 18 | 7 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-1185` | Transport Fares & Passenger Types | A | 22 | 44 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1186` | Transport Timetables | A | 21 | 14 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1187` | Transport Departure Board | C | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
+| `BO-1187` | Transport Departure Board | A | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
 | `BO-1188` | Transport Pass Types | A | 19 | 18 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1189` | Transport Network Import | A | 6 | 27 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 

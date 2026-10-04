@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `white-label` |
 | Schemas owned | `whitelabel` |
-| Operations in the slice | 91 of 93 |
+| Operations in the slice | 93 of 95 |
 | Scale | Read-heavy and heavily cached. Published, not queried. |
 | If it is down | Down freezes the current published config. Guests see the last good version. |
 
@@ -86,7 +86,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | navigation | [`getNavigation`](#getnavigation) | GET | `/tenant-config/navigation` | core | 1 | CMS-009 |
 | navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 1 | CMS-009 |
 | navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 1 | CMS-009 |
-| overview | [`getPublishedTenantConfig`](#getpublishedtenantconfig) | GET | `/storefront/tenant-config` | core | 1 | GST-001, GST-043, GST-047, KSK-002, WEB-001, WEB-028 … |
+| overview | [`getPublishedTenantConfig`](#getpublishedtenantconfig) | GET | `/storefront/tenant-config` | core | 1 | GST-001, GST-043, GST-047, GST-071, KSK-002, WEB-001 … |
 | overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038 … |
 | overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | ADM-018, BO-834, CMS-009, CMS-011 |
 | overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
@@ -117,8 +117,10 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | white-label | [`setPrimaryDomain`](#setprimarydomain) | POST | `/tenant-domains/{domainId}/primary` | core | 1 | ADM-017, CMS-017 |
 | white-label | [`verifyCustomDomain`](#verifycustomdomain) | POST | `/tenant-domains/{domainId}/verify` | core | 1 | ADM-017, CMS-017 |
 | whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | core | 1 | BO-839, CMS-007 |
+| whiteLabel | [`listContentBlocks`](#listcontentblocks) | GET | `/content-blocks` | core | 1 | CMS-007 |
 | whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | core | 1 | CMS-007 |
 | whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 1 | CMS-009 |
+| whiteLabel | [`updateContentBlock`](#updatecontentblock) | PATCH | `/content-blocks/{blockId}` | core | 1 | CMS-007 |
 
 ## Group: appPublishing
 
@@ -2982,7 +2984,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `whitelabel.homepage_section` |
+| Reads | `whitelabel.homepage_layout`, `whitelabel.homepage_section` |
 | Writes | - |
 | Called by | CMS-007 |
 
@@ -3027,7 +3029,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `whitelabel.homepage_section` |
+| Reads | `whitelabel.homepage_layout`, `whitelabel.homepage_section` |
 | Writes | - |
 | Called by | CMS-007 |
 
@@ -3079,8 +3081,8 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.homepage_section` |
-| Writes | `cache:idempotency`, `whitelabel.homepage_section` |
+| Reads | `cache:idempotency`, `whitelabel.homepage_layout`, `whitelabel.homepage_section` |
+| Writes | `cache:idempotency`, `whitelabel.homepage_layout`, `whitelabel.homepage_section` |
 | Called by | BO-840, CMS-007 |
 
 **Parameters**
@@ -3399,7 +3401,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | baseUrl | string | yes | The primary domain, or the platform subdomain where none is primary. |
-| patterns | array of object | yes |  |
+| patterns | array of object | yes | The patterns, fixed (4 October 2026, CHG-FXC-009). |
 | patterns[].kind | string | yes | A LinkTarget.kind, or bookingFlow. |
 | patterns[].pattern | string | yes | e.g. |
 | appLinksEnabled | boolean |  |  |
@@ -3424,7 +3426,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `cache:resolution`, `whitelabel.navigation_item` |
+| Reads | `cache:resolution`, `whitelabel.navigation_config`, `whitelabel.navigation_item` |
 | Writes | `cache:resolution` |
 | Called by | CMS-009 |
 
@@ -3529,8 +3531,8 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.navigation_item` |
-| Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.navigation_item` |
+| Reads | `cache:idempotency`, `whitelabel.navigation_config`, `whitelabel.navigation_item` |
+| Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.navigation_config`, `whitelabel.navigation_item` |
 | Called by | CMS-009 |
 
 **Parameters**
@@ -3621,9 +3623,9 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 2 October: servable from a local cache. |
-| Reads | `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.navigation_item` |
+| Reads | `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.navigation_config`, `whitelabel.navigation_item` |
 | Writes | - |
-| Called by | GST-001, GST-043, GST-047, KSK-002, WEB-001, WEB-028, WEB-029 |
+| Called by | GST-001, GST-043, GST-047, GST-071, KSK-002, WEB-001, WEB-028, WEB-029 |
 
 **Parameters**
 
@@ -3810,6 +3812,10 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | analyticsProviders[].measurementId | string | yes | What the tag or SDK reports to (GA4 G-..., Tag Manager GTM-..., a pixel id). (max length 100) |
 | analyticsProviders[].surfaces | array of enum (guestWeb, guestApp) | yes | (min items 1) |
 | analyticsProviders[].consentCategory | enum (functional, analytics, personalisation, marketing) | yes | The cookie category the visitor must grant before this provider loads (marketing-crm CookieCategory). |
+| paymentTokenisation | object |  | The provider the guest app tokenises cards with (4 October 2026, CHG-FXC-010; GST-071): the providerId storePaymentToken requires, its kind and the publishable key the client SDK needs. (nullable) |
+| paymentTokenisation.providerId | string (uuid) | yes |  |
+| paymentTokenisation.providerKind | string | yes |  |
+| paymentTokenisation.publishableKey | string |  | (nullable) |
 
 **Responses**
 
@@ -3909,7 +3915,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | - |
 | Called by | ADM-018, BO-834, CMS-009, CMS-011 |
 
@@ -4851,7 +4857,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.feature_toggle`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Called by | ADM-016, CMS-015 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `published` -> `draft` |
@@ -5964,6 +5970,60 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 | 201 |  | Created as a draft |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listContentBlocks
+
+**`GET /content-blocks`**: The content blocks of a page
+
+**Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `control.content_block` |
+| Writes | - |
+| Called by | CMS-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| pageKey | query | yes | string |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ContentBlock | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].pageId | string (uuid) |  | (nullable) |
+| items[].kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
+| items[].position | integer |  |  |
+| items[].body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| items[].localeVariants | object |  | Per-locale bodies, not per-locale pages. |
+| items[].status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
+| items[].publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
+| items[].expireAt | string (date-time) |  | (nullable) |
+| items[].audienceSegmentId | string (uuid) |  | Personalisation, evaluated at render. (nullable) |
+| items[].approvedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The content blocks of a page |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### publishContentBlock
 
 **`POST /content-blocks/{blockId}/publish`**: Publish now, or schedule it
@@ -6098,6 +6158,71 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### updateContentBlock
+
+**`PATCH /content-blocks/{blockId}`**: Change a draft content block
+
+**Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
+`publishAt`, `expireAt` or `audienceSegmentId`. A published block is not edited in place: it is refused with 409
+(`content-block-published`) and changed by creating a new draft and publishing it, so what a guest saw stays on
+record.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `control.content_block` |
+| Writes | `control.content_block` |
+| Called by | CMS-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| blockId | path | yes | string (uuid) |  |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| body | object |  | As ContentBlock.body. |
+| localeVariants | object |  | As ContentBlock.localeVariants. |
+| position | integer |  |  |
+| publishAt | string (date-time) |  | (nullable) |
+| expireAt | string (date-time) |  | (nullable) |
+| audienceSegmentId | string (uuid) |  | (nullable) |
+
+**Response**: `ContentBlock`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| pageId | string (uuid) |  | (nullable) |
+| kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
+| position | integer |  |  |
+| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| localeVariants | object |  | Per-locale bodies, not per-locale pages. |
+| status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
+| publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
+| expireAt | string (date-time) |  | (nullable) |
+| audienceSegmentId | string (uuid) |  | Personalisation, evaluated at render. (nullable) |
+| approvedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Changed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The block is published (content-block-published). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -6346,15 +6471,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 | kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |
 
-### `whitelabel.homepage_section`
+### `whitelabel.homepage_layout`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | template_key | text | no | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). |
 | landing_source | text | no | storefront: this home is the tenant's landing page. |
 | id | uuid | yes | Added 20 August. |
-| content_page_id | uuid | no | Points at whitelabel.content_page. |
-| homepage_section_id | uuid | yes | Points at whitelabel.homepage_section. |
+
+### `whitelabel.homepage_section`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| homepage_layout_id | uuid | yes | The parent row. |
+| id | uuid | yes | Added 20 August. |
+| kind | text | yes |  |
+| title | jsonb | no |  |
+| sort_order | integer | yes |  |
+| is_visible | boolean | yes |  |
+| content_page_id | uuid | no |  |
+| max_items | integer | no | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). |
+| scroll_animation | text | no | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). |
+| hero_style | text | no | For heroBanner only (decided 29 September, MOB-3). |
 
 ### `whitelabel.module_enablement`
 
@@ -6368,14 +6506,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Synthesised key. |
 | tenant_config_id | uuid | yes | Points at whitelabel.tenant_config. |
 
-### `whitelabel.navigation_item`
+### `whitelabel.navigation_config`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes | Added 20 August. |
 | kind | text | yes |  |
 | buy_button | jsonb | no | The persistent Buy tickets button (decided 29 September, MOB-2). |
-| navigation_item_id | uuid | yes | Points at whitelabel.navigation_item. |
+
+### `whitelabel.navigation_item`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| navigation_config_id | uuid | yes | The parent row. |
+| id | uuid | yes | Added 20 August. |
+| label | jsonb | yes |  |
+| icon | text | no |  |
+| target | jsonb | yes |  |
+| is_visible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| sort_order | integer | yes |  |
 
 ### `whitelabel.policy`
 
@@ -6477,8 +6626,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | enabled_payment_methods | text[] | no | BL-004. |
 | accessibility | jsonb | no |  |
 | header | jsonb | no |  |
-| navigation_item_id | uuid | no |  |
-| homepage_section_id | uuid | no |  |
+| navigation_config_id | uuid | no |  |
+| homepage_layout_id | uuid | no |  |
 | languages | jsonb | no |  |
 | updated_at | timestamptz | no |  |
 | is_in_maintenance | boolean | no | Written by setMaintenanceMode; read by getTenantAppStatus. |
@@ -6489,6 +6638,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | availability | text | no | Live state, written by setMaintenanceMode (audit R073). |
 | availability_message | jsonb | no | Live state, written by setMaintenanceMode (audit R073). |
 | id | uuid | yes | Synthesised key. |
+| homepage_section_id | uuid | no | Points at whitelabel.homepage_section. |
+| navigation_item_id | uuid | no | Points at whitelabel.navigation_item. |
 
 ## Not in the first release
 

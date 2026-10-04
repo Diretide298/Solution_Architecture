@@ -1,6 +1,6 @@
 # WS29 — Membership   Annual Pass Management board 1
 
-**10 screens · 22 operations · 33 schemas · 6 permissions**
+**10 screens · 23 operations · 33 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-291` | Membership Commercial, Pricing & Channel Association | B | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 12 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 14 | 69 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 29 of 210 |
+| Operations in the slice | 32 of 212 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -24,7 +24,7 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.access_point` |
-| [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal` |
+| [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
 | [PlatformService](PlatformService.md) | `control.api_client` |
 
 ## Operations in the first release
@@ -37,6 +37,7 @@
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
 | general | [`getDeviceAssignment`](#getdeviceassignment) | GET | `/devices/{deviceId}/assignment` | core | 1 | POS-016 |
+| identity | [`setRolePermissions`](#setrolepermissions) | PUT | `/roles/{roleId}/permissions` | setup | 1 | BO-054 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
 | region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-1064, BO-1065 |
@@ -44,11 +45,12 @@
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181 … |
 | request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374 … |
 | request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, ADM-530, ADM-532, POS-002 |
+| request | [`listApprovalRequests`](#listapprovalrequests) | GET | `/approval-requests` | core | 1 | ADM-130, ADM-145, ADM-224, BO-084, BO-085, BO-1181 … |
 | rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | setup | 1 | BO-055, BO-712, BO-714, BO-884, BO-917 |
 | rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021 … |
 | rota | [`updateRotaAssignment`](#updaterotaassignment) | PATCH | `/rota-assignments/{assignmentId}` | setup | 1 | BO-055 |
 | scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, ADM-421, BO-064, BO-145 |
-| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 1 | ADM-006, ADM-412, BO-055, BO-064, BO-068, BO-145 … |
+| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 1 | ADM-006, ADM-412, ADM-421, BO-055, BO-064, BO-068 … |
 | scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
 | tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-128, BO-129, POS-001, POS-025 |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
@@ -56,6 +58,7 @@
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-602, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
 | workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-109, BO-124 |
+| workstation | [`getOutlet`](#getoutlet) | GET | `/outlets/{outletId}` | core | 1 | POS-021 |
 | workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, BO-405, BO-732 … |
 | workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126 … |
 | workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063, BO-731 |
@@ -74,6 +77,26 @@
 **Agreed (decided 29 September, readiness close-out).** This duplicates setApprovalMatrix; the sample threshold bands were removed, the approval kinds became one approvalMode enum, and minimumApprovals plus requiredApproverRole express N-of-M. A venue may only tighten a higher rule and in-flight requests keep their matrix version (R129); the approval context list (request, customer, original and proposed value, margin impact, reason, evidence) is what the inbox shows, not a matrix field.
 
 **Overlaps `setApprovalMatrix`,** which stays the operation of record for that write; this one serves the screen's composite view of it.
+
+**What it writes, field by field** (4 October 2026, CHG-FXC-005; the Sprint 1-2 judging found no mapping). It is
+`setApprovalMatrix` for one rule, through the same tables and the same versioning (a matrix in use gets a new version;
+in-flight requests keep theirs, R129):
+
+| Input | Stored as |
+|---|---|
+| `module` | the matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one) |
+| `venue` | the matrix's scope (`scope_level` venue, its `scope_path`); absent, the tenant's matrix |
+| `code` | `approvals.rule.code`, the upsert key within the matrix |
+| `approvalMode` | `compositeMode`, and what the engine runs: `single` sequential with `levels` 1; `sequential` and `multiLevel` sequential with `levels` = `minimumApprovals`; `parallel` parallel; `anyOne` parallel with `minimumApprovals` 1; `allMustApprove` consensus; `conditional` sequential, applying only where `skipConditions` does not hold |
+| `amount`, `percentage` | `minAmount`, `minPercentage` |
+| `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
+| `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
+| `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
+| `skipConditions` | `condition`, negated: the rule is skipped where it holds |
+| `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new |
+
+The view reads the same row back in the input's shape. `setApprovalMatrix` stays the operation of record for whole
+matrices; both write the same rows, so neither overwrites the other's rules.
 
 |  |  |
 |---|---|
@@ -167,6 +190,21 @@
 **Agreed (decided 29 September, readiness close-out).** Delegation duplicates createApprovalDelegation and authority limits belong in setApprovalMatrix; the pre-assignment checks (user active, delegation valid, scope) and 'requester cannot approve own request' are engine behaviour, already enforced by decideApprovalRequest, so they were removed as fields. Delegation is same role and same venue (R129); AI authority-gap detection is advisory only.
 
 **Overlaps `createApprovalDelegation`,** which stays the operation of record for that write; this one serves the screen's composite view of it.
+
+**What it writes, field by field** (4 October 2026, CHG-FXC-005). One `approvals.delegation` row, as
+`createApprovalDelegation` writes it (an existing active delegation between the same two people is updated):
+
+| Input | Stored as |
+|---|---|
+| `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
+| `start`, `end`, `reason` | `from`, `to`, `reason` |
+| `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
+| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (409 `exceedsDelegatorAuthority`) |
+| `scope`, `venue`, `region`, `businessUnit`, `legalEntity`, `department` | `scopePath`: the most specific scope node given |
+| `delegationType` | `delegationType` |
+| `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (409 otherwise); `role` and `position` are display only |
+
+Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
 
 |  |  |
 |---|---|
@@ -348,7 +386,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `approvals.delegation`, `cache:idempotency`, `identity.delegated_access`, `identity.principal` |
+| Reads | `approvals.delegation`, `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `identity.delegated_access`, `identity.principal` |
 | Writes | `approvals.delegation`, `cache:idempotency` |
 | Called by | ADM-243, ADM-534, BO-087, BO-385 |
 
@@ -375,6 +413,9 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | reason | string |  |  |
 | isActive | boolean |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). |
+| delegationType | string |  | The composite screen's delegationType (planned absence, temporary cover ...), for display and reporting; the engine treats every delegation alike (4 October 2026, CHG-FXC-005). (nullable) |
+| maxPercentage | number |  | A percentage cap beside maxAmount (the composite's authorityPercentage, CHG-FXC-005). (nullable) |
+| requiredRoleId | string (uuid) |  | A role the delegate must hold for the delegation to act (the composite's requiredRole); checked when the delegate decides, refused with 409 at creation where the delegate does not hold it (CHG-FXC-00… (nullable) |
 
 **Response**: `ApprovalDelegation`
 
@@ -393,6 +434,9 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | reason | string |  |  |
 | isActive | boolean |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). |
+| delegationType | string |  | The composite screen's delegationType (planned absence, temporary cover ...), for display and reporting; the engine treats every delegation alike (4 October 2026, CHG-FXC-005). (nullable) |
+| maxPercentage | number |  | A percentage cap beside maxAmount (the composite's authorityPercentage, CHG-FXC-005). (nullable) |
+| requiredRoleId | string (uuid) |  | A role the delegate must hold for the delegation to act (the composite's requiredRole); checked when the delegate decides, refused with 409 at creation where the delegate does not hold it (CHG-FXC-00… (nullable) |
 
 **Responses**
 
@@ -528,6 +572,63 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
+## Group: identity
+
+### setRolePermissions
+
+**`PUT /roles/{roleId}/permissions`**: What this role may do
+
+POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found `identity.role_permission` with one column** — and nothing wrote it.
+A role that grants no permissions is not a role, and until now a venue could create one and never give it anything.
+**The whole set in one call.** A permission added one at a time leaves a role briefly holding a combination nobody intended, and **a segregation-of-duties rule evaluated against that intermediate state either fires wrongly or misses.**
+**Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two permissions in conflict — a venue told only *not allowed* will grant it another way.
+**No escalated permission** (decided 28 September, audit R197): a role's permission set has no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing. The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a permission ends the live sessions of every principal holding the role at once** (audit R126); an addition takes effect at their next sign-in.
+**The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the Viewer preset is given more ticks with this call like any other role; the preset is not consulted and not changed.
+
+|  |  |
+|---|---|
+| Permission | `ROLE_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `identity.role_permission` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
+| Writes | `cache:idempotency`, `cache:resolution`, `identity.role_permission`, `platform.audit_record` |
+| Called by | BO-054 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| roleId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| inheritsFromRoleId | string (uuid) |  | (nullable) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| roleId | string (uuid) | yes |  |
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| inheritsFromRoleId | string (uuid) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Breaches a segregation rule. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: matrix
 
 What requires approval, and who grants it
@@ -644,7 +745,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | Conflict policy | serverWins |
 | Reads | `approvals.external_provider`, `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
 | Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
-| Called by | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, ADM-530, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
+| Called by | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, ADM-530, BO-086, BO-087, BO-1120, BO-1149, BO-639, BO-863 |
 
 **Parameters**
 
@@ -687,6 +788,16 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
+| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). (max length 64; nullable) |
+| rules[].minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
+| rules[].requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
+| rules[].rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
+| rules[].allowRequestChanges | boolean |  | (default False) |
+| rules[].allowDelegate | boolean |  | (default True) |
+| rules[].allowReassign | boolean |  | (default False) |
+| rules[].minPercentage | number |  | A percentage threshold (a discount or a margin impact) at or above which the rule applies, beside minAmount (CHG-FXC-005). (nullable) |
+| rules[].matchAttributes | object |  | The request attributes a rule matches on (CHG-FXC-005): keys module, product, department, customerType, risk, exceptionType, legalEntity, each an exact value the request's attributes must carry. (nullable) |
+| rules[].compositeMode | enum (single, sequential, parallel, anyOne, allMustApprove, conditional, multiLevel) |  | The approvalMode the composite screen sent, kept so it reads back what it saved; mode, levels and minimumApprovals are what the engine runs (CHG-FXC-005). (nullable) |
 | isActive | boolean |  |  |
 
 **Response**: `ApprovalMatrix`
@@ -724,6 +835,16 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
+| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). (max length 64; nullable) |
+| rules[].minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
+| rules[].requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
+| rules[].rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
+| rules[].allowRequestChanges | boolean |  | (default False) |
+| rules[].allowDelegate | boolean |  | (default True) |
+| rules[].allowReassign | boolean |  | (default False) |
+| rules[].minPercentage | number |  | A percentage threshold (a discount or a margin impact) at or above which the rule applies, beside minAmount (CHG-FXC-005). (nullable) |
+| rules[].matchAttributes | object |  | The request attributes a rule matches on (CHG-FXC-005): keys module, product, department, customerType, risk, exceptionType, legalEntity, each an exact value the request's attributes must carry. (nullable) |
+| rules[].compositeMode | enum (single, sequential, parallel, anyOne, allMustApprove, conditional, multiLevel) |  | The approvalMode the composite screen sent, kept so it reads back what it saved; mode, levels and minimumApprovals are what the engine runs (CHG-FXC-005). (nullable) |
 | isActive | boolean |  |  |
 
 **Responses**
@@ -1234,6 +1355,16 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | matchedRule.signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | matchedRule.externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
+| matchedRule.code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). (max length 64; nullable) |
+| matchedRule.minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
+| matchedRule.requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
+| matchedRule.rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
+| matchedRule.allowRequestChanges | boolean |  | (default False) |
+| matchedRule.allowDelegate | boolean |  | (default True) |
+| matchedRule.allowReassign | boolean |  | (default False) |
+| matchedRule.minPercentage | number |  | A percentage threshold (a discount or a margin impact) at or above which the rule applies, beside minAmount (CHG-FXC-005). (nullable) |
+| matchedRule.matchAttributes | object |  | The request attributes a rule matches on (CHG-FXC-005): keys module, product, department, customerType, risk, exceptionType, legalEntity, each an exact value the request's attributes must carry. (nullable) |
+| matchedRule.compositeMode | enum (single, sequential, parallel, anyOne, allMustApprove, conditional, multiLevel) |  | The approvalMode the composite screen sent, kept so it reads back what it saved; mode, levels and minimumApprovals are what the engine runs (CHG-FXC-005). (nullable) |
 | matrixVersion | integer |  | (nullable) |
 | approvers | array of object |  | Resolved, with delegations applied. |
 | approvers[].principalId | string (uuid) |  |  |
@@ -1249,6 +1380,118 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Whether approval is required, and who would grant it |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listApprovalRequests
+
+**`GET /approval-requests`**: Requests awaiting a decision, or already decided
+
+11.1.16. The approver's queue and the requester's history are the same list filtered differently, so they are one operation.
+Sorted by SLA proximity rather than age. **A request breaching in ten minutes matters more than one raised yesterday with a week to run**, and sorting by age buries it.
+
+|  |  |
+|---|---|
+| Permission | `APPROVAL_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `approvals.decision`, `approvals.request` |
+| Writes | - |
+| Called by | ADM-130, ADM-145, ADM-224, BO-084, BO-085, BO-1181, BO-364, BO-366, BO-367, BO-368, BO-369, BO-371, BO-374, BO-375, BO-393, BO-940, EMP-037, POS-020 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| assignedToMe | query |  | boolean |  |
+| raisedByMe | query |  | boolean |  |
+| status | query |  | ApprovalStatus: enum (draft, pending, escalated, returned, informationRequested, approved, rejected, withdrawn, …) |  |
+| kind | query |  | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) |  |
+| breachingWithinMinutes | query |  | integer | 11.1.15. |
+| sort | query |  | enum (slaProximity, aiPriority) | slaProximity (the default, as before) or aiPriority: highest aiAssessment.priorityScore first, requests with no assessment after them in SLA order (29 September, build pass, group G2; 11.1.74). |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ApprovalRequest | yes |  |
+| items[].id | string | yes |  |
+| items[].kind | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) | yes | 11.1.7 and 11.1.30–11.1.37. |
+| items[].rerouteOnNoApprover | boolean |  | BL-154. (default True) |
+| items[].outOfOfficeDelegateId | string (uuid) |  | (nullable) |
+| items[].allowEmailApproval | boolean |  | Approving from an email link with no second factor is the weakest path in the system, so it is off by default and available only below a configured value. (default False) |
+| items[].reopenedFrom | string (uuid) |  | Reopening a decided approval creates a new one that points back. (nullable) |
+| items[].status | ApprovalStatus: enum (draft, pending, escalated, returned, informationRequested, approved, rejected, withdrawn, …) | yes |  |
+| items[].subjectContract | string |  |  |
+| items[].subjectType | string |  |  |
+| items[].subjectId | string |  |  |
+| items[].scopePath | string |  |  |
+| items[].summary | string |  |  |
+| items[].amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].justification | string |  | (nullable) |
+| items[].requestedByPrincipalId | string (uuid) | yes |  |
+| items[].matrixVersion | integer |  |  |
+| items[].mode | ApprovalMode: enum (sequential, parallel, consensus, majority) |  | 11.1.43–11.1.46. |
+| items[].currentLevel | integer |  |  |
+| items[].totalLevels | integer |  |  |
+| items[].pendingApprovers | array of object |  |  |
+| items[].pendingApprovers[].principalId | string (uuid) |  |  |
+| items[].pendingApprovers[].displayName | string |  |  |
+| items[].pendingApprovers[].isDelegate | boolean |  |  |
+| items[].decisions | array of ApprovalDecision |  | Every decision at every level, in order. |
+| items[].decisions[].id | string (uuid) |  | Added 20 August. (read-only) |
+| items[].decisions[].level | integer | yes |  |
+| items[].decisions[].principalId | string (uuid) | yes |  |
+| items[].decisions[].displayName | string |  |  |
+| items[].decisions[].isDelegate | boolean |  |  |
+| items[].decisions[].delegatedFrom | string (uuid) |  | (nullable) |
+| items[].decisions[].decision | enum (approve, reject) | yes |  |
+| items[].decisions[].comment | string |  | (nullable) |
+| items[].decisions[].reason | string |  | (nullable) |
+| items[].decisions[].usedMfa | boolean |  |  |
+| items[].decisions[].signatureRef | string |  | (nullable) |
+| items[].decisions[].decidedAt | string (date-time) | yes |  |
+| items[].escalations | array of object |  | 11.1.48. |
+| items[].escalations[].at | string (date-time) |  |  |
+| items[].escalations[].reason | string |  |  |
+| items[].escalations[].fromLevel | integer |  |  |
+| items[].escalations[].toLevel | integer |  |  |
+| items[].escalations[].wasAutomatic | boolean |  |  |
+| items[].resubmittedFromId | string |  | (nullable) |
+| items[].reopenedFromId | string |  | (nullable) |
+| items[].slaDueAt | string (date-time) |  | (nullable) |
+| items[].slaBreached | boolean |  |  |
+| items[].expiresAt | string (date-time) |  | (nullable) |
+| items[].assignedToPrincipalId | string (uuid) |  | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). (read-only; nullable) |
+| items[].assignedToDepartmentId | string (uuid) |  | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). (read-only; nullable) |
+| items[].assignedAt | string (date-time) |  | (read-only; nullable) |
+| items[].requestedAt | string (date-time) | yes |  |
+| items[].completedAt | string (date-time) |  | (nullable) |
+| items[].aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
+| items[].aiAssessment.riskScore | integer |  | (min 0; max 100) |
+| items[].aiAssessment.riskBand | enum (low, medium, high, critical) |  |  |
+| items[].aiAssessment.priorityScore | integer |  | (min 0; max 100) |
+| items[].aiAssessment.escalationSuggestion | object |  | A suggestion a person may act on through escalateApprovalRequest, or the tenant's own SLA policy may; nothing escalates because of it. |
+| items[].aiAssessment.signals | array of object |  | The signals behind the scores, largest first, as ai.AiApprovalRequestScore.signals. (max items 10) |
+| items[].aiAssessment.scoreId | string (uuid) |  | The ai.approval_request_score row it was copied from; ai.getApprovalRequestScore gives the full context. |
+| items[].aiAssessment.decisionRecordId | string |  | The ai decision record, for the audit of what the AI said and why. |
+| items[].aiAssessment.assessedAt | string (date-time) |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Requests |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1558,7 +1801,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Read routing | replica |
 | Reads | `cache:resolution`, `platform.scope` |
 | Writes | `cache:resolution` |
-| Called by | ADM-006, ADM-412, BO-055, BO-064, BO-068, BO-145, CMS-016 |
+| Called by | ADM-006, ADM-412, ADM-421, BO-055, BO-064, BO-068, BO-145, CMS-016 |
 
 **Parameters**
 
@@ -2467,6 +2710,66 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | 400 |  | A tile references an unknown or unsellable variant |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### getOutlet
+
+**`GET /outlets/{outletId}`**: Read an outlet
+
+26 September, pull audit R259 and R150. **An outlet could be amended and not read.** `updateOutlet` edits one outlet and BO-063 opens one, and the only read was the whole list.
+
+|  |  |
+|---|---|
+| Permission | `SCOPE_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `platform.outlet` |
+| Writes | - |
+| Called by | POS-021 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| outletId | path | yes | string (uuid) |  |
+
+**Response**: `Outlet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | The outlet's name in English. (max length 200) |
+| nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
+| venueId | string (uuid) | yes |  |
+| kind | OutletKind: enum (shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile) | yes |  |
+| outletType | object |  | The service model (DI-319; DEC-196; CHG-CSP-005). (nullable) |
+| departmentId | string (uuid) |  | The department the outlet belongs to (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an OrgUnit of kind department, as Workstation.departmentId. (nullable) |
+| zone | string |  | (nullable) |
+| stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
+| costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
+| paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
+| producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
+| saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
+| openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
+| openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
+| openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].endsNextDay | boolean |  | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). (default False) |
+| isActive | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The outlet |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### listDevices
 
 **`GET /devices`**: List registered devices
@@ -2779,6 +3082,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reason | text | no |  |
 | is_active | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
+| delegation_type | text | no | The composite screen's delegationType (planned absence, temporary cover ...), for display and reporting; the engine treats every delegation alike (4 October 2026, CHG-FXC-005). |
+| max_percentage | numeric | no | A percentage cap beside maxAmount (the composite's authorityPercentage, CHG-FXC-005). |
+| required_role_id | uuid | no | A role the delegate must hold for the delegation to act (the composite's requiredRole); checked when the delegate decides, refused with 409 at creation where the delegate does not hold it (CHG-FXC-00… |
 
 ### `approvals.external_provider`
 
@@ -2870,7 +3176,30 @@ Every table this service owns that the slice reads or writes, with its columns a
 | subject_types | text[] | no | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | signature_methods | text[] | no | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | external_provider_id | uuid | no | 11.1.65 (29 September). |
+| code | text | no | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). |
+| minimum_approvals | integer | no | N in N-of-M (CHG-FXC-005). |
+| required_approver_role_id | uuid | no | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). |
+| rejection_behavior | text | no | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). |
+| allow_request_changes | boolean | no |  |
+| allow_delegate | boolean | no |  |
+| allow_reassign | boolean | no |  |
+| min_percentage | numeric | no | A percentage threshold (a discount or a margin impact) at or above which the rule applies, beside minAmount (CHG-FXC-005). |
+| match_attributes | jsonb | no | The request attributes a rule matches on (CHG-FXC-005): keys module, product, department, customerType, risk, exceptionType, legalEntity, each an exact value the request's attributes must carry. |
+| composite_mode | text | no | The approvalMode the composite screen sent, kept so it reads back what it saved; mode, levels and minimumApprovals are what the engine runs (CHG-FXC-005). |
 | matrix_id | uuid | yes | Points at approvals.matrix. |
+
+### `platform.audit_record`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| principal_id | uuid | no | Who acted. |
+| org_unit_id | uuid | no | The scope node the action happened in. |
+| workstation_id | uuid | no | The workstation it was done from, where there was one. |
+| action | text | yes | What was done, as the writing operation names it. |
+| subject_ref | text | no | The thing acted on — a profile, a shift, an order. |
+| occurred_at | timestamptz | yes | When. |
+| platform_staff_grant_id | uuid | no | Set when a TICVAI platform operator acted, naming the grant they acted under (identity.openPlatformStaffGrant; decided 28 September, audit R098). |
 
 ### `platform.device`
 
@@ -3164,22 +3493,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-181 operations, added to this service in later releases without changing any of the above.
+180 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| accreditation | `cloneAccreditationProgramme`, `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `deliverAccreditationCredential`, `exportAccreditationData`, `getAccreditationApplication`, `getAccreditationExport`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `issueMyAccreditationWalletPass`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationDocuments`, `listAccreditationExports`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `listMyAccreditationApplications`, `listMyAccreditationCredentials`, `previewAccessImpact`, `renewAccreditation`, `replaceAccreditationCredential`, `resolveIdentityConflict`, `resubmitAccreditationApplication`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationApplication`, `submitAccreditationDocument`, `updateAccreditationApplication`, `updateAccreditationHolder`, `updateAccreditationProgramme`, `verifyAccreditationCredential`, `verifyAccreditationDocument`, `withdrawAccreditationApplication` |
+| accreditation | `cloneAccreditationProgramme`, `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `deliverAccreditationCredential`, `exportAccreditationData`, `getAccreditationApplication`, `getAccreditationExport`, `getAccreditationHolder`, `getAccreditationValidity`, `importAccreditationHolders`, `issueAccreditationCredential`, `issueMyAccreditationWalletPass`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationDocuments`, `listAccreditationExports`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `listMyAccreditationApplications`, `listMyAccreditationCredentials`, `previewAccessImpact`, `renewAccreditation`, `replaceAccreditationCredential`, `resolveIdentityConflict`, `resubmitAccreditationApplication`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationApplication`, `submitAccreditationDocument`, `updateAccreditationApplication`, `updateAccreditationHolder`, `updateAccreditationProgramme`, `verifyAccreditationCredential`, `verifyAccreditationDocument`, `withdrawAccreditationApplication` |
 | analytics | `getApprovalAnalytics` |
 | announcements | `acknowledgeAnnouncement`, `getAnnouncementReach`, `listAnnouncements`, `listStaffConversations`, `listStaffMessages`, `markStaffConversationRead`, `publishAnnouncement`, `sendStaffMessage` |
 | approvals | `actOnWorkflowInstance`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listAutomationExecutions`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
 | attendance | `amendAttendance`, `listAttendance` |
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
 | devices | `approveDevice`, `createDeviceFirmware`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceFirmwareStatus`, `startDeviceFirmwareRollout` |
-| identity | `setRolePermissions` |
 | matrix | `listApprovalExternalProviders`, `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
-| request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `listApprovalExternalDispatches`, `listApprovalRequests`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
+| request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `getApprovalRequest`, `listApprovalExternalDispatches`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
 | tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
-| workstation | `getDevice`, `getOutlet`, `getWorkstation`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |
+| workstation | `getDevice`, `getWorkstation`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

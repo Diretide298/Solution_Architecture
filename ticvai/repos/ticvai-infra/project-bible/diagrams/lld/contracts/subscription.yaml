@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 150 operations
+title: subscription — 152 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -348,6 +348,7 @@ operations:
   - cache:idempotency
   - subscription.plan
   - subscription.plan_limit
+  - subscription.plan_module
 - operation: createPlanVersion
   verb: POST
   path: /plans/{planId}
@@ -366,6 +367,7 @@ operations:
   - cache:idempotency
   - subscription.plan
   - subscription.plan_limit
+  - subscription.plan_module
 - operation: createTenant
   verb: POST
   path: /tenants
@@ -605,6 +607,25 @@ operations:
   - subscription.plan_limit
   - subscription.tier_allowance
   writes: []
+- operation: getMembershipProductValidation
+  verb: GET
+  path: /membership-product-validation
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.request
+  - catalogue.product
+  - subscription.membership_eligibility_rule
+  - subscription.membership_entitlement
+  - subscription.membership_household_policy
+  - subscription.membership_product
+  - subscription.membership_product_history
+  - subscription.membership_renewal_policy
+  - subscription.membership_usage_policy
+  writes: []
 - operation: getPlan
   verb: GET
   path: /plans/{planId}
@@ -780,6 +801,20 @@ operations:
   offline: false
   reads:
   - control.cell_job
+  writes: []
+- operation: listCells
+  verb: GET
+  path: /cells
+  scope: platform
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.cell
+  - control.cell_instance
+  - control.cell_job
+  - control.cell_tenant
   writes: []
 - operation: listChannelListings
   verb: GET
@@ -1460,6 +1495,7 @@ operations:
   offline: false
   reads:
   - control.cell
+  - control.cell_tenant
   writes: []
 - operation: listTenantMigrations
   verb: GET

@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 220,
+  "operations": 222,
   "contracts": 21,
   "modules": 4,
   "undrawn": 0,
@@ -59,26 +59,26 @@
  "contracts": [
   {
    "contract": "fnb",
-   "operations": 38
+   "operations": 39
   },
   {
    "contract": "maintenance",
    "operations": 27
   },
   {
+   "contract": "inventory",
+   "operations": 23
+  },
+  {
    "contract": "orders",
    "operations": 22
   },
   {
-   "contract": "inventory",
-   "operations": 22
-  },
-  {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 14
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 14
   },
   {
@@ -98,11 +98,11 @@
    "operations": 8
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 7
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 7
   },
   {
@@ -118,27 +118,27 @@
    "operations": 5
   },
   {
-   "contract": "venue-map",
-   "operations": 2
-  },
-  {
    "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "payments",
-   "operations": 1
+   "contract": "venue-map",
+   "operations": 2
   },
   {
    "contract": "accreditation",
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "approvals",
    "operations": 1
   },
   {
-   "contract": "approvals",
+   "contract": "payments",
+   "operations": 1
+  },
+  {
+   "contract": "assets",
    "operations": 1
   }
  ],
@@ -698,7 +698,7 @@
    "module": "Stock on the Floor",
    "wave": 2,
    "route": "/operations/stock-count-cycle-count-management",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -707,7 +707,7 @@
    "module": "Stock on the Floor",
    "wave": 1,
    "route": "/operations/damage-loss-shrinkage-stock-adjustment",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -1221,6 +1221,12 @@
     "summary": "Seat-level dynamic pricing rules"
    },
    {
+    "operation": "listTaxProfiles",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The tax profiles"
+   },
+   {
     "operation": "relinquishInventoryHold",
     "contract": "catalogue",
     "verb": "DELETE",
@@ -1359,12 +1365,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
-   },
-   {
     "operation": "listSegregationRules",
     "contract": "identity",
     "verb": "GET",
@@ -1417,6 +1417,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -1789,12 +1795,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
    },
    {
     "operation": "listCellEndpoints",

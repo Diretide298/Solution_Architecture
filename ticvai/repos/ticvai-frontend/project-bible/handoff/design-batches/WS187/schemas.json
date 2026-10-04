@@ -482,5 +482,140 @@
    "expiry",
    "transfer"
   ]
+ },
+ "WalletType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.wallet_type",
+  "description": "Board 1.2. **Who owns a wallet** — the first of the two vocabularies.",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "autoReloadAllowed": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Auto-reload is optional per wallet type** (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). Where false, a holder of this type cannot set an auto top-up (`setWalletAutoReloadSetting` refuses it) whatever the venue's `WalletFundingRules.autoReload` says."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "ownerKind": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "registeredCustomer",
+     "family",
+     "parent",
+     "child",
+     "corporate",
+     "school",
+     "employee"
+    ]
+   },
+   "storedValueCapability": {
+    "type": "boolean",
+    "default": true,
+    "description": "Board 1.2. Whether this wallet holds a balance at all. A pure entitlement wallet — passes and vouchers, no money — does not.\n"
+   },
+   "topUpCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "transferCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "refundCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "giftCardSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "voucherSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "membershipCreditSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "wearableSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "usageChannels": {
+    "type": "array",
+    "description": "**Where this wallet may be used, declared on the type itself.** Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and this is what lets one `topUpWallet` serve every caller: the operation is shared and the type says which channel may reach it. `WalletChannelRules` still governs the per-credential detail — PIN thresholds, offline floor limits — and this governs whether the channel is open at all.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "pos",
+      "mobileApp",
+      "api",
+      "kiosk",
+      "reader"
+     ]
+    }
+   },
+   "presetName": {
+    "type": "string",
+    "description": "**The client's own name for this composition** — \"Resort Wallet\", \"Cashless Venue Wallet\", \"Closed-Loop Wallet\". Board 1.2 lists thirteen such names as examples, not as kinds: they are combinations of `ownerKind`, `allowedCreditTypeIds` and `scopePath`. Naming the preset keeps the client's vocabulary without hard-coding it into an enum.\n"
+   },
+   "holderMayDifferFromOwner": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A child wallet's owner is the parent.** Without this the model has to pretend a seven-year-old holds an account.\n"
+   },
+   "requiresIdentification": {
+    "type": "boolean",
+    "default": false
+   },
+   "maximumBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "allowedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowNegativeBalance": {
+    "type": "boolean",
+    "default": false
+   },
+   "sharedStructureAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "lifecycleStates": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "numberingPattern": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
  }
 }

@@ -134,6 +134,7 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_usage
   writes: []
 - operation: getMediaAsset
   verb: GET
@@ -343,8 +344,10 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_collection
   - assets.media_usage
   - cache:idempotency
   writes:
   - assets.media_asset
+  - assets.media_collection_member
   - cache:idempotency

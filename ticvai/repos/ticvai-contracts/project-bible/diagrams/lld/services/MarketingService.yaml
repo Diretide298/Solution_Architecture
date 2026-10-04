@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 275 operations, 132 tables
+title: MarketingService — 277 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**275 operations and 132 tables — the biggest thing in the package, and probably two services
+why: '**277 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,7 +13,7 @@ why: '**275 operations and 132 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 275
+  operations: 277
   inAFlow: 102
   percent: 37%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -26,7 +26,7 @@ schemas:
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 275
+  count: 277
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -1250,7 +1250,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listSegments
     verb: GET
@@ -1458,8 +1458,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
-    writes: 1
+    reads: 5
+    writes: 0
   - operation: raiseMyCase
     verb: POST
     path: /my/cases
@@ -1571,7 +1571,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: respondToInvitation
     verb: POST
     path: /invitations/{token}/respond
@@ -2146,8 +2146,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: testSendCampaign
     verb: POST
     path: /campaigns/{campaignId}/test-send
@@ -2179,7 +2179,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 4
-    writes: 4
+    writes: 5
   - operation: updateCase
     verb: PATCH
     path: /cases/{caseId}
@@ -2211,6 +2211,22 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 3
+    writes: 3
+  - operation: updateLoyaltyProgramme
+    verb: PATCH
+    path: /loyalty/programmes/{programmeId}
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: updateMessageTemplate
+    verb: PATCH
+    path: /message-templates/{templateId}
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
     writes: 3
   - operation: updateMyProfile
     verb: PATCH
@@ -2316,6 +2332,8 @@ tables:
   - updateCase
   - updateGuestPreferences
   - updateGuestProfile
+  - updateLoyaltyProgramme
+  - updateMessageTemplate
   - updateMyProfile
   - uploadGuestDocument
   readBy:
@@ -2393,8 +2411,35 @@ tables:
   - updateCase
   - updateGuestPreferences
   - updateGuestProfile
+  - updateLoyaltyProgramme
+  - updateMessageTemplate
   - updateMyProfile
   - uploadGuestDocument
+  keys:
+    createUrlRedirect:
+      role: evicts
+      resolvers: &id001
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setConsentPurposes:
+      role: evicts
+      resolvers: &id002
+      - marketing.consent_purpose
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setSeoMetadata:
+      role: evicts
+      resolvers: &id003
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -2412,10 +2457,35 @@ tables:
   - setSeoMetadata
   readBy:
   - listConsentPurposes
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    createUrlRedirect:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    listConsentPurposes:
+      role: fills
+      resolvers:
+      - marketing.consent_purpose
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    setConsentPurposes:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setSeoMetadata:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: marketing.agent_availability
   columns: 7
   store: postgres

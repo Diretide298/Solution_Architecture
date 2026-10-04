@@ -3215,27 +3215,21 @@ paths:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.42; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums assigneeType; added batchId, partner)'
       summary: Code Distribution & Assignment Manager
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 42. The screen says: Manage how promotional codes are allocated
-        and distributed.
+      description: |-
+        **Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 42. The screen says: Manage how promotional codes are allocated and distributed.
 
+        **Every property carries the sentence it came from.** 26 were read from the screen's own bulleted directory and 4 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
 
-        **Every property carries the sentence it came from.** 26 were read from the screen''s own bulleted
-        directory and 4 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 6 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields; 11 one-value-per-field properties folded into enums (assigneeType); added batchId, partner; renamed viewedWhereAvailable to viewed.
 
+        Outbound sending runs through the CRM/marketing communication services, not a second messaging engine here.
 
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 6 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields; 11 one-value-per-field
-        properties folded into enums (assigneeType); added batchId, partner; renamed
-        viewedWhereAvailable to viewed.
-
-
-        Outbound sending runs through the CRM/marketing communication services, not a second
-        messaging engine here.'
+        **Where it is stored** (4 October 2026, CHG-FXC-005). The input becomes one `promotions.code_assignment` row
+        (CouponCodeAssignment: channelsType, assigneeType, assigneeReference, batchId, quantity); `quantity` codes of the batch
+        that are `issued` and unassigned move to `assigned` with `assignmentId` set and `distributionStatus` `pending` (409
+        when the batch has fewer left). The view counts the batch's codes: `generated` all of them, `assigned` those with an
+        assignment, `sent`, `delivered`, `viewed` and `cancelled` by `distributionStatus`, `redeemed` and `expired` by
+        `status`.
       tags:
         - drafted
       x-ticvai-permission: PRICE_CONFIGURE
@@ -9995,6 +9989,71 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+        assignmentId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005).
+        distributionStatus:
+          type: string
+          nullable: true
+          readOnly: true
+          enum:
+          - pending
+          - sent
+          - delivered
+          - viewed
+          - cancelled
+          description: '**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned,
+            `sent` when the channel accepted it, `delivered` on the channel''s delivery receipt, `viewed` when the holder
+            opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from
+            `status`, which is the code''s redemption life (issued, assigned, redeemed, expired, voided).'
+    CouponCodeAssignment:
+      x-ticvai-persistence: promotions.code_assignment
+      type: object
+      description: '**Who a batch of codes was given to, and through which channel** (`setCodeDistributionManager`,
+        4 October 2026, CHG-FXC-005: the drafted input had no table). One row per assignment; the codes it assigned carry
+        its id (`CouponCode.assignmentId`) and their distribution state.'
+      required:
+      - channelsType
+      - assigneeType
+      - batchId
+      - quantity
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        batchId:
+          type: string
+          format: uuid
+        channelsType:
+          type: string
+          description: As `CodeDistributionAssignmentManagerInput.channelsType`.
+        assigneeType:
+          type: string
+          description: As `CodeDistributionAssignmentManagerInput.assigneeType` (a customer segment, a B2B company, a
+            reseller, a marketing campaign ...).
+        assigneeReference:
+          type: string
+          nullable: true
+          description: The assignee's id in its own context (a segment id, a company id, a campaign id); not a
+            `pii.subject`, which is why `CouponCode.assignedSubjectId` cannot hold it.
+        quantity:
+          type: integer
+          minimum: 1
+        assignedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        assignedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
     CreateVoucherBatchRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -12436,8 +12495,7 @@ components:
     CodeDistributionAssignmentManagerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; stored as one promotions.code_assignment row (CouponCodeAssignment) and the coupon codes it assigns (CHG-FXC-005)'
       description: '**What Code Distribution & Assignment Manager submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'

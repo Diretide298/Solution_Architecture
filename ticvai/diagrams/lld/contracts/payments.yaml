@@ -389,9 +389,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.payment
   - payments.dunning_case
+  - payments.dunning_policy
   writes:
   - cache:idempotency
+  - orders.payment
   - payments.dunning_case
 - operation: setB2bPaymentTerms
   verb: PUT

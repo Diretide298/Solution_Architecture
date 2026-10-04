@@ -88,6 +88,7 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
+        - "P08 BO-048 Retail Products"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
@@ -1597,7 +1598,6 @@ paths:
         - "P02 GST-051 Plan"
         - "P02 GST-052 Suggested Itineraries"
         - "P02 GST-053 Your Plan"
-        - "P02 GST-058 Resource Availability (Cabana)"
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
@@ -1609,8 +1609,10 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-048 Retail Products"
         - "P08 BO-094 Map Editor & Publish"
         - "P08 BO-125 Product & Category Button Configuration"
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
@@ -2402,6 +2404,7 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
+        - "P08 BO-048 Retail Products"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -3971,7 +3974,6 @@ paths:
         - "P02 GST-004 Item Detail"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-050 Resource Booking – Cabana"
-        - "P02 GST-058 Resource Availability (Cabana)"
         - "P04 POS-003 Sell — Timed Entry"
         - "P05 KSK-004 Choose tickets"
         - "P05 KSK-005 Choose a performance"
@@ -4803,20 +4805,16 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Cancel a performance
-      description: 'Stops sales, notifies every holder, and queues a bulk refund for approval. The refund
-        is **not** issued automatically — a cancellation of any size is a financial event someone signs
-        off.
-
+      description: |-
+        Stops sales, notifies every holder, and queues a bulk refund for approval. The refund is **not** issued automatically — a cancellation of any size is a financial event someone signs off.
         Returns the exposure before committing so the person cancelling sees what it costs.
+        **A supervisor's step-up on the same device, not an approval request**, as for a shift reopen (proposed by the coordinator, client to confirm (audit R144): the decision did not name this act). A real run carries `supervisorStepUp`; the rule is `SupervisorStepUp` in `common.yaml`: the PIN is checked against the principal, who must hold `PERFORMANCE_CONFIGURE` at this venue, and a failure is a `403` with nothing written. A dry run needs none. The bulk refund it queues still goes for approval as a refund.
 
-        **A supervisor''s step-up on the same device, not an approval request**, as for a shift reopen
-        (proposed by the coordinator, client to confirm (audit R144): the decision did not name this
-        act). A real run carries `supervisorStepUp`; the rule is `SupervisorStepUp` in `common.yaml`:
-        the PIN is checked against the principal, who must hold `PERFORMANCE_CONFIGURE` at this venue,
-        and a failure is a `403` with nothing written. A dry run needs none. The bulk refund it queues
-        still goes for approval as a refund.
-
-        '
+        **Where the impact figures come from** (4 October 2026, CHG-FXC-004). `affectedOrders`, `affectedGuests` and
+        `refundExposure` are counted from the performance's live entitlements (`access.entitlement` by `performance_id`,
+        status not cancelled or used: distinct `order_id`, distinct `subject_id`, the sum of their order lines' paid amounts);
+        `notificationsQueued` is the number of `performance.cancelled` notifications written to the outbox. Refunds themselves
+        run in OrderService from the `performance.cancelled` event.
       tags:
       - event
       x-ticvai-permission: PERFORMANCE_CONFIGURE
@@ -9880,6 +9878,15 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: taxProfileId
+        in: query
+        required: false
+        description: '**The profile to open** (4 October 2026, CHG-FXC-010; ADM-069), from `listTaxProfiles`. Absent: the
+          profile in force at the caller''s venue; 404 when there is none.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: The tax profile and jurisdiction configuration as saved
@@ -9902,18 +9909,14 @@ paths:
         MoM 1 Sep 2026 §4.5 (tax profiles; region-configurable tax on the pre-discount price; tax exemption
         flags)'
       summary: Tax Profile & Jurisdiction Configuration
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue
-        Management, page 40. The screen says: Define reusable tax profiles according to legal entity, country,
-        jurisdiction and commercial context.
+      description: |-
+        **Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 40. The screen says: Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.
 
+        **Agreed (decided 29 September, readiness close-out).** the eight tax types became the taxType enum and the applicability levels one applicability array instead of a field each; the UAE example removed and its rate kept as the rate property (renamed ratePercent); jurisdiction level, profile id and the region-configurable tax base added; dates and codes typed. Changing a rate means a new future-dated version; historical transactions keep the version they were calculated with. The Dependencies panel (profile consumed by N products across M venues) is a read on ADM-069. Rates, bases and registrations are data the client enters.
 
-        **Agreed (decided 29 September, readiness close-out).** the eight tax types became the taxType enum
-        and the applicability levels one applicability array instead of a field each; the UAE example removed
-        and its rate kept as the rate property (renamed ratePercent); jurisdiction level, profile id and the
-        region-configurable tax base added; dates and codes typed. Changing a rate means a new future-dated
-        version; historical transactions keep the version they were calculated with. The Dependencies panel
-        (profile consumed by N products across M venues) is a read on ADM-069. Rates, bases and registrations
-        are data the client enters.'
+        **One profile per call, many per tenant** (4 October 2026, CHG-FXC-010; ADM-069). An empty `taxProfileId` creates a
+        `catalogue.tax_profile` row; a `taxProfileId` updates that row (a rate change is a new future-dated version, as
+        above). `listTaxProfiles` lists them; the legal entity comes from `finance.listLegalEntities`.
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -17428,6 +17431,55 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /tax-profiles:
+    get:
+      operationId: listTaxProfiles
+      summary: The tax profiles
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; ADM-069): the screen manages many reusable tax profiles and the contract had one
+        record per venue with no list.** Every `catalogue.tax_profile` at or above the caller's scope, in the shape
+        `getTaxProfileJurisdiction` returns, ordered by `taxProfileCode`. A profile is opened with
+        `getTaxProfileJurisdiction?taxProfileId=` and saved with `setTaxProfileJurisdiction`, which creates a profile when the
+        body's `taxProfileId` is empty and updates that profile otherwise.
+      tags:
+      - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: legalEntityId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The profiles
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TaxProfileJurisdictionConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     EventResourceCostEstimate:
@@ -20614,6 +20666,13 @@ components:
           type: string
           maxLength: 100
           nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a
+            product page finds its event and the event''s performances (`Performance.eventId`) give it dates. Null for a product
+            not tied to an event (merchandise, a pass, a membership).'
     CreateProductRequest:
       type: object
       required:
@@ -21295,6 +21354,25 @@ components:
           description: How many performances the event has. Counted by the server; never sent by a client.
         isActive:
           type: boolean
+        lifecycleState:
+          type: string
+          readOnly: true
+          enum:
+          - draft
+          - planned
+          - onSale
+          - live
+          - closed
+          - cancelled
+          - archived
+          description: '**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to
+            keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent`
+            create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state.'
+        lifecycleStateChangedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
     CreateEventRequest:
       type: object
       required:

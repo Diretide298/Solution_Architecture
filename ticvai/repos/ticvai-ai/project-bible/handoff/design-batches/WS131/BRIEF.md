@@ -130,15 +130,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-716` | Event Lifecycle & Change Command Center | A | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-717` | Lifecycle Transition Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-716` | Event Lifecycle & Change Command Center | A | 6 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-717` | Lifecycle Transition Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-718` | Event Change Request Configuration | B | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-716, BO-717, BO-718, BO-719, BO-720 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-717, BO-718, BO-719, BO-720 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

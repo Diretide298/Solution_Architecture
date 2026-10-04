@@ -280,6 +280,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listCells": {
+  "method": "GET",
+  "path": "/cells",
+  "contract": "subscription",
+  "summary": "The cells, with their health",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "region",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOwnPlatformStaffGrants": {
   "method": "GET",
   "path": "/platform-staff-grants/mine",

@@ -33,11 +33,16 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.delegated_access
   - identity.mfa_method
   - identity.principal
+  - identity.role
+  - identity.sso_group_mapping
   - identity.sso_provider
   writes:
   - cache:idempotency
+  - identity.delegated_access
+  - identity.principal
   - identity.session
   - platform.outbox
 - operation: createAccessReviewCampaign
@@ -144,11 +149,15 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.capability_template
   - identity.role
+  - identity.role_permission
+  - identity.segregation_rule
   writes:
   - cache:idempotency
   - cache:resolution
   - identity.role
+  - identity.role_permission
 - operation: decideAccessReviewItem
   verb: POST
   path: /access-review-items/{itemId}/decision
@@ -279,6 +288,7 @@ operations:
   - pii.subject
   writes:
   - cache:idempotency
+  - platform.dsar_request
 - operation: forceLogout
   verb: POST
   path: /auth/sessions/{sessionId}/force-logout
@@ -290,7 +300,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.delegated_access
+  - identity.principal
+  - identity.principal_credential
   - identity.session
+  - platform.workstation
   writes:
   - cache:idempotency
   - identity.session
@@ -465,8 +479,13 @@ operations:
   - anonymous
   offline: false
   reads:
+  - identity.guest_credential
   - identity.mfa_method
+  - identity.password_policy
+  - pii.subject_contact
   writes:
+  - identity.guest_credential
+  - identity.guest_session
   - platform.outbox
 - operation: guestSocialLogin
   verb: POST
@@ -798,6 +817,7 @@ operations:
   offline: true
   reads:
   - identity.role
+  - identity.role_permission
   writes: []
 - operation: listSegregationRules
   verb: GET
@@ -929,6 +949,7 @@ operations:
   - pii.subject
   writes:
   - cache:idempotency
+  - identity.guest_credential
   - identity.guest_session
   - pii.subject
   - pii.subject_contact

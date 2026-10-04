@@ -532,6 +532,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listLoyaltyProgrammes": {
+  "method": "GET",
+  "path": "/loyalty/programmes",
+  "contract": "marketing-crm",
+  "summary": "List loyalty programmes",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMyEntitlements": {
   "method": "GET",
   "path": "/guests/me/entitlements",

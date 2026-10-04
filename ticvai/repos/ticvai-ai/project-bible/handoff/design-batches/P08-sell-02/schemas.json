@@ -200,6 +200,7 @@
    },
    "undeclared": {
     "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
     "description": "**Present in the dish and absent from the label.** The dangerous direction, and the response leads with it.\n",
     "items": {
      "type": "object",
@@ -1000,6 +1001,26 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "lifecycleState": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "planned",
+     "onSale",
+     "live",
+     "closed",
+     "cancelled",
+     "archived"
+    ],
+    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
+   },
+   "lifecycleStateChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true
    }
   }
  },
@@ -1052,6 +1073,12 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "recipeId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**The recipe this substitute belongs to** (4 October 2026, CHG-FXC-003): the `{recipeId}` of `listIngredientSubstitutes` and `setIngredientSubstitutes`, stored on every row so the list filters by it and the set replaces exactly that recipe's rows. Taken from the path, never from the body."
    }
   }
  },
@@ -2234,6 +2261,12 @@
     ],
     "readOnly": true,
     "description": "**Computed, never entered** (decided 28 September, audit R125 (9)): the sum of each ingredient quantity at its current inventory cost, divided by `yield`. Recomputed when the recipe or an ingredient cost changes.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**The recipe's own id** (4 October 2026, CHG-FXC-003; the Sprint 1-2 judging found no operation returned one, so `listIngredientSubstitutes`, `setIngredientSubstitutes` and `SubstitutionRule.recipeId` had nothing to send). One recipe per menu item: `setRecipe` upserts on `menuItemId` and returns the id it kept."
    }
   }
  },

@@ -160,8 +160,8 @@ def main():
     # ------------------------------------------------------------------ 2
     doc.add_heading("2. Why it is cut this way", level=1)
     para(doc, "The PM call of 1 October asked for three things, and the plan is built around them:")
-    bullet(doc, " Sprints run two weeks, Monday to Friday of the following week, with UAE public holidays taken out "
-                "(Eid dates to be confirmed).", "Two-week sprints.")
+    bullet(doc, " Sprints run two weeks, Monday to Friday of the following week; every weekday is a working day (no "
+                "holidays; leave is handled when it comes up).", "Two-week sprints.")
     bullet(doc, " The old plan finished whole services and then whole apps, so nothing could be tested end to end until "
                 "late. Now a business module is split by the app it lands in, so Ticketing on the guest web is finished, "
                 "with its back end, before Ticketing on the POS. A large one is cut into parts that finish in one to "
@@ -212,8 +212,9 @@ def main():
            for s in sprints], widths=[1.3, 4.2, 2.8, 2.2, 2.2, 3.5])
     para(doc, "Capacity and planned hours are at normal hours; the block test dates are the decided ones (Block A in "
               f"Sprint {a['targetSprint']}, Block D in Sprint {blocks['D']['targetSprint']}"
-              + (", with overtime" if not bd.get("onTarget") else "") + "). Holidays: " + "; ".join(
-        f"{d(k)} {v}" for k, v in plan["calendar"]["holidays"].items()) + ". The task-by-task sprint plan is in "
+              + (", with overtime" if not bd.get("onTarget") else "") + "). Holidays: " + ("; ".join(
+        f"{d(k)} {v}" for k, v in plan["calendar"]["holidays"].items()) or "none, every weekday is a working day")
+              + ". The task-by-task sprint plan is in "
          "\"TICVAI - Sprint Plan.xlsx\" (Sprints, Tasks by sprint, Blocks, People, App-modules, Flows).")
 
     # ------------------------------------------------------------------ 5

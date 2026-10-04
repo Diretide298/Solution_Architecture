@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 93 operations
+title: white-label — 95 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -330,6 +330,7 @@ operations:
   - staff
   offline: false
   reads:
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   writes: []
 - operation: getModuleEnablement
@@ -358,6 +359,7 @@ operations:
   offline: false
   reads:
   - cache:resolution
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
   writes:
   - cache:resolution
@@ -424,7 +426,9 @@ operations:
   - whitelabel.footer_config
   - whitelabel.footer_config_column
   - whitelabel.footer_config_social_link
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
   writes: []
 - operation: getSitePackage
@@ -505,8 +509,10 @@ operations:
   - whitelabel.footer_config
   - whitelabel.footer_config_column
   - whitelabel.footer_config_social_link
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   - whitelabel.module_enablement
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
   - whitelabel.tenant_config
   writes: []
@@ -590,6 +596,17 @@ operations:
   reads:
   - whitelabel.config_version
   writes: []
+- operation: listContentBlocks
+  verb: GET
+  path: /content-blocks
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.content_block
+  writes: []
 - operation: listContentPages
   verb: GET
   path: /tenant-config/pages
@@ -648,6 +665,7 @@ operations:
   - staff
   offline: false
   reads:
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   writes: []
 - operation: listPolicies
@@ -842,8 +860,10 @@ operations:
   - whitelabel.footer_config
   - whitelabel.footer_config_column
   - whitelabel.footer_config_social_link
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   - whitelabel.module_enablement
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
   - whitelabel.tenant_config
   writes:
@@ -999,9 +1019,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   writes:
   - cache:idempotency
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
 - operation: setLanguages
   verb: PUT
@@ -1059,10 +1081,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
   writes:
   - cache:idempotency
   - cache:resolution
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
 - operation: setPolicy
   verb: PUT
@@ -1187,6 +1211,18 @@ operations:
   - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
+- operation: updateContentBlock
+  verb: PATCH
+  path: /content-blocks/{blockId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.content_block
+  writes:
+  - control.content_block
 - operation: updateContentPage
   verb: PUT
   path: /tenant-config/pages/{pageId}

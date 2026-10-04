@@ -44,7 +44,7 @@
        ],
        "kind": "multiSelect",
        "label": "Filter by",
-       "notes": "The pack filters this screen by location, product, start time, booking type, group/individual, readiness and 1 more — which are present is a decision the pack already made.",
+       "notes": "Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type, group/individual, readiness and 1 more — which are present is a decision the pack already made.",
        "provenance": "pack Rental_Management.pdf, page 64 §Filters"
       }
      ],
@@ -691,7 +691,7 @@
        "impliedBy": "lookupAsset",
        "kind": "searchField",
        "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run."
+       "notes": "Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run."
       },
       {
        "derived": true,

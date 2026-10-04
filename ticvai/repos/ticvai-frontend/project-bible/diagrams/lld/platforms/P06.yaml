@@ -46,14 +46,14 @@ modulesUsed:
 servicesCalled:
 - service: VenueOpsService
   operationCalls: 104
-- service: OrderService
-  operationCalls: 43
 - service: FnbService
+  operationCalls: 44
+- service: OrderService
   operationCalls: 43
 - service: TenancyService
   operationCalls: 30
 - service: InventoryService
-  operationCalls: 27
+  operationCalls: 28
 - service: AccessService
   operationCalls: 20
 - service: MarketingService
@@ -1955,6 +1955,7 @@ screens:
   density: comfortable
   operations:
   - enterCountLine
+  - listStockCountLines
   - listStockCounts
   - setDailyCount
   - startStockCount
@@ -1983,6 +1984,7 @@ screens:
   operations:
   - createStockMovement
   - getHaccpStatus
+  - listCorrectiveActions
   - logTemperature
   - recordWaste
   - signCorrectiveAction

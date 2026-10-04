@@ -772,53 +772,85 @@
        "provenance": "contract resources.yaml GET /resources/{resourceId}"
       },
       {
+       "kind": "textField",
+       "label": "Code",
+       "bindsTo": "Resource.code",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.code (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "Resource.name",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.name (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "bindsTo": "Resource.kind",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.kind (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Part of",
+       "bindsTo": "Resource.parentResourceId",
+       "operation": "listResources",
+       "notes": "Options from listResources; empty for a top-level resource.",
+       "provenance": "contract resources.yaml Resource.parentResourceId (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Setup (minutes)",
+       "bindsTo": "Resource.setupMinutes",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.setupMinutes (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Teardown (minutes)",
+       "bindsTo": "Resource.teardownMinutes",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.teardownMinutes (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Deposit",
+       "bindsTo": "Resource.depositAmount",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.depositAmount (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Requires qualification",
+       "bindsTo": "Resource.requiresQualification",
+       "operation": "createResource",
+       "provenance": "contract resources.yaml Resource.requiresQualification (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
        "kind": "numberField",
        "label": "Capacity",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
-       "notes": "A number with its unit (people or units); the pack drew a drop-down."
-      },
-      {
-       "kind": "selectField",
-       "label": "Unit of measure",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Customer selectable",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Priority",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Availability mode",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Scheduling mode",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+       "bindsTo": "Resource.attributes",
+       "operation": "createResource",
+       "notes": "attributes.capacity, with attributes.unitOfMeasure beside it.",
+       "provenance": "contract resources.yaml Resource.attributes (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "numberField",
-       "label": "Default duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
-       "notes": "A number with its unit (minutes); the pack drew a drop-down."
+       "label": "Default duration (minutes)",
+       "bindsTo": "Resource.attributes",
+       "operation": "createResource",
+       "notes": "attributes.defaultDurationMinutes; min and max booking duration are attributes.minBookingMinutes and attributes.maxBookingMinutes.",
+       "provenance": "contract resources.yaml Resource.attributes (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "numberField",
-       "label": "Minimum booking duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
-       "notes": "A number with its unit (minutes); the pack drew a drop-down."
-      },
-      {
-       "kind": "numberField",
-       "label": "Maximum booking duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
-       "notes": "A number with its unit (minutes); the pack drew a drop-down."
+       "kind": "toggle",
+       "label": "Guests can pick it",
+       "bindsTo": "Resource.attributes",
+       "operation": "createResource",
+       "notes": "attributes.customerSelectable.",
+       "provenance": "contract resources.yaml Resource.attributes (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -878,6 +910,25 @@
        "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create resource",
+       "operation": "createResource",
+       "notes": "id is a client UUIDv7; venueId from the session.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save resource",
+       "operation": "updateResource",
+       "notes": "Sends the whole Resource read by getResource with the edits (PUT).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
+      }
+     ]
     }
    ]
   },
@@ -885,7 +936,7 @@
    "loading": "The resource creation profile configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the resource creation profile untouched.",
    "emptyFirstRun": "No resource creation profile configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `RESOURCE_VIEW`, which `getResource` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_MANAGE` for `createResource`, `updateResource`, `setResourceLifecycleState`, `cloneResource`.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
@@ -899,8 +950,8 @@
    {
     "operationId": "getResource",
     "contract": "resources",
-    "purpose": "The resource being edited",
-    "trigger": "onAction",
+    "purpose": "The resource being edited (when opened with resourceId); a PUT sends it back whole",
+    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
@@ -952,6 +1003,13 @@
     "invalidates": [
      "listResources"
     ]
+   },
+   {
+    "operationId": "listResources",
+    "contract": "resources",
+    "purpose": "The resources this one can be part of (parentResourceId)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
    }
   ],
   "wireframe": {
@@ -964,10 +1022,13 @@
    "params": [
     {
      "name": "resourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the form creates a new resource."
     }
    ]
   },
+  "notes": "**Bound 4 October 2026 to Resource: code, name, kind, venue (session), parent, setup, teardown, deposit and qualifications; capacity, durations and guest-selectable go into Resource.attributes (the keys named on each field), as the contract keeps kind-specific settings there. Priority, availability mode and scheduling mode left the screen (no property)** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

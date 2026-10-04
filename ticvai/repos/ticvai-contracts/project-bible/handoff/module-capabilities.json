@@ -34,7 +34,7 @@
      "key": "ACCESS_POINT_CONFIGURE",
      "label": null,
      "group": "Access control",
-     "operationCount": 92,
+     "operationCount": 93,
      "operations": [
       "addBlacklistEntry",
       "approveMultiMediaPreview",
@@ -374,14 +374,14 @@
      "key": "ACCREDITATION_VIEW",
      "label": null,
      "group": "Accreditation",
-     "operationCount": 10,
+     "operationCount": 11,
      "operations": [
       "getAccreditationApplication",
       "getAccreditationHolder",
+      "getAccreditationValidity",
       "listAccessProfiles",
       "listAccreditationAccessActivity",
-      "listAccreditationApplications",
-      "listAccreditationAudit"
+      "listAccreditationApplications"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -629,14 +629,14 @@
      "key": "APPROVAL_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 21,
+     "operationCount": 22,
      "operations": [
       "createApprovalEvidencePackage",
       "evaluateApprovalRequirement",
       "getApprovalAnalytics",
       "getApprovalRecord",
-      "listAccreditationBadges",
-      "listApprovalControlPolicies"
+      "getApprovalRequest",
+      "listAccreditationBadges"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -879,7 +879,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 116,
+     "operationCount": 117,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
@@ -1118,9 +1118,10 @@
      "key": "INCIDENT_VIEW",
      "label": null,
      "group": "Maintenance & safety",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "getHaccpStatus"
+      "getHaccpStatus",
+      "listCorrectiveActions"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1191,7 +1192,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 27,
+     "operationCount": 29,
      "operations": [
       "getAllergenVerification",
       "getCourseRules",
@@ -1640,7 +1641,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 14,
+     "operationCount": 15,
      "operations": [
       "getCountVariance",
       "getInventoryItem",
@@ -1980,7 +1981,7 @@
      "key": "MARKETING_MANAGE",
      "label": "create and amend",
      "group": "Guest engagement",
-     "operationCount": 31,
+     "operationCount": 33,
      "operations": [
       "activateAudience",
       "awardBadge",
@@ -2664,7 +2665,7 @@
      "key": "DEVELOPER_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 14,
+     "operationCount": 15,
      "operations": [
       "getApiUsage",
       "getDeveloperAccount",
@@ -3037,7 +3038,7 @@
      "key": "RESOURCE_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 25,
+     "operationCount": 26,
      "operations": [
       "getExperienceResourceRequirements",
       "getMapResourceAvailability",
@@ -3545,7 +3546,7 @@
      "key": "PLATFORM_CELL_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 28,
+     "operationCount": 29,
      "operations": [
       "approveBookingLimitCommercial",
       "approveMembershipProductValidation",
@@ -3561,7 +3562,7 @@
      "key": "PLATFORM_CELL_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "getCell",
       "getCellCapacity",
@@ -3957,7 +3958,7 @@
      "key": "WALLET_VIEW",
      "label": "balances, lots, liability, disputes",
      "group": "Wallet and stored value",
-     "operationCount": 22,
+     "operationCount": 24,
      "operations": [
       "diffWalletConfigurationVersion",
       "getCreditConsumptionPolicy",
@@ -3991,7 +3992,7 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 74,
+     "operationCount": 76,
      "operations": [
       "buildDeepLink",
       "claimCustomDomain",
@@ -4097,8 +4098,8 @@
    "ACCREDITATION_VIEW": [
     "getAccreditationApplication",
     "getAccreditationHolder",
-    "listAccessProfiles",
-    "listAccreditationAccessActivity"
+    "getAccreditationValidity",
+    "listAccessProfiles"
    ],
    "AI_APPROVE": [
     "closeAiIncident",
@@ -4203,6 +4204,7 @@
    "INCIDENT_VIEW": [
     "getHaccpStatus",
     "getIncident",
+    "listCorrectiveActions",
     "listIncidents"
    ],
    "INSPECTION_SUBMIT": [

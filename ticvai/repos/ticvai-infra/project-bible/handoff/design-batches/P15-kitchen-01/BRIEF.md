@@ -1,6 +1,6 @@
 # P15-kitchen-01 — P15 · Kitchen
 
-**10 screens · 26 operations · 27 schemas · 7 permissions**
+**10 screens · 27 operations · 28 schemas · 7 permissions**
 
 Platform P15 Kitchen Display · ships as **venue-pos** ·
 staff audience · kiosk ·
@@ -134,16 +134,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `KIT-002` | Kitchen Display System (KDS) | A | 11 | 14 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
 | `KIT-003` | Order Firing & Course Management | A | 18 | 0 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 | `KIT-004` | Active Order Management & Fulfilment Journey | A | 0 | 22 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
-| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 2 | 16 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
+| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 11 | 16 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
 | `KIT-006` | Expeditor & Order Assembly | A | 14 | 14 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 | `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 0 | 20 | 6 | 6 | 2 | 0 | — | notStarted (generated) |
 | `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 14 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `KIT-009` | SLA, Priority & Service Rules | A | 0 | 15 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 3 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
+| `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 4 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**KIT-007 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KIT-007, KIT-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

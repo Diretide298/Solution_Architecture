@@ -253,6 +253,7 @@ screens:
       trigger: Opens a product and decides
       provenance: flow F01 step 1→2
       carries:
+      - eventId
       - productId
     entryFrom:
     - WEB-049
@@ -689,15 +690,17 @@ screens:
     transitions:
     - to: WEB-002
       trigger: Event & Attraction Listing
-      provenance: 'derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them.
-        The edge carries nothing: eventId only pre-selects (deep link or optional), and WEB-002 opens
-        on its own'
+      carries:
+      - eventId
+      provenance: derived — WEB-002 declares entryState.params eventId and WEB-003 holds eventId, so an
+        edge into it carries them
     - to: WEB-004
       trigger: Attraction Details
       carries:
+      - eventId
       - productId
-      provenance: derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds productId,
-        so an edge into it carries them
+      provenance: derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds eventId,
+        productId, so an edge into it carries them
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 
 
@@ -2994,10 +2997,11 @@ screens:
     - to: WEB-010
       trigger: Shopping Cart
       carries:
+      - cartId
       - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-012 holds lineId, performanceId, so an edge into it carries them
+        and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
       provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-012 holds none of them.

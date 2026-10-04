@@ -521,6 +521,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listProductionPlans": {
+  "method": "GET",
+  "path": "/production-plans",
+  "contract": "fnb",
+  "summary": "The production plans",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "forDate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listProductionRuns": {
   "method": "GET",
   "path": "/production-runs",

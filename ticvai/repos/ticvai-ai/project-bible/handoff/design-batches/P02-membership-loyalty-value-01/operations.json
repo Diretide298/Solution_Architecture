@@ -403,6 +403,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listPaymentTokens": {
+  "method": "GET",
+  "path": "/payment-tokens",
+  "contract": "orders",
+  "summary": "A guest's saved payment methods",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listProducts": {
   "method": "GET",
   "path": "/products",

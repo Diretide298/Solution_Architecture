@@ -1185,16 +1185,6 @@
   "purpose": "Define granular rules controlling what AI is allowed to read, recommend, prepare, modify or execute. This should work alongside TICVAI's existing RBAC/PBAC, not replace it.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 11"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 11"
-   },
-   {
     "operation": "setAiTool",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-012): setAiTool (PLATFORM_AI_MANAGE) was declared on a tenant policy screen; tools are platform facts replicated read-only into tenants, so the tenant board only reads them (listAiTools) (design-notes correction ai ADM-523).",
@@ -1270,14 +1260,6 @@
        "provenance": "contract ai.yaml GET /governance/policy-versions"
       },
       {
-       "kind": "multiSelect",
-       "label": "Actions the rule covers",
-       "bindsTo": "AiGovernancePolicyVersion.rules",
-       "operation": "createAiGovernancePolicyDraft",
-       "notes": "Per rule, the verbs it governs (`AiGovernanceRule.actions`: read, analyze, recommend, generate, prepare, create, modify, publish, execute, delete). The board's Analyze ... Publish buttons were these verbs, not screen actions; the ten contract verbs are grouped under the minutes' five (read, recommend, prepare, execute, publish; DEC-004 default).",
-       "provenance": "contract ai.yaml POST /governance/policy-drafts"
-      },
-      {
        "kind": "dataTable",
        "label": "Tools the rules may allow",
        "bindsTo": "AiTool",
@@ -1289,6 +1271,79 @@
        "operation": "listAiTools",
        "notes": "Read-only: tools are platform facts replicated into the tenant.",
        "provenance": "contract ai.yaml GET /tools"
+      },
+      {
+       "kind": "textField",
+       "label": "Policy name",
+       "bindsTo": "AiGovernancePolicy.name",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml AiGovernancePolicy.name (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Policy kind",
+       "bindsTo": "AiGovernancePolicy.kind",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml AiGovernancePolicy.kind (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Rules",
+       "bindsTo": "AiGovernancePolicyVersion.rules",
+       "operation": "createAiGovernancePolicyDraft",
+       "columns": [
+        "AiGovernanceRule.effect",
+        "AiGovernanceRule.capabilityKeys",
+        "AiGovernanceRule.actions",
+        "AiGovernanceRule.dataCategories",
+        "AiGovernanceRule.roleIds"
+       ],
+       "notes": "At least one rule. Conflicts resolve to the more restrictive (AIC-161).",
+       "provenance": "contract ai.yaml AiGovernancePolicyVersion.rules (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effect",
+       "bindsTo": "AiGovernanceRule.effect",
+       "operation": "createAiGovernancePolicyDraft",
+       "notes": "An AiGovernanceOutcome value; block is an answer, not an error.",
+       "provenance": "contract ai.yaml AiGovernanceRule.effect (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Capabilities",
+       "bindsTo": "AiGovernanceRule.capabilityKeys",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml AiGovernanceRule.capabilityKeys (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Actions the rule covers",
+       "bindsTo": "AiGovernanceRule.actions",
+       "operation": "createAiGovernancePolicyDraft",
+       "notes": "Options are the tools' actions from listAiTools.",
+       "provenance": "contract ai.yaml AiGovernanceRule.actions (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Data categories",
+       "bindsTo": "AiGovernanceRule.dataCategories",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml AiGovernanceRule.dataCategories (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Roles",
+       "bindsTo": "AiGovernanceRule.roleIds",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml AiGovernanceRule.roleIds (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "textField",
+       "label": "Change note",
+       "bindsTo": "AiGovernancePolicyVersion.changeNote",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml AiGovernancePolicyVersion.changeNote (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     }
@@ -1406,7 +1461,7 @@
     }
    ]
   },
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE), `listAiTools` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE), `listAiTools` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Rule fields bound 4 October 2026 to AiGovernanceRule (effect, capabilities, actions, data categories, roles); effect is required on every rule** (CHG-FXS-002)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -2260,18 +2315,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Test governance policies before activating them, so a policy mistake neither gives AI too much authority nor blocks legitimate operations.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 18"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 18"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2452,7 +2495,7 @@
     "provenance": "contract ai.yaml POST /governance/policy-versions/{versionId}/simulate"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `simulateAiGovernancePolicy` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `simulateAiGovernancePolicy` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -2519,18 +2562,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the final review, approval, versioning and publication layer for AI governance policies. No material governance policy should become active without a controlled lifecycle.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 20"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 20"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2739,7 +2770,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `publishAiGovernancePolicy` (AI_APPROVE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `publishAiGovernancePolicy` (AI_APPROVE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

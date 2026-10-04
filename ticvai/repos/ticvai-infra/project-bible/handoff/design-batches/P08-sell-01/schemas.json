@@ -1183,7 +1183,7 @@
  },
  "ComboSlot": {
   "type": "object",
-  "x-ticvai-persistence": "fnb.combo_slot",
+  "x-ticvai-persistence": "fnb.combo_slot + fnb.combo_slot_option",
   "description": "One choice within a combo. **`minSelect` and `maxSelect` are what make it a slot rather than a line** — a main is exactly one, a side is one of four, and a sauce might be none or two.\n",
   "required": [
    "id",
@@ -1569,6 +1569,26 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   },
+   "assignmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005)."
+   },
+   "distributionStatus": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "pending",
+     "sent",
+     "delivered",
+     "viewed",
+     "cancelled"
+    ],
+    "description": "**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned, `sent` when the channel accepted it, `delivered` on the channel's delivery receipt, `viewed` when the holder opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from `status`, which is the code's redemption life (issued, assigned, redeemed, expired, voided)."
    }
   }
  },
@@ -2940,6 +2960,26 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "lifecycleState": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "planned",
+     "onSale",
+     "live",
+     "closed",
+     "cancelled",
+     "archived"
+    ],
+    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
+   },
+   "lifecycleStateChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true
    }
   }
  },
@@ -4625,6 +4665,12 @@
     "type": "string",
     "maxLength": 100,
     "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    }
   }
  },

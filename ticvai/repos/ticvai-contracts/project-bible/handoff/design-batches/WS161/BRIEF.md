@@ -1,6 +1,6 @@
 # WS161 — Resource Management Configuration board 7
 
-**10 screens · 15 operations · 24 schemas · 7 permissions**
+**10 screens · 16 operations · 25 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -160,7 +160,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-916` | Equipment & Asset Allocation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-917` | Event Staff & Personnel Allocation | D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-918` | Event Resource Template Library | D | 37 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-919` | AI Event Resource Forecasting | A | 7 | 19 | 6 | 47 | 0 | 0 | — | notStarted (—) |
+| `BO-919` | AI Event Resource Forecasting | A | 10 | 19 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 | `BO-920` | Event Resource Cost Estimator | B | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | D | 4 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-922` | Event Resource Approval & Readiness Gate | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |

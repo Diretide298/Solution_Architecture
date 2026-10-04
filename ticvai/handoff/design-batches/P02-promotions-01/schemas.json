@@ -74,6 +74,26 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   },
+   "assignmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005)."
+   },
+   "distributionStatus": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "pending",
+     "sent",
+     "delivered",
+     "viewed",
+     "cancelled"
+    ],
+    "description": "**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned, `sent` when the channel accepted it, `delivered` on the channel's delivery receipt, `viewed` when the holder opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from `status`, which is the code's redemption life (issued, assigned, redeemed, expired, voided)."
    }
   }
  },

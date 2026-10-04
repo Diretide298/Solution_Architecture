@@ -1,6 +1,6 @@
 # WS36 — Pricing   Revenue Management board 3
 
-**9 screens · 19 operations · 23 schemas · 6 permissions**
+**9 screens · 20 operations · 24 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -136,7 +136,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 15 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 64 | 16 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-070` | Tax Rule & Treatment Builder | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-071` | Fee & Surcharge Library | B | 30 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-072` | Fee Applicability & Charging Rule Builder | B | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -144,11 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-074` | Price Calculation Sequence & Formula Engine | B | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-075` | Currency Precision, Rounding & Monetary Rules | B | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
-
-## Thin screens in this batch
-
-**ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 10 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

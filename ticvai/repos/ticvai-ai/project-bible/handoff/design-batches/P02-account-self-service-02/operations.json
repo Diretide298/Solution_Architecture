@@ -152,6 +152,44 @@
   "requestBody": null,
   "responds": "Order"
  },
+ "getPublishedTenantConfig": {
+  "method": "GET",
+  "path": "/storefront/tenant-config",
+  "contract": "white-label",
+  "summary": "The published guest-facing configuration, before anyone signs in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedTenantConfig"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "wallet",
+  "summary": "Read a guest wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
  "guestLogout": {
   "method": "DELETE",
   "path": "/auth/guest/session",
@@ -175,6 +213,30 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDelegations": {
   "method": "GET",
@@ -236,6 +298,45 @@
   "parameters": [],
   "requestBody": null,
   "responds": "MfaMethod"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPaymentTokens": {
   "method": "GET",

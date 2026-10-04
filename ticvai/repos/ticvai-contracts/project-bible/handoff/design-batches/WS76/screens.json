@@ -884,18 +884,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control who can discover, view, edit, download, share, approve, or manage assets.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Digital Asset Management DAM.pdf, page 49"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Digital Asset Management DAM.pdf, page 49"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -907,14 +895,59 @@
        "kind": "dataTable",
        "label": "Roles and asset actions",
        "operation": "listAuthorisationPolicies",
-       "notes": "One row per role, one column per asset action (discover, view, edit, download, share, approve, manage), each allowed or not, with the scope it applies at.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+       "notes": "One row per policy; role ids shown by the role's name from listRoles.",
+       "provenance": "contract identity.yaml AuthorisationPolicy (defined 4 October 2026, CHG-FXS-005)",
+       "bindsTo": "AuthorisationPolicy",
+       "columns": [
+        "AuthorisationPolicy.name",
+        "AuthorisationPolicy.effect",
+        "AuthorisationPolicy.permissions",
+        "AuthorisationPolicy.appliesToRoleIds",
+        "AuthorisationPolicy.effectiveTo"
+       ]
       },
       {
        "kind": "primaryButton",
        "label": "Grant an asset action to a role",
        "operation": "createAuthorisationPolicy",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Roles",
+       "bindsTo": "AuthorisationPolicy.appliesToRoleIds",
+       "operation": "listRoles",
+       "notes": "Options from listRoles, by name.",
+       "provenance": "contract identity.yaml AuthorisationPolicy.appliesToRoleIds (defined 4 October 2026, CHG-FXS-005)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Asset actions",
+       "bindsTo": "AuthorisationPolicy.permissions",
+       "operation": "createAuthorisationPolicy",
+       "notes": "ASSET_LIBRARY_VIEW, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_VIEW and ASSET_MANAGE (the permission vocabulary).",
+       "provenance": "contract identity.yaml AuthorisationPolicy.permissions (defined 4 October 2026, CHG-FXS-005)"
+      },
+      {
+       "kind": "textField",
+       "label": "Policy name",
+       "bindsTo": "AuthorisationPolicy.name",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.name (defined 4 October 2026, CHG-FXS-005)"
+      },
+      {
+       "kind": "textField",
+       "label": "Policy code",
+       "bindsTo": "AuthorisationPolicy.code",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.code (defined 4 October 2026, CHG-FXS-005)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effect",
+       "bindsTo": "AuthorisationPolicy.effect",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.effect (defined 4 October 2026, CHG-FXS-005)"
       }
      ]
     }
@@ -925,7 +958,7 @@
    "error": "Could not load. Names which read failed and leaves the role-based asset access untouched.",
    "emptyFirstRun": "No role-based asset access yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the role-based asset access are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `ROLE_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`."
   },
   "apis": [
    {
@@ -941,6 +974,13 @@
     "purpose": "Write an asset access policy",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listRoles",
+    "contract": "identity",
+    "purpose": "The roles a policy applies to (appliesToRoleIds), by name",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-005)"
    }
   ],
   "wireframe": {
@@ -965,6 +1005,7 @@
     "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
    }
   ],
+  "notes": "**The generator's 'needs a person' gaps removed 4 October 2026 (the screen is filled); the roles come from listRoles so a policy's appliesToRoleIds can be picked by name** (CHG-FXS-005)",
   "_platform": {
    "code": "P13",
    "audience": "staff",

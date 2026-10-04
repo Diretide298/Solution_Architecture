@@ -1227,7 +1227,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-499"
+    "ADM-499",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-499"
@@ -1246,104 +1247,149 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "patternReason": "Forecast values of one product and timeslot demand definition, picked on the screen (4 October 2026, CHG-FXS-004).",
   "purpose": "Predict demand at the product and inventory level so TICVAI can understand what customers are likely to buy, not only total attendance.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
      "components": [
       {
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-004)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast",
+       "bindsTo": "AiForecastDefinition.definitionKey",
+       "operation": "listForecastDefinitions",
+       "columns": [
+        "AiForecastDefinition.name",
+        "AiForecastDefinition.grain",
+        "AiForecastDefinition.horizonDays"
+       ],
+       "notes": "Query subject productDemand or timeslotDemand; the first active definition is picked by default.",
+       "provenance": "contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "bindsTo": "AiForecastPoint.targetStart",
+       "operation": "getForecast",
+       "notes": "Query from; today by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "bindsTo": "AiForecastPoint.targetEnd",
+       "operation": "getForecast",
+       "notes": "Query to; the definition's horizon by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "dataTable",
-       "label": "Every ticket product timeslot",
+       "label": "Forecast",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
        "columns": [
-        "Days Before Visit",
-        "Cumulative Sales",
-        "Current Booking Curve",
-        "Historical Average",
-        "Forecast Final Demand",
-        "Product Relationships"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.dimensionKey",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.unit"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show"
+       "notes": "a range, never a bare number (design 5.6).",
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     },
     {
      "name": "contextPanel",
-     "slot": "selection",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected ticket product timeslot",
-       "bindsTo": null,
+       "label": "The selected value",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
        "columns": [
-        "Days Before Visit",
-        "Cumulative Sales",
-        "Current Booking Curve",
-        "Historical Average",
-        "Forecast Final Demand",
-        "Product Relationships"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.targetEnd",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.drivers"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Family Meal demand typically increases”, “Where enough evidence exists, estimate”.",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show"
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Version",
+       "bindsTo": "AiForecastVersion",
+       "operation": "getForecast",
+       "columns": [
+        "AiForecastVersion.versionNumber",
+        "AiForecastVersion.status",
+        "AiForecastVersion.basis",
+        "AiForecastVersion.maturity",
+        "AiForecastVersion.dataCutoffAt"
+       ],
+       "provenance": "contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Accuracy by horizon",
+       "bindsTo": "AiForecastAccuracy",
+       "operation": "getForecastAccuracy",
+       "columns": [
+        "AiForecastAccuracy.horizonDays",
+        "AiForecastAccuracy.wape",
+        "AiForecastAccuracy.bias",
+        "AiForecastAccuracy.intervalCoverage"
+       ],
+       "provenance": "contract ai.yaml AiForecastAccuracy (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The ticket product timeslot list.",
-   "error": "Could not load. Names which read failed and leaves the ticket product timeslot untouched.",
-   "emptyFirstRun": "No ticket product timeslot yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the ticket product timeslot are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No product and timeslot demand forecast defined for this tenant yet.",
+   "emptyNoResults": "No values in this window. Names the window and offers the definition's horizon.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -1374,6 +1420,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "The product and timeslot demand forecast definitions (subject productDemand or timeslotDemand); the picked one's definitionKey is what getForecast reads",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
+   },
+   {
+    "operationId": "getForecastAccuracy",
+    "contract": "ai",
+    "purpose": "How accurate the picked demand forecast has been, by horizon, so a planner knows how far to trust it",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
    }
   ],
   "entryState": {
@@ -1398,7 +1458,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-503",
    "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-503"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 12. 0 of 6 labels bound to a contract property; 6 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -1421,7 +1481,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject productDemand or timeslotDemand) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1466,7 +1526,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-499"
+    "ADM-499",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-499"
@@ -1485,116 +1546,136 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
+  "patternReason": "Forecast values of one channel booking pace definition, picked on the screen (4 October 2026, CHG-FXS-004).",
   "purpose": "Predict where and when future sales are expected to arrive. This is particularly useful because a venue with 10,000 current bookings may still receive significant B2C, POS, reseller and walk-in volume.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
      "components": [
       {
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-004)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast",
+       "bindsTo": "AiForecastDefinition.definitionKey",
+       "operation": "listForecastDefinitions",
+       "columns": [
+        "AiForecastDefinition.name",
+        "AiForecastDefinition.grain",
+        "AiForecastDefinition.horizonDays"
+       ],
+       "notes": "Query subject channelPace; the first active definition is picked by default.",
+       "provenance": "contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "bindsTo": "AiForecastPoint.targetStart",
+       "operation": "getForecast",
+       "notes": "Query from; today by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "bindsTo": "AiForecastPoint.targetEnd",
+       "operation": "getForecast",
+       "notes": "Query to; the definition's horizon by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "dataTable",
-       "label": "Every channel booking pace",
+       "label": "Forecast",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
        "columns": [
-        "B2C Website",
-        "Mobile App",
-        "POS",
-        "Flying POS",
-        "Kiosk",
-        "B2B",
-        "Reseller",
-        "OTA / API Partners where applicable",
-        "Call Center / Agent",
-        "Walk-In",
-        "Channel Forecast",
-        "Channel Current Expected Additional Final Forecast"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.dimensionKey",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.unit"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast"
+       "notes": "dimensionKey is the sales channel; a range, never a bare number (design 5.6).",
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     },
     {
      "name": "contextPanel",
-     "slot": "selection",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected channel booking pace",
-       "bindsTo": null,
+       "label": "The selected value",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
        "columns": [
-        "B2C Website",
-        "Mobile App",
-        "POS",
-        "Flying POS",
-        "Kiosk",
-        "B2B",
-        "Reseller",
-        "OTA / API Partners where applicable",
-        "Call Center / Agent",
-        "Walk-In",
-        "Channel Forecast",
-        "Channel Current Expected Additional Final Forecast"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.targetEnd",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.drivers"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “POS/Walk-In 0 2,950 2,950”.",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast"
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Version",
+       "bindsTo": "AiForecastVersion",
+       "operation": "getForecast",
+       "columns": [
+        "AiForecastVersion.versionNumber",
+        "AiForecastVersion.status",
+        "AiForecastVersion.basis",
+        "AiForecastVersion.maturity",
+        "AiForecastVersion.dataCutoffAt"
+       ],
+       "provenance": "contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The channel booking pace list.",
-   "error": "Could not load. Names which read failed and leaves the channel booking pace untouched.",
-   "emptyFirstRun": "No channel booking pace yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the channel booking pace are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No channel booking pace forecast defined for this tenant yet.",
+   "emptyNoResults": "No values in this window. Names the window and offers the definition's horizon.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -1625,6 +1706,13 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "The channel booking pace forecast definitions (subject channelPace); the picked one's definitionKey is what getForecast reads",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
    }
   ],
   "entryState": {
@@ -1649,7 +1737,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-504",
    "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-504"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 13. 0 of 12 labels bound to a contract property; 12 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -1672,7 +1760,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject channelPace) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1717,7 +1805,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-499"
+    "ADM-499",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-499"
@@ -1735,108 +1824,157 @@
    ]
   },
   "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Revenue KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "pattern": "listDetail",
+  "patternReason": "Forecast values of one revenue definition, picked on the screen (4 October 2026, CHG-FXS-004).",
   "purpose": "Forecast future revenue based on predicted sales, attendance, product mix, current pricing and other approved commercial signals.",
   "layout": {
-   "template": "dashboard",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "headline",
      "components": [
       {
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Forecast Ticket Revenue",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "selectField",
+       "label": "Forecast",
+       "bindsTo": "AiForecastDefinition.definitionKey",
+       "operation": "listForecastDefinitions",
+       "columns": [
+        "AiForecastDefinition.name",
+        "AiForecastDefinition.grain",
+        "AiForecastDefinition.horizonDays"
+       ],
+       "notes": "Query subject revenue; the first active definition is picked by default.",
+       "provenance": "contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Forecast Membership Revenue",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "datePicker",
+       "label": "From",
+       "bindsTo": "AiForecastPoint.targetStart",
+       "operation": "getForecast",
+       "notes": "Query from; today by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Forecast Add-On Revenue",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "datePicker",
+       "label": "To",
+       "bindsTo": "AiForecastPoint.targetEnd",
+       "operation": "getForecast",
+       "notes": "Query to; the definition's horizon by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Forecast F&B Revenue where supported",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "dataTable",
+       "label": "Forecast",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
+       "columns": [
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.dimensionKey",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.unit"
+       ],
+       "notes": "dimensionKey is the revenue stream (ticket, membership, add-on, F&B, retail); a range, never a bare number (design 5.6).",
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected value",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
+       "columns": [
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.targetEnd",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.drivers"
+       ],
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Forecast Retail Revenue where supported",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "detailPanel",
+       "label": "Version",
+       "bindsTo": "AiForecastVersion",
+       "operation": "getForecast",
+       "columns": [
+        "AiForecastVersion.versionNumber",
+        "AiForecastVersion.status",
+        "AiForecastVersion.basis",
+        "AiForecastVersion.maturity",
+        "AiForecastVersion.dataCutoffAt"
+       ],
+       "provenance": "contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Total Forecast Revenue",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "secondaryButton",
+       "label": "Why did it change",
+       "operation": "explainMetricChange",
+       "notes": "metricKey the definition's, period the selected value's, comparison previousPeriod.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-004)"
       },
       {
-       "kind": "metricTile",
-       "label": "Revenue per Visitor",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Net revenue vs budget or target",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs",
-       "notes": "(CHG-FIN-002: never a bare \"Revenue\")"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue Confidence Range",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+       "kind": "detailPanel",
+       "label": "Explanation",
+       "bindsTo": "AiMetricChangeExplanation",
+       "operation": "explainMetricChange",
+       "columns": [
+        "AiMetricChangeExplanation.change",
+        "AiMetricChangeExplanation.changePercent",
+        "AiMetricChangeExplanation.drivers",
+        "AiMetricChangeExplanation.narrative"
+       ],
+       "provenance": "contract ai.yaml AiMetricChangeExplanation (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The revenue commercial forecast list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the revenue commercial forecast untouched.",
-   "emptyFirstRun": "No revenue commercial forecast yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue commercial forecast are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No revenue forecast defined for this tenant yet.",
+   "emptyNoResults": "No values in this window. Names the window and offers the definition's horizon.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -1867,6 +2005,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "The revenue forecast definitions (subject revenue); the picked one's definitionKey is what getForecast reads",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
+   },
+   {
+    "operationId": "explainMetricChange",
+    "contract": "ai",
+    "purpose": "Why the revenue forecast moved against the previous period, by driver",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
    }
   ],
   "wireframe": {
@@ -1874,8 +2026,8 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-505",
    "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-505"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 9 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
+  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject revenue) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -1971,116 +2123,184 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "patternReason": "Forecast values of one any definition, picked on the screen (4 October 2026, CHG-FXS-004).",
   "purpose": "Explain why the forecast changed and how much uncertainty it carries.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
      "components": [
       {
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-004)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast",
+       "bindsTo": "AiForecastDefinition.definitionKey",
+       "operation": "listForecastDefinitions",
+       "columns": [
+        "AiForecastDefinition.name",
+        "AiForecastDefinition.grain",
+        "AiForecastDefinition.horizonDays"
+       ],
+       "notes": "Query subject any; the first active definition is picked by default.",
+       "provenance": "contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "bindsTo": "AiForecastPoint.targetStart",
+       "operation": "getForecast",
+       "notes": "Query from; today by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "bindsTo": "AiForecastPoint.targetEnd",
+       "operation": "getForecast",
+       "notes": "Query to; the definition's horizon by default.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)"
       },
       {
        "kind": "dataTable",
-       "label": "Every forecast drivers confidence",
+       "label": "Forecast",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
        "columns": [
-        "Limited Historical Data",
-        "New Product",
-        "New Event",
-        "Missing Weather",
-        "Abnormal Promotion",
-        "High Cancellation Variability",
-        "Unusual Booking Pattern",
-        "Confidence by Horizon",
-        "92% / High",
-        "84% / High",
-        "71% / Medium",
-        "58% / Lower"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.dimensionKey",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.unit"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show"
+       "notes": "a range, never a bare number (design 5.6).",
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     },
     {
      "name": "contextPanel",
-     "slot": "selection",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected forecast drivers confidence",
-       "bindsTo": null,
+       "label": "The selected value",
+       "bindsTo": "AiForecastPoint",
+       "operation": "getForecast",
        "columns": [
-        "Limited Historical Data",
-        "New Product",
-        "New Event",
-        "Missing Weather",
-        "Abnormal Promotion",
-        "High Cancellation Variability",
-        "Unusual Booking Pattern",
-        "Confidence by Horizon",
-        "92% / High",
-        "84% / High",
-        "71% / Medium",
-        "58% / Lower"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.targetEnd",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.drivers"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Where applicable”, “Ensemble”.",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show"
+       "provenance": "contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Version",
+       "bindsTo": "AiForecastVersion",
+       "operation": "getForecast",
+       "columns": [
+        "AiForecastVersion.versionNumber",
+        "AiForecastVersion.status",
+        "AiForecastVersion.basis",
+        "AiForecastVersion.maturity",
+        "AiForecastVersion.dataCutoffAt"
+       ],
+       "provenance": "contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Accuracy by horizon",
+       "bindsTo": "AiForecastAccuracy",
+       "operation": "getForecastAccuracy",
+       "columns": [
+        "AiForecastAccuracy.horizonDays",
+        "AiForecastAccuracy.periodStart",
+        "AiForecastAccuracy.wape",
+        "AiForecastAccuracy.bias",
+        "AiForecastAccuracy.intervalCoverage"
+       ],
+       "provenance": "contract ai.yaml AiForecastAccuracy (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Versions",
+       "bindsTo": "AiForecastVersion",
+       "operation": "listForecastVersions",
+       "columns": [
+        "AiForecastVersion.versionNumber",
+        "AiForecastVersion.status",
+        "AiForecastVersion.basis",
+        "AiForecastVersion.dataCutoffAt"
+       ],
+       "provenance": "contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Why did it change",
+       "operation": "explainMetricChange",
+       "notes": "metricKey the definition's, period the selected value's, comparison forecast.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-004)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Explanation",
+       "bindsTo": "AiMetricChangeExplanation",
+       "operation": "explainMetricChange",
+       "columns": [
+        "AiMetricChangeExplanation.change",
+        "AiMetricChangeExplanation.changePercent",
+        "AiMetricChangeExplanation.drivers",
+        "AiMetricChangeExplanation.narrative",
+        "AiMetricChangeExplanation.reliability"
+       ],
+       "provenance": "contract ai.yaml AiMetricChangeExplanation (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The forecast drivers confidence list.",
-   "error": "Could not load. Names which read failed and leaves the forecast drivers confidence untouched.",
-   "emptyFirstRun": "No forecast drivers confidence yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the forecast drivers confidence are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No any forecast defined for this tenant yet.",
+   "emptyNoResults": "No values in this window. Names the window and offers the definition's horizon.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listForecastVersions` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -2132,6 +2352,13 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "The any forecast definitions (subject any); the picked one's definitionKey is what getForecast reads",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
    }
   ],
   "entryState": {
@@ -2156,7 +2383,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-506",
    "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-506"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 16. 0 of 12 labels bound to a contract property; 12 of 64 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-013): The board example (attendance figure, confidence range, \"Confidence Status High\") was pasted into the purpose; it belongs in sample data, and confidence is never a bare percentage (ADR-0051; design-notes correction ai ADM-506).",
   "overlays": [
    {
@@ -2180,7 +2407,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `explainMetricChange` (AI_USE), `listForecastVersions` (AI_USE), `getForecast` (AI_USE), `getForecastAccuracy` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `explainMetricChange` (AI_USE), `listForecastVersions` (AI_USE), `getForecast` (AI_USE), `getForecastAccuracy` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject any) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

@@ -249,35 +249,8 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "Challenges listed with the selected draft built beside it and a publish gate (defined 4 October 2026 from Challenge, CHG-FXS-001).",
   "purpose": "Create a governed challenge from objective through publication. Configure challenge name, objective, audience, actions, progress logic, start/end, recurrence and capacity. Define eligibility, terms, visibility, multilingual content, image, completion rule and reward. Support visit, purchase, scan, activity, referral, survey and approved social actions. Validate overlapping rules, reward budget, fraud controls, legal terms and approval before activation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": "createChallenge",
-    "why": "**`Challenge.kind` lacks scan, activity and purchase**, which the client keeps (decided 28 September, audit R275 (c)); handed to the contracts group to add to the enum.",
-    "source": "audit R275 (c)"
-   },
-   {
-    "operation": null,
-    "why": "**Challenge Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No listChallenges or getChallenge, and no activate step.",
-    "source": "contracts/satellite/marketing-crm.yaml#createChallenge"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -286,22 +259,32 @@
      "components": [
       {
        "kind": "selectField",
-       "label": "Challenge action",
-       "operation": "createChallenge",
-       "notes": "**Scan, activity and purchase are kept** (decided 28 September, audit R275 (c)) beside the contract's `Challenge.kind` values (visit, spend, ride, collection, streak, referral, survey, social, milestone). The three are handed to the contracts group to add to `Challenge.kind`; until then the picker offers them disabled.",
-       "provenance": "contract marketing-crm.yaml POST /challenges"
+       "label": "Status",
+       "bindsTo": "Challenge.status",
+       "operation": "listChallenges",
+       "notes": "Filter; Draft by default.",
+       "provenance": "contract marketing-crm.yaml Challenge.status (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "dataTable",
        "label": "Challenges",
+       "bindsTo": "Challenge",
        "operation": "listChallenges",
-       "provenance": "contract marketing-crm.yaml GET /challenges"
+       "columns": [
+        "Challenge.name",
+        "Challenge.kind",
+        "Challenge.rewardKind",
+        "Challenge.startsAt",
+        "Challenge.endsAt",
+        "Challenge.status"
+       ],
+       "provenance": "contract marketing-crm.yaml Challenge (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "publishGate",
-       "label": "What activating changes",
-       "notes": "Names the audience and dates the challenge goes live for.",
-       "provenance": "design-note correction, 2 October 2026"
+       "kind": "primaryButton",
+       "label": "New challenge",
+       "notes": "Opens an empty draft in the side panel.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     },
@@ -311,37 +294,122 @@
       {
        "kind": "detailPanel",
        "label": "The challenge",
+       "bindsTo": "Challenge",
        "operation": "getChallenge",
-       "provenance": "contract marketing-crm.yaml GET /challenges/{challengeId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+       "columns": [
+        "Challenge.name",
+        "Challenge.kind",
+        "Challenge.goal",
+        "Challenge.rewardKind",
+        "Challenge.status"
+       ],
+       "provenance": "contract marketing-crm.yaml Challenge (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "Challenge.name",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Challenge action",
+       "bindsTo": "Challenge.kind",
+       "operation": "createChallenge",
+       "notes": "Includes scan, activity and purchase (audit R275 (c), now in the enum).",
+       "provenance": "contract marketing-crm.yaml Challenge.kind (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Who takes part",
+       "bindsTo": "Challenge.scope",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.scope (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Goal metric",
+       "bindsTo": "Challenge.goal.metric",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.goal.metric (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Goal target",
+       "bindsTo": "Challenge.goal.target",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.goal.target (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Within (days)",
+       "bindsTo": "Challenge.goal.withinDays",
+       "operation": "createChallenge",
+       "notes": "Empty means no time limit.",
+       "provenance": "contract marketing-crm.yaml Challenge.goal.withinDays (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reward",
+       "bindsTo": "Challenge.rewardKind",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.rewardKind (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Reward value",
+       "bindsTo": "Challenge.rewardValue",
+       "operation": "createChallenge",
+       "notes": "Points for loyaltyPoints; hidden for badge and none.",
+       "provenance": "contract marketing-crm.yaml Challenge.rewardValue (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Starts",
+       "bindsTo": "Challenge.startsAt",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.startsAt (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Ends",
+       "bindsTo": "Challenge.endsAt",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml Challenge.endsAt (defined 4 October 2026, CHG-FXS-001)"
+      },
       {
        "kind": "primaryButton",
        "label": "Create challenge",
        "operation": "createChallenge",
-       "provenance": "contract marketing-crm.yaml POST /challenges"
+       "notes": "Saves a draft.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What activating changes",
+       "operation": "activateChallenge",
+       "notes": "Shows the challenge as guests will see it and its window; Activate publishes it.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Activate challenge",
        "operation": "activateChallenge",
-       "provenance": "contract marketing-crm.yaml POST /challenges/{challengeId}/activate"
+       "notes": "Draft challenges only.",
+       "permission": "MARKETING_SEND",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The challenge list.",
-   "error": "Could not load. Names which read failed and leaves the challenge untouched.",
-   "emptyFirstRun": "No challenge yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No challenges yet. Carries New challenge.",
    "emptyNoResults": "The filter narrowed it and the challenge are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listChallenges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createChallenge`; `MARKETING_SEND` for `activateChallenge`."
   },
   "apis": [
    {
@@ -378,36 +446,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-825",
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-825"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formCreateChallenge",
-    "component": "modal",
-    "trigger": "Create challenge",
-    "body": "**Collects what `createChallenge` sends before it is called.** Required: `name`, `kind`, `goal`. Optional: `scope`, `eventId`, `rewardKind`, `rewardValue`, `rewardAmount`, `badgeAssetId`, `startsAt`, `endsAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create challenge",
-     "operation": "createChallenge"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "kind",
-      "goal",
-      "scope",
-      "eventId",
-      "rewardKind",
-      "rewardValue",
-      "rewardAmount",
-      "badgeAssetId",
-      "startsAt",
-      "endsAt"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /challenges"
-   }
-  ],
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -418,6 +457,7 @@
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from Challenge (kind, scope, goal, reward, window) with listChallenges, getChallenge, createChallenge and activateChallenge. The stale gaps (no write, no list, kind lacking scan/activity/purchase) are closed: the contract has them since CHG-CSA-045 and R275 (c)** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -478,19 +518,9 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "The badge library with the selected badge edited beside it (defined 4 October 2026 from MarketingBadge, CHG-FXS-001).",
   "purpose": "Manage achievements and digital badges. Define achievement type, badge name, tier, rarity, unlock criteria, points value, visibility and validity. Maintain an approved visual badge library and multilingual name/description and accessible alt text. Configuration Scope of Work | Version 1.0 49 Configure automatic or manual issuance, revocation, duplicate prevention and profile/mobile display. Track active challenges and rewards using each achievement before editing or retiring it. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
-   },
    {
     "operation": "createChallenge",
     "removed": true,
@@ -507,33 +537,103 @@
       {
        "kind": "dataTable",
        "label": "Badges",
+       "bindsTo": "MarketingBadge",
        "operation": "listBadges",
-       "provenance": "contract marketing-crm.yaml GET /badges; wiring fix, 2 October 2026"
+       "columns": [
+        "MarketingBadge.code",
+        "MarketingBadge.name",
+        "MarketingBadge.type",
+        "MarketingBadge.isActive"
+       ],
+       "provenance": "contract marketing-crm.yaml MarketingBadge (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setBadge",
+       "label": "New badge",
+       "notes": "Opens an empty form in the side panel.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Code",
+       "bindsTo": "MarketingBadge.code",
+       "operation": "setBadge",
+       "notes": "Unique; read-only once saved.",
+       "provenance": "contract marketing-crm.yaml MarketingBadge.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "MarketingBadge.name",
+       "operation": "setBadge",
+       "provenance": "contract marketing-crm.yaml MarketingBadge.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Description",
+       "bindsTo": "MarketingBadge.description",
+       "operation": "setBadge",
+       "notes": "Also the accessible alt text of the icon.",
+       "provenance": "contract marketing-crm.yaml MarketingBadge.description (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Type",
+       "bindsTo": "MarketingBadge.type",
+       "operation": "setBadge",
+       "notes": "Free text in the contract (e.g. achievement, collection, milestone).",
+       "provenance": "contract marketing-crm.yaml MarketingBadge.type (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Icon link",
+       "bindsTo": "MarketingBadge.iconUrl",
+       "operation": "setBadge",
+       "notes": "The link of an approved image from the media library (CMS-010).",
+       "provenance": "contract marketing-crm.yaml MarketingBadge.iconUrl (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Active",
+       "bindsTo": "MarketingBadge.isActive",
+       "operation": "setBadge",
+       "provenance": "contract marketing-crm.yaml MarketingBadge.isActive (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
        "label": "Save badge",
-       "notes": "The act the screen exists for."
+       "operation": "setBadge",
+       "notes": "Upsert on code; createdAt is sent unchanged for an existing badge and as now for a new one.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Award to this guest",
+       "operation": "awardBadge",
+       "notes": "Shown only when the screen was opened from a guest (customerId); sends badgeId, status awarded and awardedAt now, sourceType manual.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setBadge"
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The achievement badge list.",
-   "error": "Could not load. Names which read failed and leaves the achievement badge untouched.",
-   "emptyFirstRun": "No achievement badge yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No badges yet. Carries New badge.",
    "emptyNoResults": "The filter narrowed it and the achievement badge are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listBadges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setBadge`, `awardBadge`."
   },
   "apis": [
    {
@@ -574,7 +674,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-826",
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-826"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
+  "notes": "**Defined 4 October 2026 from MarketingBadge and MarketingCustomerBadge: the badge library (listBadges), a badge's form (setBadge) and a hand award to the guest the screen was opened for (awardBadge). Rarity, tiers and validity are not badge properties in the contract and left the screen** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -634,20 +735,10 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Translate qualifying guest actions into controlled loyalty points. Configure rules for visits, purchases, ticket scans, activities, referrals, surveys and other approved events. Set base points, multiplier, daily/monthly limit, validity, rounding and posting timing. Apply device, account, velocity, location and transaction fraud checks and exception review. Post through the shared Loyalty Engine and preserve source event, rule/version and adjustment history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "pattern": "configEditor",
+  "patternReason": "One programme's earning rules and bonus campaigns edited as one set (defined 4 October 2026 from LoyaltyProgramme.earnRules and LoyaltyRuleSet, CHG-FXS-001).",
+  "purpose": "Turn qualifying guest actions into loyalty points for one programme: the earning rules (trigger, points, product kinds, multiplier), when points expire, and the bonus-points campaigns that run over a window.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 50"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 50"
-   },
    {
     "operation": "createLoyaltyProgramme",
     "removed": true,
@@ -662,51 +753,174 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "cardList",
-       "label": "Show the loyalty campaigns",
-       "operation": "listLoyaltyCampaigns",
+       "kind": "dataTable",
+       "label": "Earning rules",
+       "bindsTo": "LoyaltyProgramme.earnRules",
+       "operation": "listLoyaltyProgrammes",
+       "columns": [
+        "LoyaltyProgramme.earnRules.trigger",
+        "LoyaltyProgramme.earnRules.points",
+        "LoyaltyProgramme.earnRules.productKinds",
+        "LoyaltyProgramme.earnRules.multiplier"
+       ],
+       "notes": "The programme the screen was opened for (programmeId), from listLoyaltyProgrammes. Rows are edited in place.",
+       "provenance": "contract marketing-crm.yaml LoyaltyProgramme.earnRules (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Trigger",
+       "bindsTo": "LoyaltyProgramme.earnRules.trigger",
+       "operation": "updateLoyaltyProgramme",
+       "provenance": "agreed operation `updateLoyaltyProgramme`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Points",
+       "bindsTo": "LoyaltyProgramme.earnRules.points",
+       "operation": "updateLoyaltyProgramme",
+       "provenance": "agreed operation `updateLoyaltyProgramme`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Product kinds",
+       "bindsTo": "LoyaltyProgramme.earnRules.productKinds",
+       "operation": "updateLoyaltyProgramme",
+       "notes": "Empty means every kind.",
+       "provenance": "agreed operation `updateLoyaltyProgramme`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Multiplier",
+       "bindsTo": "LoyaltyProgramme.earnRules.multiplier",
+       "operation": "updateLoyaltyProgramme",
+       "provenance": "agreed operation `updateLoyaltyProgramme`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Points expire after (months)",
+       "bindsTo": "LoyaltyProgramme.pointsExpireAfterMonths",
+       "operation": "updateLoyaltyProgramme",
+       "notes": "Empty means points never expire.",
+       "provenance": "agreed operation `updateLoyaltyProgramme`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save earning rules",
+       "operation": "updateLoyaltyProgramme",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Bonus campaigns",
        "bindsTo": "MarketingLoyaltyCampaign",
+       "operation": "listLoyaltyCampaigns",
        "columns": [
         "MarketingLoyaltyCampaign.code",
         "MarketingLoyaltyCampaign.name",
         "MarketingLoyaltyCampaign.startAt",
         "MarketingLoyaltyCampaign.endAt",
-        "MarketingLoyaltyCampaign.isActive",
-        "MarketingLoyaltyCampaign.createdAt"
+        "MarketingLoyaltyCampaign.isActive"
        ],
-       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyCampaign (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "detailPanel",
-       "label": "Rules in force",
-       "bindsTo": "LoyaltyRuleSet",
-       "operation": "getLoyaltyRules",
-       "provenance": "contract marketing-crm.yaml GET /loyalty/programmes/{programmeId}/rules; wiring fix, 2 October 2026"
+       "kind": "textField",
+       "label": "Campaign code",
+       "bindsTo": "MarketingLoyaltyCampaign.code",
+       "operation": "setLoyaltyCampaign",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyCampaign.code (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setLoyaltyRules",
-       "label": "Save loyalty rules",
-       "notes": "The act the screen exists for."
+       "kind": "textField",
+       "label": "Campaign name",
+       "bindsTo": "MarketingLoyaltyCampaign.name",
+       "operation": "setLoyaltyCampaign",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyCampaign.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Starts",
+       "bindsTo": "MarketingLoyaltyCampaign.startAt",
+       "operation": "setLoyaltyCampaign",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyCampaign.startAt (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Ends",
+       "bindsTo": "MarketingLoyaltyCampaign.endAt",
+       "operation": "setLoyaltyCampaign",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyCampaign.endAt (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Campaign active",
+       "bindsTo": "MarketingLoyaltyCampaign.isActive",
+       "operation": "setLoyaltyCampaign",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyCampaign.isActive (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setLoyaltyRules"
+       "label": "Save campaign",
+       "operation": "setLoyaltyCampaign",
+       "notes": "programId is the programme being edited.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Campaign rules",
+       "bindsTo": "LoyaltyRuleSet.campaignRules",
+       "operation": "getLoyaltyRules",
+       "columns": [
+        "MarketingLoyaltyRule.campaignId",
+        "MarketingLoyaltyRule.type",
+        "MarketingLoyaltyRule.bonusPoints",
+        "MarketingLoyaltyRule.multiplier",
+        "MarketingLoyaltyRule.isActive"
+       ],
+       "provenance": "contract marketing-crm.yaml LoyaltyRuleSet.campaignRules (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Bonus points",
+       "bindsTo": "MarketingLoyaltyRule.bonusPoints",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyRule.bonusPoints (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Bonus multiplier",
+       "bindsTo": "MarketingLoyaltyRule.multiplier",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingLoyaltyRule.multiplier (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save campaign rules",
+       "operation": "setLoyaltyRules",
+       "notes": "A whole-set replace: sends the tiers and redemption rules read by getLoyaltyRules unchanged with the edited campaign rules.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The points activity rules list.",
-   "error": "Could not load. Names which read failed and leaves the points activity rules untouched.",
-   "emptyFirstRun": "No points activity rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No earning rules yet: nothing earns points. Carries an empty row to start.",
    "emptyNoResults": "The filter narrowed it and the points activity rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `getLoyaltyRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setLoyaltyRules`, `setLoyaltyCampaign`."
   },
   "apis": [
    {
@@ -736,6 +950,20 @@
     "purpose": "Show the loyalty campaigns",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listLoyaltyProgrammes",
+    "contract": "marketing-crm",
+    "purpose": "The programme being edited, with its earning rules (earnRules) and expiry",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "updateLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "purpose": "Save the programme's earning rules and points expiry: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -743,7 +971,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-827",
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-827"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -752,6 +980,7 @@
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from LoyaltyProgramme.earnRules (trigger, points, productKinds, multiplier), LoyaltyRuleSet.campaignRules and MarketingLoyaltyCampaign. Earning rules are saved with updateLoyaltyProgramme (agreed in the ledger), since setLoyaltyRules leaves them out. Daily and monthly limits and rounding are not in the contract and left the purpose** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -811,21 +1040,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "configEditor",
+  "patternReason": "One programme's milestones (its tiers) and the rewards they give, edited side by side (defined 4 October 2026 from MarketingProgrammeTier and MarketingReward, CHG-FXS-001).",
   "purpose": "Reward cumulative progress consistently. Define thresholds, tiers and immediate or delayed reward fulfillment. Support loyalty points, wallet credit, voucher, product offer, badge and membership benefit rewards. Configure eligibility, inventory, validity, redemption limit, substitution and approval threshold. Forecast reward cost/liability and prevent issuance when funding, inventory or eligibility fails. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 50"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 50"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -833,71 +1050,195 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "cardList",
-       "label": "Show the rewards a milestone can give",
-       "operation": "listRewards",
+       "kind": "selectField",
+       "label": "Programme",
+       "bindsTo": "LoyaltyProgramme.id",
+       "operation": "listLoyaltyProgrammes",
+       "columns": [
+        "LoyaltyProgramme.code",
+        "LoyaltyProgramme.name",
+        "LoyaltyProgramme.isActive"
+       ],
+       "provenance": "contract marketing-crm.yaml LoyaltyProgramme.id (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Milestones",
+       "bindsTo": "LoyaltyRuleSet.tiers",
+       "operation": "getLoyaltyRules",
+       "columns": [
+        "MarketingProgrammeTier.rank",
+        "MarketingProgrammeTier.name",
+        "MarketingProgrammeTier.minLifetimePoints",
+        "MarketingProgrammeTier.earnMultiplier",
+        "MarketingProgrammeTier.isActive"
+       ],
+       "notes": "A milestone is a tier reached at a lifetime-points threshold, in rank order.",
+       "provenance": "contract marketing-crm.yaml LoyaltyRuleSet.tiers (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Milestone code",
+       "bindsTo": "MarketingProgrammeTier.code",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Milestone name",
+       "bindsTo": "MarketingProgrammeTier.name",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Rank",
+       "bindsTo": "MarketingProgrammeTier.rank",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.rank (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Reached at (lifetime points)",
+       "bindsTo": "MarketingProgrammeTier.minLifetimePoints",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.minLifetimePoints (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Kept at (lifetime points)",
+       "bindsTo": "MarketingProgrammeTier.retainLifetimePoints",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.retainLifetimePoints (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Valid for (months)",
+       "bindsTo": "MarketingProgrammeTier.validityMonths",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.validityMonths (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Benefits",
+       "bindsTo": "MarketingProgrammeTier.benefits",
+       "operation": "setLoyaltyRules",
+       "notes": "Free entries; each is shown to the guest as written.",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.benefits (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Earn multiplier",
+       "bindsTo": "MarketingProgrammeTier.earnMultiplier",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.earnMultiplier (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Milestone active",
+       "bindsTo": "MarketingProgrammeTier.isActive",
+       "operation": "setLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml MarketingProgrammeTier.isActive (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save milestones",
+       "operation": "setLoyaltyRules",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Rewards",
        "bindsTo": "MarketingReward",
+       "operation": "listRewards",
        "columns": [
         "MarketingReward.code",
         "MarketingReward.name",
         "MarketingReward.type",
         "MarketingReward.pointsCost",
-        "MarketingReward.discountValue",
         "MarketingReward.validityDays"
        ],
-       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+       "provenance": "contract marketing-crm.yaml MarketingReward (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "dataTable",
-       "label": "Show the programmes and their milestones",
-       "operation": "listLoyaltyProgrammes",
-       "bindsTo": "LoyaltyProgramme",
-       "columns": [
-        "LoyaltyProgramme.code",
-        "LoyaltyProgramme.name",
-        "LoyaltyProgramme.pointsExpireAfterMonths",
-        "LoyaltyProgramme.isActive"
-       ],
-       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+       "kind": "textField",
+       "label": "Reward code",
+       "bindsTo": "MarketingReward.code",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.code (defined 4 October 2026, CHG-FXS-001)"
+      },
       {
-       "kind": "primaryButton",
-       "label": "Save milestones and rewards",
-       "operation": "createLoyaltyProgramme",
-       "notes": "Milestones and rewards are set on an existing programme; programme creation is elsewhere (the loyalty set-up). The operation carries the programme's tiers and earn rules.",
-       "provenance": "contract marketing-crm.yaml POST /loyalty/programmes"
+       "kind": "textField",
+       "label": "Reward name",
+       "bindsTo": "MarketingReward.name",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Reward type",
+       "bindsTo": "MarketingReward.type",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.type (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Points cost",
+       "bindsTo": "MarketingReward.pointsCost",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.pointsCost (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Discount value",
+       "bindsTo": "MarketingReward.discountValue",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.discountValue (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Valid for (days)",
+       "bindsTo": "MarketingReward.validityDays",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.validityDays (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Reward active",
+       "bindsTo": "MarketingReward.isActive",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml MarketingReward.isActive (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save reward",
        "operation": "setReward",
-       "provenance": "contract marketing-crm.yaml PUT /loyalty/rewards"
+       "notes": "loyaltyProgramId is the selected programme.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The milestones reward rules list.",
-   "error": "Could not load. Names which read failed and leaves the milestones reward rules untouched.",
-   "emptyFirstRun": "No milestones reward rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No milestones yet. Carries an empty row to start.",
    "emptyNoResults": "The filter narrowed it and the milestones reward rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setReward`, `setLoyaltyRules`."
   },
   "apis": [
-   {
-    "operationId": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "purpose": "Milestones and rewards",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "setReward",
     "contract": "marketing-crm",
@@ -918,6 +1259,20 @@
     "purpose": "Show the rewards a milestone can give",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "getLoyaltyRules",
+    "contract": "marketing-crm",
+    "purpose": "The programme's tiers (its milestones) as saved, read before the whole-set save",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "setLoyaltyRules",
+    "contract": "marketing-crm",
+    "purpose": "Save the milestones: the tiers, with the campaign and redemption rules sent back unchanged",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -925,32 +1280,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-828",
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-828"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "overlays": [
-   {
-    "id": "formCreateLoyaltyProgramme",
-    "component": "modal",
-    "trigger": "Save milestones and rewards",
-    "body": "**Collects what `createLoyaltyProgramme` sends before it is called.** Required: `code`, `name`, `earnRules`, `tiers`. Optional: `venueId`, `pointsLiabilityAccountId`, `pointsExpireAfterMonths`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save milestones and rewards",
-     "operation": "createLoyaltyProgramme"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "earnRules",
-      "tiers",
-      "venueId",
-      "pointsLiabilityAccountId",
-      "pointsExpireAfterMonths",
-      "isActive"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /loyalty/programmes"
-   },
    {
     "id": "formSetReward",
     "component": "modal",
@@ -977,6 +1308,17 @@
     "provenance": "contract marketing-crm.yaml PUT /loyalty/rewards"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the screen lists the programmes (listLoyaltyProgrammes) and the user picks one (CHG-FXS-001)."
+    }
+   ]
+  },
+  "notes": "**Defined 4 October 2026: a milestone is a programme tier (MarketingProgrammeTier, a lifetime-points threshold), saved with setLoyaltyRules after reading getLoyaltyRules; rewards are MarketingReward through setReward. 'Save milestones and rewards' no longer calls createLoyaltyProgramme, which creates a programme (programme creation is on BO-824)** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

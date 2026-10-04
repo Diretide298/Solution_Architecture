@@ -244,6 +244,7 @@
    },
    "conditions": {
     "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
     "items": {
      "$ref": "#/components/schemas/AccessCondition"
     }

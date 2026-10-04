@@ -381,6 +381,35 @@
   "requestBody": null,
   "responds": "Alert"
  },
+ "listCorrectiveActions": {
+  "method": "GET",
+  "path": "/food-safety/corrective-actions",
+  "contract": "fnb",
+  "summary": "The corrective actions",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPurchaseOrders": {
   "method": "GET",
   "path": "/purchase-orders",
@@ -468,6 +497,35 @@
     "name": "status",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockCountLines": {
+  "method": "GET",
+  "path": "/stock-counts/{countId}/lines",
+  "contract": "inventory",
+  "summary": "The lines of a stock count",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "countId",
+    "in": "path",
+    "required": true
    },
    {
     "name": null,
@@ -784,7 +842,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "DailyCountList"
  },
  "signCorrectiveAction": {
   "method": "POST",

@@ -117,6 +117,19 @@
    "isActive": {
     "type": "boolean",
     "default": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant's own rules."
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default."
    }
   }
  },
@@ -605,6 +618,61 @@
     "readOnly": true
    },
    "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "DeveloperMember": {
+  "type": "object",
+  "x-ticvai-persistence": "control.developer_member",
+  "description": "**One person at a developer organisation** (`setDeveloperMembers`, 4 October 2026, CHG-FXC-005). Developer-portal people are not tenant staff: they are kept here in the control database beside `control.developer_account`, keyed by email, and never become `identity.principal` or `identity.delegated_access` rows (the Sprint 1-2 judging found no email column on a principal and no permission a portal role could map to). A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it. What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the owner, `developer` its own clients and credentials, `readOnly` view.",
+  "required": [
+   "email",
+   "role",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email"
+   },
+   "role": {
+    "type": "string",
+    "enum": [
+     "owner",
+     "admin",
+     "developer",
+     "readOnly"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "invited",
+     "active",
+     "removed"
+    ],
+    "readOnly": true
+   },
+   "invitedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "activatedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,

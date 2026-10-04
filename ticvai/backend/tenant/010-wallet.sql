@@ -1,4 +1,4 @@
--- wallet — 31 tables
+-- wallet — 32 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -285,6 +285,10 @@ CREATE TABLE IF NOT EXISTS wallet.hold (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.integration_mapping (
     api_client_id                     uuid NOT NULL,
+    field_mappings                    jsonb,
+    currency_mappings                 jsonb,
+    status_mappings                   jsonb,
+    credit_type_mappings              jsonb,
     date_time_format                  text DEFAULT 'ISO-8601',
     time_zone                         text,
     scope_path                        ltree NOT NULL,
@@ -324,6 +328,21 @@ CREATE TABLE IF NOT EXISTS wallet.restriction (
     applied_at                        timestamptz,
     expires_at                        timestamptz,
     scope_path                        ltree NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS wallet.risk_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    risk_rules_id                     uuid NOT NULL,
+    code                              text,
+    signal                            text,
+    threshold                         numeric(18,4),
+    window_minutes                    integer,
+    action                            text,
+    minimum_confidence                numeric(18,4),
+    does_alert_on_action              boolean,
+    status                            text,
+    status_reason                     text,
+    status_until                      timestamptz
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing

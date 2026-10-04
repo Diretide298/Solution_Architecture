@@ -228,7 +228,7 @@ BEGIN
 END
 $$;
 
--- **1027 tables: 584 scoped by `scope_path`, 81 by `venue_id`, 151 through the parent that owns them, 28 by subject, 182 to the tenant root only, 0 with no policy.**
+-- **1035 tables: 586 scoped by `scope_path`, 81 by `venue_id`, 152 through the parent that owns them, 29 by subject, 186 to the tenant root only, 0 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -538,6 +538,7 @@ SELECT platform.apply_scope_rls('identity.platform_staff_grant'::regclass);
 SELECT platform.apply_scope_rls('identity.segregation_rule'::regclass);
 SELECT platform.apply_scope_rls('identity.sso_group_mapping'::regclass);
 SELECT platform.apply_scope_rls('identity.sso_provider'::regclass);
+SELECT platform.apply_scope_rls('inventory.daily_count_list'::regclass);
 SELECT platform.apply_scope_rls('inventory.kit_component'::regclass);
 SELECT platform.apply_scope_rls('inventory.purchase_order'::regclass);
 SELECT platform.apply_scope_rls('inventory.quotation'::regclass);
@@ -691,6 +692,7 @@ SELECT platform.apply_scope_rls('platform.offline_policy'::regclass);
 SELECT platform.apply_scope_rls('platform.outbox'::regclass);
 SELECT platform.apply_scope_rls('platform.workstation'::regclass);
 SELECT platform.apply_scope_rls('pricing.dynamic_price_rule'::regclass);
+SELECT platform.apply_scope_rls('promotions.code_assignment'::regclass);
 SELECT platform.apply_scope_rls('promotions.coupon_code'::regclass);
 SELECT platform.apply_scope_rls('promotions.product_relationship'::regclass);
 SELECT platform.apply_scope_rls('promotions.recommendation_experiment'::regclass);
@@ -943,7 +945,7 @@ SELECT platform.apply_parent_rls('fnb.table_reservation'::regclass, 'outlet_id',
 SELECT platform.apply_parent_rls('fnb.table_session'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');
 SELECT platform.apply_parent_rls('fnb.table_visit'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');
 SELECT platform.apply_parent_rls('fnb.waitlist_entry'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');
-SELECT platform.apply_parent_rls('games.credit_ledger'::regclass, 'card_id', 'games.card'::regclass, 'card_code');
+SELECT platform.apply_parent_rls('games.credit_ledger'::regclass, 'card_id', 'games.card'::regclass, 'id');
 SELECT platform.apply_parent_rls('games.redemption_line'::regclass, 'redemption_id', 'games.redemption'::regclass, 'id');
 SELECT platform.apply_parent_rls('inventory.goods_receipt'::regclass, 'purchase_order_id', 'inventory.purchase_order'::regclass, 'id');
 SELECT platform.apply_parent_rls('inventory.movement'::regclass, 'item_id', 'inventory.item'::regclass, 'id');
@@ -1032,6 +1034,7 @@ SELECT platform.apply_parent_rls('venuemap.path'::regclass, 'map_id', 'venuemap.
 SELECT platform.apply_parent_rls('venuemap.placed_resource'::regclass, 'resource_id', 'resources.resource'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.point'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.visit_plan_item'::regclass, 'plan_id', 'venuemap.visit_plan'::regclass, 'id');
+SELECT platform.apply_parent_rls('wallet.risk_rule'::regclass, 'risk_rules_id', 'wallet.risk_rules'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.faq_entry'::regclass, 'faq_category_id', 'whitelabel.faq_category'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.footer_config_column'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.footer_config_social_link'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
@@ -1069,6 +1072,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 
 -- By subject (SD-015): the session's own subject, or the tenant root.
 SELECT platform.apply_subject_rls('access.parking_entitlement'::regclass);
+SELECT platform.apply_subject_rls('identity.guest_credential'::regclass);
 SELECT platform.apply_subject_rls('identity.guest_identity_verification'::regclass);
 SELECT platform.apply_subject_rls('identity.otp_challenge'::regclass);
 SELECT platform.apply_subject_rls('ledger.deposit'::regclass);
@@ -1116,6 +1120,7 @@ SELECT platform.apply_tenant_rls('fnb.allergen_verdict'::regclass);  -- was: no 
 SELECT platform.apply_tenant_rls('fnb.cold_chain_event'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('fnb.combo'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('fnb.combo_slot'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.combo_slot_option'::regclass);  -- was: its owner fnb.combo_slot has no policy either
 SELECT platform.apply_tenant_rls('fnb.delivery_location_outlet'::regclass);  -- was: only nullable references (location_id -> fnb.delivery_location, outlet_id -> platform.outlet)
 SELECT platform.apply_tenant_rls('fnb.dining_table'::regclass);  -- was: only nullable references (outlet_id -> platform.outlet)
 SELECT platform.apply_tenant_rls('fnb.ingredient_substitute'::regclass);  -- was: no scope column and no declared owner
@@ -1160,6 +1165,7 @@ SELECT platform.apply_tenant_rls('ledger.tax_exemption'::regclass);  -- was: its
 SELECT platform.apply_tenant_rls('maintenance.asset_document'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('maintenance.asset_status_change'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('maintenance.incident_authority_notification'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('maintenance.incident_history'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('maintenance.incident_investigation_note'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('maintenance.incident_media'::regclass);  -- was: only nullable references (asset_ref -> assets.media_asset)
 SELECT platform.apply_tenant_rls('marketing.agent_availability'::regclass);  -- was: its owner identity.principal has no policy either
@@ -1261,16 +1267,18 @@ SELECT platform.apply_tenant_rls('transport.fare_table'::regclass);  -- was: no 
 SELECT platform.apply_tenant_rls('transport.timetable'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('transport.timetable_run'::regclass);  -- was: its owner transport.timetable has no policy either
 SELECT platform.apply_tenant_rls('venuemap.import_job'::regclass);  -- was: only nullable references (map_id -> venuemap.map)
-SELECT platform.apply_tenant_rls('venuemap.map_version'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('venuemap.map_version'::regclass);  -- was: only nullable references (base_asset_id -> assets.media_asset)
 SELECT platform.apply_tenant_rls('wallet.balance'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('wallet.hold'::regclass);  -- was: only nullable references (order_id -> orders.sales_order)
 SELECT platform.apply_tenant_rls('whitelabel.banner'::regclass);  -- was: its owner whitelabel.tenant_config has no policy either
 SELECT platform.apply_tenant_rls('whitelabel.booking_flow_step'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('whitelabel.custom_domain'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('whitelabel.feature_toggle'::regclass);  -- was: its owner whitelabel.tenant_config has no policy either
-SELECT platform.apply_tenant_rls('whitelabel.homepage_section'::regclass);  -- was: only nullable references (content_page_id -> whitelabel.content_page)
+SELECT platform.apply_tenant_rls('whitelabel.homepage_layout'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('whitelabel.homepage_section'::regclass);  -- was: its owner whitelabel.homepage_layout has no policy either
 SELECT platform.apply_tenant_rls('whitelabel.module_enablement'::regclass);  -- was: its owner whitelabel.tenant_config has no policy either
-SELECT platform.apply_tenant_rls('whitelabel.navigation_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('whitelabel.navigation_config'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('whitelabel.navigation_item'::regclass);  -- was: its owner whitelabel.navigation_config has no policy either
 SELECT platform.apply_tenant_rls('whitelabel.tenant_config'::regclass);  -- was: its owner platform.tenant has no policy either
 SELECT platform.apply_tenant_rls('workforce.attendance_amendment'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('workforce.employee'::regclass);  -- was: no scope column and no declared owner

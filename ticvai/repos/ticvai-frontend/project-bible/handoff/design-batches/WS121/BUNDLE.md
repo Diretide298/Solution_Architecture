@@ -99,7 +99,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-520` | AI Capability Registry & Ownership | D | 20 | 21 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-521` | AI Risk Classification & Assessment | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-522` | AI Autonomy Level Configuration | D | 15 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-523` | AI Action & Permission Policy Builder | A | 23 | 14 | 7 | 1 | 0 | 5 | — | notStarted (—) |
+| `ADM-523` | AI Action & Permission Policy Builder | A | 30 | 19 | 7 | 1 | 0 | 5 | — | notStarted (—) |
 | `ADM-524` | AI Data Access & Usage Policy | D | 6 | 6 | 7 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-525` | Environment, Tenant & Scope Governance | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-526` | AI Policy Conflict, Exception & Override Management | D | 13 | 33 | 7 | 1 | 2 | 0 | — | notStarted (—) |
@@ -983,9 +983,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `tenantId` (navigation) |
 | Route | `/platform/ai-action-permission-policy-builder-adm-523` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE), `listAiTools` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE), `listAiTools` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Rule fields bound 4 October 2026 to AiGovernanceRule (effect, capabilities, actions, data categories, roles); effect is required on every rule** (CHG-FXS-002)
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-012): setAiTool (PLATFORM_AI_MANAGE) was declared on a tenant policy screen; tools are platform facts replicated read-only into tenants, so the tenant board only reads …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-012): setAiTool (PLATFORM_AI_MANAGE) was declared on a tenant policy screen; tools are platform facts replicated read-only into tenants, so the tenant board only reads …
 
 **From the AI & Intelligence process.** The action and permission policy builder: rules that say which AI capabilities may read, analyse, recommend, generate, prepare, create, modify, publish, execute or delete - on which data, in which environment, for which roles and up to what amount - and with what outcome (allow, allow with conditions, prepare only, approval required, escalate, block). It works alongside RBAC, not instead of it: autonomy is separate from a person's permission. Rules are saved as a draft; testing and publication happen on ADM-527 and ADM-528. The one thing to get right: the verbs are a matrix in each rule, not buttons on the screen.
 
@@ -1008,7 +1008,14 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
-| Actions the rule covers | repeatable rows | optional | — | — | — | Per rule, the verbs it governs (`AiGovernanceRule.actions`: read, analyze, recommend, generate, prepare, create, modify, publish, execute, delete). The board's Analyze ... Publish buttons were these … | `AiGovernancePolicyVersion.rules` |
+| Policy name | text field | optional | — | — | — | — | `AiGovernancePolicy.name` |
+| Policy kind | select | optional | — | Action · Data · Scope · Autonomy · Approval · Environment | — | — | `AiGovernancePolicy.kind` |
+| Effect | select | optional | — | Allow · Allow with conditions · Prepare only · Approval required · Escalate · Block | — | An AiGovernanceOutcome value; block is an answer, not an error. | `AiGovernanceRule.effect` |
+| Capabilities | list of values (chips) | optional | — | — | — | Registered capabilities it applies to. Empty means every capability the policy names. | `AiGovernanceRule.capabilityKeys` |
+| Actions the rule covers | multi-select chips | optional | — | Read · Analyze · Recommend · Generate · Prepare · Create · Modify · Publish · Execute · Delete | — | Options are the tools' actions from listAiTools. | `AiGovernanceRule.actions` |
+| Data categories | list of values (chips) | optional | — | — | — | Data categories (ADM-524), e.g. `customerContact`, `payment`, `financial`, `operational`. | `AiGovernanceRule.dataCategories` |
+| Roles | multi-picker: choose roles | optional | — | — | — | Roles the rule applies to; empty means every role. | `AiGovernanceRule.roleIds` |
+| Change note | text field | optional | — | — | — | — | `AiGovernancePolicyVersion.changeNote` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1098,6 +1105,16 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Target contract | text | — |
 | Effect | chip: Read, Write, Destructive | — |
 | Status | chip: Active, Disabled | — |
+
+**Rules** (data table, from `createAiGovernancePolicyDraft`): At least one rule. Conflicts resolve to the more restrictive (AIC-161).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Effect | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Capability keys | list or chips (count when long) | Registered capabilities it applies to. Empty means every capability the policy names. |
+| Actions | list or chips (count when long) | ADM-523: what AI may do, from reading to executing. |
+| Data categories | list or chips (count when long) | Data categories (ADM-524), e.g. `customerContact`, `payment`, `financial`, `operational`. |
+| Roles | list or chips (count when long) | Roles the rule applies to; empty means every role. |
 
 **Actions and what each produces**
 
@@ -1225,8 +1242,8 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (30), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-523?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Save draft, Open access grant.
 - [ ] Every transition is wired: `ADM-519`.
@@ -1873,9 +1890,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `versionId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/ai-policy-testing-governance-simulation-adm-527` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `simulateAiGovernancePolicy` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `simulateAiGovernancePolicy` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)
 
 **From the AI & Intelligence process.** Test a draft governance policy before publishing it: replay it over recorded decisions in a time window and over the capability's test cases, and see what would be allowed, prepared, routed for approval or blocked - and what would change against today. A policy mistake either gives AI too much authority or stops legitimate work, so a version cannot be published until it has been simulated. Nothing runs. The one thing to get right: show the step-by-step evaluation for an example, the way the client's board does.
 
@@ -2095,9 +2110,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `versionId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/ai-governance-policy-publication-effective-policy-map-adm-528` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `publishAiGovernancePolicy` (AI_APPROVE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `publishAiGovernancePolicy` (AI_APPROVE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)
 
 **From the AI & Intelligence process.** Publication and the effective policy map: the final review where a simulated policy version is published by someone other than its author, and a map of what is actually in force for each capability at each scope - autonomy against ceiling, rules, active exceptions and resolved conflicts. The one thing to get right: the map answers "what would the decision point do here, and why", with the more restrictive rule winning visibly.
 

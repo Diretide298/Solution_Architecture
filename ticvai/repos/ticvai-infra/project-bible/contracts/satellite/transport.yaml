@@ -331,16 +331,13 @@ paths:
         - "P08 BO-1184 Transport Routes & Stops"
       x-ticvai-audience: [staff]
       summary: Define a route with its ordered stops
-      description: >
-        Created as `draft`. **Creating a route creates its catalogue side** — a catalogue
-        `Event` its departures become performances of, and one product of kind
-        `timedAdmission` whose variants are the fare table's passenger types — so a one-way
-        ticket is sold through the ordinary cart (decided 29 September, rev 3 REV3-21). The
-        catalogue ids come back on the route and are not written by the caller.
+      description: |-
+        Created as `draft`. **Creating a route creates its catalogue side** — a catalogue `Event` its departures become performances of, and one product of kind `timedAdmission` whose variants are the fare table's passenger types — so a one-way ticket is sold through the ordinary cart (decided 29 September, rev 3 REV3-21). The catalogue ids come back on the route and are not written by the caller.
+        **Stops are ordered and carry an offset** in minutes from the first stop; the first stop's offset is 0 and offsets strictly increase. Arrival time and duration on a departure card are the difference of two offsets.
 
-        **Stops are ordered and carry an offset** in minutes from the first stop; the first
-        stop's offset is 0 and offsets strictly increase. Arrival time and duration on a
-        departure card are the difference of two offsets.
+        **The catalogue records it creates** (4 October 2026, CHG-FXC-004). The route's catalogue Event and its
+        `timedAdmission` product are created by calling `catalogue.createEvent` and `catalogue.createProduct` (CatalogueService
+        owns those tables); their ids are stored on `transport.route`. This operation writes only transport tables.
       tags: [route]
       x-ticvai-permission: TRANSPORT_MANAGE
       x-ticvai-scope-level: venue
@@ -1254,10 +1251,13 @@ paths:
         - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience: [staff]
       summary: Change a departure's coach or capacity
-      description: >
-        A bigger or smaller coach on one run. **Capacity cannot go below the seats already
-        sold**; the refusal is a 422. The new capacity is written to the performance's channel
-        capacity. To cancel a departure use `cancelPerformance` on its `performanceId`.
+      description: |-
+        A bigger or smaller coach on one run. **Capacity cannot go below the seats already sold**; the refusal is a 422. The new capacity is written to the performance's channel capacity. To cancel a departure use `cancelPerformance` on its `performanceId`.
+
+        **Capacity goes through Catalogue** (4 October 2026, CHG-FXC-004). A departure is a catalogue performance, and its
+        capacity is `catalogue.channel_capacity`, which CatalogueService owns: a capacity change calls
+        `catalogue.updateChannelCapacity` on the departure's performance capacity after `transport.departure` is updated, in the same
+        request; a refusal from it (capacity below seats sold) is returned as this operation's 409.
       tags: [departure]
       x-ticvai-permission: TRANSPORT_MANAGE
       x-ticvai-scope-level: venue
@@ -2405,6 +2405,22 @@ components:
         validityDays: { type: integer }
         price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         saving: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        variants:
+          type: array
+          description: '**What `addCartLine` sells for this pass** (4 October 2026, CHG-FXC-011; GST-050, GST-056): one
+            catalogue variant of `catalogueProductId` per passenger type.'
+          items:
+            type: object
+            required:
+            - passengerTypeId
+            - variantId
+            properties:
+              passengerTypeId:
+                type: string
+                format: uuid
+              variantId:
+                type: string
+                format: uuid
 
     FavouriteRoute:
       x-ticvai-persistence: "transport.favourite_route"
@@ -2425,6 +2441,14 @@ components:
           x-ticvai-persisted: false
           description: The current fare, read on list.
         createdAt: { type: string, format: date-time }
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The guest who saved it** (4 October 2026, CHG-FXC-003; transport.favourite_route had no owner
+            column). Taken from the guest session, never from the body. Unique per (subjectId, venueId, fromStationId,
+            toStationId); `saveFavouriteRoute` counts this column for the 20-per-guest limit and `listMyFavouriteRoutes` and
+            `deleteFavouriteRoute` match on it (`x-ticvai-self-scoped: subject`).'
 
   securitySchemes:
     bearerAuth:

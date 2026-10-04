@@ -74,12 +74,18 @@
     {
      "to": "BO-460",
      "trigger": "Card Block, Suspend & Reactivation Control",
-     "provenance": "structural — pack board 7 wiring, 11 September 2026"
+     "provenance": "structural — pack board 7 wiring, 11 September 2026",
+     "carries": [
+      "cardId"
+     ]
     },
     {
      "to": "BO-461",
      "trigger": "Card Replacement & Wallet Relinking",
-     "provenance": "structural — pack board 7 wiring, 11 September 2026"
+     "provenance": "structural — pack board 7 wiring, 11 September 2026",
+     "carries": [
+      "cardId"
+     ]
     },
     {
      "to": "BO-462",

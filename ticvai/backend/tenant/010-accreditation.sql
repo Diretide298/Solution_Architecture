@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS accreditation.access_profile (
     zone_ids                          text[],
     venue_ids                         text[],
     operational_areas                 text[],
+    schedule                          jsonb,
     is_escort_required                boolean DEFAULT false,
     holder_count                      integer,
     scope_path                        ltree NOT NULL
@@ -165,6 +166,7 @@ CREATE TABLE IF NOT EXISTS accreditation.holder (
 CREATE TABLE IF NOT EXISTS accreditation.holder_access (
     holder_id                         uuid,
     access_profile_ids                text[],
+    exceptions                        jsonb,
     effective_zones                   text[],
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL

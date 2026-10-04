@@ -110,6 +110,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.campaign
+  - promotions.campaign_budget
   - promotions.promotion_audit
 - operation: createCouponCampaign
   verb: POST
@@ -1757,10 +1758,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - promotions.code_assignment
   - promotions.coupon_code
   - promotions.coupon_code_batch
   writes:
   - cache:idempotency
+  - promotions.code_assignment
   - promotions.coupon_code
   - promotions.promotion_audit
 - operation: setProductRelationships

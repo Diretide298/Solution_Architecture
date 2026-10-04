@@ -89,7 +89,7 @@ steps:
   screen: WEB-012
   action: Pays
   operations:
-  - createOrder
+  - checkoutCart
   - createPayment
   outcome: 'Order created before payment, so an unknown payment outcome has an order to attach to. This
     ordering is the whole reason recovery is possible. **Payment converts the cart''s holds**: in the

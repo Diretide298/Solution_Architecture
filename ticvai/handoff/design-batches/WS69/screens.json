@@ -1173,13 +1173,6 @@
   "pattern": "listDetail",
   "patternReason": "`listAuthorisationPolicies` reads the population and the selected policy is edited in place — list, select, act. Chosen 2 October 2026 (CHG-SOT-013); the pack gave no directory.",
   "purpose": "Provide centralized security for reports, dashboards and analytical information. The matrix specifically requires reporting access based on group rights, operating-area rights and user access rights.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1390,6 +1383,7 @@
     }
    ]
   },
+  "notes": "**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P16",
    "formFactor": "web",

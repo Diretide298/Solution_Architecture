@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS games.authorisation (
 
 -- An arcade card holding credits. The credit ledger is its history
 CREATE TABLE IF NOT EXISTS games.card (
-    card_code                         text PRIMARY KEY NOT NULL,
+    card_code                         text NOT NULL,
     kind                              text,
     venue_id                          uuid NOT NULL,
     subject_id                        uuid,
@@ -46,7 +46,9 @@ CREATE TABLE IF NOT EXISTS games.card (
     transferred_to_card_code          text,
     last_played_at                    timestamptz,
     issued_at                         timestamptz NOT NULL,
-    expires_at                        timestamptz
+    expires_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL,
+    wallet_id                         uuid
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -67,7 +69,7 @@ CREATE TABLE IF NOT EXISTS games.card_expiry_rules (
 -- through its keys; references games.card. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS games.credit_ledger (
     id                                uuid PRIMARY KEY NOT NULL,
-    card_id                           text NOT NULL
+    card_id                           uuid NOT NULL
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing

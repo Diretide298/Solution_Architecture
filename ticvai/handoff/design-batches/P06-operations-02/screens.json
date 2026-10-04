@@ -461,6 +461,7 @@
       },
       {
        "kind": "scanTarget",
+       "bindsTo": "ValidateRequest.mediaCode",
        "derived": true,
        "impliedBy": "listScans",
        "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
@@ -471,7 +472,7 @@
        "derived": true,
        "impliedBy": "lookupTicket",
        "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "notes": "Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -834,6 +835,7 @@
       },
       {
        "kind": "scanTarget",
+       "bindsTo": "ValidateRequest.mediaCode",
        "derived": true,
        "impliedBy": "syncScans",
        "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
@@ -844,7 +846,7 @@
        "derived": true,
        "impliedBy": "lookupTicket",
        "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "notes": "Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.",
        "provenance": "carried from the previous definition"
       }
      ]

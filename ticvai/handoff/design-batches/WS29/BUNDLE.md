@@ -1,6 +1,6 @@
 # WS29 — Membership   Annual Pass Management board 1
 
-**10 screens · 22 operations · 33 schemas · 6 permissions**
+**10 screens · 23 operations · 33 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-291` | Membership Commercial, Pricing & Channel Association | B | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 12 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 14 | 69 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -532,7 +532,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `BO-290` Family, Household & Dependent Membership Configuration: *Works in Family, Household & Dependent Membership Configuration*; calls `listMembershipAnnualPass`
 - → `BO-291` Membership Commercial, Pricing & Channel Association: *Works in Membership Commercial, Pricing & Channel Association*; calls `listMembershipAnnualPass`
 - → `BO-292` Renewal, Auto-Renewal & Membership Continuity Configuration: *Works in Renewal, Auto-Renewal & Membership Continuity Configuration*; calls `listMembershipAnnualPass`
-- → `BO-293` Membership Product Validation, Approval, Publication & Versioning: *Works in Membership Product Validation, Approval, Publication & Versioning*; carries `challengeId`; calls `listMembershipAnnualPass`
+- → `BO-293` Membership Product Validation, Approval, Publication & Versioning: *Works in Membership Product Validation, Approval, Publication & Versioning*; carries `challengeId`, `membershipCode`, `version`; calls `listMembershipAnnualPass`
 
 **What opens over it**
 
@@ -1880,8 +1880,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `challengeId` (navigation) |
+| Opens with | `membershipCode` (BO-284), `version` (BO-284), `challengeId` (navigation) |
 | Route | `/sell/membership-product-validation-approval-publication-versi-bo-293` |
+
+**What the spec says about it.** **Bound 4 October 2026: the screen reads the version it works on (getMembershipProductValidation, agreed in the ledger) by the membershipCode and version BO-284 carries; the eight publication targets are read, and the action, effective date, migration policy and reason are the inputs the PUT takes** (CHG-FXS-002)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The final check before a membership product is sold: validation across channels (web, POS, app, B2B, access), approval under a second factor, publication and versioning.
 
@@ -1897,15 +1899,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| B2C | select field | — | — | — | — | — | — |
-| POS | select field | — | — | — | — | — | — |
-| Mobile App | select field | — | — | — | — | — | — |
-| Call Center | select field | — | — | — | — | — | — |
-| B2B | select field | — | — | — | — | — | — |
-| Access Control | select field | — | — | — | — | — | — |
-| Ticketing | select field | — | — | — | — | — | — |
-| Other dependent services | select field | — | — | — | — | — | — |
-| Authentication code | text field | — | — | — | — | Asked in the confirmation of the approval: `approveMembershipProductValidation` is step-up mfa and refuses without a fresh token. | — |
+| Action | select | optional | — | Validate · Submit for review · Approve commercial · Approve operational · Reject · Schedule · Publish · Suspend · Reinstate | — | Only the actions the approval stage allows next are offered. | `MembershipProductValidationApprovalPublicationVersioInput.action` |
+| Effective from | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | For schedule and publish. | `MembershipProductValidationApprovalPublicationVersioInput.effectiveFrom` |
+| Existing members | segmented control | optional | — | Remain on current version · Move at next renewal · Move on effective date | — | Stay on the current version, move at next renewal, or move on the effective date. | `MembershipProductValidationApprovalPublicationVersioInput.migrationPolicy` |
+| Reason | text area | optional | — | — | — | Required for reject and suspend. | `MembershipProductValidationApprovalPublicationVersioInput.reason` |
+| Authentication code | text field | — | — | — | — | — | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Membership code | text field | — | — | `getMembershipProductValidation` ?membershipCode |
+| Version | text field | — | — | `getMembershipProductValidation` ?version |
+
+**Sent by *Submit*** (`approveMembershipProductValidation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Migration policy `migrationPolicy` | segmented control | optional | — | Remain on current version · Move at next renewal · Move on effective date | — | Migration policy for existing member contracts (pack p.18). | `approveMembershipProductValidation` body |
+| Membership code `membershipCode` | text field | optional | — | — | — | Membership code | `approveMembershipProductValidation` body |
+| Version `version` | number field | optional | — | — | — | Configuration version the decision applies to | `approveMembershipProductValidation` body |
+| Action `action` | select | optional | — | Validate · Submit for review · Approve commercial · Approve operational · Reject · Schedule · Publish · Suspend · Reinstate | — | Decision taken on BO-293; `suspend` (from `active`, reason required) and `reinstate` (from `suspended`) are the BO-284 quick actions (decided 29 September, writers pass; DM4) | `approveMembershipProductValidation` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Effective date for schedule/publish | `approveMembershipProductValidation` body |
+| Reason `reason` | text area | optional | — | — | — | Reason, recorded in the audit | `approveMembershipProductValidation` body |
 
 **Sent by *Email me a code instead*** (`createMfaChallenge`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1917,16 +1933,114 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Version** (detail panel, from `getMembershipProductValidation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Membership code | text | Membership code |
+| Version | 1,234 | Configuration version under approval |
+| Approval stage | text | Approval stage: draft, review, commercialApproval, operationalApproval, approved, scheduled or published (pack p.17) |
+| Effective from | 1 Oct 2026 | Effective Dating: date this version takes effect |
+| Migration policy | chip: Remain on current version, Move at next renewal, Move on effective date | Migration policy for existing member contracts (pack p.18). |
+
+**Validation checks** (data table, from `getMembershipProductValidation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Migration policy | chip: Remain on current version, Move at next renewal, Move on effective date | Migration policy for existing member contracts (pack p.18). |
+| Active members affected | 1,234 | Active Members Affected |
+| Future renewals | 1,234 | Future Renewals affected by the change |
+| Entitlements affected | list or chips (count when long) | Entitlements Affected |
+| Channels | list or chips (count when long) | Channels affected |
+| Pricing dependencies | list or chips (count when long) | Pricing Dependencies: pricing profiles and rules referenced |
+| Access dependencies | list or chips (count when long) | Access Dependencies: access-control rules and credentials referenced |
+| Membership code | text | Membership code |
+| Approval stage | text | Approval stage: draft, review, commercialApproval, operationalApproval, approved, scheduled or published (pack p.17) |
+| Effective from | 1 Oct 2026 | Effective Dating: date this version takes effect |
+| Validation checks | list or chips (count when long) | Configuration Validation (pack p.17) |
+| Check | chip: Product definition complete, Catalogue association, Eligibility rules, Validity … | — |
+| Passed | yes / no (icon or chip) | — |
+| Message | text | — |
+| Validation issues | list or chips (count when long) | Dependency Health (pack p.17 examples); missingCancellationPolicy is a warning (decided 29 September, readiness close-out) |
+| Code | chip: Inactive pricing profile, Missing dependent eligibility, Auto renew without consent … | — |
+| Message | text | — |
+| Publication targets | list or chips (count when long) | Publication (pack p.18): services the configuration is synchronised to |
+| Target | chip: B2C, POS, Mobile app, Call center, B2B, Access control… | — |
+| Synchronised at | 1 Oct 2026, 14:30 | — |
+
+**Issues** (data table, from `getMembershipProductValidation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Migration policy | chip: Remain on current version, Move at next renewal, Move on effective date | Migration policy for existing member contracts (pack p.18). |
+| Active members affected | 1,234 | Active Members Affected |
+| Future renewals | 1,234 | Future Renewals affected by the change |
+| Entitlements affected | list or chips (count when long) | Entitlements Affected |
+| Channels | list or chips (count when long) | Channels affected |
+| Pricing dependencies | list or chips (count when long) | Pricing Dependencies: pricing profiles and rules referenced |
+| Access dependencies | list or chips (count when long) | Access Dependencies: access-control rules and credentials referenced |
+| Membership code | text | Membership code |
+| Approval stage | text | Approval stage: draft, review, commercialApproval, operationalApproval, approved, scheduled or published (pack p.17) |
+| Effective from | 1 Oct 2026 | Effective Dating: date this version takes effect |
+| Validation checks | list or chips (count when long) | Configuration Validation (pack p.17) |
+| Check | chip: Product definition complete, Catalogue association, Eligibility rules, Validity … | — |
+| Passed | yes / no (icon or chip) | — |
+| Message | text | — |
+| Validation issues | list or chips (count when long) | Dependency Health (pack p.17 examples); missingCancellationPolicy is a warning (decided 29 September, readiness close-out) |
+| Code | chip: Inactive pricing profile, Missing dependent eligibility, Auto renew without consent … | — |
+| Message | text | — |
+| Publication targets | list or chips (count when long) | Publication (pack p.18): services the configuration is synchronised to |
+| Target | chip: B2C, POS, Mobile app, Call center, B2B, Access control… | — |
+| Synchronised at | 1 Oct 2026, 14:30 | — |
+
+**Publication targets** (data table, from `getMembershipProductValidation`): B2C, POS, mobile app, call centre, B2B, access control, ticketing and other dependent services, each with its state (the pack's eight, read, not chosen).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Migration policy | chip: Remain on current version, Move at next renewal, Move on effective date | Migration policy for existing member contracts (pack p.18). |
+| Active members affected | 1,234 | Active Members Affected |
+| Future renewals | 1,234 | Future Renewals affected by the change |
+| Entitlements affected | list or chips (count when long) | Entitlements Affected |
+| Channels | list or chips (count when long) | Channels affected |
+| Pricing dependencies | list or chips (count when long) | Pricing Dependencies: pricing profiles and rules referenced |
+| Access dependencies | list or chips (count when long) | Access Dependencies: access-control rules and credentials referenced |
+| Membership code | text | Membership code |
+| Approval stage | text | Approval stage: draft, review, commercialApproval, operationalApproval, approved, scheduled or published (pack p.17) |
+| Effective from | 1 Oct 2026 | Effective Dating: date this version takes effect |
+| Validation checks | list or chips (count when long) | Configuration Validation (pack p.17) |
+| Check | chip: Product definition complete, Catalogue association, Eligibility rules, Validity … | — |
+| Passed | yes / no (icon or chip) | — |
+| Message | text | — |
+| Validation issues | list or chips (count when long) | Dependency Health (pack p.17 examples); missingCancellationPolicy is a warning (decided 29 September, readiness close-out) |
+| Code | chip: Inactive pricing profile, Missing dependent eligibility, Auto renew without consent … | — |
+| Message | text | — |
+| Publication targets | list or chips (count when long) | Publication (pack p.18): services the configuration is synchronised to |
+| Target | chip: B2C, POS, Mobile app, Call center, B2B, Access control… | — |
+| Synchronised at | 1 Oct 2026, 14:30 | — |
+
+**Impact** (detail panel, from `getMembershipProductValidation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Active members affected | 1,234 | Active Members Affected |
+| Future renewals | 1,234 | Future Renewals affected by the change |
+| Entitlements affected | list or chips (count when long) | Entitlements Affected |
+| Channels | list or chips (count when long) | Channels affected |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Approve (primary button) | navigation or local | — | — | — | — |
+| Submit (primary button) | `approveMembershipProductValidation` PUT `/membership-product-validation` | MembershipProductValidationApprovalPublicationVersioInput | MembershipProductValidationApprovalPublicationVersioView | 409 The action is not allowed from the version's current status (`invalid-product-transition`, states/membership-product.yaml) (decided 29 September, writers pass …; 422 A suspend sent without a reason … | step-up: mfa (Platform-level product state, across tenants.) |
 | Email me a code instead (secondary button) | `createMfaChallenge` POST `/auth/mfa/challenge` | inline | inline | — | — |
 
 **What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **approveMembershipProductValidation**: Confirmation names the consequence first, then asks for the authentication code (authenticator app, or an emailed code as fallback); only a verified challenge sends approveMembershipProductValidation with its single-use stepUpToken. Wrong code: the action is not sent and nothing changes; five wrong codes lock step-up for the policy's lockout minutes and the screen says when it lifts. Why the control exists: Platform-level product state, across tenants. *(source: contracts/satellite/subscription.yaml#approveMembershipProductValidation; R126; contracts/spine/identity.yaml#createMfaChallenge)*
+
+**Data it reads**: `getMembershipProductValidation` (onLoad, The product version's validation checks, issues, impact …)
 
 **Where the user goes next**
 
@@ -1936,10 +2050,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The membership product validation configuration as saved. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the membership product validation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No membership product validation configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The version's checks and impact load first. |
+| Error (`?state=error`) | Could not load. Names the read that failed; no action is offered until it loads. |
+| Empty, first run (`?state=emptyFirstRun`) | Not used: the screen opens on one product version. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The action is not allowed from the version's current status (`invalid-product-transition`, states/membership-product.yaml) (decided 29 September, writers pass …; 422 A suspend sent without a reason (`reason-required`) (decided 29 September, writers pass; DM4); 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
@@ -1969,8 +2083,9 @@ form example:
 - `approveMembershipProductValidation` → `PLATFORM_CELL_MANAGE` (configure) · staff · step-up mfa
 - `createMfaChallenge` → no permission · staff, partner, guest
 - `verifyMfaChallenge` → no permission · staff, partner, guest
+- `getMembershipProductValidation` → `PLATFORM_CELL_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -1997,10 +2112,10 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (409, 410, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (404, 409, 410, 422).
+- [ ] Every output is drawn (69 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-293?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Approve, Email me a code instead.
+- [ ] Every action is wired with its success and its failure: Submit, Email me a code instead.
 - [ ] Every transition is wired: `BO-284`.
 - [ ] Every gated control is gated: `PLATFORM_CELL_MANAGE`.
 - [ ] The module and platform inputs below are applied.
@@ -2111,6 +2226,7 @@ Method, path, parameters, request and response for every operation these screens
 "approveMembershipProductValidation": {"method":"PUT","path":"/membership-product-validation","contract":"subscription","summary":"Membership Product Validation, Approval, Publication & Versioning","permission":"PLATFORM_CELL_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MembershipProductValidationApprovalPublicationVersioInput","responds":"MembershipProductValidationApprovalPublicationVersioView"},
 "createEntitlementTemplate": {"method":"POST","path":"/entitlement-templates","contract":"catalogue","summary":"Create an entitlement template","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EntitlementTemplate","responds":"EntitlementTemplate"},
 "createMfaChallenge": {"method":"POST","path":"/auth/mfa/challenge","contract":"identity","summary":"Second factor at staff sign-in, and step-up for a sensitive action","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"getMembershipProductValidation": {"method":"GET","path":"/membership-product-validation","contract":"subscription","summary":"A membership product's validation, as the approver sees it","permission":"PLATFORM_CELL_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"membershipCode","in":"query","required":true},{"name":"version","in":"query","required":false}],"requestBody":null,"responds":"MembershipProductValidationApprovalPublicationVersioView"},
 "listEntitlementTemplates": {"method":"GET","path":"/entitlement-templates","contract":"catalogue","summary":"List entitlement templates","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"EntitlementTemplate"},
 "listMembershipAnnualPass": {"method":"GET","path":"/membership-annual-pass","contract":"subscription","summary":"Membership & Annual Pass Command Center","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"membershipType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"tier","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"hasConfigurationIssues","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMembershipCommercialPricing": {"method":"GET","path":"/membership-commercial-pricing","contract":"subscription","summary":"Membership Commercial, Pricing & Channel Association","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"membershipCode","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"salesPeriod","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

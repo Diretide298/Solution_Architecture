@@ -100,16 +100,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-071` | Rental Checkout Command Center | C | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-072` | Voucher Scan & Reservation Retrieval | C | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `EMP-073` | Checkout Readiness Validation | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-074` | Equipment Assignment Workspace | C | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-075` | Equipment Scan & Validation | C | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
-| `EMP-076` | Pre-Rental Condition Inspection | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-077` | Safety & Handover Checklist | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-078` | Deposit & Financial Handover Validation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-079` | Group & Multi-Item Checkout | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-080` | Checkout Confirmation & Rental Activation | C | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `EMP-071` | Rental Checkout Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-072` | Voucher Scan & Reservation Retrieval | D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `EMP-073` | Checkout Readiness Validation | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-074` | Equipment Assignment Workspace | D | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-075` | Equipment Scan & Validation | D | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
+| `EMP-076` | Pre-Rental Condition Inspection | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-077` | Safety & Handover Checklist | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-078` | Deposit & Financial Handover Validation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-079` | Group & Multi-Item Checkout | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-080` | Checkout Confirmation & Rental Activation | D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-071 |
+| Block | Block D · task APP-STAFF-EMP-071 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | commandCentre (comfortable density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -162,13 +162,12 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Search rental checkout | search field | — | — | — | — | — | — |
-| Filter by | multi select | — | — | — | — | The pack filters this screen by location, product, start time, booking type, group/individual, readiness and 1 more — which are present is a decision the pack already made. | — |
+| Filter by | text field | optional | — | — | — | Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type … | `listRentalBookings` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Status | text field | — | — | `listRentalBookings` ?status |
 | Location | picker: choose a location | — | — | `listRentalBookings` ?locationId |
 | From | date and time picker | — | — | `listRentalBookings` ?from |
 | To | date and time picker | — | — | `listRentalBookings` ?to |
@@ -341,7 +340,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-072 |
+| Block | Block D · task APP-STAFF-EMP-072 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -467,7 +466,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-073 |
+| Block | Block D · task APP-STAFF-EMP-073 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -597,7 +596,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-074 |
+| Block | Block D · task APP-STAFF-EMP-074 |
 | Who uses it | venue staff holding `RENTAL_OPERATE`, `RENTAL_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -753,7 +752,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-075 |
+| Block | Block D · task APP-STAFF-EMP-075 |
 | Who uses it | venue staff holding `ASSET_VIEW`, `RENTAL_OPERATE` (1 read, 1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -773,7 +772,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
+| Search | text field | optional | — | — | — | Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run. | `lookupAsset` ?assetTag |
 
 #### Outputs: what the screen shows and produces
 
@@ -878,7 +877,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-076 |
+| Block | Block D · task APP-STAFF-EMP-076 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1011,7 +1010,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-077 |
+| Block | Block D · task APP-STAFF-EMP-077 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1132,7 +1131,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-078 |
+| Block | Block D · task APP-STAFF-EMP-078 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1265,7 +1264,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-079 |
+| Block | Block D · task APP-STAFF-EMP-079 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1385,7 +1384,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block C · task APP-STAFF-EMP-080 |
+| Block | Block D · task APP-STAFF-EMP-080 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the pack gives this screen a configuration directory (§Options; Select Equipment) and no display directory — it is settings, not a population |

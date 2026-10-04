@@ -1262,12 +1262,11 @@
        "columns": [
         "LiveGateModeLaneControlView.currentMode",
         "LiveGateModeLaneControlView.targetMode",
-        "LiveGateModeLaneControlView.operator",
-        "LiveGateModeLaneControlView.reason"
+        "LiveGateModeLaneControlView.pendingChangeId"
        ],
        "bindsTo": "LiveGateModeLaneControlView",
        "operation": "listLiveGateMode",
-       "provenance": "pack Access Control Module_Reference.pdf, page 124 §Show"
+       "provenance": "contract access.yaml LiveGateModeLaneControlView (defined 4 October 2026, CHG-FXS-005)"
       }
      ]
     },
@@ -1299,8 +1298,8 @@
        "label": "Cancel gate mode change",
        "operation": "cancelGateModeChange",
        "permission": "TURNSTILE_MODE_SET",
-       "notes": "Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.",
-       "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+       "notes": "Acts on the selected row's pendingChangeId (the scheduled change cancelGateModeChange takes); hidden when the row has none.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-005)"
       },
       {
        "kind": "secondaryButton",
@@ -1443,13 +1442,7 @@
     "provenance": "contract access.yaml PUT /access-points/{accessPointId}/mode"
    }
   ],
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation switches a gate's direction live, and no bulk gate-mode command.",
-    "source": "R221 | DI-648 | contracts/spine/access.yaml#setTurnstileMode"
-   }
-  ],
+  "notes": "**Cancel acts on LiveGateModeLaneControlView.pendingChangeId (contracts, 4 October 2026); the stale gap about a live direction switch is closed (setAccessPointDirection is bound)** (CHG-FXS-005)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

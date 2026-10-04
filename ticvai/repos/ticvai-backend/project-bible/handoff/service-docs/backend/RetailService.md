@@ -19,7 +19,7 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 
 | Service | Tables it reads |
 |---|---|
-| [InventoryService](InventoryService.md) | `inventory.kit_component` |
+| [InventoryService](InventoryService.md) | `inventory.kit_component`, `inventory.movement`, `inventory.stock_reservation` |
 
 ## Operations in the first release
 
@@ -37,7 +37,7 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 | return | [`getReturnPolicy`](#getreturnpolicy) | GET | `/outlets/{outletId}/return-policy` | core | 1 | BO-044, BO-143, POS-011 |
 | return | [`lookupRetailSale`](#lookupretailsale) | GET | `/retail-sales/lookup` | core | 1 | BO-021, POS-005, POS-011 |
 | return | [`setReturnPolicy`](#setreturnpolicy) | PUT | `/outlets/{outletId}/return-policy` | setup | 1 | BO-044, BO-143 |
-| sale | [`createRetailSale`](#createretailsale) | POST | `/retail-sales` | core | 1 | POS-002, POS-005, POS-023 |
+| sale | [`createRetailSale`](#createretailsale) | POST | `/retail-sales` | core | 1 | POS-002, POS-005 |
 | sale | [`getRetailSale`](#getretailsale) | GET | `/retail-sales/{saleId}` | core | 1 | POS-005 |
 | sale | [`listRetailSales`](#listretailsales) | GET | `/retail-sales` | core | 1 | POS-005 |
 | sale | [`reprintReceipt`](#reprintreceipt) | POST | `/retail-sales/{saleId}/reprint` | core | 1 | POS-005, POS-026, POS-030 |
@@ -131,7 +131,7 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
-| Writes | `cache:idempotency`, `retail.shop_and_drop` |
+| Writes | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Called by | POS-005 |
 | State model | Shop and drop ([states/shop-and-drop.yaml](../../../states/shop-and-drop.yaml)): created as `awaitingCollection` |
 
@@ -308,8 +308,8 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
-| Writes | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
+| Reads | `cache:idempotency`, `inventory.movement`, `inventory.stock_reservation`, `retail.reservation`, `retail.reservation_line` |
+| Writes | `cache:idempotency`, `inventory.stock_reservation`, `retail.reservation`, `retail.reservation_line` |
 | Called by | EMP-068, GST-026, KSK-017, POS-012 |
 | State model | Merchandise reservation ([states/merchandise-reservation.yaml](../../../states/merchandise-reservation.yaml)): created as `reserved` |
 
@@ -894,7 +894,7 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `inventory.kit_component`, `retail.sale`, `retail.sale_line` |
 | Writes | `cache:idempotency`, `inventory.movement`, `retail.sale`, `retail.sale_line` |
-| Called by | POS-002, POS-005, POS-023 |
+| Called by | POS-002, POS-005 |
 | State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `reserved` -> `sold`, `inStock` -> `sold` |
 
 **Parameters**

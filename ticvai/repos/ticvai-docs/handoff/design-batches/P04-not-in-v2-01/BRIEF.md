@@ -1,6 +1,6 @@
 # P04-not-in-v2-01 — P04 · Screens the v2 build does not draw
 
-**7 screens · 19 operations · 41 schemas · 12 permissions**
+**7 screens · 20 operations · 41 schemas · 13 permissions**
 
 Platform P04 Venue POS · ships as **venue-pos** ·
 staff audience · posTerminal ·
@@ -52,8 +52,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 12 permissions apply here:
-  `ASSET_LIBRARY_VIEW, ATTENDANCE_RECORD, CASH_LIFT, ORDER_CREATE, ORDER_EXCHANGE, ORDER_VIEW, PRODUCT_CONFIGURE, REPORT_VIEW_WORKSTATION, SCOPE_VIEW, SHIFT_OPEN, WORKFORCE_VIEW, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 13 permissions apply here:
+  `ASSET_LIBRARY_VIEW, ATTENDANCE_RECORD, CASH_LIFT, ORDER_CREATE, ORDER_EXCHANGE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_WORKSTATION, SCOPE_VIEW, SHIFT_OPEN, WORKFORCE_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **11 of these operations work offline**: createCashMovement, getMediaAsset, getMediaEntitlements, getTableMap, getTillShiftPolicy, listCashMovements, listDepositBoxes, listRotaAssignments
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `POS-017` | Cash In / Cash Out Operations | A | 21 | 6 | 5 | 0 | 2 | 6 | — | notStarted (designed) |
 | `POS-018` | Safe Drop & Cash Transfer Management | A | 27 | 20 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
 | `POS-019` | Shift Templates & Policies | A | 10 | 24 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
-| `POS-024` | Outlet Setup | A | 20 | 18 | 6 | 4 | 0 | 0 | — | notStarted (designed) |
+| `POS-024` | Outlet Setup | A | 21 | 27 | 6 | 4 | 0 | 0 | — | notStarted (designed) |
 
 ## Design inputs from the client meetings
 

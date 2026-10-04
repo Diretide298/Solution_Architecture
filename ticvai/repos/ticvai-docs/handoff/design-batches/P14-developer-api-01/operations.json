@@ -317,6 +317,25 @@
   "requestBody": null,
   "responds": "ApiVersion"
  },
+ "listDeveloperMembers": {
+  "method": "GET",
+  "path": "/developers/{developerId}/members",
+  "contract": "public-api",
+  "summary": "Who is in a developer organisation",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "developerId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeveloperMember"
+ },
  "listIntegrationListings": {
   "method": "GET",
   "path": "/listings",
@@ -621,7 +640,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "DeveloperMember"
  },
  "submitIntegrationListing": {
   "method": "POST",

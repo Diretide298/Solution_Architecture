@@ -1045,6 +1045,7 @@ CREATE TABLE IF NOT EXISTS ai.prompt_template (
 CREATE TABLE IF NOT EXISTS ai.proposed_action (
     id                                uuid PRIMARY KEY NOT NULL,
     interaction_id                    uuid,
+    translation_job_id                uuid,
     kind                              text NOT NULL CONSTRAINT proposed_action_kind_chk CHECK (kind IN ('pricing', 'promotion', 'operational', 'financial', 'configuration', 'content', 'audience')),
     target_contract                   text NOT NULL,
     target_operation                  text NOT NULL,

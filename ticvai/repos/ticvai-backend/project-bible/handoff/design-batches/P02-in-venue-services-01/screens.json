@@ -44,7 +44,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because a phone with the graph cached routes with no signal and a server round-trip per step does not. **The version is how a stale route is caught**: a guest holding a route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).\n\n**3D navigation (client meeting 30 September, MoM 4.8): ADR-0069.** Where the venue map has a GLB model, this view renders it natively (react-three-fiber) and the walking-navigation mode follows the guest in 3D; the route still comes from `getVenueMapGraph`, snapped from live GPS, with no external mapping service. No model, a weak phone or failed rendering: the 2D map, same route.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because a phone with the graph cached routes with no signal and a server round-trip per step does not. **The version is how a stale route is caught**: a guest holding a route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).\n\n**3D navigation (client meeting 30 September, MoM 4.8): ADR-0069.** Where the venue map has a GLB model, this view renders it natively (react-three-fiber) and the walking-navigation mode follows the guest in 3D; the route still comes from `getVenueMapGraph`, snapped from live GPS, with no external mapping service. No model, a weak phone or failed rendering: the 2D map, same route.\n\n**The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists), so a normal visit has a map to load** (CHG-FXS-003)",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4b"
@@ -71,6 +71,14 @@
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
        "notes": "Pins by point category (rides, dining, shows); a pin opens Item Detail. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+      },
+      {
+       "kind": "selectField",
+       "label": "Map",
+       "bindsTo": "BookableVenueMaps.maps",
+       "operation": "listBookableVenueMaps",
+       "notes": "Picked by itself when the venue has one published map.",
+       "provenance": "contract venue-map.yaml BookableVenueMaps.maps (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -127,7 +135,7 @@
    "error": "Could not load. Names which read failed and leaves the interactive map untouched.",
    "emptyFirstRun": "No interactive map yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "No point of that category on this map; the other categories stay.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `VENUE_MAP_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect.",
    "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error.",
    "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D."
@@ -156,13 +164,26 @@
     "contract": "venue-map",
     "purpose": "The navigation graph, ready to route over",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBookableVenueMaps",
+    "contract": "venue-map",
+    "purpose": "The venue's published map (query venueId), whose mapId getVenueMap and getVenueMapGraph take",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "mapId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Otherwise the venue's published map from listBookableVenueMaps."
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `mapId`.",
@@ -1116,7 +1137,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface parity, 31 August**: added listParkingFacilities. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate. **Rebound 28 September** (decided 28 September, audit R166): parking is sold through the normal cart and checkout (`addCartLine`, `checkoutCart`, `createPayment`), so the entitlement gets its `orderId`; the guest no longer calls `createParkingEntitlement`, which the order service issues at payment. No live availability; a full car park is the `soldOutForDay` refusal.\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface parity, 31 August**: added listParkingFacilities. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate. **Rebound 28 September** (decided 28 September, audit R166): parking is sold through the normal cart and checkout (`addCartLine`, `checkoutCart`, `createPayment`), so the entitlement gets its `orderId`; the guest no longer calls `createParkingEntitlement`, which the order service issues at payment. No live availability; a full car park is the `soldOutForDay` refusal.\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).\n\n**The car park's parking product is ParkingFacility.productVariantId (agreed with contracts in the ledger 4 October 2026): Add parking to my cart sends it as addCartLine's variantId** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1147,11 +1168,13 @@
        "label": "Car parks",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.name"
+        "ParkingFacility.name",
+        "ParkingFacility.capacity",
+        "ParkingFacility.productVariantId"
        ],
        "operation": "listParkingFacilities",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The venue's car parks by name; no live free-bay count in the first release. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every parking facility'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "provenance": "contract access.yaml ParkingFacility (defined 4 October 2026, CHG-FXS-003)",
+       "notes": "Choosing one puts its parking product (productVariantId, agreed field) in the basket with addCartLine."
       }
      ]
     },
@@ -1385,12 +1408,13 @@
      "trigger": "They open their tickets",
      "provenance": "flow F50 step 3→4",
      "carries": [
+      "entitlementId",
       "orderId"
      ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Rebound 28 September** (decided 28 September, audit R166): the guest no longer creates the parking entitlement; it is issued at payment of the cart order, and this screen reads that order (`getOrder`).\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Rebound 28 September** (decided 28 September, audit R166): the guest no longer creates the parking entitlement; it is issued at payment of the cart order, and this screen reads that order (`getOrder`).\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).\n\n**The plate, car park and pass are read from the parking entitlement (listMyEntitlements, then getParkingEntitlement), bound 4 October 2026** (CHG-FXS-003)\n\n**entitlementId comes from the order's parking entitlement in listMyEntitlements (check-screens)** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1430,6 +1454,37 @@
        "provenance": "contract orders.yaml GET /orders/{orderId}"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Your parking",
+       "bindsTo": "ParkingEntitlement",
+       "operation": "getParkingEntitlement",
+       "columns": [
+        "ParkingEntitlement.plateNumber",
+        "ParkingEntitlement.plateCountry",
+        "ParkingEntitlement.mediaCode"
+       ],
+       "notes": "The entitlement of this order (listMyEntitlements filtered by orderId).",
+       "provenance": "contract access.yaml ParkingEntitlement (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Parking passes",
+       "bindsTo": "Entitlement",
+       "operation": "listMyEntitlements",
+       "columns": [
+        "Entitlement.orderId",
+        "Entitlement.validFrom",
+        "Entitlement.status"
+       ],
+       "notes": "Filtered to this order; the parking one gives entitlementId.",
+       "provenance": "contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)"
+      }
+     ]
     }
    ]
   },
@@ -1438,7 +1493,7 @@
    "error": "Could not load. Names which read failed and leaves the parking reservation confirmed untouched.",
    "emptyFirstRun": "**Paid, entitlement not yet shown.** The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166).",
    "emptyNoResults": "Never shown: the confirmation shows one order's parking.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission (the screen's other reads need `PARKING_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "apis": [
@@ -1453,6 +1508,20 @@
     "contract": "access",
     "purpose": "Car parks at a venue, and how each integrates",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The guest's parking entitlement from this order",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "getParkingEntitlement",
+    "contract": "access",
+    "purpose": "The plate, car park and pass of that entitlement",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -1460,6 +1529,16 @@
     {
      "name": "orderId",
      "from": "previousScreen"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "entitlementId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "The parking entitlement of this order, from listMyEntitlements (the one whose orderId is the order's)."
     }
    ],
    "coldEntry": "**Opened cold, it needs the order.** Without `orderId` it sends the guest to their orders rather than showing an empty confirmation.",

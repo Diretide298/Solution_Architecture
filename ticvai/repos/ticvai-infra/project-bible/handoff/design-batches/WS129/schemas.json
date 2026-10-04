@@ -40,6 +40,7 @@
    },
    "schedule": {
     "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
     "description": "**Zone, date and time are three dimensions and all three are needed.**",
     "items": {
      "type": "object",
@@ -141,6 +142,26 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "lifecycleState": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "planned",
+     "onSale",
+     "live",
+     "closed",
+     "cancelled",
+     "archived"
+    ],
+    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
+   },
+   "lifecycleStateChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true
    }
   }
  },

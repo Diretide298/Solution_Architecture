@@ -591,21 +591,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Manage what the assistant understands and the information it may use. Maintain intents, example phrases, entities, synonyms, redirects, confidence and response variants. Connect approved FAQs, product data, policies, manuals and structured knowledge with freshness and ownership. Provide test console, expected result, source citation, ambiguity handling and low-confidence review queue. Track knowledge consumers, sync status, changes and answer-quality feedback. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 37"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 37"
-   }
-  ],
+  "pattern": "configEditor",
+  "patternReason": "The copilot's knowledge settings edited in one form beside the collections it answers from and the questions it could not answer (defined 4 October 2026, CHG-FXS-001).",
+  "purpose": "Manage what the customer-service assistant may use: the data sources and knowledge collections it answers from, the documents in them, its tone and channels, and the questions it could not answer, each a task for the content owner.",
   "layout": {
    "template": "split",
    "regions": [
@@ -613,59 +601,147 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "cardList",
-       "label": "Load the copilot configuration as saved",
+       "kind": "toggle",
+       "label": "Assistant on",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.isEnabled",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.isEnabled (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applies to",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.scopeLevel",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.scopeLevel (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Data sources",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.dataSources",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.dataSources (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Knowledge collections",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.knowledgeCollectionIds",
+       "operation": "setCustomerServiceCopilot",
+       "notes": "Options from listKnowledgeCollections.",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.knowledgeCollectionIds (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Draft replies on",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.draftChannels",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.draftChannels (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Send without review on",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.autoSend",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.autoSend (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Brand tone",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.brandTone",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.brandTone (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Reply in the guest's language",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceInput.replyInCustomerLanguage",
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceInput.replyInCustomerLanguage (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "In effect",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceView.effective",
        "operation": "getCustomerServiceCopilot",
-       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceView",
-       "columns": [
-        "AiCustomerServiceCopilotKnowledgeWorkspaceView.configuration",
-        "AiCustomerServiceCopilotKnowledgeWorkspaceView.effective",
-        "AiCustomerServiceCopilotKnowledgeWorkspaceView.knowledgeCollections"
-       ],
-       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+       "notes": "What applies after tenant and venue settings combine; the form loads from `configuration`.",
+       "provenance": "contract marketing-crm.yaml AiCustomerServiceCopilotKnowledgeWorkspaceView.effective (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setCustomerServiceCopilot",
        "label": "Save",
-       "notes": "The act the screen exists for."
+       "operation": "setCustomerServiceCopilot",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setCustomerServiceCopilot"
-      },
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
       {
        "kind": "dataTable",
        "label": "Knowledge sources",
        "bindsTo": "KnowledgeCollection",
        "operation": "listKnowledgeCollections",
-       "provenance": "contract ai.yaml GET /collections; wiring fix, 2 October 2026"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "components": [
+       "columns": [
+        "KnowledgeCollection.name",
+        "KnowledgeCollection.scopeLevel",
+        "KnowledgeCollection.documentCount",
+        "KnowledgeCollection.isActive"
+       ],
+       "provenance": "contract ai.yaml KnowledgeCollection (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Add document",
+       "bindsTo": "KnowledgeDocument.sourceAssetId",
+       "operation": "createUpload",
+       "notes": "PDF, DOCX, HTML or TXT up to 20 MB (flow-brief default). createUpload, the file PUT, completeUpload, then ingestKnowledgeDocument into the selected collection; the row shows processing until indexed.",
+       "provenance": "contract assets.yaml KnowledgeDocument.sourceAssetId (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Document title",
+       "bindsTo": "KnowledgeDocument.title",
+       "operation": "ingestKnowledgeDocument",
+       "provenance": "contract ai.yaml KnowledgeDocument.title (defined 4 October 2026, CHG-FXS-001)"
+      },
       {
        "kind": "secondaryButton",
-       "label": "Add document",
+       "label": "Add to collection",
        "operation": "ingestKnowledgeDocument",
-       "provenance": "contract ai.yaml POST /collections/{collectionId}/documents; wiring fix, 2 October 2026"
+       "notes": "Ingests the uploaded asset into the selected collection.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Questions it could not answer",
+       "bindsTo": "AiKnowledgeGap",
+       "operation": "listKnowledgeGaps",
+       "columns": [
+        "AiKnowledgeGap.question",
+        "AiKnowledgeGap.occurrences",
+        "AiKnowledgeGap.audience",
+        "AiKnowledgeGap.status",
+        "AiKnowledgeGap.lastAskedAt"
+       ],
+       "notes": "Grouped and counted, newest first; each is a task for the content owner.",
+       "provenance": "contract ai.yaml AiKnowledgeGap (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The intent knowledge list.",
-   "error": "Could not load. Names which read failed and leaves the intent knowledge untouched.",
-   "emptyFirstRun": "No intent knowledge yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No collections yet: the assistant answers nothing until one is added. Carries Add document.",
    "emptyNoResults": "The filter narrowed it and the intent knowledge are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listKnowledgeGaps` requires to show this screen, and names that permission (the screen's other reads need `AI_CONFIGURE`, `ASSET_LIBRARY_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -702,6 +778,20 @@
     "purpose": "Load the copilot configuration as saved",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "createUpload",
+    "contract": "assets",
+    "purpose": "Upload a knowledge document's file before it is ingested",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "completeUpload",
+    "contract": "assets",
+    "purpose": "Finish the upload once the file PUT succeeds (no tap of its own); the asset id is the document's sourceAssetId",
+    "trigger": "background",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -709,7 +799,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-798",
    "workshopBoard": "wireframes/WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html#bo-798"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "overlays": [
    {
     "id": "formIngestKnowledgeDocument",
@@ -733,9 +823,16 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKnowledgeCollections` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "uploadId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `createUpload`."
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from the copilot's knowledge workspace, KnowledgeCollection, KnowledgeDocument and AiKnowledgeGap. Intents, phrases, entities and synonyms are not part of the retrieval design (the assistant answers from collections, ADR-0049) and left the purpose; an intent model is a later change request** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -796,19 +893,9 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "The agent's queue with the open conversation, its transcript and the guest beside it (defined 4 October 2026, CHG-FXS-001).",
   "purpose": "Give live agents the context and tools required to resolve conversations efficiently. Provide active conversation, transcript, guest context, AI reply suggestion, canned responses and translation. Support rich messages, attachments, internal notes, tags, tasks, transfer and supervisor assistance. Expose authorized ticket, reservation, membership, loyalty, wallet and case actions without switching applications. Track agent presence, typing, ownership, response time, action outcomes and complete transcript history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 37",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 37"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 37"
-   },
    {
     "operation": "handoverToAgent",
     "removed": true,
@@ -823,40 +910,133 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "sendConversationMessage",
-       "label": "Send conversation message",
-       "notes": "The act the screen exists for."
+       "kind": "selectField",
+       "label": "Show",
+       "bindsTo": "Conversation.state",
+       "operation": "listConversations",
+       "notes": "Waiting for an agent / Assigned to me (`assignedToMe`).",
+       "provenance": "contract marketing-crm.yaml Conversation.state (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendConversationMessage"
+       "kind": "dataTable",
+       "label": "Queue",
+       "bindsTo": "Conversation",
+       "operation": "listConversations",
+       "columns": [
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.handoverReason",
+        "Conversation.sentiment",
+        "Conversation.estimatedWaitSeconds"
+       ],
+       "provenance": "contract marketing-crm.yaml Conversation (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     },
     {
-     "name": "actionBar",
+     "name": "contextPanel",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Transcript",
+       "bindsTo": "Conversation.messages",
+       "operation": "getConversation",
+       "columns": [
+        "ConversationMessage.sender",
+        "ConversationMessage.body",
+        "ConversationMessage.attachments",
+        "ConversationMessage.sentAt"
+       ],
+       "notes": "Oldest first; internal notes are visibly different and never reach the guest.",
+       "provenance": "contract marketing-crm.yaml Conversation.messages (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Handover",
+       "bindsTo": "Conversation",
+       "operation": "getConversation",
+       "columns": [
+        "Conversation.handoverReason",
+        "Conversation.handoverSummary",
+        "Conversation.intent",
+        "Conversation.locale"
+       ],
+       "provenance": "contract marketing-crm.yaml Conversation (defined 4 October 2026, CHG-FXS-001)"
+      },
       {
        "kind": "secondaryButton",
        "label": "Claim conversation",
        "operation": "claimConversation",
-       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/claim; wiring fix, 2 October 2026"
+       "notes": "Shown while the conversation is waiting; takes it from the bot.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Reply",
+       "bindsTo": "ConversationMessage.body",
+       "operation": "sendConversationMessage",
+       "provenance": "contract marketing-crm.yaml ConversationMessage.body (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendConversationMessage",
+       "notes": "Sent as the agent; the sender is resolved from the session.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Outcome",
+       "bindsTo": "CallDisposition.outcome",
+       "operation": "setCallDisposition",
+       "provenance": "contract marketing-crm.yaml CallDisposition.outcome (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Callback at",
+       "bindsTo": "CallDisposition.callbackAt",
+       "operation": "setCallDisposition",
+       "notes": "Required when the outcome is callbackScheduled.",
+       "provenance": "contract marketing-crm.yaml CallDisposition.callbackAt (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Note",
+       "bindsTo": "CallDisposition.note",
+       "operation": "setCallDisposition",
+       "provenance": "contract marketing-crm.yaml CallDisposition.note (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "End conversation",
+       "operation": "setCallDisposition",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assist at kiosk",
+       "operation": "startKioskAssist",
+       "notes": "Only when the conversation came from a kiosk; deviceId is the kiosk's.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Guest",
+       "bindsTo": "GuestProfileDetail",
+       "operation": "getGuestProfile",
+       "notes": "Name, contact, tier and recent orders as the profile returns them; nothing when the guest is anonymous (no subjectId).",
+       "provenance": "contract marketing-crm.yaml GuestProfileDetail (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The agent list.",
-   "error": "Could not load. Names which read failed and leaves the agent untouched.",
-   "emptyFirstRun": "No agent yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "Nobody is waiting. The queue refreshes by itself.",
+   "emptyNoResults": "Nothing assigned to you. Offers the waiting queue.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `sendConversationMessage`, `setCallDisposition`, `startKioskAssist`, `claimConversation`."
   },
   "apis": [
    {
@@ -886,6 +1066,27 @@
     "purpose": "Take the conversation from the bot",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "listConversations",
+    "contract": "marketing-crm",
+    "purpose": "The agent's queue: waiting and assigned-to-me conversations, refreshed every 5 s",
+    "trigger": "onInterval",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "getConversation",
+    "contract": "marketing-crm",
+    "purpose": "The open conversation and its transcript, polled every 5 s while open",
+    "trigger": "onInterval",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "The guest beside the conversation (subjectId)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -893,15 +1094,24 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-799",
    "workshopBoard": "wireframes/WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html#bo-799"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the screen shows the queue and the agent picks one (CHG-FXS-001)."
+    },
+    {
+     "name": "subjectId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "The open conversation's subjectId (Conversation.subjectId); none for an anonymous guest."
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from Conversation, ConversationMessage, CallDisposition and the customer-marketing design notes (BO-799): the queue (listConversations), the transcript (getConversation) and the guest (getGuestProfile) are bound reads; AI reply suggestions and canned responses wait for their operations** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

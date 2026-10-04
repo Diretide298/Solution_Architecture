@@ -792,49 +792,137 @@
   },
   "density": "compact",
   "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "patternReason": "One programme's validity edited as a whole record, with presets for temporary and seasonal programmes (defined 4 October 2026 from AccreditationValidity, CHG-FXS-001).",
   "purpose": "Manage short-duration and recurring accreditation programs.",
   "layout": {
    "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
      "components": [
       {
        "kind": "selectField",
-       "label": "Accreditation type",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
+       "label": "Programme",
+       "bindsTo": "AccreditationProgramme.id",
+       "operation": "listAccreditationProgrammes",
+       "columns": [
+        "AccreditationProgramme.code",
+        "AccreditationProgramme.name",
+        "AccreditationProgramme.status"
+       ],
+       "provenance": "contract accreditation.yaml AccreditationProgramme.id (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
-       "label": "Automatic expiry",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
+       "label": "Validity",
+       "bindsTo": "AccreditationValidity.validityKind",
+       "operation": "setAccreditationValidity",
+       "notes": "Presets: Temporary is fixedPeriod, Seasonal is seasonal, Event-only is eventDuration (VO-R14: presets inside the validity editor, same record as BO-666).",
+       "provenance": "contract accreditation.yaml AccreditationValidity.validityKind (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Valid for (months)",
+       "bindsTo": "AccreditationValidity.validityMonths",
+       "operation": "setAccreditationValidity",
+       "notes": "For fixedPeriod and rolling.",
+       "provenance": "contract accreditation.yaml AccreditationValidity.validityMonths (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
-       "label": "Renewal eligibility",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
+       "label": "On expiry",
+       "bindsTo": "AccreditationValidity.onExpiry",
+       "operation": "setAccreditationValidity",
+       "provenance": "contract accreditation.yaml AccreditationValidity.onExpiry (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Grace period (days)",
+       "bindsTo": "AccreditationValidity.gracePeriodDays",
+       "operation": "setAccreditationValidity",
+       "notes": "For gracePeriod.",
+       "provenance": "contract accreditation.yaml AccreditationValidity.gracePeriodDays (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Renewal window (days)",
+       "bindsTo": "AccreditationValidity.renewalWindowDays",
+       "operation": "setAccreditationValidity",
+       "provenance": "contract accreditation.yaml AccreditationValidity.renewalWindowDays (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Renewal re-verifies the holder",
+       "bindsTo": "AccreditationValidity.renewalRequiresReverification",
+       "operation": "setAccreditationValidity",
+       "provenance": "contract accreditation.yaml AccreditationValidity.renewalRequiresReverification (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save",
+       "operation": "setAccreditationValidity",
+       "notes": "Sends the whole AccreditationValidity read by getAccreditationValidity with the edits.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Validity as saved",
+       "bindsTo": "AccreditationValidity",
+       "operation": "getAccreditationValidity",
+       "columns": [
+        "AccreditationValidity.validityKind",
+        "AccreditationValidity.validityMonths",
+        "AccreditationValidity.onExpiry"
+       ],
+       "provenance": "agreed operation `getAccreditationValidity`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The temporary seasonal accreditation configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the temporary seasonal accreditation untouched.",
-   "emptyFirstRun": "No temporary seasonal accreditation configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
-   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
+   "loading": "The programme's validity as saved.",
+   "error": "Could not load. Names the read that failed; the form stays read-only.",
+   "emptyFirstRun": "Never saved: the programme's validity is the platform default (eventDuration).",
+   "emptyNoAccess": "Shown when the caller lacks `ACCREDITATION_VIEW`, which `listAccreditationProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCREDITATION_CONFIGURE` for `setAccreditationValidity`.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAccreditationProgrammes",
+    "contract": "accreditation",
+    "purpose": "The programme whose validity is set",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "getAccreditationValidity",
+    "contract": "accreditation",
+    "purpose": "The programme's validity as saved, before the whole-record save: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "setAccreditationValidity",
+    "contract": "accreditation",
+    "purpose": "Save the programme's validity (whole record)",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-669",
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-669"
   },
   "apisNote": "No operations of its own since 2 October 2026 (CHG-WIR-001): merged into BO-666, whose operations it routes to.",
-  "notes": "**Merged into BO-666** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-001). BO-669 binds the same single operation (setAccreditationValidity) on the same record as BO-666 Validity Period Configuration; temporary and seasonal periods are presets inside the validity editor (VO-R14; DI-671, DI-987; design-notes correction venue-operations BO-669). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-666, and nothing on it is built separately.\n\nDates follow from the validity kind and the programme; events and venues are the programme's scope (BO-667); access profiles are category defaults (design-note correction).",
+  "notes": "**Merged into BO-666** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-001). BO-669 binds the same single operation (setAccreditationValidity) on the same record as BO-666 Validity Period Configuration; temporary and seasonal periods are presets inside the validity editor (VO-R14; DI-671, DI-987; design-notes correction venue-operations BO-669). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-666, and nothing on it is built separately.\n\nDates follow from the validity kind and the programme; events and venues are the programme's scope (BO-667); access profiles are category defaults (design-note correction).\n\n**Defined 4 October 2026 from AccreditationValidity: the pack's select fields (type, automatic expiry, renewal eligibility) are validityKind, onExpiry and the renewal fields; the validity is read with getAccreditationValidity (agreed with contracts in the ledger) before the whole-record save** (CHG-FXS-001)\n\n**The saved validity shows beside the form** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

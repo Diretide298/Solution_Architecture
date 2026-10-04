@@ -43,25 +43,25 @@ modulesUsed:
   screens: 2
 servicesCalled:
 - service: OrderService
-  operationCalls: 70
+  operationCalls: 71
 - service: MarketingService
-  operationCalls: 61
+  operationCalls: 62
 - service: CatalogueService
-  operationCalls: 58
+  operationCalls: 56
 - service: VenueOpsService
-  operationCalls: 52
+  operationCalls: 55
 - service: IdentityService
-  operationCalls: 27
+  operationCalls: 29
+- service: AccessService
+  operationCalls: 26
+- service: WhiteLabelService
+  operationCalls: 22
 - service: FnbService
   operationCalls: 22
-- service: WhiteLabelService
-  operationCalls: 21
-- service: AccessService
-  operationCalls: 21
 - service: AiService
   operationCalls: 21
 - service: WalletService
-  operationCalls: 8
+  operationCalls: 9
 - service: LedgerService
   operationCalls: 6
 - service: RetailService
@@ -452,7 +452,9 @@ screens:
   operations:
   - getOrder
   - linkGuestCheckout
+  - registerGuest
   - reprintOrder
+  - verifyGuestEmail
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -479,6 +481,7 @@ screens:
   - getWallet
   - getWalletAutoReloadSetting
   - getWalletExitBalance
+  - listPaymentTokens
   - listWalletTransactions
   - setWalletAutoReloadSetting
   - settleWalletAtExit
@@ -491,8 +494,8 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - cardCode<-deepLink
   - subjectId<-session
+  - cardCode<-deepLink
   - walletId<-navigation
   goesTo:
   - GST-001
@@ -786,6 +789,7 @@ screens:
   - getVenueMap
   - getVenueMapGraph
   - getWaitTimes
+  - listBookableVenueMaps
   - listProducts
   states:
   - emptyFirstRun
@@ -799,6 +803,7 @@ screens:
   offlineState: true
   entryParams:
   - mapId<-deepLink
+  - venueId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -1000,6 +1005,8 @@ screens:
   density: comfortable
   operations:
   - getOrder
+  - getParkingEntitlement
+  - listMyEntitlements
   - listParkingFacilities
   states:
   - emptyFirstRun
@@ -1011,6 +1018,8 @@ screens:
   offlineState: true
   entryParams:
   - orderId<-previousScreen
+  - subjectId<-session
+  - entitlementId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1520,6 +1529,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - listMyEntitlements
   - listTicketTransfers
   - transferOrderTickets
   states:
@@ -1531,6 +1541,7 @@ screens:
   offlineState: true
   entryParams:
   - orderId<-deepLink
+  - subjectId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -1892,8 +1903,8 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - getAvailability
-  - listProducts
+  - getMapResourceAvailability
+  - listBookableVenueMaps
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1974,6 +1985,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - listMyEntitlements
   - lookupShopAndDrop
   states:
   - emptyFirstRun
@@ -1982,7 +1994,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - subjectId<-session
   goesTo:
   - GST-001
   boardFrames: null
@@ -2134,6 +2147,7 @@ screens:
   - enrolFacePass
   - getFacePassEnrolment
   - listDelegations
+  - listMyEntitlements
   - revokeFacePass
   states:
   - emptyFirstRun
@@ -2145,8 +2159,8 @@ screens:
   - subjectNotLinked
   offlineState: true
   entryParams:
-  - enrolmentId<-deepLink
   - subjectId<-session
+  - enrolmentId<-deepLink
   goesTo:
   - GST-039
   boardFrames: null
@@ -2194,6 +2208,9 @@ screens:
   density: comfortable
   operations:
   - getGiftCard
+  - getPublishedTenantConfig
+  - getWallet
+  - listConsentPurposes
   - listPaymentTokens
   - redeemLoyaltyPoints
   - storePaymentToken

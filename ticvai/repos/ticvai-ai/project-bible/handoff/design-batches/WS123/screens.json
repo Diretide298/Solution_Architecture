@@ -628,21 +628,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "detail",
+  "patternReason": "One AI decision's a business-readable explanation, read from its trace at depth business (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001).",
   "purpose": "Explain a selected AI decision in a clear business-readable format.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 58"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 58"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -653,61 +641,109 @@
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getAiDecisionTrace",
-       "notes": "One record, read-only."
+       "label": "Decision",
+       "bindsTo": "AiDecisionRecord",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiDecisionRecord.capabilityKey",
+        "AiDecisionRecord.task",
+        "AiDecisionRecord.subjectKind",
+        "AiDecisionRecord.subjectRef",
+        "AiDecisionRecord.outcome",
+        "AiDecisionRecord.createdAt"
+       ],
+       "provenance": "contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Explanation",
+       "bindsTo": "AiDecisionTrace.explanation",
+       "operation": "getAiDecisionTrace",
+       "notes": "Plain language, written for the business user; the reliability and the evidence it rests on follow.",
+       "provenance": "contract ai.yaml AiDecisionTrace.explanation (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "What it was based on",
+       "bindsTo": "AiDecisionRecord.evidence",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiEvidenceItem.label",
+        "AiEvidenceItem.name",
+        "AiEvidenceItem.value",
+        "AiEvidenceItem.observedAt"
+       ],
+       "notes": "Each item labelled source, derived or model-inferred (AIC-197).",
+       "provenance": "contract ai.yaml AiDecisionRecord.evidence (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Model and versions",
+       "bindsTo": "AiDecisionRecord",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiDecisionRecord.producer",
+        "AiDecisionRecord.modelVersion",
+        "AiDecisionRecord.promptTemplateVersion",
+        "AiDecisionRecord.policyVersion"
+       ],
+       "provenance": "contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Human decision",
+       "bindsTo": "AiDecisionRecord.humanDecision",
+       "operation": "getAiDecisionTrace",
+       "provenance": "contract ai.yaml AiDecisionRecord.humanDecision (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The decision explanation list.",
-   "error": "Could not load. Names which read failed and leaves the decision explanation untouched.",
-   "emptyFirstRun": "No decision explanation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The decision header first, then the trace.",
+   "error": "Could not load the trace. Names the decision record id; nothing else changes.",
+   "emptyFirstRun": "Not used: the screen always opens on one decision (decisionRecordId).",
    "emptyNoResults": "The filter narrowed it and the decision explanation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
     "operationId": "getAiDecisionTrace",
     "contract": "ai",
-    "purpose": "The full trace of a decision",
+    "purpose": "The decision's trace at depth business (query depth=business): a business-readable explanation",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -738,7 +774,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-541",
    "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-541"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -774,7 +810,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Defined 4 October 2026 from AiDecisionTrace at depth business: a business-readable explanation** (CHG-FXS-001)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -837,21 +873,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "detail",
+  "patternReason": "One AI decision's which data and evidence contributed and where each came from, read from its trace at depth technical (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001).",
   "purpose": "Show exactly which data and evidence contributed to an AI decision and where each item originated. This is critical for trust.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 60"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 60"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -862,61 +886,121 @@
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getAiDecisionTrace",
-       "notes": "One record, read-only."
+       "label": "Decision",
+       "bindsTo": "AiDecisionRecord",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiDecisionRecord.capabilityKey",
+        "AiDecisionRecord.task",
+        "AiDecisionRecord.subjectKind",
+        "AiDecisionRecord.subjectRef",
+        "AiDecisionRecord.outcome",
+        "AiDecisionRecord.createdAt"
+       ],
+       "provenance": "contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Evidence and provenance",
+       "bindsTo": "AiDecisionRecord.evidence",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiEvidenceItem.label",
+        "AiEvidenceItem.kind",
+        "AiEvidenceItem.name",
+        "AiEvidenceItem.ref",
+        "AiEvidenceItem.value",
+        "AiEvidenceItem.observedAt"
+       ],
+       "notes": "label is the origin (source system, derived by a rule or feature, inferred by a model); ref points at the record it was read from.",
+       "provenance": "contract ai.yaml AiDecisionRecord.evidence (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Inputs and versions",
+       "bindsTo": "AiDecisionRecord",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiDecisionRecord.inputsRef",
+        "AiDecisionRecord.featureSetVersion",
+        "AiDecisionRecord.knowledgeVersion",
+        "AiDecisionRecord.ruleVersions",
+        "AiDecisionRecord.modelVersion"
+       ],
+       "provenance": "contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Model calls",
+       "bindsTo": "AiDecisionTrace.activity",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiInteraction.capability",
+        "AiInteraction.provider",
+        "AiInteraction.model",
+        "AiInteraction.sources",
+        "AiInteraction.maskedFieldCount",
+        "AiInteraction.createdAt"
+       ],
+       "notes": "sources are the retrieved passages each call answered from.",
+       "provenance": "contract ai.yaml AiDecisionTrace.activity (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Chain verified",
+       "bindsTo": "AiDecisionTrace.chainVerified",
+       "operation": "getAiDecisionTrace",
+       "notes": "Whether the record's hash chain verifies; a break is shown as a red banner.",
+       "provenance": "contract ai.yaml AiDecisionTrace.chainVerified (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The data feature evidence list.",
-   "error": "Could not load. Names which read failed and leaves the data feature evidence untouched.",
-   "emptyFirstRun": "No data feature evidence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The decision header first, then the trace.",
+   "error": "Could not load the trace. Names the decision record id; nothing else changes.",
+   "emptyFirstRun": "Not used: the screen always opens on one decision (decisionRecordId).",
    "emptyNoResults": "The filter narrowed it and the data feature evidence are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
     "operationId": "getAiDecisionTrace",
     "contract": "ai",
-    "purpose": "The full trace of a decision",
+    "purpose": "The decision's trace at depth technical (query depth=technical): which data and evidence contributed and where each came from",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -947,7 +1031,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-542",
    "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-542"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 60 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -983,7 +1067,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Defined 4 October 2026 from AiDecisionTrace at depth technical: which data and evidence contributed and where each came from** (CHG-FXS-001)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1584,21 +1668,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "detail",
+  "patternReason": "One AI decision's the governance and human decisions around it, read from its trace at depth governance (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001).",
   "purpose": "Connect Board 1 and Board 2 governance activity to the AI decision.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 66"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 66"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1609,61 +1681,103 @@
        "kind": "selectField",
        "label": "Tenant",
        "bindsTo": "Tenant.id",
+       "operation": "listTenants",
        "columns": [
         "Tenant.code",
         "Tenant.name",
         "Tenant.status"
        ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
        "bindsTo": "PlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
         "PlatformStaffGrant.permissions",
         "PlatformStaffGrant.reason",
-        "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "listOwnPlatformStaffGrants",
-       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
-       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+       "provenance": "contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
        "label": "Open access grant",
        "operation": "openPlatformStaffGrant",
-       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
-       "provenance": "contract identity.yaml POST /platform-staff-grants"
+       "notes": "Shown when no grant into the picked tenant is open (audit R098).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getAiDecisionTrace",
-       "notes": "One record, read-only."
+       "label": "Decision",
+       "bindsTo": "AiDecisionRecord",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiDecisionRecord.capabilityKey",
+        "AiDecisionRecord.task",
+        "AiDecisionRecord.subjectKind",
+        "AiDecisionRecord.subjectRef",
+        "AiDecisionRecord.outcome",
+        "AiDecisionRecord.createdAt"
+       ],
+       "provenance": "contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Governance",
+       "bindsTo": "AiDecisionRecord",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiDecisionRecord.governanceOutcome",
+        "AiDecisionRecord.policyVersion",
+        "AiDecisionRecord.approvals",
+        "AiDecisionRecord.humanDecision",
+        "AiDecisionRecord.executionResult"
+       ],
+       "provenance": "contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Interventions",
+       "bindsTo": "AiDecisionTrace.interventions",
+       "operation": "getAiDecisionTrace",
+       "columns": [
+        "AiIntervention.kind",
+        "AiIntervention.targetKind",
+        "AiIntervention.reason",
+        "AiIntervention.principalId",
+        "AiIntervention.createdAt"
+       ],
+       "notes": "Overrides, pauses, retries and rollbacks by a person, oldest first.",
+       "provenance": "contract ai.yaml AiDecisionTrace.interventions (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Chain verified",
+       "bindsTo": "AiDecisionTrace.chainVerified",
+       "operation": "getAiDecisionTrace",
+       "provenance": "contract ai.yaml AiDecisionTrace.chainVerified (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The governance approval human list.",
-   "error": "Could not load. Names which read failed and leaves the governance approval human untouched.",
-   "emptyFirstRun": "No governance approval human yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The decision header first, then the trace.",
+   "error": "Could not load the trace. Names the decision record id; nothing else changes.",
+   "emptyFirstRun": "Not used: the screen always opens on one decision (decisionRecordId).",
    "emptyNoResults": "The filter narrowed it and the governance approval human are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
     "operationId": "getAiDecisionTrace",
     "contract": "ai",
-    "purpose": "The full trace of a decision",
+    "purpose": "The decision's trace at depth governance (query depth=governance): the governance and human decisions around it",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1694,7 +1808,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-545",
    "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-545"
   },
-  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -1730,7 +1844,7 @@
     "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Defined 4 October 2026 from AiDecisionTrace at depth governance: the governance and human decisions around it** (CHG-FXS-001)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

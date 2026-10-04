@@ -1,6 +1,6 @@
 # P08-orders-money-02 — P08 · Orders & Money (2 of 3)
 
-**10 screens · 67 operations · 88 schemas · 28 permissions**
+**10 screens · 71 operations · 101 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -167,7 +167,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-042` | Banking & Safe | C | 27 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 | `BO-043` | Daily Reconciliation | A | 34 | 66 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
 | `BO-047` | Order Corrections & Exceptions | C | 127 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
-| `BO-048` | Retail Products | A | 26 | 19 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `BO-048` | Retail Products | A | 30 | 19 | 6 | 29 | 1 | 0 | — | notStarted (generated) |
 | `BO-059` | Sales Reports | D | 76 | 20 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
 | `BO-061` | Scheduled Reports | D | 26 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 | `BO-062` | Venue Profile | C | 9 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

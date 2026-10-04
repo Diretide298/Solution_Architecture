@@ -734,6 +734,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "proposeTranslations": {
+  "method": "POST",
+  "path": "/ai/translate",
+  "contract": "ai",
+  "summary": "Fill translation gaps with a first pass, for a human to edit",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "publishGuidedChoice": {
   "method": "POST",
   "path": "/guided-choices/{guidedChoiceId}/publish",

@@ -20,6 +20,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.fiscal_period
+  - ledger.fiscal_period_event
 - operation: approveJournalEntry
   verb: POST
   path: /journal-entries/{entryId}/approve
@@ -51,6 +52,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.fiscal_period
+  - ledger.fiscal_period_event
 - operation: calculateTax
   verb: POST
   path: /tax/calculate
@@ -79,9 +81,16 @@ operations:
   - cache:idempotency
   - ledger.fiscal_period
   - ledger.fiscal_period_event
+  - ledger.journal_entry
+  - ledger.journal_line
+  - ledger.price_variance
+  - ledger.recognition_schedule
+  - ledger.settlement
+  - ledger.settlement_exception
   writes:
   - cache:idempotency
   - ledger.fiscal_period
+  - ledger.fiscal_period_event
   - platform.outbox
 - operation: createAccount
   verb: POST
@@ -743,6 +752,8 @@ operations:
   - ledger.journal_line
   writes:
   - cache:idempotency
+  - ledger.journal_entry
+  - ledger.journal_line
   - ledger.posting
 - operation: rejectJournal
   verb: POST
@@ -818,6 +829,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.journal_entry
+  - ledger.journal_line
 - operation: reviewPriceVariance
   verb: POST
   path: /price-variances/{varianceId}/review
@@ -962,6 +974,8 @@ operations:
   writes:
   - cache:idempotency
   - ledger.deposit
+  - ledger.journal_entry
+  - ledger.journal_line
   - ledger.posting
 - operation: transmitEInvoices
   verb: POST

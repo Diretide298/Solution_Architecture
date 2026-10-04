@@ -1,6 +1,6 @@
 # P09-overview-health-01 — P09 · Overview & Health
 
-**5 screens · 22 operations · 34 schemas · 8 permissions**
+**5 screens · 23 operations · 34 schemas · 8 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -119,8 +119,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-002` | Platform Dashboard | B | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-002` | Platform Dashboard | A | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-004` | Platform Audit Log | D | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
 | `ADM-013` | Tenant Performance Monitor | B | 0 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-029` | Deployment Monitor | B | 5 | 53 | 7 | 0 | 0 | 0 | — | notStarted (generated) |

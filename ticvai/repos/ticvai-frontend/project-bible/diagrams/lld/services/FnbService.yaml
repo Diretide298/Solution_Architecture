@@ -1,29 +1,29 @@
 id: LLD-FnbService
-title: FnbService — 135 operations, 53 tables
+title: FnbService — 138 operations, 54 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**135 operations and 53 tables — the largest single domain after marketing.** Its own service
+why: '**138 operations and 54 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 135
+  operations: 138
   inAFlow: 65
-  percent: 48%
+  percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 53
+  tables: 54
   stores:
   - postgres
   largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 135
+  count: 138
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -32,7 +32,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: true
     reads: 5
-    writes: 3
+    writes: 5
   - operation: amendFnbOrder
     verb: PATCH
     path: /fnb-orders/{orderId}
@@ -40,7 +40,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 5
-    writes: 2
+    writes: 3
   - operation: applyMenuActions
     verb: POST
     path: /menus/{menuId}/actions
@@ -87,24 +87,24 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 5
+    writes: 3
   - operation: claimTableSession
     verb: POST
     path: /table-sessions
     scope: venue
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 5
+    writes: 3
   - operation: clearTable
     verb: POST
     path: /tables/{tableId}/clear
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: closeCorrectiveAction
     verb: POST
     path: /food-safety/corrective-actions/{actionId}/close
@@ -143,8 +143,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 5
-    writes: 3
+    reads: 6
+    writes: 4
   - operation: createDeliveryLocation
     verb: POST
     path: /delivery-locations
@@ -367,7 +367,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getTableVisit
     verb: GET
@@ -431,7 +431,15 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 2
+    reads: 3
+    writes: 0
+  - operation: listCorrectiveActions
+    verb: GET
+    path: /food-safety/corrective-actions
+    scope: venue
+    permission: INCIDENT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listDeliveryLocations
     verb: GET
@@ -479,7 +487,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listKitchenStations
     verb: GET
@@ -545,6 +553,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listProductionPlans
+    verb: GET
+    path: /production-plans
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listProductionRuns
     verb: GET
     path: /production-runs
@@ -564,6 +580,14 @@ operationsByContract:
   - operation: listSubstitutionRules
     verb: GET
     path: /substitution-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTableCombinations
+    verb: GET
+    path: /outlets/{outletId}/table-combinations
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
@@ -800,7 +824,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 5
-    writes: 3
+    writes: 4
   - operation: scheduleMenuPublish
     verb: POST
     path: /menus/{menuId}/schedule
@@ -808,7 +832,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: seatTableReservation
     verb: POST
     path: /table-reservations/{reservationId}/seat
@@ -816,7 +840,7 @@ operationsByContract:
     permission: FNB_OPERATE
     offline: true
     reads: 4
-    writes: 4
+    writes: 5
   - operation: sendBookingConfirmation
     verb: POST
     path: /table-reservations/{reservationId}/confirm
@@ -839,8 +863,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 4
-    writes: 2
+    reads: 5
+    writes: 3
   - operation: setCourseRules
     verb: PUT
     path: /outlets/{outletId}/course-rules
@@ -887,7 +911,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 1
   - operation: setItemAvailability
     verb: PUT
@@ -967,8 +991,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 7
+    writes: 5
   - operation: setSectionLayout
     verb: PUT
     path: /outlets/{outletId}/sections
@@ -1007,7 +1031,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setTemperatureCheckpoint
     verb: PUT
@@ -1103,7 +1127,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 5
+    reads: 10
     writes: 1
 tables:
 - store: cache:idempotency
@@ -1273,6 +1297,120 @@ tables:
   - updateTable
   - updateTableReservation
   - updateTableVisit
+  keys:
+    applyMenuActions:
+      role: evicts
+      resolvers: &id001
+      - menu
+      - price-list
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    attachModifierGroup:
+      role: evicts
+      resolvers: &id002
+      - menu
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    createTable:
+      role: evicts
+      resolvers: &id003
+      - table-layout
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    publishMenu:
+      role: evicts
+      resolvers: &id004
+      - menu
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    rebalanceStationLoad:
+      role: evicts
+      resolvers: &id005
+      - fnb.kitchen_station
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    rollbackMenu:
+      role: evicts
+      resolvers: &id006
+      - menu
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    scheduleMenuPublish:
+      role: evicts
+      resolvers: &id007
+      - menu
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setCourseRules:
+      role: evicts
+      resolvers: &id008
+      - fnb.course_rule
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setDeliveryLocationOutletMapping:
+      role: evicts
+      resolvers: &id009
+      - fnb.delivery_location_outlet
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setKitchenSla:
+      role: evicts
+      resolvers: &id010
+      - fnb.kitchen_sla
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setSectionLayout:
+      role: evicts
+      resolvers: &id011
+      - table-layout
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setSubstitutionRules:
+      role: evicts
+      resolvers: &id012
+      - fnb.substitution_rule
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setTableCombinations:
+      role: evicts
+      resolvers: &id013
+      - table-layout
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateTable:
+      role: evicts
+      resolvers: &id014
+      - table-layout
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -1299,12 +1437,107 @@ tables:
   - setTableCombinations
   - updateTable
   readBy: null
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    applyMenuActions:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    attachModifierGroup:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    createTable:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    publishMenu:
+      role: evicts
+      resolvers: *id004
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    rebalanceStationLoad:
+      role: evicts
+      resolvers: *id005
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    rollbackMenu:
+      role: evicts
+      resolvers: *id006
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    scheduleMenuPublish:
+      role: evicts
+      resolvers: *id007
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setCourseRules:
+      role: evicts
+      resolvers: *id008
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setDeliveryLocationOutletMapping:
+      role: evicts
+      resolvers: *id009
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setKitchenSla:
+      role: evicts
+      resolvers: *id010
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setSectionLayout:
+      role: evicts
+      resolvers: *id011
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setSubstitutionRules:
+      role: evicts
+      resolvers: *id012
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setTableCombinations:
+      role: evicts
+      resolvers: *id013
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateTable:
+      role: evicts
+      resolvers: *id014
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: fnb.allergen_verdict
-  columns: 8
+  columns: 9
   store: postgres
   parent: fnb.menu_item
   writtenBy:
@@ -1338,6 +1571,13 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.combo_slot_option
+  columns: 5
+  store: postgres
+  parent: fnb.combo_slot
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.corrective_action
   columns: 13
   store: postgres
@@ -1353,7 +1593,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.delivery_location
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1374,7 +1614,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.dining_table
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1387,7 +1627,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: fnb.ingredient_substitute
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1410,7 +1650,7 @@ tables:
 - table: fnb.kitchen_sla
   columns: 3
   store: postgres
-  parent: null
+  parent: platform.outlet
   writtenBy:
   - fnb
   foreignWriters: null
@@ -1422,7 +1662,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.kitchen_ticket
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1467,7 +1707,8 @@ tables:
   columns: 9
   store: postgres
   parent: fnb.menu
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.menu_section
   columns: 5
@@ -1480,7 +1721,8 @@ tables:
   columns: 12
   store: postgres
   parent: fnb.menu
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.modifier_group
   columns: 6
@@ -1635,7 +1877,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_visit
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1673,9 +1915,9 @@ readsFrom:
 - service: IdentityService
   operations: 10
 - service: TenancyService
-  operations: 8
+  operations: 9
 - service: InventoryService
-  operations: 6
+  operations: 8
 - service: OrderService
   operations: 3
 - service: CatalogueService

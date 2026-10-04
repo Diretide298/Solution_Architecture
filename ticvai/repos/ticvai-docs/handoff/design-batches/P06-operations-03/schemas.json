@@ -3181,6 +3181,12 @@
     "type": "string",
     "maxLength": 100,
     "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    }
   }
  },
@@ -4687,6 +4693,24 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "overriddenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who let the party past the queue** (`overrideWaitingGuest`, 4 October 2026, CHG-FXC-003), with `overrideReason` and `overriddenAt`. Null when the entry was never overridden."
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "overriddenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  }

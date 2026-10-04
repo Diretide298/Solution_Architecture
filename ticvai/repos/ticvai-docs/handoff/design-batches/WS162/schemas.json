@@ -804,6 +804,13 @@
     "type": "string",
     "format": "uuid"
    },
+   "translationJobId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
    "kind": {
     "type": "string",
     "enum": [
@@ -995,6 +1002,12 @@
    "isActive": {
     "type": "boolean",
     "default": true
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."
    }
   }
  },

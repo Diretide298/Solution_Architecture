@@ -2808,6 +2808,7 @@
    "platformName": "Venue Management",
    "wave": 1,
    "operations": [
+    "decideProposedAction",
     "listProposedActions",
     "proposeVenueLabels",
     "proposeWalkways"
@@ -2989,6 +2990,7 @@
    "platformName": "Venue Management",
    "wave": 1,
    "operations": [
+    "getTranslationProposals",
     "proposeMarketingContent",
     "proposeTranslations"
    ]
@@ -3056,6 +3058,7 @@
    "operations": [
     "createForecastScenario",
     "getForecast",
+    "listForecastDefinitions",
     "listOperationalRequirements"
    ]
   },
@@ -3782,7 +3785,9 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast"
+    "getForecast",
+    "getForecastAccuracy",
+    "listForecastDefinitions"
    ]
   },
   {
@@ -3792,7 +3797,8 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast"
+    "getForecast",
+    "listForecastDefinitions"
    ]
   },
   {
@@ -3802,7 +3808,9 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast"
+    "explainMetricChange",
+    "getForecast",
+    "listForecastDefinitions"
    ]
   },
   {
@@ -3815,6 +3823,7 @@
     "explainMetricChange",
     "getForecast",
     "getForecastAccuracy",
+    "listForecastDefinitions",
     "listForecastVersions"
    ]
   },
@@ -4508,7 +4517,8 @@
    "platformName": "Venue CMS",
    "wave": 1,
    "operations": [
-    "getTranslationProposals"
+    "getTranslationProposals",
+    "proposeTranslations"
    ]
   },
   {

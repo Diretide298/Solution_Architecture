@@ -651,6 +651,18 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      parameters:
+      - name: connectionId
+        in: query
+        required: false
+        description: '**The provider connection this webhook belongs to** (4 October 2026, CHG-FXC-010): the
+          `payments.provider_connection` id, which `createPaymentProviderConnection` puts into the webhook URL it registers
+          with the provider. The tenant is the cell the request reached (the tenant''s API host, `resolveTenantHost`); the
+          connection is this id within it; its signing secret then verifies the body. Unknown, absent or of another
+          provider: 404 with no detail, and nothing is read from the body.'
+        schema:
+          type: string
+          format: uuid
       x-ticvai-emits:
       - payment.captured
       - order.paid
@@ -3130,6 +3142,12 @@ components:
           nullable: true
         scopePath:
           type: string
+        credentialRef:
+          type: string
+          writeOnly: true
+          description: '**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference
+            the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned;
+            `credentialFingerprint` is what reads show.'
     ProviderTestResult:
       type: object
       description: 'Board 3.10. **A provider configured and never tested fails on the first real

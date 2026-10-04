@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-409` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `ADM-410` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-411` | Billing & Legal Entity Information | B | 17 | 19 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-412` | Payment Method & Settlement Setup | A | 41 | 13 | 7 | 24 | 0 | 0 | — | notStarted (—) |
+| `ADM-412` | Payment Method & Settlement Setup | A | 48 | 16 | 7 | 24 | 0 | 0 | — | notStarted (—) |
 | `ADM-413` | Trial Configuration & Conversion Rules | B | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ADM-414` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |

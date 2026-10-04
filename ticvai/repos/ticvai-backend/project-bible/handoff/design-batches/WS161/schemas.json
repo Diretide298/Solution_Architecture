@@ -1,4 +1,191 @@
 {
+ "AiForecastDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.forecast_definition",
+  "description": "**What is forecast, at what grain, for what horizon, how often and by which producer** (design 3.1 Forecast, 5.2; ADM-500). One forecasting service for the platform: BI's extra subjects are definitions here, not a second forecaster (AIP-036, AIP-037).",
+  "required": [
+   "definitionKey",
+   "subject",
+   "grain",
+   "horizonDays",
+   "producer"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "definitionKey": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "subject": {
+    "type": "string",
+    "enum": [
+     "attendance",
+     "arrivalPattern",
+     "productDemand",
+     "timeslotDemand",
+     "channelPace",
+     "revenue",
+     "occupancy",
+     "attractionUtilisation",
+     "queue",
+     "entryFlow",
+     "staffing",
+     "posDemand",
+     "fnbDemand",
+     "retailDemand",
+     "stockDemand",
+     "resourceDemand",
+     "refunds",
+     "cashCollection",
+     "membershipRenewals",
+     "churn"
+    ]
+   },
+   "module": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+     }
+    ],
+    "description": "**Whose AI this forecast is, and so who publishes it** (Chinmay, 2 October, workbook Q3: \"the permission holder for that module's AI\"; CHG-FUP-004). `publishForecastVersion` requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module. Absent on a write, the server takes it from `subject`: ticketing for `attendance`, `arrivalPattern`, `productDemand`, `timeslotDemand`, `channelPace`, `occupancy` and `refunds`; access for `entryFlow` and `attractionUtilisation`; queue for `queue`; fnb for `fnbDemand`; retail for `retailDemand`; inventory for `stockDemand`; resources for `resourceDemand`; membership for `membershipRenewals` and `churn`; core for `revenue`, `staffing`, `posDemand` and `cashCollection`. Proposed, client to correct; a venue may name the module itself. Always present on a read."
+   },
+   "grain": {
+    "type": "string",
+    "enum": [
+     "hour",
+     "day",
+     "week",
+     "month"
+    ]
+   },
+   "dimensions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Breakdowns forecast directly or reconciled to. **Documented keys (29 September, build; 8.2.12, 8.2.14, 8.2.27):** `product`, `channel`, `timeslot`, `gate`, `outlet`, `customerSegment` and `originCountry`. `customerSegment` is the marketing-crm segment (of those in `segmentIds`, else the membership tier) the guest belonged to on the day of the booking; `originCountry` is the guest profile's country, else the order's billing country, else the channel's market, recorded as `unknown` rather than guessed. **The nightly snapshot (design 2.2 C step 1) carries both for every booking and admission**, so a definition that names them is forecast and reconciled by them. Any other key is accepted and forecast only where the snapshot carries it."
+   },
+   "segmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The marketing-crm segments `customerSegment` breaks down by, in priority order where a guest is in several. Empty means membership tiers."
+   },
+   "horizonDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 730
+   },
+   "refreshCadence": {
+    "type": "string",
+    "enum": [
+     "hourly",
+     "daily",
+     "weekly"
+    ]
+   },
+   "producer": {
+    "type": "string",
+    "enum": [
+     "rule",
+     "statistical",
+     "model",
+     "ensemble"
+    ],
+    "description": "Which producer is live (design 3.10). A model is promoted only through `promoteAiRelease`. **`ensemble`** (18 September minutes, M18-16): a weighted blend of the rule and statistical producers, and of a promoted model where one exists; the weights are recorded on each version. Setting `ensemble` never brings in an unpromoted model."
+   },
+   "historyWindowMonths": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 60,
+    "default": 36,
+    "description": "How much of the venue's own history the statistical producer reads (18 September minutes, M18-16: \"36 months of history\"). Imported history (`importVenueHistory`) counts. Less than the window is not an error: the cold-start setting fills the gap."
+   },
+   "coldStart": {
+    "type": "object",
+    "description": "**What the forecast stands on before the venue has history** (29 September, AI functions review; forecasting book p.27 \"New Venue / New Product Problem\"). Day one is never empty: the prior is the venue AI settings (typical weekday and weekend attendance, capacity, opening hours) x the starting pattern for the venue type x the UAE calendar x weather, with bookings on hand as a floor. The statistical producer blends own data in as `(k x prior + n x own) / (k + n)`, with `k` = `priorWeightObservations`. The version's `maturity` says which stage it reached.",
+    "properties": {
+     "strategy": {
+      "type": "string",
+      "enum": [
+       "venueSettings",
+       "startingPattern",
+       "sisterVenue",
+       "categoryBaseline",
+       "importedHistory"
+      ],
+      "default": "venueSettings",
+      "description": "`venueSettings` uses the onboarding figures with the venue-type pattern; `sisterVenue` a venue of the same tenant; `categoryBaseline` a product category's own history; `importedHistory` means an import covers the window and the prior only fills unseen holidays."
+     },
+     "sisterVenueId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "For `sisterVenue`. Same tenant only (no data is pooled across tenants, AIP-149)."
+     },
+     "priorWeightObservations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 52,
+      "default": 4,
+      "description": "`k`: how many own observations the prior is worth (4 same weekdays by default)."
+     },
+     "startingBandPercent": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 80,
+      "default": 40,
+      "description": "The width of the range while the prior carries most of the weight (about +/-40%)."
+     }
+    }
+   },
+   "producerRef": {
+    "type": "string",
+    "readOnly": true
+   },
+   "shadowProducerRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Runs alongside and is recorded, never shown (design 3.5)."
+   },
+   "autoPublish": {
+    "type": "boolean",
+    "default": false,
+    "description": "Publish without approval when the quality gates pass (autonomy L4, design 3.8). Otherwise an `AI_APPROVE` holder publishes."
+   },
+   "qualityGates": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Completeness, blocking signals and accuracy-regression thresholds a version must pass to publish."
+   },
+   "signalKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Signal sources this definition may use (ADM-501)."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AiForecastPoint": {
   "type": "object",
   "x-ticvai-persistence": "ai.forecast_point",
@@ -534,7 +721,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
   "enum": [
    "refund",
    "priceOverride",
@@ -1449,6 +1636,20 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "packageId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The package this requirement is a component of** (4 October 2026, CHG-FXC-003). Written by `updateResourcePackage`, which replaces the package's `components` as these rows; `listResourcePackages` reads them back by it. Null for an experience's own requirement (`productId`)."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The experience product this requirement belongs to (`setExperienceResourceRequirements`). Exactly one of `packageId` and `productId` is set."
    }
   }
  },

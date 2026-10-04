@@ -376,6 +376,8 @@ operations:
   - staff
   offline: false
   reads:
+  - transport.departure
+  - transport.fare_table
   - transport.route
   - transport.route_stop
   - transport.station
@@ -417,6 +419,7 @@ operations:
   - transport.route
   - transport.route_stop
   - transport.station
+  - transport.timetable
   writes:
   - transport.route
   - transport.route_stop

@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "CustomDomain"
  },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
  "createPreview": {
   "method": "POST",
   "path": "/tenant-config/preview",
@@ -36,6 +55,25 @@
   ],
   "requestBody": null,
   "responds": "Preview"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
  },
  "diffConfigVersion": {
   "method": "GET",
@@ -366,6 +404,65 @@
   ],
   "requestBody": null,
   "responds": "TenantConfig"
+ },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "setAppIcons": {
   "method": "PUT",

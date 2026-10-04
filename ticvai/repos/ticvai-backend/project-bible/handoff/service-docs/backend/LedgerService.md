@@ -37,7 +37,7 @@
 | tax | [`issueCreditMemo`](#issuecreditmemo) | POST | `/tax-invoices/{invoiceId}/credit-memos` | core | 1 | BO-022, BO-023, POS-011 |
 | tax | [`issueTaxInvoice`](#issuetaxinvoice) | POST | `/tax-invoices` | core | 1 | BO-022, GST-019, POS-026, POS-030, WEB-019 |
 | tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | ANL-072, BO-023, BO-1081, GST-019, WEB-019 |
-| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ADM-068, ANL-072, BO-022, BO-1081, GST-019, WEB-019 |
+| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ADM-068, ANL-072, BO-022, BO-1081, GST-019, POS-026 … |
 | tax | [`setEInvoicingProvider`](#seteinvoicingprovider) | PUT | `/e-invoicing/providers` | setup | 1 | ADM-069 |
 | tax | [`transmitEInvoices`](#transmiteinvoices) | POST | `/e-invoicing/transmissions` | setup | 1 | ADM-077 |
 | tax | [`updateTaxCode`](#updatetaxcode) | PATCH | `/tax-codes/{taxCodeId}` | setup | 1 | BO-075 |
@@ -1050,7 +1050,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | Read routing | replica |
 | Reads | `ledger.tax_invoice`, `ledger.tax_invoice_line` |
 | Writes | - |
-| Called by | ADM-068, ANL-072, BO-022, BO-1081, GST-019, WEB-019 |
+| Called by | ADM-068, ANL-072, BO-022, BO-1081, GST-019, POS-026, WEB-019 |
 
 **Parameters**
 
@@ -1237,6 +1237,19 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 
 6.1.1. **Shares issued tax invoices and credit memos with the external e-invoicing solution.** The platform calls this itself (`service`) within the provider's `transmitWithinHours` of issue; staff call it to resend a `failed` document or a range. Each document is converted to the provider's format (`pintAe`), hashed, sent, and recorded as a transmission in `queued`, then `sent`; the provider's answer arrives through `recordEInvoiceTransmissionStatus`.
 A document already `accepted` is never sent again. Nothing is sent for a legal entity whose provider is `disabled`; `test` sends to the provider's test endpoint only.
+
+**The PINT AE mapping this build uses until the regulator's list is in hand** (4 October 2026, CHG-FXC-009; a client
+question, CF-133, stays open). From FinTaxInvoice: `invoiceNumber` the invoice ID, `issuedAt` the issue date,
+`supplyDate` the supply date, `invoiceType` the type code (380 a tax invoice, simplified invoices flagged as
+simplified), `currency` the document currency, `supplierName`, `supplierAddress` and
+`supplierTaxRegistrationNumber` the seller party and its TRN, `buyerName`, `buyerAddress`, `buyerCountryCode` and
+`buyerTaxRegistrationNumber` the buyer party, each line its quantity, net amount, tax category and rate, and the
+totals `netAmount`, `discountAmount`, `taxAmount`, `grossAmount` (with `taxAmountInLegalCurrency` where the document
+currency is not AED). From FinCreditMemo: type code 381, `creditMemoNumber`, the billing reference to
+`taxInvoiceNumber`, `reason`, its lines and totals. A document missing a field the provider rejects as mandatory is
+not sent: its `eInvoiceStatus` becomes `rejected` with the provider's reason, and the rest of the batch goes on. The
+mapping lives in the provider adapter (ADR-0062), so the regulator's final list changes the adapter, not this
+contract.
 
 |  |  |
 |---|---|

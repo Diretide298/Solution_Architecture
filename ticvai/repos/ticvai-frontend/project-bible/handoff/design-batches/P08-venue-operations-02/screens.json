@@ -1082,7 +1082,7 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-5F** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Moved to wave 1 on 24 August.** F33 walks a till going offline and coming back, which is a wave-1 journey — ADR-0013 makes the POS local-first from the first release. **A venue that can trade offline and cannot resolve a sync rejection has an unbounded journal and no way to clear it**, and `check-flows` refused the flow rather than let that ship.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-5F** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Moved to wave 1 on 24 August.** F33 walks a till going offline and coming back, which is a wave-1 journey — ADR-0013 makes the POS local-first from the first release. **A venue that can trade offline and cannot resolve a sync rejection has an unbounded journal and no way to clear it**, and `check-flows` refused the flow rather than let that ship.\n\n**runReport's reportId comes from listReports (the seeded report's definition, provisioned with isSystem true), bound 4 October 2026** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "POS Board 5.dc.html#pos-5f"
@@ -1170,6 +1170,14 @@
        "kind": "searchField",
        "label": "Search offline alerts, limits",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "selectField",
+       "label": "Report",
+       "bindsTo": "ReportDefinition.id",
+       "operation": "listReports",
+       "notes": "The seeded report voidsAndDiscounts by default; its id is runReport's reportId.",
+       "provenance": "contract reporting.yaml ReportDefinition.id (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1281,6 +1289,13 @@
     "purpose": "List workstations (the pick list)",
     "trigger": "onLoad",
     "provenance": "design-note correction, 2 October 2026 (BO-133)"
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "The seeded voidsAndDiscounts report's definition, whose id runReport takes (query search voidsAndDiscounts)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

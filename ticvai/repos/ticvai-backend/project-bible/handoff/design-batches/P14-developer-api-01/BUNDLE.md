@@ -1,6 +1,6 @@
 # P14-developer-api-01 — P14 · Developer & API
 
-**8 screens · 32 operations · 18 schemas · 3 permissions**
+**8 screens · 33 operations · 19 schemas · 3 permissions**
 
 Platform P14 Developer · ships as **ticvai-control** ·
 partner audience · web ·
@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `DEV-001` | API Reference | B | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `DEV-002` | Register & Organisation | A | 12 | 6 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
+| `DEV-001` | API Reference | A | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
+| `DEV-002` | Register & Organisation | A | 12 | 13 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
 | `DEV-003` | Clients & Credentials | A | 15 | 16 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
 | `DEV-004` | Sandbox | B | 14 | 31 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
 | `DEV-005` | Webhooks | B | 9 | 21 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 | `DEV-006` | Usage & Limits | B | 0 | 13 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `DEV-007` | Marketplace Listing | B | 8 | 17 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `DEV-008` | Programme Administration | A | 41 | 39 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `DEV-008` | Programme Administration | A | 41 | 43 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 1 · needs the `developerApi` module |
-| Block | Block B · task APP-DEVPORTAL-DEV-001 |
+| Block | Block A · task APP-DEVPORTAL-DEV-001 |
 | Who uses it | partner staff holding `DEVELOPER_VIEW` (1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listApiVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/developer/reference` |
 
-**What the spec says about it.** CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.
+**What the spec says about it.** CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **The reference content is the published OpenAPI document of the selected version, a static file built from the release's public contract and served with the portal (`/reference/{version}/openapi.json`); listApiVersions picks the version and listApiScopes groups the operations (ApiScope.operations). The operation panel, code samples and search read that file, so no API call returns them (default taken 4 October 2026, Chinmay to review)** (CHG-FXS-003)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The API reference grouped by licensable module then contract, with versions, changelog per version and "Try it" against the developer's sandbox. A link to an operation opens at that operation.
 
@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Search operations | search field | — | — | — | — | — | — |
+| Search operations | search field | — | — | — | — | Searches operation ids, paths and summaries in the selected version's OpenAPI file. | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -161,7 +161,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Migration guide URL | text | — |
 | Active client count | 1,234 | — |
 
-**Detail panel** (detail panel): Request, response, scopes and error codes. **The error codes are what a developer comes back for**, and they are the section most documentation buries.
+**Operation** (detail panel): Method, path, summary, scopes, request and response schemas and error codes of the operation picked in the tree, read from the version's OpenAPI file.
 
 **Code block** (code block): A working example per language. **Copy-paste that runs** — an example with a placeholder token teaches nothing about auth, which is where integrations fail.
 
@@ -326,7 +326,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `developerId` (deepLink) · cold entry: **A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. … |
 | Route | `/developer/organisation` |
 
-**What the spec says about it.** 13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR. **Form rebuilt 2 October 2026 (CHG-SOT-014, design-notes corrections DEV-002).** Registration asks name, email, website and country; the eight raw schema names (id, status, verifiedAt, partnerId among them) are gone from the form. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's.
+**What the spec says about it.** 13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR. **Form rebuilt 2 October 2026 (CHG-SOT-014, design-notes corrections DEV-002).** Registration asks name, email, website and country; the eight raw schema names (id, status, verifiedAt, partnerId among them) are gone from the form. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's. **The members table reads listDeveloperMembers (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** An integrator registers their organisation (not a personal account) and its owner manages who in it may do what: owner, admin, developer, read-only. Registration is pending until TICVAI verifies it; nothing is provisioned before that, because an unverified account with live credentials is an open door.
 
@@ -395,7 +395,17 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Registration status** (banner): Shown after registering: "Pending: check your email" until the email is verified, then "Verified on <date>" (`DeveloperAccount.status`, `verifiedAt`). The partner link (`partnerId`) is set by TICVAI, never typed.
 
-**Data table** (data table): Role per member — owner, admin, developer, read-only.
+**Members** (data table, from `listDeveloperMembers`): Role per member — owner, admin, developer, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Developer account | the name it points at, never the id | — |
+| Email | email, tap to write | — |
+| Role | chip: Owner, Admin, Developer, Read only | — |
+| Status | chip: Invited, Active, Removed | — |
+| Invited at | 1 Oct 2026, 14:30 | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -403,13 +413,13 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|
 | Invite (primary button) | navigation or local | — | — | — | — |
 | Register developer (primary button) | `registerDeveloper` POST `/developers` | DeveloperAccount | DeveloperAccount | — | — |
-| Save developer members (secondary button) | `setDeveloperMembers` PUT `/developers/{developerId}/members` | inline | inline | — | opens modal first |
+| Save developer members (secondary button) | `setDeveloperMembers` PUT `/developers/{developerId}/members` | inline | DeveloperMember[] | — | opens modal first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **Verification status**: Pending, verified (with date), suspended or closed, and what pending means ("we review within 2 working days; you can explore the docs and sandbox meanwhile"). *(source: contracts/satellite/public-api.yaml#/components/schemas/DeveloperAccount)*
 
-**Data it reads**: `getDeveloperAccount` (onLoad, Show the registered organisation and its members)
+**Data it reads**: `getDeveloperAccount` (onLoad, Show the registered organisation and its members); `listDeveloperMembers` (onLoad, The organisation's members: added by the contracts agent …)
 
 **Where the user goes next**
 
@@ -422,7 +432,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Loading (`?state=loading`) | The organisation and its members. |
 | Error (`?state=error`) | Could not load. Your credentials are unaffected. |
 | Empty, first run (`?state=emptyFirstRun`) | **You are the first member and you are the owner.** An integration outlives the engineer who built it, so this is an organisation rather than a personal account — and the invite action is the point of the state. |
-| Permission denied (`?state=emptyNoAccess`) | **You are a member and not an owner.** Stated plainly rather than shown as an empty list, because a developer who sees no colleagues assumes the page is broken. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVELOPER_VIEW`, which `getDeveloperAccount` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `setDeveloperMembers`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -453,8 +463,9 @@ members:
 - `registerDeveloper` → `DEVELOPER_VIEW` (read) · public
 - `setDeveloperMembers` → `DEVELOPER_MANAGE` (configure) · partner
 - `getDeveloperAccount` → `DEVELOPER_VIEW` (read) · partner, staff
+- `listDeveloperMembers` → `DEVELOPER_VIEW` (read) · staff
 
-**A refused user sees:** **You are a member and not an owner.** Stated plainly rather than shown as an empty list, because a developer who sees no colleagues assumes the page is broken.
+**A refused user sees:** Shown when the caller lacks `DEVELOPER_VIEW`, which `getDeveloperAccount` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `setDeveloperMembers`.
 
 #### Requirements it meets
 
@@ -488,7 +499,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-002?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Invite, Register developer, Save developer members.
 - [ ] Every transition is wired: `DEV-003`.
@@ -1557,7 +1568,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `listingId` (deepLink), `version` (deepLink), `requestId` (navigation) · cold entry: **A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is … |
 | Route | `/developer/admin` |
 
-**What the spec says about it.** **`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota. **Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s. **Quota form labelled 2 October 2026 (CHG-SOT-014, design-notes correction DEV-008):** number fields with units and a client picker replace the raw schema names; the quota id is the server's.
+**What the spec says about it.** **`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota. **Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s. **Quota form labelled 2 October 2026 (CHG-SOT-014, design-notes correction DEV-008):** number fields with units and a client picker replace the raw schema names; the quota id is the server's. **The certification queue is read with listIntegrationListings (4 October 2026); certifyIntegration acts on the selected listing** (CHG-FXS-003)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI's programme administration behind the developer portal: per-client quotas, certification of integrations (with an end date), the production-access queue, anomaly rules, API licensing per tenant and version deprecation. Never shown to a developer; a developer reaching it is told plainly it is a TICVAI screen.
 
@@ -1742,6 +1753,15 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Next cursor | text | — |
 | Has more | yes / no (icon or chip) | — |
 
+**Certification queue** (data table, from `listIntegrationListings`): Pending certifications first; selecting one gives Certify its listingId.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Category | chip: Crm, Marketing, Accounting, Hotel, Transport, Analytics… | — |
+| Developer | the name it points at, never the id | — |
+| Visibility | chip: Public, Private | `private`: certified for production access and never shown in the marketplace (17 September minutes, M17-06). |
+
 **Tree nav** (tree nav): Quotas · Certification queue · Production access · Anomaly rules · Licensing · Versions.
 
 **Actions and what each produces**
@@ -1757,7 +1777,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Decide production access (secondary button) | `decideProductionAccess` POST `/production-access-requests/{requestId}/decide` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Already decided (`already-decided`), or the listing's certification lapsed since the request … | opens modal first |
 | Save anomaly rule (secondary button) | `setApiAnomalyRule` PUT `/api-anomaly-rules` | ApiAnomalyRule | ApiAnomalyRule | — | opens modal first |
 
-**Data it reads**: `listProductionAccessRequests` (onLoad, The production key queue); `listApiQuotas` (onLoad, Show the quotas per client); `listApiAnomalyRules` (onLoad, Show the anomaly rules); `listApiLicences` (onLoad, Show the licences per client)
+**Data it reads**: `listProductionAccessRequests` (onLoad, The production key queue); `listApiQuotas` (onLoad, Show the quotas per client); `listApiAnomalyRules` (onLoad, Show the anomaly rules); `listApiLicences` (onLoad, Show the licences per client); `listIntegrationListings` (onLoad, The certification queue: listings waiting for a decision …)
 
 **Where the user goes next**
 
@@ -1770,7 +1790,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Loading (`?state=loading`) | Pending certifications first. |
 | Error (`?state=error`) | Could not load. |
 | Empty, first run (`?state=emptyFirstRun`) | Nothing awaiting review. |
-| Permission denied (`?state=emptyNoAccess`) | **This is a Softlabs screen and you are a developer.** Said plainly — a blank administration page shown to a partner is worse than a refusal, because they will file a support ticket about it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVELOPER_VIEW`, which `listProductionAccessRequests` requires to show this screen, and names that permission (the screen's other reads need `DEVELOPER_ADMIN` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | No production access request with this status. Names the filter and offers to clear it. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already decided (`already-decided`), or the listing's certification lapsed since the request (`certification-required`).; 422 `reject` without a `reason`. |
@@ -1821,12 +1841,13 @@ quota:
 - `listApiQuotas` → `DEVELOPER_ADMIN` (configure) · staff
 - `listApiAnomalyRules` → `DEVELOPER_ADMIN` (configure) · staff
 - `listApiLicences` → `DEVELOPER_ADMIN` (configure) · staff
+- `listIntegrationListings` → `DEVELOPER_VIEW` (read) · public, staff, partner
 
-**A refused user sees:** **This is a Softlabs screen and you are a developer.** Said plainly — a blank administration page shown to a partner is worse than a refusal, because they will file a support ticket about it.
+**A refused user sees:** Shown when the caller lacks `DEVELOPER_VIEW`, which `listProductionAccessRequests` requires to show this screen, and names that permission (the screen's other reads need `DEVELOPER_ADMIN` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1834,6 +1855,8 @@ quota:
 | 13.1.39 | API Audit Logs - System shall maintain API audit logs. | Developer & API Management | CONTRACTED | `setApiAnomalyRule` |
 | 13.1.36 | Rate Limiting - System shall support API rate limiting. | Developer & API Management | CONTRACTED | data `ApiQuota` |
 | 13.1.37 | Throttling Rules - System shall support API throttling. | Developer & API Management | CONTRACTED | data `ApiQuota` |
+| 13.1.50 | API Marketplace - System shall support publishing integrations and extensions. | Developer & API Management | CONTRACTED | data `IntegrationListing` |
+| 13.3.16 | APIs shall support installation, activation and management of third-party integrations and marketplace extensions. | Developer & API Management | CONTRACTED | data `IntegrationListing` |
 
 #### Client meeting inputs
 
@@ -1856,7 +1879,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Reject, Save API quota, Certify integration, Save API licensing, Deprecate API version, Decide production access, Save anomaly rule.
 - [ ] Every transition is wired: `DEV-003`.
@@ -1949,6 +1972,7 @@ Method, path, parameters, request and response for every operation these screens
 "listApiQuotas": {"method":"GET","path":"/api-quotas","contract":"public-api","summary":"The rate limits and quotas set per client","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listApiScopes": {"method":"GET","path":"/api-scopes","contract":"public-api","summary":"The scope catalogue, one read and one write scope per module","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"module","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listApiVersions": {"method":"GET","path":"/api-versions","contract":"public-api","summary":"Versions, their status and their sunset dates","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"ApiVersion"},
+"listDeveloperMembers": {"method":"GET","path":"/developers/{developerId}/members","contract":"public-api","summary":"Who is in a developer organisation","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"developerId","in":"path","required":true}],"requestBody":null,"responds":"DeveloperMember"},
 "listIntegrationListings": {"method":"GET","path":"/listings","contract":"public-api","summary":"Published third-party integrations","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"IntegrationListing"},
 "listProductionAccessRequests": {"method":"GET","path":"/production-access-requests","contract":"public-api","summary":"Production access requests, pending first","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSandboxes": {"method":"GET","path":"/sandboxes","contract":"public-api","summary":"Sandbox environments","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Sandbox"},
@@ -1964,7 +1988,7 @@ Method, path, parameters, request and response for every operation these screens
 "setApiAnomalyRule": {"method":"PUT","path":"/api-anomaly-rules","contract":"public-api","summary":"When API traffic is flagged as abnormal","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApiAnomalyRule","responds":"ApiAnomalyRule"},
 "setApiLicensing": {"method":"PUT","path":"/api-licensing","contract":"public-api","summary":"Which API modules a tenant has licensed, and on what terms","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApiLicence","responds":"ApiLicence"},
 "setApiQuota": {"method":"PUT","path":"/api-quotas","contract":"public-api","summary":"Rate limits and throttling per client","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApiQuota","responds":"ApiQuota"},
-"setDeveloperMembers": {"method":"PUT","path":"/developers/{developerId}/members","contract":"public-api","summary":"Who at this organisation may do what","permission":"DEVELOPER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"setDeveloperMembers": {"method":"PUT","path":"/developers/{developerId}/members","contract":"public-api","summary":"Who at this organisation may do what","permission":"DEVELOPER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DeveloperMember"},
 "submitIntegrationListing": {"method":"POST","path":"/listings","contract":"public-api","summary":"Submit an integration for certification (and, if public, listing)","permission":"DEVELOPER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"IntegrationListing","responds":"IntegrationListing"}
 }
 ```
@@ -1976,7 +2000,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "ApiAnomaly": {"type":"object","x-ticvai-persistence":"control.api_anomaly","description":"One flagged breach of an anomaly rule (M17-07).","required":["id","ruleKey","clientId","detectedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"ruleKey":{"type":"string"},"clientId":{"type":"string","format":"uuid","x-ticvai-references":"control.api_client"},"measure":{"type":"string"},"observed":{"type":"number"},"baseline":{"type":"number","nullable":true},"actionTaken":{"type":"string","enum":["flag","throttle","suspend"]},"detectedAt":{"type":"string","format":"date-time"},"resolvedAt":{"type":"string","format":"date-time","nullable":true}}},
-"ApiAnomalyRule": {"type":"object","x-ticvai-persistence":"control.api_anomaly_rule","description":"**When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for every tenant; TICVAI tightens them per tenant or per client.\n","required":["ruleKey","measure","comparison","threshold","action"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"ruleKey":{"type":"string"},"clientId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"control.api_client","description":"Null applies to every client of the tenant."},"measure":{"type":"string","enum":["callsPerMinute","clientErrorShare","allowListRefusals","unusualOperations","authFailures"]},"comparison":{"type":"string","enum":["aboveBaselineMultiple","aboveFixed"],"description":"`aboveBaselineMultiple`: above `threshold` x the same hour over the last four weeks."},"threshold":{"type":"number"},"windowMinutes":{"type":"integer","minimum":1,"default":5},"action":{"type":"string","enum":["flag","throttle","suspend"],"default":"flag"},"isActive":{"type":"boolean","default":true}}},
+"ApiAnomalyRule": {"type":"object","x-ticvai-persistence":"control.api_anomaly_rule","description":"**When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for every tenant; TICVAI tightens them per tenant or per client.\n","required":["ruleKey","measure","comparison","threshold","action"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"ruleKey":{"type":"string"},"clientId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"control.api_client","description":"Null applies to every client of the tenant."},"measure":{"type":"string","enum":["callsPerMinute","clientErrorShare","allowListRefusals","unusualOperations","authFailures"]},"comparison":{"type":"string","enum":["aboveBaselineMultiple","aboveFixed"],"description":"`aboveBaselineMultiple`: above `threshold` x the same hour over the last four weeks."},"threshold":{"type":"number"},"windowMinutes":{"type":"integer","minimum":1,"default":5},"action":{"type":"string","enum":["flag","throttle","suspend"],"default":"flag"},"isActive":{"type":"boolean","default":true},"tenantId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant's own rules."},"scopePath":{"type":"string","nullable":true,"readOnly":true,"description":"The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default."}}},
 "ApiClient": {"type":"object","x-ticvai-persistence":"control.api_client","description":"CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n","required":["id","developerId","name","environment","scopes","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"developerId":{"type":"string","format":"uuid"},"name":{"type":"string"},"clientId":{"type":"string","readOnly":true},"environment":{"type":"string","enum":["sandbox","production"],"description":"**Bound to one, stated on the object rather than by naming convention.** A key that works in both is a key somebody will use in the wrong one.\n"},"scopes":{"type":"array","description":"**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n","items":{"type":"string","pattern":"^[a-zA-Z]+\\.(read|write)$"}},"issuedBy":{"type":"string","enum":["partner","ticvai"],"readOnly":true,"description":"Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"},"certificationListingId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"control.integration_listing","description":"For a production client, the certified integration it was issued against."},"credentialTtlDays":{"type":"integer","minimum":1,"maximum":730,"nullable":true,"description":"Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the key stops working unless rotated. No token is issued after it."},"allowedTenantIds":{"type":"array","description":"13.1.46. **Which tenants this client may act for.** A developer integrating for one venue must not reach another, and a client with an empty list reaches none.\n","items":{"type":"string","format":"uuid"}},"ipAllowList":{"type":"array","description":"13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n","items":{"type":"string"}},"status":{"type":"string","enum":["active","suspended","revoked"],"readOnly":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**A credential unused for a year is a credential nobody will notice being stolen.**\n"}}},
 "ApiLicence": {"type":"object","x-ticvai-persistence":"control.api_licence","description":"13.3.24, decision D5. **Configuration, not code** — rates and terms change without a release.\n**The rates themselves are CF-135c and remain open.** This is the surface they will be set through.\n","required":["tenantId","licensedModules"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"tenantId":{"type":"string","format":"uuid"},"licensedModules":{"type":"array","description":"**The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one. **The platform module list** (17 September minutes, M17-05), so the licence, the scope catalogue and the modules a tenant buys are one vocabulary.\n","items":{"$ref":"../shared/common.yaml#/components/schemas/ModuleKey"}},"callAllowancePerMonth":{"type":"integer","nullable":true},"catalogueWriteException":{"type":"object","nullable":true,"description":"**M17-04: the one way a client reaches a catalogue write**, set by TICVAI platform staff only (`setApiLicensing` refuses anyone else 403 `platform-staff-only`). Null, the default, means no partner or developer client of this tenant can create or change products, price lists, prices, channel capacity, lifecycle or alternative codes.\n","required":["clientId","operationIds","reason","grantedUntil"],"properties":{"clientId":{"type":"string","format":"uuid","x-ticvai-references":"control.api_client"},"operationIds":{"type":"array","minItems":1,"items":{"type":"string","enum":["createProduct","updateProduct","setProductAttributes","createPriceList","updatePriceList","copyPriceList","setPrices","createChannelCapacity","updateChannelCapacity","setChannelAllocations","transitionProductLifecycle","setAlternativeCodes"]}},"reason":{"type":"string","maxLength":500},"grantedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"grantedUntil":{"type":"string","format":"date"}}},"overageRatePerThousand":{"type":"number","nullable":true},"revenueSharePercent":{"type":"number","nullable":true},"effectiveFrom":{"type":"string","format":"date"},"effectiveTo":{"type":"string","format":"date","nullable":true}}},
 "ApiQuota": {"type":"object","x-ticvai-persistence":"control.api_limit","description":"13.1.36 and 13.1.37. **A quota protects the venue, not the developer.**\n","required":["clientId","sustainedPerMinute"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"clientId":{"type":"string","format":"uuid"},"sustainedPerMinute":{"type":"integer"},"burstPerSecond":{"type":"integer","description":"**Separate from the sustained rate**, because a nightly sync is a legitimate spike and a flat per-second limit either blocks it or permits the flood it was meant to stop.\n"},"dailyCap":{"type":"integer","nullable":true},"perOperationOverrides":{"type":"object","additionalProperties":{"type":"integer"},"description":"**Availability checks and order creation deserve different limits** — one is cheap and polled, the other is expensive and rare.\n"},"onBreach":{"type":"string","enum":["throttle","reject","queue"],"default":"throttle"}}},
@@ -1984,6 +2008,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ApiUsageSummary": {"type":"object","description":"13.1.16 to 13.1.20, 13.1.41 to 13.1.45. **One endpoint because they are one question asked five ways.**\n","properties":{"totalCalls":{"type":"integer"},"successRate":{"type":"number"},"clientErrorRate":{"type":"number","description":"**4xx — the integrator's problem.** Separated because a single error rate lets both sides blame the other.\n"},"serverErrorRate":{"type":"number","description":"5xx — TICVAI's problem."},"p50LatencyMs":{"type":"number"},"p95LatencyMs":{"type":"number"},"p99LatencyMs":{"type":"number"},"quotaBreaches":{"type":"integer"},"byOperation":{"type":"array","items":{"type":"object","properties":{"operationId":{"type":"string"},"calls":{"type":"integer"},"errorRate":{"type":"number"}}}}}},
 "ApiVersion": {"type":"object","x-ticvai-persistence":"control.api_version","description":"13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production version was tenable when only Softlabs called the API, and **with third parties a breaking change with no window breaks somebody else's business.**\n","required":["version","status"],"properties":{"version":{"type":"string"},"status":{"type":"string","enum":["preview","current","deprecated","sunset"]},"releasedAt":{"type":"string","format":"date-time"},"deprecatedAt":{"type":"string","format":"date-time","nullable":true},"sunsetAt":{"type":"string","format":"date-time","nullable":true},"minimumNoticeMonths":{"type":"integer","default":12,"description":"**The commitment, not the intention.** A deprecation policy without a stated minimum is a policy that shortens under pressure.\n"},"migrationGuideUrl":{"type":"string","nullable":true},"activeClientCount":{"type":"integer","readOnly":true},"changes":{"type":"array","description":"**The developer changelog for this version** (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. Generated at release from the contract diff; shown on DEV-001.\n","items":{"type":"object","required":["operationId","kind"],"properties":{"operationId":{"type":"string"},"contract":{"type":"string"},"kind":{"type":"string","enum":["added","changed","deprecated","removed"]},"breaking":{"type":"boolean","default":false},"summary":{"type":"string"}}}}}},
 "DeveloperAccount": {"type":"object","x-ticvai-persistence":"control.developer_account","description":"13.1.6 to 13.1.9. **An organisation, because an integration outlives the engineer who built it.** A credential tied to somebody's personal account dies when they leave.\n**Not a tenant and not a partner.** A partner resells tickets; a developer writes software, and one organisation may be both.\n","required":["id","organisationName","contactEmail","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"organisationName":{"type":"string"},"contactEmail":{"type":"string","format":"email"},"websiteUrl":{"type":"string","nullable":true},"countryCode":{"type":"string"},"partnerId":{"type":"string","format":"uuid","nullable":true,"description":"Where this developer is also a commercial partner. **The link exists and the two are not the same record**, which is what CF-135a was about.\n"},"status":{"type":"string","enum":["pending","verified","suspended","closed"],"readOnly":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
+"DeveloperMember": {"type":"object","x-ticvai-persistence":"control.developer_member","description":"**One person at a developer organisation** (`setDeveloperMembers`, 4 October 2026, CHG-FXC-005). Developer-portal people are not tenant staff: they are kept here in the control database beside `control.developer_account`, keyed by email, and never become `identity.principal` or `identity.delegated_access` rows (the Sprint 1-2 judging found no email column on a principal and no permission a portal role could map to). A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it. What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the owner, `developer` its own clients and credentials, `readOnly` view.","required":["email","role","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"developerAccountId":{"type":"string","format":"uuid","readOnly":true},"email":{"type":"string","format":"email"},"role":{"type":"string","enum":["owner","admin","developer","readOnly"]},"status":{"type":"string","enum":["invited","active","removed"],"readOnly":true},"invitedAt":{"type":"string","format":"date-time","readOnly":true},"activatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "IntegrationListing": {"type":"object","x-ticvai-persistence":"control.integration_listing","description":"13.1.50, decision D1. **A listing, not an installation.** The integration runs on the developer's own infrastructure.\n**Third-party code does not execute inside TICVAI** — stated rather than assumed, because that is a different product with a different threat model.\n","required":["id","developerId","name","category","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"developerId":{"type":"string","format":"uuid"},"name":{"type":"string"},"category":{"type":"string","enum":["crm","marketing","accounting","hotel","transport","analytics","accessibility","other"]},"description":{"type":"string"},"integrationUrl":{"type":"string"},"requiredScopes":{"type":"array","items":{"type":"string"}},"status":{"type":"string","enum":["draft","submitted","inReview","certified","rejected","revoked","delisted"],"readOnly":true},"certifiedUntil":{"type":"string","format":"date","nullable":true,"readOnly":true,"description":"**Certification expires.** An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.\n"},"certifiedAgainstVersion":{"type":"string","nullable":true,"readOnly":true},"listingFeeModel":{"type":"string","enum":["none","flat","revenueShare"],"nullable":true},"visibility":{"type":"string","enum":["public","private"],"default":"public","description":"`private`: certified for production access and never shown in the marketplace (17 September minutes, M17-06). `public`: also listed once certified.\n"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "ProductionAccessRequest": {"type":"object","x-ticvai-persistence":"control.production_access_request","description":"**A developer's request for production keys** (17 September minutes, M17-06): sandbox, then certification, then production.\n","required":["id","developerId","sandboxClientId","listingId","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"developerId":{"type":"string","format":"uuid","readOnly":true},"sandboxClientId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"control.api_client"},"listingId":{"type":"string","format":"uuid","x-ticvai-references":"control.integration_listing"},"scopes":{"type":"array","items":{"type":"string"}},"allowedTenantIds":{"type":"array","items":{"type":"string","format":"uuid"}},"ipAllowList":{"type":"array","items":{"type":"string"}},"note":{"type":"string","nullable":true},"status":{"type":"string","enum":["pending","approved","rejected","withdrawn"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"reason":{"type":"string","nullable":true,"readOnly":true},"productionClientId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"control.api_client"},"requestedAt":{"type":"string","format":"date-time","readOnly":true}}},

@@ -44,15 +44,15 @@
    "operations": 7
   },
   {
-   "contract": "retail",
-   "operations": 3
-  },
-  {
    "contract": "catalogue",
    "operations": 3
   },
   {
    "contract": "ai",
+   "operations": 3
+  },
+  {
+   "contract": "retail",
    "operations": 3
   },
   {

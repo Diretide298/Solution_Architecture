@@ -338,6 +338,25 @@
   "requestBody": null,
   "responds": null
  },
+ "registerGuest": {
+  "method": "POST",
+  "path": "/auth/guest/register",
+  "contract": "identity",
+  "summary": "Create a guest account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisterGuestRequest",
+  "responds": "GuestSession"
+ },
  "removeCartLine": {
   "method": "DELETE",
   "path": "/carts/{cartId}/lines/{lineId}",
@@ -399,5 +418,24 @@
   ],
   "requestBody": null,
   "responds": "Cart"
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

@@ -150,14 +150,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-049` | Interactive Seat Selection | A | 8 | 38 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
 | `GST-050` | Resource Booking – Cabana | A | 19 | 18 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
 | `GST-056` | Bundle Package | A | 19 | 5 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
-| `GST-058` | Resource Availability (Cabana) | A | 1 | 18 | 6 | 17 | 4 | 0 | guest | notStarted (designed) |
+| `GST-058` | Resource Availability (Cabana) | A | 3 | 20 | 6 | 0 | 4 | 0 | guest | notStarted (designed) |
 | `GST-072` | Share & Group Booking | A | 14 | 14 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
 | `GST-074` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (designed) |
 | `GST-075` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 
-**GST-048, GST-050, GST-056, GST-058 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-048, GST-050, GST-056 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

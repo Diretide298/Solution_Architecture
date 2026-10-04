@@ -1,6 +1,6 @@
 # P04-not-in-v2-01 — P04 · Screens the v2 build does not draw
 
-**7 screens · 19 operations · 41 schemas · 12 permissions**
+**7 screens · 20 operations · 41 schemas · 13 permissions**
 
 Platform P04 Venue POS · ships as **venue-pos** ·
 staff audience · posTerminal ·
@@ -52,8 +52,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 12 permissions apply here:
-  `ASSET_LIBRARY_VIEW, ATTENDANCE_RECORD, CASH_LIFT, ORDER_CREATE, ORDER_EXCHANGE, ORDER_VIEW, PRODUCT_CONFIGURE, REPORT_VIEW_WORKSTATION, SCOPE_VIEW, SHIFT_OPEN, WORKFORCE_VIEW, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 13 permissions apply here:
+  `ASSET_LIBRARY_VIEW, ATTENDANCE_RECORD, CASH_LIFT, ORDER_CREATE, ORDER_EXCHANGE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_WORKSTATION, SCOPE_VIEW, SHIFT_OPEN, WORKFORCE_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **11 of these operations work offline**: createCashMovement, getMediaAsset, getMediaEntitlements, getTableMap, getTillShiftPolicy, listCashMovements, listDepositBoxes, listRotaAssignments
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `POS-017` | Cash In / Cash Out Operations | A | 21 | 6 | 5 | 0 | 2 | 6 | — | notStarted (designed) |
 | `POS-018` | Safe Drop & Cash Transfer Management | A | 27 | 20 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
 | `POS-019` | Shift Templates & Policies | A | 10 | 24 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
-| `POS-024` | Outlet Setup | A | 20 | 18 | 6 | 4 | 0 | 0 | — | notStarted (designed) |
+| `POS-024` | Outlet Setup | A | 21 | 27 | 6 | 4 | 0 | 0 | — | notStarted (designed) |
 
 ---
 
@@ -1469,14 +1469,14 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `fnb` module |
 | Block | Block A · task APP-POS-POS-024 |
-| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure) |
+| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | **Configuration is refused offline.** A table layout edited on two disconnected tablets is two layouts, and the room only has one. |
 | Opens with | `workstationId` (session), `outletId` (session), `itemId` (deepLink) · cold entry: **Resolves from the session, which carries the workstation and its outlet.** A till is signed into, not navigated to — and the outlet is a property of where … |
 | Route | `/sell/outlet-setup` |
 
-**What the spec says about it.** **Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into the same till a cashier uses and sees screens the cashier does not.** **A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops push together, which is why `setTableLayout` and `setTableCombinations` belong within reach of the floor and not only in the back office.
+**What the spec says about it.** **Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into the same till a cashier uses and sees screens the cashier does not.** **A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops push together, which is why `setTableLayout` and `setTableCombinations` belong within reach of the floor and not only in the back office. **The combinations are read with listTableCombinations before the whole-set PUT (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-008): The outlet is the till's and the menu is not edited here (86 needs only the items); the outlet and menu tables were plumbing on a manager's screen (R254 … Removed 2 October 2026 (CHG-WIR-008): The outlet is the till's and the menu is not edited here (86 needs only the items); the outlet and menu tables were plumbing on a manager's screen (R254 …
 
@@ -1521,6 +1521,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Y `tables[].position.y` | number field | optional | — | — | — | — | `setTableLayout` body |
 | Shape `tables[].shape` | radio group | optional | — | Round · Square · Rectangle · Booth · Bar | — | — | `setTableLayout` body |
 | Is out of service `tables[].isOutOfService` | toggle | optional | off | `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`. | — | Damaged, or its section closed. `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`. | `setTableLayout` body |
+| Code generation `tables[].codeGeneration` | number field | optional | 1 | min 1; A code carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code printed before. | — | Which printing of the location's ordering code is current (4 October 2026, CHG-FXC-009). | `setTableLayout` body |
 
 Errors to draw in the form: 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
@@ -1563,7 +1564,18 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 
 **Floor** (card list): Each table has Remove (marks it Out of service, DEC-067) rather than Delete.
 
-**Combinations** (detail panel): **Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step, a service run. A host knows which pairs work and a floor plan does not.
+**Combinations** (detail panel, from `listTableCombinations`): Saved with setTableCombinations as the whole set read here.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Outlet | the name it points at, never the id | The outlet in the path. |
+| Tables | list or chips (count when long) | — |
+| Combined covers | 1,234 | — |
+| Setup minutes | 1,234 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Floor** (detail panel, from `getTableMap`)
 
@@ -1581,6 +1593,7 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 | Y | 1,234.5 | — |
 | Shape | chip: Round, Square, Rectangle, Booth, Bar | — |
 | Is out of service | yes / no (icon or chip) | Damaged, or its section closed. `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`. |
+| Code generation | 1,234 | Which printing of the location's ordering code is current (4 October 2026, CHG-FXC-009). |
 | Status | chip: Free, Seated, Ordered, Bill requested, Needs clearing, Reserved… | — |
 | Visit | the name it points at, never the id | — |
 | Covers | 1,234 | — |
@@ -1601,7 +1614,7 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 
 - **Save layout**: Saves the hall's whole layout in one go; refused if someone else changed it meanwhile ("Reload to see the latest layout"). *(source: contracts/satellite/fnb.yaml#setTableLayout)*
 
-**Data it reads**: `getTableMap` (onLoad, The outlet's floor as it is laid out); `getGuestMenu` (onLoad, List the outlet's menu items for the '86 an item' picker)
+**Data it reads**: `getTableMap` (onLoad, The outlet's floor as it is laid out); `getGuestMenu` (onLoad, List the outlet's menu items for the '86 an item' picker); `listTableCombinations` (onLoad, The combinations already declared, read before the …)
 
 **Where the user goes next**
 
@@ -1615,7 +1628,7 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 | Error (`?state=error`) | Could not load configuration. **Selling is unaffected.** |
 | Empty, first run (`?state=emptyFirstRun`) | **A new outlet with no layout.** The one action that draws the first table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches. |
-| Permission denied (`?state=emptyNoAccess`) | **You are signed in as a cashier.** Configuration needs a manager role — ADR-0002 makes that the person, not the device, so signing in again on this same till is the way through. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`, `setTableCombinations`, `setItemAvailability`. |
 | Offline (`?state=offline`) | **Configuration is refused offline.** A table layout edited on two disconnected tablets is two layouts, and the room only has one. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -1650,8 +1663,9 @@ combination: T6 + T7 = 9 covers · 5 min set-up
 - `setItemAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
 - `getTableMap` → `ORDER_VIEW` (read) · staff
 - `getGuestMenu` → no permission · guest, staff
+- `listTableCombinations` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** **You are signed in as a cashier.** Configuration needs a manager role — ADR-0002 makes that the person, not the device, so signing in again on this same till is the way through.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`, `setTableCombinations`, `setItemAvailability`.
 
 #### Requirements it meets
 
@@ -1682,12 +1696,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (400, 404, 412).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 403, 404, 412).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#POS-024?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Apply, Save table layout, Save table combinations, Save item availability.
 - [ ] Every transition is wired: `POS-002`.
-- [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
@@ -1839,6 +1853,7 @@ Method, path, parameters, request and response for every operation these screens
 "listDepositBoxes": {"method":"GET","path":"/deposit-boxes","contract":"shift","summary":"Cash boxes and who holds them","permission":"SHIFT_OPEN","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRotaAssignments": {"method":"GET","path":"/rota-assignments","contract":"workforce","summary":"The rota","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"departmentId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listShifts": {"method":"GET","path":"/shifts","contract":"shift","summary":"List shifts","permission":"REPORT_VIEW_WORKSTATION","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workstationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"openedFrom","in":"query","required":null},{"name":"openedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listTableCombinations": {"method":"GET","path":"/outlets/{outletId}/table-combinations","contract":"fnb","summary":"The outlet's table combinations","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"outletId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "recordAttendance": {"method":"POST","path":"/attendance/clock","contract":"workforce","summary":"Clock in, clock out, or take a break","permission":"ATTENDANCE_RECORD","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AttendanceRecord"},
 "setItemAvailability": {"method":"PUT","path":"/menu-items/{itemId}/availability","contract":"fnb","summary":"Mark an item available or eighty-sixed","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MenuItem"},
 "setTableCombinations": {"method":"PUT","path":"/outlets/{outletId}/table-combinations","contract":"fnb","summary":"Which tables can be pushed together, and to what capacity","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
@@ -1890,7 +1905,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ShiftStatus": {"type":"string","enum":["pendingApproval","open","suspended","pendingVariance","pendingClosure","closed","autoClosed"]},
 "SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
 "TableCombination": {"type":"object","x-ticvai-persistence":"fnb.table_combination","description":"**Tables that can be pushed together, and what they seat together.** Declared by a host rather than inferred from a floor plan — a pillar, a step or a service run stops two adjacent tables combining. `setTableCombinations` writes the outlet's set.\n","required":["tableIds","combinedCovers"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"outletId":{"type":"string","format":"uuid","readOnly":true,"description":"The outlet in the path."},"tableIds":{"type":"array","minItems":2,"items":{"type":"string","format":"uuid"}},"combinedCovers":{"type":"integer","minimum":1},"setupMinutes":{"type":"integer","default":5},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `outlet` scope."}}},
-"TableDefinition": {"x-ticvai-persistence":"fnb.dining_table","type":"object","description":"A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).","required":["id","label","capacity"],"properties":{"id":{"type":"string","format":"uuid"},"label":{"type":"string","maxLength":32,"x-ticvai-unique":"venue","description":"**The table code, unique per venue** (decided 28 September, audit R108). Two tables in one venue never share a label, across all its outlets, so *T12* names one table wherever it is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.\n"},"capacity":{"type":"integer","minimum":1},"zone":{"type":"string","nullable":true},"position":{"type":"object","properties":{"x":{"type":"number"},"y":{"type":"number"}}},"shape":{"type":"string","enum":["round","square","rectangle","booth","bar"]},"isOutOfService":{"type":"boolean","default":false,"description":"**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."}}},
+"TableDefinition": {"x-ticvai-persistence":"fnb.dining_table","type":"object","description":"A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).","required":["id","label","capacity"],"properties":{"id":{"type":"string","format":"uuid"},"label":{"type":"string","maxLength":32,"x-ticvai-unique":"venue","description":"**The table code, unique per venue** (decided 28 September, audit R108). Two tables in one venue never share a label, across all its outlets, so *T12* names one table wherever it is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.\n"},"capacity":{"type":"integer","minimum":1},"zone":{"type":"string","nullable":true},"position":{"type":"object","properties":{"x":{"type":"number"},"y":{"type":"number"}}},"shape":{"type":"string","enum":["round","square","rectangle","booth","bar"]},"isOutOfService":{"type":"boolean","default":false,"description":"**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."},"codeGeneration":{"type":"integer","minimum":1,"default":1,"description":"**Which printing of the location's ordering code is current** (4 October 2026, CHG-FXC-009). A code carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code printed before."}}},
 "TableMap": {"x-ticvai-persistence":"none — projection","type":"object","required":["outletId","tables"],"properties":{"outletId":{"type":"string","format":"uuid"},"zones":{"type":"array","items":{"type":"string"}},"tables":{"type":"array","items":{"$ref":"#/components/schemas/TableState"}}}},
 "TableState": {"x-ticvai-persistence":"none — projection over table and visit","allOf":[{"$ref":"#/components/schemas/TableDefinition"},{"type":"object","required":["status"],"properties":{"status":{"$ref":"#/components/schemas/TableStatus"},"visitId":{"type":"string","format":"uuid","nullable":true},"covers":{"type":"integer","nullable":true},"seatedAt":{"type":"string","format":"date-time","nullable":true},"serverPrincipalId":{"type":"string","format":"uuid","nullable":true},"billTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}]},
 "TillShiftPolicy": {"x-ticvai-persistence":"orders.till_shift_policy","type":"object","description":"**The venue's opening, closing and exception rules for every till** (CHG-CSP-020; POS-019; DI-309). One per venue. Proposed defaults are ours, client to correct.\n","required":["venueId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","readOnly":true},"requireOpenApproval":{"type":"boolean","default":false,"description":"Every shift opens `pendingApproval` and waits for `approveShiftOpen` (SHIFT_APPROVE_OPEN). Off by default: only a float outside `openingFloatTolerance` waits.\n"},"openingFloatTolerance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"How far a declared opening float may differ from the box's allocated float before the shift waits for approval (`states/shift.yaml`, pendingApproval). Null: any difference waits.\n"},"depositBoxRequired":{"type":"boolean","default":true,"description":"A shift cannot open without a deposit box (`OpenShiftRequest.depositBoxCode`); refused `400` otherwise."},"bagNumberRequired":{"type":"boolean","default":false,"description":"A shift cannot open without a bag number (`OpenShiftRequest.bagNumber`)."},"requireCloseApproval":{"type":"boolean","default":false,"description":"Every counted shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE), even within the variance threshold.\n"},"autoCloseAfterHours":{"type":"integer","nullable":true,"minimum":1,"maximum":48,"default":14,"description":"Hours after which an open or suspended shift nobody closed is closed by the inactivity job as `autoClosed` and the supervisors are told (`states/shift.yaml`). Null never auto-closes.\n"},"noSaleAlertCount":{"type":"integer","nullable":true,"minimum":1,"default":10,"description":"No-sales in one shift (`recordNoSale`) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. Null sends no alert.\n"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},

@@ -1817,6 +1817,14 @@
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Risk rules",
+       "bindsTo": "WalletRiskRules.rules",
+       "operation": "getWalletRiskRules",
+       "notes": "Each rule with its code and status; Emergency disable and Suspend act on the selected rule's ruleCode.",
+       "provenance": "agreed operation `getWalletRiskRules`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1897,7 +1905,7 @@
    "error": "Could not load. Names which read failed and leaves the security governance audit untouched.",
    "emptyFirstRun": "No security governance audit yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the security governance audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `listWalletConfigurationVersions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AUDIT_VIEW` for `listAuditRecords`; `WALLET_CONFIGURE` for `publishWalletConfiguration`, `restoreWalletConfigurationVersion`, `setWalletRiskRuleStatus`."
   },
   "apis": [
    {
@@ -1941,6 +1949,13 @@
     "contract": "wallet",
     "purpose": "Set rule status",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getWalletRiskRules",
+    "contract": "wallet",
+    "purpose": "The risk rules in force, each with the ruleCode setWalletRiskRuleStatus takes: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -1973,7 +1988,7 @@
    "workshopBoard": "wireframes/WS193 Wallet Configuration Backend Structure v1.0 Board 8.dc.html#bo-1162"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 98. 0 of 11 labels bound to a contract property; 16 of 95 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Security Audit: `listAuditRecords`; still owed by a contract change: `diffWalletConfigurationVersion`, `listWalletConfigurationVersions`, `restoreWalletConfigurationVersion`, `setWalletRiskRuleStatus`.",
-  "notes": "**Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says \"Tenant-wide wallet security\" and the screen opens only to a tenant administrator holding the wallet configuration right.",
+  "notes": "**Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says \"Tenant-wide wallet security\" and the screen opens only to a tenant administrator holding the wallet configuration right.\n\n**The risk rules are read with getWalletRiskRules (agreed, ledger) 4 October 2026, so the status actions have a ruleCode** (CHG-FXS-003)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

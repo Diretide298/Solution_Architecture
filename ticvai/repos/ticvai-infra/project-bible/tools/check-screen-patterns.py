@@ -20,6 +20,10 @@ The rules live in `tools/screen_patterns.py`, shared with the generators and the
          PATCH) and binds no read that returns it: the r1 gate's G3           (CHG-R1S-004)
          Block A fails on any; outside Block A the count may only fall
          (READ_OUTSIDE_A_CEILING), each one fixed before its block is cut
+    NP   a screen a Sprint 1 or 2 task builds says a person must define it, or
+         binds no operation: the Sprint 1-2 judging of 4 October           (CHG-FXS-007)
+         Sprints 1-2 fail on any; a later sprint's count may only fall
+         (NP_LATER_CEILING), each one defined before its sprint is judged
 
 **An exception is written here with its reason**, never skipped silently, and every exemption used
 is printed. P8 reads Block A from `handoff/service-docs/op-release.json` (what the tickets were cut
@@ -57,6 +61,17 @@ EXEMPT = {
         "figures (REPORT_VIEW_OWN / REPORT_VIEW_WORKSTATION); runReport and listReports still declare "
         "REPORT_VIEW_VENUE. Asked of the contract owner in the CHG-SPF-003 report",
 }
+
+# NP: Sprint 1-2 screens the package cannot define, handed to the plan to move out of Sprints 1-2
+# (runs/fix-s12/LEDGER.md, 4 October 2026). Each goes when the plan moves it; then the exemption is unused.
+NP_OUT = {
+    "BO-822": "no operation stores service-recovery automation rules (contract gap CHG-WIR-007)",
+    "BO-1069": "no tenant-facing operation reports platform service status (contract gap CHG-WIR-024)",
+    "BO-1072": "no staff read of the published API definitions (contract gap CHG-WIR-027)",
+    "ADM-408": "no operation approves a prospect's commercial package (contract gap CHG-WIR-024)",
+}
+for _sid, _why in NP_OUT.items():
+    EXEMPT[("NP", _sid, "")] = "moved out of Sprints 1-2 by the plan (ledger, 4 October): " + _why
 
 # P5: Block A screens whose load needs an id that no screen holding it links to yet, each a question
 # for the lead (CHG-SPF-004); the screen is right that it cannot load without it.
@@ -132,6 +147,10 @@ DECIDED = [
 # read. Each is fixed before its block is broken into tasks; until then the count may only fall. Lower this
 # number when it does.
 READ_OUTSIDE_A_CEILING = 574
+# NP after Sprint 2: the screens later sprints build that still say a person must define them or bind
+# nothing, 4 October 2026 (CHG-FXS-007). Each is defined before its sprint is judged; lower this number
+# when the count falls.
+NP_LATER_CEILING = 191
 
 BUTTONS = {"primaryButton", "secondaryButton", "destructiveButton", "iconButton"}
 
@@ -163,6 +182,7 @@ def run(only=None):
     inb = sp.inbound(S)
     owners = sp.component_owners(S)
     block_a = sp.block_a_screens()
+    sprints = sp.planned_sprints() if only in (None, "NP") else {}
     found = decided(S) if only in (None, "DEC") else []
     for sid, s in S.items():
         if only in (None, "P1"):
@@ -179,6 +199,8 @@ def run(only=None):
             found += sp.p8(pk, sid, s, block_a, {})
         if only in (None, "READ") and block_a is not None:
             found += sp.p_read(pk, sid, s)
+        if only in (None, "NP") and sprints and sid in sprints:
+            found += [(r, i, f"{d} (Sprint {sprints[sid]})") for r, i, d in sp.p_np(pk, sid, s)]
     return found, block_a
 
 
@@ -204,6 +226,17 @@ def main() -> int:
         if len(outside) > READ_OUTSIDE_A_CEILING:
             found += [("READ", "-", f"{len(outside)} READ findings outside Block A, above the ceiling of "
                                     f"{READ_OUTSIDE_A_CEILING}: a new screen shows or edits data with no read")]
+    later = [f for f in found if f[0] == "NP" and not f[2].endswith(("(Sprint 1)", "(Sprint 2)"))]
+    found = [f for f in found if f not in later]
+    if later:
+        print(f"  ratchet NP {len(later)} in Sprints 3 and later (ceiling {NP_LATER_CEILING}): each is "
+              f"defined before its sprint is judged (CHG-FXS-007); --list-np shows them")
+        if "--list-np" in args:
+            for _, sid, detail in later:
+                print(f"    NP {sid:<9} {detail}")
+        if len(later) > NP_LATER_CEILING:
+            found += [("NP", "-", f"{len(later)} NP findings in Sprints 3 and later, above the ceiling of "
+                                  f"{NP_LATER_CEILING}: a screen planned later needs a person or binds nothing")]
     for rule, sid, detail in found:
         why = next((w for (r, s, phrase), w in EXEMPT.items()
                     if r == rule and s == sid and phrase in detail), None)

@@ -1,6 +1,6 @@
 # WS156 — Resource Management Configuration board 2
 
-**9 screens · 14 operations · 10 schemas · 4 permissions**
+**9 screens · 15 operations · 10 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -99,7 +99,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-864` | Resource Calendar Command Center | D | 0 | 10 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-865` | Calendar Filters, Search & Smart Discovery | D | 2 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-866` | Resource Availability Schedule Configuration | A | 23 | 6 | 6 | 47 | 1 | 0 | — | notStarted (—) |
+| `BO-866` | Resource Availability Schedule Configuration | A | 23 | 10 | 6 | 47 | 1 | 0 | — | notStarted (—) |
 | `BO-867` | Resource Time-Slot Configuration | D | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-868` | Advance Reservation Management | D | 26 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-869` | Recurring Reservation Configuration | D | 10 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |

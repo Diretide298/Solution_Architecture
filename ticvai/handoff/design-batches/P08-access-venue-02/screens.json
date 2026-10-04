@@ -1658,7 +1658,7 @@
      "carries": [
       "mapId"
      ],
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds mapId, so an edge into it carries them"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-092 holds mapId, so an edge into it carries them"
     },
     {
      "to": "BO-093",
@@ -1852,12 +1852,13 @@
      "trigger": "The operator places what the drawing did not carry and links each point to what it is",
      "provenance": "flow F26 step 3→4",
      "carries": [
-      "mapId"
+      "mapId",
+      "uploadId"
      ]
     }
    ]
   },
-  "notes": "CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer and a bad suggestion look identical if the screen blurs them**, and the operator is left saying only that the map is wrong. **Low-confidence proposals are shown, not filtered** — the shape the assistant is unsure about is the one most worth a human looking at. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "notes": "CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer and a bad suggestion look identical if the screen blurs them**, and the operator is left saying only that the map is wrong. **Low-confidence proposals are shown, not filtered** — the shape the assistant is unsure about is the one most worth a human looking at. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**decideProposedAction bound 4 October 2026: accepting or rejecting a proposal closes it, so the open proposals that block the publish clear** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "Seat Board 1.dc.html#seat-1a"
@@ -1903,8 +1904,8 @@
        "kind": "secondaryButton",
        "label": "Accept or reject segment",
        "operation": "acceptWalkwayProposals",
-       "notes": "**One segment at a time** (Chinmay, 3 October 2026: accepted segment by segment). Each proposed segment is drawn over the plan with its confidence, low confidence shown, not hidden; Accept, Edit (move the centreline) or Reject sends one decision, and the graph validation that comes back is shown at once, so a rejected segment that strands a point says so. No accept-all.",
-       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/walkway-proposals"
+       "notes": "acceptWalkwayProposals applies the segment, then decideProposedAction closes its proposal (approve or reject with a reason).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       }
      ]
     },
@@ -2059,6 +2060,13 @@
        "operation": "listProposedActions",
        "notes": "The walkway segments `proposeWalkways` proposed and nobody has decided yet (one `ai.proposed_action` each), read again when the operator comes back to the import; each is accepted or rejected on its own with `acceptWalkwayProposals` (3 October 2026, CHG-RONEC-001).",
        "provenance": "contract ai.yaml GET /proposed-actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Close proposal",
+       "operation": "decideProposedAction",
+       "notes": "Fired with the accept or reject of each proposal; a rejected one needs a reason.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       }
      ]
     }
@@ -2069,7 +2077,7 @@
    "error": "Could not load. Names which read failed and leaves the map import labelling untouched.",
    "emptyNoResults": "An import that read no resources on a map meant to carry them says so (`resourcesFound` 0) and names the resource layer it looked for, rather than showing an empty price-band table.",
    "emptyFirstRun": "No map import labelling configured. The form opens empty and `importVenueGeometry` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_MANAGE`, which `importVenueGeometry` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMapImportJob` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `listProposedActions`, `decideProposedAction`; `ASSET_LIBRARY_MANAGE` for `createUpload`, `completeUpload`; `VENUE_MAP_MANAGE` for `importVenueGeometry`, `proposeVenueLabels`, `acceptVenueLabelProposals`, `acceptWalkwayProposals` and 1 more."
   },
   "apis": [
    {
@@ -2133,6 +2141,13 @@
     "purpose": "Propose the path network of a raster or scanned plan, from hand-marked paths where there are any",
     "trigger": "onAction",
     "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-001)"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Close each walkway or label proposal once accepted or rejected (approve / reject), so no open proposal blocks the publish",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -2154,6 +2169,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional: opened without it, the screen makes one with `createUpload`."
+    },
+    {
+     "name": "actionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listProposedActions`."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mapId`."

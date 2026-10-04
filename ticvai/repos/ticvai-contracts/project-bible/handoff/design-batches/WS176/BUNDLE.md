@@ -158,11 +158,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1061` | Platform Command Center | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1062` | Tenant & Brand Context | A | 79 | 12 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1063` | Venue-Specific Configuration | B | 1 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
+| `BO-1062` | Tenant & Brand Context | A | 82 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1063` | Venue-Specific Configuration | B | 85 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
 | `BO-1064` | Naming, Numbering & Localization | C | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1065` | Currency, Timezone & Channels | A | 47 | 17 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `BO-1066` | Roles, Permissions & Masking | B | 0 | 0 | 6 | 12 | 1 | 5 | — | notStarted (—) |
+| `BO-1066` | Roles, Permissions & Masking | B | 92 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |
 | `BO-1067` | Seat Approval Workflows | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1068` | Lifecycle & Environment Promotion | B | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
 | `BO-1069` | Platform Health & Observability | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -170,7 +170,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-1061, BO-1062, BO-1064, BO-1066, BO-1067, BO-1068, BO-1069 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-1061, BO-1064, BO-1067, BO-1068, BO-1069 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -318,7 +318,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-1062` Tenant & Brand Context
 
-**Configure the hierarchy and isolation boundary for seat management. Maintain tenant, legal entity, brand, region, venue ownership, status and data-residency classification. Configure tenant isolation, encryption context, export restriction, cross-brand sharing and support-access policy. Show inherited platform settings and the venues, users, integrations and environments within each context. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+**See where this venue sits in the tenant's hierarchy (tenant, brand, region, venue) and set the defaults every venue inherits unless it overrides them.**
 
 | | |
 |---|---|
@@ -327,18 +327,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-1062 |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): The organisation node in context, with the tenant's venue-setting defaults edited beside it (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `orgUnitId` (navigation) |
 | Route | `/access-venue/tenant-brand-context-bo-1062` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from OrgUnit (getOrgUnit) and the tenant's venue-setting defaults. Legal entity, isolation, encryption and residency are set on their own screens (finance, BO-1065)** (CHG-FXS-001)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Tenant and brand context and the defaults venues inherit (seat management). Tenant-level defaults set here apply to every venue unless overridden there.
 
 **Fixed on main** (the package already carries these; draw what it says): requiresModule 'seating' on the tenant and brand context. (CHG-SBO-003).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Cart hold (seconds) | number field (seconds) | optional | 900 | min 30; max 3600 | — | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. | `VenueSettings.cartLeaseSeconds` |
+| Display currencies | list of values (chips) | optional | — | A code the region has no rate for is refused `400`. | — | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). | `VenueSettings.displayCurrencies` |
+| Calendar day starts at (hour) | stepper or slider | optional | 6 | min 0; max 23 | — | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a … | `VenueSettings.calendarDayStartHour` |
 
 **Form: Save venue setting defaults** (modal, opened by *Save venue setting defaults*; *Save venue setting defaults* calls `setVenueSettingsDefaults`, *Cancel* sends nothing)
 
@@ -404,9 +412,18 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Where this sits** (detail panel, from `getOrgUnit`): path is shown as tenant > brand > region > venue.
 
-**Venue setting defaults** (detail panel, from `getVenueSettingsDefaults`): **The inherited settings** — the tenant's default for every venue setting, which a venue inherits wherever it leaves a limit null (decided 28 September, audit R094).
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Code | text | — |
+| Level | chip: Tenant, Brand, Region, Venue, Department, Sub department… | The eight organisational levels, plus `subject`. Restored 24 August. |
+| Path | text | Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`. |
+| Is active | yes / no (icon or chip) | False causes every permission query at or beneath this node to resolve to DENY. |
+| Child count | 1,234 | — |
+
+**Venue setting defaults** (detail panel, from `getVenueSettingsDefaults`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -414,14 +431,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Quiet hours | grouped details | When the platform does not send. A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this. |
 | Alerting | grouped details | CF-134. On-platform notification, marked as read. |
 | Display currencies | list or chips (count when long) | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). |
-| Shift variance threshold | AED 1,234.50 | Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. |
-| Catalogue | grouped details | — |
-| Inventory | grouped details | — |
-| Seating | grouped details | — |
-| Promotions | grouped details | — |
-| Fnb | grouped details | — |
-| Queue | grouped details | — |
-| Reporting | grouped details | — |
+| Cart lease seconds | 1,234 | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for … |
 
 **Actions and what each produces**
 
@@ -429,7 +439,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|---|---|---|---|
 | Save venue setting defaults (secondary button) | `setVenueSettingsDefaults` PUT `/venue-settings-defaults` | VenueSettings | VenueSettings | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | gated `TENANT_CONFIGURE`; opens modal first |
 
-**Data it reads**: `getVenueSettingsDefaults` (onLoad, The tenant's default for every venue setting — the …)
+**Data it reads**: `getOrgUnit` (onLoad, The node opened (orgUnitId), or the venue in session, with …); `getVenueSettingsDefaults` (onLoad, The tenant's default for every venue setting — the …)
 
 **Where the user goes next**
 
@@ -439,11 +449,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The tenant brand context list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the tenant brand context untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No tenant brand context yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The node and the defaults. |
+| Error (`?state=error`) | Could not load. Names the read that failed. |
+| Empty, first run (`?state=emptyFirstRun`) | Never saved: the platform defaults show. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the tenant brand context are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `getOrgUnit` requires to show this screen, and names that permission (the screen's other reads need `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setVenueSettingsDefaults`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -474,7 +484,7 @@ getOrgUnit (OrgUnit):
 - `getVenueSettingsDefaults` → `TENANT_VIEW` (read) · staff
 - `setVenueSettingsDefaults` → `TENANT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `getOrgUnit` requires to show this screen, and names that permission (the screen's other reads need `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setVenueSettingsDefaults`.
 
 #### Requirements it meets
 
@@ -520,8 +530,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (79), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (82), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1062?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save venue setting defaults.
 - [ ] Every transition is wired: `BO-1061`.
@@ -534,7 +544,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 ### `BO-1063` Venue-Specific Configuration
 
-**Set local defaults without creating separate seat systems. Configure default map, lock/hold duration, naming, accessibility, sales channels, approvals and publishing policy. Map local entrances, devices, price/seat categories, operating calendars and venue-specific exceptions. Display which settings inherit from platform/tenant/brand and require justification for permitted overrides. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Configuration Scope of Work / Version 1.0 50 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+**Set this venue's seating and hold defaults without a separate seat system: how long a cart and a seat hold last, how often they extend, and how many seats a guest may book in one order.**
 
 | | |
 |---|---|
@@ -543,12 +553,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Block | Block B · task VM-BO-1063 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): One venue's seating defaults in one form (defined 4 October 2026 from VenueSettings.seating and the cart hold settings, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `venueId` (session) |
 | Route | `/access-venue/venue-specific-configuration-bo-1063` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from VenueSettings (cart lease and extensions, seat hold extensions, seats per order). Default map, naming, approvals and publishing policy are not venue settings in the contract and left the purpose** (CHG-FXS-001) **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Venue-specific overrides of the tenant defaults (map, hold duration, accessibility, channels). Each value shows the inherited default beside the override.
 
@@ -558,7 +568,63 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Seats per guest booking | stepper or slider | optional | 10 | min 1; max 50 | — | **How many seats one guest may take in one booking on Guest Web and the Guest App** (decided 29 September, rev 3 REV3-7). Default 10, from 1 to 50; left empty, the venue inherits the tenant default. … | `VenueSettings.seating.maxSeatsPerGuestOrder` |
+| Cart hold (seconds) | number field (seconds) | optional | 900 | min 30; max 3600 | — | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. | `VenueSettings.cartLeaseSeconds` |
+| Cart extension (minutes) | stepper or slider (minutes) | optional | 5 | min 1; max 30 | — | How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094). | `VenueSettings.cartHoldExtensionMinutes` |
+| Cart extensions allowed | stepper or slider | optional | 1 | min 0; max 5 | — | How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). | `VenueSettings.cartMaxExtensions` |
+| Seat hold extension (seconds) | number field (seconds) | optional | 300 | min 60; max 1800 | — | What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). | `VenueSettings.seating.seatHoldExtensionSeconds` |
+| Seat hold extensions allowed | stepper or slider | optional | 2 | min 0; max 5 | — | How many times a seat hold may be extended. Proposed, client to correct (audit R094). | `VenueSettings.seating.seatHoldMaxExtensions` |
+| Seats per guest booking | stepper or slider | optional | 10 | min 1; max 50 | — | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. | `VenueSettings.seating.maxSeatsPerGuestOrder` |
+
+**Sent by *Save venue settings*** (`setVenueSettings`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Calendar day start hour `calendarDayStartHour` | stepper or slider | optional | 6 | min 0; max 23 | — | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in … | `setVenueSettings` body |
+| Support hours `supportHours` | group | optional | — | — | — | CF-100. A venue decides whether its support desk is 24/7 or bounded, and the platform does not. | `setVenueSettings` body |
+| Mode `supportHours.mode` | radio group | optional | — | Always on · Business hours · Custom · None | — | — | `setVenueSettings` body |
+| Timezone `supportHours.timezone` | text field | optional | — | — | — | IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract. | `setVenueSettings` body |
+| Windows `supportHours.windows` | repeatable rows | optional | — | — | — | — | `setVenueSettings` body |
+| Day `supportHours.windows[].day` | select | optional | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | — | `setVenueSettings` body |
+| From `supportHours.windows[].from` | text field | optional | — | — | — | Wall-clock time the desk opens. | `setVenueSettings` body |
+| To `supportHours.windows[].to` | text field | optional | — | — | — | Wall-clock time the desk closes. | `setVenueSettings` body |
+| Out of hours message `supportHours.outOfHoursMessage` | text field | optional | — | — | — | — | `setVenueSettings` body |
+| Quiet hours `quietHours` | group | optional | — | — | — | When the platform does not send. A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this. | `setVenueSettings` body |
+| From `quietHours.from` | text field | optional | — | — | — | Wall-clock time sending stops | `setVenueSettings` body |
+| To `quietHours.to` | text field | optional | — | — | — | Wall-clock time sending resumes | `setVenueSettings` body |
+| Biometrics `biometrics` | group | optional | — | — | — | CF-35, BL-096, BL-105, BL-106. The venue-level master switch, and the one place a person is asked whether the paperwork exists. | `setVenueSettings` body |
+| Is enabled `biometrics.isEnabled` | toggle | optional | off | Off by default, and turning it on is refused without the two fields below. | — | Off by default, and turning it on is refused without the two fields below. `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — a DPIA nobody can … | `setVenueSettings` body |
+| Dpia reference `biometrics.dpiaReference` | text field | optional | — | max length 200 | — | The venue's own reference for its Article 21 assessment. The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is … | `setVenueSettings` body |
+| Consent notice acknowledged at `biometrics.consentNoticeAcknowledgedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | When somebody confirmed the consent forms are in place at the point of capture. A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice … | `setVenueSettings` body |
+| Face tag purge minutes after close `biometrics.faceTagPurgeMinutesAfterClose` | number field (minutes) | optional | 0 | — | — | BL-106. How long a same-visit Face Tag survives past the close of the operating day, and zero is the default because that is what 3.2.44 describes. | `setVenueSettings` body |
+| Consent form `biometrics.consentFormId` | picker: choose a consent form | optional | — | Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access … | shows names, sends the id | The venue's own consent form, which every biometric capture is taken on (decided 2 October 2026, Chinmay, batch 4, BO-188: "Consent first, on the venue's consent form"; DEC-128 … | `setVenueSettings` body |
+| Allow minors `biometrics.allowMinors` | toggle | optional | on | Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method. | — | Whether this venue enrols minors at all (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: "Guardian consent on the venue's form; minor age per country; the … | `setVenueSettings` body |
+| Accreditation face matching `biometrics.accreditationFaceMatching` | group | optional | — | Face matching to find duplicate accreditation applicants, off unless the venue enables it (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables it, with applicant …; Enabling it is refused without `legalSignOffReference` … | — | Face matching to find duplicate accreditation applicants, off unless the venue enables it (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables … | `setVenueSettings` body |
+| Is enabled `biometrics.accreditationFaceMatching.isEnabled` | toggle | optional | off | — | — | — | `setVenueSettings` body |
+| Legal sign off reference `biometrics.accreditationFaceMatching.legalSignOffReference` | text field | optional | — | max length 200 | — | The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when. | `setVenueSettings` body |
+| Segregated access `segregatedAccess` | group | optional | — | — | — | CF-130. Configured at venue level because it changes by region and the venue is where it is known — a Ladies Night, a family session, a prayer-time closure. | `setVenueSettings` body |
+| Is enabled `segregatedAccess.isEnabled` | toggle | optional | off | — | — | — | `setVenueSettings` body |
+| Applies to access points `segregatedAccess.appliesToAccessPointIds` | multi-picker: choose applies to access points | optional | — | — | — | — | `setVenueSettings` body |
+| Schedule `segregatedAccess.schedule` | repeatable rows | optional | — | — | — | — | `setVenueSettings` body |
+| Day `segregatedAccess.schedule[].day` | select | optional | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | — | `setVenueSettings` body |
+| From `segregatedAccess.schedule[].from` | text field | optional | — | — | — | Wall-clock time | `setVenueSettings` body |
+| To `segregatedAccess.schedule[].to` | text field | optional | — | — | — | Wall-clock time | `setVenueSettings` body |
+| Admits `segregatedAccess.schedule[].admits` | radio group | optional | — | All · Women · Women and children · Families · Members | — | — | `setVenueSettings` body |
+| Gender verification `segregatedAccess.genderVerification` | segmented control | optional | Off | Off · Staff assisted · Device assisted; Available only where the driver reports the capability, and the result is advisory to the steward rather than decisive at the turnstile (3. | — | `off` — the entitlement decides and a steward handles exceptions. The default, and what is contracted. | `setVenueSettings` body |
+| Override rate alert threshold `segregatedAccess.overrideRateAlertThreshold` | number field | optional | — | — | — | Where `deviceAssisted` is on. An override rate near zero means the steward has stopped deciding, and that is the number that says whether the human safeguard is working or … | `setVenueSettings` body |
+| Alerting `alerting` | group | optional | — | The panel is the default and email or WhatsApp only where the matrix names them — an operational alert that arrives by email is an alert nobody sees in time. | — | CF-134. On-platform notification, marked as read. | `setVenueSettings` body |
+| Channel `alerting.channel` | segmented control | optional | Dashboard panel | Dashboard panel · Dashboard and email · Dashboard and whatsapp | — | — | `setVenueSettings` body |
+| Acknowledgement required `alerting.acknowledgementRequired` | toggle | optional | on | — | — | — | `setVenueSettings` body |
+| Escalate after minutes `alerting.escalateAfterMinutes` | number field (minutes) | optional | — | — | — | — | `setVenueSettings` body |
+| Display currencies `displayCurrencies` | list of values (chips) | optional | — | A code the region has no rate for is refused `400`. | — | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). | `setVenueSettings` body |
+| Charge currencies `chargeCurrencies` | list of values (chips) | optional | — | presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. | — | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). | `setVenueSettings` body |
+| Cart lease seconds `cartLeaseSeconds` | number field (seconds) | optional | 900 | min 30; max 3600 | — | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. | `setVenueSettings` body |
+| Cart hold extension minutes `cartHoldExtensionMinutes` | stepper or slider (minutes) | optional | 5 | min 1; max 30 | — | How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094). | `setVenueSettings` body |
+| Cart max extensions `cartMaxExtensions` | stepper or slider | optional | 1 | min 0; max 5 | — | How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). | `setVenueSettings` body |
+| Resale cutoff hours `resaleCutoffHours` | number field (hours) | optional | 24 | min 0; max 168 | — | Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). | `setVenueSettings` body |
+| Exchange cutoff hours `exchangeCutoffHours` | number field (hours) | optional | 24 | min 0; max 720 | — | Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). | `setVenueSettings` body |
+| Reschedule cutoff hours `rescheduleCutoffHours` | number field (hours) | optional | 24 | min 0; max 720 | — | Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). | `setVenueSettings` body |
+| Reservation max extensions `reservationMaxExtensions` | stepper or slider | optional | 1 | min 0; max 5 | — | How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094). | `setVenueSettings` body |
+| … 34 more | | | | | | the rest are in `schemas.json` | `setVenueSettings` body |
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -566,15 +632,11 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
-**Shown**
-
-**Detail panel** (detail panel): One record, read-only. **Shows the configured limits** (decided 28 September, audit R094); a limit the venue has not set is null and shows the tenant default it inherits.
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save venue settings (primary button) | navigation or local | — | — | — | — |
+| Save venue settings (primary button) | `setVenueSettings` PUT `/venues/{venueId}/settings` | VenueSettings | VenueSettings | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `getVenueSettings` (onLoad, Venue configuration)
@@ -587,11 +649,11 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The venue-specific list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the venue-specific untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No venue-specific yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The form with the venue's saved values. |
+| Error (`?state=error`) | Could not load. Names the read that failed; nothing is editable until it loads. |
+| Empty, first run (`?state=emptyFirstRun`) | Never saved: the form shows the defaults getVenueSettings returns. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the venue-specific are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setVenueSettings`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 An enable the venue cannot evidence. Biometrics switched on without a DPIA reference and a consent-notice acknowledgement, or device-assisted gender … |
 
@@ -617,7 +679,7 @@ overrides:
 - `getVenueSettings` → `TENANT_VIEW` (read) · staff
 - `setVenueSettings` → `TENANT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setVenueSettings`.
 
 #### Requirements it meets
 
@@ -658,7 +720,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 403, 404, 422).
+- [ ] Every input above is drawn (85), with its required mark, default, format and its error state (400, 403, 404, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save venue settings, Cancel.
@@ -805,7 +867,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `regionId` (navigation) |
 | Route | `/access-venue/currency-timezone-channels-bo-1065` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)
 
 **From the Food, Beverage & Retail process.** Region settings: the trading currency and its decimals, time zone, date and number formats, fiscal year start, and the notes and coins every till in the region counts. Written at region scope by someone who holds region configuration, and inherited by every venue beneath. One thing to get right: currency and decimals freeze once the region has traded, and denominations are never deleted — a note taken out of circulation is deactivated so past cash-ups still read.
 
@@ -1093,20 +1155,28 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Block | Block B · task VM-BO-1066 |
 | Who uses it | venue staff holding `PERMISSION_GRANT`, `PERMISSION_MANAGE`, `PERMISSION_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): Access policies listed with the selected one edited, simulated and moved through its states, and the findings and reviews beside them (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `policyId` (navigation), `campaignId` (navigation), `itemId` (navigation) |
 | Route | `/access-venue/roles-permissions-masking-bo-1066` |
 
-**What the spec says about it.** **No default roles (DEC-007):** the access policy reads the role's per-module checklist; presets only fill it.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **No default roles (DEC-007):** the access policy reads the role's per-module checklist; presets only fill it. **Defined 4 October 2026 from AuthorisationPolicy, IdentityPermissionFinding and IdentityAccessReviewCampaign with the screen's bound operations** (CHG-FXS-001)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Attribute-based access policies with field masking, temporary and emergency access, simulation and history. Every policy can be simulated for a person before it is enabled.
 
 **Fixed on main** (the package already carries these; draw what it says): requiresModule 'seating' on the tenant's access-policy screen. (CHG-SBO-003).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Policy name | text field | optional | — | — | — | — | `AuthorisationPolicy.name` |
+| Policy code | text field | optional | — | — | — | — | `AuthorisationPolicy.code` |
+| Effect | segmented control | optional | — | Permit · Deny | — | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake … | `AuthorisationPolicy.effect` |
+| Permissions | list of values (chips) | optional | — | — | — | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about. | `AuthorisationPolicy.permissions` |
+| Combine conditions | segmented control | optional | All must match | All must match · Any may match | — | — | `AuthorisationPolicy.combining` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1123,7 +1193,122 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Draft policy | picker: choose a draft policy | — | — | `listPermissionFindings` ?draftPolicyId |
 | Status | segmented control | — | Open · Completed · Expired | `listAccessReviewCampaigns` ?status |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Create access policy*** (`createAuthorisationPolicy`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Code `code` | text field | required | — | — | — | — | `createAuthorisationPolicy` body |
+| Name `name` | text field | required | — | — | — | — | `createAuthorisationPolicy` body |
+| Description `description` | text area | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Is template `isTemplate` | toggle | optional | off | — | — | — | `createAuthorisationPolicy` body |
+| Permissions `permissions` | list of values (chips) | optional | — | — | — | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about. | `createAuthorisationPolicy` body |
+| Conditions `conditions` | repeatable rows | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Attribute `conditions[].attribute` | select | required | — | User.attribute · Employee.attribute · Employee.on shift · Membership.tier · Membership.status · Accreditation.type · Accreditation.status · Customer.segment · Resource.classification · Venue.attribute · Venue.id · Attraction.attribute … | — | — | `createAuthorisationPolicy` body |
+| Key `conditions[].key` | text field | optional | — | — | — | For the `*.attribute` forms — which attribute, by code. | `createAuthorisationPolicy` body |
+| Operator `conditions[].operator` | select | required | — | Equals · Not equals · In · Not in · Greater than · Less than · Between · Contains · Starts with · Exists | — | — | `createAuthorisationPolicy` body |
+| Value `conditions[].value` | field | optional | — | — | — | The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. | `createAuthorisationPolicy` body |
+| Values `conditions[].values` | list of values (chips) | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Combining `combining` | segmented control | optional | All must match | All must match · Any may match | — | — | `createAuthorisationPolicy` body |
+| Effect `effect` | segmented control | required | — | Permit · Deny | — | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of … | `createAuthorisationPolicy` body |
+| Priority `priority` | number field | optional | 0 | — | — | — | `createAuthorisationPolicy` body |
+| Scope path `scopePath` | text field | optional | — | — | — | 3.3.40 to 3.3.43. Tenant, venue and cross-venue policies are one mechanism, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance … | `createAuthorisationPolicy` body |
+| Applies to roles `appliesToRoleIds` | multi-picker: choose applies to roles | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAuthorisationPolicy` body |
+| Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAuthorisationPolicy` body |
+| Delegated admin roles `delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `createAuthorisationPolicy` body |
+
+**Sent by *Save as new version*** (`updateAuthorisationPolicy`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Code `code` | text field | required | — | — | — | — | `updateAuthorisationPolicy` body |
+| Name `name` | text field | required | — | — | — | — | `updateAuthorisationPolicy` body |
+| Description `description` | text area | optional | — | — | — | — | `updateAuthorisationPolicy` body |
+| Is template `isTemplate` | toggle | optional | off | — | — | — | `updateAuthorisationPolicy` body |
+| Permissions `permissions` | list of values (chips) | optional | — | — | — | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about. | `updateAuthorisationPolicy` body |
+| Conditions `conditions` | repeatable rows | optional | — | — | — | — | `updateAuthorisationPolicy` body |
+| Attribute `conditions[].attribute` | select | required | — | User.attribute · Employee.attribute · Employee.on shift · Membership.tier · Membership.status · Accreditation.type · Accreditation.status · Customer.segment · Resource.classification · Venue.attribute · Venue.id · Attraction.attribute … | — | — | `updateAuthorisationPolicy` body |
+| Key `conditions[].key` | text field | optional | — | — | — | For the `*.attribute` forms — which attribute, by code. | `updateAuthorisationPolicy` body |
+| Operator `conditions[].operator` | select | required | — | Equals · Not equals · In · Not in · Greater than · Less than · Between · Contains · Starts with · Exists | — | — | `updateAuthorisationPolicy` body |
+| Value `conditions[].value` | field | optional | — | — | — | The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. | `updateAuthorisationPolicy` body |
+| Values `conditions[].values` | list of values (chips) | optional | — | — | — | — | `updateAuthorisationPolicy` body |
+| Combining `combining` | segmented control | optional | All must match | All must match · Any may match | — | — | `updateAuthorisationPolicy` body |
+| Effect `effect` | segmented control | required | — | Permit · Deny | — | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of … | `updateAuthorisationPolicy` body |
+| Priority `priority` | number field | optional | 0 | — | — | — | `updateAuthorisationPolicy` body |
+| Scope path `scopePath` | text field | optional | — | — | — | 3.3.40 to 3.3.43. Tenant, venue and cross-venue policies are one mechanism, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance … | `updateAuthorisationPolicy` body |
+| Applies to roles `appliesToRoleIds` | multi-picker: choose applies to roles | optional | — | — | — | — | `updateAuthorisationPolicy` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAuthorisationPolicy` body |
+| Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAuthorisationPolicy` body |
+| Delegated admin roles `delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `updateAuthorisationPolicy` body |
+
+**Sent by *Simulate*** (`simulateAuthorisationPolicy`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Policy `policyId` | picker: choose a policy | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| Policy `policy` | group | optional | — | — | — | 3.3. Conditions and an effect, evaluated by one engine. | `simulateAuthorisationPolicy` body |
+| Code `policy.code` | text field | required | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Name `policy.name` | text field | required | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Description `policy.description` | text area | optional | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Is template `policy.isTemplate` | toggle | optional | off | — | — | — | `simulateAuthorisationPolicy` body |
+| Permissions `policy.permissions` | list of values (chips) | optional | — | — | — | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about. | `simulateAuthorisationPolicy` body |
+| Conditions `policy.conditions` | repeatable rows | optional | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Attribute `policy.conditions[].attribute` | select | required | — | User.attribute · Employee.attribute · Employee.on shift · Membership.tier · Membership.status · Accreditation.type · Accreditation.status · Customer.segment · Resource.classification · Venue.attribute · Venue.id · Attraction.attribute … | — | — | `simulateAuthorisationPolicy` body |
+| Key `policy.conditions[].key` | text field | optional | — | — | — | For the `*.attribute` forms — which attribute, by code. | `simulateAuthorisationPolicy` body |
+| Operator `policy.conditions[].operator` | select | required | — | Equals · Not equals · In · Not in · Greater than · Less than · Between · Contains · Starts with · Exists | — | — | `simulateAuthorisationPolicy` body |
+| Value `policy.conditions[].value` | field | optional | — | — | — | The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. | `simulateAuthorisationPolicy` body |
+| Values `policy.conditions[].values` | list of values (chips) | optional | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Combining `policy.combining` | segmented control | optional | All must match | All must match · Any may match | — | — | `simulateAuthorisationPolicy` body |
+| Effect `policy.effect` | segmented control | required | — | Permit · Deny | — | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of … | `simulateAuthorisationPolicy` body |
+| Priority `policy.priority` | number field | optional | 0 | — | — | — | `simulateAuthorisationPolicy` body |
+| Scope path `policy.scopePath` | text field | optional | — | — | — | 3.3.40 to 3.3.43. Tenant, venue and cross-venue policies are one mechanism, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance … | `simulateAuthorisationPolicy` body |
+| Applies to roles `policy.appliesToRoleIds` | multi-picker: choose applies to roles | optional | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Effective from `policy.effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `simulateAuthorisationPolicy` body |
+| Effective to `policy.effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `simulateAuthorisationPolicy` body |
+| Delegated admin roles `policy.delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `simulateAuthorisationPolicy` body |
+| Contexts `contexts` | repeatable rows | required | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Principal `contexts[].principalId` | picker: choose a principal | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| Subject `contexts[].subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| Permission `contexts[].permission` | text field | optional | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Scope path `contexts[].scopePath` | text field | optional | — | — | — | — | `simulateAuthorisationPolicy` body |
+| Venue `contexts[].venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| Attraction `contexts[].attractionId` | picker: choose an attraction | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| Device `contexts[].deviceId` | picker: choose a device | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| Event `contexts[].eventId` | picker: choose an event | optional | — | — | shows names, sends the id | — | `simulateAuthorisationPolicy` body |
+| At `contexts[].at` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `simulateAuthorisationPolicy` body |
+| Attributes `contexts[].attributes` | key and value settings | optional | — | — | — | Deliberately an open map, keyed by attribute (the `AccessCondition.attribute` vocabulary, with `key` for the `*.attribute` forms), each value the one a condition compares against. | `simulateAuthorisationPolicy` body |
+
+**Sent by *Submit / approve / activate / retire*** (`setAuthorisationPolicyState`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| State `state` | radio group | required | — | Draft · Pending approval · Active · Suspended · Retired | — | — | `setAuthorisationPolicyState` body |
+| Reason `reason` | text area | optional | — | — | — | — | `setAuthorisationPolicyState` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setAuthorisationPolicyState` body |
+
+**Sent by *Emergency override*** (`createEmergencyAccessOverride`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Principal `principalId` | picker: choose a principal | optional | — | — | shows names, sends the id | — | `createEmergencyAccessOverride` body |
+| Scope path `scopePath` | text field | required | — | — | — | — | `createEmergencyAccessOverride` body |
+| Permissions `permissions` | list of values (chips) | optional | — | — | — | — | `createEmergencyAccessOverride` body |
+| Reason `reason` | text area | required | — | — | — | — | `createEmergencyAccessOverride` body |
+| Expires at `expiresAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createEmergencyAccessOverride` body |
+
+**Sent by *Start access review*** (`createAccessReviewCampaign`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | required | — | max length 200 | — | — | `createAccessReviewCampaign` body |
+| Scope path `scopePath` | text field | required | — | — | — | The partition key (ADR-0005), and what is reviewed: every grant at or below it. Inside the caller's own scope. | `createAccessReviewCampaign` body |
+| Roles `roleIds` | multi-picker: choose roles | optional | — | — | — | Only grants of these roles; null reviews every grant in scope. | `createAccessReviewCampaign` body |
+| Reviewer mode `reviewerMode` | segmented control | required | — | Line manager · Named | — | `lineManager`: each item goes to the holder's manager from their primary work assignment, falling back to the named reviewers where none is found. | `createAccessReviewCampaign` body |
+| Reviewer principals `reviewerPrincipalIds` | multi-picker: choose reviewer principals | optional | — | — | — | — | `createAccessReviewCampaign` body |
+| Due at `dueAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAccessReviewCampaign` body |
+| Recurrence `recurrence` | radio group | optional | None | None · Quarterly · Semi annual · Annual | — | — | `createAccessReviewCampaign` body |
+| Prefill from findings `prefillFromFindings` | toggle | optional | on | — | — | — | `createAccessReviewCampaign` body |
+| Lookback days `lookbackDays` | number field (days) | optional | 90 | min 7; max 365 | — | — | `createAccessReviewCampaign` body |
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -1133,14 +1318,47 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Access policies** (data table, from `listAuthorisationPolicies`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Effect | chip: Permit, Deny | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not … |
+| Permissions | list or chips (count when long) | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being … |
+| Applies to roles | list or chips (count when long) | — |
+| Priority | 1,234 | — |
+| Effective to | 1 Oct 2026, 14:30 | — |
+
+**Permission findings** (data table, from `listPermissionFindings`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kind | chip: Excessive, Missing, Conflicting | — |
+| Principal | the name it points at, never the id | — |
+| Permission | text | — |
+| Recommendation | chip: Revoke, Grant, Review | — |
+| Last used at | 1 Oct 2026, 14:30 | The last permit that used it; null when never used in the window. |
+
+**Access reviews** (data table, from `listAccessReviewCampaigns`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Due at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Open, Completed, Expired | — |
+| Item count | 1,234 | — |
+| Decided count | 1,234 | Kept by `decideAccessReviewItem` in the same write, so the campaign list needs no count query. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create access policy (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Create access policy (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | — | — |
+| Save as new version (secondary button) | `updateAuthorisationPolicy` PUT `/authorisation-policies/{policyId}` | AuthorisationPolicy | AuthorisationPolicy | — | — |
+| Simulate (secondary button) | `simulateAuthorisationPolicy` POST `/authorisation-policies/simulate` | inline | AccessDecision[] | — | — |
+| Submit / approve / activate / retire (secondary button) | `setAuthorisationPolicyState` POST `/authorisation-policies/{policyId}/state` | inline | AuthorisationPolicy | — | — |
+| Emergency override (destructive button) | `createEmergencyAccessOverride` POST `/access-overrides` | inline | EmergencyAccessOverride | — | — |
+| Start access review (secondary button) | `createAccessReviewCampaign` POST `/access-review-campaigns` | IdentityAccessReviewCampaign | IdentityAccessReviewCampaign | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 `dueAt` not in the future, `reviewerMode` `named` with no `reviewerPrincipalIds`, a `scopePath` outside the caller's own, or no … | — |
 
 **What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -1156,11 +1374,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The roles permissions masking list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the roles permissions masking untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No roles permissions masking yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No access policies yet: roles alone decide. Carries Create access policy. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the roles permissions masking are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_GRANT` for `decideAccessReviewItem`; `PERMISSION_MANAGE` for `createAuthorisationPolicy`, `updateAuthorisationPolicy` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 `revoke` without a `reason`, or `certify` against a `revoke` recommendation without one.; 409 Already decided, or the campaign is no longer `open` (`campaign-closed`).; 409 The target version was never approved, is the current version, or the policy is retired |
 
@@ -1208,11 +1426,11 @@ policy:
 - `listAccessReviewItems` → `PERMISSION_VIEW` (read) · staff
 - `decideAccessReviewItem` → `PERMISSION_GRANT` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_GRANT` for `decideAccessReviewItem`; `PERMISSION_MANAGE` for `createAuthorisationPolicy`, `updateAuthorisationPolicy` …
 
 #### Requirements it meets
 
-12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+15 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1228,6 +1446,7 @@ policy:
 | 7.1.46 | Maintain historical versions of access policies, support comparison between versions and allow rollback to previous approved versions. | F&B POS | CONTRACTED | `restoreAuthorisationPolicyVersion` |
 | 7.1.47 | Provide a sandbox environment to test authorization policies before deployment and identify conflicts, missing permissions and excessive permissions. | F&B POS | CONTRACTED | `listPermissionFindings` |
 | 7.1.56 | Provide AI recommendations for role assignments, permission optimization, risk reduction, user provisioning and periodic access reviews. | F&B POS | CONTRACTED | `createAccessReviewCampaign` |
+| … 3 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1255,10 +1474,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (92), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1066?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create access policy, Cancel.
+- [ ] Every action is wired with its success and its failure: Create access policy, Save as new version, Simulate, Submit / approve / activate / retire, Emergency override, Start access review.
 - [ ] Every transition is wired: `BO-1061`.
 - [ ] Every gated control is gated: `PERMISSION_GRANT`, `PERMISSION_MANAGE`, `PERMISSION_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1898,7 +2117,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AccessCondition": {"type":"object","description":"**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n","required":["attribute","operator"],"properties":{"attribute":{"type":"string","enum":["user.attribute","employee.attribute","employee.onShift","membership.tier","membership.status","accreditation.type","accreditation.status","customer.segment","resource.classification","venue.attribute","venue.id","attraction.attribute","device.kind","device.id","device.trusted","time.ofDay","time.dayOfWeek","time.season","time.withinOperatingHours","event.id","event.status","capacity.utilisationPercent","occupancy.level","risk.score","ticket.status","location.scopePath"]},"key":{"type":"string","nullable":true,"description":"For the `*.attribute` forms — which attribute, by code."},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThan","lessThan","between","contains","startsWith","exists"]},"value":{"nullable":true,"description":"The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"},"values":{"type":"array","items":{"type":"string"}}}},
 "AccessContext": {"type":"object","description":"**Everything the decision is allowed to depend on.** Stated as one object so a simulation and a live decision see the same shape — a simulator that takes different inputs from the evaluator is testing something else.\n","properties":{"principalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"permission":{"type":"string"},"scopePath":{"type":"string"},"venueId":{"type":"string","format":"uuid","nullable":true},"attractionId":{"type":"string","format":"uuid","nullable":true},"deviceId":{"type":"string","format":"uuid","nullable":true},"eventId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time","nullable":true},"attributes":{"type":"object","additionalProperties":true,"description":"**Deliberately an open map**, keyed by attribute (the `AccessCondition.attribute` vocabulary, with `key` for the `*.attribute` forms), each value the one a condition compares against. **Supplied attributes are a fallback, not the source.** The evaluator resolves what it can itself; a caller that could assert its own membership tier could assert any membership tier.\n"}}},
 "AccessDecision": {"type":"object","x-ticvai-persistence":"identity.access_decision","description":"3.3.37. **The decision, the policy version behind it, and the attribute values it actually saw.** The third is what separates *the policy is wrong* from *the data was stale*.\n","properties":{"id":{"type":"string","format":"uuid"},"effect":{"type":"string","enum":["permit","deny"]},"decidedAt":{"type":"string","format":"date-time"},"decidedBy":{"type":"string","enum":["central","deviceBundle"],"description":"3.3.29 against 3.3.30 — which evaluator answered."},"principalId":{"type":"string","format":"uuid","nullable":true},"permission":{"type":"string"},"scopePath":{"type":"string"},"matchedPolicies":{"type":"array","items":{"type":"object","properties":{"policyId":{"type":"string","format":"uuid"},"version":{"type":"integer"},"effect":{"type":"string"},"matched":{"type":"boolean"},"failedCondition":{"type":"string","nullable":true}}}},"observedAttributes":{"type":"object","additionalProperties":true,"description":"**Deliberately an open map**, the same keys as `AccessContext.attributes`: the value of every attribute the evaluator actually read, whichever source it came from.\n"},"overrideId":{"type":"string","format":"uuid","nullable":true},"latencyMs":{"type":"integer","nullable":true},"scopePathIndex":{"type":"string"}}},
-"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
+"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
 "AuthorisationPolicyEffectiveness": {"type":"object","x-ticvai-persistence":"none — computed from identity.access_decision and identity.access_override over the requested period","description":"One `AuthorisationPolicy` over a period (3.3.48; decided 29 September, build pass).","required":["policyId","evaluations"],"properties":{"policyId":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"type":"string","enum":["draft","pendingApproval","active","suspended","retired"]},"versionsInPeriod":{"type":"array","items":{"type":"integer"},"description":"The versions that decided anything in the period."},"evaluations":{"type":"integer","minimum":0,"description":"Decisions that evaluated this policy."},"matched":{"type":"integer","minimum":0,"description":"Evaluations in which every condition held (or one, for `anyMayMatch`)."},"decisivePermits":{"type":"integer","minimum":0,"description":"Permits this policy decided."},"decisiveDenies":{"type":"integer","minimum":0,"description":"Denies this policy decided, deny winning over any permit."},"overridesAtScope":{"type":"integer","minimum":0,"description":"Emergency overrides opened in the period at or beneath the policy's scope for a permission it speaks to - the times people had to go around it."},"lastMatchedAt":{"type":"string","format":"date-time","nullable":true},"neverMatched":{"type":"boolean","description":"True when the policy was evaluated and never matched in the period, the usual sign of a condition written backwards or a policy nobody needs."},"trend":{"type":"array","description":"One point per day in the period.","items":{"type":"object","properties":{"date":{"type":"string","format":"date"},"evaluations":{"type":"integer"},"decisiveDenies":{"type":"integer"}}}}}},
 "AuthorisationPolicyVersion": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy_version","description":"3.3.36 and 3.3.39. **Who changed what, from what, and why.**","properties":{"policyId":{"type":"string","format":"uuid"},"version":{"type":"integer"},"changedBy":{"type":"string","format":"uuid"},"changedAt":{"type":"string","format":"date-time"},"reason":{"type":"string","nullable":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"previous":{"$ref":"#/components/schemas/AuthorisationPolicy"},"current":{"$ref":"#/components/schemas/AuthorisationPolicy"},"scopePath":{"type":"string"}}},
 "BulkUpdateSeatsRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["selection"],"properties":{"selection":{"type":"object","description":"Seats to amend. Combine filters; an empty selection is rejected.","properties":{"seatIds":{"type":"array","items":{"type":"string"}},"sectionCodes":{"type":"array","items":{"type":"string"}},"rowLabels":{"type":"array","items":{"type":"string"}}}},"categoryId":{"type":"string","format":"uuid"},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"isActive":{"type":"boolean"}}},

@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 220 |
+| Operations | 222 |
 | Contracts | 21 |
 | Modules | 4 |
 | Undrawn | 0 |
@@ -55,11 +55,11 @@
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
+| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
-| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | … | | | 99 more |
 
 ### 3 modules split across waves
@@ -144,8 +144,8 @@
 | `EMP-063` | Requisition & Smart Store Replenishment | Stock on the Floor | 2 | 4 | yes |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | Stock on the Floor | 2 | 5 | yes |
 | `EMP-065` | Receiving | Stock on the Floor | 1 | 6 | yes |
-| `EMP-066` | Stock Count & Cycle Count Management | Stock on the Floor | 2 | 4 | yes |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | Stock on the Floor | 1 | 5 | yes |
+| `EMP-066` | Stock Count & Cycle Count Management | Stock on the Floor | 2 | 5 | yes |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | Stock on the Floor | 1 | 6 | yes |
 | `EMP-068` | Reservation, Allocation & Omnichannel Inventory | Stock on the Floor | 2 | 4 | yes |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | Stock on the Floor | 2 | 2 | yes |
 | `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | Stock on the Floor | 2 | 3 | yes |

@@ -1,5 +1,5 @@
 id: LLD-public-api
-title: public-api — 35 operations
+title: public-api — 36 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -219,6 +219,17 @@ operations:
   offline: false
   reads:
   - control.api_version
+  writes: []
+- operation: listDeveloperMembers
+  verb: GET
+  path: /developers/{developerId}/members
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.developer_member
   writes: []
 - operation: listIntegrationListings
   verb: GET
@@ -451,11 +462,11 @@ operations:
   reads:
   - cache:idempotency
   - control.developer_account
-  - identity.principal
+  - control.developer_member
   writes:
   - cache:idempotency
   - control.developer_account
-  - identity.delegated_access
+  - control.developer_member
 - operation: submitIntegrationListing
   verb: POST
   path: /listings

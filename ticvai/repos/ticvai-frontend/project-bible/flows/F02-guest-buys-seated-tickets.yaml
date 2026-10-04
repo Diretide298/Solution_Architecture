@@ -52,7 +52,7 @@ steps:
   screen: WEB-012
   action: Pays
   operations:
-  - createOrder
+  - checkoutCart
   - createPayment
   outcome: Hold converts to entitlements on payment
 branches:

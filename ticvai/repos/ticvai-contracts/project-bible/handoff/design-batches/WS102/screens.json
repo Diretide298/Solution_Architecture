@@ -605,18 +605,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Set up a tenant's payment provider and settlement for a venue, from the console under an open grant.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 61"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 61"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -625,21 +613,11 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "multiSelect",
-       "label": "Payment methods",
-       "bindsTo": "PaymentProvider.id",
-       "columns": [
-        "PaymentProvider.supportedMethods"
-       ],
-       "operation": "setPaymentProvider",
-       "notes": "**The methods follow the contract (decided 28 September, audit R275 (a))**: the options are the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack's Credit / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method is not in the contract and is dropped.",
-       "provenance": "contract orders.yaml PUT /payment-providers"
-      },
-      {
        "kind": "primaryButton",
        "label": "Save payment provider",
        "operation": "setPaymentProvider",
-       "provenance": "contract orders.yaml PUT /payment-providers"
+       "notes": "Upsert on id; If-Match carries the version read by listPaymentProviders.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       }
      ]
     },
@@ -709,6 +687,78 @@
        "operation": "openPlatformStaffGrant",
        "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "textField",
+       "label": "Provider name",
+       "bindsTo": "SetPaymentProviderRequest.name",
+       "operation": "setPaymentProvider",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.name (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Gateway",
+       "bindsTo": "SetPaymentProviderRequest.kind",
+       "operation": "setPaymentProvider",
+       "notes": "Network International and Stripe for Phase 1 (CF-131).",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.kind (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Payment methods",
+       "bindsTo": "SetPaymentProviderRequest.supportedMethods",
+       "operation": "setPaymentProvider",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.supportedMethods (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Currencies",
+       "bindsTo": "SetPaymentProviderRequest.supportedCurrencies",
+       "operation": "setPaymentProvider",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.supportedCurrencies (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Channels",
+       "bindsTo": "SetPaymentProviderRequest.acceptedOnChannels",
+       "operation": "setPaymentProvider",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.acceptedOnChannels (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "textField",
+       "label": "Credential reference",
+       "bindsTo": "SetPaymentProviderRequest.credentialRef",
+       "operation": "setPaymentProvider",
+       "notes": "The vault reference the operator was given, never the key itself.",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.credentialRef (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applies at",
+       "bindsTo": "SetPaymentProviderRequest.scopeLevel",
+       "operation": "setPaymentProvider",
+       "notes": "Venue by default: the venue picked above.",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.scopeLevel (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Active",
+       "bindsTo": "SetPaymentProviderRequest.isActive",
+       "operation": "setPaymentProvider",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.isActive (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Routing",
+       "bindsTo": "SetPaymentProviderRequest.routing",
+       "operation": "setPaymentProvider",
+       "columns": [
+        "PaymentRouting.priority",
+        "PaymentRouting.conditions",
+        "PaymentRouting.fallbackProviderId"
+       ],
+       "notes": "Ordered rules, first match wins; a fallback provider is required.",
+       "provenance": "contract orders.yaml SetPaymentProviderRequest.routing (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     }
@@ -801,6 +851,7 @@
    ]
   },
   "purposeNote": "Purpose corrected 2 October 2026 (CHG-SBO-011): `setPaymentProvider` configures how a tenant's venue collects from guests; TICVAI's own fees are subscription billing (ADM-009), not this screen.",
+  "notes": "**Save form bound 4 October 2026 to SetPaymentProviderRequest: name, kind, methods, currencies, channels, credential reference, scope, active and routing (the methods multiSelect alone could not send a provider)** (CHG-FXS-002)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

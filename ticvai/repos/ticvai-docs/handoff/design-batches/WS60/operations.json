@@ -84,7 +84,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "templateId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "PdfPrintablePosTicketDesignerView"
  },

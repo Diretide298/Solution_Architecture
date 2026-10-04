@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-409` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `ADM-410` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-411` | Billing & Legal Entity Information | B | 17 | 19 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-412` | Payment Method & Settlement Setup | A | 41 | 13 | 7 | 24 | 0 | 0 | — | notStarted (—) |
+| `ADM-412` | Payment Method & Settlement Setup | A | 48 | 16 | 7 | 24 | 0 | 0 | — | notStarted (—) |
 | `ADM-413` | Trial Configuration & Conversion Rules | B | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ADM-414` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -629,7 +629,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `tenantId` (navigation) |
 | Route | `/tenants-licensing/payment-method-settlement-setup-adm-412` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Save form bound 4 October 2026 to SetPaymentProviderRequest: name, kind, methods, currencies, channels, credential reference, scope, active and routing (the methods multiSelect alone could not send a provider)** (CHG-FXS-002)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Set up how a tenant's payment provider collects and settles: supported methods per the provider, settlement, under a platform-staff grant into the picked tenant. This screen is the reference implementation of how a platform operator acts inside a tenant: pick a tenant, open a time-boxed grant with a second factor, see the grant and its countdown while working.
 
@@ -641,9 +641,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Payment methods | picker: choose an id | optional | — | — | shows names, sends the id | **The methods follow the contract (decided 28 September, audit R275 (a))**: the options are the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack's Credit / Debit … | `PaymentProvider.id` |
 | Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant … | `Tenant.id` |
 | Venue | picker: choose an id | optional | — | — | shows names, sends the id | After the tenant, the venue: `setPaymentProvider` is configured per venue (ADR-0018), so a venue is picked inside the open grant. | `OrgUnit.id` |
+| Provider name | text field | optional | — | — | — | — | `SetPaymentProviderRequest.name` |
+| Gateway | select | optional | — | Network international · Stripe · Adyen · Checkout · Cash · Wallet · Other | — | Network International and Stripe for Phase 1 (CF-131). | `SetPaymentProviderRequest.kind` |
+| Payment methods | multi-select chips | optional | — | Card · Apple pay · Google pay · Samsung pay · Wallet · Bank transfer · Cash · Bnpl | — | — | `SetPaymentProviderRequest.supportedMethods` |
+| Currencies | list of values (chips) | optional | — | — | — | — | `SetPaymentProviderRequest.supportedCurrencies` |
+| Channels | multi-select chips | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | BL-115. Which channels may use this provider. | `SetPaymentProviderRequest.acceptedOnChannels` |
+| Credential reference | text field | optional | — | — | — | The vault reference the operator was given, never the key itself. | `SetPaymentProviderRequest.credentialRef` |
+| Applies at | segmented control | optional | — | Tenant · Region · Venue | — | Venue by default: the venue picked above. | `SetPaymentProviderRequest.scopeLevel` |
+| Active | toggle | optional | — | — | — | — | `SetPaymentProviderRequest.isActive` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -739,6 +746,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
+
+**Routing** (card list, from `setPaymentProvider`): Ordered rules, first match wins; a fallback provider is required.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Priority | 1,234 | — |
+| Conditions | grouped details | Match on what is known before the charge — channel, currency, method, issuer country, amount band. |
+| Fallback provider | the name it points at, never the id | Where this provider declines or is unreachable. A decline is not always a fallback case — an insufficient-funds decline should not be … |
 
 **Actions and what each produces**
 
@@ -857,8 +872,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 412).
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (48), with its required mark, default, format and its error state (400, 403, 412).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-412?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Save payment provider, Open access grant.
 - [ ] Every transition is wired: `ADM-409`.

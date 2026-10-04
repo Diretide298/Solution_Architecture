@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 214,
+  "operations": 213,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
@@ -127,7 +127,7 @@
   },
   {
    "contract": "orders",
-   "operations": 32
+   "operations": 31
   },
   {
    "contract": "identity",
@@ -150,11 +150,11 @@
    "operations": 10
   },
   {
-   "contract": "wallet",
+   "contract": "white-label",
    "operations": 8
   },
   {
-   "contract": "white-label",
+   "contract": "wallet",
    "operations": 8
   },
   {
@@ -174,7 +174,7 @@
    "operations": 6
   },
   {
-   "contract": "seating",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -182,7 +182,7 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "seating",
    "operations": 5
   },
   {
@@ -313,7 +313,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/order-confirmation",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -349,7 +349,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-account-dashboard",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -412,7 +412,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/membership-loyalty-and-value/devices-wishlist-consent",
-   "operations": 20,
+   "operations": 21,
    "drawn": true
   },
   {
@@ -547,7 +547,7 @@
    "module": "In-venue Services",
    "wave": 1,
    "route": "/venue-map-and-wait-times",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {

@@ -1,6 +1,6 @@
 # WS193 — Wallet Configuration Backend Structure v1.0 board 8
 
-**10 screens · 15 operations · 13 schemas · 6 permissions**
+**10 screens · 16 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1159` | Automated Security Action Orchestration | C | 12 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-1160` | Fraud Alert & Investigation Case Management | D | 0 | 90 | 6 | 15 | 1 | 0 | — | notStarted (—) |
 | `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | B | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1162` | Security Governance, Audit & Rule Publication | A | 4 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1162` | Security Governance, Audit & Rule Publication | A | 4 | 33 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -1498,7 +1498,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `ruleCode` (navigation), `version` (navigation) |
 | Route | `/orders-money/security-governance-audit-rule-publication-bo-1162` |
 
-**What the spec says about it.** **Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says "Tenant-wide wallet security" and the screen opens only to a tenant administrator holding the wallet configuration right.
+**What the spec says about it.** **Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says "Tenant-wide wallet security" and the screen opens only to a tenant administrator holding the wallet configuration right. **The risk rules are read with getWalletRiskRules (agreed, ledger) 4 October 2026, so the status actions have a ruleCode** (CHG-FXS-003)
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
@@ -1542,6 +1542,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Approval status | text | not in the schema: `Approval status` |
 | Change governance | text | not in the schema: `Change Governance` |
 
+**Risk rules** (data table, from `getWalletRiskRules`): Each rule with its code and status; Emergency disable and Suspend act on the selected rule's ruleCode.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Rules | list or chips (count when long) | — |
+| Code | text | — |
+| Signal | chip: Velocity count, Velocity amount, New credential, Geography jump, Device change … | 4.3.32 (29 September, build pass). `accountSharing`: one wallet or credential used from more devices or places at once than one person can … |
+| Threshold | 1,234.5 | — |
+| Window minutes | 1,234 | — |
+| Action | chip: Score only, Challenge, Hold transaction, Freeze wallet, Raise case | — |
+| Minimum confidence | 1,234.5 | Required before an automated freeze. A rule that freezes on a false positive will eventually freeze a family in a queue. |
+| Alert on action | yes / no (icon or chip) | — |
+| Status | chip: Active, Suspended, Emergency disabled | Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not `active` is evaluated for nothing (VM close-out, 29 September). |
+| Status reason | text | — |
+| Status until | 1 Oct 2026, 14:30 | When a `suspended` rule returns to `active` by itself. |
+
 **The selected security governance audit** (detail panel): The pack groups this record's detail under its own headings: “Every change records”, “Maintain history for”, “Then”, “The module progression is now”.
 
 | Shows | Format | Notes |
@@ -1579,7 +1595,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - **Restore version**: Copies it into the working draft with its findings; it does not publish. *(source: contracts/satellite/wallet.yaml#restoreWalletConfigurationVersion)*
 - **Suspend or emergency-disable a rule**: Immediate, no new version; suspended may carry an "until" and returns to active by itself; emergency-disabled stays off. *(source: contracts/satellite/wallet.yaml#setWalletRiskRuleStatus)*
 
-**Data it reads**: `listWalletConfigurationVersions` (onLoad, Wallet configuration versions, newest first)
+**Data it reads**: `listWalletConfigurationVersions` (onLoad, Wallet configuration versions, newest first); `getWalletRiskRules` (onLoad, The risk rules in force, each with the ruleCode …)
 
 **Where the user goes next**
 
@@ -1597,7 +1613,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the security governance audit untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No security governance audit yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the security governance audit are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WALLET_VIEW`, which `listWalletConfigurationVersions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AUDIT_VIEW` for `listAuditRecords`; `WALLET_CONFIGURE` for `publishWalletConfiguration`, `restoreWalletConfigurationVersion` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or `until` in the past. |
 
@@ -1628,8 +1644,9 @@ rule:
 - `diffWalletConfigurationVersion` → `WALLET_VIEW` (read) · staff
 - `restoreWalletConfigurationVersion` → `WALLET_CONFIGURE` (configure) · staff
 - `setWalletRiskRuleStatus` → `WALLET_CONFIGURE` (configure) · staff
+- `getWalletRiskRules` → `WALLET_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WALLET_VIEW`, which `listWalletConfigurationVersions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AUDIT_VIEW` for `listAuditRecords`; `WALLET_CONFIGURE` for `publishWalletConfiguration`, `restoreWalletConfigurationVersion` …
 
 #### Requirements it meets
 
@@ -1655,7 +1672,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 404, 422).
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1162?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: What publishing changes, Version comparison, Rollback, Emergency disable, Rule suspension, Security Audit.
 - [ ] Every transition is wired: `BO-1153`.
@@ -1770,6 +1787,7 @@ Method, path, parameters, request and response for every operation these screens
 "decideRiskAlert": {"method":"POST","path":"/risk/alerts/{alertId}/decide","contract":"ai","summary":"Dismiss, monitor, mark false positive, or escalate","permission":"RISK_REVIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiRiskAlert"},
 "diffWalletConfigurationVersion": {"method":"GET","path":"/wallet-configuration/versions/{version}/diff","contract":"wallet","summary":"Compare a wallet configuration version against another or the working draft","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"against","in":"query","required":null}],"requestBody":null,"responds":"WalletConfigurationDiff"},
 "getRiskCase": {"method":"GET","path":"/risk/cases/{caseId}","contract":"ai","summary":"A case with its evidence and actions","permission":"RISK_INVESTIGATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiRiskCaseDetail"},
+"getWalletRiskRules": {"method":"GET","path":"/wallet-risk-rules","contract":"wallet","summary":"The wallet risk rules","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"WalletRiskRules"},
 "linkWalletCredential": {"method":"POST","path":"/wallet-credentials","contract":"wallet","summary":"Bind a wristband, card or device to a wallet","permission":"WALLET_OPERATE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WalletCredential","responds":"WalletCredential"},
 "listAuditRecords": {"method":"GET","path":"/audit-records","contract":"tenancy","summary":"Who did what, where, and when","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orgUnitId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"action","in":"query","required":null},{"name":"subjectRef","in":"query","required":null},{"name":"platformStaffGrantId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRiskAlerts": {"method":"GET","path":"/risk/alerts","contract":"ai","summary":"Risk alerts","permission":"RISK_REVIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"band","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"entityType","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1801,6 +1819,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "WalletDispute": {"type":"object","x-ticvai-persistence":"wallet.dispute","description":"Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.","required":["walletId","description"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"description":{"type":"string"},"raisedBy":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["open","investigating","escalated","upheld","rejected","withdrawn"],"description":"`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."},"resolution":{"type":"string","nullable":true},"escalatedToRoleId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"reprocessedTransactionIds":{"type":"array","readOnly":true,"description":"Transactions created by a `reprocess` action.","items":{"type":"string","format":"uuid"}},"resolvedBy":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"adjustmentId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "WalletRestriction": {"type":"object","x-ticvai-persistence":"wallet.restriction","description":"Board 7.8. **Freeze, block and restrict are three different things.**","required":["walletId","kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["freeze","block","restrict","none"],"description":"**`freeze` stops spending and allows funding** — what you do while investigating. **`block` stops both** — a confirmed fraud. **`restrict` limits channels or categories** — what a parent asked for.\n"},"blockedChannels":{"type":"array","items":{"type":"string"}},"blockedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"appliedBy":{"type":"string","format":"uuid"},"appliedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"WalletRiskRules": {"type":"object","x-ticvai-persistence":"wallet.risk_rules","description":"Boards 8.2 to 8.7. **A risk rule with no action is a report.**","properties":{"rules":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"signal":{"type":"string","enum":["velocityCount","velocityAmount","newCredential","geographyJump","deviceChange","dormantThenLarge","repeatedFailure","refundPattern","accountSharing","duplicateTransaction","aiRiskScore"],"description":"4.3.32 (29 September, build pass). **`accountSharing`**: one wallet or credential used from more devices or places at once than one person can be (`threshold` concurrent devices within `windowMinutes`). **`duplicateTransaction`**: the same amount at the same acceptance point within `windowMinutes` (`threshold` repeats). **`aiRiskScore`**: the score the `ai` risk engine returns for the wallet operation (`scoreTransactionRisk`, rules first and statistical baselines as history builds, ai-system-design 3.10); `threshold` is the score at or above which the rule acts. The wallet keeps its own rules and actions; the AI finding and its case are the `ai` contract's (`listRiskAlerts`)."},"threshold":{"type":"number"},"windowMinutes":{"type":"integer"},"action":{"type":"string","enum":["scoreOnly","challenge","holdTransaction","freezeWallet","raiseCase"]},"minimumConfidence":{"type":"number","nullable":true,"description":"**Required before an automated freeze.** A rule that freezes on a false positive will eventually freeze a family in a queue.\n"},"alertOnAction":{"type":"boolean","default":true},"status":{"type":"string","readOnly":true,"enum":["active","suspended","emergencyDisabled"],"default":"active","description":"Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not `active` is evaluated for nothing (VM close-out, 29 September)."},"statusReason":{"type":"string","nullable":true,"readOnly":true},"statusUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a `suspended` rule returns to `active` by itself."}}}},"scopePath":{"type":"string"}}}
+"WalletRiskRules": {"type":"object","x-ticvai-persistence":"wallet.risk_rules + wallet.risk_rule","description":"Boards 8.2 to 8.7. **A risk rule with no action is a report.**","properties":{"rules":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"signal":{"type":"string","enum":["velocityCount","velocityAmount","newCredential","geographyJump","deviceChange","dormantThenLarge","repeatedFailure","refundPattern","accountSharing","duplicateTransaction","aiRiskScore"],"description":"4.3.32 (29 September, build pass). **`accountSharing`**: one wallet or credential used from more devices or places at once than one person can be (`threshold` concurrent devices within `windowMinutes`). **`duplicateTransaction`**: the same amount at the same acceptance point within `windowMinutes` (`threshold` repeats). **`aiRiskScore`**: the score the `ai` risk engine returns for the wallet operation (`scoreTransactionRisk`, rules first and statistical baselines as history builds, ai-system-design 3.10); `threshold` is the score at or above which the rule acts. The wallet keeps its own rules and actions; the AI finding and its case are the `ai` contract's (`listRiskAlerts`)."},"threshold":{"type":"number"},"windowMinutes":{"type":"integer"},"action":{"type":"string","enum":["scoreOnly","challenge","holdTransaction","freezeWallet","raiseCase"]},"minimumConfidence":{"type":"number","nullable":true,"description":"**Required before an automated freeze.** A rule that freezes on a false positive will eventually freeze a family in a queue.\n"},"alertOnAction":{"type":"boolean","x-ticvai-column":"does_alert_on_action","default":true},"status":{"type":"string","readOnly":true,"enum":["active","suspended","emergencyDisabled"],"default":"active","description":"Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not `active` is evaluated for nothing (VM close-out, 29 September)."},"statusReason":{"type":"string","nullable":true,"readOnly":true},"statusUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a `suspended` rule returns to `active` by itself."}}}},"scopePath":{"type":"string"}}}
 }
 ```

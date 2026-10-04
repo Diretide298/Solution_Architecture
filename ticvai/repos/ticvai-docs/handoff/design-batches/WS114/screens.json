@@ -88,15 +88,10 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Dashboard analytics shall show) and no metric row",
-  "purpose": "Central dashboard for accreditation notifications and operational communications.",
+  "pattern": "commandCentre",
+  "patternReason": "The accreditation communications section's home: links to its screens, with no dashboard until a read of sends and delivery outcomes exists (4 October 2026, CHG-FXS-001).",
+  "purpose": "The home of accreditation communications: open the notification rules, templates, schedules and delivery screens of this section.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
-   },
    {
     "operation": "setAccreditationNotificationRules",
     "removed": true,
@@ -114,33 +109,20 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
      "components": [
       {
-       "kind": "chart",
-       "label": "Communications",
-       "columns": [
-        "Delivery success rate",
-        "Notifications by type",
-        "Notifications by channel",
-        "Failure trends",
-        "Upcoming scheduled communications"
-       ],
-       "notes": "Delivery success rate, notifications by type and channel, failure trends and upcoming scheduled communications are charts and tiles on a dashboard (VO-R02), not table columns.",
-       "provenance": "design-note correction, 2 October 2026"
+       "kind": "cardList",
+       "label": "Accreditation communications",
+       "notes": "One card per screen this hub opens (navigation.exitTo), each with its name and purpose; no figures until the delivery read exists (contract gap CHG-WIR-004).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The accreditation communications list.",
-   "error": "Could not load. Names which read failed and leaves the accreditation communications untouched.",
+   "loading": "The cards render at once; nothing is fetched.",
+   "error": "Not used: the hub fetches nothing.",
    "emptyFirstRun": "No accreditation communications yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the accreditation communications are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
@@ -160,7 +142,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-674",
    "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-674"
   },
-  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 55. 0 of 5 labels bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
+  "notes": "**Defined 4 October 2026 as the section's navigation hub: the five dashboard elements had no read (contract gap CHG-WIR-004, still open), so the chart left the screen and it links to BO-675 to BO-683** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

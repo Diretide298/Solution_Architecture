@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 78 of 290 |
+| Operations in the slice | 78 of 291 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -32,7 +32,7 @@
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076, CMS-095 |
-| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | BO-008, BO-094, CMS-010, CMS-061, CMS-062, CMS-067 … |
+| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075, CMS-082 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 1 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
@@ -66,7 +66,7 @@
 | resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 1 | GST-074, WEB-047 |
 | resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 1 | BO-861, BO-895, BO-918 |
 | resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 1 | GST-074, WEB-047 |
-| resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 1 | GST-074, WEB-047 |
+| resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 1 | GST-058, GST-074, WEB-047 |
 | resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 1 | BO-096, BO-857, BO-866, WEB-031 |
 | resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
 | resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 1 | GST-075, WEB-048 |
@@ -90,13 +90,13 @@
 | timetable | [`createTransportTimetable`](#createtransporttimetable) | POST | `/transport/routes/{routeId}/timetables` | setup | 1 | BO-1186 |
 | timetable | [`publishTransportTimetable`](#publishtransporttimetable) | POST | `/transport/timetables/{timetableId}/publish` | setup | 1 | BO-1186 |
 | timetable | [`withdrawTransportTimetable`](#withdrawtransporttimetable) | POST | `/transport/timetables/{timetableId}/withdraw` | setup | 1 | BO-1186 |
-| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 1 | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010 … |
-| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 1 | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010 … |
+| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 1 | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955 … |
+| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 1 | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955 … |
 | venueMap | [`createVenueMap`](#createvenuemap) | POST | `/venue-maps` | setup | 1 | BO-092 |
 | venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 1 | BO-094, EMP-030, GST-004, GST-021, GST-074, WEB-039 … |
 | venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 1 | BO-094, GST-021, WEB-039 |
 | venueMap | [`importVenueGeometry`](#importvenuegeometry) | POST | `/venue-maps/{mapId}/import` | setup | 1 | BO-093 |
-| venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 1 | GST-074, WEB-047 |
+| venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 1 | GST-021, GST-058, GST-074, WEB-039, WEB-047 |
 | venueMap | [`publishVenueMap`](#publishvenuemap) | POST | `/venue-maps/{mapId}/publish` | setup | 1 | BO-094 |
 | venueMap | [`setPlacedResource`](#setplacedresource) | POST | `/venue-maps/{mapId}/resources` | setup | 1 | BO-094 |
 | venueMap | [`setVenueMapArtwork`](#setvenuemapartwork) | POST | `/venue-maps/{mapId}/artwork` | setup | 1 | BO-094 |
@@ -345,7 +345,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Read routing | replica |
 | Reads | `assets.media_asset` |
 | Writes | - |
-| Called by | BO-008, BO-094, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
+| Called by | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
 
 **Parameters**
 
@@ -430,8 +430,8 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
-| Writes | `assets.media_asset`, `cache:idempotency` |
+| Reads | `assets.media_asset`, `assets.media_collection`, `assets.media_usage`, `cache:idempotency` |
+| Writes | `assets.media_asset`, `assets.media_collection_member`, `cache:idempotency` |
 | Called by | CMS-010, CMS-075, CMS-082 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): moves `quarantined` -> `ready`, `ready` -> `archived`, `archived` -> `ready` |
 
@@ -561,6 +561,8 @@ The reader path. Offline-capable so a machine can validate a card during a netwo
 | lastPlayedAt | string (date-time) |  | (nullable) |
 | issuedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | (nullable) |
+| id | string (uuid) |  | The card's own id (4 October 2026, CHG-FXC-006): the {cardId} of setGameCardLifecycle, which had no column to match, and the id of the Wallet view wallet.loadGameCredits and wallet.adjustGameCard ret… (read-only) |
+| walletId | string (uuid) |  | Where the card's credits are held (4 October 2026, CHG-FXC-006). (read-only; nullable) |
 
 **Responses**
 
@@ -624,6 +626,8 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 | lastPlayedAt | string (date-time) |  | (nullable) |
 | issuedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | (nullable) |
+| id | string (uuid) |  | The card's own id (4 October 2026, CHG-FXC-006): the {cardId} of setGameCardLifecycle, which had no column to match, and the id of the Wallet view wallet.loadGameCredits and wallet.adjustGameCard ret… (read-only) |
+| walletId | string (uuid) |  | Where the card's credits are held (4 October 2026, CHG-FXC-006). (read-only; nullable) |
 
 **Responses**
 
@@ -858,6 +862,11 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 
 A bigger or smaller coach on one run. **Capacity cannot go below the seats already sold**; the refusal is a 422. The new capacity is written to the performance's channel capacity. To cancel a departure use `cancelPerformance` on its `performanceId`.
 
+**Capacity goes through Catalogue** (4 October 2026, CHG-FXC-004). A departure is a catalogue performance, and its
+capacity is `catalogue.channel_capacity`, which CatalogueService owns: a capacity change calls
+`catalogue.updateChannelCapacity` on the departure's performance capacity after `transport.departure` is updated, in the same
+request; a refusal from it (capacity below seats sold) is returned as this operation's 409.
+
 |  |  |
 |---|---|
 | Permission | `TRANSPORT_MANAGE` |
@@ -965,6 +974,9 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 | admittedCount | integer |  | (nullable) |
 | joinedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
+| overriddenByPrincipalId | string (uuid) |  | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. (read-only; nullable) |
+| overrideReason | string |  | (read-only; nullable) |
+| overriddenAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -1043,6 +1055,9 @@ Where the party includes someone below the height requirement, the join is refus
 | admittedCount | integer |  | (nullable) |
 | joinedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
+| overriddenByPrincipalId | string (uuid) |  | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. (read-only; nullable) |
+| overrideReason | string |  | (read-only; nullable) |
+| overriddenAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -1420,6 +1435,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | items[].adultFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].adultFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].createdAt | string (date-time) | yes |  |
+| items[].subjectId | string (uuid) |  | The guest who saved it (4 October 2026, CHG-FXC-003; transport.favourite_route had no owner column). (read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -1480,6 +1496,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | adultFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | adultFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | createdAt | string (date-time) | yes |  |
+| subjectId | string (uuid) |  | The guest who saved it (4 October 2026, CHG-FXC-003; transport.favourite_route had no owner column). (read-only) |
 
 **Responses**
 
@@ -1896,6 +1913,9 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | items[].saving.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].saving.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].saving.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].variants | array of object |  | What addCartLine sells for this pass (4 October 2026, CHG-FXC-011; GST-050, GST-056): one catalogue variant of catalogueProductId per passenger type. |
+| items[].variants[].passengerTypeId | string (uuid) | yes |  |
+| items[].variants[].variantId | string (uuid) | yes |  |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2372,6 +2392,7 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 | depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
+| resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
 
 **Response**: `Resource`
 
@@ -2401,6 +2422,7 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 | depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
+| resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
 
 **Responses**
 
@@ -2488,7 +2510,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
 | Guest callable | True |
-| Reads | `resources.resource_hold` |
+| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `venuemap.map`, `venuemap.placed_resource` |
 | Writes | `resources.resource_hold` |
 | Called by | GST-074, WEB-047 |
 | State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): created as `held` |
@@ -2587,6 +2609,8 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | components[].requiredAttributes | object |  |  |
 | components[].substituteResourceIds | array of string (uuid) |  |  |
 | components[].scopePath | string |  |  |
+| components[].packageId | string (uuid) |  | The package this requirement is a component of (4 October 2026, CHG-FXC-003). (read-only; nullable) |
+| components[].productId | string (uuid) |  | The experience product this requirement belongs to (setExperienceResourceRequirements). (read-only; nullable) |
 | allocationPriority | integer |  | (default 0) |
 | effectiveFrom | string (date) |  | (nullable) |
 | effectiveTo | string (date) |  | (nullable) |
@@ -2619,6 +2643,8 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | components[].requiredAttributes | object |  |  |
 | components[].substituteResourceIds | array of string (uuid) |  |  |
 | components[].scopePath | string |  |  |
+| components[].packageId | string (uuid) |  | The package this requirement is a component of (4 October 2026, CHG-FXC-003). (read-only; nullable) |
+| components[].productId | string (uuid) |  | The experience product this requirement belongs to (setExperienceResourceRequirements). (read-only; nullable) |
 | allocationPriority | integer |  | (default 0) |
 | effectiveFrom | string (date) |  | (nullable) |
 | effectiveTo | string (date) |  | (nullable) |
@@ -2717,7 +2743,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Guest callable | True |
 | Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `venuemap.map`, `venuemap.map_version`, `venuemap.placed_resource` |
 | Writes | - |
-| Called by | GST-074, WEB-047 |
+| Called by | GST-058, GST-074, WEB-047 |
 
 **Parameters**
 
@@ -3014,7 +3040,7 @@ Requirements are stated as type and quantity with optional qualifications — *o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| experienceId | path | yes | string (uuid) |  |
+| experienceId | path | yes | string (uuid) | The experience's catalogue Product.id (4 October 2026, CHG-FXC-010; BO-877). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
@@ -3032,6 +3058,8 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | requirements[].requiredAttributes | object |  |  |
 | requirements[].substituteResourceIds | array of string (uuid) |  |  |
 | requirements[].scopePath | string |  |  |
+| requirements[].packageId | string (uuid) |  | The package this requirement is a component of (4 October 2026, CHG-FXC-003). (read-only; nullable) |
+| requirements[].productId | string (uuid) |  | The experience product this requirement belongs to (setExperienceResourceRequirements). (read-only; nullable) |
 
 **Responses**
 
@@ -3105,6 +3133,7 @@ Board 1.10. **One operation, not seven.** Draft, pending approval, approved, act
 | depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
+| resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
 
 **Responses**
 
@@ -3246,6 +3275,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
+| resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
 
 **Response**: `Resource`
 
@@ -3275,6 +3305,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
+| resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
 
 **Responses**
 
@@ -3327,6 +3358,8 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | components[].requiredAttributes | object |  |  |
 | components[].substituteResourceIds | array of string (uuid) |  |  |
 | components[].scopePath | string |  |  |
+| components[].packageId | string (uuid) |  | The package this requirement is a component of (4 October 2026, CHG-FXC-003). (read-only; nullable) |
+| components[].productId | string (uuid) |  | The experience product this requirement belongs to (setExperienceResourceRequirements). (read-only; nullable) |
 | allocationPriority | integer |  | (default 0) |
 | effectiveFrom | string (date) |  | (nullable) |
 | effectiveTo | string (date) |  | (nullable) |
@@ -3359,6 +3392,8 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | components[].requiredAttributes | object |  |  |
 | components[].substituteResourceIds | array of string (uuid) |  |  |
 | components[].scopePath | string |  |  |
+| components[].packageId | string (uuid) |  | The package this requirement is a component of (4 October 2026, CHG-FXC-003). (read-only; nullable) |
+| components[].productId | string (uuid) |  | The experience product this requirement belongs to (setExperienceResourceRequirements). (read-only; nullable) |
 | allocationPriority | integer |  | (default 0) |
 | effectiveFrom | string (date) |  | (nullable) |
 | effectiveTo | string (date) |  | (nullable) |
@@ -3397,7 +3432,7 @@ A stock photograph licensed for one season and still on a website two years late
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `assets.media_asset` |
+| Reads | `assets.media_asset`, `assets.media_usage` |
 | Writes | - |
 | Called by | CMS-010, CMS-081, CMS-088, CMS-090 |
 
@@ -3423,6 +3458,10 @@ A stock photograph licensed for one season and still on a website two years late
 
 Created as `draft`. **Creating a route creates its catalogue side** — a catalogue `Event` its departures become performances of, and one product of kind `timedAdmission` whose variants are the fare table's passenger types — so a one-way ticket is sold through the ordinary cart (decided 29 September, rev 3 REV3-21). The catalogue ids come back on the route and are not written by the caller.
 **Stops are ordered and carry an offset** in minutes from the first stop; the first stop's offset is 0 and offsets strictly increase. Arrival time and duration on a departure card are the difference of two offsets.
+
+**The catalogue records it creates** (4 October 2026, CHG-FXC-004). The route's catalogue Event and its
+`timedAdmission` product are created by calling `catalogue.createEvent` and `catalogue.createProduct` (CatalogueService
+owns those tables); their ids are stored on `transport.route`. This operation writes only transport tables.
 
 |  |  |
 |---|---|
@@ -3712,7 +3751,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Reads | `transport.departure`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station` |
 | Writes | `transport.route` |
 | Called by | BO-1184 |
 | State model | Transport route ([states/transport-route.yaml](../../../states/transport-route.yaml)): moves `draft` -> `active`, `active` -> `suspended`, `suspended` -> `active`, `active` -> `retired`, `suspended` -> `retired`, `draft` -> `retired` |
@@ -3787,7 +3826,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
 | Writes | `transport.route`, `transport.route_stop` |
 | Called by | BO-1184 |
 
@@ -4237,7 +4276,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
-| Called by | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| Called by | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955, CMS-002, CMS-004, CMS-010, CMS-063, SUP-013 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): created as `processing` |
 
 **Parameters**
@@ -4337,7 +4376,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 | Conflict policy | serverWins |
 | Reads | `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_upload`, `cache:idempotency` |
-| Called by | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| Called by | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955, CMS-002, CMS-004, CMS-010, CMS-063, SUP-013 |
 
 **Parameters**
 
@@ -4894,7 +4933,7 @@ A venue with no published bookable map is an empty `maps` list, not a 404.
 | Guest callable | True |
 | Reads | `venuemap.map`, `venuemap.map_version`, `venuemap.placed_resource` |
 | Writes | - |
-| Called by | GST-074, WEB-047 |
+| Called by | GST-021, GST-058, GST-074, WEB-039, WEB-047 |
 
 **Parameters**
 
@@ -4941,12 +4980,12 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 |---|---|
 | Permission | `VENUE_MAP_PUBLISH` |
 | Scope level | venue |
-| Part of slice | setup, makes `venuemap.map` non-empty |
+| Part of slice | setup, makes `venuemap.map`, `venuemap.map_version` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `cache:idempotency`, `platform.outlet`, `venuemap.map`, `venuemap.path`, `venuemap.point` |
-| Writes | `cache:idempotency`, `cache:resolution`, `venuemap.map` |
+| Reads | `assets.media_asset`, `cache:idempotency`, `platform.outlet`, `venuemap.map`, `venuemap.path`, `venuemap.placed_resource`, `venuemap.point` |
+| Writes | `cache:idempotency`, `cache:resolution`, `venuemap.map`, `venuemap.map_version` |
 | Called by | BO-094 |
 | State model | Venue map ([states/venue-map.yaml](../../../states/venue-map.yaml)): moves `draft` -> `published`, `published` -> `published` |
 
@@ -5956,13 +5995,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_played_at | timestamptz | no |  |
 | issued_at | timestamptz | yes |  |
 | expires_at | timestamptz | no |  |
+| id | uuid | yes | The card's own id (4 October 2026, CHG-FXC-006): the {cardId} of setGameCardLifecycle, which had no column to match, and the id of the Wallet view wallet.loadGameCredits and wallet.adjustGameCard ret… |
+| wallet_id | uuid | no | Where the card's credits are held (4 October 2026, CHG-FXC-006). |
 
 ### `games.credit_ledger`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes | Synthesised key. |
-| card_id | text | yes | Points at games.card. |
+| card_id | uuid | yes | Points at games.card. |
 
 ### `maintenance.inspection_template`
 
@@ -6081,6 +6122,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | admitted_count | integer | no |  |
 | joined_at | timestamptz | yes |  |
 | synced_at | timestamptz | no |  |
+| overridden_by_principal_id | uuid | no | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. |
+| override_reason | text | no |  |
+| overridden_at | timestamptz | no |  |
 
 ### `queue.queue`
 
@@ -6192,6 +6236,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | deposit_amount | numeric(18,4) | no |  |
 | status | text | no |  |
 | is_active | boolean | no |  |
+| resource_type_id | uuid | no | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). |
 
 ### `resources.resource_block`
 
@@ -6258,6 +6303,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | required_attributes | jsonb | no |  |
 | substitute_resource_ids | text[] | no |  |
 | scope_path | text | no |  |
+| package_id | uuid | no | The package this requirement is a component of (4 October 2026, CHG-FXC-003). |
+| product_id | uuid | no | The experience product this requirement belongs to (setExperienceResourceRequirements). |
 
 ### `resources.resource_schedule`
 
@@ -6337,6 +6384,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | to_station_name | text | no |  |
 | label | text | no |  |
 | created_at | timestamptz | yes |  |
+| subject_id | uuid | no | The guest who saved it (4 October 2026, CHG-FXC-003; transport.favourite_route had no owner column). |
 
 ### `transport.network_import`
 
@@ -6600,7 +6648,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-212 operations, added to this service in later releases without changing any of the above.
+213 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6622,7 +6670,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
 | queue | `getQueue`, `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
-| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
+| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceBooking`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
 | timetable | `listTransportTimetables`, `updateTransportTimetable` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `getVenueNavigationFile`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |

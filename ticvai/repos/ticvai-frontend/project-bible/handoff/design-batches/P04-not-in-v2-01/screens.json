@@ -1587,7 +1587,7 @@
     }
    ]
   },
-  "notes": "**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into the same till a cashier uses and sees screens the cashier does not.**\n\n**A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops push together, which is why `setTableLayout` and `setTableCombinations` belong within reach of the floor and not only in the back office.",
+  "notes": "**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into the same till a cashier uses and sees screens the cashier does not.**\n\n**A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops push together, which is why `setTableLayout` and `setTableCombinations` belong within reach of the floor and not only in the back office.\n\n**The combinations are read with listTableCombinations before the whole-set PUT (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)",
   "density": "touchLarge",
   "densityReason": "**A tablet on a POS platform is still a POS platform.**  refused comfortable and was right: the same person configuring the floor is the person who was selling on it ten minutes ago, and a screen that changes target size between those two is a screen they mis-tap.",
   "pattern": "listDetail",
@@ -1610,8 +1610,10 @@
       {
        "kind": "detailPanel",
        "label": "Combinations",
-       "notes": "**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step, a service run. A host knows which pairs work and a floor plan does not.",
-       "provenance": "carried from the previous definition"
+       "notes": "Saved with setTableCombinations as the whole set read here.",
+       "provenance": "agreed operation `listTableCombinations`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)",
+       "bindsTo": "TableCombination",
+       "operation": "listTableCombinations"
       },
       {
        "kind": "multiSelect",
@@ -1672,7 +1674,7 @@
    "error": "Could not load configuration. **Selling is unaffected.**",
    "emptyFirstRun": "**A new outlet with no layout.** The one action that draws the first table.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**You are signed in as a cashier.** Configuration needs a manager role — ADR-0002 makes that the person, not the device, so signing in again on this same till is the way through.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`, `setTableCombinations`, `setItemAvailability`.",
    "offline": "**Configuration is refused offline.** A table layout edited on two disconnected tablets is two layouts, and the room only has one."
   },
   "apis": [
@@ -1707,6 +1709,13 @@
     "purpose": "List the outlet's menu items for the '86 an item' picker",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listTableCombinations",
+    "contract": "fnb",
+    "purpose": "The combinations already declared, read before the whole-set save (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

@@ -57,31 +57,31 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 817
+  operationCalls: 821
 - service: VenueOpsService
-  operationCalls: 527
+  operationCalls: 532
 - service: TenancyService
-  operationCalls: 486
+  operationCalls: 492
 - service: OrderService
-  operationCalls: 423
+  operationCalls: 422
 - service: AccessService
   operationCalls: 297
 - service: MarketingService
-  operationCalls: 225
+  operationCalls: 236
 - service: WalletService
-  operationCalls: 219
+  operationCalls: 222
 - service: AiService
-  operationCalls: 114
+  operationCalls: 117
 - service: PlatformService
-  operationCalls: 97
+  operationCalls: 98
 - service: FnbService
-  operationCalls: 93
+  operationCalls: 95
 - service: LedgerService
-  operationCalls: 88
+  operationCalls: 90
 - service: ReportingService
-  operationCalls: 87
+  operationCalls: 88
 - service: InventoryService
-  operationCalls: 81
+  operationCalls: 82
 - service: IdentityService
   operationCalls: 65
 - service: RetailService
@@ -1491,6 +1491,7 @@ screens:
   - getHaccpStatus
   - getReturnPolicy
   - getTableMap
+  - listCorrectiveActions
   - listDeliveryLocations
   - listOutlets
   - recordCorrectiveAction
@@ -1654,8 +1655,12 @@ screens:
   density: compact
   operations:
   - createMerchandise
+  - listInventoryItems
   - listMerchandise
   - listOutlets
+  - listProductCategories
+  - listProductVariants
+  - listProducts
   - updateMerchandise
   states:
   - emptyFirstRun
@@ -2806,6 +2811,7 @@ screens:
   density: compact
   operations:
   - decideApprovalRequest
+  - getApprovalRequest
   - listApprovalRequests
   - resubmitApprovalRequest
   - withdrawApprovalRequest
@@ -2861,7 +2867,9 @@ screens:
   operations:
   - createApprovalDelegation
   - listApprovalDelegations
+  - listApprovalMatrices
   - revokeApprovalDelegation
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3033,6 +3041,7 @@ screens:
   - acceptWalkwayProposals
   - completeUpload
   - createUpload
+  - decideProposedAction
   - getVenueMapImportJob
   - importVenueGeometry
   - listProposedActions
@@ -3048,6 +3057,7 @@ screens:
   entryParams:
   - mapId<-deepLink
   - jobId<-navigation
+  - uploadId<-navigation
   goesTo:
   - BO-092
   - BO-094
@@ -3086,6 +3096,7 @@ screens:
   entryParams:
   - mapId<-deepLink
   - pathId<-deepLink
+  - uploadId<-navigation
   goesTo:
   - BO-092
   boardFrames:
@@ -3154,6 +3165,7 @@ screens:
   - checkInResource
   - checkOutResource
   - getRentalBooking
+  - getResourceBooking
   - relinquishStoredValue
   states:
   - emptyFirstRun
@@ -3279,6 +3291,7 @@ screens:
   - ADM-319
   - ADM-329
   - ADM-339
+  - ADM-340
   - ADM-342
   - ADM-349
   - ADM-354
@@ -3288,6 +3301,7 @@ screens:
   - ADM-579
   - ADM-589
   - ADM-599
+  - ADM-606
   - ADM-609
   - ADM-620
   - ADM-621
@@ -3308,10 +3322,12 @@ screens:
   - BO-1003
   - BO-101
   - BO-1013
+  - BO-1018
   - BO-102
   - BO-1023
   - BO-103
   - BO-1033
+  - BO-1034
   - BO-104
   - BO-1043
   - BO-105
@@ -3900,6 +3916,7 @@ screens:
   - completeProductionRun
   - createStockTransfer
   - getProductionRun
+  - listProductionPlans
   - listProductionRuns
   - planProductionRun
   - printPrepSheet
@@ -4452,6 +4469,7 @@ screens:
   operations:
   - listAlerts
   - listAuditRecords
+  - listReports
   - listSyncRejections
   - listWorkstations
   - resolveSyncRejection
@@ -5034,7 +5052,7 @@ screens:
   wave: 1
   density: compact
   operations:
-  - listAdmissionRules
+  - listVisualAccessRules
   - setVisualAccessRule
   states:
   - emptyFirstRun
@@ -8332,6 +8350,7 @@ screens:
   operations:
   - approveMembershipProductValidation
   - createMfaChallenge
+  - getMembershipProductValidation
   - verifyMfaChallenge
   states:
   - emptyFirstRun
@@ -8340,6 +8359,8 @@ screens:
   - loading
   offlineState: false
   entryParams:
+  - membershipCode<-BO-284
+  - version<-BO-284
   - challengeId<-navigation
   goesTo:
   - BO-284
@@ -9517,9 +9538,12 @@ screens:
   operations:
   - archiveMediaTemplate
   - cloneTicketTemplate
+  - createTicketTemplate
   - importTicketTemplate
   - listMediaDesign
   - listTicketTemplates
+  - printTicketProof
+  - updateTicketTemplate
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9572,12 +9596,8 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createTicketTemplate
   - getPdfPrintablePos
-  - listTicketTemplates
-  - printTicketProof
   - setPdfPrintablePos
-  - updateTicketTemplate
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -17276,7 +17296,10 @@ screens:
   requiresModule: accreditation
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAccreditationValidity
+  - listAccreditationProgrammes
+  - setAccreditationValidity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19663,6 +19686,8 @@ screens:
   - createCampaign
   - launchCampaign
   - listCampaigns
+  - listMessageTemplates
+  - listSegments
   - proposeMarketingContent
   - testSendCampaign
   states:
@@ -19806,8 +19831,10 @@ screens:
   density: compact
   operations:
   - decideAiInsight
+  - getCampaign
   - getCampaignPerformance
   - listMarketingRecommendations
+  - listMessageTemplates
   - proposeMarketingContent
   - requestSuggestion
   - updateCampaign
@@ -20131,9 +20158,11 @@ screens:
   density: compact
   operations:
   - createMessageTemplate
+  - getTranslationProposals
   - listMessageTemplates
   - proposeMarketingContent
   - proposeTranslations
+  - updateMessageTemplate
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -20141,7 +20170,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - translationJobId<-BO-785
   goesTo:
   - BO-784
   boardFrames: null
@@ -20441,6 +20471,8 @@ screens:
   wave: 1
   density: compact
   operations:
+  - completeUpload
+  - createUpload
   - getCustomerServiceCopilot
   - ingestKnowledgeDocument
   - listKnowledgeCollections
@@ -20469,6 +20501,9 @@ screens:
   density: compact
   operations:
   - claimConversation
+  - getConversation
+  - getGuestProfile
+  - listConversations
   - sendConversationMessage
   - setCallDisposition
   - startKioskAssist
@@ -20481,6 +20516,7 @@ screens:
   offlineState: false
   entryParams:
   - conversationId<-navigation
+  - subjectId<-navigation
   goesTo:
   - BO-794
   boardFrames: null
@@ -21138,8 +21174,10 @@ screens:
   operations:
   - getLoyaltyRules
   - listLoyaltyCampaigns
+  - listLoyaltyProgrammes
   - setLoyaltyCampaign
   - setLoyaltyRules
+  - updateLoyaltyProgramme
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -21162,9 +21200,10 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createLoyaltyProgramme
+  - getLoyaltyRules
   - listLoyaltyProgrammes
   - listRewards
+  - setLoyaltyRules
   - setReward
   states:
   - emptyFirstRun
@@ -21173,7 +21212,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-navigation
   goesTo:
   - BO-824
   boardFrames: null
@@ -21858,6 +21898,7 @@ screens:
   - getResource
   - getResourceAvailability
   - getResourceQualifications
+  - listResources
   - setResourceLifecycleState
   - updateResource
   states:
@@ -22083,6 +22124,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getResource
   - getResourceAvailability
   - getResourceSchedule
   - setResourceSchedule
@@ -22363,6 +22405,7 @@ screens:
   density: compact
   operations:
   - getExperienceResourceRequirements
+  - listProducts
   - listResources
   - setExperienceResourceRequirements
   - suggestResources
@@ -23405,6 +23448,7 @@ screens:
   operations:
   - createForecastScenario
   - getForecast
+  - listForecastDefinitions
   - listOperationalRequirements
   states:
   - emptyFirstRun
@@ -27685,6 +27729,7 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
+  - listWalletTypes
   - setWalletFundingRules
   states:
   - emptyFirstRun
@@ -28943,6 +28988,7 @@ screens:
   density: compact
   operations:
   - getRefundPolicy
+  - getWalletRefundPolicy
   - setRefundPolicy
   - setWalletRefundPolicy
   states:
@@ -29333,6 +29379,7 @@ screens:
   density: compact
   operations:
   - diffWalletConfigurationVersion
+  - getWalletRiskRules
   - listAuditRecords
   - listWalletConfigurationVersions
   - publishWalletConfiguration
@@ -30552,6 +30599,7 @@ screens:
   operations:
   - getTaxProfileJurisdiction
   - listEInvoicingProviders
+  - listLegalEntities
   - listTaxInvoiceTemplates
   - setEInvoicingProvider
   - setTaxInvoiceTemplate
@@ -30739,6 +30787,7 @@ screens:
   - listCalculationValidationReconciliation
   - listEInvoiceTransmissions
   - listEInvoicingProviders
+  - listLegalEntities
   - transmitEInvoices
   states:
   - emptyFirstRun

@@ -538,6 +538,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.incident
+  - maintenance.incident_history
 - operation: updateMaintenancePlan
   verb: PATCH
   path: /maintenance-plans/{planId}

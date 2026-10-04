@@ -39,10 +39,10 @@ The four parts share 16 back-end services. Each looks after one area of the busi
 | Sales and payments | Baskets, orders, payments, refunds, and opening and closing cashier shifts. | No new sales can be taken. This service has the highest availability target. |
 | Products and pricing | What is sold, at what price and when: products, events and sessions, price lists, promotions, bundles and seating. | Tills keep selling from their last published catalogue; changes wait. |
 | Entry and admission | Tickets and passes at the gate, admission rules and entry validation. | Gates fall back to their local copy of what is valid. |
-| Wallets and credit | Guest wallets, stored credit, gift cards and membership credit. | Wallet balances cannot be spent until it returns. |
 | Finance | The financial record of every sale, refund and payment, and currency rates. | Finance postings wait until it returns; trading is not affected. |
-| Venue operations | Queues and wait times, maintenance, bookable resources, the venue map and media. | Venue operations degrade; selling and entry continue. |
+| Wallets and credit | Guest wallets, stored credit, gift cards and membership credit. | Wallet balances cannot be spent until it returns. |
 | Food and beverage | Menus, table service, kitchen screens and food orders. | Kitchens fall back to printed tickets. |
+| Venue operations | Queues and wait times, maintenance, bookable resources, the venue map and media. | Venue operations degrade; selling and entry continue. |
 | Stock | Stock levels, counting and purchasing. | Receiving and counting pause; selling continues. |
 | Retail | Merchandise, shop sales, returns and shop-and-drop. | The shop stops; gates and restaurants do not. |
 | Guests and marketing | Guest profiles, consent, loyalty, campaigns, forms and support. | Campaigns and guest look-up pause; trading continues. |

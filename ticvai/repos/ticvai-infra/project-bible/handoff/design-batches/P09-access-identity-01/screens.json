@@ -694,7 +694,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listRoles` (ROLE_MANAGE), `createRole` (ROLE_MANAGE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**No default roles (decided 2 October 2026 by Chinmay, DEC-007; CHG-CSP-003):** roles start from per-module presets (All, Viewer, Mid-level) that fill an editable checklist; the role can be renamed. Created inside the picked tenant under the open grant.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listRoles` (ROLE_MANAGE), `createRole` (ROLE_MANAGE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**No default roles (decided 2 October 2026 by Chinmay, DEC-007; CHG-CSP-003):** roles start from per-module presets (All, Viewer, Mid-level) that fill an editable checklist; the role can be renamed. Created inside the picked tenant under the open grant.\n\n**The create-role modal's preset picker and checklist read listCapabilityTemplates and listPermissions (4 October 2026)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -757,6 +757,26 @@
        ],
        "operation": "listRoles",
        "provenance": "contract identity.yaml GET /roles"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Start from presets",
+       "bindsTo": "CapabilityTemplate.code",
+       "operation": "listCapabilityTemplates",
+       "columns": [
+        "CapabilityTemplate.name",
+        "CapabilityTemplate.module",
+        "CapabilityTemplate.presetLevel"
+       ],
+       "provenance": "contract identity.yaml CapabilityTemplate.code (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Permissions by module",
+       "bindsTo": "Role.permissions",
+       "operation": "listPermissions",
+       "notes": "Grouped by IdentityPermission.moduleId; a preset ticks its capabilities.",
+       "provenance": "contract identity.yaml Role.permissions (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -803,7 +823,7 @@
    "error": "Could not load. Names which read failed and leaves the platform role untouched.",
    "emptyFirstRun": "No platform role yet. Offers Create role (`createRole`).",
    "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
+   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `ROLE_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -839,6 +859,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listCapabilityTemplates",
+    "contract": "identity",
+    "purpose": "The presets (All, Viewer, Mid-level) per module for the create-role modal (DEC-007)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "listPermissions",
+    "contract": "identity",
+    "purpose": "The per-module permission checklist",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

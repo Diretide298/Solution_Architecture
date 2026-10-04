@@ -598,7 +598,10 @@ def spare_text(b):
 def _style():
     from openpyxl.styles import Font, PatternFill
     return {"HEAD": PatternFill("solid", fgColor="1F3864"), "SUB": PatternFill("solid", fgColor="D9E1F2"),
-            "BLOCK": {"A": PatternFill("solid", fgColor="2E75B6"), "B": PatternFill("solid", fgColor="70AD47"),
+            # A2 (Block A's second half, sprint_plan.BLOCKS) in a lighter shade of A's blue: without it the Gantt
+            # stopped on the first A2 app-module (KeyError 'A2').
+            "BLOCK": {"A": PatternFill("solid", fgColor="2E75B6"), "A2": PatternFill("solid", fgColor="9DC3E6"),
+                      "B": PatternFill("solid", fgColor="70AD47"),
                       "C": PatternFill("solid", fgColor="FFC000"), "D": PatternFill("solid", fgColor="A5A5A5")},
             "TEST": PatternFill("solid", fgColor="C00000"), "OVER": PatternFill("solid", fgColor="F4B084"),
             "WHITE": Font(color="FFFFFF", bold=True)}
@@ -959,7 +962,8 @@ def write_md(plan, path):
         bt = "; ".join(f"{x['block']}: {_d(x['from'])}-{_d(x['to'])}" for x in s["blockTest"])
         w(f"| {s['n']}{' (buffer)' if s.get('buffer') else ''} | {_d(s['start'])} – {_d(s['end'])} | {', '.join(s['blocks'])} | {_pp(s['capacity'])} | {_pp(s['planned'])} | {bt} |")
     w("")
-    w("Holidays counted: " + "; ".join(f"{_d(d)} {n}" for d, n in plan["calendar"]["holidays"].items()) + ". Eid dates are to be confirmed.")
+    w("Holidays counted: " + ("; ".join(f"{_d(d)} {n}" for d, n in plan["calendar"]["holidays"].items())
+                              or "none: every weekday is a working day, and leave is handled when it comes up") + ".")
     w("")
     w("## 4. Packages")
     w("")

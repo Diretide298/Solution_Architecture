@@ -15,9 +15,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - queue.entry
   - queue.queue
   writes:
   - cache:idempotency
+  - queue.entry
   - queue.queue
 - operation: configureQueueFeed
   verb: PUT
@@ -264,6 +266,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - queue.feed
   - queue.reading
   writes:
   - cache:idempotency

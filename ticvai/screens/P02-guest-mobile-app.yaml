@@ -192,9 +192,10 @@ screens:
       - productId
     - to: GST-005
       trigger: What's On
-      provenance: 'derived — GST-005 declares entryState.params eventId and GST-001 holds none of them.
-        The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-005 opens
-        on its own'
+      carries:
+      - eventId
+      provenance: derived — GST-005 declares entryState.params eventId and GST-001 holds eventId, so an
+        edge into it carries them
     - to: GST-006
       trigger: Event / Exhibition Details
       carries:
@@ -228,8 +229,8 @@ screens:
     - to: GST-011
       trigger: Wallet Overview
       provenance: 'derived — GST-011 declares entryState.params cardCode, walletId and GST-001 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); GST-011
-        finds walletId (getWallet) itself, and GST-011 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and GST-011 opens on its own'
     - to: GST-012
       trigger: My Tickets
       carries:
@@ -371,8 +372,10 @@ screens:
         edge into it carries them
     - to: GST-049
       trigger: Interactive Seat Selection
+      carries:
+      - eventId
       provenance: derived — GST-049 declares entryState.params eventId, holdId, performanceId and GST-001
-        holds none of them, so the edge carries nothing and GST-049 opens cold
+        holds eventId, so an edge into it carries them
     - to: GST-052
       trigger: Suggested Itineraries
       provenance: 'derived — GST-052 declares entryState.params  and GST-001 holds none of them. The edge
@@ -785,15 +788,17 @@ screens:
         its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
-      provenance: 'derived — GST-003 declares entryState.params eventId and GST-002 holds none of them.
-        The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-003 opens
-        on its own'
+      carries:
+      - eventId
+      provenance: derived — GST-003 declares entryState.params eventId and GST-002 holds eventId, so an
+        edge into it carries them
     - to: GST-004
       trigger: Attraction Details
       carries:
+      - eventId
       - productId
       provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-002
-        holds productId, so an edge into it carries them
+        holds eventId, productId, so an edge into it carries them
     - to: GST-063
       trigger: Searches (results in place)
       provenance: decided 29 September 2026, MOB-1
@@ -6025,6 +6030,7 @@ screens:
       trigger: They open their tickets
       provenance: flow F50 step 3→4
       carries:
+      - entitlementId
       - orderId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement`

@@ -235,7 +235,7 @@
     }
    ]
   },
-  "notes": "4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.",
+  "notes": "4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.\n\n**The guest's drops are found by their own tickets (listMyEntitlements, then lookupShopAndDrop per entitlementId), bound 4 October 2026** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop` (a GET with query identifiers, so no request body) (CHG-SGU-018)",
@@ -251,8 +251,8 @@
        "kind": "cardList",
        "label": "Waiting for you",
        "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup",
-       "notes": "Each drop with its collection point, collect-by time and a code large enough to show at the desk; claimed by the ticket the guest carries."
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)",
+       "notes": "One lookupShopAndDrop per ticket the guest carries (listMyEntitlements), merged; a receipt number or drop reference can be typed as well."
       }
      ]
     },
@@ -264,6 +264,17 @@
        "kind": "banner",
        "notes": "Collect-by time. Usually venue close",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "My tickets",
+       "bindsTo": "Entitlement",
+       "operation": "listMyEntitlements",
+       "columns": [
+        "Entitlement.productId",
+        "Entitlement.validTo"
+       ],
+       "provenance": "contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     }
@@ -273,7 +284,7 @@
    "loading": "Finding what is waiting for you.",
    "error": "Could not load. Names which read failed and leaves the shop drop collection untouched.",
    "emptyFirstRun": "Nothing waiting: no shop-and-drop for this guest.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "apis": [
@@ -282,6 +293,13 @@
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The guest's tickets; lookupShopAndDrop is called once per entitlementId to find the goods waiting",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "wireframe": {
@@ -298,6 +316,15 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session",
+     "notes": "The signed-in guest: the screen reads their own tickets (4 October 2026)."
+    }
+   ]
+  },
   "_platform": {
    "code": "P02",
    "audience": "guest",

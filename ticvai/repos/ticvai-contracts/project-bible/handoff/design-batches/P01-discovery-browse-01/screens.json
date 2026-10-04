@@ -240,6 +240,7 @@
      "trigger": "Opens a product and decides",
      "provenance": "flow F01 step 1→2",
      "carries": [
+      "eventId",
       "productId"
      ]
     }
@@ -248,7 +249,7 @@
     "WEB-049"
    ]
   },
-  "notes": "**Venue selection added 28 September** (decided 28 September, audit R267): a venue picker on first open, remembered on the device, **Change venue** in the header, and a visit-day suggestion from the guest's ticket. The options come from `getTenantAppStatus.venues`, the tenant's active venues, public and cacheable.\n\n**Rev 3 (decided 29 September).** Category cards render as a grid or as one scrolling row per `BookingFlowConfig.cardLayout` (the retired `categoryDisplay` of 23SEP-18 is removed, W7). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off; 23SEP-19); the date picker always sits at the top of the booking step. The venue picked here (audit R267) is the venue whose booking-flow settings apply on every booking screen, and the booking screens' *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset` (CFG-1, no change); the search box in the banner is off by default (`searchInBanner` default false, CFG-6). The in-venue notifications link is live again: WEB-046 is back in the first release (GAP-C1, reversing audit R242).\n\n**29 September.** *Plan your visit* in the header opens WEB-050 full screen (MOB-6). W7: `categoryDisplay` is retired.",
+  "notes": "**Venue selection added 28 September** (decided 28 September, audit R267): a venue picker on first open, remembered on the device, **Change venue** in the header, and a visit-day suggestion from the guest's ticket. The options come from `getTenantAppStatus.venues`, the tenant's active venues, public and cacheable.\n\n**Rev 3 (decided 29 September).** Category cards render as a grid or as one scrolling row per `BookingFlowConfig.cardLayout` (the retired `categoryDisplay` of 23SEP-18 is removed, W7). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off; 23SEP-19); the date picker always sits at the top of the booking step. The venue picked here (audit R267) is the venue whose booking-flow settings apply on every booking screen, and the booking screens' *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset` (CFG-1, no change); the search box in the banner is off by default (`searchInBanner` default false, CFG-6). The in-venue notifications link is live again: WEB-046 is back in the first release (GAP-C1, reversing audit R242).\n\n**29 September.** *Plan your visit* in the header opens WEB-050 full screen (MOB-6). W7: `categoryDisplay` is retired.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act",
@@ -522,7 +523,7 @@
     }
    ]
   },
-  "notes": "**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Categories: tiles from `listProductCategories`, then `listProducts?categoryId=`, or one flat list, per `BookingFlowConfig.ticketCategories` (REV3-16); tiles as a grid or a row per `cardLayout` (`categoryDisplay` retired, W7). **Info-only products** (`Product.guestListing` `infoOnly`) are listed with `notBookableLabel` (default *Info only / Not bookable online*) and open their details instead of adding to the basket; they are hidden when `BookingFlowConfig.showInfoOnly` is off (REV3-14). Each card shows the product's own primary image (`Product.media` `isPrimary`, `searchCatalogue` `primaryMedia`; 23SEP-4). **Book** opens the ticket counters (WEB-005) as a side panel on this listing rather than a new page (23SEP-5). Card layout, size and density are the enums `cardLayout` [stackedRows, splitRows, cardsAcross, posterCards], `cardSize` [compact, standard, large, extraLarge] and `density` [compact, standard, roomy] (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September.** W4: Help me choose filters this list, with *Show everything*. W3: view-only products show Call sales / Email sales. W7: `categoryDisplay` retired.",
+  "notes": "**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Categories: tiles from `listProductCategories`, then `listProducts?categoryId=`, or one flat list, per `BookingFlowConfig.ticketCategories` (REV3-16); tiles as a grid or a row per `cardLayout` (`categoryDisplay` retired, W7). **Info-only products** (`Product.guestListing` `infoOnly`) are listed with `notBookableLabel` (default *Info only / Not bookable online*) and open their details instead of adding to the basket; they are hidden when `BookingFlowConfig.showInfoOnly` is off (REV3-14). Each card shows the product's own primary image (`Product.media` `isPrimary`, `searchCatalogue` `primaryMedia`; 23SEP-4). **Book** opens the ticket counters (WEB-005) as a side panel on this listing rather than a new page (23SEP-5). Card layout, size and density are the enums `cardLayout` [stackedRows, splitRows, cardsAcross, posterCards], `cardSize` [compact, standard, large, extraLarge] and `density` [compact, standard, roomy] (DG-6). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September.** W4: Help me choose filters this list, with *Show everything*. W3: view-only products show Call sales / Email sales. W7: `categoryDisplay` retired.\n\n**A product's event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
@@ -679,7 +680,8 @@
     "WaitTime.queueName",
     "WaitTime.attractionProductId",
     "WaitTime.status",
-    "WaitTime.waitMinutes"
+    "WaitTime.waitMinutes",
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
    ]
   },
   "wireframe": {
@@ -753,15 +755,19 @@
     {
      "to": "WEB-002",
      "trigger": "Event & Attraction Listing",
-     "provenance": "derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them. The edge carries nothing: eventId only pre-selects (deep link or optional), and WEB-002 opens on its own"
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — WEB-002 declares entryState.params eventId and WEB-003 holds eventId, so an edge into it carries them"
     },
     {
      "to": "WEB-004",
      "trigger": "Attraction Details",
      "carries": [
+      "eventId",
       "productId"
      ],
-     "provenance": "derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds productId, so an edge into it carries them"
+     "provenance": "derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds eventId, productId, so an edge into it carries them"
     }
    ]
   },
@@ -972,7 +978,7 @@
     }
    ]
   },
-  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).\n\n**Video plays directly (client meeting 30 September, MoM 4.8, Qossai; the same page as the app's GST-004, so the same behaviour).** The ride or attraction video starts in place with no loader in front of it; its poster frame shows while it buffers, and a video that cannot play leaves the poster and the details, never an error screen.",
+  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).\n\n**Video plays directly (client meeting 30 September, MoM 4.8, Qossai; the same page as the app's GST-004, so the same behaviour).** The ride or attraction video starts in place with no loader in front of it; its poster frame shows while it buffers, and a video that cannot play leaves the poster and the details, never an error screen.\n\n**A product's event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getProduct` reads one of them — list, select, act",

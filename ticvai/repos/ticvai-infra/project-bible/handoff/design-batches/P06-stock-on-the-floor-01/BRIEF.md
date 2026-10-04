@@ -1,6 +1,6 @@
 # P06-stock-on-the-floor-01 — P06 · Stock on the Floor
 
-**10 screens · 34 operations · 38 schemas · 11 permissions**
+**10 screens · 36 operations · 40 schemas · 11 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -135,8 +135,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-063` | Requisition & Smart Store Replenishment | D | 18 | 21 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | D | 14 | 48 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
 | `EMP-065` | Receiving | A | 31 | 25 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
-| `EMP-066` | Stock Count & Cycle Count Management | D | 17 | 20 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 6 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
+| `EMP-066` | Stock Count & Cycle Count Management | A | 17 | 37 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 9 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
 | `EMP-068` | Reservation, Allocation & Omnichannel Inventory | C | 8 | 5 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | D | 3 | 8 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
 | `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | D | 18 | 9 | 6 | 6 | 0 | 4 | — | notStarted (generated) |

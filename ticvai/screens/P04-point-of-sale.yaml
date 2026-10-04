@@ -8219,7 +8219,7 @@ screens:
       carries:
       - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-023 holds orderId, promotionId, so an edge into it carries them
+        and POS-023 holds promotionId, so an edge into it carries them
     uses:
     - posPrimaryRail
     - posSaleToPayment
@@ -9166,8 +9166,6 @@ screens:
       provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
         and POS-027 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
         only pre-select (deep link or optional), and POS-002 opens on its own'
-      carries:
-      - subjectId
   notes: '**`identifyGuest` was called from the catalogue and had no screen of its own**, so the model
     could attach a guest to a sale and could not say how the cashier found them. The prototype makes lookup
     a surface, which is also where the wallet and open reservations become visible before the sale rather

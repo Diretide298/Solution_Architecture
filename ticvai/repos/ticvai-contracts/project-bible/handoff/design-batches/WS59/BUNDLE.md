@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-334` | Virtual Ticket Command Center | C | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 9 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 19 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-336` | Virtual Ticket Status & Lifecycle Model | C | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-337` | Media Type & Credential Technology Registry | C | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-338` | Multi-Media Binding & Association Rules | C | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
@@ -420,6 +420,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/virtual-ticket-identity-master-record-configuration-bo-335` |
 
+**What the spec says about it.** **The nine inputs are text inputs bound to VirtualTicketIdentityMasterRecordConfigurationInput (free strings in the contract, so no invented options), 4 October 2026** (CHG-FXS-002)
+
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Defines the Virtual Ticket - the master ticket record that every QR, wristband, card, wallet pass or face attaches to - for a venue: the ticket number format (prefix, suffix, length, e.g. VT-2026-000009821), classification, ownership and holder rules, transferability, validity, consumption and entitlement models, and which media a ticket must carry. The one thing to get right: show that the number never changes when media are replaced, regenerated, reprinted or moved to another device.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
@@ -439,15 +441,30 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| ID generation pattern | select field | — | — | — | — | — | — |
-| Ticket classification | select field | — | — | — | — | — | — |
-| Ticket ownership model | select field | — | — | — | — | — | — |
-| Holder assignment requirements | select field | — | — | — | — | — | — |
-| Transferability reference | select field | — | — | — | — | — | — |
-| Validity model | select field | — | — | — | — | — | — |
-| Consumption model | select field | — | — | — | — | — | — |
-| Entitlement model | select field | — | — | — | — | — | — |
-| Media requirements | select field | — | — | — | — | — | — |
+| ID generation pattern | text field | optional | — | — | — | Virtual Ticket ID format: prefix, suffix and length | `VirtualTicketIdentityMasterRecordConfigurationInput.idGenerationPattern` |
+| Ticket classification | text field | optional | — | — | — | Ticket classification | `VirtualTicketIdentityMasterRecordConfigurationInput.ticketClassification` |
+| Ticket ownership model | text field | optional | — | — | — | Ticket ownership model | `VirtualTicketIdentityMasterRecordConfigurationInput.ticketOwnershipModel` |
+| Holder assignment requirements | text field | optional | — | — | — | Holder assignment requirements | `VirtualTicketIdentityMasterRecordConfigurationInput.holderAssignmentRequirements` |
+| Transferability reference | text field | optional | — | — | — | Transferability reference | `VirtualTicketIdentityMasterRecordConfigurationInput.transferabilityReference` |
+| Validity model | text field | optional | — | — | — | Validity model | `VirtualTicketIdentityMasterRecordConfigurationInput.validityModel` |
+| Consumption model | text field | optional | — | — | — | Consumption model | `VirtualTicketIdentityMasterRecordConfigurationInput.consumptionModel` |
+| Entitlement model | text field | optional | — | — | — | Entitlement model | `VirtualTicketIdentityMasterRecordConfigurationInput.entitlementModel` |
+| Media requirements | list of values (chips) | optional | — | — | — | Free entries. | `VirtualTicketIdentityMasterRecordConfigurationInput.mediaRequirements` |
+
+**Sent by *Save changes*** (`setVirtualTicketIdentity`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Venue `venueId` | text field | required | — | — | — | Venue this configuration applies to | `setVirtualTicketIdentity` body |
+| ID generation pattern `idGenerationPattern` | text field | optional | — | — | — | Virtual Ticket ID format: prefix, suffix and length | `setVirtualTicketIdentity` body |
+| Ticket classification `ticketClassification` | text field | optional | — | — | — | Ticket classification | `setVirtualTicketIdentity` body |
+| Ticket ownership model `ticketOwnershipModel` | text field | optional | — | — | — | Ticket ownership model | `setVirtualTicketIdentity` body |
+| Holder assignment requirements `holderAssignmentRequirements` | text field | optional | — | — | — | Holder assignment requirements | `setVirtualTicketIdentity` body |
+| Transferability reference `transferabilityReference` | text field | optional | — | — | — | Transferability reference | `setVirtualTicketIdentity` body |
+| Validity model `validityModel` | text field | optional | — | — | — | Validity model | `setVirtualTicketIdentity` body |
+| Consumption model `consumptionModel` | text field | optional | — | — | — | Consumption model | `setVirtualTicketIdentity` body |
+| Entitlement model `entitlementModel` | text field | optional | — | — | — | Entitlement model | `setVirtualTicketIdentity` body |
+| Media requirements `mediaRequirements` | list of values (chips) | optional | — | — | — | Media types a ticket of this configuration must carry | `setVirtualTicketIdentity` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -476,7 +493,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save changes (primary button) | navigation or local | — | — | — | — |
+| Save changes (primary button) | `setVirtualTicketIdentity` PUT `/virtual-ticket-identity` | VirtualTicketIdentityMasterRecordConfigurationInput | VirtualTicketIdentityMasterRecordConfigurationView | — | produces a document or message: Virtual Ticket Identity & Master Record Configuration |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -552,7 +569,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (403, 404).
+- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (403, 404).
 - [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-335?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.

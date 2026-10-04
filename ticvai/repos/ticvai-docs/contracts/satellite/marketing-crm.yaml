@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 233
+  x-ticvai-screen-count: 234
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -995,12 +995,14 @@ paths:
       - guestAuth: []
       - bearerAuth: []
       summary: Accept or decline
-      description: '**The token is single-use.** An invitation link forwarded to a group chat is the failure
-        mode, and a token that survives its first use ends up there.
-
+      description: |-
+        **The token is single-use.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use ends up there.
         **Accepting issues the entitlement**, which is why this is not a marketing operation with a follow-up.
 
-        '
+        **How accepting issues the entitlement** (4 October 2026, CHG-FXC-004). Accepting calls `orders.issueInvitation`
+        (OrderService) with the invitation campaign's product, performance and quantity and the invited guest as holder;
+        `entitlementIds` are the ids that call returns. This operation writes only `marketing.invitation`; the entitlement is
+        written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW
@@ -1011,6 +1013,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-calls:
+      - orders.issueInvitation
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1818,11 +1822,12 @@ paths:
       - guestAuth: []
       - bearerAuth: []
       summary: Report something lost, or hand something in
-      description: '**One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner
-        hands in. **Modelling them separately would mean matching across two shapes**, which is how a
-        match gets missed.
+      description: |-
+        **One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner hands in. **Modelling them separately would mean matching across two shapes**, which is how a match gets missed.
 
-        '
+        **A guest caller** (4 October 2026, CHG-FXC-011; WEB-034): reports only, with `kind` `lost`, under their guest
+        session; CASE_MANAGE is what a staff caller needs (a cleaner handing in, `kind` `found`). A guest's report is tied to
+        their own subject and they can read back only their own reports.
       tags:
       - marketing
       x-ticvai-permission: CASE_MANAGE
@@ -2845,6 +2850,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-794 Omnichannel Command Center"
         - "P08 BO-795 Unified Inbox"
+        - "P08 BO-799 Agent Workspace"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-008 Agent Performance & SLA View"
@@ -2911,6 +2917,7 @@ paths:
       operationId: getConversation
       x-ticvai-consumed-by:
         - "P08 BO-796 Guest Conversation 360"
+        - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-audience:
       - staff
@@ -3742,6 +3749,7 @@ paths:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
+        - "P08 BO-799 Agent Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4180,6 +4188,7 @@ paths:
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
         - "P02 GST-066 Privacy & My Data"
+        - "P02 GST-071 Payment Methods"
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -4738,6 +4747,7 @@ paths:
         - "P08 BO-754 Audience Intelligence"
         - "P08 BO-755 Dynamic Segment Builder"
         - "P08 BO-757 Behavioral Segmentation"
+        - "P08 BO-766 Campaign Builder"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
       - staff
@@ -5046,6 +5056,7 @@ paths:
       operationId: getCampaign
       x-ticvai-consumed-by:
         - "P08 BO-771 Budget, Goals & Forecast"
+        - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5077,15 +5088,13 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend, pause or resume a campaign
-      description: 'Content and audience are editable only in draft. A live campaign may be paused, rescheduled
-        or stopped — nothing else. Changing the audience mid-send produces a campaign nobody can report
-        on afterwards.
+      description: |-
+        Content and audience are editable only in draft. A live campaign may be paused, rescheduled or stopped — nothing else. Changing the audience mid-send produces a campaign nobody can report on afterwards.
+        **One more change on a live A/B campaign** (29 September, build pass, group G2; 22.1.17): with `abTest.winnerRule` `manual`, a person sets `abTest.winningVariantId` once the test phase has run, and the winner goes to the rest of the audience. Variants themselves, like all content, are editable only in draft.
 
-        **One more change on a live A/B campaign** (29 September, build pass, group G2; 22.1.17): with
-        `abTest.winnerRule` `manual`, a person sets `abTest.winningVariantId` once the test phase has run, and the
-        winner goes to the rest of the audience. Variants themselves, like all content, are editable only in draft.
-
-        '
+        **Variants and the A/B test are editable here** (4 October 2026, CHG-FXC-010; BO-772): `variants` and `abTest` take
+        the shapes `createCampaign` takes. While the campaign is a draft both may change; once it is live only
+        `abTest.winningVariantId` may be set (409 otherwise), and only where `abTest.winnerRule` is `manual`.
       tags:
       - campaign
       x-ticvai-permission: MARKETING_MANAGE
@@ -5112,6 +5121,57 @@ paths:
                   format: date-time
                 content:
                   $ref: '#/components/schemas/CampaignContent'
+                variants:
+                  type: array
+                  maxItems: 5
+                  nullable: true
+                  description: '**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2;
+                    22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person
+                    or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of
+                    `marketing.campaign_variant`. Null or empty is a single-content campaign.'
+                  items:
+                    $ref: '#/components/schemas/MarketingCampaignVariant'
+                abTest:
+                  type: object
+                  nullable: true
+                  description: How the variants are tested. Required when `variants` has two or more.
+                  properties:
+                    testPercent:
+                      type: integer
+                      minimum: 5
+                      maximum: 100
+                      default: 20
+                      description: Share of the audience the variants are tested on; 100 splits everyone and picks no
+                        winner.
+                    successMetric:
+                      type: string
+                      enum:
+                      - openRate
+                      - clickRate
+                      - conversionRate
+                      - attributedRevenue
+                      default: clickRate
+                    decideAfterHours:
+                      type: integer
+                      minimum: 1
+                      maximum: 168
+                      default: 4
+                    winnerRule:
+                      type: string
+                      enum:
+                      - automatic
+                      - manual
+                      default: automatic
+                    minimumSamplePerVariant:
+                      type: integer
+                      minimum: 1
+                      default: 500
+                      description: Below this many sends per variant no winner is declared automatically; a person picks.
+                    winningVariantId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: Set by the automatic rule, or by a person through `updateCampaign`.
       responses:
         '200':
           headers:
@@ -5485,8 +5545,10 @@ paths:
     get:
       operationId: listMessageTemplates
       x-ticvai-consumed-by:
+        - "P08 BO-766 Campaign Builder"
         - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
+        - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-785 Template Library"
         - "P12 SUP-007 Canned Response Management"
       x-ticvai-audience:
@@ -6122,8 +6184,10 @@ paths:
     get:
       operationId: listLoyaltyProgrammes
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
         - "P08 BO-833 Gamification Analytics & Audit"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -6170,8 +6234,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createLoyaltyProgramme
-      x-ticvai-consumed-by:
-        - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -14975,6 +15037,7 @@ paths:
       operationId: getLoyaltyRules
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
+        - "P08 BO-828 Milestones & Reward Rules"
       summary: Every rule a loyalty programme runs on
       description: 'Decision 8 of the schema merge. **`marketing.loyalty_programme` holds no rules** —
         it is a header with a code, a name and an expiry. The rules were taken from the backend
@@ -15020,6 +15083,7 @@ paths:
       operationId: setLoyaltyRules
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
+        - "P08 BO-828 Milestones & Reward Rules"
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
         programme inconsistent in the middle, which means guests earning under one rule and
@@ -17376,6 +17440,161 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /message-templates/{templateId}:
+    patch:
+      operationId: updateMessageTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-785 Template Library"
+      summary: Change a message template
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; BO-785, design-notes correction CHG-SBO-005).** A tenant's own template is
+        edited in place: `name`, `subjects`, `bodies`, `mergeFields` and `providerTemplateId`. Every change writes a new
+        `marketing.message_template_version`, so a campaign already sent keeps the version it used. A template whose
+        `ownership` is `platform` is TICVAI's and is refused with 409; copy it with `createMessageTemplate` instead.
+      tags:
+      - message
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 200
+                subjects:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Per language, as `MessageTemplate.subjects`.
+                bodies:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Per language, as `MessageTemplate.bodies`.
+                mergeFields:
+                  type: array
+                  items:
+                    type: string
+                providerTemplateId:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageTemplate'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: The template is platform-owned (`template-platform-owned`) and cannot be edited by a tenant.
+          x-ticvai-problem-types:
+          - template-platform-owned
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /loyalty/programmes/{programmeId}:
+    patch:
+      operationId: updateLoyaltyProgramme
+      x-ticvai-consumed-by:
+        - "P08 BO-827 Points & Activity Rules"
+      summary: Change a loyalty programme
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; BO-827).** The earning rules are `LoyaltyProgramme.earnRules` and nothing wrote
+        them after `createLoyaltyProgramme`. Changes `name`, `earnRules` (replaced whole, as `marketing.points_earning_rule`
+        rows), `pointsExpireAfterMonths` and `isActive`. Points already earned keep the rule and the expiry they were earned
+        under; the change applies to what is earned from now. Tiers are not changed here.
+      tags:
+      - loyalty
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: programmeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 200
+                earnRules:
+                  type: array
+                  description: Replaces the programme's earning rules; each item as `LoyaltyProgramme.earnRules[]`.
+                  items:
+                    type: object
+                    required:
+                    - trigger
+                    - points
+                    properties:
+                      trigger:
+                        type: string
+                      points:
+                        type: number
+                      productKinds:
+                        type: array
+                        items:
+                          $ref: '../spine/catalogue.yaml#/components/schemas/ProductKind'
+                      multiplier:
+                        type: number
+                pointsExpireAfterMonths:
+                  type: integer
+                  nullable: true
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgramme'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     CookieCategory:

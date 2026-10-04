@@ -196,6 +196,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "previewSubscriptionChange": {
   "method": "POST",
   "path": "/tenants/{tenantId}/subscription/preview",

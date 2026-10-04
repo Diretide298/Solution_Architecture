@@ -151,13 +151,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Search rental checkout | search field | — | — | — | — | — | — |
-| Filter by | multi select | — | — | — | — | The pack filters this screen by location, product, start time, booking type, group/individual, readiness and 1 more — which are present is a decision the pack already made. | — |
+| Filter by | text field | optional | — | — | — | Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type … | `listRentalBookings` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Status | text field | — | — | `listRentalBookings` ?status |
 | Location | picker: choose a location | — | — | `listRentalBookings` ?locationId |
 | From | date and time picker | — | — | `listRentalBookings` ?from |
 | To | date and time picker | — | — | `listRentalBookings` ?to |
@@ -661,7 +660,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
+| Search | text field | optional | — | — | — | Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run. | `lookupAsset` ?assetTag |
 
 #### Outputs: what the screen shows and produces
 

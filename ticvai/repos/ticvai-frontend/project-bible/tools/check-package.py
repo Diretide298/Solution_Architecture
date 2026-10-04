@@ -56,11 +56,33 @@ Checks:
 Run: python3 tools/check-package.py
 """
 import json
+import pickle
 import re
 import sys
 from pathlib import Path
 
 import yaml
+
+# **Each file is parsed once** (CHG-RSPD-001, profiled 4 October). This checker parsed the contracts
+# and the screens files again for nearly every rule -- 969 `yaml.safe_load` calls, 727 of its 787
+# seconds. The parse is remembered by the exact text it was given and every caller gets its own fresh
+# copy (a pickle of the parsed document, loaded anew per call), so a rule that mutates what it loaded
+# cannot leak into the next and the result is the plain parser's. Rule 18's duplicate-key loader
+# (`yaml.load` with its own constructor) is not cached: it reports while it parses.
+_YAML_PARSED: dict = {}
+_yaml_safe_load = yaml.safe_load
+
+
+def _safe_load_once(stream):
+    if not isinstance(stream, str):
+        return _yaml_safe_load(stream)
+    blob = _YAML_PARSED.get(stream)
+    if blob is None:
+        blob = _YAML_PARSED[stream] = pickle.dumps(_yaml_safe_load(stream), pickle.HIGHEST_PROTOCOL)
+    return pickle.loads(blob)
+
+
+yaml.safe_load = _safe_load_once
 
 ROOT = Path(__file__).resolve().parents[1]
 if not (ROOT / "contracts").exists():

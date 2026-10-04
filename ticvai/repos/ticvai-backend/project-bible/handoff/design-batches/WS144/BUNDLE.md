@@ -1,6 +1,6 @@
 # WS144 — Marketing CRM Configuration Reference v1.0 board 10
 
-**10 screens · 20 operations · 19 schemas · 5 permissions**
+**10 screens · 20 operations · 20 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -134,10 +134,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-824` | Gamification Command Center | B | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-825` | Challenge Builder | A | 15 | 35 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-826` | Achievement & Badge Engine | A | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-827` | Points & Activity Rules | A | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-828` | Milestones & Reward Rules | A | 31 | 10 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-825` | Challenge Builder | A | 25 | 11 | 6 | 20 | 0 | 0 | — | notStarted (—) |
+| `BO-826` | Achievement & Badge Engine | A | 24 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-827` | Points & Activity Rules | A | 64 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-828` | Milestones & Reward Rules | A | 62 | 10 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-829` | Family, Team & Event Challenges | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-830` | Referral & Streak Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-831` | Progress, Leaderboards & Hub | D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -146,7 +146,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-826, BO-829, BO-830, BO-832, BO-833 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-829, BO-830, BO-832, BO-833 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -316,12 +316,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-825 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_SEND`, `MARKETING_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): Challenges listed with the selected draft built beside it and a publish gate (defined 4 October 2026 from Challenge, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `challengeId` (navigation) |
 | Route | `/engagement-support/challenge-builder-bo-825` |
 
-**Known gaps.** **`Challenge.kind` lacks scan, activity and purchase**, which the client keeps (decided 28 September, audit R275 (c)); handed to the contracts group to add to the enum. **Challenge Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**What the spec says about it.** **Defined 4 October 2026 from Challenge (kind, scope, goal, reward, window) with listChallenges, getChallenge, createChallenge and activateChallenge. The stale gaps (no write, no list, kind lacking scan/activity/purchase) are closed: the contract has them since CHG-CSA-045 and R275 (c)** (CHG-FXS-001)
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The marketer defines a challenge, mission or streak: what a guest must do (visit, spend, ride, collect, streak, refer, survey, social, milestone, scan, activity, purchase), for whom, by when, and for what reward. Gamification is not loyalty. A challenge pays for behaviour spend does not produce, such as a second visit, a quiet Tuesday, or a ride nobody rides.
 
@@ -333,7 +333,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Challenge action | select field | — | — | — | — | **Scan, activity and purchase are kept** (decided 28 September, audit R275 (c)) beside the contract's `Challenge.kind` values (visit, spend, ride, collection, streak, referral, survey, social … | — |
+| Status | radio group | optional | — | Draft · Active · Paused · Ended · Archived | — | Filter; Draft by default. | `Challenge.status` |
+| Name | text field | optional | — | — | — | — | `Challenge.name` |
+| Challenge action | select | optional | — | Visit · Spend · Ride · Collection · Streak · Referral · Survey · Social · Milestone · Scan · Activity · Purchase | — | Includes scan, activity and purchase (audit R275 (c), now in the enum). | `Challenge.kind` |
+| Who takes part | radio group | optional | Individual | Individual · Family · Group · Team | — | 22.6.7 and 22.6.8. A family challenge is not a per-person challenge counted twice — members contribute toward one shared goal, and a school competing against another school is a group scoring against … | `Challenge.scope` |
+| Goal metric | text field | optional | — | — | — | — | `Challenge.goal.metric` |
+| Goal target | number field | optional | — | — | — | — | `Challenge.goal.target` |
+| Within (days) | number field (days) | optional | — | — | — | Empty means no time limit. | `Challenge.goal.withinDays` |
+| Reward | select | optional | — | Badge · Loyalty points · Wallet credit · Voucher · Entitlement · None | — | 22.6.13. A reward that issues wallet credit is money, and it goes through the same stored-value mechanism as everything else rather than a parallel one. | `Challenge.rewardKind` |
+| Reward value | number field | optional | — | min 1 | — | Points for loyaltyPoints; hidden for badge and none. | `Challenge.rewardValue` |
+| Starts | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `Challenge.startsAt` |
+| Ends | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `Challenge.endsAt` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -341,9 +351,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Status | radio group | — | Draft · Active · Paused · Ended · Archived | `listChallenges` ?status |
 
-**Form: Create challenge** (modal, opened by *Create challenge*; *Create challenge* calls `createChallenge`, *Cancel* sends nothing)
-
-**Collects what `createChallenge` sends before it is called.** Required: `name`, `kind`, `goal`. Optional: `scope`, `eventId`, `rewardKind`, `rewardValue`, `rewardAmount`, `badgeAssetId`, `startsAt`, `endsAt`. Dismissing sends nothing; the screen behind is unchanged.
+**Sent by *Create challenge*** (`createChallenge`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -377,54 +385,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| Items | list or chips (count when long) | — |
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Visit, Spend, Ride, Collection, Streak, Referral… | What an entrant does to progress. `scan`, `activity` and `purchase` were added from the BO-825 pack (decided 28 September, audit R275 (c)) … |
-| Scope | chip: Individual, Family, Group, Team | 22.6.7 and 22.6.8. A family challenge is not a per-person challenge counted twice — members contribute toward one shared goal, and a school … |
-| Goal | grouped details | What completes it. |
-| Metric | text | — |
-| Target | 1,234.5 | — |
-| Within days | 1,234 | — |
-| Event | the name it points at, never the id | — |
 | Reward kind | chip: Badge, Loyalty points, Wallet credit, Voucher, Entitlement, None | 22.6.13. A reward that issues wallet credit is money, and it goes through the same stored-value mechanism as everything else rather than a … |
-| Reward value | 1,234 | Points, for `rewardKind: loyaltyPoints` only. A count, not an amount — a money reward is `rewardAmount`, never this. |
-| Reward amount | AED 1,234.50 | The credit, for `rewardKind: walletCredit` only. The shared `Money`, stored as `numeric(18,4)` with currency and scale resolved from the … |
-| Badge image | the image or video | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Draft, Active, Paused, Ended, Archived | — |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
 
 **The challenge** (detail panel, from `getChallenge`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Visit, Spend, Ride, Collection, Streak, Referral… | What an entrant does to progress. `scan`, `activity` and `purchase` were added from the BO-825 pack (decided 28 September, audit R275 (c)) … |
-| Scope | chip: Individual, Family, Group, Team | 22.6.7 and 22.6.8. A family challenge is not a per-person challenge counted twice — members contribute toward one shared goal, and a school … |
 | Goal | grouped details | What completes it. |
-| Metric | text | — |
-| Target | 1,234.5 | — |
-| Within days | 1,234 | — |
-| Event | the name it points at, never the id | — |
 | Reward kind | chip: Badge, Loyalty points, Wallet credit, Voucher, Entitlement, None | 22.6.13. A reward that issues wallet credit is money, and it goes through the same stored-value mechanism as everything else rather than a … |
-| Reward value | 1,234 | Points, for `rewardKind: loyaltyPoints` only. A count, not an amount — a money reward is `rewardAmount`, never this. |
-| Reward amount | AED 1,234.50 | The credit, for `rewardKind: walletCredit` only. The shared `Money`, stored as `numeric(18,4)` with currency and scale resolved from the … |
-| Badge image | the image or video | — |
-| Starts at | 1 Oct 2026, 14:30 | — |
-| Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Draft, Active, Paused, Ended, Archived | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| What activating changes (publish gate) | navigation or local | — | — | — | — |
-| Create challenge (primary button) | `createChallenge` POST `/challenges` | Challenge | Challenge | — | opens modal first |
-| Activate challenge (secondary button) | `activateChallenge` POST `/challenges/{challengeId}/activate` | — | Challenge | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The challenge is not a draft (`challenge-not-draft`). | — |
+| New challenge (primary button) | navigation or local | — | — | — | — |
+| Create challenge (primary button) | `createChallenge` POST `/challenges` | Challenge | Challenge | — | — |
+| What activating changes (publish gate) | `activateChallenge` POST `/challenges/{challengeId}/activate` | — | Challenge | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The challenge is not a draft (`challenge-not-draft`). | — |
+| Activate challenge (secondary button) | `activateChallenge` POST `/challenges/{challengeId}/activate` | — | Challenge | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The challenge is not a draft (`challenge-not-draft`). | gated `MARKETING_SEND` |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -440,11 +425,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The challenge list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the challenge untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No challenge yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No challenges yet. Carries New challenge. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the challenge are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listChallenges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createChallenge`; `MARKETING_SEND` for `activateChallenge`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The challenge is not a draft (`challenge-not-draft`). |
 
@@ -471,11 +456,27 @@ terms: One reward per guest; visits on the same day count once.
 - `getChallenge` → `MARKETING_VIEW` (read) · staff
 - `activateChallenge` → `MARKETING_SEND` (operate) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listChallenges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createChallenge`; `MARKETING_SEND` for `activateChallenge`.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 19.2.73 | Gamification - System shall support gamification features. | Guest Mobile App & Branding | CONTRACTED | data `Challenge` |
+| 19.2.74 | Digital Badges - System shall support digital badges. | Guest Mobile App & Branding | CONTRACTED | data `Challenge` |
+| 19.2.75 | Challenges & Activities - System shall support challenges and activities. | Guest Mobile App & Branding | CONTRACTED | data `Challenge` |
+| 22.6.1 | Challenge Management | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.2 | Achievement Engine | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.3 | Digital Badges | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.4 | Points-Based Activities | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.5 | Visit Streak Tracking | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.6 | Milestone Rewards | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.7 | Family Challenges | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.8 | Team & Group Challenges | Marketing & CRM | CONTRACTED | data `Challenge` |
+| 22.6.9 | Event-Based Challenges | Marketing & CRM | CONTRACTED | data `Challenge` |
+| … 8 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -496,10 +497,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-825?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: What activating changes, Create challenge, Activate challenge.
+- [ ] Every action is wired with its success and its failure: New challenge, Create challenge, What activating changes, Activate challenge.
 - [ ] Every transition is wired: `BO-824`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_SEND`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -518,12 +519,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-826 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): The badge library with the selected badge edited beside it (defined 4 October 2026 from MarketingBadge, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `customerId` (navigation) · cold entry: Opened from BO-824 with the guest picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says … |
 | Route | `/engagement-support/achievement-badge-engine-bo-826` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): The screen manages badges and its primary action was "Create challenge"; listBadges and setBadge are its main act (design-notes correction customer-marketing …
+**What the spec says about it.** **Defined 4 October 2026 from MarketingBadge and MarketingCustomerBadge: the badge library (listBadges), a badge's form (setBadge) and a hand award to the guest the screen was opened for (awardBadge). Rarity, tiers and validity are not badge properties in the contract and left the screen** (CHG-FXS-001)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-005): The screen manages badges and its primary action was "Create challenge"; listBadges and setBadge are its main act (design-notes correction customer-marketing …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Achievements and badges: type, name, tier, rarity, unlock criteria, points value, visibility, validity, an approved badge image library with multilingual names and alt text; automatic or manual issuance, revocation and duplicate prevention. The status badges the client named are Explorer, Adventurer and Legend.
 
@@ -531,7 +534,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Code | text field | optional | — | max length 100 | — | Unique; read-only once saved. | `MarketingBadge.code` |
+| Name | text field | optional | — | max length 150 | — | — | `MarketingBadge.name` |
+| Description | text area | optional | — | max length 500 | — | Also the accessible alt text of the icon. | `MarketingBadge.description` |
+| Type | text field | optional | — | max length 30 | — | Free text in the contract (e.g. achievement, collection, milestone). | `MarketingBadge.type` |
+| Icon link | text area | optional | — | max length 1000 | — | The link of an approved image from the media library (CMS-010). | `MarketingBadge.iconUrl` |
+| Active | toggle | optional | — | — | — | — | `MarketingBadge.isActive` |
+
+**Sent by *Save badge*** (`setBadge`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setBadge` body |
+| Code `code` | text field | required | — | max length 100 | — | — | `setBadge` body |
+| Name `name` | text field | required | — | max length 150 | — | — | `setBadge` body |
+| Description `description` | text area | optional | — | max length 500 | — | — | `setBadge` body |
+| Icon URL `iconUrl` | text area | optional | — | max length 1000 | — | — | `setBadge` body |
+| Type `type` | text field | required | — | max length 30 | — | — | `setBadge` body |
+| Is active `isActive` | toggle | required | — | — | — | — | `setBadge` body |
+| Created at `createdAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setBadge` body |
+| Updated at `updatedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setBadge` body |
+
+**Sent by *Award to this guest*** (`awardBadge`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `awardBadge` body |
+| Customer `customerId` | picker: choose a customer | required | — | — | shows names, sends the id | — | `awardBadge` body |
+| Badge `badgeId` | picker: choose a badge | required | — | — | shows names, sends the id | — | `awardBadge` body |
+| Challenge `challengeId` | picker: choose a challenge | optional | — | — | shows names, sends the id | — | `awardBadge` body |
+| Source type `sourceType` | text field | optional | — | max length 30 | — | — | `awardBadge` body |
+| Source reference `sourceReferenceId` | picker: choose a source reference | optional | — | — | shows names, sends the id | — | `awardBadge` body |
+| Awarded at `awardedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `awardBadge` body |
+| Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `awardBadge` body |
+| Status `status` | text field | required | — | max length 20 | — | — | `awardBadge` body |
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -545,22 +585,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Items | list or chips (count when long) | — |
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Description | text | — |
-| Icon URL | text | — |
 | Type | text | — |
 | Is active | yes / no (icon or chip) | — |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save badge (primary button) | navigation or local | — | — | — | — |
+| New badge (primary button) | navigation or local | — | — | — | — |
+| Save badge (primary button) | `setBadge` PUT `/badges` | MarketingBadge | MarketingBadge | — | — |
+| Award to this guest (secondary button) | `awardBadge` POST `/customers/{customerId}/badges` | MarketingCustomerBadge | MarketingCustomerBadge | 409 Already held and not expired | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
@@ -577,11 +613,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The achievement badge list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the achievement badge untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No achievement badge yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No badges yet. Carries New badge. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the achievement badge are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listBadges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setBadge`, `awardBadge`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already held and not expired |
 
@@ -602,7 +638,7 @@ badges:
 - `awardBadge` → `MARKETING_MANAGE` (configure) · staff, service
 - `listBadges` → `MARKETING_VIEW` (read) · staff, guest
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listBadges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setBadge`, `awardBadge`.
 
 #### Requirements it meets
 
@@ -629,10 +665,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-826?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save badge, Cancel.
+- [ ] Every action is wired with its success and its failure: New badge, Save badge, Award to this guest, Cancel.
 - [ ] Every transition is wired: `BO-824`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -642,7 +678,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-827` Points & Activity Rules
 
-**Translate qualifying guest actions into controlled loyalty points. Configure rules for visits, purchases, ticket scans, activities, referrals, surveys and other approved events. Set base points, multiplier, daily/monthly limit, validity, rounding and posting timing. Apply device, account, velocity, location and transaction fraud checks and exception review. Post through the shared Loyalty Engine and preserve source event, rule/version and adjustment history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+**Turn qualifying guest actions into loyalty points for one programme: the earning rules (trigger, points, product kinds, multiplier), when points expire, and the bonus-points campaigns that run over a window.**
 
 | | |
 |---|---|
@@ -651,12 +687,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-827 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): One programme's earning rules and bonus campaigns edited as one set (defined 4 October 2026 from LoyaltyProgramme.earnRules and LoyaltyRuleSet, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `programmeId` (navigation) |
 | Route | `/engagement-support/points-activity-rules-bo-827` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): A whole-set replace (setLoyaltyRules) without reading the current set erases rules, and getLoyaltyRules was consumed by no screen; programme creation belongs on …
+**What the spec says about it.** **Defined 4 October 2026 from LoyaltyProgramme.earnRules (trigger, points, productKinds, multiplier), LoyaltyRuleSet.campaignRules and MarketingLoyaltyCampaign. Earning rules are saved with updateLoyaltyProgramme (agreed in the ledger), since setLoyaltyRules leaves them out. Daily and monthly limits and rounding are not in the contract and left the purpose** (CHG-FXS-001)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-005): A whole-set replace (setLoyaltyRules) without reading the current set erases rules, and getLoyaltyRules was consumed by no screen; programme creation belongs on …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The loyalty administrator sets how guest actions earn points: base points, multipliers, daily and monthly caps, validity, rounding and when points post. The rules are edited and saved as ONE set, so a live programme is never half-changed. The ratio between earning and redemption is what the administrator is reasoning about, so both are on screen together.
 
@@ -670,6 +708,23 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Trigger | select | optional | — | Per currency unit · Per visit · Per product · On signup · On birthday · On review | — | — | `LoyaltyProgramme.earnRules.trigger` |
+| Points | number field | optional | — | — | — | — | `LoyaltyProgramme.earnRules.points` |
+| Product kinds | multi-select chips | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Empty means every kind. | `LoyaltyProgramme.earnRules.productKinds` |
+| Multiplier | number field | optional | — | — | — | — | `LoyaltyProgramme.earnRules.multiplier` |
+| Points expire after (months) | number field | optional | — | — | — | Empty means points never expire. | `LoyaltyProgramme.pointsExpireAfterMonths` |
+| Campaign code | text field | optional | — | max length 100 | — | — | `MarketingLoyaltyCampaign.code` |
+| Campaign name | text field | optional | — | max length 200 | — | — | `MarketingLoyaltyCampaign.name` |
+| Starts | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `MarketingLoyaltyCampaign.startAt` |
+| Ends | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `MarketingLoyaltyCampaign.endAt` |
+| Campaign active | toggle | optional | — | — | — | — | `MarketingLoyaltyCampaign.isActive` |
+| Bonus points | number field | optional | — | — | — | — | `MarketingLoyaltyRule.bonusPoints` |
+| Bonus multiplier | number field | optional | — | — | — | — | `MarketingLoyaltyRule.multiplier` |
+
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
@@ -677,7 +732,72 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Programme | picker: choose a programme | — | — | `listLoyaltyCampaigns` ?programmeId |
 | Active on | date and time picker | — | — | `listLoyaltyCampaigns` ?activeOn |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Save earning rules*** (`updateLoyaltyProgramme`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateLoyaltyProgramme` body |
+| Earn rules `earnRules` | repeatable rows | optional | — | — | — | Replaces the programme's earning rules; each item as `LoyaltyProgramme.earnRules[]`. | `updateLoyaltyProgramme` body |
+| Trigger `earnRules[].trigger` | text field | required | — | — | — | — | `updateLoyaltyProgramme` body |
+| Points `earnRules[].points` | number field | required | — | — | — | — | `updateLoyaltyProgramme` body |
+| Product kinds `earnRules[].productKinds` | multi-select chips | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | — | `updateLoyaltyProgramme` body |
+| Multiplier `earnRules[].multiplier` | number field | optional | — | — | — | — | `updateLoyaltyProgramme` body |
+| Points expire after months `pointsExpireAfterMonths` | number field | optional | — | — | — | — | `updateLoyaltyProgramme` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `updateLoyaltyProgramme` body |
+
+**Sent by *Save campaign*** (`setLoyaltyCampaign`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setLoyaltyCampaign` body |
+| Program `programId` | picker: choose a program | required | — | — | shows names, sends the id | — | `setLoyaltyCampaign` body |
+| Campaign `campaignId` | picker: choose a campaign | optional | — | — | shows names, sends the id | — | `setLoyaltyCampaign` body |
+| Code `code` | text field | required | — | max length 100 | — | — | `setLoyaltyCampaign` body |
+| Name `name` | text field | required | — | max length 200 | — | — | `setLoyaltyCampaign` body |
+| Start at `startAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyCampaign` body |
+| End at `endAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyCampaign` body |
+| Is active `isActive` | toggle | required | — | — | — | — | `setLoyaltyCampaign` body |
+| Created at `createdAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyCampaign` body |
+
+**Sent by *Save campaign rules*** (`setLoyaltyRules`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Programme `programmeId` | picker: choose a programme | required | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Campaign rules `campaignRules` | repeatable rows | optional | — | — | — | Bonus, multiplier and condition rules, each scoped to a campaign window. | `setLoyaltyRules` body |
+| ID `campaignRules[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Campaign `campaignRules[].campaignId` | picker: choose a campaign | required | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Type `campaignRules[].type` | text field | required | — | max length 30 | — | — | `setLoyaltyRules` body |
+| Points earning rule `campaignRules[].pointsEarningRuleId` | picker: choose a points earning rule | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Reward `campaignRules[].rewardId` | picker: choose a reward | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Bonus points `campaignRules[].bonusPoints` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Multiplier `campaignRules[].multiplier` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Conditions json `campaignRules[].conditionsJson` | text field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Is active `campaignRules[].isActive` | toggle | required | — | — | — | — | `setLoyaltyRules` body |
+| Tiers `tiers` | repeatable rows | optional | — | — | — | The programme's tiers, in `rank` order. Read with the rules because a redemption rule that is tier-gated is meaningless without them — 500 points off for Gold members is two … | `setLoyaltyRules` body |
+| Code `tiers[].code` | text field | required | — | max length 40 | — | — | `setLoyaltyRules` body |
+| Name `tiers[].name` | text field | required | — | max length 120 | — | — | `setLoyaltyRules` body |
+| Rank `tiers[].rank` | number field | required | — | — | — | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned. | `setLoyaltyRules` body |
+| Min lifetime points `tiers[].minLifetimePoints` | number field | optional | — | — | — | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this minus nothing. | `setLoyaltyRules` body |
+| Retain lifetime points `tiers[].retainLifetimePoints` | number field | optional | — | — | — | What keeping it requires, per review period. Usually lower than reaching it, and a scheme that cannot express the difference either never demotes or demotes on the day a guest … | `setLoyaltyRules` body |
+| Validity months `tiers[].validityMonths` | number field | optional | — | — | — | Null means the tier does not lapse on its own. | `setLoyaltyRules` body |
+| Benefits `tiers[].benefits` | list of values (chips) | optional | — | — | — | What the tier gives, as the guest reads it. Text shown, not rules enforced. | `setLoyaltyRules` body |
+| Earn multiplier `tiers[].earnMultiplier` | number field | optional | — | — | — | Applied to every earn rule while the guest holds this tier. Null means 1. | `setLoyaltyRules` body |
+| Is active `tiers[].isActive` | toggle | optional | on | — | — | — | `setLoyaltyRules` body |
+| Redemption rules `redemptionRules` | repeatable rows | optional | — | — | — | — | `setLoyaltyRules` body |
+| ID `redemptionRules[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Loyalty program `redemptionRules[].loyaltyProgramId` | picker: choose a loyalty program | required | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Point redemption rule code `redemptionRules[].pointRedemptionRuleCode` | text field | required | — | max length 100 | — | — | `setLoyaltyRules` body |
+| Name `redemptionRules[].name` | text field | required | — | max length 200 | — | — | `setLoyaltyRules` body |
+| Redemption type `redemptionRules[].redemptionType` | text field | required | — | max length 30 | — | — | `setLoyaltyRules` body |
+| Required `redemptionRules[].required` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Monetary value `redemptionRules[].monetaryValue` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Minimum points `redemptionRules[].minimumPoints` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Maximum points `redemptionRules[].maximumPoints` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Product `redemptionRules[].productId` | picker: choose a product | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Valid from `redemptionRules[].validFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyRules` body |
+| Valid to `redemptionRules[].validTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyRules` body |
+| Is active `redemptionRules[].isActive` | toggle | required | — | — | — | — | `setLoyaltyRules` body |
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -689,7 +809,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Show the loyalty campaigns** (card list, from `listLoyaltyCampaigns`)
+**Earning rules** (data table, from `listLoyaltyProgrammes`): The programme the screen was opened for (programmeId), from listLoyaltyProgrammes. Rows are edited in place.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Trigger | chip: Per currency unit, Per visit, Per product, On signup, On birthday, On review | — |
+| Points | 1,234.5 | — |
+| Product kinds | list or chips (count when long) | Limits a `perProduct` or `perCurrencyUnit` rule to these kinds. Empty means every kind. |
+| Multiplier | 1,234.5 | — |
+
+**Bonus campaigns** (data table, from `listLoyaltyCampaigns`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -698,39 +827,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Start at | 1 Oct 2026, 14:30 | — |
 | End at | 1 Oct 2026, 14:30 | — |
 | Is active | yes / no (icon or chip) | — |
-| Created at | 1 Oct 2026, 14:30 | — |
 
-**Rules in force** (detail panel, from `getLoyaltyRules`)
+**Campaign rules** (data table, from `getLoyaltyRules`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Programme | the name it points at, never the id | — |
-| Campaign rules | list or chips (count when long) | Bonus, multiplier and condition rules, each scoped to a campaign window. |
-| ID | the name it points at, never the id | — |
 | Campaign | the name it points at, never the id | — |
 | Type | text | — |
-| Points earning rule | the name it points at, never the id | — |
-| Reward | the name it points at, never the id | — |
 | Bonus points | 1,234.5 | — |
 | Multiplier | 1,234.5 | — |
-| Conditions json | text | — |
 | Is active | yes / no (icon or chip) | — |
-| Tiers | list or chips (count when long) | The programme's tiers, in `rank` order. Read with the rules because a redemption rule that is tier-gated is meaningless without them — 500 … |
-| ID | the name it points at, never the id | — |
-| Loyalty programme | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Rank | 1,234 | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is … |
-| Min lifetime points | 1,234 | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this … |
-| Retain lifetime points | 1,234 | What keeping it requires, per review period. Usually lower than reaching it, and a scheme that cannot express the difference either never … |
-| Validity months | 1,234 | Null means the tier does not lapse on its own. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save loyalty rules (primary button) | navigation or local | — | — | — | — |
+| Save earning rules (primary button) | `updateLoyaltyProgramme` PATCH `/loyalty/programmes/{programmeId}` | inline | LoyaltyProgramme | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Save campaign (secondary button) | `setLoyaltyCampaign` PUT `/loyalty/campaigns` | MarketingLoyaltyCampaign | MarketingLoyaltyCampaign | — | — |
+| Save campaign rules (secondary button) | `setLoyaltyRules` PUT `/loyalty/programmes/{programmeId}/rules` | LoyaltyRuleSet | LoyaltyRuleSet | 409 A rule references a reward or product that does not exist | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -740,7 +855,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Save rules**: Replaces the programme's rule set as a whole, or not at all; the response is the new set. *(source: contracts/satellite/marketing-crm.yaml#setLoyaltyRules)*
 
-**Data it reads**: `getLoyaltyRules` (onLoad, Every rule the programme runs on); `listLoyaltyCampaigns` (onLoad, Show the loyalty campaigns)
+**Data it reads**: `getLoyaltyRules` (onLoad, Every rule the programme runs on); `listLoyaltyCampaigns` (onLoad, Show the loyalty campaigns); `listLoyaltyProgrammes` (onLoad, The programme being edited, with its earning rules …)
 
 **Where the user goes next**
 
@@ -750,11 +865,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The points activity rules list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the points activity rules untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No points activity rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No earning rules yet: nothing earns points. Carries an empty row to start. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the points activity rules are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `getLoyaltyRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setLoyaltyRules`, `setLoyaltyCampaign`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A rule references a reward or product that does not exist |
 
@@ -785,12 +900,20 @@ campaign: Ramadan double points - 1 Mar to 30 Mar 2027 - x2 on F&B
 - `setLoyaltyCampaign` → `MARKETING_MANAGE` (configure) · staff
 - `getLoyaltyRules` → `MARKETING_VIEW` (read) · staff
 - `listLoyaltyCampaigns` → `MARKETING_VIEW` (read) · staff
+- `listLoyaltyProgrammes` → `MARKETING_VIEW` (read) · staff, guest
+- `updateLoyaltyProgramme` → `MARKETING_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `getLoyaltyRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setLoyaltyRules`, `setLoyaltyCampaign`.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 5.4.1 | The system should have the ability to integrate and exchange client information with a loyalty point system which will manage the loyalty points credited on to the loyalty account as per the … | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
+| 5.4.8 | Loyalty program data can be shared with a third party partner thanks to an API. For example, venue has an agreement with the airplane company Etihad allowing Etihad loyalty program members to spend … | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
+| 5.4.29 | Expose APIs for loyalty integrations. | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
 
 #### Client meeting inputs
 
@@ -808,13 +931,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-827`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 10
 - Flow F253 *Marketing CRM Configuration Reference v1.0 board 10: Gamification Command Center*, step 6: Works in Points & Activity Rules → Translate qualifying guest actions into controlled loyalty points. Configure rules for visits, purchases, ticket scans, activities, referrals, surveys and other approved events. Set base points …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (64), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-827?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save loyalty rules, Cancel.
+- [ ] Every action is wired with its success and its failure: Save earning rules, Cancel, Save campaign, Save campaign rules.
 - [ ] Every transition is wired: `BO-824`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -835,12 +959,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-828 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): One programme's milestones (its tiers) and the rewards they give, edited side by side (defined 4 October 2026 from MarketingProgrammeTier and MarketingReward, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `programmeId` (navigation) |
 | Route | `/engagement-support/milestones-reward-rules-bo-828` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026: a milestone is a programme tier (MarketingProgrammeTier, a lifetime-points threshold), saved with setLoyaltyRules after reading getLoyaltyRules; rewards are MarketingReward through setReward. 'Save milestones and rewards' no longer calls createLoyaltyProgramme, which creates a programme (programme creation is on BO-824)** (CHG-FXS-001)
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Rewards for cumulative progress: thresholds, tiers, immediate or delayed fulfilment; reward kinds (points, wallet credit, voucher, product offer, badge, membership benefit); eligibility, inventory, validity, redemption limits and approval thresholds; cost forecast; issuance stops when funding, stock or eligibility fails.
 
@@ -848,41 +972,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Programme | picker: choose an id | optional | — | — | shows names, sends the id | — | `LoyaltyProgramme.id` |
+| Milestone code | text field | optional | — | max length 40 | — | — | `MarketingProgrammeTier.code` |
+| Milestone name | text field | optional | — | max length 120 | — | — | `MarketingProgrammeTier.name` |
+| Rank | number field | optional | — | — | — | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned. | `MarketingProgrammeTier.rank` |
+| Reached at (lifetime points) | number field | optional | — | — | — | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this minus nothing. | `MarketingProgrammeTier.minLifetimePoints` |
+| Kept at (lifetime points) | number field | optional | — | — | — | What keeping it requires, per review period. Usually lower than reaching it, and a scheme that cannot express the difference either never demotes or demotes on the day a guest stops earning. | `MarketingProgrammeTier.retainLifetimePoints` |
+| Valid for (months) | number field | optional | — | — | — | Null means the tier does not lapse on its own. | `MarketingProgrammeTier.validityMonths` |
+| Benefits | list of values (chips) | optional | — | — | — | Free entries; each is shown to the guest as written. | `MarketingProgrammeTier.benefits` |
+| Earn multiplier | number field | optional | — | — | — | Applied to every earn rule while the guest holds this tier. Null means 1. | `MarketingProgrammeTier.earnMultiplier` |
+| Milestone active | toggle | optional | on | — | — | — | `MarketingProgrammeTier.isActive` |
+| Reward code | text field | optional | — | max length 100 | — | — | `MarketingReward.code` |
+| Reward name | text field | optional | — | max length 200 | — | — | `MarketingReward.name` |
+| Reward type | text field | optional | — | max length 30 | — | — | `MarketingReward.type` |
+| Points cost | number field | optional | — | — | — | — | `MarketingReward.pointsCost` |
+| Discount value | number field | optional | — | — | — | — | `MarketingReward.discountValue` |
+| Valid for (days) | number field (days) | optional | — | — | — | — | `MarketingReward.validityDays` |
+| Reward active | toggle | optional | — | — | — | — | `MarketingReward.isActive` |
+
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Programme | picker: choose a programme | — | — | `listRewards` ?programmeId |
-
-**Form: Save milestones and rewards** (modal, opened by *Save milestones and rewards*; *Save milestones and rewards* calls `createLoyaltyProgramme`, *Cancel* sends nothing)
-
-**Collects what `createLoyaltyProgramme` sends before it is called.** Required: `code`, `name`, `earnRules`, `tiers`. Optional: `venueId`, `pointsLiabilityAccountId`, `pointsExpireAfterMonths`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Tiers `tiers` | repeatable rows | required | — | — | — | Rows of `marketing.programme_tier`, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot round-trip. | `createLoyaltyProgramme` body |
-| Code `tiers[].code` | text field | required | — | max length 40 | — | — | `createLoyaltyProgramme` body |
-| Name `tiers[].name` | text field | required | — | max length 120 | — | — | `createLoyaltyProgramme` body |
-| Rank `tiers[].rank` | number field | required | — | — | — | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned. | `createLoyaltyProgramme` body |
-| Min lifetime points `tiers[].minLifetimePoints` | number field | optional | — | — | — | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this minus nothing. | `createLoyaltyProgramme` body |
-| Retain lifetime points `tiers[].retainLifetimePoints` | number field | optional | — | — | — | What keeping it requires, per review period. Usually lower than reaching it, and a scheme that cannot express the difference either never demotes or demotes on the day a guest … | `createLoyaltyProgramme` body |
-| Validity months `tiers[].validityMonths` | number field | optional | — | — | — | Null means the tier does not lapse on its own. | `createLoyaltyProgramme` body |
-| Benefits `tiers[].benefits` | list of values (chips) | optional | — | — | — | What the tier gives, as the guest reads it. Text shown, not rules enforced. | `createLoyaltyProgramme` body |
-| Earn multiplier `tiers[].earnMultiplier` | number field | optional | — | — | — | Applied to every earn rule while the guest holds this tier. Null means 1. | `createLoyaltyProgramme` body |
-| Is active `tiers[].isActive` | toggle | optional | on | — | — | — | `createLoyaltyProgramme` body |
-| Code `code` | text field | required | — | A code already used by any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`. | — | Unique per tenant (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`. | `createLoyaltyProgramme` body |
-| Name `name` | text field | required | — | — | — | — | `createLoyaltyProgramme` body |
-| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `createLoyaltyProgramme` body |
-| Points liability account `pointsLiabilityAccountId` | picker: choose a points liability account | optional | — | — | shows names, sends the id | Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent. | `createLoyaltyProgramme` body |
-| Earn rules `earnRules` | repeatable rows | required | — | — | — | — | `createLoyaltyProgramme` body |
-| Trigger `earnRules[].trigger` | select | required | — | Per currency unit · Per visit · Per product · On signup · On birthday · On review | — | — | `createLoyaltyProgramme` body |
-| Points `earnRules[].points` | number field | required | — | — | — | — | `createLoyaltyProgramme` body |
-| Product kinds `earnRules[].productKinds` | multi-select chips | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Limits a `perProduct` or `perCurrencyUnit` rule to these kinds. Empty means every kind. | `createLoyaltyProgramme` body |
-| Multiplier `earnRules[].multiplier` | number field | optional | — | — | — | — | `createLoyaltyProgramme` body |
-| Points expire after months `pointsExpireAfterMonths` | number field | optional | — | — | — | — | `createLoyaltyProgramme` body |
-| Is active `isActive` | toggle | optional | — | — | — | — | `createLoyaltyProgramme` body |
-
-Errors to draw in the form: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
 
 **Form: Save reward** (modal, opened by *Save reward*; *Save reward* calls `setReward`, *Cancel* sends nothing)
 
@@ -901,6 +1017,46 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Validity days `validityDays` | number field (days) | optional | — | — | — | — | `setReward` body |
 | Is active `isActive` | toggle | required | — | — | — | — | `setReward` body |
 
+**Sent by *Save milestones*** (`setLoyaltyRules`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Programme `programmeId` | picker: choose a programme | required | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Campaign rules `campaignRules` | repeatable rows | optional | — | — | — | Bonus, multiplier and condition rules, each scoped to a campaign window. | `setLoyaltyRules` body |
+| ID `campaignRules[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Campaign `campaignRules[].campaignId` | picker: choose a campaign | required | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Type `campaignRules[].type` | text field | required | — | max length 30 | — | — | `setLoyaltyRules` body |
+| Points earning rule `campaignRules[].pointsEarningRuleId` | picker: choose a points earning rule | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Reward `campaignRules[].rewardId` | picker: choose a reward | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Bonus points `campaignRules[].bonusPoints` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Multiplier `campaignRules[].multiplier` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Conditions json `campaignRules[].conditionsJson` | text field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Is active `campaignRules[].isActive` | toggle | required | — | — | — | — | `setLoyaltyRules` body |
+| Tiers `tiers` | repeatable rows | optional | — | — | — | The programme's tiers, in `rank` order. Read with the rules because a redemption rule that is tier-gated is meaningless without them — 500 points off for Gold members is two … | `setLoyaltyRules` body |
+| Code `tiers[].code` | text field | required | — | max length 40 | — | — | `setLoyaltyRules` body |
+| Name `tiers[].name` | text field | required | — | max length 120 | — | — | `setLoyaltyRules` body |
+| Rank `tiers[].rank` | number field | required | — | — | — | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned. | `setLoyaltyRules` body |
+| Min lifetime points `tiers[].minLifetimePoints` | number field | optional | — | — | — | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this minus nothing. | `setLoyaltyRules` body |
+| Retain lifetime points `tiers[].retainLifetimePoints` | number field | optional | — | — | — | What keeping it requires, per review period. Usually lower than reaching it, and a scheme that cannot express the difference either never demotes or demotes on the day a guest … | `setLoyaltyRules` body |
+| Validity months `tiers[].validityMonths` | number field | optional | — | — | — | Null means the tier does not lapse on its own. | `setLoyaltyRules` body |
+| Benefits `tiers[].benefits` | list of values (chips) | optional | — | — | — | What the tier gives, as the guest reads it. Text shown, not rules enforced. | `setLoyaltyRules` body |
+| Earn multiplier `tiers[].earnMultiplier` | number field | optional | — | — | — | Applied to every earn rule while the guest holds this tier. Null means 1. | `setLoyaltyRules` body |
+| Is active `tiers[].isActive` | toggle | optional | on | — | — | — | `setLoyaltyRules` body |
+| Redemption rules `redemptionRules` | repeatable rows | optional | — | — | — | — | `setLoyaltyRules` body |
+| ID `redemptionRules[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Loyalty program `redemptionRules[].loyaltyProgramId` | picker: choose a loyalty program | required | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Point redemption rule code `redemptionRules[].pointRedemptionRuleCode` | text field | required | — | max length 100 | — | — | `setLoyaltyRules` body |
+| Name `redemptionRules[].name` | text field | required | — | max length 200 | — | — | `setLoyaltyRules` body |
+| Redemption type `redemptionRules[].redemptionType` | text field | required | — | max length 30 | — | — | `setLoyaltyRules` body |
+| Required `redemptionRules[].required` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Monetary value `redemptionRules[].monetaryValue` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Minimum points `redemptionRules[].minimumPoints` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Maximum points `redemptionRules[].maximumPoints` | number field | optional | — | — | — | — | `setLoyaltyRules` body |
+| Product `redemptionRules[].productId` | picker: choose a product | optional | — | — | shows names, sends the id | — | `setLoyaltyRules` body |
+| Valid from `redemptionRules[].validFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyRules` body |
+| Valid to `redemptionRules[].validTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyRules` body |
+| Is active `redemptionRules[].isActive` | toggle | required | — | — | — | — | `setLoyaltyRules` body |
+
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
 - **Reward**: Kind, points cost or trigger milestone, validity, stock, limit per guest. *(source: contracts/satellite/marketing-crm.yaml#setReward)*
@@ -909,7 +1065,17 @@ Errors to draw in the form: 409 A business code the request names is already use
 
 **Shown**
 
-**Show the rewards a milestone can give** (card list, from `listRewards`)
+**Milestones** (data table, from `getLoyaltyRules`): A milestone is a tier reached at a lifetime-points threshold, in rank order.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Rank | 1,234 | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is … |
+| Name | text | — |
+| Min lifetime points | 1,234 | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this … |
+| Earn multiplier | 1,234.5 | Applied to every earn rule while the guest holds this tier. Null means 1. |
+| Is active | yes / no (icon or chip) | — |
+
+**Rewards** (data table, from `listRewards`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -917,26 +1083,17 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Name | text | — |
 | Type | text | — |
 | Points cost | 1,234.5 | — |
-| Discount value | 1,234.5 | — |
 | Validity days | 1,234 | — |
-
-**Show the programmes and their milestones** (data table, from `listLoyaltyProgrammes`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Code | text | Unique per tenant (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused … |
-| Name | text | — |
-| Points expire after months | 1,234 | — |
-| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save milestones and rewards (primary button) | `createLoyaltyProgramme` POST `/loyalty/programmes` | LoyaltyProgramme | LoyaltyProgramme | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens modal first |
+| Save milestones (primary button) | `setLoyaltyRules` PUT `/loyalty/programmes/{programmeId}/rules` | LoyaltyRuleSet | LoyaltyRuleSet | 409 A rule references a reward or product that does not exist | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
 | Save reward (secondary button) | `setReward` PUT `/loyalty/rewards` | MarketingReward | MarketingReward | — | opens modal first |
 
-**Data it reads**: `listLoyaltyProgrammes` (onLoad, Show the programmes and their milestones); `listRewards` (onLoad, Show the rewards a milestone can give)
+**Data it reads**: `listLoyaltyProgrammes` (onLoad, Show the programmes and their milestones); `listRewards` (onLoad, Show the rewards a milestone can give); `getLoyaltyRules` (onLoad, The programme's tiers (its milestones) as saved, read …)
 
 **Where the user goes next**
 
@@ -946,13 +1103,13 @@ Errors to draw in the form: 409 A business code the request names is already use
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The milestones reward rules list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the milestones reward rules untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No milestones reward rules yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No milestones yet. Carries an empty row to start. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the milestones reward rules are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setReward`, `setLoyaltyRules`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A rule references a reward or product that does not exist |
 
 #### Sample data for the mock-up
 
@@ -966,24 +1123,24 @@ milestones:
 
 #### Permissions
 
-- `createLoyaltyProgramme` → `MARKETING_MANAGE` (configure) · staff
 - `setReward` → `MARKETING_MANAGE` (configure) · staff
 - `listLoyaltyProgrammes` → `MARKETING_VIEW` (read) · staff, guest
 - `listRewards` → `MARKETING_VIEW` (read) · staff, guest
+- `getLoyaltyRules` → `MARKETING_VIEW` (read) · staff
+- `setLoyaltyRules` → `MARKETING_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setReward`, `setLoyaltyRules`.
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 5.4.7 | The loyalty program options allow to create loyalty points for a certain type of transactions and to use these points as a form of payment. | F&B & Guest Management | CONTRACTED | `createLoyaltyProgramme` |
-| 5.4.28 | Support multiple brands and venues. | F&B & Guest Management | CONTRACTED | `createLoyaltyProgramme` |
 | 5.4.1 | The system should have the ability to integrate and exchange client information with a loyalty point system which will manage the loyalty points credited on to the loyalty account as per the … | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
 | 5.4.8 | Loyalty program data can be shared with a third party partner thanks to an API. For example, venue has an agreement with the airplane company Etihad allowing Etihad loyalty program members to spend … | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
 | 5.4.29 | Expose APIs for loyalty integrations. | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
+| 5.4.31 | Each tier may come with specific benefits, privileges, or incentives to encourage repeat purchases. Tier Structure Example: - Bronze Tier: Customers who spend more than AED 5,000 qualify for the … | F&B & Guest Management | CONTRACTED | data `MarketingProgrammeTier` |
 
 #### Client meeting inputs
 
@@ -1005,10 +1162,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (62), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-828?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save milestones and rewards, Save reward.
+- [ ] Every action is wired with its success and its failure: Save milestones, Cancel, Save reward.
 - [ ] Every transition is wired: `BO-824`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1708,7 +1865,6 @@ Method, path, parameters, request and response for every operation these screens
 "activateChallenge": {"method":"POST","path":"/challenges/{challengeId}/activate","contract":"marketing-crm","summary":"Publish a draft challenge to guests","permission":"MARKETING_SEND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Challenge"},
 "awardBadge": {"method":"POST","path":"/customers/{customerId}/badges","contract":"marketing-crm","summary":"Award a badge","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"customerId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MarketingCustomerBadge","responds":"MarketingCustomerBadge"},
 "createChallenge": {"method":"POST","path":"/challenges","contract":"marketing-crm","summary":"Define a challenge, mission or streak","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Challenge","responds":"Challenge"},
-"createLoyaltyProgramme": {"method":"POST","path":"/loyalty/programmes","contract":"marketing-crm","summary":"Create a loyalty programme","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LoyaltyProgramme","responds":"LoyaltyProgramme"},
 "createReferral": {"method":"POST","path":"/referrals","contract":"marketing-crm","summary":"Issue a referral code","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Referral","responds":"Referral"},
 "getChallenge": {"method":"GET","path":"/challenges/{challengeId}","contract":"marketing-crm","summary":"One challenge","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Challenge"},
 "getDashboard": {"method":"GET","path":"/dashboards/{dashboardId}","contract":"reporting","summary":"Read a dashboard with tile data","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"refresh","in":"query","required":null}],"requestBody":null,"responds":"DashboardData"},
@@ -1724,7 +1880,8 @@ Method, path, parameters, request and response for every operation these screens
 "setBadge": {"method":"PUT","path":"/badges","contract":"marketing-crm","summary":"Define a badge","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingBadge","responds":"MarketingBadge"},
 "setLoyaltyCampaign": {"method":"PUT","path":"/loyalty/campaigns","contract":"marketing-crm","summary":"Define a loyalty campaign and its window","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingLoyaltyCampaign","responds":"MarketingLoyaltyCampaign"},
 "setLoyaltyRules": {"method":"PUT","path":"/loyalty/programmes/{programmeId}/rules","contract":"marketing-crm","summary":"Replace a programme's rules as one set","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"LoyaltyRuleSet","responds":"LoyaltyRuleSet"},
-"setReward": {"method":"PUT","path":"/loyalty/rewards","contract":"marketing-crm","summary":"Define a reward and its points cost","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingReward","responds":"MarketingReward"}
+"setReward": {"method":"PUT","path":"/loyalty/rewards","contract":"marketing-crm","summary":"Define a reward and its points cost","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingReward","responds":"MarketingReward"},
+"updateLoyaltyProgramme": {"method":"PATCH","path":"/loyalty/programmes/{programmeId}","contract":"marketing-crm","summary":"Change a loyalty programme","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":"programmeId","in":"path","required":true}],"requestBody":null,"responds":"LoyaltyProgramme"}
 }
 ```
 
@@ -1751,6 +1908,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MarketingReward": {"type":"object","x-ticvai-persistence":"marketing.reward","description":"**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.","required":["loyaltyProgramId","code","name","type","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"loyaltyProgramId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"type":{"type":"string","maxLength":30},"productId":{"type":"string","format":"uuid","nullable":true},"pointsCost":{"type":"number","nullable":true},"discountValue":{"type":"number","nullable":true},"validityDays":{"type":"integer","nullable":true},"isActive":{"type":"boolean"}}},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"ProductKind": {"type":"string","description":"**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n","enum":["admission","timedAdmission","datedAdmission","openDated","seated","membership","bundle","fnb","retail","rental","addOn","giftCard"]},
 "Referral": {"type":"object","x-ticvai-persistence":"marketing.referral","description":"BL-034. **No referrer, no reward, nothing anywhere.**\n**The reward fires on the referee's qualifying act, not on the sign-up**, because a referral that pays on registration pays for accounts rather than for guests.\n","required":["id","referrerSubjectId","code","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"referrerSubjectId":{"type":"string","format":"uuid"},"refereeSubjectId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"code":{"readOnly":true,"type":"string"},"status":{"readOnly":true,"type":"string","enum":["issued","registered","qualified","rewarded","expired","void"]},"qualifyingAction":{"type":"string","enum":["firstPurchase","firstVisit","membershipPurchase"]},"referrerRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"refereeRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "ReportResult": {"x-ticvai-persistence":"none — result set, cached in object storage","type":"object","required":["executionId","columns","rows"],"properties":{"executionId":{"type":"string"},"columns":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"}}}},"rows":{"type":"array","description":"**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n","items":{"type":"object","additionalProperties":true}},"totals":{"type":"object","additionalProperties":true,"description":"Aggregated columns only, keyed and typed as a row is."},"rowCount":{"type":"integer"},"nextCursor":{"type":"string","nullable":true},"generatedAt":{"type":"string","format":"date-time"},"dataAsOf":{"type":"string","format":"date-time","description":"Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"}}}
 }

@@ -1,6 +1,6 @@
 # WS187 — Wallet Configuration Backend Structure v1.0 board 2
 
-**10 screens · 7 operations · 8 schemas · 3 permissions**
+**10 screens · 8 operations · 9 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1093` | Funding Command Center | C | 28 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-1094` | Funding Method Configuration | A | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1094` | Funding Method Configuration | A | 38 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1095` | Top-Up Rule Configuration | C | 23 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-1096` | Channel & Funding Source Mapping | C | 20 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1097` | Auto-Reload Configuration | C | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -281,7 +281,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-1094` Funding Method Configuration
 
-**Configure which funding methods TICVAI wallets can accept. The source requires multiple methods for funding wallet value, including bank-linked funding, credit/debit cards through digital channels, and cash/cards through physical channels.**
+**Configure how wallets at this venue may be funded: which funding sources and channels are accepted, the minimum, maximum and preset top-ups, the amount above which a top-up needs approval, and automatic reload.**
 
 | | |
 |---|---|
@@ -294,6 +294,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/funding-method-configuration-bo-1094` |
+
+**What the spec says about it.** **Bound 4 October 2026 to WalletFundingRules, one rules object per venue: funding sources are a fixed list in the contract, not records, so the screen edits which are allowed rather than creating methods. Per-method fees and provider choice are not in the contract and left the screen** (CHG-FXS-002)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How wallets may be funded: minimum and maximum top-up, preset amounts, channels, funding sources (card, cash, bank transfer, voucher, corporate account, loyalty conversion), bonuses, auto-reload on a balance threshold, recurring funding on a date, an approval threshold and velocity limits. Manual admin funding for service recovery is permission-controlled.
 
@@ -311,24 +313,49 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Funding method name | select field | — | — | — | — | — | — |
-| Internal code | select field | — | — | — | — | — | — |
-| Funding category | select field | — | — | — | — | — | — |
-| Payment service/provider | select field | — | — | — | — | — | — |
-| Supported currencies | select field | — | — | — | — | — | — |
-| Minimum top-up | select field | — | — | — | — | — | — |
-| Maximum top-up | select field | — | — | — | — | — | — |
-| Applicable wallet types | select field | — | — | — | — | — | — |
-| Applicable credit types | select field | — | — | — | — | — | — |
-| Applicable tenants | select field | — | — | — | — | — | — |
-| Applicable venues | select field | — | — | — | — | — | — |
-| Applicable channels | select field | — | — | — | — | — | — |
-| Customer verification requirement | select field | — | — | — | — | — | — |
-| Authorization requirement | select field | — | — | — | — | — | — |
-| Refund/reversal eligibility | select field | — | — | — | — | — | — |
-| Fees | select field | — | — | — | — | — | — |
-| Effective dates | select field | — | — | — | — | — | — |
-| Active/inactive status | select field | — | — | — | — | — | — |
+| Wallet type | picker: choose a wallet type | optional | — | — | shows names, sends the id | Options from listWalletTypes. | `WalletFundingRules.walletTypeId` |
+| Funding sources | multi-select chips | optional | — | Card · Cash · Bank transfer · Voucher · Corporate account · Loyalty conversion | — | Card, cash, bank transfer, voucher, corporate account, loyalty conversion. | `WalletFundingRules.allowedFundingSources` |
+| Channels | list of values (chips) | optional | — | — | — | — | `WalletFundingRules.allowedChannels` |
+| Minimum top-up | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `WalletFundingRules.minimumTopUp` |
+| Maximum top-up | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `WalletFundingRules.maximumTopUp` |
+| Preset amounts | repeatable rows | optional | — | — | — | — | `WalletFundingRules.presetAmounts` |
+| Approval above | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `WalletFundingRules.approvalAboveAmount` |
+
+**Sent by *Save funding rules*** (`setWalletFundingRules`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Wallet type `walletTypeId` | picker: choose a wallet type | optional | — | — | shows names, sends the id | — | `setWalletFundingRules` body |
+| Minimum top up `minimumTopUp` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Maximum top up `maximumTopUp` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Preset amounts `presetAmounts` | repeatable rows | optional | — | — | — | — | `setWalletFundingRules` body |
+| Allowed channels `allowedChannels` | list of values (chips) | optional | — | — | — | — | `setWalletFundingRules` body |
+| Allowed funding sources `allowedFundingSources` | multi-select chips | optional | — | Card · Cash · Bank transfer · Voucher · Corporate account · Loyalty conversion | — | — | `setWalletFundingRules` body |
+| Bonus rules `bonusRules` | repeatable rows | optional | — | — | — | Board 2.3. *Top up 200, get 20.* The bonus is a separate lot of a separate credit type, which is how it can expire on different terms from the cash. | `setWalletFundingRules` body |
+| Minimum amount `bonusRules[].minimumAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Bonus amount `bonusRules[].bonusAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Bonus percent `bonusRules[].bonusPercent` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Bonus credit type `bonusRules[].bonusCreditTypeId` | picker: choose a bonus credit type | optional | — | — | shows names, sends the id | — | `setWalletFundingRules` body |
+| Valid from `bonusRules[].validFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setWalletFundingRules` body |
+| Valid to `bonusRules[].validTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setWalletFundingRules` body |
+| Auto reload `autoReload` | group | optional | — | — | — | Board 2.5, matrix 4.3.28. Fires when the balance drops. | `setWalletFundingRules` body |
+| Enabled `autoReload.enabled` | toggle | optional | off | — | — | — | `setWalletFundingRules` body |
+| Threshold amount `autoReload.thresholdAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Reload amount `autoReload.reloadAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Maximum per day `autoReload.maximumPerDay` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Recurring funding `recurringFunding` | group | optional | — | — | — | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. Fires on a date, which is what an allowance needs. | `setWalletFundingRules` body |
+| Enabled `recurringFunding.enabled` | toggle | optional | off | — | — | — | `setWalletFundingRules` body |
+| Cadence `recurringFunding.cadence` | segmented control | optional | — | Daily · Weekly · Monthly | — | — | `setWalletFundingRules` body |
+| Amount `recurringFunding.amount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Day of week `recurringFunding.dayOfWeek` | text field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Day of month `recurringFunding.dayOfMonth` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Approval above amount `approvalAboveAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Velocity limits `velocityLimits` | group | optional | — | — | — | A fraud control, not a commercial one. Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it. | `setWalletFundingRules` body |
+| Max transactions per hour `velocityLimits.maxTransactionsPerHour` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Max transactions per day `velocityLimits.maxTransactionsPerDay` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Max amount per day `velocityLimits.maxAmountPerDay` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Max amount per month `velocityLimits.maxAmountPerMonth` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `setWalletFundingRules` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -340,7 +367,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**How a wallet may be topped up** (detail panel, from `getWalletFundingRules`)
+**Automatic reload** (detail panel, from `getWalletFundingRules`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -365,7 +392,14 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Recurring funding | grouped details | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. Fires on a date, which is what an allowance needs. |
 | Enabled | yes / no (icon or chip) | — |
 
-**Data it reads**: `getWalletFundingRules` (onLoad, How a wallet may be topped up)
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save funding rules (primary button) | `setWalletFundingRules` PUT `/wallet-funding-rules` | WalletFundingRules | WalletFundingRules | 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getWalletFundingRules` (onLoad, How a wallet may be topped up); `listWalletTypes` (onLoad, The wallet type the rules apply to (walletTypeId))
 
 **Where the user goes next**
 
@@ -375,10 +409,10 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The funding method configuration as saved. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the funding method untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No funding method configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The form with the saved rules. |
+| Error (`?state=error`) | Could not load. Names the read that failed; the form stays read-only. |
+| Empty, first run (`?state=emptyFirstRun`) | Never saved: the defaults getWalletFundingRules returns. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WALLET_VIEW`, which `getWalletFundingRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_CONFIGURE` for `setWalletFundingRules`. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
@@ -404,8 +438,9 @@ rules:
 
 - `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
+- `listWalletTypes` → `WALLET_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WALLET_VIEW`, which `getWalletFundingRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_CONFIGURE` for `setWalletFundingRules`.
 
 #### Requirements it meets
 
@@ -432,10 +467,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (412).
+- [ ] Every input above is drawn (38), with its required mark, default, format and its error state (412).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1094?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Save funding rules, Cancel.
 - [ ] Every transition is wired: `BO-1093`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1769,6 +1804,7 @@ Method, path, parameters, request and response for every operation these screens
 "getWalletFundingRules": {"method":"GET","path":"/wallet-funding-rules","contract":"wallet","summary":"How a wallet may be topped up","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletFundingRules"},
 "getWalletReconciliation": {"method":"GET","path":"/wallet-reconciliation","contract":"wallet","summary":"The wallet sub-ledger against the general ledger and the acquirer","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true}],"requestBody":null,"responds":"WalletReconciliation"},
 "listWalletTransactions": {"method":"GET","path":"/wallets/{subjectId}/transactions","contract":"wallet","summary":"Wallet transaction history","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listWalletTypes": {"method":"GET","path":"/wallet-types","contract":"wallet","summary":"The kinds of wallet that may exist — who owns one","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"WalletType"},
 "reverseWalletFunding": {"method":"POST","path":"/wallet-funding/reversals","contract":"wallet","summary":"Undo a top-up, in full or in part","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletAdjustment"},
 "setWalletFundingRules": {"method":"PUT","path":"/wallet-funding-rules","contract":"wallet","summary":"Amounts, channels, bonuses, limits and velocity","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WalletFundingRules","responds":"WalletFundingRules"}
 }
@@ -1787,6 +1823,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "WalletFundingRules": {"type":"object","x-ticvai-persistence":"wallet.funding_rules","description":"Board 2, which is the 27 August minute one screen for one.","properties":{"walletTypeId":{"type":"string","format":"uuid","nullable":true},"minimumTopUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumTopUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"presetAmounts":{"type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"allowedChannels":{"type":"array","items":{"type":"string"}},"allowedFundingSources":{"type":"array","items":{"type":"string","enum":["card","cash","bankTransfer","voucher","corporateAccount","loyaltyConversion"]}},"bonusRules":{"type":"array","description":"Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n","items":{"type":"object","properties":{"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bonusAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bonusPercent":{"type":"number","nullable":true},"bonusCreditTypeId":{"type":"string","format":"uuid"},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true}}}},"autoReload":{"type":"object","description":"Board 2.5, matrix 4.3.28. **Fires when the balance drops.**","properties":{"enabled":{"type":"boolean","default":false},"thresholdAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reloadAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumPerDay":{"type":"integer","nullable":true}}},"recurringFunding":{"type":"object","description":"Board 2.6, matrix 4.3.29 — ***\"distinct from auto-reload\"***. **Fires on a date**, which is what an allowance needs.\n","properties":{"enabled":{"type":"boolean","default":false},"cadence":{"type":"string","enum":["daily","weekly","monthly"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"dayOfWeek":{"type":"string","nullable":true},"dayOfMonth":{"type":"integer","nullable":true}}},"approvalAboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"velocityLimits":{"type":"object","description":"**A fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it.\n","properties":{"maxTransactionsPerHour":{"type":"integer","nullable":true},"maxTransactionsPerDay":{"type":"integer","nullable":true},"maxAmountPerDay":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmountPerMonth":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"scopePath":{"type":"string"}}},
 "WalletReconciliation": {"type":"object","description":"Board 9.4. **Three sources, and the exception names which pair disagrees.**","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"subLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"generalLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptions":{"type":"array","items":{"type":"object","properties":{"pair":{"type":"string","enum":["subLedgerVsGeneralLedger","subLedgerVsAcquirer","generalLedgerVsAcquirer"]},"difference":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"likelyCause":{"type":"string","nullable":true}}}}}},
 "WalletTransaction": {"x-ticvai-persistence":"wallet.wallet_transaction","type":"object","required":["id","kind","amount","balanceAfter","recordedAt"],"properties":{"id":{"type":"string"},"walletId":{"type":"string","format":"uuid","x-ticvai-references":"wallet.wallet","description":"The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"wallet.hold","description":"The hold a spend settled, where it came through `holdWalletFunds`."},"kind":{"$ref":"#/components/schemas/WalletTransactionKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balanceAfter":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"orderId":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"principalId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
-"WalletTransactionKind": {"type":"string","enum":["topUp","spend","refund","adjustment","bonus","expiry","transfer"]}
+"WalletTransactionKind": {"type":"string","enum":["topUp","spend","refund","adjustment","bonus","expiry","transfer"]},
+"WalletType": {"type":"object","x-ticvai-persistence":"wallet.wallet_type","description":"Board 1.2. **Who owns a wallet** — the first of the two vocabularies.","required":["code","name"],"properties":{"autoReloadAllowed":{"type":"boolean","default":true,"description":"**Auto-reload is optional per wallet type** (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). Where false, a holder of this type cannot set an auto top-up (`setWalletAutoReloadSetting` refuses it) whatever the venue's `WalletFundingRules.autoReload` says."},"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"ownerKind":{"type":"string","enum":["guest","registeredCustomer","family","parent","child","corporate","school","employee"]},"storedValueCapability":{"type":"boolean","default":true,"description":"Board 1.2. Whether this wallet holds a balance at all. A pure entitlement wallet — passes and vouchers, no money — does not.\n"},"topUpCapability":{"type":"boolean","default":false},"transferCapability":{"type":"boolean","default":false},"refundCapability":{"type":"boolean","default":false},"giftCardSupport":{"type":"boolean","default":false},"voucherSupport":{"type":"boolean","default":false},"membershipCreditSupport":{"type":"boolean","default":false},"wearableSupport":{"type":"boolean","default":false},"usageChannels":{"type":"array","description":"**Where this wallet may be used, declared on the type itself.** Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and this is what lets one `topUpWallet` serve every caller: the operation is shared and the type says which channel may reach it. `WalletChannelRules` still governs the per-credential detail — PIN thresholds, offline floor limits — and this governs whether the channel is open at all.\n","items":{"type":"string","enum":["online","pos","mobileApp","api","kiosk","reader"]}},"presetName":{"type":"string","description":"**The client's own name for this composition** — \"Resort Wallet\", \"Cashless Venue Wallet\", \"Closed-Loop Wallet\". Board 1.2 lists thirteen such names as examples, not as kinds: they are combinations of `ownerKind`, `allowedCreditTypeIds` and `scopePath`. Naming the preset keeps the client's vocabulary without hard-coding it into an enum.\n"},"holderMayDifferFromOwner":{"type":"boolean","default":false,"description":"**A child wallet's owner is the parent.** Without this the model has to pretend a seven-year-old holds an account.\n"},"requiresIdentification":{"type":"boolean","default":false},"maximumBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowNegativeBalance":{"type":"boolean","default":false},"sharedStructureAllowed":{"type":"boolean","default":false},"lifecycleStates":{"type":"array","items":{"type":"string"}},"numberingPattern":{"type":"string","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}}
 }
 ```

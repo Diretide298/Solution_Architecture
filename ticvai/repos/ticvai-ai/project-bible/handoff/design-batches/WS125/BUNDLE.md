@@ -108,11 +108,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-694` | Event Catalogue Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-696` | Event Duplication & Clone Configuration | A | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-696` | Event Duplication & Clone Configuration | A | 6 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-694, BO-695, BO-696 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-694, BO-695 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -394,12 +394,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-696 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): One event copied with the parts and date shift chosen (defined 4 October 2026 from cloneEvent, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/event-duplication-clone-configuration-bo-696` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent** (CHG-FXS-001)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Clone an event for next season choosing exactly what comes with it: schedule, prices, seat map, resource plan, staff roster; never the sales. Most events are last year's event, so this is a frequent act and must be a short checklist, not a wizard.
 
@@ -411,7 +411,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| New event name | text field | — | — | — | — | Body newName; the source name with ' (copy)' by default. | — |
+| Copy | multi select | — | — | — | — | Body include[]: the parts to copy (performances, prices, capacities, resources, content); all ticked by default. | — |
+| Move dates by (days) | number field | — | — | — | — | Body shiftDatesByDays; 0 keeps the dates, 7 moves every performance a week on. | — |
+
+**Sent by *Copy event*** (`cloneEvent`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Include `include` | multi-select chips | optional | — | Schedule · Pricing · Seat map · Capacity profile · Resource requirements · Staff plan · Registration form · Access rules | — | — | `cloneEvent` body |
+| Shift dates by days `shiftDatesByDays` | number field (days) | optional | — | — | — | — | `cloneEvent` body |
+| New name `newName` | text field | optional | — | — | — | — | `cloneEvent` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -421,23 +435,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Read an event** (detail panel, from `getEvent`)
+**Event to copy** (detail panel, from `getEvent`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Parent event | the name it points at, never the id | For grouped events. |
+| Code | text | — |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
-| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+| Copy event (primary button) | `cloneEvent` POST `/events/{eventId}/clone` | inline | inline | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -454,11 +464,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The event duplication clone list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the event duplication clone untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No event duplication clone yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The event being copied. |
+| Error (`?state=error`) | Could not load the event. Names it; nothing is copied. |
+| Empty, first run (`?state=emptyFirstRun`) | Not used: the screen opens on one event (eventId). |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event duplication clone are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `cloneEvent`. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -481,7 +491,7 @@ clone:
 - `cloneEvent` → `EVENT_CONFIGURE` (configure) · staff
 - `getEvent` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `cloneEvent`.
 
 #### Requirements it meets
 
@@ -506,10 +516,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (3 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-696?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Copy event, Cancel.
 - [ ] Every transition is wired: `BO-694`.
 - [ ] Every gated control is gated: `EVENT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -630,7 +640,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"}}},
+"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
 "EventType": {"type":"object","x-ticvai-persistence":"catalogue.event_type","description":"Event board 1.2. **The type decides behaviour, not just a label.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"hasPerformances":{"type":"boolean","default":true,"description":"**An open-run exhibition has none**, and modelling it as 400 daily performances is how a schedule becomes unmanageable.\n"},"capacityBasis":{"type":"string","enum":["perPerformance","perDay","unlimited"],"description":"`perSession` was removed: a session is a Performance (decided 28 September, audit R165), so `perPerformance` covers it.\n"},"ticketNamesDate":{"type":"boolean","default":true},"multiDay":{"type":"boolean","default":false},"requiresRegistration":{"type":"boolean","default":false},"requiresAccreditation":{"type":"boolean","default":false},"seatingModesAllowed":{"type":"array","items":{"type":"string"}},"defaultLifecycle":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }

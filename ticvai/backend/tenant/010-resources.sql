@@ -101,7 +101,8 @@ CREATE TABLE IF NOT EXISTS resources.resource (
     requires_qualification            text[],
     deposit_amount                    numeric(18,4),
     status                            text CONSTRAINT resource_status_chk CHECK (status IN ('available', 'booked', 'checkedOut', 'maintenance', 'retired')),
-    is_active                         boolean DEFAULT true
+    is_active                         boolean DEFAULT true,
+    resource_type_id                  uuid
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -263,7 +264,9 @@ CREATE TABLE IF NOT EXISTS resources.resource_requirement (
     required_qualifications           text[],
     required_attributes               jsonb,
     substitute_resource_ids           text[],
-    scope_path                        ltree NOT NULL
+    scope_path                        ltree NOT NULL,
+    package_id                        uuid,
+    product_id                        uuid
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

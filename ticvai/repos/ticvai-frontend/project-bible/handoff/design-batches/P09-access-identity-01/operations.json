@@ -158,6 +158,25 @@
   "requestBody": null,
   "responds": "Principal"
  },
+ "listCapabilityTemplates": {
+  "method": "GET",
+  "path": "/capability-templates",
+  "contract": "identity",
+  "summary": "Saved tick-sets",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CapabilityTemplate"
+ },
  "listMfaMethods": {
   "method": "GET",
   "path": "/auth/mfa/methods",
@@ -223,6 +242,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listPermissions": {
+  "method": "GET",
+  "path": "/permissions",
+  "contract": "identity",
+  "summary": "Every permission key the contracts enforce",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "moduleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IdentityPermission"
  },
  "listPrincipals": {
   "method": "GET",

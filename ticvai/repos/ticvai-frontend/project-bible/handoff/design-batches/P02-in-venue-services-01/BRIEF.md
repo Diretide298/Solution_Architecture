@@ -1,6 +1,6 @@
 # P02-in-venue-services-01 — P02 · In-venue Services
 
-**10 screens · 29 operations · 73 schemas · 6 permissions**
+**10 screens · 31 operations · 76 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `ORDER_MODIFY, ORDER_VIEW, PARKING_CONFIGURE, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **10 of these operations work offline**: getOrder, getTenantAppStatus, getVenueMap, getVenueMapGraph, getWaitTimes, joinRestaurantWaitlist, listMyTableReservations, listParkingFacilities
+- **12 of these operations work offline**: getOrder, getTenantAppStatus, getVenueMap, getVenueMapGraph, getWaitTimes, joinRestaurantWaitlist, listBookableVenueMaps, listMyEntitlements
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -176,20 +176,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-021` | Interactive Map | A | 0 | 16 | 8 | 17 | 6 | 0 | guest | notStarted (client-verified) |
+| `GST-021` | Interactive Map | A | 1 | 16 | 8 | 17 | 6 | 0 | guest | notStarted (client-verified) |
 | `GST-022` | Attraction Wait Times | A | 0 | 5 | 4 | 4 | 5 | 6 | guest | notStarted (client-verified) |
 | `GST-023` | Virtual Queue | A | 8 | 11 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
 | `GST-024` | F&B – Browse & Order | A | 27 | 40 | 6 | 7 | 11 | 1 | guest | notStarted (client-verified) |
 | `GST-025` | F&B – Order Tracking | A | 0 | 10 | 4 | 0 | 1 | 1 | guest | notStarted (client-verified) |
-| `GST-027` | Parking – Reserve & Pay | A | 22 | 7 | 7 | 7 | 2 | 2 | guest | notStarted (client-verified) |
-| `GST-028` | Parking – Reservation Confirmed | A | 0 | 2 | 6 | 7 | 1 | 2 | guest | notStarted (client-verified) |
-| `GST-029` | Venue Info & Services | A | 2 | 24 | 5 | 0 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-027` | Parking – Reserve & Pay | A | 22 | 9 | 7 | 7 | 2 | 2 | guest | notStarted (client-verified) |
+| `GST-028` | Parking – Reservation Confirmed | A | 0 | 8 | 6 | 9 | 1 | 2 | guest | notStarted (client-verified) |
+| `GST-029` | Venue Info & Services | A | 2 | 25 | 5 | 0 | 0 | 0 | guest | notStarted (client-verified) |
 | `GST-038` | At the Venue | A | 1 | 39 | 8 | 16 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-070` | Reserve a Table | A | 44 | 20 | 6 | 15 | 7 | 1 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
-**GST-022, GST-025, GST-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-022, GST-025 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

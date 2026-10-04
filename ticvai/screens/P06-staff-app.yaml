@@ -71,17 +71,15 @@ screens:
     fromFlows: true
     isEntryPoint: true
     transitions:
-    - to: EMP-002
-      trigger: Selects venue and role
-      provenance: flow F08 step 1→2, F64 step 1→2
-      carries:
-      - availableRoles
     - to: EMP-003
       trigger: Home — on duty
       provenance: structural — EMP-001 is P06's home screen and its exits are its launcher
     - to: EMP-048
       trigger: Opening checklist
       provenance: structural — EMP-001 is P06's home screen and its exits are its launcher
+    - to: EMP-002
+      trigger: Selects venue and role
+      provenance: flow F08 step 1→2, F64 step 1→2
   notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
     the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
     providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
@@ -551,8 +549,9 @@ screens:
         or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058 opens on its own'
     - to: EMP-059
       trigger: Table Order, Bill & Payment Management
-      provenance: derived — EMP-059 declares entryState.params visitId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-059 opens cold
+      provenance: 'derived — EMP-059 declares entryState.params visitId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-059 finds visitId (createFnbOrder) itself, and EMP-059 opens on
+        its own'
     - to: EMP-060
       trigger: Reservation & Table Performance
       provenance: 'derived — EMP-060 declares entryState.params outletId and EMP-003 holds none of them.
@@ -590,8 +589,10 @@ screens:
         its own'
     - to: EMP-067
       trigger: Damage, Loss, Shrinkage & Stock Adjustment
-      provenance: derived — EMP-067 declares entryState.params actionId, outletId and EMP-003 holds none
-        of them, so the edge carries nothing and EMP-067 opens cold
+      provenance: 'derived — EMP-067 declares entryState.params actionId, outletId and EMP-003 holds none
+        of them. The edge carries nothing: actionId only pre-selects (deep link or optional); EMP-067
+        opens on listCorrectiveActions, and outletId has no source on EMP-067 yet (a gap in EMP-067, not
+        in this edge)'
     - to: EMP-068
       trigger: Reservation, Allocation & Omnichannel Inventory
       provenance: 'derived — EMP-068 declares entryState.params reservationId and EMP-003 holds none of
@@ -2053,7 +2054,8 @@ screens:
         derived: true
         impliedBy: lookupTicket
         label: Search
-        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012).
+          A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -2335,7 +2337,8 @@ screens:
         derived: true
         impliedBy: lookupTicket
         label: Search
-        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012).
+          A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -14311,8 +14314,9 @@ screens:
         - Status
         kind: multiSelect
         label: Filter by
-        notes: Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type, group/individual,
-          readiness and 1 more — which are present is a decision the pack already made.
+        notes: Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`)
+          (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type,
+          group/individual, readiness and 1 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 64 §Filters
       name: contentBody
       slot: filters
@@ -14765,7 +14769,8 @@ screens:
         impliedBy: lookupAsset
         kind: searchField
         label: Search
-        notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012).
+          A search that returns nothing must say so differently from a search not yet run.
       - derived: true
         impliedBy: assignRentalEquipment
         kind: secondaryButton
@@ -15354,8 +15359,9 @@ screens:
         - Group/Individual
         kind: multiSelect
         label: Filter by
-        notes: Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status, expected
-          return and 2 more — which are present is a decision the pack already made.
+        notes: Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`)
+          (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status,
+          expected return and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 78 §Filters
       name: contentBody
       slot: filters
@@ -15619,7 +15625,8 @@ screens:
       components:
       - kind: selectField
         label: Additional duration
-        notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012). +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
+        notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012).
+          +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
         operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability
       - kind: textField

@@ -1,6 +1,6 @@
 # WS113 — ACCREDITATION board 6
 
-**10 screens · 10 operations · 7 schemas · 4 permissions**
+**10 screens · 11 operations · 7 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-666` | Validity Period Configuration | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-667` | Event & Venue Accreditation Assignment | D | 25 | 20 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 | `BO-668` | Multi-Venue Accreditation Management | D | 0 | 16 | 6 | 6 | 0 | 6 | — | notStarted (—) |
-| `BO-669` | Temporary & Seasonal Accreditation | B | 3 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-669` | Temporary & Seasonal Accreditation | B | 15 | 3 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-670` | Suspension & Reactivation Management | D | 9 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-671` | Accreditation Revocation Management | D | 0 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
 | `BO-672` | Expiry Monitor & Expiration Rules | D | 0 | 14 | 6 | 6 | 0 | 0 | — | notStarted (—) |
@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-664, BO-666, BO-667, BO-668, BO-669, BO-671, BO-673 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-664, BO-666, BO-667, BO-668, BO-671, BO-673 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -1047,14 +1047,14 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | Block B · task VM-BO-669 |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population |
+| Pattern | configEditor (compact density): One programme's validity edited as a whole record, with presets for temporary and seasonal programmes (defined 4 October 2026 from AccreditationValidity, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/temporary-seasonal-accreditation-bo-669` |
 
-**What the spec says about it.** **Merged into BO-666** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-001). BO-669 binds the same single operation (setAccreditationValidity) on the same record as BO-666 Validity Period Configuration; temporary and seasonal periods are presets inside the validity editor (VO-R14; DI-671, DI-987; design-notes correction venue-operations BO-669). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-666, and nothing on it is built separately. Dates follow from the validity kind and the programme; events and venues are the programme's scope (BO-667); access profiles are category defaults (design-note correction).
+**What the spec says about it.** **Merged into BO-666** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-001). BO-669 binds the same single operation (setAccreditationValidity) on the same record as BO-666 Validity Period Configuration; temporary and seasonal periods are presets inside the validity editor (VO-R14; DI-671, DI-987; design-notes correction venue-operations BO-669). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-666, and nothing on it is built separately. Dates follow from the validity kind and the programme; events and venues are the programme's scope (BO-667); access profiles are category defaults (design-note correction). **Defined 4 October 2026 from AccreditationValidity: the pack's select fields (type, automatic expiry, renewal eligibility) are validityKind, onExpiry and the renewal fields; the validity is read with getAccreditationValidity (agreed with contracts in the ledger) before the whole-record save** (CHG-FXS-001) **The saved validity shows beside the form** (CHG-FXS-001)
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Presets for short and recurring accreditations: one-day events, contractors, media visits (temporary) and sports or exhibition seasons, annual operations (seasonal). Per VO-R14 it is the preset picker at the top of the validity editor (BO-666), not a separate record. The one thing to get right: temporary accreditations expire on their own, with no manual step, and the screen says when.
 
@@ -1066,9 +1066,33 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Accreditation type | select field | — | — | — | — | — | — |
-| Automatic expiry | select field | — | — | — | — | — | — |
-| Renewal eligibility | select field | — | — | — | — | — | — |
+| Programme | picker: choose an id | optional | — | — | shows names, sends the id | — | `AccreditationProgramme.id` |
+| Validity | radio group | optional | — | Event duration · Fixed period · Seasonal · Rolling · Permanent | — | Presets: Temporary is fixedPeriod, Seasonal is seasonal, Event-only is eventDuration (VO-R14: presets inside the validity editor, same record as BO-666). | `AccreditationValidity.validityKind` |
+| Valid for (months) | number field | optional | — | — | — | For fixedPeriod and rolling. | `AccreditationValidity.validityMonths` |
+| On expiry | segmented control | optional | Revoke access | Revoke access · Grace period · Auto renew | — | — | `AccreditationValidity.onExpiry` |
+| Grace period (days) | number field (days) | optional | — | — | — | For gracePeriod. | `AccreditationValidity.gracePeriodDays` |
+| Renewal window (days) | number field (days) | optional | — | — | — | — | `AccreditationValidity.renewalWindowDays` |
+| Renewal re-verifies the holder | toggle | optional | on | — | — | The point of an expiry is that somebody looks again. | `AccreditationValidity.renewalRequiresReverification` |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Is template | toggle | — | — | `listAccreditationProgrammes` ?isTemplate |
+| Programme | picker: choose a programme | — | — | `getAccreditationValidity` ?programmeId |
+
+**Sent by *Save*** (`setAccreditationValidity`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Programme `programmeId` | picker: choose a programme | optional | — | — | shows names, sends the id | — | `setAccreditationValidity` body |
+| Validity kind `validityKind` | radio group | optional | — | Event duration · Fixed period · Seasonal · Rolling · Permanent | — | — | `setAccreditationValidity` body |
+| Validity months `validityMonths` | number field | optional | — | — | — | — | `setAccreditationValidity` body |
+| Renewal window days `renewalWindowDays` | number field (days) | optional | — | — | — | — | `setAccreditationValidity` body |
+| Renewal requires reverification `renewalRequiresReverification` | toggle | optional | on | — | — | The point of an expiry is that somebody looks again. | `setAccreditationValidity` body |
+| On expiry `onExpiry` | segmented control | optional | Revoke access | Revoke access · Grace period · Auto renew | — | — | `setAccreditationValidity` body |
+| Grace period days `gracePeriodDays` | number field (days) | optional | — | — | — | — | `setAccreditationValidity` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `setAccreditationValidity` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1079,6 +1103,23 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Validity as saved** (detail panel, from `getAccreditationValidity`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Validity kind | chip: Event duration, Fixed period, Seasonal, Rolling, Permanent | — |
+| Validity months | 1,234 | — |
+| On expiry | chip: Revoke access, Grace period, Auto renew | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save (primary button) | `setAccreditationValidity` PUT `/accreditation-validity` | AccreditationValidity | AccreditationValidity | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Expiry statement**: "Holders in this programme lose access automatically at 23:59 on 20 Dec 2026" under the form. *(source: screens/P08-venue-back-office.yaml#BO-669)*
@@ -1086,6 +1127,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 **What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Save**: Whole-record save of the programme's validity (VO-R04). *(source: contracts/satellite/accreditation.yaml#setAccreditationValidity)*
+
+**Data it reads**: `listAccreditationProgrammes` (onLoad, The programme whose validity is set); `getAccreditationValidity` (onLoad, The programme's validity as saved, before the whole-record …)
 
 **Where the user goes next**
 
@@ -1095,10 +1138,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The temporary seasonal accreditation configuration as saved. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the temporary seasonal accreditation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No temporary seasonal accreditation configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
+| Loading (`?state=loading`) | The programme's validity as saved. |
+| Error (`?state=error`) | Could not load. Names the read that failed; the form stays read-only. |
+| Empty, first run (`?state=emptyFirstRun`) | Never saved: the programme's validity is the platform default (eventDuration). |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCREDITATION_VIEW`, which `listAccreditationProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCREDITATION_CONFIGURE` for `setAccreditationValidity`. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
@@ -1133,11 +1176,21 @@ presets:
 
 #### Permissions
 
-**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
+- `listAccreditationProgrammes` → `ACCREDITATION_VIEW` (read) · staff
+- `getAccreditationValidity` → `ACCREDITATION_VIEW` (read) · staff
+- `setAccreditationValidity` → `ACCREDITATION_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Shown when the caller lacks `ACCREDITATION_VIEW`, which `listAccreditationProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCREDITATION_CONFIGURE` for `setAccreditationValidity`.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 12.1.6 | Expiration Management System shall support temporary and permanent accreditation validity periods. | Accreditation & Credential Management | CONTRACTED | `setAccreditationValidity` |
+| 12.1.41 | Temporary Event Accreditation - System shall support temporary event credentials. | Accreditation & Credential Management | CONTRACTED | `setAccreditationValidity` |
+| 12.1.42 | Seasonal Accreditation - System shall support seasonal accreditation programs. | Accreditation & Credential Management | CONTRACTED | `setAccreditationValidity` |
 
 #### Client meeting inputs
 
@@ -1163,12 +1216,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (3 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-669?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Save, Cancel.
 - [ ] Every transition is wired: `BO-664`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1956,6 +2009,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "cloneAccreditationProgramme": {"method":"POST","path":"/accreditation-programmes/{programmeId}/clone","contract":"accreditation","summary":"Start a programme from a template or last season's programme","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationProgramme"},
+"getAccreditationValidity": {"method":"GET","path":"/accreditation-validity","contract":"accreditation","summary":"The validity and renewal rules of a programme","permission":"ACCREDITATION_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":true}],"requestBody":null,"responds":"AccreditationValidity"},
 "listAccessProfiles": {"method":"GET","path":"/accreditation-access-profiles","contract":"accreditation","summary":"Named bundles of zones, dates and times","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AccessProfile"},
 "listAccreditationDocuments": {"method":"GET","path":"/accreditation-documents","contract":"accreditation","summary":"Documents supplied, by holder, application, requirement or state","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"applicationId","in":"query","required":null},{"name":"holderId","in":"query","required":null},{"name":"requirementCode","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"expiringWithinDays","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAccreditationHolders": {"method":"GET","path":"/accreditation-holders","contract":"accreditation","summary":"Everybody accredited, and what state they are in","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":"organisationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"expiringWithinDays","in":"query","required":null}],"requestBody":null,"responds":"AccreditationHolder"},
@@ -1974,7 +2028,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessProfile": {"type":"object","x-ticvai-persistence":"accreditation.access_profile","description":"Board 5.2. **How an estate stays governable.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"zoneIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"operationalAreas":{"type":"array","items":{"type":"string"}},"schedule":{"type":"array","description":"**Zone, date and time are three dimensions and all three are needed.**","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid","nullable":true},"daysOfWeek":{"type":"array","items":{"type":"string"}},"dateFrom":{"type":"string","format":"date","nullable":true},"dateTo":{"type":"string","format":"date","nullable":true},"from":{"type":"string","nullable":true},"to":{"type":"string","nullable":true},"eventPhase":{"type":"string","nullable":true,"enum":["build","rehearsal","doorsOpen","liveShow","breakdown"]}}}},"escortRequired":{"type":"boolean","default":false},"holderCount":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
+"AccessProfile": {"type":"object","x-ticvai-persistence":"accreditation.access_profile","description":"Board 5.2. **How an estate stays governable.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"zoneIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"operationalAreas":{"type":"array","items":{"type":"string"}},"schedule":{"type":"array","x-ticvai-persistence-column":"jsonb","description":"**Zone, date and time are three dimensions and all three are needed.**","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid","nullable":true},"daysOfWeek":{"type":"array","items":{"type":"string"}},"dateFrom":{"type":"string","format":"date","nullable":true},"dateTo":{"type":"string","format":"date","nullable":true},"from":{"type":"string","nullable":true},"to":{"type":"string","nullable":true},"eventPhase":{"type":"string","nullable":true,"enum":["build","rehearsal","doorsOpen","liveShow","breakdown"]}}}},"escortRequired":{"type":"boolean","default":false},"holderCount":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
 "AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "AccreditationDocument": {"type":"object","x-ticvai-persistence":"accreditation.document","description":"Board 2.5. **Submitted against a named requirement, not into a folder.**","required":["requirementCode","assetId"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","nullable":true},"applicationId":{"type":"string","format":"uuid","nullable":true},"requirementCode":{"type":"string"},"assetId":{"type":"string","format":"uuid"},"submittedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["submitted","verified","rejected","expired"]},"verifiedBy":{"type":"string","format":"uuid","nullable":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"},"scopePath":{"type":"string"}}},
 "AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},

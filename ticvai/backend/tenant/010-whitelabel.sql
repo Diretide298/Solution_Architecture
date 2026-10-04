@@ -1,4 +1,4 @@
--- whitelabel — 27 tables
+-- whitelabel — 29 tables
 -- **Derived. Do not hand-edit.**
 
 -- An analytics platform a storefront or app reports to, per venue: which provider, its property or
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.content_page (
 -- existed anywhere in 1,010 — and ADM-017 Domain & Certificate Management declared 41 operations,
 -- none of them about a domain. Verification before issuance, always. Hangs off: reaches
 -- whitelabel.footer_config through its keys; references platform.tenant. Reached by: 6 operations
--- read it and 3 write it.
+-- read it and 5 write it.
 CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
@@ -242,13 +242,24 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
     sort_order                        integer NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS whitelabel.homepage_layout (
+    template_key                      text,
+    landing_source                    text DEFAULT 'storefront' CONSTRAINT homepage_layout_landing_source_chk CHECK (landing_source IN ('storefront', 'ownSite')),
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A block on a tenant homepage, ordered. A section naming a disabled module must not render at all
 CREATE TABLE IF NOT EXISTS whitelabel.homepage_section (
-    template_key                      text,
-    landing_source                    text DEFAULT 'storefront' CONSTRAINT homepage_section_landing_source_chk CHECK (landing_source IN ('storefront', 'ownSite')),
+    homepage_layout_id                uuid NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL,
+    kind                              text NOT NULL,
+    title                             jsonb,
+    sort_order                        integer NOT NULL,
+    is_visible                        boolean NOT NULL,
     content_page_id                   uuid,
-    homepage_section_id               uuid NOT NULL
+    max_items                         integer,
+    scroll_animation                  text,
+    hero_style                        text
 );
 
 -- Which modules a tenant has on. The gate every requiresModule screen resolves against
@@ -262,13 +273,22 @@ CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
     tenant_config_id                  uuid NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS whitelabel.navigation_config (
+    id                                uuid PRIMARY KEY NOT NULL,
+    kind                              text NOT NULL CONSTRAINT navigation_config_kind_chk CHECK (kind IN ('bottomNavigation', 'drawer', 'tabs')),
+    buy_button                        jsonb
+);
+
 -- One entry in a tenant’s own navigation. Hangs off: reaches whitelabel.footer_config through its
 -- keys. Reached by: 5 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
+    navigation_config_id              uuid NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL CONSTRAINT navigation_item_kind_chk CHECK (kind IN ('bottomNavigation', 'drawer', 'tabs')),
-    buy_button                        jsonb,
-    navigation_item_id                uuid NOT NULL
+    label                             jsonb NOT NULL,
+    icon                              text,
+    target                            jsonb NOT NULL,
+    is_visible                        boolean NOT NULL,
+    sort_order                        integer NOT NULL
 );
 
 -- A tenant’s own terms, privacy and cookie text, versioned because agreeing to one version is not
@@ -369,8 +389,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.tenant_config (
     enabled_payment_methods           text[],
     accessibility                     jsonb,
     header                            jsonb,
-    navigation_item_id                uuid,
-    homepage_section_id               uuid,
+    navigation_config_id              uuid,
+    homepage_layout_id                uuid,
     languages                         jsonb,
     updated_at                        timestamptz,
     is_in_maintenance                 boolean DEFAULT false,
@@ -380,6 +400,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.tenant_config (
     contact                           jsonb,
     availability                      text,
     availability_message              jsonb,
-    id                                uuid PRIMARY KEY NOT NULL
+    id                                uuid PRIMARY KEY NOT NULL,
+    homepage_section_id               uuid,
+    navigation_item_id                uuid
 );
 

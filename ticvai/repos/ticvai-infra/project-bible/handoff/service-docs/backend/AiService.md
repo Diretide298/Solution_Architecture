@@ -34,8 +34,8 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | actions | [`overrideAiDecision`](#overrideaidecision) | POST | `/decision-records/{decisionRecordId}/override` | core | 1 | ADM-533, ADM-536 |
-| ai | [`getTranslationProposals`](#gettranslationproposals) | GET | `/ai/translate/{translationJobId}` | core | 1 | CMS-011 |
-| ai | [`proposeTranslations`](#proposetranslations) | POST | `/ai/translate` | core | 1 | BO-785, BO-793 |
+| ai | [`getTranslationProposals`](#gettranslationproposals) | GET | `/ai/translate/{translationJobId}` | core | 1 | BO-785, CMS-011 |
+| ai | [`proposeTranslations`](#proposetranslations) | POST | `/ai/translate` | core | 1 | BO-785, BO-793, CMS-011 |
 | ai | [`proposeVenueLabels`](#proposevenuelabels) | POST | `/ai/venue-map/{mapId}/propose-labels` | core | 1 | BO-093 |
 | ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 1 | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005 … |
 | ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 1 |  |
@@ -54,7 +54,7 @@
 | forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 1 | ADM-518, BO-927 |
 | forecast | [`getAiVenueSettings`](#getaivenuesettings) | GET | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071, BO-927 |
 | forecast | [`getForecast`](#getforecast) | GET | `/forecasts` | core | 1 | ADM-499, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506 … |
-| forecast | [`getForecastAccuracy`](#getforecastaccuracy) | GET | `/forecast-accuracy` | core | 1 | ADM-506, ADM-508 |
+| forecast | [`getForecastAccuracy`](#getforecastaccuracy) | GET | `/forecast-accuracy` | core | 1 | ADM-503, ADM-506, ADM-508 |
 | forecast | [`getVenueHistoryImport`](#getvenuehistoryimport) | GET | `/history-imports/{importId}` | core | 1 | ANL-071 |
 | forecast | [`importVenueHistory`](#importvenuehistory) | POST | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
 | forecast | [`listForecastVersions`](#listforecastversions) | GET | `/forecast-versions` | core | 1 | ADM-506, ADM-508 |
@@ -66,7 +66,7 @@
 | forecast | [`setForecastDefinition`](#setforecastdefinition) | PUT | `/forecast-definitions/{definitionKey}` | setup | 1 | ADM-500, ADM-501 |
 | generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 1 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
 | governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 1 | ADM-523, ADM-524, ADM-525, ADM-530 |
-| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 1 | ADM-492, ADM-531, ADM-532, ANL-009, BO-598, BO-762 … |
+| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 1 | ADM-492, ADM-531, ADM-532, ANL-009, BO-093, BO-598 … |
 | governance | [`evaluateAiGovernance`](#evaluateaigovernance) | POST | `/governance/evaluate` | core | 1 |  |
 | governance | [`getAiUsage`](#getaiusage) | GET | `/usage` | core | 1 | ADM-549, ANL-070, BO-091 |
 | governance | [`getEffectiveAiPolicy`](#geteffectiveaipolicy) | GET | `/governance/effective-policy` | core | 1 | ADM-489, ADM-522, ADM-525, ADM-526, ADM-528, ANL-060 … |
@@ -77,7 +77,7 @@
 | governance | [`revokeAiPolicyException`](#revokeaipolicyexception) | POST | `/governance/policy-exceptions/{exceptionId}/revoke` | core | 1 | ADM-526 |
 | governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 1 | ADM-527, ADM-538 |
 | insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 1 | ANL-019, ANL-059, BO-772, BO-782 |
-| insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 1 | ADM-506, ANL-019, ANL-056 |
+| insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 1 | ADM-505, ADM-506, ANL-019, ANL-056 |
 | knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 1 | BO-091, SUP-018 |
 | knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 1 | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
 | models | [`listAiEvaluations`](#listaievaluations) | GET | `/evaluations` | core | 1 | ADM-554, ANL-060 |
@@ -168,6 +168,13 @@ The action pipeline and human oversight (design C3)
 
 The drafts a `proposeTranslations` job has written so far, and whether it has finished (contract gap logged in CHG-WIR-017 for CMS-011; built in CHG-CSA-045). The CMS polls it after the 202 to offer machine translation as a first pass for review (DI-081, DI-083); nothing is published from here.
 
+**Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
+lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
+the block or template it is for (by id: a storefront content block or a marketing message template), its job (`translationJobId`), the language, the proposed
+text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
+content; `getTranslationProposals` reads the rows back by job.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -177,9 +184,9 @@ The drafts a `proposeTranslations` job has written so far, and whether it has fi
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | - |
+| Reads | `ai.proposed_action` |
 | Writes | - |
-| Called by | CMS-011 |
+| Called by | BO-785, CMS-011 |
 
 **Parameters**
 
@@ -215,6 +222,13 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 **A first pass, never a publish.** Every proposal lands as a draft on the block it translates, and **a tenant's own words in a language nobody at the venue reads is exactly the content that must not go live unreviewed.**
 **Lives here rather than in `white-label` because it calls a model.** ADR-0020: only the AI contract writes AI tables — and the boundary caught this on the day it was written, for the third time in one session. **A rule I had just described in the description above and then broke in the lineage below it.**
 
+**Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
+lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
+the block or template it is for (`control.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
+text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
+content; `getTranslationProposals` reads the rows back by job.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -225,7 +239,7 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `control.content_block`, `marketing.message_template`, `marketing.message_template_version` |
 | Writes | `ai.activity`, `ai.proposed_action`, `cache:idempotency` |
-| Called by | BO-785, BO-793 |
+| Called by | BO-785, BO-793, CMS-011 |
 
 **Parameters**
 
@@ -666,6 +680,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | proposedAction | object |  | Present where the answer suggests a change. (nullable) |
 | proposedAction.id | string (uuid) | yes |  |
 | proposedAction.interactionId | string (uuid) |  |  |
+| proposedAction.translationJobId | string (uuid) |  | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. (read-only; nullable) |
 | proposedAction.kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | proposedAction.targetContract | string | yes | Which contract would perform it. |
 | proposedAction.targetOperation | string | yes |  |
@@ -1537,7 +1552,7 @@ Forecasting and operational requirements (design C8)
 | Read routing | analytical |
 | Reads | `ai.forecast_accuracy` |
 | Writes | - |
-| Called by | ADM-506, ADM-508 |
+| Called by | ADM-503, ADM-506, ADM-508 |
 
 **Parameters**
 
@@ -2420,7 +2435,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Conflict policy | serverWins |
 | Reads | `ai.action_plan`, `ai.proposed_action`, `cache:idempotency` |
 | Writes | `ai.action_plan`, `ai.activity`, `ai.decision_record`, `ai.proposed_action`, `cache:idempotency` |
-| Called by | ADM-492, ADM-531, ADM-532, ANL-009, BO-598, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
+| Called by | ADM-492, ADM-531, ADM-532, ANL-009, BO-093, BO-598, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
 | State model | AI action plan ([states/ai-action-plan.yaml](../../../states/ai-action-plan.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `cancelled`<br/>AI proposed action ([states/ai-proposed-action.yaml](../../../states/ai-proposed-action.yaml)): moves `proposed` -> `approved`, `proposed` -> `rejected` |
 
 **Parameters**
@@ -2443,6 +2458,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | interactionId | string (uuid) |  |  |
+| translationJobId | string (uuid) |  | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. (read-only; nullable) |
 | kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | targetContract | string | yes | Which contract would perform it. |
 | targetOperation | string | yes |  |
@@ -3157,7 +3173,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | Read routing | analytical |
 | Reads | `ai.insight`, `ai.policy`, `cache:idempotency` |
 | Writes | `ai.activity`, `ai.insight`, `cache:idempotency` |
-| Called by | ADM-506, ANL-019, ANL-056 |
+| Called by | ADM-505, ADM-506, ANL-019, ANL-056 |
 
 **Parameters**
 
@@ -5328,6 +5344,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | interaction_id | uuid | no |  |
+| translation_job_id | uuid | no | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. |
 | kind | text | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | target_contract | text | yes | Which contract would perform it. |
 | target_operation | text | yes |  |

@@ -384,6 +384,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listBookableVenueMaps": {
+  "method": "GET",
+  "path": "/bookable-venue-maps",
+  "contract": "venue-map",
+  "summary": "The published maps of a venue that carry bookable spots",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookableVenueMaps"
+ },
  "listDeliveryLocations": {
   "method": "GET",
   "path": "/venues/{venueId}/delivery-locations",
@@ -476,6 +505,45 @@
     "name": "date",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
    },
    {
     "name": null,

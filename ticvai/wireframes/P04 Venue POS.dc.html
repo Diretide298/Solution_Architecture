@@ -185,7 +185,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; submitShiftCount · acceptShiftVariance · getCurrentShift · listCashMovements +4</div>
+          <div><b>OPERATIONS</b> &middot; submitShiftCount · acceptShiftVariance · getCurrentShift · listCashMovements +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session, boxId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-000">POS-000</a>  &mdash; <i>Close and sign out</i> <span class="car">shiftId · countedCash</span><br><a href="#pos-008">POS-008</a>  &mdash; <i>The day is reported</i><br><a href="#pos-009">POS-009</a>  &mdash; <i>Staff Roster</i><br><a href="#pos-025">POS-025</a>  &mdash; <i>A shift was closed in error</i></div>
@@ -1459,7 +1459,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; recordNoSale · listAlerts · createApprovalRequest · decideApprovalRequest +1</div>
+          <div><b>OPERATIONS</b> &middot; recordNoSale · listAlerts · createApprovalRequest · decideApprovalRequest +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;deepLink, reportId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i><br><a href="#pos-007">POS-007</a>  &mdash; <i>End of shift</i></div>
@@ -1478,7 +1478,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGuestMenu · addCartLine · evaluatePromotions · setItemAvailability</div>
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · addCartLine · evaluatePromotions · setItemAvailability +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">promotionId</span><br><a href="#pos-022">POS-022</a>  &mdash; <i>The order goes to the pass before the guest </i></div>
@@ -1516,12 +1516,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; lookupMerchandise · addCartLine · createRetailSale · evaluatePromotions</div>
+          <div><b>OPERATIONS</b> &middot; lookupMerchandise · addCartLine · evaluatePromotions</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, cartId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">orderId · promotionId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">promotionId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formCreateRetailSale &middot; <i>Create retail sale</i> &middot; <b>Create retail sale</b> &middot; Cancel <span class="dis">discards id · outletId · lines · recordedAt · shiftId · subjectId · couponCodes</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div></div>
         </div>
       </div>
       <div id="pos-024" class="scr">
@@ -1730,7 +1730,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setTableLayout · setTableCombinations · setItemAvailability · getTableMap +1</div>
+          <div><b>OPERATIONS</b> &middot; setTableLayout · setTableCombinations · setItemAvailability · getTableMap +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, itemId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i></div>
@@ -1749,7 +1749,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWorkstationShift · listSaleBoards · getWorkstationHealth · listAlerts +3</div>
+          <div><b>OPERATIONS</b> &middot; getWorkstationShift · listSaleBoards · getWorkstationHealth · listAlerts +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i><br><a href="#pos-021">POS-021</a>  &mdash; <i>Sell — Food &amp; Drink</i><br><a href="#pos-023">POS-023</a>  &mdash; <i>Sell — Merchandise</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i><br><a href="#pos-027">POS-027</a>  &mdash; <i>Guest Lookup</i><br><a href="#pos-028">POS-028</a>  &mdash; <i>Table Service</i><br><a href="#pos-029">POS-029</a>  &mdash; <i>Order Queue</i><br><a href="#pos-026">POS-026</a>  &mdash; <i>Receipt &amp; Reprint</i><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i><br><a href="#pos-030">POS-030</a>  &mdash; <i>Sales journal (F7, or a KPI tile)</i><br><a href="#pos-031">POS-031</a>  &mdash; <i>Reservations (F5)</i><br><a href="#pos-018">POS-018</a>  &mdash; <i>Cash lift (the drawer is over its limit)</i> <span class="car">shiftId</span><br><a href="#pos-000">POS-000</a>  &mdash; <i>Sign out (back to the till door)</i><br><a href="P08%20Venue%20Management.dc.html#bo-024">BO-024</a> <span class="away">other board</span>  &mdash; <i>The deposit boxes of the settled shifts clos</i></div>
@@ -1768,12 +1768,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; reprintReceipt · reprintOrder · reissueEntitlement · issueTaxInvoice +2</div>
+          <div><b>OPERATIONS</b> &middot; reprintReceipt · reprintOrder · reissueEntitlement · issueTaxInvoice +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;navigation, workstationId&larr;session, saleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-011">POS-011</a>  &mdash; <i>Returns, Refunds &amp; Exchanges</i> <span class="car">invoiceId · orderId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReprintReceipt &middot; <i>Reprint receipt</i> &middot; <b>Reprint receipt</b> &middot; Cancel <span class="dis">discards delivery · destination</span></div><div class="ov"><b>modal</b> formReissueEntitlement &middot; <i>Reissue entitlement</i> &middot; <b>Reissue entitlement</b> &middot; Cancel <span class="dis">discards reason · validFrom · note</span></div></div>
         </div>
       </div>
       <div id="pos-027" class="scr">
@@ -1825,12 +1825,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listFnbOrders</div>
+          <div><b>OPERATIONS</b> &middot; listFnbOrders · acceptFnbOrder · setKitchenTicketStatus · recordOrderHandover</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, orderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-022">POS-022</a>  &mdash; <i>Send to Kitchen</i> <span class="car">orderId · ticketId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAcceptFnbOrder &middot; <i>Accept order</i> &middot; <b>Accept order</b> &middot; Cancel <span class="dis">discards estimatedReadyAt · stationId</span></div><div class="ov"><b>modal</b> formRecordOrderHandover &middot; <i>Hand over</i> &middot; <b>Hand over</b> &middot; Cancel <span class="dis">discards outcome</span></div></div>
         </div>
       </div>
       <div id="pos-030" class="scr">

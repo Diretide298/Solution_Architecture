@@ -136,7 +136,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1176` | Wallet Events, Webhooks & Notification Orchestration | B | 11 | 9 | 6 | 12 | 0 | 6 | — | notStarted (—) |
 | `BO-1177` | API Security, Access & Integration Permissions | B | 15 | 17 | 6 | 1 | 2 | 5 | — | notStarted (—) |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | C | 12 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1179` | Integration Monitoring & Exception Workbench | C | 25 | 26 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1179` | Integration Monitoring & Exception Workbench | A | 25 | 26 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-1180` | Wallet Configuration Governance & Version Control | C | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1181` | Approval, Publication & Change Management | C | 7 | 30 | 6 | 12 | 0 | 3 | — | notStarted (—) |
 | `BO-1182` | Wallet Platform Health, Audit & Administration Center | C | 0 | 2 | 6 | 0 | 0 | 6 | — | notStarted (—) |

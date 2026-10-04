@@ -130,15 +130,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-716` | Event Lifecycle & Change Command Center | A | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-717` | Lifecycle Transition Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-716` | Event Lifecycle & Change Command Center | A | 6 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-717` | Lifecycle Transition Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-718` | Event Change Request Configuration | B | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-716, BO-717, BO-718, BO-719, BO-720 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-717, BO-718, BO-719, BO-720 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -157,12 +157,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Block | Block A · task APP-SETUP-BO-716 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | detail (compact density): One event's lifecycle state with the change to its next state beside it (defined 4 October 2026 from setEventLifecycleState, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/event-lifecycle-change-command-center-bo-716` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026: the current state is Event.lifecycleState (readOnly, agreed with contracts in the ledger; setEventLifecycleState's 200 has no body, so the screen reads the event again), the target state, reason and effective date are the call's body** (CHG-FXS-001)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Moves an event through its lifecycle (draft, planned, on sale, live, closed, cancelled) and shows why a transition is not yet possible: going on sale needs a price, a capacity and a schedule; going live a resource plan; cancelling a treatment for everyone who bought. Changes above a configured impact go to approval.
 
@@ -170,21 +170,33 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Move to | select | optional | — | Draft · Planned · On sale · Live · Closed · Cancelled · Archived | — | Draft, planned, on sale, live, closed, cancelled, archived; only the next states the current one allows. On sale needs a price, a capacity and a schedule; live needs a resource plan; cancelled needs … | `Event.lifecycleState` |
+| Reason | text field | — | — | — | — | Body reason; required for cancelled. | — |
+| Effective from | date picker | — | — | — | — | Body effectiveFrom; now by default. | — |
+
+**Sent by *Save event lifecycle state*** (`setEventLifecycleState`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| State `state` | select | required | — | Draft · Planned · On sale · Live · Closed · Cancelled · Archived | — | — | `setEventLifecycleState` body |
+| Reason `reason` | text area | optional | — | — | — | — | `setEventLifecycleState` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setEventLifecycleState` body |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Read an event** (detail panel, from `getEvent`)
+**Event** (detail panel, from `getEvent`): lifecycleState is readOnly on Event (agreed with contracts in the ledger).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Parent event | the name it points at, never the id | For grouped events. |
+| Code | text | — |
+| Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 
@@ -192,7 +204,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save event lifecycle state (primary button) | navigation or local | — | — | — | — |
+| Save event lifecycle state (primary button) | `setEventLifecycleState` POST `/events/{eventId}/lifecycle` | inline | no body | 409 Preconditions for the transition are not met; they are listed | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -213,11 +225,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The event lifecycle change list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the event lifecycle change untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No event lifecycle change yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The event and its state. |
+| Error (`?state=error`) | Could not load the event. Names it; nothing changes. |
+| Empty, first run (`?state=emptyFirstRun`) | Not used: the screen opens on one event (eventId). |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event lifecycle change are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `setEventLifecycleState`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Preconditions for the transition are not met; they are listed |
 
@@ -243,7 +255,7 @@ event:
 - `setEventLifecycleState` → `EVENT_CONFIGURE` (configure) · staff
 - `getEvent` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `setEventLifecycleState`.
 
 #### Requirements it meets
 
@@ -273,8 +285,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-716?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save event lifecycle state, Cancel.
 - [ ] Every transition is wired: `BO-100`, `BO-717`, `BO-718`, `BO-719`, `BO-720`.
@@ -326,6 +338,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Parent event | the name it points at, never the id | For grouped events. |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
+| Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
+| Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -405,7 +419,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-717?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save event lifecycle state, Cancel.
 - [ ] Every transition is wired: `BO-716`.
@@ -576,6 +590,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Parent event | the name it points at, never the id | For grouped events. |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
+| Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
+| Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -645,7 +661,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-719?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-716`.
@@ -711,6 +727,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Parent event | the name it points at, never the id | For grouped events. |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
+| Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
+| Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
 
 **The selected ticket reservation customer** (detail panel): The pack groups this record's detail under its own headings: “Administrators can”, “Critical Governance Principle”.
 
@@ -778,7 +796,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-720?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-716`.
@@ -899,12 +917,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
 "ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
 "CreateApprovalRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["id","kind","subjectContract","subjectType","subjectId","scopePath","summary"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"subjectContract":{"type":"string","description":"Which contract owns the thing being approved."},"subjectType":{"type":"string"},"subjectId":{"type":"string","description":"**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"},"scopePath":{"type":"string"},"summary":{"type":"string","maxLength":300,"description":"What the approver sees in their queue before opening it."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributes":{"type":"object","additionalProperties":true},"justification":{"type":"string","maxLength":1000},"isDraft":{"type":"boolean","default":false,"description":"True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"}}},
-"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"}}},
+"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
 "EventReschedule": {"type":"object","x-ticvai-persistence":"catalogue.event_reschedule","description":"Event boards 7.4 and 7.5. **The decision that generates every phone call.**","required":["kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["moveTime","moveDate","moveVenue","cancel","abandon"]},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"newStartsAt":{"type":"string","format":"date-time","nullable":true},"newSpaceId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string"},"ticketTreatment":{"type":"string","enum":["moveAutomatically","offerChoice","refund","creditToWallet","honourAtAnyPerformance"],"description":"**Made once and applied consistently**, rather than per guest at a desk."},"refundFees":{"type":"boolean","default":true},"notifyGuests":{"type":"boolean","default":true},"notificationTemplateId":{"type":"string","format":"uuid","nullable":true},"affectedOrders":{"type":"integer","readOnly":true},"affectedGuests":{"type":"integer","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}}
 }
 ```

@@ -1,6 +1,6 @@
 # WS76 — Digital Asset Management DAM board 3
 
-**10 screens · 10 operations · 14 schemas · 6 permissions**
+**10 screens · 11 operations · 16 schemas · 7 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW, ROLE_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-083` | Rights, License & Usage Policy Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-084` | Asset Approval Workflow Management | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `CMS-085` | Publication Eligibility & Governance Validation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-086` | Role-Based Asset Access & Permission Management | B | 19 | 20 | 6 | 3 | 1 | 5 | — | notStarted (—) |
+| `CMS-086` | Role-Based Asset Access & Permission Management | B | 24 | 5 | 6 | 6 | 1 | 5 | — | notStarted (—) |
 | `CMS-087` | Secure Internal & External Sharing | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-088` | Rights Expiry, Renewal & Usage Impact | B | 0 | 8 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-089` | Governance Audit Trail & Compliance Evidence | B | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**CMS-082, CMS-083, CMS-085, CMS-086, CMS-089, CMS-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-082, CMS-083, CMS-085, CMS-089, CMS-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -792,20 +792,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
 | Block | Block B · task APP-CMS-CMS-086 |
-| Who uses it | venue staff holding `PERMISSION_MANAGE`, `PERMISSION_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `PERMISSION_MANAGE`, `PERMISSION_VIEW`, `ROLE_MANAGE` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/role-based-asset-access-permission-management-cms-086` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **The generator's 'needs a person' gaps removed 4 October 2026 (the screen is filled); the roles come from listRoles so a policy's appliesToRoleIds can be picked by name** (CHG-FXS-005)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Who may discover, view, edit, download, share, approve or manage assets.
 
 **Fixed on main** (the package already carries these; draw what it says): Empty table and a generic policy create. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Roles | multi-picker: choose applies to roles | optional | — | — | — | Options from listRoles, by name. | `AuthorisationPolicy.appliesToRoleIds` |
+| Asset actions | list of values (chips) | optional | — | — | — | ASSET_LIBRARY_VIEW, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_VIEW and ASSET_MANAGE (the permission vocabulary). | `AuthorisationPolicy.permissions` |
+| Policy name | text field | optional | — | — | — | — | `AuthorisationPolicy.name` |
+| Policy code | text field | optional | — | — | — | — | `AuthorisationPolicy.code` |
+| Effect | segmented control | optional | — | Permit · Deny | — | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake … | `AuthorisationPolicy.effect` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -848,30 +858,15 @@ The role, the asset actions it may take (discover, view, edit, download, share, 
 
 **Shown**
 
-**Roles and asset actions** (data table, from `listAuthorisationPolicies`): One row per role, one column per asset action (discover, view, edit, download, share, approve, manage), each allowed or not, with the scope it applies at.
+**Roles and asset actions** (data table, from `listAuthorisationPolicies`): One row per policy; role ids shown by the role's name from listRoles.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update. |
-| Code | text | — |
 | Name | text | — |
-| Description | text | — |
-| Is template | yes / no (icon or chip) | — |
-| Permissions | list or chips (count when long) | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being … |
-| Conditions | list or chips (count when long) | — |
-| Attribute | chip: User.attribute, Employee.attribute, Employee.on shift, Membership.tier … | — |
-| Key | text | For the `*.attribute` forms — which attribute, by code. |
-| Operator | chip: Equals, Not equals, In, Not in, Greater than, Less than… | — |
-| Value | text | The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by … |
-| Values | list or chips (count when long) | — |
-| Combining | chip: All must match, Any may match | — |
 | Effect | chip: Permit, Deny | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not … |
-| Priority | 1,234 | — |
+| Permissions | list or chips (count when long) | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being … |
 | Applies to roles | list or chips (count when long) | — |
-| Status | chip: Draft, Pending approval, Active, Suspended, Retired | Moved only by `setAuthorisationPolicyState`. A policy is created as a `draft`, and a status sent in a create or update body is ignored — … |
-| Effective from | 1 Oct 2026, 14:30 | — |
 | Effective to | 1 Oct 2026, 14:30 | — |
-| Delegated admin roles | list or chips (count when long) | 3.3.35. Who may edit this policy without being a platform administrator. |
 
 **Actions and what each produces**
 
@@ -879,7 +874,7 @@ The role, the asset actions it may take (discover, view, edit, download, share, 
 |---|---|---|---|---|---|
 | Grant an asset action to a role (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | — | opens modal first |
 
-**Data it reads**: `listAuthorisationPolicies` (onLoad, Who may see which assets)
+**Data it reads**: `listAuthorisationPolicies` (onLoad, Who may see which assets); `listRoles` (onLoad, The roles a policy applies to (appliesToRoleIds), by name)
 
 **Where the user goes next**
 
@@ -893,7 +888,7 @@ The role, the asset actions it may take (discover, view, edit, download, share, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the role-based asset access untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No role-based asset access yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the role-based asset access are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `ROLE_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -925,18 +920,22 @@ listAuthorisationPolicies (AuthorisationPolicy):
 
 - `listAuthorisationPolicies` → `PERMISSION_VIEW` (read) · staff
 - `createAuthorisationPolicy` → `PERMISSION_MANAGE` (configure) · staff
+- `listRoles` → `ROLE_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `ROLE_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`.
 
 #### Requirements it meets
 
-3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 3.3.1 | Allows permissions to be granted dynamically based on attributes and context rather than fixed roles only. | Admission and Access | CONTRACTED | `createAuthorisationPolicy` |
 | 3.3.5 | Dynamic Rule Engine Administrators shall configure access policies without software development. | Admission and Access | CONTRACTED | `createAuthorisationPolicy` |
 | 7.1.44 | Provide a no-code visual interface for building access policies using conditions, rules, logic operators, approval requirements and reusable components. | F&B POS | CONTRACTED | `createAuthorisationPolicy` |
+| 3.3.35 | Delegated Access Management - System shall support delegated administration of access policies. | Admission and Access | CONTRACTED | data `AuthorisationPolicy` |
+| 3.3.40 | Tenant-Specific Policies - System shall support tenant-specific access policies. | Admission and Access | CONTRACTED | data `AuthorisationPolicy` |
+| 3.3.42 | Cross-Venue Access Policies - System shall support policies spanning multiple venues. | Admission and Access | CONTRACTED | data `AuthorisationPolicy` |
 
 #### Client meeting inputs
 
@@ -961,15 +960,16 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - Workshop pack: Digital Asset Management DAM.pdf board 3
 - Flow F185 *Digital Asset Management DAM board 3: DAM Governance & Rights Command Center*, step 10: Works in Role-Based Asset Access & Permission Management → Control who can discover, view, edit, download, share, approve, or manage assets.
 - ADR-0068 *Guest admission policy lives in Access only, and the offline package carries it* (`docs/adr/0068-guest-admission-policy-lives-in-access-only.md`)
+- ADR-0051 *Every AI function ships on a baseline and learns per tenant; a model goes live only on evidence* (`docs/adr/0051-ai-ships-on-a-baseline-and-learns-per-tenant.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (19), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-086?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Grant an asset action to a role.
 - [ ] Every transition is wired: `CMS-081`.
-- [ ] Every gated control is gated: `PERMISSION_MANAGE`, `PERMISSION_VIEW`.
+- [ ] Every gated control is gated: `PERMISSION_MANAGE`, `PERMISSION_VIEW`, `ROLE_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1624,6 +1624,7 @@ Method, path, parameters, request and response for every operation these screens
 "getMediaUsageAnalytics": {"method":"GET","path":"/media-usage","contract":"assets","summary":"Downloads, views, shares and library health","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"MediaUsageRow"},
 "listAuthorisationPolicies": {"method":"GET","path":"/authorisation-policies","contract":"identity","summary":"Attribute-based authorisation policies","permission":"PERMISSION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"scopePath","in":"query","required":null}],"requestBody":null,"responds":"AuthorisationPolicy"},
 "listMediaAssetAudit": {"method":"GET","path":"/media-assets/{assetId}/audit","contract":"assets","summary":"Who did what to this asset, and who received it","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MediaAuditRecord"},
+"listRoles": {"method":"GET","path":"/roles","contract":"identity","summary":"List roles","permission":"ROLE_MANAGE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setMediaAssetApproval": {"method":"POST","path":"/media-assets/{assetId}/approval","contract":"assets","summary":"Submit, approve, reject or publish an asset","permission":"ASSET_LIBRARY_APPROVE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaAssetApproval"},
 "setMediaAssetRights": {"method":"PUT","path":"/media-assets/{assetId}/rights","contract":"assets","summary":"Licence, permitted use and expiry","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaRights","responds":"MediaRights"},
 "updateMediaAsset": {"method":"PATCH","path":"/media/{mediaId}","contract":"assets","summary":"Amend metadata, tags or rights","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaAsset"}
@@ -1637,7 +1638,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccessCondition": {"type":"object","description":"**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n","required":["attribute","operator"],"properties":{"attribute":{"type":"string","enum":["user.attribute","employee.attribute","employee.onShift","membership.tier","membership.status","accreditation.type","accreditation.status","customer.segment","resource.classification","venue.attribute","venue.id","attraction.attribute","device.kind","device.id","device.trusted","time.ofDay","time.dayOfWeek","time.season","time.withinOperatingHours","event.id","event.status","capacity.utilisationPercent","occupancy.level","risk.score","ticket.status","location.scopePath"]},"key":{"type":"string","nullable":true,"description":"For the `*.attribute` forms — which attribute, by code."},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThan","lessThan","between","contains","startsWith","exists"]},"value":{"nullable":true,"description":"The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"},"values":{"type":"array","items":{"type":"string"}}}},
-"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
+"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
 "ExpiringMedia": {"x-ticvai-persistence":"none — computed","type":"object","required":["assetId","filename","validTo","isExpired","isInUse"],"properties":{"assetId":{"type":"string","format":"uuid"},"filename":{"type":"string"},"thumbnailUrl":{"type":"string","nullable":true},"licensor":{"type":"string","nullable":true},"validTo":{"type":"string","format":"date"},"daysRemaining":{"type":"integer"},"isExpired":{"type":"boolean"},"isInUse":{"type":"boolean","description":"True while `liveUsageCount` is above zero, that is, while live (published) content references the asset (audit R106 (10)). Drafts and collections do not count."},"liveUsageCount":{"type":"integer","description":"References from live (published) content only (audit R106 (10)). Expired and live is the combination that matters."}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
@@ -1649,6 +1650,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaShare": {"type":"object","x-ticvai-persistence":"assets.share","description":"Board 3.7. **A licence grant with a link attached** — revocable, expiring and logged.","required":["assetIds","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"assetIds":{"type":"array","items":{"type":"string","format":"uuid"}},"recipientEmail":{"type":"string","nullable":true},"recipientOrganisation":{"type":"string","nullable":true},"allowDownload":{"type":"boolean","default":false},"allowedRenditions":{"type":"array","items":{"type":"string"}},"passwordProtected":{"type":"boolean","default":false},"expiresAt":{"type":"string","format":"date-time"},"revokedAt":{"type":"string","format":"date-time","nullable":true},"url":{"type":"string","readOnly":true},"openedCount":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "MediaUsage": {"x-ticvai-persistence":"assets.media_usage","type":"object","description":"One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n","required":["surface","referenceId"],"properties":{"extractedText":{"type":"string","description":"**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"surface":{"type":"string","enum":["tenantBranding","homepageBanner","promoBlock","contentPage","product","event","menuItem","merchandise","workOrder","incident","inspection","campaign"]},"referenceId":{"type":"string"},"label":{"type":"string"},"isLive":{"type":"boolean","description":"True where the referencing surface is published to guests."}}},
-"MediaUsageRow": {"type":"object","description":"Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"assetCount":{"type":"integer"},"storageBytes":{"type":"integer"},"downloads":{"type":"integer"},"views":{"type":"integer"},"shares":{"type":"integer"},"neverUsedCount":{"type":"integer"},"unclassifiedCount":{"type":"integer"}}}
+"MediaUsageRow": {"type":"object","description":"Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"assetCount":{"type":"integer"},"storageBytes":{"type":"integer"},"downloads":{"type":"integer"},"views":{"type":"integer"},"shares":{"type":"integer"},"neverUsedCount":{"type":"integer"},"unclassifiedCount":{"type":"integer"}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Role": {"x-ticvai-persistence":"identity.role","type":"object","required":["id","code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","x-ticvai-unique":"tenant","description":"**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"},"name":{"type":"string"},"description":{"type":"string"},"permissions":{"type":"array","description":"**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"inheritsFromRoleId":{"type":"string","format":"uuid","nullable":true,"description":"**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"},"isSystem":{"type":"boolean","default":false,"description":"**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n\n**Superseded 2 October 2026: no fixed default roles** (Chinmay; DEC-007; CHG-CSP-003). The five are presets (`CapabilityTemplate`, `isPreset`) a role starts from, not roles a tenant is given. The field stays for clients built at r1 and is false on every role created from 2 October.\n"},"presetCode":{"type":"string","nullable":true,"readOnly":true,"maxLength":64,"description":"**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"},"principalCount":{"type":"integer"},"grantCount":{"type":"integer"}}}
 }
 ```

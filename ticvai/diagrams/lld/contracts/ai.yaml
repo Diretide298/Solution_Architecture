@@ -827,7 +827,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ai.proposed_action
   writes: []
 - operation: getVenueHistoryImport
   verb: GET

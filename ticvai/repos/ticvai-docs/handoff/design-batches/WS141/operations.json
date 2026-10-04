@@ -18,6 +18,44 @@
   "requestBody": null,
   "responds": "Conversation"
  },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
  "escalateCase": {
   "method": "POST",
   "path": "/cases/{caseId}/escalate",
@@ -62,6 +100,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "AiCustomerServiceCopilotKnowledgeWorkspaceView"
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
  },
  "getGuestTimeline": {
   "method": "GET",

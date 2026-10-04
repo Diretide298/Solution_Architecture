@@ -959,7 +959,8 @@
    "orderId": {
     "type": "string",
     "format": "uuid",
-    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
+    "nullable": true,
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). **Null for an entitlement an invitation issued** (`invitationId`; 4 October 2026, CHG-FXC-007)."
    },
    "orderLineId": {
     "type": "string",
@@ -1147,6 +1148,12 @@
     "x-ticvai-persisted": false,
     "x-ticvai-derived": "onRead",
     "description": "The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`), or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** — the PII split keeps the biometric on its own side, and this carries only its id. It is how a screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.\n"
+   },
+   "invitationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The invitation that issued it** (4 October 2026, CHG-FXC-007): `orders.issueInvitation` issues the entitlement without an order, because an invitation never enters the order path. Exactly one of `orderId` and `invitationId` is set."
    }
   }
  },

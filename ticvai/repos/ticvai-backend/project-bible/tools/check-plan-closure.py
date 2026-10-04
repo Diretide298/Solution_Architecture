@@ -54,6 +54,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import ticket_done as td  # noqa: E402  (load_holds, CHG-FXP-002)
 import sprint_plan as sp  # noqa: E402
 import ticket_done as td  # noqa: E402
 
@@ -247,6 +248,11 @@ def main() -> int:
 
     # C-GONE, C-UNTICKETED: against the last released plan
     departures = extra.get("departures") or {}
+    op_hold, scr_hold, _ = td.load_holds(g.ROOT)
+    reach = {}
+    for o_, x_ in (g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}).items():
+        for t_ in (x_ or {}).get("reads", []) + (x_ or {}).get("writes", []):
+            reach.setdefault(t_, set()).add(o_)
     ref, ref_rows = reference(since)
     if ref is None:
         guard.note(f"C-GONE and C-UNTICKETED not run: {ref_rows}")
@@ -259,6 +265,16 @@ def main() -> int:
                 name = art.split(" ", 1)[1]
                 if art.startswith("operation ") and name in provisional:
                     guard.note(f"excused: {art} built by {ref}, held now as provisional (CHG-GTR-007)")
+                    continue
+                # **What the spec says is not built leaves by rule** (4 October, CHG-FXP-002, -003): an operation its
+                # contract marks a stub or deprecated, a screen merged into another or binding such an operation, and
+                # a table only such operations reach. Each is printed, so the departure is still visible.
+                held_why = (op_hold.get(name) if art.startswith("operation ") else
+                            (scr_hold.get(name) or (None, None, None))[2] if art.startswith("screen ") else
+                            ("reached only by held operations" if art.startswith("table ") and reach.get(name)
+                             and all(o in op_hold for o in reach[name]) else None))
+                if held_why:
+                    guard.note(f"excused: {art} built by {ref}, not built now: {held_why} (CHG-FXP-002, -003)")
                     continue
                 if art in departures:
                     used.add(art)

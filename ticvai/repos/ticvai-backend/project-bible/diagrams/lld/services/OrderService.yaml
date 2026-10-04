@@ -95,7 +95,7 @@ operationsByContract:
     permission: ORDER_DISCOUNT
     offline: true
     reads: 6
-    writes: 4
+    writes: 5
   - operation: approveExceptionServiceRecovery
     verb: PUT
     path: /exception-service-recovery
@@ -351,7 +351,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createUpgradeCredentialRegeneration
     verb: POST
     path: /upgrade-credential-regeneration
@@ -1343,7 +1343,7 @@ operationsByContract:
     permission: ORDER_REFUND_APPROVE
     offline: false
     reads: 9
-    writes: 6
+    writes: 8
   - operation: recordChargebackOutcome
     verb: POST
     path: /chargebacks/{chargebackId}/outcome
@@ -2065,8 +2065,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: setB2bPaymentTerms
     verb: PUT
     path: /b2b-credit-accounts/{accountId}/terms
@@ -2228,8 +2228,8 @@ operationsByContract:
     scope: venue
     permission: OVERSHORT_ACCEPT
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: adjustDepositBoxFloat
     verb: POST
     path: /deposit-boxes/{boxId}/adjust-float
@@ -2365,7 +2365,7 @@ operationsByContract:
     permission: SHIFT_OPEN
     offline: true
     reads: 8
-    writes: 3
+    writes: 5
   - operation: recordNoSale
     verb: POST
     path: /shifts/{shiftId}/no-sale
@@ -2437,7 +2437,7 @@ operationsByContract:
     permission: CASH_LIFT
     offline: true
     reads: 4
-    writes: 3
+    writes: 5
 tables:
 - store: cache:idempotency
   kind: cache
@@ -2662,6 +2662,31 @@ tables:
   - voidOrder
   - voidPayment
   - withdrawFromDepositBox
+  keys:
+    setFraudRules:
+      role: evicts
+      resolvers: &id001
+      - orders.fraud_rule
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setInstalmentPolicy:
+      role: evicts
+      resolvers: &id002
+      - payments.instalment_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setRefundPolicy:
+      role: evicts
+      resolvers: &id003
+      - orders.refund_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -2679,10 +2704,35 @@ tables:
   - setRefundPolicy
   readBy:
   - getRefundPolicy
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    getRefundPolicy:
+      role: fills
+      resolvers:
+      - orders.refund_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    setFraudRules:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setInstalmentPolicy:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setRefundPolicy:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: orders.after_sale_policy
   columns: 33
   store: postgres
@@ -2763,7 +2813,8 @@ tables:
   columns: 5
   store: postgres
   parent: orders.chargeback
-  writtenBy: []
+  writtenBy:
+  - orders
   foreignWriters: null
 - table: orders.credit_override
   columns: 7
@@ -2773,7 +2824,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.deposit
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy: []
@@ -3434,7 +3485,7 @@ tables:
   - orders
   foreignWriters: null
 - table: payments.provider_connection
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -3844,6 +3895,7 @@ screens:
 - P02:GST-008 Tickets & Add-ons
 - P02:GST-009 Review & Payment
 - P02:GST-010 Booking Confirmation
+- P02:GST-011 Wallet Overview
 - P02:GST-012 My Tickets
 - P02:GST-013 Ticket Details
 - P02:GST-014 Ticket Transfer
@@ -4111,7 +4163,6 @@ screens:
 - P08:BO-332 Financial Traceability, Control & Audit Explorer
 - P08:BO-333 Order Financial Analytics & AI Reconciliation Intelligence
 - P08:BO-344 Media Design Studio Command Center
-- P08:BO-346 PDF, Printable & POS Ticket Designer
 - P08:BO-572 Deposit Release, Capture & Customer Confirmation
 - P08:BO-778 Abandoned Cart Recovery
 - P09:ADM-412 Payment Method & Settlement Setup

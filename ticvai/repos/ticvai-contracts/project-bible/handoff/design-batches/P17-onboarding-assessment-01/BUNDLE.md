@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `SGN-001` | Welcome & Start Your TICVAI Journey | B | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `SGN-002` | Customer & Organization Registration | B | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-002` | Customer & Organization Registration | B | 35 | 0 | 6 | 14 | 1 | 0 | — | notStarted (—) |
 | `SGN-003` | Venue Type & Business Profile | B | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `SGN-004` | Visitor, Capacity & Operational Scale | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `SGN-005` | Sales Channel Assessment | B | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
@@ -264,14 +264,12 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 | Block | Block B · task APP-SIGNUP-SGN-002 |
 | Who uses it | public staff holding `TENANT_CONFIGURE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | wizard (compact density): Three steps on one form: prove the email, then the organisation, then submit (defined 4 October 2026 from OnboardingApplication, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `challengeId` (navigation) |
 | Route | `/onboarding-assessment/customer-organization-registration-sgn-002` |
 
-**What the spec says about it.** The self-service form of `ADM-380`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** The self-service form of `ADM-380`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step. **Defined 4 October 2026 from StartProspectSignupRequest, VerifyProspectSignupCodeRequest and OnboardingApplication (companyName, contactEmail, contactPhone, countryCode, billingEntity)** (CHG-FXS-001)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Create the prospect's customer account and organisation profile: legal name, country, contact, verified email.
 
@@ -285,8 +283,15 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Work email | email field | optional | — | max length 256 | name@example.ae | Step one of the prospect sign-up session (DEC-167, "Email + one-time code"): the code goes to this address; "Continue saved setup" is the same field (CHG-CLN-019). | `StartProspectSignupRequest.email` |
-| One-time code | text field | optional | — | pattern `^[0-9]{6}$` | — | Six digits from the email; a right code opens the sign-up session (prospectAuth) the rest of the journey runs on and resumes a saved setup (CHG-CLN-019). | `VerifyProspectSignupCodeRequest.code` |
+| Work email | email field | optional | — | max length 256 | name@example.ae | The prospect's work email; the one-time code goes here. | `StartProspectSignupRequest.email` |
+| One-time code | text field | optional | — | pattern `^[0-9]{6}$` | — | Six digits; five attempts, then a new code is needed. | `VerifyProspectSignupCodeRequest.code` |
+| Company name | text field | optional | — | — | — | — | `OnboardingApplication.companyName` |
+| Contact email | email field | optional | — | — | name@example.ae | The verified email, read-only. | `OnboardingApplication.contactEmail` |
+| Contact phone | phone field | optional | — | — | +971 5X XXX XXXX (E.164) | E.164, +971 by default. | `OnboardingApplication.contactPhone` |
+| Country | text field | optional | — | — | — | ISO 3166-1 alpha-2; AE by default. | `OnboardingApplication.countryCode` |
+| Legal name | text area | optional | — | max length 300 | — | Optional here; required before the first invoice. | `OnboardingApplication.billingEntity.legalName` |
+| Trade licence number | text field | optional | — | max length 100 | — | Optional here. | `OnboardingApplication.billingEntity.tradeLicenceNumber` |
+| Tax registration number (TRN) | text field | optional | — | max length 30 | — | Optional; 15 digits for a UAE VAT registrant. | `OnboardingApplication.billingEntity.trn` |
 
 **Sent by *Send code*** (`startProspectSignup`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -301,6 +306,34 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 |---|---|---|---|---|---|---|---|
 | Code `code` | text field | required | — | pattern `^[0-9]{6}$` | — | The six-digit one-time code sent to the email. | `verifyProspectSignupCode` body |
 
+**Sent by *Submit*** (`submitOnboardingApplication`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `submitOnboardingApplication` body |
+| Company name `companyName` | text field | required | — | — | — | — | `submitOnboardingApplication` body |
+| Contact email `contactEmail` | email field | required | — | — | name@example.ae | — | `submitOnboardingApplication` body |
+| Contact phone `contactPhone` | phone field | optional | — | — | +971 5X XXX XXXX (E.164) | — | `submitOnboardingApplication` body |
+| Country code `countryCode` | text field | optional | — | — | — | — | `submitOnboardingApplication` body |
+| Venue type template `venueTypeTemplateId` | picker: choose a venue type template | optional | — | — | shows names, sends the id | A water park and a theatre need different defaults, and asking a prospect to configure 300 settings from empty is asking them to leave. | `submitOnboardingApplication` body |
+| Requested plan `requestedPlanId` | picker: choose a requested plan | optional | — | — | shows names, sends the id | — | `submitOnboardingApplication` body |
+| Status `status` | select | required | — | Submitted · Verifying · Approved · Provisioning · Active · Rejected · Abandoned | — | — | `submitOnboardingApplication` body |
+| Trial ends at `trialEndsAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Trial is a state, not a plan. A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion … | `submitOnboardingApplication` body |
+| Rejection reason `rejectionReason` | text field | optional | — | — | — | — | `submitOnboardingApplication` body |
+| Provisioned tenant `provisionedTenantId` | picker: choose a provisioned tenant | optional | — | — | shows names, sends the id | — | `submitOnboardingApplication` body |
+| Billing entity `billingEntity` | group | optional | — | — | — | The company to be invoiced, saved on the application before verification (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). | `submitOnboardingApplication` body |
+| Legal name `billingEntity.legalName` | text area | optional | — | max length 300 | — | — | `submitOnboardingApplication` body |
+| Trade licence number `billingEntity.tradeLicenceNumber` | text field | optional | — | max length 100 | — | — | `submitOnboardingApplication` body |
+| Trn `billingEntity.trn` | text field | optional | — | max length 30 | — | The tax registration number; entering one makes the VAT certificate required. | `submitOnboardingApplication` body |
+| Country code `billingEntity.countryCode` | text field | optional | — | min length 2; max length 2 | — | — | `submitOnboardingApplication` body |
+| Address `billingEntity.address` | text area | optional | — | max length 1000 | — | — | `submitOnboardingApplication` body |
+| Invoice email `billingEntity.invoiceEmail` | email field | optional | — | — | name@example.ae | — | `submitOnboardingApplication` body |
+| Documents `billingEntity.documents` | repeatable rows | optional | — | — | — | The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification. | `submitOnboardingApplication` body |
+| Document type `billingEntity.documents[].documentType` | segmented control | optional | — | Trade licence · VAT certificate | — | — | `submitOnboardingApplication` body |
+| File ref `billingEntity.documents[].fileRef` | text field | optional | — | — | — | — | `submitOnboardingApplication` body |
+| Expiry date `billingEntity.documents[].expiryDate` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `submitOnboardingApplication` body |
+| Verification status `billingEntity.documents[].verificationStatus` | radio group | optional | — | Missing · Uploaded · Verified · Rejected · Expired | — | — | `submitOnboardingApplication` body |
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -309,7 +342,7 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 |---|---|---|---|---|---|
 | Send code (secondary button) | `startProspectSignup` POST `/auth/prospect/signup` | StartProspectSignupRequest | ProspectSignupChallenge | 400 Validation failed | produces a document or message: Start (or resume) a TICVAI sign-up with an email and a one-time code |
 | Verify code (secondary button) | `verifyProspectSignupCode` POST `/auth/prospect/signup/{challengeId}/verify` | VerifyProspectSignupCodeRequest | ProspectSignupSession | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The challenge is spent (`codeExpired`) because the code expired, five wrong codes were tried or it was already … | produces a document or message: Prove the email with the one-time code and receive the prospect sign-up session |
-| Submit (primary button) | navigation or local | — | — | — | — |
+| Submit (primary button) | `submitOnboardingApplication` POST `/onboarding-applications` | OnboardingApplication | OnboardingApplication | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
@@ -321,11 +354,11 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The customer organization registration list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the customer organization registration untouched. |
+| Loading (`?state=loading`) | Not used: the form renders at once. |
+| Error (`?state=error`) | The call that failed is named beside its button (code, verify or submit); what was typed stays. |
 | Empty, first run (`?state=emptyFirstRun`) | No customer organization registration yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the customer organization registration are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `submitOnboardingApplication` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The challenge is spent (`codeExpired`) because the code expired, five wrong codes were tried or it was already used; start a new one with startProspectSignup; 422 The code is wrong (`codeInvalid`); it counts against the challenge |
 
@@ -348,11 +381,27 @@ organisation:
 - `startProspectSignup` → no permission · public, prospect
 - `verifyProspectSignupCode` → no permission · public, prospect
 
-**A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `submitOnboardingApplication` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+14 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 20.1.1 | Customer Registration - System shall support self-service customer registration. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.1.3 | AI Setup Wizard - System shall provide AI-assisted onboarding. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.1.4 | Venue Type Templates - System shall provide venue-specific setup templates. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.1.5 | Automatic Configuration - System shall automatically configure the platform based on onboarding selections. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.1.6 | Trial-to-Paid Conversion - System shall support conversion from trial to paid subscriptions. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.1 | Venue Size Index - System shall support licensing based on Venue Size Index. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.2 | POS-Based Licensing - System shall support licensing based on POS quantities. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.3 | User-Based Licensing - System shall support licensing based on active users. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.4 | Venue-Based Licensing - System shall support licensing based on number of venues. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.5 | Transaction-Based Licensing - System shall support licensing based on transaction volumes. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.6 | Attendance-Based Licensing - System shall support licensing based on attendance volumes. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| 20.3.7 | Hybrid Licensing Models - System shall support hybrid licensing calculations. | Subscription & Licensing Management | CONTRACTED | data `OnboardingApplication` |
+| … 2 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -373,7 +422,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 404, 409, 422).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SGN-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Send code, Verify code, Submit, Cancel.
@@ -1467,7 +1516,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "BillingEntity": {"type":"object","x-ticvai-persistence":"control.billing_entity","description":"**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"tenantId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Null while it rides on an onboarding application."},"legalName":{"type":"string","maxLength":300},"tradeLicenceNumber":{"type":"string","maxLength":100,"nullable":true},"trn":{"type":"string","maxLength":30,"nullable":true,"description":"The tax registration number; entering one makes the VAT certificate required."},"countryCode":{"type":"string","minLength":2,"maxLength":2},"address":{"type":"string","maxLength":1000,"nullable":true},"invoiceEmail":{"type":"string","format":"email","nullable":true},"documents":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.","items":{"type":"object","properties":{"documentType":{"type":"string","enum":["tradeLicence","vatCertificate"]},"fileRef":{"type":"string","nullable":true},"expiryDate":{"type":"string","format":"date","nullable":true},"verificationStatus":{"type":"string","enum":["missing","uploaded","verified","rejected","expired"]}}}},"missingDocuments":{"type":"array","readOnly":true,"description":"The documents the country's rule requires that are not yet uploaded and verified.","items":{"type":"string"}},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"ModuleListing": {"type":"object","x-ticvai-persistence":"subscription.module_listing","description":"Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n","required":["moduleCode"],"properties":{"moduleCode":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"category":{"type":"string","nullable":true},"requiresModules":{"type":"array","items":{"type":"string"}},"incompatibleWithModules":{"type":"array","items":{"type":"string"}},"includedInTiers":{"type":"array","items":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"pricingBasis":{"type":"string","enum":["included","flatFee","perVenue","perUnit","revenueShare","metered"]},"meteredMetric":{"allOf":[{"$ref":"#/components/schemas/UsageMetric"}],"nullable":true,"description":"For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."},"meteredUnitSize":{"type":"integer","minimum":1,"nullable":true,"description":"For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."},"provisioningMinutes":{"type":"integer","nullable":true},"requiresProfessionalServices":{"type":"boolean","default":false},"status":{"type":"string","enum":["available","beta","deprecated","withdrawn"]}}},
+"ModuleListing": {"type":"object","x-ticvai-persistence":"subscription.module_listing","description":"Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n","required":["moduleCode"],"properties":{"moduleCode":{"type":"string","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."},"name":{"type":"string"},"description":{"type":"string","nullable":true},"category":{"type":"string","nullable":true},"requiresModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"incompatibleWithModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"includedInTiers":{"type":"array","items":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"pricingBasis":{"type":"string","enum":["included","flatFee","perVenue","perUnit","revenueShare","metered"]},"meteredMetric":{"allOf":[{"$ref":"#/components/schemas/UsageMetric"}],"nullable":true,"description":"For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."},"meteredUnitSize":{"type":"integer","minimum":1,"nullable":true,"description":"For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."},"provisioningMinutes":{"type":"integer","nullable":true},"requiresProfessionalServices":{"type":"boolean","default":false},"status":{"type":"string","enum":["available","beta","deprecated","withdrawn"]}}},
 "OnboardingApplication": {"type":"object","x-ticvai-persistence":"control.onboarding_application","description":"BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n","required":["id","companyName","contactEmail","status"],"properties":{"id":{"type":"string","format":"uuid"},"companyName":{"type":"string"},"contactEmail":{"type":"string","format":"email"},"contactPhone":{"type":"string","nullable":true},"countryCode":{"type":"string"},"venueTypeTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"},"requestedPlanId":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["submitted","verifying","approved","provisioning","active","rejected","abandoned"]},"trialEndsAt":{"type":"string","format":"date-time","nullable":true,"description":"**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"},"rejectionReason":{"type":"string","nullable":true},"provisionedTenantId":{"type":"string","format":"uuid","nullable":true},"billingEntity":{"$ref":"#/components/schemas/BillingEntity","description":"**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."}}},
 "ProspectSignupChallenge": {"type":"object","x-ticvai-persistence":"none — the challenge is held by identity for its lifetime (CHG-CLN-019)","required":["challengeId","expiresInSeconds"],"properties":{"challengeId":{"type":"string","format":"uuid"},"expiresInSeconds":{"type":"integer"},"resendAfterSeconds":{"type":"integer"}}},
 "ProspectSignupSession": {"type":"object","x-ticvai-persistence":"none — a session token, not a table the package reads (CHG-CLN-019)","required":["token","expiresAt","resumed"],"properties":{"token":{"type":"string","description":"The `prospectAuth` bearer token, scoped to one onboarding application."},"expiresAt":{"type":"string","format":"date-time"},"onboardingApplicationId":{"type":"string","format":"uuid","nullable":true,"description":"The application in progress for this email, or null until the first `submitOnboardingApplication`."},"resumed":{"type":"boolean","description":"True when the email already had an application in progress (\"Continue saved setup\")."}}},

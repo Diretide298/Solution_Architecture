@@ -67,22 +67,10 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "detail",
+  "patternReason": "One event's lifecycle state with the change to its next state beside it (defined 4 October 2026 from setEventLifecycleState, CHG-FXS-001).",
   "purpose": "See where an event is in its lifecycle and move it to its next state under change control.",
   "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-716)",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -90,36 +78,65 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "columns": [
+        "Event.name",
+        "Event.code",
+        "Event.lifecycleState",
+        "Event.performanceCount",
+        "Event.isActive"
+       ],
+       "notes": "lifecycleState is readOnly on Event (agreed with contracts in the ledger).",
+       "provenance": "contract catalogue.yaml Event (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Move to",
+       "bindsTo": "Event.lifecycleState",
+       "operation": "setEventLifecycleState",
+       "notes": "Draft, planned, on sale, live, closed, cancelled, archived; only the next states the current one allows. On sale needs a price, a capacity and a schedule; live needs a resource plan; cancelled needs a treatment for every buyer (the server refuses otherwise, naming what is missing).",
+       "provenance": "contract catalogue.yaml Event.lifecycleState (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Reason",
+       "operation": "setEventLifecycleState",
+       "notes": "Body reason; required for cancelled.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective from",
+       "operation": "setEventLifecycleState",
+       "notes": "Body effectiveFrom; now by default.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setEventLifecycleState",
        "label": "Save event lifecycle state",
-       "notes": "The act the screen exists for."
+       "operation": "setEventLifecycleState",
+       "notes": "A change above the configured impact goes to approvals and shows Waiting for approval; getEvent is read again after the 200.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setEventLifecycleState"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "Read an event",
-       "bindsTo": "Event",
-       "operation": "getEvent",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
+       "notes": "Leaves without changing the state.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The event lifecycle change list.",
-   "error": "Could not load. Names which read failed and leaves the event lifecycle change untouched.",
-   "emptyFirstRun": "No event lifecycle change yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The event and its state.",
+   "error": "Could not load the event. Names it; nothing changes.",
+   "emptyFirstRun": "Not used: the screen opens on one event (eventId).",
    "emptyNoResults": "The filter narrowed it and the event lifecycle change are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `setEventLifecycleState`."
   },
   "apis": [
    {
@@ -145,7 +162,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-716",
    "workshopBoard": "wireframes/WS54 Event Management Configuration Backend Structure v1.0 Board 7.dc.html#bo-716"
   },
-  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -154,6 +171,7 @@
     }
    ]
   },
+  "notes": "**Defined 4 October 2026: the current state is Event.lifecycleState (readOnly, agreed with contracts in the ledger; setEventLifecycleState's 200 has no body, so the screen reads the event again), the target state, reason and effective date are the call's body** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

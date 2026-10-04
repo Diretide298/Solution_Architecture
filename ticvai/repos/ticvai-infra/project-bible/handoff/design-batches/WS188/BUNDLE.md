@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1108` | Expiry & Validity Policy Configuration | C | 11 | 14 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-1109` | FEFO & Credit Lot Management | C | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1110` | Split Tender & Multi-Credit Consumption | C | 18 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1111` | Credit Expiry, Extension & Forfeiture Operations | A | 0 | 25 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1111` | Credit Expiry, Extension & Forfeiture Operations | A | 1 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1112` | Consumption Simulator, Validation & Rule Publication | C | 0 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -991,6 +991,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Wallet | picker: choose a wallet | — | — | `listCreditLots` ?walletId |
 | Include exhausted | toggle | off | — | `listCreditLots` ?includeExhausted |
+| Expiring within days | number field (days) | — | min 1 | `listCreditLots` ?expiringWithinDays |
 
 #### Outputs: what the screen shows and produces
 
@@ -1220,6 +1221,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/credit-expiry-extension-forfeiture-operations-bo-1111` |
 
+**What the spec says about it.** **Credit lots are listed across the venue by expiry window (listCreditLots without walletId, expiringWithinDays), 4 October 2026; the pack-label tables left** (CHG-FXS-003)
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Credit approaching or reaching expiry: expire, extend or forfeit lots, with the accounting consequence stated, because expired credit stops being a liability and becomes breakage revenue on a date someone can defend. Extensions are recorded and never rewrite the original history.
@@ -1228,14 +1231,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Expiring within | select field | — | — | — | — | Query expiringWithinDays: today, 7 or 30 days. | — |
+
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Wallet | picker: choose a wallet | — | — | `listCreditLots` ?walletId |
 | Include exhausted | toggle | off | — | `listCreditLots` ?includeExhausted |
-
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+| Expiring within days | number field (days) | — | min 1 | `listCreditLots` ?expiringWithinDays |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1245,19 +1253,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every credit expiry extension** (data table)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Expiring today | text | not in the schema: `Expiring today` |
-| Expiring in 7 days | text | not in the schema: `Expiring in 7 days` |
-| Expiring in 30 days | text | not in the schema: `Expiring in 30 days` |
-| Expired | text | not in the schema: `Expired` |
-| Extended | text | not in the schema: `Extended` |
-| Forfeited | text | not in the schema: `Forfeited` |
-| Suspended | text | not in the schema: `Suspended` |
-
-**The tranches behind a balance, with their expiry** (data table, from `listCreditLots`)
+**Credit lots** (data table, from `listCreditLots`): Across the venue's wallets when no wallet is picked; selecting lots gives expireCreditLots its lots to expire, extend or forfeit.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1273,23 +1269,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Terms snapshot | grouped details | The credit type's terms as they stood at issue. Changing a credit type must not retro-expire credit already given, so the lot carries its … |
 | Status | chip: Active, Exhausted, Expired, Forfeited, Reversed | — |
 
-**The selected credit expiry extension** (detail panel): The pack groups this record's detail under its own headings: “Authorized administrators may”, “Require”.
-
-| Shows | Format | Notes |
-|---|---|---|
-| Expiring today | text | not in the schema: `Expiring today` |
-| Expiring in 7 days | text | not in the schema: `Expiring in 7 days` |
-| Expiring in 30 days | text | not in the schema: `Expiring in 30 days` |
-| Expired | text | not in the schema: `Expired` |
-| Extended | text | not in the schema: `Extended` |
-| Forfeited | text | not in the schema: `Forfeited` |
-| Suspended | text | not in the schema: `Suspended` |
-
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **run preview**: Lots affected, wallets affected, total amount and breakage amount before applying. *(source: contracts/satellite/wallet.yaml#expireCreditLots)*
 
-**Data it reads**: `listCreditLots` (onLoad, The tranches behind a balance, with their expiry)
+**Data it reads**: `listCreditLots` (onLoad, Every wallet's credit lots at this venue (no walletId) …)
 
 **Where the user goes next**
 
@@ -1352,8 +1336,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1111?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1103`.
@@ -1590,7 +1574,7 @@ Method, path, parameters, request and response for every operation these screens
 "expireCreditLots": {"method":"POST","path":"/credit-lots/expire","contract":"wallet","summary":"Expire, extend or forfeit credit that has run out of time","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CreditExpiryResult"},
 "getCreditConsumptionPolicy": {"method":"GET","path":"/credit-consumption-policy","contract":"wallet","summary":"Which credit is spent first","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CreditConsumptionPolicy"},
 "getWalletLiability": {"method":"GET","path":"/wallet-liability","contract":"wallet","summary":"What is outstanding, and what is breakage","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"asOf","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"WalletLiabilityRow"},
-"listCreditLots": {"method":"GET","path":"/credit-lots","contract":"wallet","summary":"The tranches behind a balance, with their expiry","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"walletId","in":"query","required":true},{"name":"includeExhausted","in":"query","required":null}],"requestBody":null,"responds":"CreditLot"},
+"listCreditLots": {"method":"GET","path":"/credit-lots","contract":"wallet","summary":"The tranches behind a balance, with their expiry","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"walletId","in":"query","required":false},{"name":"includeExhausted","in":"query","required":null},{"name":"expiringWithinDays","in":"query","required":false}],"requestBody":null,"responds":"CreditLot"},
 "listCreditTypes": {"method":"GET","path":"/credit-types","contract":"wallet","summary":"The kinds of value that may sit in a wallet","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"CreditType"},
 "publishWalletConfiguration": {"method":"POST","path":"/wallet-configuration/publish","contract":"wallet","summary":"Validate and publish the wallet configuration as a version","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletConfigurationVersion"},
 "setCreditConsumptionPolicy": {"method":"PUT","path":"/credit-consumption-policy","contract":"wallet","summary":"The order credit is drawn down in","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"CreditConsumptionPolicy","responds":"CreditConsumptionPolicy"},

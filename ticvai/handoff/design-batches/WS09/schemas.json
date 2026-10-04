@@ -1015,6 +1015,13 @@
     "type": "string",
     "format": "date-time",
     "description": "effective time"
+   },
+   "pendingChangeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The scheduled mode change on this lane, if any** (4 October 2026, CHG-FXC-003; BO-230): the `access.gate_mode_change` id `cancelGateModeChange` takes as `{changeId}`, set while `targetMode` differs from `currentMode` and the change has not taken effect. Null otherwise."
    }
   },
   "required": [

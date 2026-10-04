@@ -1991,8 +1991,8 @@ screens:
       - what: CreateSegmentRequest supports a flat list of criteria with match all or any; the purpose requires nested AND/OR/NOT groups, effective dates, refresh frequency, ownership, tags and approval.
         why: The contract cannot hold what the builder is specified to build. Either extend the request (rule groups, effective dates, owner, approval) or reduce the purpose.
         source: contracts/satellite/marketing-crm.yaml#createSegment; screens/P08-venue-back-office.yaml#BO-755
-        status: logged
-        by: CHG-SBO-005
+        status: fixed
+        by: CHG-FXS-001
       - what: The screen has list states but no list operation (listSegments is not declared here).
         why: Opening an existing segment to edit needs a read. Add listSegments (and a get).
         source: contracts/satellite/marketing-crm.yaml#listSegments
@@ -2128,8 +2128,8 @@ screens:
       - what: Only listMessageTemplates and createMessageTemplate are wired; the purpose requires edit, version, approval, clone, archive, compare and change history.
         why: No update, version or archive operation for message templates exists in the contract. Add them, or reduce the purpose to list and create.
         source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; screens/P08-venue-back-office.yaml#BO-785
-        status: logged
-        by: CHG-SBO-005
+        status: fixed
+        by: CHG-FXS-001
       - what: BO-785 Template Library and BO-677 Communication Template Library both list message templates.
         why: They look like one screen in two places; decide whether BO-677 is the platform-wide view or merge them.
         source: contracts/satellite/marketing-crm.yaml#listMessageTemplates

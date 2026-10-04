@@ -1,6 +1,6 @@
 # WS02 — Access Control board 2
 
-**10 screens · 17 operations · 23 schemas · 5 permissions**
+**10 screens · 18 operations · 23 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-154` | Access Rule Command Center | C | 0 | 2 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
-| `BO-155` | Visual Access Rule Builder | A | 0 | 20 | 6 | 6 | 1 | 0 | — | notStarted (generated) |
+| `BO-155` | Visual Access Rule Builder | A | 15 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-156` | Entry, Exit & Re-entry Rules | C | 47 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `BO-157` | Anti-Passback & Journey Sequence | C | 15 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-158` | Access Validity & Time Rules | C | 54 | 0 | 5 | 9 | 4 | 0 | — | notStarted (generated) |
@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-155, BO-156, BO-160, BO-162 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-156, BO-160, BO-162 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

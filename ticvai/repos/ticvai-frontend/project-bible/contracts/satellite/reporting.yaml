@@ -453,6 +453,7 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
@@ -1363,6 +1364,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1081 Finance Dashboard"
         - "P09 ADM-031 Security & Compliance Dashboard"
+        - "P15 KIT-010 Kitchen Performance, AI & Operational Optimization"
         - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-068 Embedded BI, Workspace & Tenant Administration"
       x-ticvai-audience:

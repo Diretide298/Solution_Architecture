@@ -130,6 +130,7 @@ screens:
       provenance: flow F83 step 1→2
       carries:
       - ticketId
+      - visitId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -331,7 +332,11 @@ screens:
     screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
     rather than naming the screen, so the title is the only join — *Kitchen Display System (KDS)* matched
     at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
-    screen, which is how a mapping goes wrong quietly.'
+    screen, which is how a mapping goes wrong quietly.
+
+
+    **Notify server reads the ticket''s own visitId (added by the contracts agent, runs/fix-s12/LEDGER.md
+    (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -424,7 +429,9 @@ screens:
         label: Notify server
         operation: notifyServer
         permission: ORDER_MODIFY
-        provenance: contract fnb.yaml POST /table-visits/{visitId}/notify-server
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+        notes: Takes the selected ticket's visitId (KitchenTicket.visitId); hidden for a counter or delivery
+          ticket, which has none.
   states:
     loading: 'The rail. **The count renders before the tickets.** **The server''s order, never re-sorted
       on the device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail):
@@ -1004,7 +1011,12 @@ screens:
     **Matched on frame title against screen name, constrained to this board’s platforms.** These packs
     label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Station
     Workload &amp; Dynamic Routing* matched at 0.89. **A cross-platform title match was refused**: `Outlet
-    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
+
+
+    **Move work bound 4 October 2026 to rebalanceStationLoad (StationRebalance: moves[] fromStationId,
+    toStationId, categoryIds; revertAt), as the contract types it (ledger); Bump is the rail''s (KIT-002)**
+    (CHG-FXS-002)'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -1056,9 +1068,30 @@ screens:
           picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
           set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
-        provenance: carried from the previous definition
+      - kind: selectField
+        label: Move from station
+        bindsTo: KitchenStation.id
+        operation: listKitchenStations
+        notes: moves[].fromStationId.
+        provenance: contract fnb.yaml KitchenStation.id (defined 4 October 2026, CHG-FXS-002)
+      - kind: selectField
+        label: Move to station
+        bindsTo: KitchenStation.id
+        operation: listKitchenStations
+        notes: moves[].toStationId.
+        provenance: contract fnb.yaml KitchenStation.id (defined 4 October 2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Menu categories to move
+        bindsTo: StationRebalance.moves
+        operation: rebalanceStationLoad
+        notes: moves[].categoryIds; one move per from/to pair.
+        provenance: contract fnb.yaml StationRebalance.moves (defined 4 October 2026, CHG-FXS-002)
+      - kind: datePicker
+        label: Revert at
+        bindsTo: StationRebalance.revertAt
+        operation: rebalanceStationLoad
+        notes: The move undoes itself then; end of service by default.
+        provenance: contract fnb.yaml StationRebalance.revertAt (defined 4 October 2026, CHG-FXS-002)
     - name: contextPanel
       slot: selection
       components:
@@ -1079,7 +1112,12 @@ screens:
         provenance: contract fnb.yaml GET /kitchen/stations
     - name: actionBar
       slot: rowActions
-      components: []
+      components:
+      - kind: primaryButton
+        label: Move work
+        operation: rebalanceStationLoad
+        notes: Sends StationRebalance {moves, revertAt}; the rail re-routes at once.
+        provenance: defined 4 October 2026 (CHG-FXS-002)
   states:
     loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
       to know how deep it is before it reads anything.
@@ -1179,6 +1217,7 @@ screens:
       provenance: flow F88 step 1→2
       carries:
       - ticketId
+      - visitId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled**
     — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is a
     kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here**
@@ -1588,7 +1627,11 @@ screens:
     **Matched on frame title against screen name, constrained to this board’s platforms.** These packs
     label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Exceptions,
     Re-Fire &amp; Unavailable Items* matched at 1.0. **A cross-platform title match was refused**: `Outlet
-    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
+
+
+    **Bump and the unbound rail cards left 4 October 2026: the exceptions screen saves no ticket status
+    (CHG-WIR-008); bumping is the rail''s (KIT-002, setKitchenTicketStatus)** (CHG-FXS-005)'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -1628,24 +1671,12 @@ screens:
     - name: contentBody
       slot: carried
       components:
-      - kind: cardList
-        bindsTo: KitchenTicket[]
-        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
-          sits above one that arrived first, because a kitchen works to when food is wanted.'
-        provenance: carried from the previous definition
-      - kind: metricTile
-        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
-          is a number they will not read. The station-load tile is not in the first release (decided 28
-          September, audit R277).
       - kind: numberField
         label: Course
         operation: listKitchenTickets
         notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
           picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
           set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
         provenance: carried from the previous definition
       - kind: datePicker
         label: From
@@ -1986,7 +2017,12 @@ screens:
     **This is the performance and AI analysis (pack frame FNB-3K), not the rail** (design-notes correction
     finance-insights KIT-010; CHG-SPO-017): kitchen performance, station performance, demand forecast
     and the recommendations. The rail and Bump are KIT-002. The named reads behind those tiles do not
-    exist yet (open entry CHG-SPO-019).'
+    exist yet (open entry CHG-SPO-019).
+
+
+    **The dashboard is found with listDashboards (module fnb) 4 October 2026, so the screen no longer
+    needs a dashboardId from KIT-002 (SPF-2''s station-dashboard read); its tiles are the dashboard''s
+    reports (tileData). The rail cards and the unbound tile left: the rail is KIT-002** (CHG-FXS-003)'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -2010,16 +2046,15 @@ screens:
         operation: getDashboard
         permission: REPORT_VIEW_VENUE
         provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-      - kind: cardList
-        bindsTo: KitchenTicket[]
-        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
-          sits above one that arrived first, because a kitchen works to when food is wanted.'
-        provenance: carried from the previous definition
-      - kind: metricTile
-        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
-          is a number they will not read. The station-load tile is not in the first release (decided 28
-          September, audit R277).
-        provenance: carried from the previous definition
+      - kind: selectField
+        label: Dashboard
+        bindsTo: Dashboard.id
+        operation: listDashboards
+        columns:
+        - Dashboard.name
+        - Dashboard.isShared
+        notes: Query module fnb; the kitchen's shared dashboard by default.
+        provenance: contract reporting.yaml Dashboard.id (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
       components:
@@ -2033,7 +2068,9 @@ screens:
     error: Could not load the performance figures. Names which read failed.
     emptyFirstRun: '**Insufficient data**: fewer service days than the analysis needs; says how many more.'
     emptyNoResults: No service in the chosen period.
-    emptyNoAccess: Shown when the caller lacks REPORT_VIEW_VENUE, and names it.
+    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getDashboard` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question.
     offline: '**Not available offline.** `getDashboard` is an analytical read (ADR-0016) and there is
       nothing local to serve. The rail on KIT-001 is what survives a network loss. **Corrected 24 August**:
       the earlier wording described the kitchen rather than this screen, and a checker cannot tell those
@@ -2052,6 +2089,11 @@ screens:
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
       screen waits for it.
     trigger: background
+  - operationId: listDashboards
+    contract: reporting
+    purpose: 'The venue''s kitchen dashboard (module fnb, shared): its id is what getDashboard reads'
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: venueId
@@ -2059,7 +2101,9 @@ screens:
     - name: stationId
       from: session
     - name: dashboardId
-      from: KIT-002
+      from: navigation
+      optional: true
+      notes: Otherwise the first shared fnb dashboard listDashboards returns (the kitchen's).
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
       is open, and it resolves its station from the device assignment rather than from a person.'
   wireframe:

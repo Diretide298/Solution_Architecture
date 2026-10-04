@@ -307,20 +307,15 @@ paths:
         - "P08 BO-939 Shift Change, Swap, Pickup & Release"
       x-ticvai-audience: [staff]
       summary: Ask someone to take your shift
-      description: >
-        `EMP-023`. **Routes through `approvals`** rather than implementing its own — the
-        supervisor approving a swap is the same mechanism as the one approving a refund, with
-        the same audit trail and the same rule that a requester cannot approve themselves.
+      description: |-
+        `EMP-023`. **Routes through `approvals`** rather than implementing its own — the supervisor approving a swap is the same mechanism as the one approving a refund, with the same audit trail and the same rule that a requester cannot approve themselves.
+        Both parties must accept before the supervisor sees it. A swap approved against someone who never agreed is a gap in the rota nobody notices until the shift starts.
+        **Who may swap with whom** (decided 28 September, audit R129 (6)): only two people holding the same role at the same venue. `toPrincipalId` must hold the assignment's `requiredRoleId` (or, where that is null, the requester's role for the assignment) at the assignment's venue; otherwise a `409` names which condition failed. **Every swap needs a supervisor's approval before it takes effect**: the request moves the rota assignment to `swapPending`, and the assignment changes hands only when the approval request is granted.
 
-        Both parties must accept before the supervisor sees it. A swap approved against someone
-        who never agreed is a gap in the rota nobody notices until the shift starts.
-
-        **Who may swap with whom** (decided 28 September, audit R129 (6)): only two people holding
-        the same role at the same venue. `toPrincipalId` must hold the assignment's
-        `requiredRoleId` (or, where that is null, the requester's role for the assignment) at the
-        assignment's venue; otherwise a `409` names which condition failed. **Every swap needs a
-        supervisor's approval before it takes effect**: the request moves the rota assignment to
-        `swapPending`, and the assignment changes hands only when the approval request is granted.
+        **The approval request it raises** (4 October 2026, CHG-FXC-008): `approvals.createApprovalRequest` with kind
+        `configurationChange`, `subjectType` `shiftSwap`, `subjectContract` `workforce` and `subjectId` the ShiftSwap's id,
+        once both parties have accepted. A venue's matrix routes it with a rule whose `subjectTypes` holds `shiftSwap`; with no
+        such rule the tenant default asks a supervisor at the assignment's venue.
       tags: [rota]
       x-ticvai-permission: WORKFORCE_VIEW
       x-ticvai-scope-level: venue

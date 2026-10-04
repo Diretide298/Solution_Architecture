@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 21 operations · 27 schemas · 5 permissions**
+**10 screens · 24 operations · 37 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `AI_CONFIGURE, AI_USE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AI_CONFIGURE, AI_USE, ASSET_LIBRARY_MANAGE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -107,8 +107,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-795` | Unified Inbox | D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-796` | Guest Conversation 360 | D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-797` | AI Chatbot Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-798` | Intent & Knowledge Management | A | 5 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-799` | Agent Workspace | A | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `BO-798` | Intent & Knowledge Management | A | 28 | 29 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-799` | Agent Workspace | A | 16 | 33 | 6 | 19 | 0 | 0 | — | notStarted (—) |
 | `BO-800` | Routing & Queue Management | D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-801` | Sales & Service Actions | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-802` | Sentiment, Quality & Escalation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
@@ -116,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-794, BO-795, BO-796, BO-797, BO-799, BO-801, BO-802, BO-803 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-794, BO-795, BO-796, BO-797, BO-801, BO-802, BO-803 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -596,27 +596,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-798` Intent & Knowledge Management
 
-**Manage what the assistant understands and the information it may use. Maintain intents, example phrases, entities, synonyms, redirects, confidence and response variants. Connect approved FAQs, product data, policies, manuals and structured knowledge with freshness and ownership. Provide test console, expected result, source citation, ambiguity handling and low-confidence review queue. Track knowledge consumers, sync status, changes and answer-quality feedback. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+**Manage what the customer-service assistant may use: the data sources and knowledge collections it answers from, the documents in them, its tone and channels, and the questions it could not answer, each a task for the content owner.**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
 | Block | Block A · task APP-SETUP-BO-798 |
-| Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE` (1 configure, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE`, `ASSET_LIBRARY_MANAGE` (2 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): The copilot's knowledge settings edited in one form beside the collections it answers from and the questions it could not answer (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | `collectionId` (navigation) |
+| Opens with | `collectionId` (navigation), `uploadId` (navigation) |
 | Route | `/engagement-support/intent-knowledge-management-bo-798` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from the copilot's knowledge workspace, KnowledgeCollection, KnowledgeDocument and AiKnowledgeGap. Intents, phrases, entities and synonyms are not part of the retrieval design (the assistant answers from collections, ADR-0049) and left the purpose; an intent model is a later change request** (CHG-FXS-001)
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** What the assistant understands and may use: intents, example phrases, entities, synonyms, approved FAQs, product data and policies with freshness and ownership, a test console with citations, and the queue of questions it could not answer.
 
 **Fixed on main** (the package already carries these; draw what it says): Intents and knowledge sources have no operation; setCustomerServiceCopilot is the only write. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Assistant on | toggle | optional | off | — | — | — | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.isEnabled` |
+| Applies to | segmented control | optional | — | Tenant · Venue | — | — | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.scopeLevel` |
+| Data sources | multi-select chips | optional | — | Customer · Cases · Orders · Tickets · Products · Service policies · Pricing · Payments · Membership · Wallet · Group bookings · Interaction history … | — | The authorised data the copilot may read, always within the asking agent's own permissions. | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.dataSources` |
+| Knowledge collections | multi-picker: choose knowledge collections | optional | — | — | — | Options from listKnowledgeCollections. | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.knowledgeCollectionIds` |
+| Draft replies on | multi-select chips | optional | — | Email · Chat · Whatsapp · Case response · Internal escalation | — | — | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.draftChannels` |
+| Send without review on | multi-select chips | optional | — | Email · Chat · Whatsapp | — | Channels where an approved automation may send without an agent. Empty means every customer-facing message waits for a person. | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.autoSend` |
+| Brand tone | text area | optional | — | max length 1000 | — | Tone guidance applied to every draft. | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.brandTone` |
+| Reply in the guest's language | toggle | optional | on | — | — | — | `AiCustomerServiceCopilotKnowledgeWorkspaceInput.replyInCustomerLanguage` |
+| Add document | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | PDF, DOCX, HTML or TXT up to 20 MB (flow-brief default). createUpload, the file PUT, completeUpload, then ingestKnowledgeDocument into the selected collection; the row shows processing until indexed. | `KnowledgeDocument.sourceAssetId` |
+| Document title | text field | optional | — | — | — | — | `KnowledgeDocument.title` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -638,47 +653,85 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reingest document `reingestDocumentId` | picker: choose a reingest document | optional | — | — | shows names, sends the id | An `indexed` or `failed` document in this collection to process again from `sourceAssetId`. | `ingestKnowledgeDocument` body |
 | Supersedes document `supersedesDocumentId` | picker: choose a supersedes document | optional | — | — | shows names, sends the id | The `indexed` document in this collection that this one replaces. It moves to `superseded` when this one reaches `indexed`, and is kept — a technician who followed version 2 last … | `ingestKnowledgeDocument` body |
 
+**Sent by *Save*** (`setCustomerServiceCopilot`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Scope level `scopeLevel` | segmented control | required | — | Tenant · Venue | — | — | `setCustomerServiceCopilot` body |
+| Scope path `scopePath` | text field | optional | — | — | — | The partition key (ADR-0005), and the upsert key: one row per scope. | `setCustomerServiceCopilot` body |
+| Is enabled `isEnabled` | toggle | optional | off | — | — | — | `setCustomerServiceCopilot` body |
+| Data sources `dataSources` | multi-select chips | required | — | Customer · Cases · Orders · Tickets · Products · Service policies · Pricing · Payments · Membership · Wallet · Group bookings · Interaction history … | — | The authorised data the copilot may read, always within the asking agent's own permissions. | `setCustomerServiceCopilot` body |
+| Knowledge collections `knowledgeCollectionIds` | multi-picker: choose knowledge collections | optional | — | — | — | `ai.knowledge_collection` rows holding service procedures, product information, refund rules, ticket policies, venue instructions, FAQs and internal SOPs. | `setCustomerServiceCopilot` body |
+| Draft channels `draftChannels` | multi-select chips | required | — | Email · Chat · Whatsapp · Case response · Internal escalation | — | — | `setCustomerServiceCopilot` body |
+| Brand tone `brandTone` | text area | optional | — | max length 1000 | — | Tone guidance applied to every draft. | `setCustomerServiceCopilot` body |
+| Reply in customer language `replyInCustomerLanguage` | toggle | optional | on | — | — | — | `setCustomerServiceCopilot` body |
+| Auto send `autoSend` | multi-select chips | optional | — | Email · Chat · Whatsapp | — | Channels where an approved automation may send without an agent. Empty means every customer-facing message waits for a person. | `setCustomerServiceCopilot` body |
+| Pattern detection `patternDetection` | group | optional | — | — | — | Flags a systemic problem when many cases share one cause. | `setCustomerServiceCopilot` body |
+| Is enabled `patternDetection.isEnabled` | toggle | optional | on | — | — | — | `setCustomerServiceCopilot` body |
+| Minimum cases `patternDetection.minimumCases` | number field | optional | 25 | min 2 | — | — | `setCustomerServiceCopilot` body |
+| Window hours `patternDetection.windowHours` | number field (hours) | optional | 168 | min 1; max 720 | — | — | `setCustomerServiceCopilot` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Load the copilot configuration as saved** (card list, from `getCustomerServiceCopilot`)
+**In effect** (detail panel, from `getCustomerServiceCopilot`): What applies after tenant and venue settings combine; the form loads from `configuration`.
 
 | Shows | Format | Notes |
 |---|---|---|
 | Configuration | grouped details | The customer-service copilot's configuration for one scope (pack 10.1.10). A field left out takes its default, not its old value. |
+| ID | the name it points at, never the id | — |
+| Scope level | chip: Tenant, Venue | — |
+| Is enabled | yes / no (icon or chip) | — |
+| Data sources | list or chips (count when long) | The authorised data the copilot may read, always within the asking agent's own permissions. |
+| Knowledge collections | list or chips (count when long) | `ai.knowledge_collection` rows holding service procedures, product information, refund rules, ticket policies, venue instructions, FAQs and … |
+| Draft channels | list or chips (count when long) | — |
+| Brand tone | text | Tone guidance applied to every draft. |
+| Reply in customer language | yes / no (icon or chip) | — |
+| Auto send | list or chips (count when long) | Channels where an approved automation may send without an agent. Empty means every customer-facing message waits for a person. |
+| Pattern detection | grouped details | Flags a systemic problem when many cases share one cause. |
+| Is enabled | yes / no (icon or chip) | — |
+| Minimum cases | 1,234 | — |
+| Window hours | 1,234 | — |
 | Effective | grouped details | The narrowest of this row, its tenant row and `getAiPolicy`. |
-| Knowledge collections | list or chips (count when long) | — |
+| Is enabled | yes / no (icon or chip) | — |
+| Data sources | list or chips (count when long) | — |
+| Draft channels | list or chips (count when long) | — |
+| Auto send | list or chips (count when long) | — |
+| AI capabilities | list or chips (count when long) | `AiPolicy.enabledCapabilities` at this scope. |
 
 **Knowledge sources** (data table, from `listKnowledgeCollections`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Description | text | — |
 | Scope level | chip: Tenant, Region, Venue | — |
 | Document count | 1,234 | — |
-| Shard key | text | The tenant boundary on shared placement (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard … |
-| Retrieval | chip: Dense, Hybrid | Set at creation and not changeable. A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is … |
-| Sparse model | text | The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise. |
-| Idf scope | chip: Shard, Tenant, Venue | Which population the sparse score measures rarity against (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term … |
-| Embedding model | text | This is what decides how many collections exist (ADR-0021). A collection carries its own vector configuration and a shard cannot, so … |
 | Is active | yes / no (icon or chip) | — |
+
+**Questions it could not answer** (data table, from `listKnowledgeGaps`): Grouped and counted, newest first; each is a task for the content owner.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Question | text | The normalised question. |
+| Occurrences | 1,234 | — |
+| Audience | chip: Staff, Guest | — |
+| Status | chip: Open, Assigned, Answered, Dismissed | — |
+| Last asked at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
+| Save (primary button) | `setCustomerServiceCopilot` PUT `/customer-service-copilot` | AiCustomerServiceCopilotKnowledgeWorkspaceInput | AiCustomerServiceCopilotKnowledgeWorkspaceView | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 A venue row would widen the tenant's configuration or the AI policy. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| Add document (secondary button) | `ingestKnowledgeDocument` POST `/collections/{collectionId}/documents` | KnowledgeDocument | KnowledgeDocument | — | opens modal first |
+| Add to collection (secondary button) | `ingestKnowledgeDocument` POST `/collections/{collectionId}/documents` | KnowledgeDocument | KnowledgeDocument | — | opens modal first |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
 - **Knowledge gaps**: Unanswered questions grouped and counted, newest first, each becoming a task for the content owner. *(source: contracts/satellite/ai.yaml#listKnowledgeGaps)*
 
-**Data it reads**: `listKnowledgeGaps` (onLoad, Questions the assistant could not answer); `listKnowledgeCollections` (onLoad, The knowledge collections the assistant answers from); `getCustomerServiceCopilot` (onLoad, Load the copilot configuration as saved)
+**Data it reads**: `listKnowledgeGaps` (onLoad, Questions the assistant could not answer); `listKnowledgeCollections` (onLoad, The knowledge collections the assistant answers from); `getCustomerServiceCopilot` (onLoad, Load the copilot configuration as saved); `completeUpload` (background, Finish the upload once the file PUT succeeds (no tap of its …)
 
 **Where the user goes next**
 
@@ -688,13 +741,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The intent knowledge list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the intent knowledge untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No intent knowledge yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No collections yet: the assistant answers nothing until one is added. Carries Add document. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the intent knowledge are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listKnowledgeGaps` requires to show this screen, and names that permission (the screen's other reads need `AI_CONFIGURE`, `ASSET_LIBRARY_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A venue row would widen the tenant's configuration or the AI policy. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the limit for that kind. Checked here rather than after a guest has uploaded two hundred megabytes.; 400 Validation failed; 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed … (UploadRefusedProblem); 422 A venue row would widen the tenant's … |
 
 #### Sample data for the mock-up
 
@@ -713,16 +766,19 @@ gaps:
 - `listKnowledgeCollections` → `AI_CONFIGURE` (configure) · staff
 - `ingestKnowledgeDocument` → `AI_CONFIGURE` (configure) · staff
 - `getCustomerServiceCopilot` → `AI_CONFIGURE` (configure) · staff
+- `createUpload` → `ASSET_LIBRARY_MANAGE` (configure) · staff
+- `completeUpload` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listKnowledgeGaps` requires to show this screen, and names that permission (the screen's other reads need `AI_CONFIGURE`, `ASSET_LIBRARY_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 8.4.38 | System shall support Retrieval-Augmented Generation (RAG) using approved enterprise knowledge sources, documents, policies, product catalogs, support content, operational data, and reporting datasets … | Unified Operations Dashboard | CONTRACTED | `ingestKnowledgeDocument` |
+| 23.1.4 | Authorized users shall upload assets individually or in bulk through web interfaces and APIs. | Digital Asset Management | CONTRACTED | `createUpload` |
 
 #### Client meeting inputs
 
@@ -740,16 +796,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html#bo-798`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 7
 - Flow F250 *Marketing CRM Configuration Reference v1.0 board 7: Omnichannel Command Center*, step 8: Works in Intent & Knowledge Management → Manage what the assistant understands and the information it may use. Maintain intents, example phrases, entities, synonyms, redirects, confidence and response variants. Connect approved FAQs …
+- ADR-0049 *Vectors live in Qdrant from day one, one collection per tenant, each with its own token* (`docs/adr/0049-vectors-live-in-qdrant-one-collection-per-tenant.md`)
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
+- ADR-0069 *In-park 3D navigation is built natively, from a venue model, a pathway file and GPS* (`docs/adr/0069-in-park-3d-navigation-is-built-natively.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 404, 422).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (28), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-798?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel, Add document.
+- [ ] Every action is wired with its success and its failure: Save, Cancel, Add to collection.
 - [ ] Every transition is wired: `BO-794`.
-- [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`.
+- [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`, `ASSET_LIBRARY_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -764,14 +822,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
 | Block | Block A · task APP-SETUP-BO-799 |
-| Who uses it | venue staff holding `CASE_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW`, `GUEST_VIEW` (1 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): The agent's queue with the open conversation, its transcript and the guest beside it (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | `conversationId` (navigation) |
+| Opens with | `conversationId` (navigation), `subjectId` (navigation) |
 | Route | `/engagement-support/agent-workspace-bo-799` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): handoverToAgent is the guest's side of the handover (guest audience); the agent claims the conversation (claimConversation) (design-notes correction …
+**What the spec says about it.** **Defined 4 October 2026 from Conversation, ConversationMessage, CallDisposition and the customer-marketing design notes (BO-799): the queue (listConversations), the transcript (getConversation) and the guest (getGuestProfile) are bound reads; AI reply suggestions and canned responses wait for their operations** (CHG-FXS-001)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-005): handoverToAgent is the guest's side of the handover (guest audience); the agent claims the conversation (claimConversation) (design-notes correction …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The live agent's workspace: transcript, guest context, AI reply suggestion, canned responses, translation, rich messages (images, PDFs, QR codes, tickets), internal notes, transfer, and authorised booking and wallet actions without switching applications. Closing records why the conversation ended and any callback promised.
 
@@ -779,23 +839,115 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Show | select | optional | — | With assistant · Queued · With agent · Waiting on guest · Resolved · Abandoned · Timed out | — | Waiting for an agent / Assigned to me (`assignedToMe`). | `Conversation.state` |
+| Reply | text area | optional | — | — | — | — | `ConversationMessage.body` |
+| Outcome | select | optional | — | Information · Resolved · No sale · Sale completed · Callback scheduled · Escalated · Wrong number · Abandoned · Unreachable | — | — | `CallDisposition.outcome` |
+| Callback at | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Required when the outcome is callbackScheduled. | `CallDisposition.callbackAt` |
+| Note | text area | optional | — | — | — | — | `CallDisposition.note` |
+
+**Sent by *Send*** (`sendConversationMessage`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Body `body` | text area | required | — | max length 4000 | — | — | `sendConversationMessage` body |
+| Attachments `attachments` | repeatable rows | optional | — | — | — | — | `sendConversationMessage` body |
+| Asset `attachments[].assetId` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | `sendConversationMessage` body |
+| Kind `attachments[].kind` | select | optional | — | Image · Video · Document · Ticket · QR · Payment link | — | — | `sendConversationMessage` body |
+
+**Sent by *End conversation*** (`setCallDisposition`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Outcome `outcome` | select | required | — | Information · Resolved · No sale · Sale completed · Callback scheduled · Escalated · Wrong number · Abandoned · Unreachable | — | — | `setCallDisposition` body |
+| Callback at `callbackAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | An agent could not schedule a callback with the case attached, so a promise to ring back lived in somebody's notebook. | `setCallDisposition` body |
+| Callback assigned to principal `callbackAssignedToPrincipalId` | picker: choose a callback assigned to principal | optional | — | — | shows names, sends the id | — | `setCallDisposition` body |
+| Note `note` | text area | optional | — | — | — | — | `setCallDisposition` body |
+
+**Sent by *Assist at kiosk*** (`startKioskAssist`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Device `deviceId` | picker: choose a device | required | — | — | shows names, sends the id | — | `startKioskAssist` body |
+| Cart `cartId` | picker: choose a cart | optional | — | — | shows names, sends the id | — | `startKioskAssist` body |
+| Reason `reason` | radio group | optional | — | Guest called · Health alert · Stuck session · Payment issue · Proactive | — | — | `startKioskAssist` body |
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Queue** (data table, from `listConversations`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Channel | chip: Web chat, In app chat, Whatsapp, SMS, Email, Kiosk… | — |
+| State | chip: With assistant, Queued, With agent, Waiting on guest, Resolved, Abandoned… | `withAssistant` and `queued` are different, and the second has a person waiting. |
+| Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
+| Sentiment | chip: Positive, Neutral, Negative, Escalating | 22.8.16. `escalating` is a routing signal, not a report line. |
+| Estimated wait seconds | 1,234 | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
+
+**Transcript** (card list, from `getConversation`): Oldest first; internal notes are visibly different and never reach the guest.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Sender | chip: Guest, Agent, Assistant, System | Resolved, never declared. The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for … |
+| Body | text | — |
+| Attachments | list or chips (count when long) | — |
+| Sent at | 1 Oct 2026, 14:30 | — |
+
+**Handover** (detail panel, from `getConversation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
+| Handover summary | text | The assistant's own account of what the guest wants, so an agent opens with context rather than reading a transcript while somebody waits. |
+| Intent | text | 22.8.13. What the guest appears to want, used for routing. |
+| Locale | text | — |
+
+**Guest** (detail panel, from `getGuestProfile`): Name, contact, tier and recent orders as the profile returns them; nothing when the guest is anonymous (no subjectId).
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
+| Display name | text | — |
+| Email | text | — |
+| Phone | +971 50 123 4567 | — |
+| Preferred language | text | — |
+| Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
+| Tags | list or chips (count when long) | — |
+| Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
+| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
+| Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Visit count | 1,234 | — |
+| Last visit at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
+| Merged at | 1 Oct 2026, 14:30 | — |
+| Consents | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Send conversation message (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 | Claim conversation (secondary button) | `claimConversation` POST `/conversations/{conversationId}/claim` | — | Conversation | 409 Already claimed by another agent | — |
+| Send (primary button) | `sendConversationMessage` POST `/conversations/{conversationId}/messages` | inline | ConversationMessage | — | — |
+| End conversation (secondary button) | `setCallDisposition` POST `/conversations/{conversationId}/disposition` | CallDisposition | CallDisposition | — | — |
+| Assist at kiosk (secondary button) | `startKioskAssist` POST `/kiosk-assists` | inline | KioskAssistSession | — | — |
 
 **What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
 - **Send**: Sent as the agent (the sender is resolved from the session). Internal notes are visibly different and never reach the guest. *(source: contracts/satellite/marketing-crm.yaml#sendConversationMessage; F05 step 2)*
 - **End conversation**: Requires a disposition and records a callback if one was promised. *(source: contracts/satellite/marketing-crm.yaml#setCallDisposition)*
 - **Assist at kiosk**: Starts a remote assist session on a kiosk the guest is using. *(source: contracts/satellite/marketing-crm.yaml#startKioskAssist)*
+
+**Data it reads**: `listConversations` (onInterval, The agent's queue: waiting and assigned-to-me …); `getConversation` (onInterval, The open conversation and its transcript, polled every 5 s …); `getGuestProfile` (onLoad, The guest beside the conversation (subjectId))
 
 **Where the user goes next**
 
@@ -805,11 +957,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The agent list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the agent untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No agent yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the agent are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | Nobody is waiting. The queue refreshes by itself. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing assigned to you. Offers the waiting queue. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `sendConversationMessage`, `setCallDisposition` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already claimed by another agent |
 
@@ -827,12 +979,15 @@ suggestion: AI - "You can move your Day Pass to Sunday 4 Oct at no charge. Shall
 - `setCallDisposition` → `CASE_MANAGE` (configure) · staff
 - `startKioskAssist` → `CASE_MANAGE` (configure) · staff
 - `claimConversation` → `CASE_MANAGE` (configure) · staff
+- `listConversations` → `CASE_VIEW` (read) · staff
+- `getConversation` → `CASE_VIEW` (read) · staff
+- `getGuestProfile` → `GUEST_VIEW` (read) · staff, guest
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `sendConversationMessage`, `setCallDisposition` …
 
 #### Requirements it meets
 
-7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+19 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -843,6 +998,12 @@ suggestion: AI - "You can move your Day Pass to Sunday 4 Oct at no charge. Shall
 | 22.8.6 | Agent Workspace | Marketing & CRM | CONTRACTED | `claimConversation` |
 | 22.8.17 | Conversation Routing | Marketing & CRM | CONTRACTED | `claimConversation` |
 | 22.8.18 | Queue Management | Marketing & CRM | CONTRACTED | `claimConversation` |
+| 22.8.1 | Omnichannel Inbox | Marketing & CRM | CONTRACTED | `listConversations` |
+| 22.3.8 | Omnichannel Communication Tracking | Marketing & CRM | CONTRACTED | `getConversation` |
+| 22.8.2 | Guest Conversation History | Marketing & CRM | CONTRACTED | `getConversation` |
+| 22.8.26 | Conversation Audit Trail | Marketing & CRM | CONTRACTED | `getConversation` |
+| 13.3.8 | APIs shall support guest profile creation, updates, segmentation, communication preferences and activity history retrieval. | Developer & API Management | CONTRACTED | `getGuestProfile` |
+| … 7 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -863,12 +1024,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-799?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Send conversation message, Cancel, Claim conversation.
+- [ ] Every action is wired with its success and its failure: Claim conversation, Send, End conversation, Assist at kiosk.
 - [ ] Every transition is wired: `BO-794`.
-- [ ] Every gated control is gated: `CASE_MANAGE`.
+- [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`, `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1497,9 +1658,12 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "claimConversation": {"method":"POST","path":"/conversations/{conversationId}/claim","contract":"marketing-crm","summary":"An agent takes it","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Conversation"},
+"completeUpload": {"method":"POST","path":"/media/uploads/{uploadId}/complete","contract":"assets","summary":"Confirm an upload and create the asset","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaAsset"},
+"createUpload": {"method":"POST","path":"/media/uploads","contract":"assets","summary":"Request a signed upload URL","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"UploadTicket"},
 "escalateCase": {"method":"POST","path":"/cases/{caseId}/escalate","contract":"marketing-crm","summary":"Escalate a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
 "getConversation": {"method":"GET","path":"/conversations/{conversationId}","contract":"marketing-crm","summary":"One conversation and everything before it","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Conversation"},
 "getCustomerServiceCopilot": {"method":"GET","path":"/customer-service-copilot","contract":"marketing-crm","summary":"The customer-service copilot configuration as saved","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiCustomerServiceCopilotKnowledgeWorkspaceView"},
+"getGuestProfile": {"method":"GET","path":"/guests/{subjectId}","contract":"marketing-crm","summary":"Read a guest profile","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GuestProfileDetail"},
 "getGuestTimeline": {"method":"GET","path":"/guests/{guestId}/timeline","contract":"marketing-crm","summary":"Everything this guest did, in order, across the platform","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"kinds","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"GuestTimelineEvent"},
 "ingestKnowledgeDocument": {"method":"POST","path":"/collections/{collectionId}/documents","contract":"ai","summary":"Add a document","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"KnowledgeDocument","responds":null},
 "listAgentWorkloadAvailability": {"method":"GET","path":"/agent-workload-availability","contract":"marketing-crm","summary":"Agent Workload, Availability & Workforce Control","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":"queueId","in":"query","required":false},{"name":"team","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"skill","in":"query","required":false},{"name":"language","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1536,22 +1700,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CaseKind": {"type":"string","description":"**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n","enum":["lostProperty","complaint","question","accessibility","refundRequest","other"]},
 "CasePriority": {"type":"string","enum":["low","normal","high","urgent"]},
 "CaseStatus": {"type":"string","enum":["open","inProgress","awaitingGuest","escalated","resolved","closed"]},
+"ConsentState": {"x-ticvai-persistence":"none — projection over consent_record","type":"object","required":["subjectId","purposes"],"properties":{"subjectId":{"type":"string","format":"uuid"},"purposes":{"type":"array","items":{"type":"object","required":["purpose","decision","requiresRenewal"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","nullable":true},"requiresRenewal":{"type":"boolean","description":"True where the notice has been superseded since consent was given."},"decidedAt":{"type":"string","format":"date-time","nullable":true}}}}}},
 "Conversation": {"type":"object","x-ticvai-persistence":"marketing.conversation","description":"22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n","required":["id","channel","state"],"properties":{"id":{"type":"string","format":"uuid"},"telephony":{"type":"object","nullable":true,"description":"BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n","properties":{"providerCallId":{"type":"string"},"direction":{"type":"string","enum":["inbound","outbound","transferred"]},"fromNumberMasked":{"type":"string","nullable":true,"description":"**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"},"recordingRef":{"type":"string","nullable":true,"description":"Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"},"agentState":{"type":"string","enum":["available","onCall","wrapUp","away","offline"],"nullable":true}}},"assistSessionId":{"type":"string","format":"uuid","nullable":true,"description":"BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"},"channel":{"$ref":"#/components/schemas/ConversationChannel"},"state":{"$ref":"#/components/schemas/ConversationState"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"assignedPrincipalId":{"type":"string","format":"uuid","nullable":true},"queueId":{"type":"string","format":"uuid","nullable":true},"queuePosition":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-derived":"onRead","description":"Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."},"estimatedWaitSeconds":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-derived":"onRead","description":"From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."},"handoverReason":{"type":"string","nullable":true,"enum":["guestRequested","assistantRefused","assistantFailed","outOfScope","negativeSentiment","complexIntent","paymentIssue"]},"handoverSummary":{"type":"string","nullable":true,"description":"**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"},"sentiment":{"type":"string","nullable":true,"enum":["positive","neutral","negative","escalating"],"description":"22.8.16. **`escalating` is a routing signal**, not a report line."},"intent":{"type":"string","nullable":true,"description":"22.8.13. What the guest appears to want, used for routing."},"locale":{"type":"string"},"caseId":{"type":"string","format":"uuid","nullable":true,"description":"22.8.12. Where the conversation raised one."},"messages":{"type":"array","items":{"$ref":"#/components/schemas/ConversationMessage"}},"firstResponseSeconds":{"type":"integer","nullable":true,"readOnly":true},"startedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"outcome":{"type":"string","nullable":true,"enum":["resolved","caseRaised","abandonedByGuest","timedOut","spam"]}}},
 "ConversationChannel": {"type":"string","enum":["webChat","inAppChat","whatsapp","sms","email","kiosk","voice"]},
 "ConversationMessage": {"type":"object","x-ticvai-persistence":"marketing.conversation_message + marketing.conversation_message_attachment","required":["id","sender","body","sentAt"],"properties":{"id":{"type":"string","format":"uuid"},"sender":{"type":"string","enum":["guest","agent","assistant","system"],"description":"**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"},"senderPrincipalId":{"type":"string","format":"uuid","nullable":true},"body":{"type":"string"},"attachments":{"type":"array","items":{"type":"object","properties":{"assetId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["image","video","document","ticket","qr","paymentLink"]}}}},"aiInteractionId":{"type":"string","format":"uuid","nullable":true,"description":"Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"},"sentAt":{"type":"string","format":"date-time"},"readAt":{"type":"string","format":"date-time","nullable":true}}},
 "ConversationState": {"type":"string","description":"**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n","enum":["withAssistant","queued","withAgent","waitingOnGuest","resolved","abandoned","timedOut"]},
+"GuestProfile": {"x-ticvai-persistence":"marketing.guest_profile","type":"object","required":["subjectId","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid","description":"Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"},"displayName":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"preferredLanguage":{"type":"string","nullable":true},"preferredChannel":{"$ref":"#/components/schemas/MessageChannel"},"guestLinkId":{"type":"string","nullable":true,"description":"Present where the guest is linked across cells. Marketing acts locally."},"tags":{"type":"array","items":{"type":"string"}},"engagementScore":{"type":"integer","nullable":true,"minimum":0,"maximum":100,"description":"22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"},"engagementTier":{"type":"string","nullable":true,"enum":["new","active","occasional","lapsing","lapsed","dormant"],"description":"5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"},"lifetimeValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"visitCount":{"type":"integer"},"lastVisitAt":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"mergedIntoSubjectId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"},"mergedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
+"GuestProfileDetail": {"x-ticvai-persistence":"marketing.guest_profile","allOf":[{"$ref":"#/components/schemas/GuestProfile"},{"type":"object","properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"consents":{"$ref":"#/components/schemas/ConsentState"},"loyalty":{"$ref":"#/components/schemas/LoyaltyPosition"},"openCaseCount":{"type":"integer"},"recentOrderIds":{"type":"array","items":{"type":"string"}},"membershipIds":{"type":"array","items":{"type":"string","format":"uuid"}},"notes":{"type":"string","nullable":true}}}]},
 "GuestTimelineEvent": {"type":"object","description":"Board 1.5. **Facts, notes and predictions distinguished on the row.**","properties":{"id":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"kind":{"type":"string","enum":["purchase","ticketUsed","reservation","visit","membershipChange","loyalty","wallet","campaign","message","case","survey","waiver","note","prediction"]},"nature":{"type":"string","enum":["operationalFact","userNote","aiDerived"],"description":"**A prediction and a gate scan are both useful and only one happened.**"},"summary":{"type":"string"},"channel":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"sourceContract":{"type":"string","nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"value":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outcome":{"type":"string","nullable":true}}},
 "IntelligentRoutingSkillsAssignmentEngineInput": {"type":"object","x-ticvai-persistence":"marketing.case_routing_rule","description":"One case routing rule (pack 10.2.3). Empty match lists match everything; all non-empty lists must match.","required":["code","name","strategy","rank","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60,"description":"The natural key, e.g. `eventDayArabic`."},"name":{"type":"string","maxLength":150},"rank":{"type":"integer","minimum":1,"description":"Lower is tried first."},"queueId":{"type":"string","format":"uuid","nullable":true,"description":"The queue this rule routes into; null routes straight to an agent."},"match":{"type":"object","properties":{"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Case categories and subcategories (`Case.categoryId`)."},"kinds":{"type":"array","items":{"$ref":"#/components/schemas/CaseKind"}},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"customerLanguages":{"type":"array","items":{"type":"string","maxLength":10},"description":"BCP-47 tags, e.g. `ar`, `en`."},"customerTypes":{"type":"array","items":{"type":"string","enum":["individual","member","vip","corporate","group","partner"]}},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"eventIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productIds":{"type":"array","items":{"type":"string","format":"uuid"}},"priorities":{"type":"array","items":{"$ref":"#/components/schemas/CasePriority"}},"eventWithinHours":{"type":"integer","minimum":0,"nullable":true,"description":"Event proximity - matches only when the case's event starts within this many hours."}}},"strategy":{"type":"string","enum":["roundRobin","leastBusy","skillBased","priorityBased","languageBased","customerTierBased","aiRecommended"]},"requiredSkills":{"type":"array","items":{"type":"string","maxLength":60},"description":"Skills an agent must hold (`AgentServiceProfile.skills`), e.g. `ticketing`, `refunds`."},"requireLanguageMatch":{"type":"boolean","default":true,"description":"Only agents who speak the customer's language are candidates."},"maxUtilizationRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Agents above this workload are skipped."},"respectSlaCapability":{"type":"boolean","default":true,"description":"Skip agents whose current queue would push the case past its SLA."},"stickyOwnership":{"type":"boolean","default":false,"description":"Prefer the agent who last handled the customer or the reopened case, if available."},"stickyWindowHours":{"type":"integer","minimum":1,"nullable":true},"fallbackQueueId":{"type":"string","format":"uuid","nullable":true,"description":"Where the case goes when no candidate agent is available."},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "IntelligentRoutingSkillsAssignmentEngineView": {"description":"A routing rule as stored, with how often it has matched.","x-ticvai-persistence":"none — the marketing.case_routing_rule (new) row plus a count over marketing.case","allOf":[{"$ref":"#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput"},{"type":"object","properties":{"matchedLast7Days":{"type":"integer","minimum":0,"readOnly":true},"lastMatchedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}}]},
 "KioskAssistSession": {"type":"object","x-ticvai-persistence":"marketing.kiosk_assist_session","description":"2.1.25. A staff member acting on a kiosk session remotely. **The guest can always see it and always end it** — remote assistance a guest cannot see or stop is surveillance.\n","required":["id","deviceId","staffPrincipalId","startedAt"],"properties":{"id":{"type":"string","format":"uuid"},"deviceId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"staffPrincipalId":{"type":"string","format":"uuid"},"staffDisplayName":{"type":"string","description":"**Shown on the kiosk.** A guest being helped should know by whom.\n"},"cartId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","enum":["guestCalled","healthAlert","stuckSession","paymentIssue","proactive"]},"endedBy":{"type":"string","nullable":true,"enum":["staff","guest","timeout"]},"actionsTaken":{"type":"array","description":"**Every action recorded as the staff member's**, not the kiosk's. A cashier completing a guest's checkout remotely is a staff action on a guest cart.\n","items":{"type":"object","properties":{"operationId":{"type":"string"},"at":{"type":"string","format":"date-time"}}}},"startedAt":{"type":"string","format":"date-time"},"endedAt":{"type":"string","format":"date-time","nullable":true}}},
 "KnowledgeCollection": {"type":"object","x-ticvai-persistence":"ai.knowledge_collection","required":["name","scopeLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"description":{"type":"string"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"documentCount":{"type":"integer","readOnly":true},"shardKey":{"type":"string","readOnly":true,"description":"**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"},"retrieval":{"type":"string","enum":["dense","hybrid"],"default":"hybrid","description":"**Set at creation and not changeable.** A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is a creation decision rather than a query one.\nHybrid is the default because **a venue corpus is mostly proper nouns** — Yas Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning and poor at exact tokens, and half our queries are exact tokens.\n"},"sparseModel":{"type":"string","nullable":true,"description":"The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise."},"idfScope":{"type":"string","enum":["shard","tenant","venue"],"default":"tenant","description":"**Which population the sparse score measures rarity against** (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term common at one venue and rare at another gets one score for both. Shard-per-tenant fixes the cross-tenant case; **inside a dedicated cell the shard is the whole tenant and venues share it**, which is what this narrows.\n"},"embeddingModel":{"type":"string","readOnly":true,"description":"**This is what decides how many collections exist** (ADR-0021). A collection carries its own vector configuration and a shard cannot, so vectors from two models cannot share one. A tenant that residency forces onto a local model therefore has its own collection — forced by the model, not chosen for isolation.\nRead-only because **changing it invalidates every embedding in the collection**, and a collection silently searched with mismatched vectors returns plausible nonsense.\n"},"isActive":{"type":"boolean"}}},
 "KnowledgeDocument": {"type":"object","x-ticvai-persistence":"ai.knowledge_document","required":["title","sourceAssetId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"collectionId":{"type":"string","format":"uuid","readOnly":true},"title":{"type":"string"},"sourceAssetId":{"type":"string","format":"uuid"},"mimeType":{"type":"string"},"reingestDocumentId":{"type":"string","format":"uuid","nullable":true,"writeOnly":true,"x-ticvai-persisted":false,"description":"An `indexed` or `failed` document in this collection to process again from `sourceAssetId`. **The same document** returns to `processing` and keeps its id (states/ai-knowledge-document.yaml). A request, not a fact about the row, so it is not stored.\n"},"supersedesDocumentId":{"type":"string","format":"uuid","nullable":true,"description":"The `indexed` document in this collection that this one replaces. It moves to `superseded` when this one reaches `indexed`, and is kept — **a technician who followed version 2 last week needs version 2 to still exist.**\n"},"status":{"type":"string","enum":["processing","indexed","failed","superseded"],"readOnly":true},"chunkCount":{"type":"integer","readOnly":true},"failureReason":{"type":"string","nullable":true,"readOnly":true},"indexedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so neither did its chunks. Copied from the collection at ingestion, narrowed where the document is venue-specific (\"documents carry the scope they may be retrieved at\"). `ai.chunk_embedding` is scoped through this row.\n"}}},
+"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
+"LoyaltyPosition": {"x-ticvai-persistence":"marketing.loyalty_position","type":"object","required":["subjectId","programmeId","pointsBalance","tierCode"],"properties":{"leaderboardNickname":{"type":"string","nullable":true,"maxLength":24,"description":"BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"},"subjectId":{"type":"string","format":"uuid"},"programmeId":{"type":"string","format":"uuid"},"pointsBalance":{"type":"integer"},"lifetimePoints":{"type":"integer"},"tierId":{"type":"string","format":"uuid","nullable":true,"description":"**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"pointsToNextTier":{"type":"integer","nullable":true},"nextExpiryPoints":{"type":"integer","nullable":true},"nextExpiryAt":{"type":"string","format":"date-time","nullable":true}}},
+"MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
+"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive","model3d"],"description":"`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"},
+"MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
+"MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "OrderBookingTicketServiceWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.case_service_action","x-ticvai-record-definition":"Permitted Service Actions (one per executed action)","description":"One service action on an order, taken from a case. Only an `execute` stores a row.","required":["id","mode","orderId"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7; equals the `Idempotency-Key` header."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"mode":{"type":"string","enum":["evaluate","execute"]},"caseId":{"type":"string","format":"uuid","description":"Required with `execute`; the action is recorded on this case."},"orderId":{"type":"string","format":"uuid"},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Omit for the whole order."},"action":{"type":"string","description":"Required with `execute`.","enum":["resendTicket","downloadTicket","reissue","transfer","changeName","reschedule","exchange","upgrade","cancel"]},"targetPerformanceId":{"type":"string","format":"uuid","description":"For `reschedule` and `exchange`, the option chosen from the evaluation."},"targetProductId":{"type":"string","format":"uuid","description":"For `exchange` and `upgrade`."},"recipientSubjectId":{"type":"string","format":"uuid","description":"For `transfer` and `changeName`, the new ticket holder."},"deliveryChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"description":"For `resendTicket`."},"reason":{"type":"string","maxLength":500},"status":{"type":"string","readOnly":true,"enum":["completed","pendingPayment","refused","failed"]},"downstreamOperation":{"type":"string","readOnly":true,"description":"The operation that performed it, e.g. `rescheduleOrder`."},"downstreamReference":{"type":"string","readOnly":true,"nullable":true},"performedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "OrderBookingTicketServiceWorkspaceView": {"type":"object","x-ticvai-persistence":"none — projection over orders.sales_order, orders.order_line, orders.payment, access.entitlement, marketing.case_service_action (new) and the policies each owning operation reads","description":"The order as a service agent sees it, what may be done to it, and what was done.","required":["orderId","order","availableActions"],"properties":{"orderId":{"type":"string","format":"uuid"},"order":{"type":"string","description":"The order number shown to the guest."},"subjectId":{"type":"string","format":"uuid","nullable":true},"purchaseDate":{"type":"string","format":"date-time"},"channel":{"type":"string","description":"The sales channel the order came through."},"products":{"type":"integer","minimum":0},"tickets":{"type":"integer","minimum":0},"eventId":{"type":"string","format":"uuid","nullable":true},"dateTime":{"type":"string","format":"date-time","nullable":true,"description":"The performance start."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"payment":{"type":"string","enum":["paid","partiallyPaid","unpaid","partiallyRefunded","refunded"]},"fulfillment":{"type":"string","enum":["pending","issued","delivered","failed"]},"ticketStatus":{"type":"string","enum":["valid","partiallyUsed","used","expired","cancelled"]},"availableActions":{"type":"array","items":{"type":"object","required":["action","isPermitted"],"properties":{"action":{"type":"string","enum":["resendTicket","downloadTicket","reissue","transfer","changeName","reschedule","exchange","upgrade","cancel","requestRefund"]},"isPermitted":{"type":"boolean"},"refusedBy":{"type":"string","nullable":true,"enum":["ticketPolicy","servicePolicy","orderStatus","eventDate","customerEntitlement","permission"]},"policyReference":{"type":"string","nullable":true},"options":{"type":"array","description":"Alternatives for `reschedule`, `exchange` and `upgrade`, earliest first.","items":{"type":"object","properties":{"performanceId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time","nullable":true},"available":{"type":"boolean"},"priceDifferencePerTicket":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"priceDifferenceTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}}},"lastAction":{"allOf":[{"$ref":"#/components/schemas/OrderBookingTicketServiceWorkspaceInput"}],"nullable":true,"description":"The action just executed; null on `evaluate`."}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "QualityManagementAgentEvaluationView": {"type":"object","x-ticvai-persistence":"marketing.quality_evaluation","description":"One quality evaluation of one interaction (pack 10.2.7). Resolution time and SLA outcome are read from the case, not entered.","required":["id","agentPrincipalId","sourceType","evaluatedBy","status","criteria"],"properties":{"id":{"type":"string","format":"uuid"},"agentPrincipalId":{"type":"string","format":"uuid"},"evaluatorPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The caller who scored it; null while only the AI has."},"sourceType":{"type":"string","enum":["call","chat","email","whatsapp","case","complaint"]},"caseId":{"type":"string","format":"uuid","nullable":true},"conversationId":{"type":"string","format":"uuid","nullable":true},"evaluatedBy":{"type":"string","enum":["human","ai"]},"status":{"type":"string","enum":["draft","scored","acknowledged"]},"criteria":{"type":"array","maxItems":30,"items":{"type":"object","required":["criterion","score","maxScore"],"properties":{"criterion":{"type":"string","maxLength":60,"description":"The tenant's criterion code; the pack's defaults are `greeting`, `customerVerification`, `understanding`, `accuracy`, `policyCompliance`, `communicationQuality`, `empathy`, `resolution`, `documentation`, `closing`."},"score":{"type":"integer","minimum":0},"maxScore":{"type":"integer","minimum":1},"comment":{"type":"string","maxLength":1000,"nullable":true}}}},"criticalFailures":{"type":"array","items":{"type":"string","enum":["incorrectRefund","privacyViolation","unauthorisedCompensation","incorrectTicketInformation","securityVerificationFailure","other"]}},"overallScore":{"type":"integer","minimum":0,"maximum":100,"nullable":true,"readOnly":true,"description":"Criteria score as a percentage; 0 when any critical failure is recorded."},"aiFindings":{"type":"array","readOnly":true,"items":{"type":"object","required":["area","finding"],"properties":{"area":{"type":"string","enum":["policyAdherence","requiredStatements","tone","accuracy","resolutionQuality","missingCaseDocumentation"]},"finding":{"type":"string","maxLength":500},"confidence":{"type":"number","minimum":0,"maximum":1}}}},"feedback":{"type":"string","maxLength":2000,"nullable":true},"coachingActions":{"type":"array","items":{"type":"object","required":["type"],"properties":{"type":{"type":"string","enum":["productTraining","policyTraining","communicationCoaching","systemTraining"]},"note":{"type":"string","maxLength":500,"nullable":true},"dueAt":{"type":"string","format":"date-time","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true}}}},"resolutionSeconds":{"type":"integer","minimum":0,"nullable":true,"readOnly":true},"slaMet":{"type":"boolean","nullable":true,"readOnly":true},"agentComment":{"type":"string","maxLength":1000,"nullable":true},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"evaluatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ServiceQueue": {"type":"object","x-ticvai-persistence":"marketing.service_queue","description":"**A customer-service queue** (e.g. `eventDaySupport`). Cases (`Case.queueId`), routing rules (`queueId`, `fallbackQueueId`) and agents (`AgentAvailability.queueIds`) name it; `listContact` and `listAgentWorkloadAvailability` report per queue. Maintained by `setServiceQueueDefinition`, read by `listServiceQueues` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n","required":["id","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60},"name":{"type":"string","maxLength":150},"overflowWaitSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"The queue's overflow threshold; a case waiting longer marks the queue `critical`."},"isActive":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"UnifiedInteractionCommunicationHistoryView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case_message, marketing.conversation_message, marketing.conversation (telephony), marketing.message_dispatch and marketing.kiosk_assist_session","description":"One interaction on the timeline. `social` and `whatsapp` appear only where that channel is integrated.","required":["id","occurredAt","channel","direction","actorKind","source","recordId"],"properties":{"id":{"type":"string","description":"Stable across pages; the source and record id combined."},"occurredAt":{"type":"string","format":"date-time"},"channel":{"type":"string","enum":["email","phone","liveChat","whatsapp","sms","webForm","mobileApp","b2cPortal","social","posFrontDesk","internalNote","automatedNotification"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"The guest; the name is resolved on screen through `getGuestProfile` under GUEST_VIEW_PII."},"actorKind":{"type":"string","enum":["guest","agent","system","ai"]},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"direction":{"type":"string","enum":["inbound","outbound","internal"]},"subject":{"type":"string","nullable":true},"excerpt":{"type":"string","maxLength":500,"nullable":true},"relatedCaseId":{"type":"string","format":"uuid","nullable":true},"relatedOrderId":{"type":"string","nullable":true},"relatedTicketId":{"type":"string","nullable":true},"attachmentRefs":{"type":"array","items":{"type":"string"}},"sentiment":{"type":"string","nullable":true,"enum":["positive","neutral","negative"],"description":"Where sentiment analysis is enabled; AI-derived."},"source":{"type":"string","enum":["caseMessage","conversationMessage","call","messageDispatch","kioskAssist"]},"recordId":{"type":"string","description":"The row in the source table."}}}
+"UnifiedInteractionCommunicationHistoryView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case_message, marketing.conversation_message, marketing.conversation (telephony), marketing.message_dispatch and marketing.kiosk_assist_session","description":"One interaction on the timeline. `social` and `whatsapp` appear only where that channel is integrated.","required":["id","occurredAt","channel","direction","actorKind","source","recordId"],"properties":{"id":{"type":"string","description":"Stable across pages; the source and record id combined."},"occurredAt":{"type":"string","format":"date-time"},"channel":{"type":"string","enum":["email","phone","liveChat","whatsapp","sms","webForm","mobileApp","b2cPortal","social","posFrontDesk","internalNote","automatedNotification"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"The guest; the name is resolved on screen through `getGuestProfile` under GUEST_VIEW_PII."},"actorKind":{"type":"string","enum":["guest","agent","system","ai"]},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"direction":{"type":"string","enum":["inbound","outbound","internal"]},"subject":{"type":"string","nullable":true},"excerpt":{"type":"string","maxLength":500,"nullable":true},"relatedCaseId":{"type":"string","format":"uuid","nullable":true},"relatedOrderId":{"type":"string","nullable":true},"relatedTicketId":{"type":"string","nullable":true},"attachmentRefs":{"type":"array","items":{"type":"string"}},"sentiment":{"type":"string","nullable":true,"enum":["positive","neutral","negative"],"description":"Where sentiment analysis is enabled; AI-derived."},"source":{"type":"string","enum":["caseMessage","conversationMessage","call","messageDispatch","kioskAssist"]},"recordId":{"type":"string","description":"The row in the source table."}}},
+"UploadTicket": {"x-ticvai-persistence":"assets.media_upload","type":"object","required":["uploadId","uploadUrl","method","expiresAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"uploadId":{"type":"string","format":"uuid"},"uploadUrl":{"type":"string","description":"Signed. PUT the file here, then confirm with `/complete`."},"method":{"type":"string","enum":["PUT","POST"]},"headers":{"type":"object","additionalProperties":{"type":"string"}},"maxSizeBytes":{"type":"integer"},"expiresAt":{"type":"string","format":"date-time"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"venueId":{"type":"string","format":"uuid","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"}}}
 }
 ```

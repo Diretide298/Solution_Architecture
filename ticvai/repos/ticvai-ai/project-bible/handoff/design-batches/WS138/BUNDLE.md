@@ -1,6 +1,6 @@
 # WS138 — Marketing CRM Configuration Reference v1.0 board 4
 
-**10 screens · 15 operations · 29 schemas · 7 permissions**
+**10 screens · 16 operations · 31 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -186,13 +186,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-764` | Campaign Command Center | D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-765` | Campaign Library & Calendar | C | 0 | 7 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-766` | Campaign Builder | A | 44 | 0 | 6 | 21 | 0 | 6 | — | notStarted (—) |
+| `BO-766` | Campaign Builder | A | 63 | 6 | 6 | 25 | 0 | 6 | — | notStarted (—) |
 | `BO-767` | Audience & Offer Selection | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `BO-768` | Multichannel Composer | D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-769` | Schedule & Trigger Rules | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-770` | Campaign Approval Workflow | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-771` | Budget, Goals & Forecast | B | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-772` | A/B & AI Optimization | A | 0 | 0 | 6 | 26 | 0 | 0 | — | notStarted (—) |
+| `BO-772` | A/B & AI Optimization | A | 48 | 21 | 6 | 31 | 0 | 0 | — | notStarted (—) |
 | `BO-773` | Attribution & Audit | D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -510,12 +510,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Block | Block A · task APP-SETUP-BO-766 |
 | Who uses it | venue staff holding `AI_USE`, `MARKETING_MANAGE`, `MARKETING_SEND`, `MARKETING_VIEW` (2 operate, 1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): The campaign library beside a builder for the selected or new campaign (defined 4 October 2026 from CreateCampaignRequest, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `campaignId` (navigation) |
 | Route | `/engagement-support/campaign-builder-bo-766` |
 
-**Known gaps.** **Campaign Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from CreateCampaignRequest, testSendCampaign and launchCampaign, with the audiences (listSegments) and templates (listMessageTemplates) the builder picks from. A/B variants are set on BO-772** (CHG-FXS-001)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-005): The Campaign Builder's create action was createInvitationCampaign, the quota-bounded addressed invitation (press night); the builder's purpose is the general …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The marketer creates a campaign in stages: objective, audience, offer, channels and content, schedule, review, activation. Each stage validates before the next. The review stage shows how many guests will actually receive it after consent and suppression. Offers come only from the pre-configured offers list; nobody types a discount here.
 
@@ -527,15 +529,44 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Status | select | optional | — | Draft · Scheduled · Sending · Paused · Completed · Stopped · Failed | — | Filter; All by default. | `Campaign.status` |
+| Name | text field | optional | — | max length 200 | — | — | `CreateCampaignRequest.name` |
+| Kind | radio group | optional | — | One off · Scheduled · Triggered · Recurring | — | — | `CreateCampaignRequest.kind` |
+| Channel | select | optional | — | Email · SMS · Whatsapp · Push · In app · Post | — | — | `CreateCampaignRequest.channel` |
+| Audience | picker: choose a segment | optional | — | — | shows names, sends the id | Options from listSegments, each with its last evaluated size. | `CreateCampaignRequest.segmentId` |
+| Template | picker: choose a template | optional | — | — | shows names, sends the id | Options from listMessageTemplates on the chosen channel. | `CreateCampaignRequest.content.templateId` |
+| Send time | segmented control | optional | Fixed | Fixed · Optimised | — | Fixed, or optimised per guest. | `CreateCampaignRequest.sendTimeMode` |
+| Scheduled for | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `CreateCampaignRequest.scheduledFor` |
+| Test recipients | text field | — | — | — | — | Named staff addresses only; the test is marked as a test and never counted. | — |
+
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Status | select | — | Draft · Scheduled · Sending · Paused · Completed · Stopped · Failed | `listCampaigns` ?status |
+| Search | text field | — | max length 200 | `listSegments` ?search |
+| Channel | select | — | Email · SMS · Whatsapp · Push · In app · Post | `listMessageTemplates` ?channel |
 
-**Form: Create campaign** (modal, opened by *Create campaign*; *Create campaign* calls `createCampaign`, *Cancel* sends nothing)
+**Sent by *Draft with AI*** (`proposeMarketingContent`; no form is declared, so these are filled from the screen or collected inline)
 
-**Collects what `createCampaign` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Target kind `targetKind` | select | required | — | Message template · Subject line · Notification wording · Content block · Content page · Banner · Promo block · Homepage section | — | — | `proposeMarketingContent` body |
+| Target ref `targetRef` | text field | optional | — | — | — | The template, campaign, block, page, banner or promo block the draft is for. Null drafts a new one. | `proposeMarketingContent` body |
+| Channel `channel` | select | optional | — | Email · SMS · Push · Whatsapp · In app · Web · App | — | Sets the length and form limits (an SMS segment, a push title) the draft must meet. | `proposeMarketingContent` body |
+| Brief `brief` | text area | required | — | min length 10; max length 4000 | — | What the content is for, in the author's words. | `proposeMarketingContent` body |
+| Objective `objective` | radio group | optional | — | Awareness · Conversion · Retention · Reactivation · Information | — | — | `proposeMarketingContent` body |
+| Tone `tone` | text field | optional | — | max length 200 | — | — | `proposeMarketingContent` body |
+| Locales `locales` | list of values (chips) | required | — | at least 1; at most 10 | — | — | `proposeMarketingContent` body |
+| Variants `variants` | stepper or slider | optional | 1 | min 1; max 5 | — | — | `proposeMarketingContent` body |
+| Glossary ref `glossaryRef` | text field | optional | — | — | — | Terms that must not be changed or translated, as for `proposeTranslations`. | `proposeMarketingContent` body |
+| Grounding refs `groundingRefs` | list of values (chips) | optional | — | at most 50 | — | Products, events, offers or pages the text may cite, read as the caller. Nothing outside them is named. | `proposeMarketingContent` body |
+
+**Sent by *Create campaign*** (`createCampaign`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -580,11 +611,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Minimum sample per variant `abTest.minimumSamplePerVariant` | number field | optional | 500 | min 1 | — | Below this many sends per variant no winner is declared automatically; a person picks. | `createCampaign` body |
 | Winning variant `abTest.winningVariantId` | picker: choose a winning variant | optional | — | — | shows names, sends the id | Set by the automatic rule, or by a person through `updateCampaign`. | `createCampaign` body |
 
-Errors to draw in the form: 400 Validation failed
-
-**Form: Send test** (modal, opened by *Send test*; *Send test* calls `testSendCampaign`, *Cancel* sends nothing)
-
-**Collects what `testSendCampaign` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+**Sent by *Send test*** (`testSendCampaign`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -613,15 +640,26 @@ Errors to draw in the form: 400 Validation failed
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Campaigns** (data table, from `listCampaigns`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Kind | chip: One off, Scheduled, Triggered, Recurring | — |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Status | chip: Draft, Scheduled, Sending, Paused, Completed, Stopped… | — |
+| Scheduled for | 1 Oct 2026, 14:30 | — |
+| Sent count | 1,234 | How many messages went out, counted from `marketing.message_dispatch` at read time rather than kept as a counter on the campaign row, so it … |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create campaign (secondary button) | `createCampaign` POST `/campaigns` | CreateCampaignRequest | Campaign | 400 Validation failed | opens modal first |
-| Send test (secondary button) | `testSendCampaign` POST `/campaigns/{campaignId}/test-send` | inline | inline | — | opens modal first |
-| Launch campaign (secondary button) | `launchCampaign` POST `/campaigns/{campaignId}/launch` | inline | LaunchResult | 403 Authenticated but not permitted at the requested scope; 409 Already launched (`alreadyLaunched`), audience size differs beyond tolerance (`audienceSizeChanged`), or every recipient was excluded … | — |
+| New campaign (primary button) | navigation or local | — | — | — | — |
+| Draft with AI (secondary button) | `proposeMarketingContent` POST `/ai/content-drafts` | inline | AiContentDraftSet | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks … | — |
+| Create campaign (primary button) | `createCampaign` POST `/campaigns` | CreateCampaignRequest | Campaign | 400 Validation failed | — |
+| Send test (secondary button) | `testSendCampaign` POST `/campaigns/{campaignId}/test-send` | inline | inline | — | — |
+| Launch campaign (secondary button) | `launchCampaign` POST `/campaigns/{campaignId}/launch` | inline | LaunchResult | 403 Authenticated but not permitted at the requested scope; 409 Already launched (`alreadyLaunched`), audience size differs beyond tolerance (`audienceSizeChanged`), or every recipient was excluded … | gated `MARKETING_SEND` |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -633,7 +671,7 @@ Errors to draw in the form: 400 Validation failed
 - **Launch or schedule**: Consent is checked again at send time. The launch carries the audience size the marketer saw and is refused if the segment has grown unexpectedly, so "Audience changed - review again" is a state. *(source: contracts/satellite/marketing-crm.yaml#launchCampaign)*
 - **Draft with AI**: The AI writes drafts of the subject, body and variants for the channel's length limits; a person edits and applies. Nothing is published by AI. *(source: contracts/satellite/ai.yaml#proposeMarketingContent)*
 
-**Data it reads**: `listCampaigns` (onLoad, The library and calendar)
+**Data it reads**: `listCampaigns` (onLoad, The library and calendar); `listSegments` (onLoad, The audiences a campaign can target (segmentId)); `listMessageTemplates` (onLoad, The templates a campaign's content uses (templateId))
 
 **Where the user goes next**
 
@@ -643,11 +681,11 @@ Errors to draw in the form: 400 Validation failed
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The campaign list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the campaign untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No campaign yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No campaigns yet. Carries New campaign. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the campaign are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`; `MARKETING_MANAGE` for `createCampaign`, `testSendCampaign`; `MARKETING_SEND` for `launchCampaign`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Already launched (`alreadyLaunched`), audience size differs beyond tolerance (`audienceSizeChanged`), or every recipient was excluded (`noReachableRecipients`). (CampaignStateProblem); 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
 
@@ -684,12 +722,14 @@ variants:
 - `createCampaign` → `MARKETING_MANAGE` (configure) · staff
 - `testSendCampaign` → `MARKETING_MANAGE` (configure) · staff
 - `launchCampaign` → `MARKETING_SEND` (operate) · staff
+- `listSegments` → `MARKETING_VIEW` (read) · staff
+- `listMessageTemplates` → `MARKETING_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`; `MARKETING_MANAGE` for `createCampaign`, `testSendCampaign`; `MARKETING_SEND` for `launchCampaign`.
 
 #### Requirements it meets
 
-21 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+25 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -705,7 +745,7 @@ variants:
 | 22.1.12 | Ticketing Campaigns | Marketing & CRM | CONTRACTED | `createCampaign` |
 | 22.1.13 | Membership Campaigns | Marketing & CRM | CONTRACTED | `createCampaign` |
 | 22.1.14 | Loyalty Campaigns | Marketing & CRM | CONTRACTED | `createCampaign` |
-| … 9 more | | | | `traceability.json` |
+| … 13 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -731,10 +771,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (44), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (63), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-766?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create campaign, Send test, Launch campaign.
+- [ ] Every action is wired with its success and its failure: New campaign, Draft with AI, Create campaign, Send test, Launch campaign.
 - [ ] Every transition is wired: `BO-764`.
 - [ ] Every gated control is gated: `AI_USE`, `MARKETING_MANAGE`, `MARKETING_SEND`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1400,14 +1440,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-772 |
 | Who uses it | venue staff holding `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW` (1 operate, 1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): One campaign's A/B test edited in place beside its results and the AI's recommendations on it (defined 4 October 2026 from Campaign.variants and Campaign.abTest, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `campaignId` (navigation), `insightId` (navigation) |
 | Route | `/engagement-support/a-b-ai-optimization-bo-772` |
 
-**What the spec says about it.** **Guests who checked out without an account receive marketing only if they ticked the checkout opt-in (unticked by default, source checkout); nothing is sent without it (decided 2 October 2026 by Chinmay, DEC-275; CHG-CSA-025).** Replaces "not targeted until the consent question is answered".
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Guests who checked out without an account receive marketing only if they ticked the checkout opt-in (unticked by default, source checkout); nothing is sent without it (decided 2 October 2026 by Chinmay, DEC-275; CHG-CSA-025).** Replaces "not targeted until the consent question is answered". **Defined 4 October 2026 from Campaign.variants, Campaign.abTest, CampaignPerformance.variants and the AI design notes (ai.yaml BO-772): one campaign's A/B test, its results and the AI's recommendations. updateCampaign carries variants and abTest (the contract says both are written by updateCampaign; the PATCH body gains them, agreed in the ledger)** (CHG-FXS-001)
 
 **From the AI & Intelligence process.** A/B and AI optimisation for campaigns: variants for subject, content, creative, offer, channel and send time; split, sample size, duration, success metric and winner rule; AI recommendations and drafted variants. Day one uses rule playbooks and a typical send hour per channel; send time per guest after three touches. The one thing to get right: AI drafts and recommends; applying a winner or a change is a person's action (campaigns L2).
 
@@ -1419,6 +1457,20 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Variant label | text field | optional | — | max length 20 | — | A, B, C... | `Campaign.variants.label` |
+| Variant template | picker: choose a template | optional | — | — | shows names, sends the id | Options from listMessageTemplates filtered to the campaign's channel. | `Campaign.variants.templateId` |
+| Variant split (%) | stepper or slider | optional | — | min 1; max 100 | — | Share of the test group; null splits evenly. | `Campaign.variants.splitPercent` |
+| Test share of the audience (%) | stepper or slider | optional | 20 | min 5; max 100 | — | 5 to 100, default 20; 100 splits everyone and picks no winner. | `Campaign.abTest.testPercent` |
+| Success metric | radio group | optional | Click rate | Open rate · Click rate · Conversion rate · Attributed revenue | — | — | `Campaign.abTest.successMetric` |
+| Decide after (hours) | number field (hours) | optional | 4 | min 1; max 168 | — | — | `Campaign.abTest.decideAfterHours` |
+| Winner rule | segmented control | optional | Automatic | Automatic · Manual | — | — | `Campaign.abTest.winnerRule` |
+| Minimum sends per variant | number field | optional | 500 | min 1 | — | Below this many sends per variant no winner is declared automatically; a person picks. | `Campaign.abTest.minimumSamplePerVariant` |
+| Winning variant | picker: choose a winning variant | optional | — | — | shows names, sends the id | Shown when the winner rule is manual, or the automatic rule declared none because a variant is below the minimum sends. Options are the campaign's variants. | `Campaign.abTest.winningVariantId` |
+
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
@@ -1426,29 +1478,130 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Target kind | segmented control | — | Campaign · Journey | `listMarketingRecommendations` ?targetKind |
 | Target ref | text field | — | — | `listMarketingRecommendations` ?targetRef |
 | Status | select | — | New · Reviewed · Accepted · Rejected · Actioned · Measured | `listMarketingRecommendations` ?status |
+| Channel | select | — | Email · SMS · Whatsapp · Push · In app · Post | `listMessageTemplates` ?channel |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Draft a variant with AI*** (`proposeMarketingContent`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Target kind `targetKind` | select | required | — | Message template · Subject line · Notification wording · Content block · Content page · Banner · Promo block · Homepage section | — | — | `proposeMarketingContent` body |
+| Target ref `targetRef` | text field | optional | — | — | — | The template, campaign, block, page, banner or promo block the draft is for. Null drafts a new one. | `proposeMarketingContent` body |
+| Channel `channel` | select | optional | — | Email · SMS · Push · Whatsapp · In app · Web · App | — | Sets the length and form limits (an SMS segment, a push title) the draft must meet. | `proposeMarketingContent` body |
+| Brief `brief` | text area | required | — | min length 10; max length 4000 | — | What the content is for, in the author's words. | `proposeMarketingContent` body |
+| Objective `objective` | radio group | optional | — | Awareness · Conversion · Retention · Reactivation · Information | — | — | `proposeMarketingContent` body |
+| Tone `tone` | text field | optional | — | max length 200 | — | — | `proposeMarketingContent` body |
+| Locales `locales` | list of values (chips) | required | — | at least 1; at most 10 | — | — | `proposeMarketingContent` body |
+| Variants `variants` | stepper or slider | optional | 1 | min 1; max 5 | — | — | `proposeMarketingContent` body |
+| Glossary ref `glossaryRef` | text field | optional | — | — | — | Terms that must not be changed or translated, as for `proposeTranslations`. | `proposeMarketingContent` body |
+| Grounding refs `groundingRefs` | list of values (chips) | optional | — | at most 50 | — | Products, events, offers or pages the text may cite, read as the caller. Nothing outside them is named. | `proposeMarketingContent` body |
+
+**Sent by *Save A/B test*** (`updateCampaign`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateCampaign` body |
+| Is paused `isPaused` | toggle | optional | — | — | — | — | `updateCampaign` body |
+| Scheduled for `scheduledFor` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateCampaign` body |
+| Content `content` | group | optional | — | — | — | — | `updateCampaign` body |
+| Template `content.templateId` | picker: choose a template | required | — | — | shows names, sends the id | — | `updateCampaign` body |
+| Subject override `content.subjectOverride` | key and value settings | optional | — | — | — | — | `updateCampaign` body |
+| Merge defaults `content.mergeDefaults` | key and value settings | optional | — | — | — | Fallback values for the template's `mergeFields`, by name, used where a guest has no value. | `updateCampaign` body |
+| Promotion `content.promotionId` | picker: choose a promotion | optional | — | — | shows names, sends the id | Offer carried by the campaign. Coupon codes are issued from it. | `updateCampaign` body |
+| Variants `variants` | repeatable rows | optional | — | at most 5 | — | A/B (or up to five-way) content and subject variants (29 September, build pass, group G2; 22.1.17, BO-772). | `updateCampaign` body |
+| Label `variants[].label` | text field | required | — | max length 20 | — | A, B, C... | `updateCampaign` body |
+| Subject override `variants[].subjectOverride` | key and value settings | optional | — | — | — | Subject line by locale. | `updateCampaign` body |
+| Template `variants[].templateId` | picker: choose a template | optional | — | — | shows names, sends the id | A different template for this variant; null uses the campaign's `content.templateId`. | `updateCampaign` body |
+| Split percent `variants[].splitPercent` | stepper or slider | optional | — | min 1; max 100 | — | Share of the test group; null splits evenly. | `updateCampaign` body |
+| Source `variants[].source` | segmented control | optional | Manual | Manual · AI draft | — | — | `updateCampaign` body |
+| AI decision record `variants[].aiDecisionRecordId` | text field | optional | — | — | — | The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`. | `updateCampaign` body |
+| Ab test `abTest` | group | optional | — | Required when `variants` has two or more. | — | How the variants are tested. Required when `variants` has two or more. | `updateCampaign` body |
+| Test percent `abTest.testPercent` | stepper or slider | optional | 20 | min 5; max 100 | — | Share of the audience the variants are tested on; 100 splits everyone and picks no winner. | `updateCampaign` body |
+| Success metric `abTest.successMetric` | radio group | optional | Click rate | Open rate · Click rate · Conversion rate · Attributed revenue | — | — | `updateCampaign` body |
+| Decide after hours `abTest.decideAfterHours` | number field (hours) | optional | 4 | min 1; max 168 | — | — | `updateCampaign` body |
+| Winner rule `abTest.winnerRule` | segmented control | optional | Automatic | Automatic · Manual | — | — | `updateCampaign` body |
+| Minimum sample per variant `abTest.minimumSamplePerVariant` | number field | optional | 500 | min 1 | — | Below this many sends per variant no winner is declared automatically; a person picks. | `updateCampaign` body |
+| Winning variant `abTest.winningVariantId` | picker: choose a winning variant | optional | — | — | shows names, sends the id | Set by the automatic rule, or by a person through `updateCampaign`. | `updateCampaign` body |
+
+**Sent by *Accept recommendation*** (`decideAiInsight`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Review · Accept · Reject · Actioned | — | — | `decideAiInsight` body |
+| Reason `reason` | text area | optional | — | max length 1000 | — | — | `decideAiInsight` body |
+| Action ref `actionRef` | text field | optional | — | — | — | — | `decideAiInsight` body |
+
+**Sent by *Suggest a send time*** (`requestSuggestion`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Kind `kind` | select | required | — | Price · Replenishment · Requisition · Demand forecast · Prep plan · Menu engineering · Staffing · Sla target · Wait time · Upsell · Segmentation · Anomaly …; Anything else is refused — a guest asking for `price` is a guest asking what the venue is willing to … | — | A guest caller may ask for `prepPlan`, `upsell`, `waitTime` and `itinerary` only. | `requestSuggestion` body |
+| Subject ref `subjectRef` | text field | optional | — | — | — | — | `requestSuggestion` body |
+| Horizon `horizon` | text field | optional | — | — | — | For a forecast — `nextService`, `7d`, `28d`, or an ISO period. | `requestSuggestion` body |
+| Context `context` | key and value settings | optional | — | — | — | What the caller already knows. Passed rather than re-fetched so a suggestion made from a screen uses the numbers the screen is showing — advice computed from data the manager … | `requestSuggestion` body |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Campaign** (detail panel, from `getCampaign`)
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Status | chip: Draft, Scheduled, Sending, Paused, Completed, Stopped… | — |
+| Scheduled for | 1 Oct 2026, 14:30 | — |
+| Send time mode | chip: Fixed, Optimised | `optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives for them, inside `sendWindow` (29 September … |
+
+**Variants** (data table, from `getCampaign`): Two or more variants make an A/B test. A row is edited in place; the split percentages add up to 100 before Save is enabled.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | A, B, C... |
+| Template | the name it points at, never the id | A different template for this variant; null uses the campaign's `content.templateId`. |
+| Split percent | 1,234 | Share of the test group; null splits evenly. |
+| Source | chip: Manual, AI draft | — |
+| Is winner | yes / no (icon or chip) | — |
+
+**Results by variant** (data table, from `getCampaignPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Sent | 1,234 | — |
+| Opened | 1,234 | — |
+| Clicked | 1,234 | — |
+| Attributed revenue | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Is winner | yes / no (icon or chip) | — |
+
+**AI recommendations** (data table, from `listMarketingRecommendations`): targetKind campaign, targetRef the campaignId. Uplift is shown as a range with its evidence; accepting one does not change the campaign (a person applies it).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Recommendation | chip: Change segment, Change channel, Change timing, Change offer, Change content, Add … | — |
+| Expected impact | grouped details | A range on the named metric (conversion, open rate, revenue), never a single number (design 5.6). |
+| Rationale | text | — |
+| Priority | chip: Low, Medium, High, Critical | — |
+| Status | chip: New, Reviewed, Accepted, Rejected, Actioned, Measured | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+| Add variant (secondary button) | navigation or local | — | — | — | — |
+| Draft a variant with AI (secondary button) | `proposeMarketingContent` POST `/ai/content-drafts` | inline | AiContentDraftSet | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks … | — |
+| Save A/B test (primary button) | `updateCampaign` PATCH `/campaigns/{campaignId}` | inline | Campaign | 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem) | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Pick winner (primary button) | `updateCampaign` PATCH `/campaigns/{campaignId}` | inline | Campaign | 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem) | — |
+| Accept recommendation (secondary button) | `decideAiInsight` POST `/insights/{insightId}/decide` | inline | AiInsight | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move is not allowed from the insight's state. | — |
+| Reject recommendation (secondary button) | `decideAiInsight` POST `/insights/{insightId}/decide` | inline | AiInsight | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move is not allowed from the insight's state. | — |
+| Suggest a send time (secondary button) | `requestSuggestion` POST `/ai/suggestions` | inline | Suggestion | 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **recommendations**: Recommendation, expected uplift as a range, evidence, stage and Based on; accept applies through updateCampaign by a person. *(source: contracts/satellite/ai.yaml#listMarketingRecommendations / ADR-0050 / ADR-0051 (AI functions review 30 Sep §4 Marketing))*
 
-**Data it reads**: `listMarketingRecommendations` (onLoad, AI recommendations on this campaign or journey, with …)
+**Data it reads**: `getCampaignPerformance` (onLoad, Results per variant, to compare and pick a winner); `listMarketingRecommendations` (onLoad, AI recommendations on this campaign or journey, with …); `getCampaign` (onLoad, The campaign with its variants and A/B settings, as saved); `listMessageTemplates` (onLoad, The templates a variant can use)
 
 **Where the user goes next**
 
@@ -1458,11 +1611,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The optimization list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the optimization untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No optimization yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the optimization are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The campaign, its variants and results load together. |
+| Error (`?state=error`) | Could not load. Names which read failed (campaign, results or recommendations) and leaves the campaign untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No variants yet: the campaign sends one content. Add variant starts a test. |
+| Empty, no results (`?state=emptyNoResults`) | No results yet: the test has not sent. Results appear after the first send. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `getCampaignPerformance` requires to show this screen, and names that permission (the screen's other reads need `AI_USE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `updateCampaign`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and …; 409 The move is not allowed from the insight's state.; 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem); 422 A setting the answer cannot do without is missing (29 … |
 
@@ -1490,12 +1643,14 @@ recommendation:
 - `decideAiInsight` → `AI_USE` (operate) · staff
 - `requestSuggestion` → `AI_USE` (operate) · staff, guest
 - `updateCampaign` → `MARKETING_MANAGE` (configure) · staff
+- `getCampaign` → `MARKETING_VIEW` (read) · staff
+- `listMessageTemplates` → `MARKETING_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `getCampaignPerformance` requires to show this screen, and names that permission (the screen's other reads need `AI_USE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `updateCampaign`.
 
 #### Requirements it meets
 
-26 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+31 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1511,7 +1666,7 @@ recommendation:
 | 22.9.17 | AI Language Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
 | 22.10.14 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
 | 22.10.16 | AI Website Builder | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
-| … 14 more | | | | `traceability.json` |
+| … 19 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1533,10 +1688,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (48), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-772?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Add variant, Draft a variant with AI, Save A/B test, Cancel, Pick winner, Accept recommendation, Reject recommendation, Suggest a send time.
 - [ ] Every transition is wired: `BO-764`.
 - [ ] Every gated control is gated: `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1775,6 +1930,7 @@ Method, path, parameters, request and response for every operation these screens
 "listCampaigns": {"method":"GET","path":"/campaigns","contract":"marketing-crm","summary":"List campaigns","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMarketingRecommendations": {"method":"GET","path":"/marketing-recommendations","contract":"ai","summary":"Recommendations on marketing campaigns and journeys","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"targetKind","in":"query","required":true},{"name":"targetRef","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listSegments": {"method":"GET","path":"/segments","contract":"marketing-crm","summary":"List segments","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "proposeMarketingContent": {"method":"POST","path":"/ai/content-drafts","contract":"ai","summary":"Draft marketing content for a person to edit and apply","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "requestSuggestion": {"method":"POST","path":"/ai/suggestions","contract":"ai","summary":"Ask for an answer, however it is currently produced","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Suggestion"},
 "testSendCampaign": {"method":"POST","path":"/campaigns/{campaignId}/test-send","contract":"marketing-crm","summary":"Send a test to named recipients","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
@@ -1793,7 +1949,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiMarketingRecommendation": {"type":"object","x-ticvai-persistence":"none — read from ai.insight (kind marketingRecommendation)","description":"One recommendation on a campaign or journey (22.1.16, 22.3.17), decided through `decideAiInsight` and applied by a person in marketing-crm.","required":["insightId","targetKind","targetRef","recommendation","status"],"properties":{"insightId":{"type":"string","format":"uuid","description":"The `ai.insight` row; `decideAiInsight` takes it."},"targetKind":{"type":"string","enum":["campaign","journey"]},"targetRef":{"type":"string"},"recommendation":{"type":"string","enum":["changeSegment","changeChannel","changeTiming","changeOffer","changeContent","addStep","removeStep","reorderSteps","startJourneyFromTemplate"]},"parameters":{"type":"object","additionalProperties":true,"nullable":true,"description":"What to change to, e.g. the channel, the send hour, the step to drop."},"expectedImpact":{"type":"object","nullable":true,"properties":{"metric":{"type":"string"},"low":{"type":"number"},"high":{"type":"number"}},"description":"A range on the named metric (conversion, open rate, revenue), never a single number (design 5.6)."},"rationale":{"type":"string"},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"priority":{"type":"string","enum":["low","medium","high","critical"]},"status":{"type":"string","enum":["new","reviewed","accepted","rejected","actioned","measured"]},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"detectedAt":{"type":"string","format":"date-time"}}},
 "AiMaturity": {"type":"object","x-ticvai-persistence":"none — embedded as jsonb on ai.suggestion and ai.forecast_version","description":"**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.","required":["stage","basedOn"],"properties":{"stage":{"type":"string","enum":["starting","learning","established","learned"],"description":"`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."},"basedOn":{"type":"string","description":"The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."},"sources":{"type":"array","items":{"type":"object","required":["source"],"properties":{"source":{"type":"string","enum":["venueSettings","startingPattern","calendar","weather","bookingsOnHand","ownHistory","importedHistory","configuration","trainedModel"]},"detail":{"type":"string","nullable":true,"description":"e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."},"observations":{"type":"integer","nullable":true}}}},"ownDataShare":{"type":"number","minimum":0,"maximum":1,"description":"The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."},"limitedHistory":{"type":"boolean"},"nextStage":{"type":"object","nullable":true,"description":"What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.","properties":{"stage":{"type":"string","enum":["learning","established","learned"]},"needs":{"type":"string"},"expectedBy":{"type":"string","format":"date","nullable":true}}}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
 "ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
@@ -1810,10 +1966,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
 "CreateApprovalRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["id","kind","subjectContract","subjectType","subjectId","scopePath","summary"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"subjectContract":{"type":"string","description":"Which contract owns the thing being approved."},"subjectType":{"type":"string"},"subjectId":{"type":"string","description":"**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"},"scopePath":{"type":"string"},"summary":{"type":"string","maxLength":300,"description":"What the approver sees in their queue before opening it."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributes":{"type":"object","additionalProperties":true},"justification":{"type":"string","maxLength":1000},"isDraft":{"type":"boolean","default":false,"description":"True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"}}},
 "CreateCampaignRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","kind","channel","segmentId","content"],"properties":{"name":{"type":"string","maxLength":200},"kind":{"$ref":"#/components/schemas/CampaignKind"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"venueId":{"type":"string","format":"uuid"},"segmentId":{"type":"string","format":"uuid"},"content":{"$ref":"#/components/schemas/CampaignContent"},"trigger":{"$ref":"#/components/schemas/CampaignTrigger"},"scheduledFor":{"type":"string","format":"date-time"},"consentPurpose":{"allOf":[{"$ref":"#/components/schemas/ConsentPurpose"}],"default":"marketing"},"sendWindow":{"type":"object","description":"Hours during which sending is permitted. A promotional message at 3am is a complaint waiting to happen.\n","properties":{"startTime":{"type":"string"},"endTime":{"type":"string"},"timeZone":{"type":"string"}}},"sendTimeMode":{"type":"string","enum":["fixed","optimised"],"default":"fixed","description":"`optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives for them, inside `sendWindow` (29 September, build pass, group G2; 22.3.19). `fixed` is the behaviour before. Falls back to `scheduledFor` per recipient where there is no suggestion or AI is off."},"optimiseChannel":{"type":"boolean","default":false,"description":"With `sendTimeMode` `optimised`, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). Off keeps `channel`."},"variants":{"type":"array","maxItems":5,"nullable":true,"description":"**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2; 22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of `marketing.campaign_variant`. Null or empty is a single-content campaign.","items":{"$ref":"#/components/schemas/MarketingCampaignVariant"}},"abTest":{"type":"object","nullable":true,"description":"How the variants are tested. Required when `variants` has two or more.","properties":{"testPercent":{"type":"integer","minimum":5,"maximum":100,"default":20,"description":"Share of the audience the variants are tested on; 100 splits everyone and picks no winner."},"successMetric":{"type":"string","enum":["openRate","clickRate","conversionRate","attributedRevenue"],"default":"clickRate"},"decideAfterHours":{"type":"integer","minimum":1,"maximum":168,"default":4},"winnerRule":{"type":"string","enum":["automatic","manual"],"default":"automatic"},"minimumSamplePerVariant":{"type":"integer","minimum":1,"default":500,"description":"Below this many sends per variant no winner is declared automatically; a person picks."},"winningVariantId":{"type":"string","format":"uuid","nullable":true,"description":"Set by the automatic rule, or by a person through `updateCampaign`."}}}}},
+"CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"ruleGroups":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.","items":{"$ref":"#/components/schemas/SegmentRuleGroup"}},"effectiveFrom":{"type":"string","format":"date-time","nullable":true,"description":"The segment is evaluated for sends only from this time."},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who answers for the segment; defaults to its creator."},"requiresApproval":{"type":"boolean","default":false,"description":"Where true, a campaign may use the segment only after an `approvals` request on it is approved."}}},
 "MarketingCampaignVariant": {"type":"object","x-ticvai-persistence":"marketing.campaign_variant","description":"One content or subject variant of a campaign, for an A/B test (22.1.17; 29 September, build pass, group G2, from group G1's handoff). Written with its campaign by `createCampaign` and `updateCampaign`.","required":["label"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"campaignId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"marketing.campaign"},"label":{"type":"string","maxLength":20,"description":"A, B, C..."},"subjectOverride":{"type":"object","nullable":true,"description":"Subject line by locale.","additionalProperties":{"type":"string"}},"templateId":{"type":"string","format":"uuid","nullable":true,"description":"A different template for this variant; null uses the campaign's `content.templateId`."},"splitPercent":{"type":"integer","minimum":1,"maximum":100,"nullable":true,"description":"Share of the test group; null splits evenly."},"source":{"type":"string","enum":["manual","aiDraft"],"default":"manual"},"aiDecisionRecordId":{"type":"string","nullable":true,"description":"The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`."},"isWinner":{"type":"boolean","default":false,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005), the campaign's."}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Segment": {"x-ticvai-persistence":"marketing.segment + marketing.segment_criterion","allOf":[{"$ref":"#/components/schemas/CreateSegmentRequest"},{"type":"object","required":["id","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"lastEvaluatedSize":{"type":"integer","nullable":true},"lastEvaluatedAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"}}}]},
 "Suggestion": {"type":"object","x-ticvai-persistence":"ai.suggestion","description":"One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n","required":["id","kind","basis","maturity","producedAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/SuggestionKind"},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"scopePath":{"type":"string"},"subjectRef":{"type":"string","nullable":true,"description":"What it is about — a product, an outlet, an item, a party."},"value":{"type":"object","additionalProperties":true,"description":"The suggestion itself. Shape depends on `kind`."},"confidence":{"type":"number","nullable":true,"minimum":0,"maximum":1,"description":"**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"},"explanation":{"type":"string","description":"**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"},"inputs":{"type":"object","additionalProperties":true,"description":"What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"},"producerRef":{"type":"string","description":"The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"description":"**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"}}},
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "SuggestionKind": {"type":"string","description":"What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n","enum":["price","replenishment","requisition","demandForecast","prepPlan","menuEngineering","staffing","slaTarget","waitTime","upsell","segmentation","anomaly","scenario","sendTime","wasteRisk","queueBalancing","itinerary"]}

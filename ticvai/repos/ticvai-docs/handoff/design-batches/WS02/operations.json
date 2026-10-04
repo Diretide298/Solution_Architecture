@@ -258,6 +258,30 @@
   "requestBody": null,
   "responds": "GuestCompanionEligibilityRulesView"
  },
+ "listVisualAccessRules": {
+  "method": "GET",
+  "path": "/visual-access-rules",
+  "contract": "access",
+  "summary": "The visual access rules at a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "publishRuleConflictCheck": {
   "method": "PUT",
   "path": "/rule-conflict-check",

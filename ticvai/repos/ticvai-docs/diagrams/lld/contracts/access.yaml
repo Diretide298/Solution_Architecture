@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 256 operations
+title: access — 257 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -339,7 +339,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.biometric_profile
   writes: []
 - operation: getBleBeaconGeofence
   verb: GET
@@ -349,7 +350,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.device_placement
   writes: []
 - operation: getCredentialIssuanceRetryPolicy
   verb: GET
@@ -410,7 +413,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.biometric_profile
   writes: []
 - operation: getFacePassEnrolment
   verb: GET
@@ -480,7 +484,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_template
   writes: []
 - operation: getVirtualTicketIdentity
   verb: GET
@@ -490,7 +495,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_policy
   writes: []
 - operation: issueOrderEntitlements
   verb: POST
@@ -764,7 +770,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - tenancy.data_retention_setting
   writes: []
 - operation: listBiometricValidationGate
   verb: GET
@@ -1988,6 +1995,18 @@ operations:
   offline: false
   reads:
   - access.ticket_status_transition
+  writes: []
+- operation: listVisualAccessRules
+  verb: GET
+  path: /visual-access-rules
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.admission_rules
+  - access.entry_rule_point
   writes: []
 - operation: lockIdentity
   verb: POST

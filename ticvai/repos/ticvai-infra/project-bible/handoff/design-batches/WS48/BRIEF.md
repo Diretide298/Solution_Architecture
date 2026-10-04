@@ -114,8 +114,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-173` | Gift, Free Product & Added-Value Offer Builder | B–D | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-174` | Cross-Category Promotion Builder | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-175` | Reward Selection, Substitution & Customer Choice | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-176` | Advanced Offer Guardrails & Conflict Controls | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | C | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-176` | Advanced Offer Guardrails & Conflict Controls | B | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | B | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

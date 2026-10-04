@@ -2610,7 +2610,7 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.\n\n**One recipe screen per dish, two tabs: Recipe | Substitutions & allergens** (decided 2 October 2026, merge as proposed; CHG-SBO-021; DI-987, DI-474). BO-110 Recipe & BOM Management is merged in; this id is kept as the home because flows F31 and F93 run on it.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.\n\n**One recipe screen per dish, two tabs: Recipe | Substitutions & allergens** (decided 2 October 2026, merge as proposed; CHG-SBO-021; DI-987, DI-474). BO-110 Recipe & BOM Management is merged in; this id is kept as the home because flows F31 and F93 run on it.\n\n**The recipeId listIngredientSubstitutes and setIngredientSubstitutes need is Recipe.id (readOnly, agreed with contracts in the ledger 4 October 2026); the selected recipe row carries it** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "FnB Board 2.dc.html#fnb-2f",
@@ -2688,13 +2688,15 @@
        "label": "Recipes",
        "bindsTo": "Recipe",
        "columns": [
+        "Recipe.id",
         "Recipe.menuItemId",
         "Recipe.yield",
         "Recipe.costPerPortion"
        ],
        "operation": "listRecipes",
-       "provenance": "contract fnb.yaml GET /recipes",
-       "tab": "Recipe"
+       "provenance": "contract fnb.yaml Recipe (defined 4 October 2026, CHG-FXS-003)",
+       "tab": "Recipe",
+       "notes": "Selecting a row sets the recipeId (Recipe.id, agreed field) for the substitutes and substitution rules."
       }
      ]
     },
@@ -2958,7 +2960,7 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.\n\n**One Production screen, three tabs: Plan | Commissary | Batches** (decided 2 October 2026, merge as proposed; CHG-SBO-021; DI-987, DI-671). BO-113 Central Kitchen & Commissary and BO-138 Production Execution & Batch are merged in; consumption stays with stock (BO-137). **The commissary is an outlet that produces for others** (DEC-186, DEC-188): a producing outlet's runs are sent to the outlets they serve with Send to outlets.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.\n\n**One Production screen, three tabs: Plan | Commissary | Batches** (decided 2 October 2026, merge as proposed; CHG-SBO-021; DI-987, DI-671). BO-113 Central Kitchen & Commissary and BO-138 Production Execution & Batch are merged in; consumption stays with stock (BO-137). **The commissary is an outlet that produces for others** (DEC-186, DEC-188): a producing outlet's runs are sent to the outlets they serve with Send to outlets.\n\n**Plans are listed with listProductionPlans (agreed, ledger) 4 October 2026; a draft is built only by the Build plan action** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "FnB Board 2.dc.html#fnb-2m"
@@ -3005,6 +3007,18 @@
        "operation": "getProductionRun",
        "provenance": "contract fnb.yaml GET /production-runs/{runId}; wiring fix, 2 October 2026",
        "tab": "Batches"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Production plans",
+       "bindsTo": "ProductionPlan",
+       "operation": "listProductionPlans",
+       "columns": [
+        "ProductionPlan.forDate",
+        "ProductionPlan.status"
+       ],
+       "notes": "Opening the screen lists plans; Build plan makes a new draft only when pressed, never on load.",
+       "provenance": "agreed operation `listProductionPlans`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -3120,6 +3134,13 @@
     "purpose": "One batch",
     "trigger": "onAction",
     "provenance": "merged from BO-138, 2 October 2026"
+   },
+   {
+    "operationId": "listProductionPlans",
+    "contract": "fnb",
+    "purpose": "The production plans by date and status, to reopen one (planId): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

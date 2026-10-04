@@ -33,7 +33,7 @@
 | [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 1 | 1 |
 | [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 1 | 5 |
 | [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 1 | 3 |
-| [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 3 |
+| [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 4 |
 | [POS-000](#pos-000-sign-in) | Sign In | Shift | 1 | 8 |
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 7 |
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 32 |
@@ -41,7 +41,7 @@
 | [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 7 |
 | [POS-005](#pos-005-payment) | Payment | Payment | 1 | 13 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
-| [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 8 |
+| [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 9 |
 | [POS-008](#pos-008-reports) | Reports | Reports | 1 | 4 |
 | [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 1 | 3 |
 | [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 5 |
@@ -54,16 +54,16 @@
 | [POS-017](#pos-017-cash-in-cash-out-operations) | Cash In / Cash Out Operations | Sell | 1 | 2 |
 | [POS-018](#pos-018-safe-drop-cash-transfer-management) | Safe Drop & Cash Transfer Management | Sell | 1 | 3 |
 | [POS-019](#pos-019-shift-templates-policies) | Shift Templates & Policies | Sell | 1 | 3 |
-| [POS-020](#pos-020-shift-exceptions-alerts) | Shift Exceptions & Alerts | Sell | 1 | 5 |
-| [POS-021](#pos-021-sell-food-drink) | Sell — Food & Drink | Sell | 1 | 4 |
+| [POS-020](#pos-020-shift-exceptions-alerts) | Shift Exceptions & Alerts | Sell | 1 | 6 |
+| [POS-021](#pos-021-sell-food-drink) | Sell — Food & Drink | Sell | 1 | 5 |
 | [POS-022](#pos-022-send-to-kitchen) | Send to Kitchen | Sell | 1 | 5 |
-| [POS-023](#pos-023-sell-merchandise) | Sell — Merchandise | Sell | 1 | 4 |
-| [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 5 |
-| [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 7 |
-| [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 6 |
+| [POS-023](#pos-023-sell-merchandise) | Sell — Merchandise | Sell | 1 | 3 |
+| [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 6 |
+| [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 8 |
+| [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 8 |
 | [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 5 |
 | [POS-028](#pos-028-table-service) | Table Service | Sell | 1 | 13 |
-| [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 1 |
+| [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 4 |
 | [POS-030](#pos-030-sales-journal) | Sales Journal | Sell | 1 | 8 |
 | [POS-031](#pos-031-reservations-group-arrivals) | Reservations & Group Arrivals | Sell | 1 | 9 |
 
@@ -118,7 +118,7 @@
 | KIT-008 | Exceptions, Re-Fire & Unavailable Items | ticketId |  |
 | KIT-009 | SLA, Priority & Service Rules |  |  |
 | KIT-010 | Kitchen Performance, AI & Operational Optimization |  |  |
-| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
+| KIT-002 | Kitchen Display System (KDS) | ticketId, visitId |  |
 
 ## KIT-002 Kitchen Display System (KDS)
 
@@ -363,7 +363,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | KIT-001 | Kitchen Operations Command Center |  |  |
-| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
+| KIT-002 | Kitchen Display System (KDS) | ticketId, visitId |  |
 
 ## KIT-007 Guest Collection, Buzzer & Digital Notification
 
@@ -522,7 +522,7 @@
 |---|---|
 | venueId | session |
 | stationId | session |
-| dashboardId | KIT-002 |
+| dashboardId | navigation |
 
 **Operations**
 
@@ -531,6 +531,7 @@
 | `getDashboard` | [ReportingService](../backend/ReportingService.md#getdashboard) | onLoad | Read a dashboard with tile data | `REPORT_VIEW_VENUE` |
 | `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
 | `recordDashboardView` | [ReportingService](../backend/ReportingService.md#recorddashboardview) | background | Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it. | `REPORT_VIEW_VENUE` |
+| `listDashboards` | [ReportingService](../backend/ReportingService.md#listdashboards) | onLoad | The venue's kitchen dashboard (module fnb, shared): its id is what getDashboard reads | `REPORT_VIEW_VENUE` |
 
 **States**
 
@@ -540,7 +541,7 @@
 | error | Could not load the performance figures. Names which read failed. |
 | emptyFirstRun | Insufficient data: fewer service days than the analysis needs; says how many more. |
 | emptyNoResults | No service in the chosen period. |
-| emptyNoAccess | Shown when the caller lacks REPORT_VIEW_VENUE, and names it. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getDashboard` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available offline. `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. Corrected 24 August: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |
 
 **Goes to**
@@ -773,8 +774,8 @@
 | Module | Sell |
 | Wave | 1 |
 | Licensed module | ticketing |
-| Route | `/sell/sell-timed-entry` |
-| Component | `apps/venue-pos/src/routes/sell/SellTimedEntryForm.tsx` |
+| Route | `/sell/sell-ticket-catalogue/timedentry` |
+| Component | `apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -827,8 +828,8 @@
 | Module | Sell |
 | Wave | 1 |
 | Licensed module | seating |
-| Route | `/sell/sell-seat-map` |
-| Component | `apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx` |
+| Route | `/sell/sell-ticket-catalogue/seatmap` |
+| Component | `apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx` |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1024,6 +1025,7 @@
 | `rejectShiftVariance` | [OrderService](../backend/OrderService.md#rejectshiftvariance) | onAction | A supervisor sends a counted shift back for a recount, with a reason and their PIN; the shift stays pendingVariance (DEC-175; CHG-CSP-013) | `OVERSHORT_ACCEPT` |
 | `getShiftCountLines` | [OrderService](../backend/OrderService.md#getshiftcountlines) | onAction | The denominations the cashier counted, line by line, for the supervisor reviewing the shift; counted values only, never the expected figure (CHG-CSP-014) | `REPORT_VIEW_WORKSTATION` |
 | `closeShift` | [OrderService](../backend/OrderService.md#closeshift) | onAction | A supervisor closes a cashier's shift on this till or any till of the venue, with their own PIN; counted, expected and variance go to the supervisor only (decided 2 October 2026, Chinmay, pre-apply round; DEC-059; CHG-CSP-012, CHG-SPO-021) | `SHIFT_CLOSE` |
+| `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | Shifts of the venue waiting for a supervisor (status pendingVariance) or a recount, on any till: F32's 'from whichever till they are at' | `REPORT_VIEW_WORKSTATION` |
 
 **States**
 
@@ -1652,6 +1654,7 @@
 | `createApprovalRequest` | [TenancyService](../backend/TenancyService.md#createapprovalrequest) | onAction | Raise a request | `APPROVAL_REQUEST` |
 | `decideApprovalRequest` | [TenancyService](../backend/TenancyService.md#decideapprovalrequest) | onAction | Approve or reject | `APPROVAL_DECIDE` |
 | `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Shift summary -- runs the seeded report shiftSummary (audit R282) | `REPORT_VIEW_VENUE` |
+| `listApprovalRequests` | [TenancyService](../backend/TenancyService.md#listapprovalrequests) | onLoad | The approval requests waiting for this supervisor (assignedToMe, status pending); each row's id is what decideApprovalRequest takes | `APPROVAL_VIEW` |
 
 **States**
 
@@ -1661,7 +1664,7 @@
 | error | Could not load. Names which read failed and leaves the shift exceptions alerts untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | emptyNoResults | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the shift exceptions alerts are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission (the screen's other reads need `APPROVAL_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`. |
 | offline | The till keeps taking money; this screen does not keep showing alerts. `listAlerts` reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. Corrected 24 August: the prose claimed continued function the wiring cannot deliver. |
 
 **Goes to**
@@ -1701,6 +1704,7 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 | `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
+| `getOutlet` | [TenancyService](../backend/TenancyService.md#getoutlet) | onLoad | The outlet's paymentTiming (pay first or send first, POS-021 decision), which decides whether Pay or Send to kitchen comes first | `SCOPE_VIEW` |
 
 **States**
 
@@ -1710,7 +1714,7 @@
 | error | Could not load. The last published menu is still on the device — a till that stops selling because a panel failed is worse than a stale panel. |
 | emptyFirstRun | No menu published for this outlet. Names the back-office screen that publishes one rather than showing an empty board. |
 | emptyNoResults | Nothing matches this section. |
-| emptyNoAccess | You do not have permission to sell at this outlet. |
+| emptyNoAccess | Shown when the caller lacks `SCOPE_VIEW`, which `getOutlet` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`; `PRODUCT_CONFIGURE` for `setItemAvailability`. |
 | offline | Selling continues from the cached menu. 86 changes made while offline arrive on sync, which is why an item can be sold that the kitchen has just marked unavailable — the kitchen refuses it and the guest is refunded at the counter. |
 | denied | Ordering is refused without `payment.take`. The kitchen is not fired, so nothing is cooked against a sale that cannot be paid for. |
 | soldOutByCount | A dish whose daily count reached zero shows Sold out and cannot be added; the kitchen or the back office sets tomorrow's count (DEC-194; CHG-CSA-017). |
@@ -1802,7 +1806,6 @@
 |---|---|---|---|---|
 | `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
-| `createRetailSale` | [RetailService](../backend/RetailService.md#createretailsale) | onAction | Sell merchandise | `ORDER_CREATE` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 
 **States**
@@ -1813,7 +1816,7 @@
 | error | Could not load. The cached catalogue is still sellable. |
 | emptyFirstRun | No merchandise published to this outlet. |
 | emptyNoResults | Nothing matches. A scan that finds nothing is a barcode not in the catalogue — said plainly, because the cashier will otherwise scan it four more times. |
-| emptyNoAccess | You do not have permission to sell at this store. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `lookupMerchandise` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`. |
 | offline | A retail sale needs the link (`createRetailSale` is not offline-capable). The tiles stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail POS-023; the offline-overselling rule is an open question, CHG-SPO-020.) |
 | denied | Merchandise scans and prices normally; charging needs `payment.take`. Stock reserved on add is released rather than held against a sale that cannot complete. |
 | stockConflict | The merchandise line went out of stock between scan and charge. The line is flagged and the rest of the sale stands. |
@@ -1823,7 +1826,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-005 | Charge | discount | payment.take |
-| POS-002 | Sell — Ticket Catalogue | orderId, promotionId |  |
+| POS-002 | Sell — Ticket Catalogue | promotionId |  |
 
 ## POS-024 Outlet Setup
 
@@ -1855,6 +1858,7 @@
 | `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
 | `getTableMap` | [FnbService](../backend/FnbService.md#gettablemap) | onLoad | The outlet's floor as it is laid out | `ORDER_VIEW` |
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | List the outlet's menu items for the '86 an item' picker | `None` |
+| `listTableCombinations` | [FnbService](../backend/FnbService.md#listtablecombinations) | onLoad | The combinations already declared, read before the whole-set save (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026) | `PRODUCT_VIEW` |
 
 **States**
 
@@ -1864,7 +1868,7 @@
 | error | Could not load configuration. Selling is unaffected. |
 | emptyFirstRun | A new outlet with no layout. The one action that draws the first table. |
 | emptyNoResults | Nothing matches. |
-| emptyNoAccess | You are signed in as a cashier. Configuration needs a manager role — ADR-0002 makes that the person, not the device, so signing in again on this same till is the way through. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`, `setTableCombinations`, `setItemAvailability`. |
 | offline | Configuration is refused offline. A table layout edited on two disconnected tablets is two layouts, and the room only has one. |
 
 **Goes to**
@@ -1904,6 +1908,7 @@
 | `listDevices` | [TenancyService](../backend/TenancyService.md#listdevices) | onLoad | The peripherals bound to this workstation | `DEVICE_VIEW` |
 | `suspendShift` | [OrderService](../backend/OrderService.md#suspendshift) | onAction | Suspend the shift so another user can sign in | `SHIFT_SUSPEND` |
 | `reopenShift` | [OrderService](../backend/OrderService.md#reopenshift) | onAction | Supervisor reopens a shift closed in error (PIN step-up, R144) | `SHIFT_REOPEN` |
+| `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | This till's last closed shift (query workstationId, status closed), the one a supervisor may reopen | `REPORT_VIEW_WORKSTATION` |
 
 **States**
 
@@ -1912,7 +1917,7 @@
 | loading | The saved till home. |
 | error | Could not load. Names which read failed and leaves the till home untouched. |
 | emptyFirstRun | A till with no sale boards assigned. Nothing to create here: says that the till layout is set per outlet in the back office (with a till override on POS-016) and names who at the venue configures it, and the launcher shows only what needs no board (design-notes correction platform-foundation POS-025). |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SHIFT_REOPEN` for `reopenShift`; `SHIFT_SUSPEND` for `suspendShift`. |
 | offline | Working from the local journal. The tiles show what this workstation knows; the queue and alerts are last-known and say so. |
 | denied | Names the permission the operator does not hold and who at this venue does. Never a disabled tile with no explanation — that reads as a broken till. |
 
@@ -1969,6 +1974,8 @@
 | `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
 | `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
 | `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onAction | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | The order as it was sold, with each line's entitlementIds | `ORDER_VIEW` |
+| `listTaxInvoices` | [LedgerService](../backend/LedgerService.md#listtaxinvoices) | onAction | The order's simplified tax invoice when the entry carries no invoiceId (query orderId) | `LEDGER_VIEW` |
 
 **States**
 
@@ -1977,7 +1984,7 @@
 | loading | The saved receipt. |
 | error | Could not load. Names which read failed and leaves the receipt untouched. |
 | emptyFirstRun | No receipt yet. Carries the create action and says what the till does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `LEDGER_VIEW`, which `getTaxInvoice` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`; `ORDER_EXCHANGE` for `reissueEntitlement`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`. |
 | offline | Reprint is available offline; reissue is not. A reissue changes what the gate will admit, and the gate cannot be told from here. |
 
 **Goes to**
@@ -2112,12 +2119,17 @@
 |---|---|
 | workstationId | session |
 | outletId | session |
+| orderId | navigation |
+| ticketId | navigation |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listFnbOrders` | [FnbService](../backend/FnbService.md#listfnborders) | onLoad | Every order this outlet is working | `ORDER_VIEW` |
+| `acceptFnbOrder` | [FnbService](../backend/FnbService.md#acceptfnborder) | onAction | Received to preparing: the outlet takes the order | `ORDER_MODIFY` |
+| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Preparing to ready: advance the order's kitchen ticket | `ORDER_MODIFY` |
+| `recordOrderHandover` | [FnbService](../backend/FnbService.md#recordorderhandover) | onAction | Hand the order over: served, collected or delivered (contracts, ledger: these are the stages after ready) | `ORDER_MODIFY` |
 
 **States**
 
@@ -2126,7 +2138,7 @@
 | loading | The saved queue. |
 | error | Could not load. Names which read failed and leaves the queue untouched. |
 | emptyFirstRun | No queue yet. Offers no create action — this screen declares no operation that makes one and says what the till does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `acceptFnbOrder`, `setKitchenTicketStatus`, `recordOrderHandover`. |
 | offline | The queue is the one thing that must never look current when it is not. Offline, every card carries the time it was last known and the advance action is withheld. |
 
 **Goes to**

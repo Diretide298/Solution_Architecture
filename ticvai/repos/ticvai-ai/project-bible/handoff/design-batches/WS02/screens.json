@@ -326,60 +326,114 @@
   "density": "compact",
   "purposeNote": "Complex admission rules can be configured without code or vendor development.",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "Visual access rules listed with the selected rule edited beside it (defined 4 October 2026 from VisualAccessRuleBuilderInput, CHG-FXS-001).",
   "purpose": "Provide a no-code rule engine. This is where TICVAI should become significantly easier to configure than traditional access-control systems.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Access Control Module_Reference.pdf, page 18"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Access Control Module_Reference.pdf, page 18"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
     {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Rules",
+       "bindsTo": "VisualAccessRuleBuilderView",
+       "operation": "listVisualAccessRules",
+       "columns": [
+        "VisualAccessRuleBuilderView.name",
+        "VisualAccessRuleBuilderView.decision",
+        "VisualAccessRuleBuilderView.appliesTo",
+        "VisualAccessRuleBuilderView.locationIds"
+       ],
+       "provenance": "agreed operation `listVisualAccessRules`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setVisualAccessRule"
+       "label": "New rule",
+       "notes": "Opens an empty rule; ruleId is a client UUIDv7.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contextPanel",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Rule name",
+       "bindsTo": "VisualAccessRuleBuilderInput.name",
+       "operation": "setVisualAccessRule",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Applies to",
+       "bindsTo": "VisualAccessRuleBuilderInput.appliesTo",
+       "operation": "setVisualAccessRule",
+       "notes": "The credential or ticket kinds the rule covers (WHEN).",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.appliesTo (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Locations",
+       "bindsTo": "VisualAccessRuleBuilderInput.locationIds",
+       "operation": "setVisualAccessRule",
+       "notes": "Gates and zones (AT).",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.locationIds (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Conditions",
+       "bindsTo": "VisualAccessRuleBuilderInput.conditions",
+       "operation": "setVisualAccessRule",
+       "notes": "IF clauses, each one line.",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.conditions (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Combine conditions",
+       "bindsTo": "VisualAccessRuleBuilderInput.logic",
+       "operation": "setVisualAccessRule",
+       "notes": "all or any.",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.logic (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Decision",
+       "bindsTo": "VisualAccessRuleBuilderInput.decision",
+       "operation": "setVisualAccessRule",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.decision (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Consequences",
+       "bindsTo": "VisualAccessRuleBuilderInput.consequences",
+       "operation": "setVisualAccessRule",
+       "provenance": "contract access.yaml VisualAccessRuleBuilderInput.consequences (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save rule",
+       "operation": "setVisualAccessRule",
+       "notes": "Upsert on ruleId.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setVisualAccessRule"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Rules",
-       "operation": "listAdmissionRules",
-       "provenance": "contract access.yaml GET /admission-rules; wiring fix, 2 October 2026"
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The visual access rule list.",
-   "error": "Could not load. Names which read failed and leaves the visual access rule untouched.",
-   "emptyFirstRun": "No visual access rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No rules yet. Carries New rule.",
    "emptyNoResults": "The filter narrowed it and the visual access rule are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `setVisualAccessRule` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -389,11 +443,11 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "listAdmissionRules",
+    "operationId": "listVisualAccessRules",
     "contract": "access",
-    "purpose": "The admission profiles whose ruleConditions the builder edits",
+    "purpose": "The venue's visual access rules: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
     "trigger": "onLoad",
-    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -402,7 +456,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-155",
    "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-155"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
+  "notes": "**Defined 4 October 2026 from VisualAccessRuleBuilderInput: the rules are read with listVisualAccessRules (agreed in the ledger) and saved one at a time by ruleId; the admission profiles (listAdmissionRules) share no fields with a rule and left the screen** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

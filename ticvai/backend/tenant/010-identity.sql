@@ -1,4 +1,4 @@
--- identity — 32 tables
+-- identity — 33 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS identity.authorisation_policy (
     description                       text,
     is_template                       boolean DEFAULT false,
     permissions                       text[],
+    conditions                        jsonb,
     combining                         text DEFAULT 'allMustMatch' CONSTRAINT authorisation_policy_combining_chk CHECK (combining IN ('allMustMatch', 'anyMayMatch')),
     effect                            text NOT NULL CONSTRAINT authorisation_policy_effect_chk CHECK (effect IN ('permit', 'deny')),
     priority                          integer DEFAULT 0,
@@ -188,6 +189,15 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     granted_by_principal_id           uuid NOT NULL,
     revoked_by_principal_id           uuid,
     scope_id                          uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS identity.guest_credential (
+    id                                uuid PRIMARY KEY NOT NULL,
+    subject_id                        uuid NOT NULL,
+    password_hash                     text NOT NULL,
+    failed_attempts                   integer NOT NULL,
+    locked_until                      timestamptz,
+    password_set_at                   timestamptz
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing

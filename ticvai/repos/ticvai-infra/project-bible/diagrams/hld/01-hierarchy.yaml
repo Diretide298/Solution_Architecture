@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 596
-  configurations: 111
+  operations: 603
+  configurations: 113
   configuredBy:
   - claimCustomDomain
   - configureAiCapability
@@ -91,7 +91,7 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 2016
+  operations: 2026
   configurations: 184
   configuredBy:
   - cloneAccreditationProgramme

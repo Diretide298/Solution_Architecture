@@ -262,7 +262,8 @@ CREATE TABLE IF NOT EXISTS orders.deposit (
     status                            text NOT NULL CONSTRAINT deposit_status_chk CHECK (char_length(status) <= 30),
     settled_at                        timestamptz,
     created_at                        timestamptz,
-    updated_at                        timestamptz
+    updated_at                        timestamptz,
+    ledger_deposit_id                 uuid
 );
 
 -- A cashier’s cash box. Allocated to a person, not a workstation — a cashier moving between tills
@@ -639,6 +640,8 @@ CREATE TABLE IF NOT EXISTS orders.group_visit_plan (
     updated_at                        timestamptz
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.guest_credit_account (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -1339,7 +1342,7 @@ CREATE TABLE IF NOT EXISTS orders.status_transition_rule (
 -- A hold against any stored-value instrument (CF-126). Two-phase spend for all six, where only the
 -- retail wallet had it — a guest with 200 game credits starting a play the machine then failed had
 -- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 4 operations
--- read it and 5 write it; written by 3 contracts — marketing-crm, orders, resources.
+-- read it and 6 write it; written by 3 contracts — marketing-crm, orders, resources.
 CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT stored_value_authorisation_kind_chk CHECK (kind IN ('wallet', 'giftCard', 'gameCard', 'voucher', 'loyalty', 'prepaidEntitlement')),
@@ -1354,7 +1357,7 @@ CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
 
 -- Ticket artwork and media selection (BL-102). A venue changing its artwork had no path that was
 -- not a code change. Hangs off: reaches orders.sales_order through its keys. Reached by: 7
--- operations read it and 2 write it; 1 tables reference it.
+-- operations read it and 4 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.ticket_template (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,

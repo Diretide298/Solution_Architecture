@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Resources
   version: 1.0.0
-  x-ticvai-screen-count: 61
+  x-ticvai-screen-count: 62
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -69,6 +69,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
         - "P08 BO-854 Resource Management Command Center"
+        - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-874 Staff Resource Profile"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P08 BO-903 Equipment & Asset Command Center"
@@ -1129,6 +1130,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-862 Multi-Venue Resource Assignment"
+        - "P08 BO-866 Resource Availability Schedule Configuration"
         - "P08 BO-935 Assignment Detail & Operational Brief"
       summary: One resource, with every configured section
       description: 'Board 1.04. Identity, organisation, operational configuration, location, commercial,
@@ -1870,6 +1872,33 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}:
+    get:
+      operationId: getResourceBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-097 Check Out & Check In"
+      summary: One resource booking
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; VM-BO-097: no read of a ResourceBooking).** One `resources.booking` row: status, `conditionOut`, `conditionIn`, `depositAuthorisationId`. A rental booking (`rental.getRentalBooking`) names the resource bookings it holds; this reads one of them.
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: One resource booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBooking'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
     - name: bookingId
       in: path
@@ -2489,6 +2518,7 @@ paths:
     - name: experienceId
       in: path
       required: true
+      description: The experience's catalogue `Product.id` (4 October 2026, CHG-FXC-010; BO-877).
       schema:
         type: string
         format: uuid
@@ -2638,6 +2668,7 @@ paths:
       operationId: getMapResourceAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-058 Resource Availability (Cabana)"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -4311,6 +4342,21 @@ components:
             format: uuid
         scopePath:
           type: string
+        packageId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The package this requirement is a component of** (4 October 2026, CHG-FXC-003). Written by
+            `updateResourcePackage`, which replaces the package''s `components` as these rows; `listResourcePackages` reads
+            them back by it. Null for an experience''s own requirement (`productId`).'
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The experience product this requirement belongs to (`setExperienceResourceRequirements`). Exactly one
+            of `packageId` and `productId` is set.
     ResourceVenueAssignment:
       type: object
       x-ticvai-persistence: resources.venue_assignment
@@ -4716,6 +4762,13 @@ components:
         isActive:
           type: boolean
           default: true
+        resourceTypeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003).
+            `kind` is the fixed family a type belongs to; this is the tenant''s own type within it, and the
+            `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it.'
     ResourceCleaningPolicy:
       x-ticvai-persistence: none — columns on resources.resource
       type: object

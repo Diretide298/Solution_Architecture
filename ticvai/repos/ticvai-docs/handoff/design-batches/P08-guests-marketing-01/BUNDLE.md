@@ -153,7 +153,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-068` | Audit Log | B | 9 | 9 | 6 | 6 | 1 | 0 | — | notStarted (generated) |
 | `BO-073` | Lost & Found Register | D | 4 | 18 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `BO-091` | AI Policy & Spend | A | 40 | 38 | 6 | 37 | 1 | 0 | — | notStarted (generated) |
-| `BO-107` | Guests & Marketing | D | 42 | 28 | 6 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-107` | Guests & Marketing | A | 42 | 28 | 6 | 25 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -884,7 +884,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Guests & Marketing · wave 1 · needs the `core` module |
-| Block | Block D · task VM-BO-107 |
+| Block | Block A · task VM-BO-107 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW`, `REPORT_VIEW_VENUE`, `TENANT_VIEW` (1 configure, 2 read, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCampaigns` reads the population and `getVenueSettings` reads one of them — list, select, act |

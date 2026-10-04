@@ -486,11 +486,6 @@
   "purpose": "Automatically create the initial venue structure using information collected during onboarding.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**Venue & Operational Structure Creation declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
     "operation": "createPrincipal",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue; createOrgUnit is the venue write (design-notes corrections platform-foundation ADM-421, ADM-422).",
@@ -550,43 +545,39 @@
       },
       {
        "kind": "selectField",
-       "label": "Venue Name",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+       "label": "Place under",
+       "bindsTo": "CreateScopeNodeRequest.parentId",
+       "operation": "listOrgUnits",
+       "columns": [
+        "OrgUnit.name",
+        "OrgUnit.level",
+        "OrgUnit.path"
+       ],
+       "notes": "Brand and region nodes of the picked tenant (listOrgUnits level brand, region).",
+       "provenance": "contract tenancy.yaml CreateScopeNodeRequest.parentId (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "selectField",
-       "label": "Venue Type",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+       "label": "Level",
+       "bindsTo": "CreateScopeNodeRequest.level",
+       "operation": "createOrgUnit",
+       "notes": "venue by default; zone under a venue.",
+       "provenance": "contract tenancy.yaml CreateScopeNodeRequest.level (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Address",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+       "kind": "textField",
+       "label": "Code",
+       "bindsTo": "CreateScopeNodeRequest.code",
+       "operation": "createOrgUnit",
+       "notes": "Unique in the tenant; letters, digits and hyphens.",
+       "provenance": "contract tenancy.yaml CreateScopeNodeRequest.code (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Time Zone",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
-      },
-      {
-       "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
-      },
-      {
-       "kind": "selectField",
-       "label": "Operating Region",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
-      },
-      {
-       "kind": "selectField",
-       "label": "Default Language",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
-      },
-      {
-       "kind": "selectField",
-       "label": "Operating Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+       "kind": "textField",
+       "label": "Venue name",
+       "bindsTo": "CreateScopeNodeRequest.name",
+       "operation": "createOrgUnit",
+       "provenance": "contract tenancy.yaml CreateScopeNodeRequest.name (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -623,27 +614,13 @@
      ]
     },
     "provenance": "contract identity.yaml POST /platform-staff-grants"
-   },
-   {
-    "id": "formCreateOrgUnit",
-    "component": "modal",
-    "trigger": "Create venue structure",
-    "body": "**Collects what `createOrgUnit` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create venue structure",
-     "operation": "createOrgUnit"
-    },
-    "dismiss": {
-     "label": "Cancel"
-    },
-    "provenance": "contract tenancy.yaml POST /org-units; wiring fix, 2 October 2026"
    }
   ],
   "states": {
    "loading": "The venue operational structure configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the venue operational structure untouched.",
    "emptyFirstRun": "No venue operational structure configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `SCOPE_MANAGE` for `createOrgUnit`.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
@@ -672,6 +649,13 @@
     "contract": "identity",
     "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The picked tenant's brands and regions, to place the venue under",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
    }
   ],
   "wireframe": {
@@ -689,6 +673,7 @@
     }
    ]
   },
+  "notes": "**Bound 4 October 2026 to CreateScopeNodeRequest (level, parentId, code, name) with the parent picked from listOrgUnits. Type, address, time zone, currency, region, language and operating model are not part of createOrgUnit: currency and region come from the parent region (ADR-0018), the rest are venue settings set on the venue's own screens** (CHG-FXS-002)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1142,16 +1127,6 @@
   "purpose": "Activate the modules purchased in Board 4/5 and verify all required dependencies.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
-   },
-   {
     "operation": "listVenueTypeTemplates",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-021): Module Activation was wired to listVenueTypeTemplates, which belongs to the next screen (ADM-425 Venue Template Application); activation reads licence data (getTenantLicences), checks dependencies (listModuleCatalogue) and switches modules on (getModuleEnablement, setModuleEnablement). setModuleEnablement is a tenant-scoped write, so the screen carries the R098 tenant picker and grant like its sibling ADM-421 (design-notes correction platform-foundation ADM-424).",
@@ -1164,19 +1139,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "selectField",
-       "label": "Tenant",
-       "bindsTo": "Tenant.id",
-       "columns": [
-        "Tenant.code",
-        "Tenant.name",
-        "Tenant.status"
-       ],
-       "operation": "listTenants",
-       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
-       "provenance": "contract subscription.yaml GET /tenants"
-      },
       {
        "kind": "banner",
        "label": "Open grant into this tenant",
@@ -1194,31 +1156,55 @@
        "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
       },
       {
-       "kind": "dataTable",
-       "label": "Tenant",
-       "operation": "listTenants",
-       "provenance": "contract subscription.yaml GET /tenants; wiring fix, 2 October 2026"
-      },
-      {
        "kind": "detailPanel",
        "label": "Licensed modules",
-       "bindsTo": "LicencePosition",
+       "bindsTo": "LicencePosition.licensedModules",
        "operation": "getTenantLicences",
-       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences; wiring fix, 2 October 2026"
+       "provenance": "contract subscription.yaml LicencePosition.licensedModules (defined 4 October 2026, CHG-FXS-002)",
+       "columns": [
+        "LicencePosition.licensedModules.moduleKey",
+        "LicencePosition.licensedModules.source",
+        "LicencePosition.licensedModules.validTo"
+       ]
       },
       {
        "kind": "dataTable",
        "label": "Dependencies",
        "bindsTo": "ModuleListing",
        "operation": "listModuleCatalogue",
-       "provenance": "contract subscription.yaml GET /module-catalogue; wiring fix, 2 October 2026"
+       "provenance": "contract subscription.yaml ModuleListing (defined 4 October 2026, CHG-FXS-002)",
+       "columns": [
+        "ModuleListing.moduleCode",
+        "ModuleListing.name",
+        "ModuleListing.requiresModules",
+        "ModuleListing.incompatibleWithModules",
+        "ModuleListing.status"
+       ]
       },
       {
        "kind": "dataTable",
        "label": "Active modules",
        "bindsTo": "ModuleEnablement",
        "operation": "getModuleEnablement",
-       "provenance": "contract white-label.yaml GET /tenant-config/modules; wiring fix, 2 October 2026"
+       "provenance": "contract white-label.yaml ModuleEnablement (defined 4 October 2026, CHG-FXS-002)",
+       "columns": [
+        "ModuleEnablement.moduleKey",
+        "ModuleEnablement.displayName",
+        "ModuleEnablement.isLicensed",
+        "ModuleEnablement.isEnabled"
+       ]
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "operation": "listTenants",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -1344,6 +1330,7 @@
     }
    ]
   },
+  "notes": "**One vocabulary 4 October 2026: ModuleListing.moduleCode, LicencePosition.licensedModules[].moduleKey and ModuleEnablement.moduleKey all hold ModuleKey values (the contract is asked to type the first two as ModuleKey, ledger). Activate is enabled for a module only when it is licensed and every module in its requiresModules is licensed and enabled or being enabled; one in incompatibleWithModules blocks it, naming the conflict** (CHG-FXS-002)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

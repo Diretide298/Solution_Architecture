@@ -1,6 +1,6 @@
 # P08-access-venue-03 — P08 · Access & Venue (3 of 3)
 
-**5 screens · 15 operations · 24 schemas · 7 permissions**
+**5 screens · 16 operations · 24 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -132,10 +132,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-096` | Resource Calendar | A | 10 | 11 | 6 | 27 | 3 | 0 | — | notStarted (generated) |
-| `BO-097` | Check Out & Check In | A | 24 | 20 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-097` | Check Out & Check In | A | 24 | 36 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
 | `BO-098` | Qualifications | D | 15 | 7 | 5 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-099` | Performance Manifest | D | 2 | 8 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-103` | Access & Venue | C | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `BO-103` | Access & Venue | A | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -355,14 +355,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `resources` module |
 | Block | Block A · task VM-BO-097 |
-| Who uses it | venue staff holding `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK` (2 operate, 1 read); in the flows as guest |
+| Who uses it | venue staff holding `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK`, `RESOURCE_VIEW` (2 operate, 2 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`checkOutResource`, `checkInResource`, `authoriseStoredValue`) and no read of a population — it is settings, not a list |
 | Offline | Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**. |
 | Opens with | `authorisationId` (deepLink), `bookingId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/resources/check-out` |
 
-**What the spec says about it.** CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions and a fee. **Damage routes the resource to maintenance directly**, because routing through available leaves a window where the next guest books a broken item. **The deposit operations are declared here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not, which the flow checker refused. **A step calling an operation its screen does not declare is one of the two out of step**, and in this case it was the screen.
+**What the spec says about it.** CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions and a fee. **Damage routes the resource to maintenance directly**, because routing through available leaves a window where the next guest books a broken item. **The deposit operations are declared here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not, which the flow checker refused. **A step calling an operation its screen does not declare is one of the two out of step**, and in this case it was the screen. **The writes act on the resource booking, read with getResourceBooking (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026); the rental booking panel stays for its timeline** (CHG-FXS-003)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Hand a rental over and take it back: check out with a deposit held (not taken) against the item, check in with its condition, then release the hold or capture part of it for damage. Damage sends the item to maintenance directly so the next guest cannot book a broken one.
 
@@ -463,6 +463,27 @@ Errors to draw in the form: 409 Insufficient balance after existing holds. The r
 | Satisfied | yes / no (icon or chip) | — |
 | Detail | text | — |
 
+**Resource booking** (detail panel, from `getResourceBooking`): status, condition out and in, deposit authorisation.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Resource | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Status | chip: Reserved, Checked out, Returned, Overdue, Cancelled, No show | — |
+| Hold | the name it points at, never the id | The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). |
+| Recurrence group | the name it points at, never the id | Ties the occurrences of a recurring booking. Cancelling one week does not cancel the series, and cancelling the series is a separate act … |
+| Deposit authorisation | the name it points at, never the id | The hold, through `orders.authoriseStoredValue` (CF-126). A deposit taken and refunded is two transactions and a fee; held and released is … |
+| Checked out at | 1 Oct 2026, 14:30 | — |
+| Due back at | 1 Oct 2026, 14:30 | — |
+| Returned at | 1 Oct 2026, 14:30 | — |
+| Condition out | text | — |
+| Condition in | text | — |
+| Synced at | 1 Oct 2026, 14:30 | When the latest offline check-out or check-in write reached the server. The device times are `checkedOutAt` and `returnedAt`, taken from … |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -479,7 +500,7 @@ Errors to draw in the form: 409 Insufficient balance after existing holds. The r
 
 - **Check in**: Releases the hold or captures part of it; the remainder is released in the same act and the result says both amounts. *(source: contracts/spine/orders.yaml#captureStoredValue / contracts/spine/orders.yaml#relinquishStoredValue)*
 
-**Data it reads**: `getRentalBooking` (onLoad, One booking, its timeline and its readiness)
+**Data it reads**: `getRentalBooking` (onLoad, One booking, its timeline and its readiness); `getResourceBooking` (onLoad, The resource booking the check-out and check-in act on …)
 
 **Where the user goes next**
 
@@ -492,7 +513,7 @@ Errors to draw in the form: 409 Insufficient balance after existing holds. The r
 | Loading (`?state=loading`) | The booking and its condition history |
 | Error (`?state=error`) | Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync. |
 | Empty, first run (`?state=emptyFirstRun`) | Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation. |
-| Permission denied (`?state=emptyNoAccess`) | Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_BOOK`. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`, `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource` … |
 | Offline (`?state=offline`) | Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient balance after existing holds. The reason says which — the balance itself is too low (`insufficientBalance`), or enough is there but other holds … (StoredValueProblem); 409 Nothing is held to release — the hold is already `captured`, `released` or `expired` (`authorisationNotHeld`). (StoredValueProblem); 409 The hold is no longer live — `captured`, `released` or `expired` … |
 
@@ -526,8 +547,9 @@ checkIn:
 - `relinquishStoredValue` → `ORDER_CREATE` (operate) · staff, device
 - `captureStoredValue` → `ORDER_CREATE` (operate) · staff, device
 - `getRentalBooking` → `RENTAL_VIEW` (read) · staff
+- `getResourceBooking` → `RESOURCE_VIEW` (read) · staff
 
-**A refused user sees:** Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_BOOK`.
+**A refused user sees:** Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`, `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource` …
 
 #### Requirements it meets
 
@@ -572,12 +594,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-097?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Check out, Check in, Check out resource, Check in resource, Authorise stored value, Release stored value, Capture stored value.
 - [ ] Every transition is wired: `BO-096`.
-- [ ] Every gated control is gated: `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK`, `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -939,7 +961,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `core` module |
-| Block | Block C · task VM-BO-103 |
+| Block | Block A · task VM-BO-103 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE`, `SCOPE_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAccessPoints` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1273,6 +1295,7 @@ Method, path, parameters, request and response for every operation these screens
 "getPerformanceManifest": {"method":"GET","path":"/performances/{performanceId}/manifest","contract":"resources","summary":"Who is in a performance, in what order","permission":"RESOURCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PerformanceParticipant"},
 "getRentalBooking": {"method":"GET","path":"/rental-bookings/{bookingId}","contract":"rental","summary":"One booking, its timeline and its readiness","permission":"RENTAL_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"RentalBooking"},
 "getResourceAvailability": {"method":"GET","path":"/resources/{resourceId}/availability","contract":"resources","summary":"When it is free, with conflicts already resolved","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true}],"requestBody":null,"responds":"ResourceAvailability"},
+"getResourceBooking": {"method":"GET","path":"/resource-bookings/{bookingId}","contract":"resources","summary":"One resource booking","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ResourceBooking"},
 "getResourceQualifications": {"method":"GET","path":"/resources/{resourceId}/qualifications","contract":"resources","summary":"What an instructor or staff resource is certified to do, and until when — as saved","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Qualification"},
 "listAccessPoints": {"method":"GET","path":"/access-points","contract":"access","summary":"List access points","permission":"SCOPE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listScans": {"method":"GET","path":"/access/scans","contract":"access","summary":"List scan events","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"accessPointId","in":"query","required":null},{"name":"ticketId","in":"query","required":null},{"name":"outcome","in":"query","required":null},{"name":"recordedFrom","in":"query","required":null},{"name":"recordedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

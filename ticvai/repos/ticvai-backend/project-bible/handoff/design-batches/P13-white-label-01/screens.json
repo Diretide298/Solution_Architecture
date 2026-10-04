@@ -793,7 +793,10 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "carries": [
+      "uploadId"
+     ],
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-004 holds uploadId, so an edge into it carries them"
     },
     {
      "to": "CMS-003",
@@ -802,7 +805,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).\n\n**Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
@@ -811,7 +814,7 @@
    "loading": "The logo assets, read by `getBrandIdentity`.",
    "error": "Could not load. Names which read failed and leaves the logo assets untouched.",
    "emptyFirstRun": "No logo assets yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -837,6 +840,27 @@
     "contract": "white-label",
     "purpose": "Replace a logo, favicon or splash",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "The media library, to pick an existing asset by name",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "createUpload",
+    "contract": "assets",
+    "purpose": "Upload a new asset",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "completeUpload",
+    "contract": "assets",
+    "purpose": "Finish the upload once the file PUT succeeds; the asset id fills the field",
+    "trigger": "background",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "wireframe": {
@@ -886,6 +910,27 @@
        ],
        "operation": "getAppIcons",
        "provenance": "contract white-label.yaml GET /tenant-config/app-icons"
+      },
+      {
+       "kind": "cardList",
+       "label": "Media library",
+       "bindsTo": "MediaAsset",
+       "operation": "searchMedia",
+       "columns": [
+        "MediaAsset.filename",
+        "MediaAsset.kind",
+        "MediaAsset.contentType"
+       ],
+       "notes": "Picking one fills the logo, icon source, splash and video with its id.",
+       "provenance": "contract assets.yaml MediaAsset (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Upload new",
+       "bindsTo": "MediaAsset.id",
+       "operation": "createUpload",
+       "notes": "createUpload, the file PUT, completeUpload; the asset id fills the field being edited.",
+       "provenance": "contract assets.yaml MediaAsset.id (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -955,6 +1000,16 @@
     "provenance": "contract white-label.yaml PUT /tenant-config/brand"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "uploadId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `createUpload`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1485,7 +1540,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)).** The builder reads `getModuleEnablement` and applies the mapping on `HomepageSectionKind`: `tickets` needs `ticketsAndBooking`, `whatsOn` needs `events`, `attractions` needs `attractions`, `membership` needs `membership`, `dining` needs `diningAndFnb`, `shop` needs `shop`, `map` needs `map`; `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need none. A section whose module is off cannot be added or made visible, and says which module to switch on (on CMS-001). `setHomepageLayout` refuses such a section with 400 in any case.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)).** The builder reads `getModuleEnablement` and applies the mapping on `HomepageSectionKind`: `tickets` needs `ticketsAndBooking`, `whatsOn` needs `events`, `attractions` needs `attractions`, `membership` needs `membership`, `dining` needs `diningAndFnb`, `shop` needs `shop`, `map` needs `map`; `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need none. A section whose module is off cannot be added or made visible, and says which module to switch on (on CMS-001). `setHomepageLayout` refuses such a section with 400 in any case.\n\n**The builder loads and edits existing blocks with listContentBlocks and updateContentBlock (agreed, ledger) 4 October 2026** (CHG-FXS-003)\n\n**Save block edits an existing block (updateContentBlock)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getHomepageLayout` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1543,6 +1598,21 @@
        ],
        "operation": "listContentPages",
        "provenance": "contract white-label.yaml GET /tenant-config/pages"
+      },
+      {
+       "kind": "cardList",
+       "label": "Blocks on this page",
+       "bindsTo": "ContentBlock",
+       "operation": "listContentBlocks",
+       "notes": "In page order; drag to reorder (updateContentBlock position).",
+       "provenance": "agreed operation `listContentBlocks`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save block",
+       "operation": "updateContentBlock",
+       "notes": "Saves the selected block's content or its new position.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       }
      ]
     },
@@ -1684,6 +1754,20 @@
     "contract": "white-label",
     "purpose": "The landing-page templates TICVAI provides (DEC-548)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listContentBlocks",
+    "contract": "white-label",
+    "purpose": "The page's existing blocks, in order: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "updateContentBlock",
+    "contract": "white-label",
+    "purpose": "Edit or reorder a block (position): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "wireframe": {
@@ -1809,6 +1893,29 @@
      "label": "Cancel"
     },
     "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+   },
+   {
+    "id": "formUpdateContentBlock",
+    "component": "modal",
+    "trigger": "Save block",
+    "body": "**Collects what `updateContentBlock` sends before it is called**, for the block selected in Blocks on this page. At least one of: `body` (the block's content, typed by its kind, in the block editor's fields), `localeVariants` (the per-language bodies), `position` (its order on the page; a drag sets it), `publishAt`, `expireAt` and `audienceSegmentId` (who sees it). Only what changed is sent. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ContentBlock",
+    "confirm": {
+     "label": "Save block",
+     "operation": "updateContentBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "body",
+      "localeVariants",
+      "position",
+      "publishAt",
+      "expireAt",
+      "audienceSegmentId"
+     ]
+    },
+    "provenance": "contract white-label.yaml PATCH /content-blocks/{blockId} (4 October 2026, CHG-RFM-010)"
    }
   ],
   "_platform": {

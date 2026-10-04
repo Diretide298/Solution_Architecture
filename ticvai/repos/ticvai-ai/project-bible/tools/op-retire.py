@@ -204,6 +204,46 @@ def build_plan():
                 "(CHG-CLN-017), so this ticket is closed.")
         plan += [(x, "merge", note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
         covered.add(key)
+    # **Screens and operations the spec says are not built** (4 October, the Sprint 1-2 judging; CHG-FXP-002, -003). The
+    # plan gives them no task (tools/ticket_done.py screen_holds, operation_hold): a screen merged into another closes
+    # into the ticket that builds it, a replaced or undefined screen and one binding an operation not yet agreed go on
+    # hold, and a task whose every operation is a stub, provisional or deprecated goes on hold until it is agreed.
+    sys.path.insert(0, str(Path(__file__).parent))
+    import ticket_done as td
+    op_hold, scr_hold, _ = td.load_holds(ROOT)
+    for sid, (kind, into, why) in sorted(scr_hold.items()):
+        for k, subs in keys_for(sid):
+            if k in covered:
+                continue
+            if kind in ("merged", "replaced") and into:
+                note = (f"**{'Merged into' if kind == 'merged' else 'Replaced by'} {into}** (4 October 2026, "
+                        f"CHG-FXP-002): the screen spec says {sid} is not built on its own; {into}'s ticket "
+                        f"({ticket_of(into)}) builds it, so this ticket is closed.")
+                plan += [(x, "merge", note) for x in [k] + subs]
+            else:
+                note = (f"**Out of the plan for now** (4 October 2026, CHG-FXP-002, -003): {sid} {why}. The ticket is on "
+                        "hold and off the board; it comes back with the first refresh after that is settled.")
+                plan += [(x, "defer", note) for x in [k] + subs]
+            covered.add(k)
+    ex_ = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
+    for sid, why in td.rest_held((json.loads(ex_.read_text(encoding="utf-8")).get("screensNotBuilt") or {})
+                                 if ex_.exists() else {}).items():
+        for k in [k_ for k_ in gone if k_.endswith(f"-{sid}-REST") and k_ not in covered]:
+            note = (f"**Out of the plan for now** (4 October 2026, CHG-FXP-004): the rest of {sid} {why}. Its setup "
+                    "part stays on its own ticket. This ticket is on hold and comes back when the screen is defined.")
+            plan += [(x, "defer", note) for x in [k] + [s_ for s_ in mp if s_.startswith(k + "#")]]
+            covered.add(k)
+    for g in gone:
+        if g in covered:
+            continue
+        parts = sorted({s_.partition("#")[2] for s_ in mp if s_.startswith(g + "#")})
+        if parts and all(p_ in op_hold for p_ in parts):
+            note = (f"**Out of the plan for now** (4 October 2026, CHG-FXP-003): its operations ("
+                    + ", ".join(f"{p_}: {op_hold[p_]}" for p_ in parts) + ") are not built until the contract is "
+                    "agreed (a stub's shape is a proposal; a deprecated operation is superseded). The ticket is on "
+                    "hold and off the board.")
+            plan += [(x, "defer", note) for x in [g] + [s_ for s_ in mp if s_.startswith(g + "#")]]
+            covered.add(g)
     # A pushed sub-task whose task is still planned but whose operation or table is no longer under it (the task
     # was split or regrouped, 29-30 September): 128 on 1 October. Its work is either on another planned sub-task
     # (a duplicate in effect: closed, pointing at that one) or has left the plan (on hold). Decided 1 October.
@@ -227,6 +267,11 @@ def build_plan():
                                                    f"`{REPLACED_OPS[part]}`")))
             continue
         other = home.get(part)
+        if part in op_hold and not other:
+            plan.append((k, "defer", f"**Out of the plan for now** (4 October 2026, CHG-FXP-003): `{part}` is "
+                                     f"{op_hold[part]} in its contract, so it is not built until agreed. The "
+                                     "sub-task is on hold and comes back with the refresh after that."))
+            continue
         if not re.match(r"^[a-z][A-Za-z0-9]+$", part) and "." not in part:
             plan.append((k, "merge", f"**Not a separate piece of work** (1 October): `{part}` was a fragment of "
                                      f"{base}'s title, read as an operation by mistake. {base} itself carries it, "

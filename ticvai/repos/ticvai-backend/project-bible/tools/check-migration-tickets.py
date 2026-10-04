@@ -38,6 +38,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import ticket_done as td  # noqa: E402  (load_holds, CHG-FXP-003)
 
 RULES = {
     "M-FILE-NAMED": "a migration ticket names no V-file (CHG-TBF-002)",
@@ -139,6 +140,7 @@ def main() -> int:
         if m:
             on_ticket |= set(m.group(1).split(", "))
     lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
+    op_hold = td.load_holds(g.ROOT)[0]        # stub, provisional, deprecated: not built (CHG-FXP-003)
     reached = {}
     for o, x in lineage.items():
         for kk in ("reads", "writes"):
@@ -149,6 +151,8 @@ def main() -> int:
         if not why:
             guard.add("M-TABLE-ASSIGNED", t, f"{t}: in backend/ but in no migration ticket and not listed under "
                                              "'Tables no migration creates'")
+        elif why.startswith("held:") and reached.get(t) and all(o in op_hold for o in reached[t]):
+            continue          # reached only by operations the plan holds out until agreed (CHG-FXP-003)
         elif reached.get(t) or why.startswith("GAP"):
             guard.add("M-TABLE-ASSIGNED", t, f"{t}: listed as needing no migration, but "
                                              f"{', '.join(sorted(reached.get(t, ()))[:3]) or 'it'} reads or writes it")

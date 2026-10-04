@@ -71,6 +71,46 @@
    "delayed"
   ]
  },
+ "CreateDashboardRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "module",
+   "tiles"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey",
+    "description": "**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n"
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"
+   },
+   "isShared": {
+    "type": "boolean",
+    "default": false
+   },
+   "tiles": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 24,
+    "items": {
+     "$ref": "#/components/schemas/DashboardTile"
+    }
+   }
+  }
+ },
  "CreateFnbOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -838,6 +878,13 @@
    },
    "elapsedSeconds": {
     "type": "integer"
+   },
+   "visitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The table visit the ticket is for** (4 October 2026, CHG-FXC-011; KIT-002): the `{visitId}` `notifyServer` takes. Null for a counter or delivery order with no visit."
    }
   }
  },

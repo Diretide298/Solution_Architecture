@@ -325,58 +325,72 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "configEditor",
+  "patternReason": "One event copied with the parts and date shift chosen (defined 4 October 2026 from cloneEvent, CHG-FXS-001).",
   "purpose": "Copy an existing event, with the parts and dates chosen, to start a new one.",
   "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-696)",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 87"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 87"
-   }
-  ],
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Event to copy",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "columns": [
+        "Event.name",
+        "Event.code",
+        "Event.performanceCount"
+       ],
+       "provenance": "contract catalogue.yaml Event (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "New event name",
+       "operation": "cloneEvent",
+       "notes": "Body newName; the source name with ' (copy)' by default.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Copy",
+       "operation": "cloneEvent",
+       "notes": "Body include[]: the parts to copy (performances, prices, capacities, resources, content); all ticked by default.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Move dates by (days)",
+       "operation": "cloneEvent",
+       "notes": "Body shiftDatesByDays; 0 keeps the dates, 7 moves every performance a week on.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "cloneEvent",
-       "notes": "The act the screen exists for."
+       "label": "Copy event",
+       "operation": "cloneEvent",
+       "notes": "On 201 opens the new event (the eventId returned) as a draft.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "cloneEvent"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "Read an event",
-       "bindsTo": "Event",
-       "operation": "getEvent",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
+       "notes": "Leaves without copying.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The event duplication clone list.",
-   "error": "Could not load. Names which read failed and leaves the event duplication clone untouched.",
-   "emptyFirstRun": "No event duplication clone yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The event being copied.",
+   "error": "Could not load the event. Names it; nothing is copied.",
+   "emptyFirstRun": "Not used: the screen opens on one event (eventId).",
    "emptyNoResults": "The filter narrowed it and the event duplication clone are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `cloneEvent`."
   },
   "apis": [
    {
@@ -402,7 +416,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-696",
    "workshopBoard": "wireframes/WS48 Event Management Configuration Backend Structure v1.0 Board 1.dc.html#bo-696"
   },
-  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 87. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -411,6 +425,7 @@
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

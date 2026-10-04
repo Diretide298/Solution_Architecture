@@ -728,6 +728,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listCorrectiveActions": {
+  "method": "GET",
+  "path": "/food-safety/corrective-actions",
+  "contract": "fnb",
+  "summary": "The corrective actions",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDeliveryLocations": {
   "method": "GET",
   "path": "/venues/{venueId}/delivery-locations",

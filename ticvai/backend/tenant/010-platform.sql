@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.scope through its keys; references
--- catalogue.event, platform.tenant. Reached by: 4 operations read it and 97 write it; 1 tables
+-- catalogue.event, platform.tenant. Reached by: 4 operations read it and 107 write it; 1 tables
 -- reference it; written by 20 contracts — access, accreditation, approvals, catalogue.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid NOT NULL,

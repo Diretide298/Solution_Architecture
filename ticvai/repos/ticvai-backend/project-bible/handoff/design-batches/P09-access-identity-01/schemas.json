@@ -85,6 +85,67 @@
    }
   }
  },
+ "CapabilityTemplate": {
+  "x-ticvai-persistence": "identity.capability_template",
+  "type": "object",
+  "description": "3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**\n",
+  "required": [
+   "code",
+   "name",
+   "capabilities"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "module": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The module a per-module preset belongs to** (a contract name, as `listModuleCapabilities`; CHG-CSP-003). Null for a template that spans modules, such as the Cashier starting configuration.\n"
+   },
+   "presetLevel": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "all",
+     "viewer",
+     "midLevel"
+    ],
+    "description": "**Which of the three per-module presets this is** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): All, Viewer or Mid-level. Null on a template a tenant saved itself and on a cross-module starting configuration.\n"
+   },
+   "isPreset": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Seeded by the platform, not saved by the tenant** (CHG-CSP-003). A preset is offered when a role is created and cannot be deleted; a tenant saves its own tick-sets beside them with `setCapabilityTemplate`.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written by the server at `tenant` scope; ignored if a request sends it."
+   }
+  }
+ },
  "ChangeCredentialRequest": {
   "type": "object",
   "description": "Request only. The credential itself is stored hashed in `identity.principal_credential` and is never returned by any operation (`handoff/schema-storage-only.md`).\n",
@@ -148,6 +209,62 @@
      "type": "string",
      "format": "uuid"
     }
+   }
+  }
+ },
+ "IdentityPermission": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.permission",
+  "description": "**Taken from the backend workbook, 20 September.** Defines individual authorization actions under a module or sub-module, such as PRODUCT.VIEW, ORDER.CREATE, or REFUND.APPROVE.",
+  "required": [
+   "moduleId",
+   "code",
+   "name",
+   "action",
+   "isSystem",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "moduleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "action": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "isSystem": {
+    "type": "boolean"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },

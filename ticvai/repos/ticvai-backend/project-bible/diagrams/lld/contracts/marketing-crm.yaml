@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 275 operations
+title: marketing-crm — 277 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -2065,6 +2065,8 @@ operations:
   offline: false
   reads:
   - marketing.guest_profile
+  - marketing.segment
+  - marketing.segment_criterion
   writes: []
 - operation: listSegments
   verb: GET
@@ -2421,9 +2423,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes:
+  reads:
+  - marketing.consent_record
+  - marketing.guest_profile
+  - marketing.segment
   - marketing.segment_criterion
+  - marketing.suppression
+  writes: []
 - operation: raiseMyCase
   verb: POST
   path: /my/cases
@@ -2646,6 +2652,7 @@ operations:
   - marketing.case_message
   writes:
   - cache:idempotency
+  - marketing.case
   - marketing.case_message
 - operation: respondToInvitation
   verb: POST
@@ -3614,9 +3621,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.case
   - marketing.review
   writes:
   - cache:idempotency
+  - marketing.case
   - marketing.review
 - operation: testSendCampaign
   verb: POST
@@ -3682,6 +3691,7 @@ operations:
   - cache:idempotency
   - marketing.campaign
   - marketing.campaign_target
+  - marketing.campaign_variant
   - marketing.segment_criterion
 - operation: updateCase
   verb: PATCH
@@ -3745,6 +3755,38 @@ operations:
   - cache:idempotency
   - marketing.guest_profile
   - marketing.loyalty_position
+- operation: updateLoyaltyProgramme
+  verb: PATCH
+  path: /loyalty/programmes/{programmeId}
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.loyalty_programme
+  - marketing.points_earning_rule
+  - marketing.programme_tier
+  writes:
+  - cache:idempotency
+  - marketing.loyalty_programme
+  - marketing.points_earning_rule
+- operation: updateMessageTemplate
+  verb: PATCH
+  path: /message-templates/{templateId}
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.message_template
+  writes:
+  - cache:idempotency
+  - marketing.message_template
+  - marketing.message_template_version
 - operation: updateMyProfile
   verb: PATCH
   path: /guests/me/profile

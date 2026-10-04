@@ -23,19 +23,21 @@ modulesUsed:
   screens: 211
 servicesCalled:
 - service: PlatformService
-  operationCalls: 368
+  operationCalls: 371
 - service: IdentityService
-  operationCalls: 260
+  operationCalls: 262
 - service: AiService
-  operationCalls: 253
+  operationCalls: 259
 - service: TenancyService
-  operationCalls: 25
+  operationCalls: 26
 - service: WhiteLabelService
   operationCalls: 24
 - service: ReportingService
   operationCalls: 5
 - service: LedgerService
   operationCalls: 4
+- service: VenueOpsService
+  operationCalls: 3
 - service: OrderService
   operationCalls: 3
 - service: CatalogueService
@@ -164,6 +166,9 @@ screens:
   - ADM-489
   - ADM-499
   - ADM-500
+  - ADM-503
+  - ADM-504
+  - ADM-505
   - ADM-506
   - ADM-508
   - ADM-509
@@ -196,6 +201,7 @@ screens:
   - getCellCapacity
   - getCellHealth
   - listCellJobs
+  - listCells
   - updateCellTier
   states:
   - emptyFirstRun
@@ -640,7 +646,9 @@ screens:
   wave: 1
   density: compact
   operations:
+  - completeUpload
   - createPreview
+  - createUpload
   - diffConfigVersion
   - exportSitePackage
   - getAppIcons
@@ -653,6 +661,7 @@ screens:
   - openPlatformStaffGrant
   - publishTenantConfig
   - restoreConfigVersion
+  - searchMedia
   - setAppIcons
   - setBrandIdentity
   - setTheme
@@ -810,7 +819,9 @@ screens:
   density: compact
   operations:
   - createRole
+  - listCapabilityTemplates
   - listOwnPlatformStaffGrants
+  - listPermissions
   - listRoles
   - listTenants
   - openPlatformStaffGrant
@@ -2648,6 +2659,7 @@ screens:
   density: compact
   operations:
   - createOrgUnit
+  - listOrgUnits
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3105,6 +3117,8 @@ screens:
   density: compact
   operations:
   - generateInvoice
+  - listSubscriptionInvoices
+  - listTenants
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3113,7 +3127,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - tenantId<-session
+  - tenantId<-navigation
   goesTo:
   - ADM-459
   boardFrames: null
@@ -4389,6 +4403,8 @@ screens:
   density: compact
   operations:
   - getForecast
+  - getForecastAccuracy
+  - listForecastDefinitions
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4416,6 +4432,7 @@ screens:
   density: compact
   operations:
   - getForecast
+  - listForecastDefinitions
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4442,7 +4459,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - explainMetricChange
   - getForecast
+  - listForecastDefinitions
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4472,6 +4491,7 @@ screens:
   - explainMetricChange
   - getForecast
   - getForecastAccuracy
+  - listForecastDefinitions
   - listForecastVersions
   - listOwnPlatformStaffGrants
   - listTenants

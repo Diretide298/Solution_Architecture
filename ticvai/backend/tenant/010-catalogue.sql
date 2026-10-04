@@ -612,7 +612,9 @@ CREATE TABLE IF NOT EXISTS catalogue.event (
     scope_path                        ltree NOT NULL,
     parent_event_id                   uuid,
     performance_count                 integer,
-    is_active                         boolean
+    is_active                         boolean,
+    lifecycle_state                   text CONSTRAINT event_lifecycle_state_chk CHECK (lifecycle_state IN ('draft', 'planned', 'onSale', 'live', 'closed', 'cancelled', 'archived')),
+    lifecycle_state_changed_at        timestamptz
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -1437,7 +1439,8 @@ CREATE TABLE IF NOT EXISTS catalogue.product (
     location_id                       uuid,
     brand_id                          uuid,
     market_code                       text CONSTRAINT product_market_code_chk CHECK (char_length(market_code) <= 40),
-    sales_territory                   text CONSTRAINT product_sales_territory_chk CHECK (char_length(sales_territory) <= 100)
+    sales_territory                   text CONSTRAINT product_sales_territory_chk CHECK (char_length(sales_territory) <= 100),
+    event_id                          uuid
 );
 
 -- The merchandise hierarchy — categories, brands, collections (Retail Board 2, 20 August).

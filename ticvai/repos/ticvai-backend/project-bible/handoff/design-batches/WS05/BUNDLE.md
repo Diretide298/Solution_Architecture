@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-184` | Biometric Access Command Center | C | 0 | 240 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-185` | Biometric Verification Profile Builder | A | 8 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-185` | Biometric Verification Profile Builder | A | 16 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-186` | Face Pass Enrollment Configuration | A | 19 | 8 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-187` | Biometric Consent & Guardian Management | B | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
 | `BO-188` | Face Tag Temporary Enrollment | A | 10 | 17 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
@@ -587,7 +587,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/biometric-verification-profile-builder-bo-185` |
 
-**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of biometric verification profiles (setBiometricVerificationProfile has no list or get).
+**What the spec says about it.** **Bound 4 October 2026 to BiometricVerificationProfileBuilderInput: the eight pack labels are the values of one selectType, not eight fields; venueId comes from the session. The read gap is closed (getBiometricVerificationProfile is bound)** (CHG-FXS-002)
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Decides which tickets and credentials can or must use face verification, and where: a biometric profile picks the model (Face Pass, Face Tag, a future provider), what it applies to (ticket product or type, membership, annual pass, multi-day, multi-attraction, VIP credential, accreditation, customer segments) and the requirement per place - the pack's example "Annual Pass - Main entry Face required, Attractions Credential only, VIP Lounge Face required". The one thing to get right: draw it as a per-location matrix for one credential type, so the manager sees the whole journey's face requirements at once.
 
@@ -603,14 +603,27 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Ticket Product | select field | — | — | — | — | — | — |
-| Ticket Type | select field | — | — | — | — | — | — |
-| Membership | select field | — | — | — | — | — | — |
-| Annual Pass | select field | — | — | — | — | — | — |
-| Multi-Day Ticket | select field | — | — | — | — | — | — |
-| Multi-Attraction Ticket | select field | — | — | — | — | — | — |
-| VIP Credential | select field | — | — | — | — | — | — |
-| Accreditation | select field | — | — | — | — | — | — |
+| Profile name | text field | optional | — | — | — | — | `BiometricVerificationProfileBuilderInput.name` |
+| Applies to | select | optional | — | Ticket product · Ticket type · Membership · Annual pass · Multi day ticket · Multi attraction ticket · Vip credential · Accreditation · Selected customer segments | — | One of ticket product, ticket type, membership, annual pass, multi-day, multi-attraction, VIP credential, accreditation (the pack's eight). | `BiometricVerificationProfileBuilderInput.selectType` |
+| Biometric | segmented control | optional | — | Face pass · Face tag · Other provider | — | Biometric model this profile uses | `BiometricVerificationProfileBuilderInput.biometricType` |
+| Face check | segmented control | optional | — | Not used · Optional · Required | — | Not used, optional or required. | `BiometricVerificationProfileBuilderInput.faceRequirement` |
+| Status | segmented control | optional | Active | Active · Inactive | — | Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass) | `BiometricVerificationProfileBuilderInput.status` |
+
+**Sent by *Save changes*** (`setBiometricVerificationProfile`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Face requirement `faceRequirement` | segmented control | required | — | Not used · Optional · Required | — | Whether face verification is not used, allowed, or required at this location (e.g. | `setBiometricVerificationProfile` body |
+| Biometric type `biometricType` | segmented control | required | — | Face pass · Face tag · Other provider | — | Biometric model this profile uses | `setBiometricVerificationProfile` body |
+| Profile `profileId` | picker: choose a profile | required | — | — | shows names, sends the id | The profile row's key (access.biometric_profile.id, a UUIDv7); absent creates one (decided 29 September, writers pass) | `setBiometricVerificationProfile` body |
+| Select type `selectType` | select | required | — | Ticket product · Ticket type · Membership · Annual pass · Multi day ticket · Multi attraction ticket · Vip credential · Accreditation · Selected customer segments | — | Vocabulary listed under Select. | `setBiometricVerificationProfile` body |
+| Venue `venueId` | text field | required | — | — | — | Venue | `setBiometricVerificationProfile` body |
+| Park `parkId` | text field | optional | — | — | — | Park | `setBiometricVerificationProfile` body |
+| Zone `zoneId` | text field | optional | — | — | — | Zone | `setBiometricVerificationProfile` body |
+| Attraction `attractionId` | text field | optional | — | — | — | Attraction | `setBiometricVerificationProfile` body |
+| Gate `gateId` | text field | optional | — | — | — | Gate | `setBiometricVerificationProfile` body |
+| Name `name` | text field | optional | — | — | — | — | `setBiometricVerificationProfile` body |
+| Status `status` | segmented control | optional | Active | Active · Inactive | — | Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass) | `setBiometricVerificationProfile` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -637,7 +650,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save changes (primary button) | navigation or local | — | — | — | — |
+| Save changes (primary button) | `setBiometricVerificationProfile` PUT `/biometric-verification-profile` | BiometricVerificationProfileBuilderInput | BiometricVerificationProfileBuilderView | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -728,7 +741,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403, 404).
+- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (403, 404).
 - [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-185?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
@@ -957,6 +970,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Opens with | `venueId` (session) |
 | Route | `/access-venue/biometric-consent-guardian-management-bo-187` |
 
+**What the spec says about it.** **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).
+
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Consent for persistent biometric enrolment: the policy by jurisdiction, tenant, venue, credential, enrolment channel and guest category, the adult journey (Guest identified > Consent presented > Accepted > Facial capture enabled), the minor journey (Minor identified > Guardian required > Guardian identity/relationship > Consent > Verification > Facial capture enabled), and the consent records kept as evidence. The one thing to get right: the pack's critical separation - biometric data and the consent/audit record are different things; after deletion the face is gone but the consent record may stay, and the screen must say which is which.
 
 **Known correction pending (do not draw the wrong version)**
@@ -994,7 +1009,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save minors and consent** (modal, opened by *Save minors and consent*; *Save minors and consent* calls `setVenueSettings`, *Cancel* sends nothing)
 
-**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `biometrics`. Only the biometrics section: the consent form, the minors switch. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `biometrics`. Only the biometrics section: the consent form, the minors switch. Dismissing sends nothing; the screen behind is unchanged. **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

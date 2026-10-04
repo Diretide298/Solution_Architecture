@@ -1553,11 +1553,15 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-048 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "carries": [
+      "productId",
+      "variantId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-048 holds productId, variantId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Cross-platform navigation removed 24 August**: GST-026. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Cross-platform navigation removed 24 August**: GST-026. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.\n\n**Pick lists bound 4 October 2026: the variant comes from listProducts (kind merchandise) then listProductVariants, the category from listProductCategories and the stock item from listInventoryItems, each picked by name** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1644,6 +1648,42 @@
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "selectField",
+       "label": "Catalogue product",
+       "bindsTo": "Product.id",
+       "operation": "listProducts",
+       "columns": [
+        "Product.name",
+        "Product.kind"
+       ],
+       "notes": "Query kind merchandise; picked by name.",
+       "provenance": "contract catalogue.yaml Product.id (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Variant",
+       "bindsTo": "CreateMerchandiseRequest.variantId",
+       "operation": "listProductVariants",
+       "notes": "Options from listProductVariants of the picked product, by name; required.",
+       "provenance": "contract catalogue.yaml CreateMerchandiseRequest.variantId (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "bindsTo": "CreateMerchandiseRequest.categoryId",
+       "operation": "listProductCategories",
+       "notes": "Options from listProductCategories, by name.",
+       "provenance": "contract catalogue.yaml CreateMerchandiseRequest.categoryId (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Stock item",
+       "bindsTo": "CreateMerchandiseRequest.inventoryItemId",
+       "operation": "listInventoryItems",
+       "notes": "Options from listInventoryItems, by name; optional.",
+       "provenance": "contract inventory.yaml CreateMerchandiseRequest.inventoryItemId (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1705,6 +1745,34 @@
     "purpose": "List outlets (the pick list)",
     "trigger": "onLoad",
     "provenance": "design-note correction, 2 October 2026 (BO-048)"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The catalogue's merchandise products (kind merchandise), to pick the one a shop item sells",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The picked product's variants; the chosen one is the item's variantId",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "The category pick list, by name",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "listInventoryItems",
+    "contract": "inventory",
+    "purpose": "The stock item pick list, by name",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -1712,6 +1780,12 @@
     {
      "name": "merchandiseId",
      "from": "deepLink"
+    },
+    {
+     "name": "productId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listProducts`."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `merchandiseId`.",
@@ -2693,7 +2767,7 @@
   "navigation": {
    "inferred": true
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
@@ -2925,7 +2999,7 @@
     "id": "formSetVenueSettings",
     "component": "modal",
     "trigger": "Save venue settings",
-    "body": "**Collects what `setVenueSettings` sends before it is called, in sections, not property names.** Nothing in the body is required. **Day and hours**: calendar day start, support hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`, `id`, `venueId` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setVenueSettings` sends before it is called, in sections, not property names.** Nothing in the body is required. **Day and hours**: calendar day start, support hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`, `id`, `venueId` (3 October 2026, CHG-SPF-001). **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
     "bindsTo": "VenueSettings",
     "confirm": {
      "label": "Save venue settings",

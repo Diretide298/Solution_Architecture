@@ -158,13 +158,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Search targeting eligibility | search field | — | — | — | — | — | — |
-| Filter by | multi select | — | — | — | — | The pack filters this screen by guest type, crm segment, membership, loyalty, demographic, behavioral and 8 more — which are present is a decision the pack already made. | — |
+| Filter by | text field | optional | — | — | — | Sends `?guestType=` to `listTargetingEligibility`; each other dimension is its own query parameter of that read (CHG-RFM-012). The pack filters this screen by guest type, crm segment, membership … | `listTargetingEligibility` ?guestType |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Guest type | text field | — | — | `listTargetingEligibility` ?guestType |
 | Crm segment | text field | — | — | `listTargetingEligibility` ?crmSegment |
 | Membership | text field | — | — | `listTargetingEligibility` ?membership |
 | Loyalty | text field | — | — | `listTargetingEligibility` ?loyalty |

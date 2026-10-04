@@ -675,9 +675,10 @@ screens:
         carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+      carries:
+      - uploadId
+      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-004 holds uploadId, so
+        an edge into it carries them
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-004 holds none of them. The edge
@@ -856,6 +857,12 @@ screens:
       - introVideoAssetRef
       - introVideoMode
     provenance: contract white-label.yaml PUT /tenant-config/brand
+  entryState:
+    params:
+    - name: uploadId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
 - id: CMS-005
   name: Theme Editor
   module: White Label
@@ -1577,10 +1584,11 @@ screens:
   - id: formUpdateContentBlock
     component: modal
     trigger: Save block
-    body: '**Collects what `updateContentBlock` sends before it is called**, for the block selected in Blocks on this
-      page. At least one of: `body` (the block''s content, typed by its kind, in the block editor''s fields), `localeVariants`
-      (the per-language bodies), `position` (its order on the page; a drag sets it), `publishAt`, `expireAt` and
-      `audienceSegmentId` (who sees it). Only what changed is sent. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `updateContentBlock` sends before it is called**, for the block selected in
+      Blocks on this page. At least one of: `body` (the block''s content, typed by its kind, in the block
+      editor''s fields), `localeVariants` (the per-language bodies), `position` (its order on the page;
+      a drag sets it), `publishAt`, `expireAt` and `audienceSegmentId` (who sees it). Only what changed
+      is sent. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: ContentBlock
     confirm:
       label: Save block

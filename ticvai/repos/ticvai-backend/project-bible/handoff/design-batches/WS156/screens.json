@@ -409,6 +409,19 @@
        "operation": "getResourceSchedule",
        "notes": "A week grid of windows with dated exceptions (holidays, closures, maintenance, private blocks): the pack's 25 bullets were headings and examples, not fields. The time zone is the region's (ADR-0011).",
        "provenance": "contract resources.yaml GET /resources/{resourceId}/schedule"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Resource",
+       "bindsTo": "Resource",
+       "operation": "getResource",
+       "columns": [
+        "Resource.code",
+        "Resource.name",
+        "Resource.kind",
+        "Resource.status"
+       ],
+       "provenance": "contract resources.yaml Resource (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -485,7 +498,7 @@
    "loading": "The resource availability schedule configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the resource availability schedule untouched.",
    "emptyFirstRun": "No resource availability schedule configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `RESOURCE_VIEW`, which `getResource` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_CONFIGURE` for `setResourceSchedule`; `RESOURCE_MANAGE` for `updateResource`.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
@@ -523,6 +536,13 @@
      "getResourceSchedule",
      "getResourceAvailability"
     ]
+   },
+   {
+    "operationId": "getResource",
+    "contract": "resources",
+    "purpose": "The resource whose cleaning policy is edited; the PUT sends it back whole with the policy changed",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "wireframe": {
@@ -565,6 +585,7 @@
     "provenance": "contract resources.yaml PUT /resources/{resourceId}/schedule"
    }
   ],
+  "notes": "**getResource bound 4 October 2026: updateResource is a full PUT of Resource (id, code, name, kind, venueId required), so the screen reads the resource and sends it back with only the cleaning policy changed** (CHG-FXS-003)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

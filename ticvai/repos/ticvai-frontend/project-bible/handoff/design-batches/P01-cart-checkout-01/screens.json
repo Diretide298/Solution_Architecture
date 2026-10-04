@@ -365,7 +365,10 @@
      "from": "session"
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the identity fork waits until checkout (ADR-0045)."
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the identity fork waits until checkout (ADR-0045).",
+   "preloaded": [
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
+   ]
   },
   "wireframe": {
    "status": "review",
@@ -381,7 +384,7 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
-  "notes": "**Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On the cart:** prices show in the selected currency, marked approx. until checkout locks the rate.",
+  "notes": "**Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On the cart:** prices show in the selected currency, marked approx. until checkout locks the rate.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -471,7 +474,7 @@
     }
    ]
   },
-  "notes": "**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.\n\n**Rev 3 (decided 29 September).** Booking consent questions not yet answered are asked here (REV3-26). The sign-in gate may already have been passed at the Add-ons exit (`signInAt` `afterAddOns`, REV3-3); a guest who signed in there arrives with their details filled.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile is created and completed later (WEB-020).",
+  "notes": "**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.\n\n**Rev 3 (decided 29 September).** Booking consent questions not yet answered are asked here (REV3-26). The sign-in gate may already have been passed at the Add-ons exit (`signInAt` `afterAddOns`, REV3-3); a guest who signed in there arrives with their details filled.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile is created and completed later (WEB-020).\n\n**The holder details are written by checkoutCart on WEB-012 (attendees), which turns the cart into the order (4 October 2026): this step collects them and hands them over, because a verified or signed-in guest whose cart needs no forms skips this step (W1) and WEB-012 must make the order either way. recordConsentAnswers' answers are typed in the contract (questionId, questionVersion, answer, cartLineId, personIndex); the pull cut them (ledger)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
@@ -504,16 +507,16 @@
       {
        "kind": "detailPanel",
        "bindsTo": "Cart.lines",
-       "notes": "One block per holder, titled \"Ticket 2 of 4 - Child\", only for lines whose ticket is name-bound; the buyer is separate from the holders.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "notes": "One holder name per cart line that needs one; handed to WEB-012, which sends them as checkoutCart attendees[] (lineId, holderName).",
+       "provenance": "contract orders.yaml Cart.lines (defined 4 October 2026, CHG-FXS-003)",
        "operation": "getCart",
        "label": "Ticket holder details"
       },
       {
        "kind": "consentBlock",
        "bindsTo": "ConsentPurposeConfig[]",
-       "notes": "One unticked checkbox per configured marketing channel and purpose, beside the terms, never pre-ticked. The ticks travel with checkout as `marketingConsents[]` and are recorded by `recordCheckoutConsents` with source checkout, bound to the order and the verified contact (M18-15); nothing is recorded from this step, so an unpaid order records no consent.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "notes": "Unticked by default; the ticked purposes go to WEB-012 and into checkoutCart marketingConsents (DEC-275).",
+       "provenance": "contract marketing-crm.yaml ConsentPurposeConfig[] (defined 4 October 2026, CHG-FXS-003)",
        "label": "Send me offers and news",
        "operation": "listConsentPurposes"
       },
@@ -551,7 +554,8 @@
       {
        "kind": "primaryButton",
        "label": "Continue to payment",
-       "provenance": "carried from the previous definition"
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)",
+       "notes": "Records the consent answers (recordConsentAnswers), then opens WEB-012 with the holder names and the ticked opt-ins; nothing else is sent here."
       },
       {
        "kind": "secondaryButton",
@@ -672,7 +676,8 @@
     "GuestDevice.subjectId",
     "GuestDevice.platform",
     "GuestDevice.tokenFingerprint",
-    "GuestDevice.tokenRef"
+    "GuestDevice.tokenRef",
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
    ]
   },
   "wireframe": {
@@ -758,10 +763,11 @@
      "to": "WEB-010",
      "trigger": "Shopping Cart",
      "carries": [
+      "cartId",
       "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-012 holds lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-011",
@@ -787,7 +793,7 @@
     }
    ]
   },
-  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On this screen:** the total shows in the selected currency with the base amount and the rate beneath (\"USD 81.72 · AED 300.00 at 3.6710, held until 14:25\"); when the hold lapses the amount is re-quoted and the guest confirms the new figure before paying. The earlier rule above (\"both in base currency, so tender currency equals base currency\") is superseded for card and wallet.",
+  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On this screen:** the total shows in the selected currency with the base amount and the rate beneath (\"USD 81.72 · AED 300.00 at 3.6710, held until 14:25\"); when the hold lapses the amount is re-quoted and the guest confirms the new figure before paying. The earlier rule above (\"both in base currency, so tender currency equals base currency\") is superseded for card and wallet.\n\n**createOrder left 4 October 2026: the order is made from the cart by checkoutCart (the cart's lines, holder names and opt-ins), then paid with createPayment; F01 step 7 and F02 step 5 say the same** (CHG-FXS-003)",
   "openQuestions": [
    "Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot be tested without them."
   ],
@@ -838,9 +844,8 @@
       {
        "kind": "consentBlock",
        "label": "Terms and conditions",
-       "operation": "createOrder",
-       "notes": "After the code the guest goes straight to the T&Cs tick and completes (W1).",
-       "provenance": "decided 29 September 2026, W1"
+       "notes": "Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       },
       {
        "kind": "detailPanel",
@@ -858,9 +863,9 @@
       {
        "kind": "toggle",
        "label": "Send me offers and news",
-       "operation": "createOrder",
-       "notes": "Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]` on the order, bound to the verified contact.",
-       "provenance": "decided 29 September 2026, M18-15"
+       "operation": "checkoutCart",
+       "notes": "Unticked by default; sent as checkoutCart marketingConsents. Prefilled from WEB-011 when it ran.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       },
       {
        "kind": "banner",
@@ -878,9 +883,9 @@
       {
        "kind": "primaryButton",
        "label": "Pay now",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)",
        "operation": "createPayment",
-       "notes": "One Pay: creates the order (`createOrder`, with the T&Cs tick and the opt-in above) and then the payment (`createPayment`) for card, Apple Pay, Google Pay or wallet (R080)."
+       "notes": "checkoutCart (once; its idempotency key is the cart's), then createPayment against the order it returns; an unknown payment outcome has the order to attach to."
       }
      ]
     }
@@ -890,16 +895,10 @@
    "loading": "The checkout payment, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the checkout payment untouched.",
    "emptyFirstRun": "No checkout payment yet. Offers Create order (`createOrder`).",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction"
-   },
    {
     "operationId": "createPayment",
     "contract": "orders",
@@ -931,24 +930,42 @@
     "purpose": "The current terms and conditions the guest ticks, with their version, readable before sign-in (GFIX-2)",
     "trigger": "onLoad",
     "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Pay now, first step: turn the session's cart into the order pending payment, with the holder names (attendees) and opt-ins (marketingConsents) from WEB-011 when it ran",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "A link to an order already pending payment opens it; otherwise checkoutCart makes the order from the cart."
     },
     {
      "name": "paymentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true
     },
     {
      "name": "venueId",
      "from": "session"
     }
    ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "the holder names and marketing opt-ins typed on WEB-011, when it ran",
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
+   ]
   },
   "wireframe": {
    "status": "review",
@@ -1068,7 +1085,7 @@
     }
    ]
   },
-  "notes": "**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.",
+  "notes": "**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.\n\n**'Set a password' is 'Create an account' (4 October 2026): registerGuest and verifyGuestEmail make and prove the account (no password field exists), then linkGuestCheckout** (CHG-FXS-003)\n\n**Create an account collects the email and the code its two calls send** (CHG-FXS-003)\n\n**The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getOrder` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1108,6 +1125,26 @@
        "kind": "secondaryButton",
        "label": "Add to wallet",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send me a code",
+       "operation": "registerGuest",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify the code",
+       "operation": "verifyGuestEmail",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+      },
+      {
+       "kind": "textField",
+       "label": "Email for the account",
+       "bindsTo": "RegisterGuestRequest.identifier",
+       "operation": "registerGuest",
+       "notes": "The order's email, prefilled; channel email.",
+       "provenance": "contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1129,10 +1166,10 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Set a password",
+       "label": "Create an account",
        "operation": "linkGuestCheckout",
-       "notes": "Offered after a guest checkout: keeps these tickets in an account.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
+       "notes": "Guest accounts are passwordless: registerGuest with the order's email, verifyGuestEmail with the code, then linkGuestCheckout.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       }
      ]
     }
@@ -1142,7 +1179,7 @@
    "loading": "The booking confirmation, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
    "emptyFirstRun": "No booking confirmation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT` for `reprintOrder`.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1163,6 +1200,20 @@
     "contract": "identity",
     "purpose": "Set a password: turn the guest-checkout order into an account (parity with GST-010)",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "Create an account for the order's email: sends a code",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Prove the code; then linkGuestCheckout moves the order to the account",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -1223,6 +1274,23 @@
      "label": "Cancel"
     },
     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
+   },
+   {
+    "id": "formVerifyGuestEmail",
+    "component": "modal",
+    "trigger": "Verify the code",
+    "body": "**Collects what `verifyGuestEmail` sends before it is called.** Required: `mode` (code), the six-digit `code` sent to the order's email. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Verify the code",
+     "operation": "verifyGuestEmail"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/guest/verify-email (4 October 2026, CHG-FXS-003)"
    }
   ],
   "gaps": [

@@ -43,21 +43,21 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 61
+  operationCalls: 62
 - service: OrderService
   operationCalls: 56
 - service: CatalogueService
   operationCalls: 44
 - service: VenueOpsService
-  operationCalls: 38
-- service: WhiteLabelService
-  operationCalls: 23
+  operationCalls: 39
 - service: IdentityService
+  operationCalls: 25
+- service: WhiteLabelService
   operationCalls: 23
 - service: FnbService
   operationCalls: 19
 - service: AccessService
-  operationCalls: 12
+  operationCalls: 13
 - service: AiService
   operationCalls: 11
 - service: WalletService
@@ -499,7 +499,7 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createOrder
+  - checkoutCart
   - createPayment
   - getOrder
   - getPublishedBookingFlow
@@ -513,6 +513,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - cartId<-session
   - orderId<-deepLink
   - paymentId<-navigation
   - venueId<-session
@@ -536,7 +537,9 @@ screens:
   operations:
   - getOrder
   - linkGuestCheckout
+  - registerGuest
   - reprintOrder
+  - verifyGuestEmail
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -661,6 +664,7 @@ screens:
   - getMyChallenges
   - getWallet
   - getWishlist
+  - listLoyaltyProgrammes
   - listMyEntitlements
   - listMyOrders
   - respondToInvitation
@@ -910,6 +914,7 @@ screens:
   - listDelegations
   - listGuestDevices
   - listMfaMethods
+  - listMyEntitlements
   - listPublishedTrackingTechnologies
   - recordConsent
   - recordDeviceConsent
@@ -1353,6 +1358,7 @@ screens:
   - getVenueMap
   - getVenueMapGraph
   - getWaitTimes
+  - listBookableVenueMaps
   - listQueues
   states:
   - emptyFirstRun

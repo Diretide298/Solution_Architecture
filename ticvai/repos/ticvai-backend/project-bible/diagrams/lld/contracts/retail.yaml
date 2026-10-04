@@ -127,6 +127,7 @@ operations:
   writes:
   - cache:idempotency
   - retail.shop_and_drop
+  - retail.shop_and_drop_line
 - operation: disposeShopAndDrop
   verb: POST
   path: /shop-and-drop/{dropId}/dispose
@@ -297,10 +298,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - inventory.movement
+  - inventory.stock_reservation
   - retail.reservation
   - retail.reservation_line
   writes:
   - cache:idempotency
+  - inventory.stock_reservation
   - retail.reservation
   - retail.reservation_line
 - operation: setReturnPolicy

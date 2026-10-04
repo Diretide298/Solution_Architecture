@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `reporting` |
 | Schemas owned | `reporting` |
-| Operations in the slice | 17 of 51 |
+| Operations in the slice | 18 of 51 |
 | Scale | Analytical. Runs against the replica and the analytical store. |
 | If it is down | Down stops dashboards. Nothing operational depends on it. |
 
@@ -33,6 +33,7 @@
 | catalogue | [`updateReport`](#updatereport) | PUT | `/reports/{reportId}` | setup | 1 | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058 … |
 | dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 1 | ADM-031, ANL-021, ANL-022, ANL-023, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 1 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
+| dashboard | [`listDashboards`](#listdashboards) | GET | `/dashboards` | core | 1 | ADM-031, ANL-021, ANL-068, BO-1081, KIT-010 |
 | dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 1 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 1 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
 | execution | [`runReport`](#runreport) | POST | `/reports/{reportId}/run` | core | 1 | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006 … |
@@ -297,7 +298,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | Read routing | analytical |
 | Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
-| Called by | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060, BO-133, BO-262, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -648,6 +649,37 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 |---|---|---|
 | 200 |  | Dashboard with data |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listDashboards
+
+**`GET /dashboards`**: List dashboards
+
+|  |  |
+|---|---|
+| Permission | `REPORT_VIEW_VENUE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | analytical |
+| Reads | `reporting.dashboard`, `reporting.dashboard_tile` |
+| Writes | - |
+| Called by | ADM-031, ANL-021, ANL-068, BO-1081, KIT-010 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| module | query |  | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | Narrows the library to one module. |
+| includeArchived | query |  | boolean | Archived dashboards are left out unless this is true — the "unless asked for" that Dashboard.archivedAt promises. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Dashboards |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordDashboardView
@@ -1549,12 +1581,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-34 operations, added to this service in later releases without changing any of the above.
+33 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | catalogue | `listReportFields` |
-| dashboard | `getCommandCentre`, `listDashboards` |
+| dashboard | `getCommandCentre` |
 | execution | `cancelReportExecution`, `getReportExecution`, `getReportResult`, `listReportExecutions` |
 | export | `exportReportResult`, `getReportExport` |
 | naturalLanguage | `runSemanticQuery` |

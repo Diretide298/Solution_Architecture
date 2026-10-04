@@ -1,4 +1,4 @@
--- inventory — 21 tables
+-- inventory — 22 tables
 -- **Derived. Do not hand-edit.**
 
 -- A stock take. Its lines carry both the counted number and the recount, because two counts that
@@ -44,6 +44,15 @@ CREATE TABLE IF NOT EXISTS inventory.count_line (
     counted_by_principal_id           uuid,
     counted_at                        timestamptz,
     note                              text
+);
+
+CREATE TABLE IF NOT EXISTS inventory.daily_count_list (
+    id                                uuid PRIMARY KEY NOT NULL,
+    item_ids                          text[] NOT NULL,
+    location_id                       uuid,
+    due_by                            text,
+    does_post_adjustment              boolean NOT NULL,
+    scope_path                        ltree NOT NULL
 );
 
 -- Stock arriving against a purchase order. Where a three-way match would begin

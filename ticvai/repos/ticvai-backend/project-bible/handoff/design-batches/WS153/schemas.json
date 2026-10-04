@@ -88,6 +88,22 @@
      }
     ],
     "description": "Rate movement between arising and settling. Posts to FX gain and loss on the selling entity, which carried the balance.\n"
+   },
+   "agreedAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The figure a dispute was resolved at** (4 October 2026, CHG-FXC-003): written by `resolveObligationDispute`, which returns the obligation to `outstanding`. `arisingAmount` keeps the original, so the difference stays auditable; settlement settles `agreedAmount` where it is set and `arisingAmount` otherwise. Null until a dispute is resolved."
+   },
+   "disputeNote": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `note` of the last `disputeObligation` or `resolveObligationDispute`."
    }
   }
  },

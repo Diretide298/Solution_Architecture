@@ -106,10 +106,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-706` | Registration & Attendance Command Center | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-707` | Attendee Data & Registration Form Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-706` | Registration & Attendance Command Center | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-707` | Attendee Data & Registration Form Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-708` | Accreditation & Participant Category Configuration | B | 0 | 4 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-709` | Event Admission & Entry Policy Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-709` | Event Admission & Entry Policy Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

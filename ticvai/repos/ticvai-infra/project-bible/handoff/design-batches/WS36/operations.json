@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "taxProfileId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "TaxProfileJurisdictionConfigurationView"
  },
@@ -196,6 +202,30 @@
     "in": "query",
     "required": false
    },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listLegalEntities": {
+  "method": "GET",
+  "path": "/legal-entities",
+  "contract": "finance",
+  "summary": "List legal entities",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
    {
     "name": null,
     "in": null,

@@ -56,6 +56,30 @@
   "requestBody": null,
   "responds": null
  },
+ "getMembershipProductValidation": {
+  "method": "GET",
+  "path": "/membership-product-validation",
+  "contract": "subscription",
+  "summary": "A membership product's validation, as the approver sees it",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "membershipCode",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "MembershipProductValidationApprovalPublicationVersioView"
+ },
  "listEntitlementTemplates": {
   "method": "GET",
   "path": "/entitlement-templates",

@@ -235,7 +235,7 @@
     }
    ]
   },
-  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.\n\n**Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a linked child, and is recorded as guardian by the server. The age below which a subject is a minor is an open value client counsel sets.",
+  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.\n\n**Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a linked child, and is recorded as guardian by the server. The age below which a subject is a minor is an open value client counsel sets.\n\n**The passes come from listMyEntitlements (4 October 2026): entitlementId for enrolFacePass, facePassEnrolmentId for getFacePassEnrolment. The template comes from the facial-reader vendor's SDK, a client choice still open (ADR-0063); the build uses a stub until it is named** (CHG-FXS-003)\n\n**The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)",
   "density": "comfortable",
   "offline": false,
   "pattern": "statusTracker",
@@ -273,6 +273,20 @@
        ],
        "operation": "getFacePassEnrolment",
        "provenance": "contract access.yaml GET /face-pass/enrolments/{enrolmentId}"
+      },
+      {
+       "kind": "cardList",
+       "label": "Passes",
+       "bindsTo": "Entitlement",
+       "operation": "listMyEntitlements",
+       "columns": [
+        "Entitlement.productId",
+        "Entitlement.validTo",
+        "Entitlement.facePassEnrolmentId",
+        "Entitlement.status"
+       ],
+       "notes": "Passes of the selected person (self or a linked child). A pass with a facePassEnrolmentId shows its enrolment (getFacePassEnrolment); one without offers Enrol.",
+       "provenance": "contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -308,7 +322,7 @@
     "id": "formEnrolFacePass",
     "component": "modal",
     "trigger": "Enrol face pass",
-    "body": "**Collects what `enrolFacePass` sends before it is called.** Required: `subjectId`, `entitlementId`, `template`, `capturedAt`, `source`, `consent`. `subjectId` is the person picked in **Who is this for** (the guest or a linked child), not typed; **no guardian is asked for** — the server sets `consent.guardianSubjectId` to the signed-in guest (decided 28 September, audit R205). Dismissing sends nothing; the screen behind is unchanged. **Consent is the venue's own consent form** (`VenueSettings.biometrics.consentFormId`), shown before the camera opens; for a child the signed-in guest consents as guardian, and the form version is recorded with the enrolment (CHG-SGU-004). **Where:** in this app, at a ticket or annual-pass counter, or at a self-service kiosk with the consent shown (`enrolmentChannel` selfServiceKiosk); never at a turnstile (CHG-CSP-021) (CHG-SGU-021).",
+    "body": "**Collects what `enrolFacePass` sends before it is called.** Required: `subjectId`, `entitlementId`, `template`, `capturedAt`, `source`, `consent`. `subjectId` is the person picked in **Who is this for** (the guest or a linked child), not typed; **no guardian is asked for** — the server sets `consent.guardianSubjectId` to the signed-in guest (decided 28 September, audit R205). Dismissing sends nothing; the screen behind is unchanged. **Consent is the venue's own consent form** (`VenueSettings.biometrics.consentFormId`), shown before the camera opens; for a child the signed-in guest consents as guardian, and the form version is recorded with the enrolment (CHG-SGU-004). **Where:** in this app, at a ticket or annual-pass counter, or at a self-service kiosk with the consent shown (`enrolmentChannel` selfServiceKiosk); never at a turnstile (CHG-CSP-021) (CHG-SGU-021). The face is captured by the facial-reader vendor's SDK behind a FaceCapture interface, which returns the write-only `template`; until the client names the vendor (ADR-0063) the build uses a stub returning a fixed test template (CHG-FXS-003).",
     "confirm": {
      "label": "Enrol face pass",
      "operation": "enrolFacePass"
@@ -332,7 +346,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does — **before** the camera opens.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `listDelegations` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFacePass`, `revokeFacePass`.",
    "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads.",
    "subjectNotLinked": "**Refused: that person is not linked to you** (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to **Who is this for**, which is refreshed in case the link was just removed (decided 28 September, audit R205)."
   },
@@ -360,19 +374,26 @@
     "contract": "access",
     "purpose": "Remove a facial profile",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The passes a face can be registered on (entitlementId), each with its facePassEnrolmentId",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
      "name": "enrolmentId",
      "from": "deepLink",
      "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `enrolFacePass`; a link or an edge that holds one opens it instead."
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
+     "notes": "Otherwise the selected pass's Entitlement.facePassEnrolmentId."
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
@@ -454,7 +475,7 @@
     }
    ]
   },
-  "notes": "**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no guest screen.\n\n**Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever the contracts call them.",
+  "notes": "**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no guest screen.\n\n**Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever the contracts call them.\n\n**storePaymentToken's providerId comes from the published tenant config (paymentTokenisation, agreed with contracts in the ledger) and its consentPurposeId from listConsentPurposes; the transfer's walletId is the guest's wallet id from getWallet (Wallet.id, agreed). Bound 4 October 2026** (CHG-FXS-003)\n\n**The card is entered in the provider's secure fields, named by the published config** (CHG-FXS-003)",
   "density": "comfortable",
   "offline": false,
   "pattern": "listDetail",
@@ -480,6 +501,36 @@
        "operation": "listPaymentTokens",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
        "notes": "Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+      },
+      {
+       "kind": "detailPanel",
+       "label": "My wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "columns": [
+        "Wallet.balance",
+        "Wallet.status"
+       ],
+       "provenance": "contract wallet.yaml Wallet (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "Save this card for future payments",
+       "bindsTo": "ConsentPurposeConfig.purpose",
+       "operation": "listConsentPurposes",
+       "notes": "The purpose for stored cards; its id is storePaymentToken's consentPurposeId.",
+       "provenance": "contract marketing-crm.yaml ConsentPurposeConfig.purpose (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Card provider",
+       "bindsTo": "PublishedTenantConfig",
+       "operation": "getPublishedTenantConfig",
+       "columns": [
+        "PublishedTenantConfig.paymentTokenisation"
+       ],
+       "notes": "The tokenising provider; its secure card fields take the card, which never reaches the platform.",
+       "provenance": "contract white-label.yaml PublishedTenantConfig (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -534,7 +585,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW`, `WALLET_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `storePaymentToken`; `WALLET_OPERATE` for `transferWalletBalance`.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
@@ -576,6 +627,27 @@
     "contract": "wallet",
     "purpose": "Balance on a gift card",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The consent purpose a saved card is stored under (consentPurposeId: storing a card for future payments)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "getPublishedTenantConfig",
+    "contract": "white-label",
+    "purpose": "The provider the app tokenises cards with (paymentTokenisation.providerId, agreed field)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "The guest's wallet and its id, for a balance transfer",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

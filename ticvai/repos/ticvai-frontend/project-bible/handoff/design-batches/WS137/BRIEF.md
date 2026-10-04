@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-754` | Audience Intelligence | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-755` | Dynamic Segment Builder | A | 21 | 23 | 6 | 10 | 1 | 6 | — | notStarted (—) |
+| `BO-755` | Dynamic Segment Builder | A | 33 | 11 | 6 | 12 | 1 | 6 | — | notStarted (—) |
 | `BO-756` | Static Lists & Imports | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-757` | Behavioral Segmentation | D | 0 | 20 | 6 | 13 | 1 | 6 | — | notStarted (—) |
 | `BO-758` | Membership & Loyalty Segments | D | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-754, BO-755, BO-756, BO-758, BO-759, BO-760, BO-761, BO-762 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-754, BO-756, BO-758, BO-759, BO-760, BO-761, BO-762 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

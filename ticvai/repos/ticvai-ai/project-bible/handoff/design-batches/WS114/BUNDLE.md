@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-674` | Accreditation Communications Command Center | B | 0 | 5 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-674` | Accreditation Communications Command Center | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-675` | Notification Rule Management | D | 9 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-676` | Expiry & Renewal Notification Scheduler | D | 6 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `BO-677` | Communication Template Library | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ### `BO-674` Accreditation Communications Command Center
 
-**Central dashboard for accreditation notifications and operational communications.**
+**The home of accreditation communications: open the notification rules, templates, schedules and delivery screens of this section.**
 
 | | |
 |---|---|
@@ -160,12 +160,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Block | Block B · task VM-BO-674 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Dashboard analytics shall show) and no metric row |
+| Pattern | commandCentre (compact density): The accreditation communications section's home: links to its screens, with no dashboard until a read of sends and delivery outcomes exists (4 October 2026, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/accreditation-communications-command-center-bo-674` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): The only bound operation was the rule write, used "at a glance"; the rules are edited on BO-675. No read returns accreditation notification sends or delivery … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of accreditation notification sends and delivery outcomes (or an accreditation filter on listDeliveryQueueFailure).
+**What the spec says about it.** **Defined 4 October 2026 as the section's navigation hub: the five dashboard elements had no read (contract gap CHG-WIR-004, still open), so the chart left the screen and it links to BO-675 to BO-683** (CHG-FXS-001)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): The only bound operation was the rule write, used "at a glance"; the rules are edited on BO-675. No read returns accreditation notification sends or delivery … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of accreditation notification sends and delivery outcomes (or an accreditation filter on listDeliveryQueueFailure).
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The landing page of the communications and bulk-operations board: what was sent, what is scheduled, what failed, and quick routes to send, configure rules, templates, imports and exports. Per VO-R02 it is a command-centre dashboard. The one thing to get right: failures and exceptions lead (a rejection email that never arrived is a complaint tomorrow), and every figure is about accreditation messages only.
 
@@ -183,15 +185,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Communications** (chart): Delivery success rate, notifications by type and channel, failure trends and upcoming scheduled communications are charts and tiles on a dashboard (VO-R02), not table columns.
-
-| Shows | Format | Notes |
-|---|---|---|
-| Delivery success rate | text | not in the schema: `Delivery success rate` |
-| Notifications by type | text | not in the schema: `Notifications by type` |
-| Notifications by channel | text | not in the schema: `Notifications by channel` |
-| Failure trends | text | not in the schema: `Failure trends` |
-| Upcoming scheduled communications | text | not in the schema: `Upcoming scheduled communications` |
+**Accreditation communications** (card list): One card per screen this hub opens (navigation.exitTo), each with its name and purpose; no figures until the delivery read exists (contract gap CHG-WIR-004).
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -219,8 +213,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The accreditation communications list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the accreditation communications untouched. |
+| Loading (`?state=loading`) | The cards render at once; nothing is fetched. |
+| Error (`?state=error`) | Not used: the hub fetches nothing. |
 | Empty, first run (`?state=emptyFirstRun`) | No accreditation communications yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the accreditation communications are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
@@ -297,7 +291,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-674?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-675`, `BO-676`, `BO-677`, `BO-678`, `BO-679`, `BO-680`, `BO-681`, `BO-682`, `BO-683`.

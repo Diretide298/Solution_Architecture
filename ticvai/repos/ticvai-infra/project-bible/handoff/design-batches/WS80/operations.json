@@ -127,12 +127,17 @@
    {
     "name": "walletId",
     "in": "query",
-    "required": true
+    "required": false
    },
    {
     "name": "includeExhausted",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,

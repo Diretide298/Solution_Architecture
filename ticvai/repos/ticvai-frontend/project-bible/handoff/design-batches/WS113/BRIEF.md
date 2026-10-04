@@ -1,6 +1,6 @@
 # WS113 — ACCREDITATION board 6
 
-**10 screens · 10 operations · 7 schemas · 4 permissions**
+**10 screens · 11 operations · 7 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-666` | Validity Period Configuration | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-667` | Event & Venue Accreditation Assignment | D | 25 | 20 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 | `BO-668` | Multi-Venue Accreditation Management | D | 0 | 16 | 6 | 6 | 0 | 6 | — | notStarted (—) |
-| `BO-669` | Temporary & Seasonal Accreditation | B | 3 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-669` | Temporary & Seasonal Accreditation | B | 15 | 3 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-670` | Suspension & Reactivation Management | D | 9 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-671` | Accreditation Revocation Management | D | 0 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
 | `BO-672` | Expiry Monitor & Expiration Rules | D | 0 | 14 | 6 | 6 | 0 | 0 | — | notStarted (—) |
@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-664, BO-666, BO-667, BO-668, BO-669, BO-671, BO-673 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-664, BO-666, BO-667, BO-668, BO-671, BO-673 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

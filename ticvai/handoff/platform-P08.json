@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1661,
-  "operations": 1860,
+  "operations": 1872,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
@@ -179,7 +179,7 @@
  "contracts": [
   {
    "contract": "access",
-   "operations": 236
+   "operations": 237
   },
   {
    "contract": "catalogue",
@@ -191,7 +191,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 140
+   "operations": 141
   },
   {
    "contract": "promotions",
@@ -199,7 +199,7 @@
   },
   {
    "contract": "fnb",
-   "operations": 75
+   "operations": 77
   },
   {
    "contract": "finance",
@@ -207,15 +207,15 @@
   },
   {
    "contract": "wallet",
-   "operations": 59
-  },
-  {
-   "contract": "resources",
-   "operations": 55
+   "operations": 61
   },
   {
    "contract": "ai",
-   "operations": 54
+   "operations": 56
+  },
+  {
+   "contract": "resources",
+   "operations": 56
   },
   {
    "contract": "inventory",
@@ -226,31 +226,31 @@
    "operations": 52
   },
   {
+   "contract": "approvals",
+   "operations": 47
+  },
+  {
    "contract": "payments",
    "operations": 46
   },
   {
-   "contract": "approvals",
-   "operations": 46
+   "contract": "subscription",
+   "operations": 45
   },
   {
    "contract": "tenancy",
    "operations": 45
   },
   {
-   "contract": "subscription",
+   "contract": "accreditation",
    "operations": 44
   },
   {
-   "contract": "accreditation",
-   "operations": 43
-  },
-  {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {
@@ -290,11 +290,11 @@
    "operations": 12
   },
   {
-   "contract": "white-label",
+   "contract": "retail",
    "operations": 11
   },
   {
-   "contract": "retail",
+   "contract": "white-label",
    "operations": 11
   },
   {
@@ -579,7 +579,7 @@
    "module": "Commercial",
    "wave": 1,
    "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -651,7 +651,7 @@
    "module": "Commercial",
    "wave": 1,
    "route": "/commercial/calculation-validation-reconciliation-service-interface-adm-077",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4899,7 +4899,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations/f-b-outlets",
-   "operations": 16,
+   "operations": 17,
    "drawn": true
   },
   {
@@ -4935,7 +4935,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/retail-products",
-   "operations": 4,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -5268,7 +5268,7 @@
    "module": "People & Access Rights",
    "wave": 1,
    "route": "/approvals/approval-request",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -5286,7 +5286,7 @@
    "module": "People & Access Rights",
    "wave": 2,
    "route": "/approvals/approval-delegations",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -5340,7 +5340,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-mapping/map-import",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -5376,7 +5376,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/resources/check-out",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -6339,7 +6339,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/orders-money/funding-method-configuration-bo-1094",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6591,7 +6591,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/production-planning-production-sheets",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -6852,7 +6852,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/orders-money/refund-to-wallet-policy-configuration-bo-1146",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7014,7 +7014,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/orders-money/security-governance-audit-rule-publication-bo-1162",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -7410,7 +7410,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations/offline-alerts-limits-audit",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -8850,7 +8850,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/membership-product-validation-approval-publication-versi-bo-293",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -9300,7 +9300,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/media-design-studio-command-center-bo-344",
-   "operations": 5,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -9318,7 +9318,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
-   "operations": 6,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -12207,7 +12207,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/temporary-seasonal-accreditation-bo-669",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -13080,7 +13080,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/campaign-builder-bo-766",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -13134,7 +13134,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/a-b-ai-optimization-bo-772",
-   "operations": 6,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -13251,7 +13251,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/template-library-bo-785",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -13368,7 +13368,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/intent-knowledge-management-bo-798",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -13377,7 +13377,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/agent-workspace-bo-799",
-   "operations": 4,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -13629,7 +13629,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/points-activity-rules-bo-827",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -13638,7 +13638,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/milestones-reward-rules-bo-828",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -13899,7 +13899,7 @@
    "module": "Rentals",
    "wave": 1,
    "route": "/rentals/resource-creation-profile-bo-857",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -13980,7 +13980,7 @@
    "module": "Rentals",
    "wave": 1,
    "route": "/rentals/resource-availability-schedule-configuration-bo-866",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -14079,7 +14079,7 @@
    "module": "Rentals",
    "wave": 1,
    "route": "/rentals/qualification-assignment-rule-engine-bo-877",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -14457,7 +14457,7 @@
    "module": "Rentals",
    "wave": 1,
    "route": "/rentals/ai-event-resource-forecasting-bo-919",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -15466,6 +15466,12 @@
     "summary": "Seat-level dynamic pricing rules"
    },
    {
+    "operation": "listTaxProfiles",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The tax profiles"
+   },
+   {
     "operation": "relinquishInventoryHold",
     "contract": "catalogue",
     "verb": "DELETE",
@@ -15670,12 +15676,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
-   },
-   {
     "operation": "listSegregationRules",
     "contract": "identity",
     "verb": "GET",
@@ -15728,6 +15728,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -16280,12 +16286,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
    },
    {
     "operation": "listCellEndpoints",

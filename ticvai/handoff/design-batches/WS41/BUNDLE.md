@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-023` | Consent Purpose & Consent Type Builder | D | 17 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | D | 17 | 0 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
 | `CMS-025` | Cookie, Tracking & Digital Technology Registry | A | 44 | 67 | 6 | 3 | 1 | 4 | — | notStarted (generated) |
-| `CMS-026` | Cookie Banner & Preference Center Designer | A | 31 | 0 | 5 | 1 | 2 | 4 | configures | notStarted (generated) |
+| `CMS-026` | Cookie Banner & Preference Center Designer | A | 33 | 4 | 5 | 1 | 2 | 4 | configures | notStarted (generated) |
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | D | 28 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `CMS-028` | Privacy Notice, Policy & Terms Version Management | D | 9 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | D | 8 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
@@ -726,7 +726,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | `scanRunId` (navigation) |
 | Route | `/policy/cookie-tracking-digital-technology-registry-cms-025` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Analytics Tracker, Embedded Service, Other tracking technology. Each needs an operation, or needs removing … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **The generator's 'needs a person' gaps removed 4 October 2026: the registry is defined, and the pack's three kinds (analytics tracker, embedded service, other) are values of the technology type, not separate operations** (CHG-FXS-005)
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The registry of every cookie, SDK, pixel and storage key on the venue's channels, including the mobile app and embedded checkout. It runs on the strictest posture: anything not strictly necessary needs consent before it loads, and a technology a scan detects is blocked until an administrator classifies and approves it.
 
@@ -1072,6 +1072,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/cookie-banner-preference-center-designer-cms-026` |
 
+**What the spec says about it.** **Channel and brand, the upsert key, are fields on the form and choosing a row of the list loads that design (4 October 2026); the remaining selects are bound to the design's properties** (CHG-FXS-002)
+
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the … **Cookie Banner & Preference Center Designer declares no operation that writes anything** — its only declared call is `listCookieBannerPreference`, a read. The name promises authoring and the …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** A no-code designer for the cookie banner and preference centre, one design per brand and channel, each saved as a new version and published through privacy testing and approval. The posture is fixed: "Reject non-essential" is always offered and one click, every non-essential category starts off, and strictly necessary is always on with a description.
@@ -1084,15 +1086,17 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Logo | select field | — | — | — | — | — | — |
+| Logo | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | A media asset id from the library. | `CookieBannerPreferenceCenterDesignerView.logoAssetId` |
 | Title | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | Text per language (English and Arabic required). | `CookieBannerPreferenceCenterDesignerView.title` |
 | Description | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | Text per language (English and Arabic required). | `CookieBannerPreferenceCenterDesignerView.body` |
-| Position | select field | — | — | — | — | — | — |
-| Theme | select field | — | — | — | — | — | — |
-| Branding | select field | — | — | — | — | — | — |
-| Language | select field | — | — | — | — | Languages are tabs of the text fields; English and Arabic are required. | — |
+| Position | radio group | optional | — | Top · Bottom · Popup · Modal | — | — | `CookieBannerPreferenceCenterDesignerView.position` |
+| Theme | text field | optional | — | — | — | The white-label theme it takes colours and fonts from. | `CookieBannerPreferenceCenterDesignerView.themeId` |
+| Language | list of values (chips) | optional | — | at least 1 | — | Languages are tabs of the text fields; English and Arabic are required. | `CookieBannerPreferenceCenterDesignerView.languages` |
 | Links | repeatable rows | optional | — | — | — | A list of links (privacy notice, cookie notice) per language. | `CookieBannerPreferenceCenterDesignerView.links` |
 | Category descriptions | repeatable rows | optional | — | at least 1 | — | The description of each category per language. | `CookieBannerPreferenceCenterDesignerView.categories` |
+| Channel | select | optional | — | B2C website · Customer portal · Mobile app · Embedded checkout · White label site · Partner microsite | — | Required; with the brand, the key the save upserts on. | `CookieBannerPreferenceCenterDesignerView.channel` |
+| Brand | picker: choose a brand (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | The brand the design is for; picking a row of the list fills channel and brand and loads that design. | `CookieBannerPreferenceCenterDesignerView.brandId` |
+| Reject in one click | toggle | optional | on | — | — | Must be true. | `CookieBannerPreferenceCenterDesignerView.rejectIsOneClick` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1145,6 +1149,15 @@ Errors to draw in the form: 400 Validation failed; 422 A design that makes rejec
 **Shown**
 
 **Buttons** (detail panel): Fixed by the posture, not chosen: Accept all, Reject non-essential (always one click) and Choose.
+
+**Designs** (data table, from `listCookieBannerPreference`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Channel | chip: B2C website, Customer portal, Mobile app, Embedded checkout, White label site … | — |
+| Brand | the name it points at, never the id | Null for the corporate design every brand inherits. |
+| Position | chip: Top, Bottom, Popup, Modal | — |
+| Languages | list or chips (count when long) | Every language the storefront serves; Arabic renders right to left. |
 
 **Actions and what each produces**
 
@@ -1265,8 +1278,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 403, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 403, 422).
+- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-026?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save version.
 - [ ] Every transition is wired: `CMS-021`.

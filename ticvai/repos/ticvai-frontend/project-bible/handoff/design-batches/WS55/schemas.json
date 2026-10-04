@@ -58,12 +58,28 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   },
+   "delegationType": {
+    "type": "string",
+    "nullable": true,
+    "description": "The composite screen's `delegationType` (planned absence, temporary cover ...), for display and reporting; the engine treats every delegation alike (4 October 2026, CHG-FXC-005)."
+   },
+   "maxPercentage": {
+    "type": "number",
+    "nullable": true,
+    "description": "A percentage cap beside `maxAmount` (the composite's `authorityPercentage`, CHG-FXC-005)."
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A role the delegate must hold for the delegation to act (the composite's `requiredRole`); checked when the delegate decides, refused with 409 at creation where the delegate does not hold it (CHG-FXC-005)."
    }
   }
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
   "enum": [
    "refund",
    "priceOverride",
@@ -249,6 +265,74 @@
     "format": "uuid",
     "nullable": true,
     "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null."
+   },
+   "minimumApprovals": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "N in N-of-M (CHG-FXC-005). Null means every approver the mode asks."
+   },
+   "requiredApproverRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of `approverRoleIds` (CHG-FXC-005)."
+   },
+   "rejectionBehavior": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "rejectRequest",
+     "returnToPreviousLevel",
+     "returnToRequester"
+    ],
+    "description": "What a rejection at this rule does; null is `rejectRequest` (CHG-FXC-005)."
+   },
+   "allowRequestChanges": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowDelegate": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowReassign": {
+    "type": "boolean",
+    "default": false
+   },
+   "minPercentage": {
+    "type": "number",
+    "nullable": true,
+    "description": "A percentage threshold (a discount or a margin impact) at or above which the rule applies, beside `minAmount` (CHG-FXC-005)."
+   },
+   "matchAttributes": {
+    "type": "object",
+    "x-ticvai-persistence-column": "jsonb",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string"
+    },
+    "description": "**The request attributes a rule matches on** (CHG-FXC-005): keys `module`, `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity`, each an exact value the request's attributes must carry. Every key given must match; an absent key matches anything. Evaluated before `condition`."
+   },
+   "compositeMode": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "single",
+     "sequential",
+     "parallel",
+     "anyOne",
+     "allMustApprove",
+     "conditional",
+     "multiLevel"
+    ],
+    "description": "The `approvalMode` the composite screen sent, kept so it reads back what it saved; `mode`, `levels` and `minimumApprovals` are what the engine runs (CHG-FXC-005)."
    }
   }
  },

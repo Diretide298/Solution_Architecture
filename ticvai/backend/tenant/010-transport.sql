@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS transport.favourite_route (
     from_station_name                 text,
     to_station_name                   text,
     label                             text,
-    created_at                        timestamptz NOT NULL
+    created_at                        timestamptz NOT NULL,
+    subject_id                        uuid
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing

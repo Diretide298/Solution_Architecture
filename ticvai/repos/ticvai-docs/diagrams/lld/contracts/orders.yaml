@@ -117,6 +117,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_discount
   - orders.payment
   - orders.sales_order
 - operation: approveExceptionServiceRecovery
@@ -690,6 +691,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.ticket_template
+  - orders.ticket_template_channel
 - operation: createUpgradeCredentialRegeneration
   verb: POST
   path: /upgrade-credential-regeneration
@@ -2538,6 +2540,8 @@ operations:
   - ledger.journal_line
   - ledger.posting
   - orders.chargeback
+  - orders.chargeback_evidence
+  - orders.chargeback_investigation_log
   - platform.outbox
 - operation: recordChargebackOutcome
   verb: POST

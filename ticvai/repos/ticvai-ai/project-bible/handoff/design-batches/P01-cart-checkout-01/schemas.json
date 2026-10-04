@@ -713,18 +713,6 @@
    "checkedOut"
   ]
  },
- "Channel": {
-  "type": "string",
-  "enum": [
-   "pos",
-   "kiosk",
-   "web",
-   "mobile",
-   "b2b",
-   "ota",
-   "callCentre"
-  ]
- },
  "ConsentPurpose": {
   "type": "string",
   "enum": [
@@ -875,6 +863,26 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   },
+   "assignmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005)."
+   },
+   "distributionStatus": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "pending",
+     "sent",
+     "delivered",
+     "viewed",
+     "cancelled"
+    ],
+    "description": "**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned, `sent` when the channel accepted it, `delivered` on the channel's delivery receipt, `viewed` when the holder opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from `status`, which is the code's redemption life (issued, assigned, redeemed, expired, voided)."
    }
   }
  },
@@ -1001,60 +1009,6 @@
     "type": "object",
     "additionalProperties": true,
     "description": "**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"
-   }
-  }
- },
- "CreateOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "channel",
-   "lines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel"
-   },
-   "shiftId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null for an anonymous sale. Identity and entitlement are separate."
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells."
-   },
-   "catalogueBundleVersion": {
-    "type": "string",
-    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
-   },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
    }
   }
  },
@@ -1455,6 +1409,77 @@
    }
   }
  },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse and fill a cart but not transact: the gate is the checkout page (ADR-0045), where `checkoutCart` refuses it until the guest verifies or proves the contact by code. UAE Pass returns a verified identity, so it starts true. Rule on `verifyGuestEmail`, decided 17 September 2026.\n"
+   },
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
+   },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false,
+    "description": "True only where the sign-in venue enabled guest two-step verification (`VenueSettings.identity.guestTwoStep`, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per venue). The session is then not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge. Always false for a UAE Pass sign-in, which is already a verified two-factor identity (proposed, client to correct).\n"
+   },
+   "mfaMethods": {
+    "type": "array",
+    "description": "The guest's active methods, so the client can offer the right one. Empty when `requiresMfa` is false.",
+    "items": {
+     "$ref": "#/components/schemas/MfaMethod"
+    }
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**30 days, sliding** (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. **One session per device**: a guest may be signed in on a phone and a laptop at once, and a new sign-in on the same `deviceId` ends that device's previous session.\n"
+   }
+  }
+ },
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -1473,6 +1498,49 @@
    "inApp",
    "post"
   ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
  },
  "Money": {
   "type": "object",
@@ -2376,6 +2444,61 @@
    }
   }
  },
+ "RegisterGuestRequest": {
+  "type": "object",
+  "required": [
+   "identifier",
+   "channel"
+  ],
+  "properties": {
+   "identifier": {
+    "type": "string",
+    "maxLength": 256,
+    "description": "Email address or mobile number in E.164."
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ]
+   },
+   "displayName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "password": {
+    "type": "string",
+    "minLength": 8,
+    "maxLength": 256,
+    "writeOnly": true,
+    "description": "Optional. OTP-only accounts are supported and are the default."
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "pattern": "^[a-z]{2}$"
+   },
+   "consents": {
+    "type": "array",
+    "description": "Consent captured at registration, recorded with the notice version.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "type": "string"
+      },
+      "granted": {
+       "type": "boolean"
+      },
+      "noticeVersion": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
  "ResourceHold": {
   "x-ticvai-persistence": "resources.resource_hold",
   "type": "object",
@@ -2563,5 +2686,27 @@
    "giftCard",
    "complimentary"
   ]
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
+   },
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
  }
 }

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 79
+  x-ticvai-screen-count: 80
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -138,7 +138,9 @@ paths:
     post:
       operationId: verifyGuestEmail
       x-ticvai-consumed-by:
+        - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-010 Booking Confirmation"
         - "P02 GST-073 Security & Sign-in"
       security:
       - guestAuth: []
@@ -479,6 +481,7 @@ paths:
       operationId: listCapabilityTemplates
       x-ticvai-consumed-by:
         - "P08 BO-054 Role Assignment"
+        - "P09 ADM-021 Platform Role Management"
       summary: Saved tick-sets
       description: '3.3.23, BL-110. **A role, without the taxonomy.** *Duty Manager* is a named
         set of ticks somebody saved because they grant it often — useful, and **not a thing access
@@ -747,6 +750,9 @@ paths:
                   default: json
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Export started, as a data-subject request (`platform.dsar_request`). The same
             shape `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests
             read alike.
@@ -1550,6 +1556,7 @@ paths:
         - "P08 BO-106 People & Access Rights"
         - "P09 ADM-021 Platform Role Management"
         - "P13 CMS-019 User Access"
+        - "P13 CMS-086 Role-Based Asset Access & Permission Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1981,7 +1988,9 @@ paths:
     post:
       operationId: registerGuest
       x-ticvai-consumed-by:
+        - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-016 Login / Register"
+        - "P02 GST-010 Booking Confirmation"
         - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-audience:
       - anonymous
@@ -4834,6 +4843,8 @@ paths:
   /permissions:
     get:
       operationId: listPermissions
+      x-ticvai-consumed-by:
+        - "P09 ADM-021 Platform Role Management"
       summary: Every permission key the contracts enforce
       description: '**The catalogue that makes a role reviewable.** Every refresh reports *154
         permission keys on operations, 35 in roles.yaml, 0 shared* — the keys the contracts enforce
@@ -7118,6 +7129,7 @@ components:
             '
         conditions:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             $ref: '#/components/schemas/AccessCondition'
         combining:
@@ -7188,6 +7200,20 @@ components:
             tenant''s.
 
             '
+    GuestCredential:
+      x-ticvai-persistence: identity.guest_credential
+      type: object
+      description: '**A guest''s password, as stored** (4 October 2026, CHG-FXC-003; `registerGuest` took a password and
+        no table held it, so `guestPasswordLogin` had nothing to check). Never returned by any operation: this schema exists
+        to say where the hash lives. One row per guest subject; `registerGuest` and `changeOwnCredential` write it,
+        `guestPasswordLogin` reads it, counts failures against `identity.password_policy` and locks until `lockedUntil`.'
+      required: [subjectId, passwordHash, failedAttempts]
+      properties:
+        subjectId: { type: string, format: uuid }
+        passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password.' }
+        failedAttempts: { type: integer, minimum: 0 }
+        lockedUntil: { type: string, format: date-time, nullable: true }
+        passwordSetAt: { type: string, format: date-time }
     AccessCondition:
       type: object
       description: '**One attribute, one operator, one value** — and the attribute names are an enum

@@ -1,6 +1,6 @@
 # P08-access-venue-03 — P08 · Access & Venue (3 of 3)
 
-**5 screens · 15 operations · 24 schemas · 7 permissions**
+**5 screens · 16 operations · 24 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -132,10 +132,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-096` | Resource Calendar | A | 10 | 11 | 6 | 27 | 3 | 0 | — | notStarted (generated) |
-| `BO-097` | Check Out & Check In | A | 24 | 20 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-097` | Check Out & Check In | A | 24 | 36 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
 | `BO-098` | Qualifications | D | 15 | 7 | 5 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-099` | Performance Manifest | D | 2 | 8 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-103` | Access & Venue | C | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `BO-103` | Access & Venue | A | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -1,6 +1,6 @@
 # P06-stock-on-the-floor-01 — P06 · Stock on the Floor
 
-**10 screens · 34 operations · 38 schemas · 11 permissions**
+**10 screens · 36 operations · 40 schemas · 11 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -135,8 +135,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-063` | Requisition & Smart Store Replenishment | D | 18 | 21 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | D | 14 | 48 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
 | `EMP-065` | Receiving | A | 31 | 25 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
-| `EMP-066` | Stock Count & Cycle Count Management | D | 17 | 20 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 6 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
+| `EMP-066` | Stock Count & Cycle Count Management | A | 17 | 37 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 9 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
 | `EMP-068` | Reservation, Allocation & Omnichannel Inventory | C | 8 | 5 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | D | 3 | 8 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
 | `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | D | 18 | 9 | 6 | 6 | 0 | 4 | — | notStarted (generated) |
@@ -1365,7 +1365,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | Block D · task APP-STAFF-EMP-066 |
+| Block | Block A · task APP-SETUP-EMP-066 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getCountVariance` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1373,7 +1373,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `venueId` (session), `countId` (EMP-003) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
 | Route | `/operations/stock-count-cycle-count-management` |
 
-**What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4f`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Stock Count &amp; Cycle Count Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
+**What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4f`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Stock Count &amp; Cycle Count Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly. **The count lines are read with listStockCountLines (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-008): In F30, variance review, recount requests and posting are the supervisor's steps on BO-079 (steps 4, 5 and 7); a counter's device showing variance weakens the … Removed 2 October 2026 (CHG-WIR-008): In F30, variance review, recount requests and posting are the supervisor's steps on BO-079 (steps 4, 5 and 7); a counter's device showing variance weakens the … Removed 2 October 2026 (CHG-WIR-008): In F30, variance review, recount requests and posting are the supervisor's steps on BO-079 (steps 4, 5 and 7); a counter's device showing variance weakens the …
 
@@ -1448,7 +1448,27 @@ Errors to draw in the form: 409 A count is already open for this location
 
 **Shown**
 
-**Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The lines arrive pre-filled from on-hand stock** — one card per item at the location, with a blank count and no expected figure; the counter enters what is on the shelf (audit R110 (a), R171 (7)).
+**Lines to count** (card list, from `listStockCountLines`): One card per line (item, counted); the expected quantity stays hidden while a blind count is open. Each card's itemId is what enterCountLine sends.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Count | the name it points at, never the id | — |
+| Item | the name it points at, never the id | — |
+| Location | the name it points at, never the id | — |
+| Batch | the name it points at, never the id | — |
+| Counted quantity | 1,234.5 | — |
+| Theoretical quantity | 1,234.5 | Snapshotted at entry. What the platform believed was there at the moment the counter looked. |
+| UOM | text | — |
+| Variance | 1,234.5 | — |
+| Variance percent | 1,234.5 | — |
+| Status | chip: Entered, Recount requested, Recounted, Accepted, Rejected | — |
+| Counted by principal | the name it points at, never the id | — |
+| Counted at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Open counts** (data table, from `listStockCounts`)
 
@@ -1482,13 +1502,13 @@ Errors to draw in the form: 409 A count is already open for this location
 | Confirm (primary button) | navigation or local | — | — | — | — |
 | Start stock count (primary button) | `startStockCount` POST `/stock-counts` | StartStockCountRequest | StockCount | 409 A count is already open for this location | works offline; opens modal first |
 | Enter count line (secondary button) | `enterCountLine` POST `/fnb-stock-counts/{countId}/lines` | inline | inline | — | works offline; opens modal first |
-| Save daily count (secondary button) | `setDailyCount` PUT `/stock-counts/daily` | inline | inline | — | opens modal first |
+| Save daily count (secondary button) | `setDailyCount` PUT `/stock-counts/daily` | inline | DailyCountList | — | opens modal first |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
 - **Progress**: "38 of 46 counted", and lines sent back for recount highlighted at the top with the supervisor's reason. *(source: F30 step 6 / contracts/satellite/fnb.yaml#requestRecount)*
 
-**Data it reads**: `listStockCounts` (onLoad, The open counts to enter lines on)
+**Data it reads**: `listStockCounts` (onLoad, The open counts to enter lines on); `listStockCountLines` (onLoad, The pre-filled lines of the count being entered (countId) …)
 
 **Where the user goes next**
 
@@ -1531,6 +1551,7 @@ line:
 - `enterCountLine` → `PRODUCT_CONFIGURE` (configure) · staff
 - `setDailyCount` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listStockCounts` → `PRODUCT_VIEW` (read) · staff
+- `listStockCountLines` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `startStockCount`, `enterCountLine`, `setDailyCount`.
 
@@ -1573,8 +1594,8 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-066?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Start stock count, Enter count line, Save daily count.
 - [ ] Every transition is wired: `BO-079`.
@@ -1594,7 +1615,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-SETUP-EMP-067 |
+| Block | Block A · task APP-SETUP-EMP-067-REST |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE` (2 configure, 2 operate, 1 read); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`) and no read of a population — it is settings, not a list |
@@ -1602,7 +1623,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 | Opens with | `venueId` (session), `outletId` (EMP-003), `actionId` (deepLink) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. A corrective action opened from the … |
 | Route | `/operations/damage-loss-shrinkage-stock-adjustment` |
 
-**What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.**
+**What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.** **The action to sign is picked from listCorrectiveActions (agreed, ledger), 4 October 2026** (CHG-FXS-003)
 
 **From the Food, Beverage & Retail process.** Damage, Loss & Adjustment on the handheld: record that something broke, spoiled, went missing or was found, with a reason, so stock stays true and shrinkage is visible. The one thing to get right is a single, quick form (item, quantity, reason, note) that writes one movement.
 
@@ -1625,6 +1646,12 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 | Reason | select field | — | — | — | — | Required. | — |
 | Recorded at | date picker | — | — | — | — | Required. | — |
 | Note | text field | — | — | — | — | — | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | text field | — | — | `listCorrectiveActions` ?status |
 
 **Form: Create stock movement** (modal, opened by *Create stock movement*; *Create stock movement* calls `createStockMovement`, *Cancel* sends nothing)
 
@@ -1709,6 +1736,14 @@ Errors to draw in the form: 409 A critical finding signed by the principal who r
 | Oldest open action age hours | 1,234 | — |
 | Last inspection at | 1 Oct 2026, 14:30 | — |
 
+**Waiting for my signature** (card list, from `listCorrectiveActions`): Query status recorded; tapping one gives Sign its actionId.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Source | chip: Temperature excursion, Cold chain breach, Expired stock, Contamination, Pest … | `missedCheck` is raised by the server when a checkpoint goes past its `checkFrequencyMinutes` with no reading (audit R125 (5)). |
+| Status | chip: Open, Actioned, Signed, Escalated, Closed | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -1719,7 +1754,7 @@ Errors to draw in the form: 409 A critical finding signed by the principal who r
 | Sign corrective action (secondary button) | `signCorrectiveAction` POST `/food-safety/corrective-actions/{actionId}/sign` | inline | CorrectiveAction | 409 A critical finding signed by the principal who raised it (`CorrectiveAction.raisedByPrincipalId`). | opens modal first |
 | Confirm (primary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getHaccpStatus` (onLoad, Food-safety checks due and open findings)
+**Data it reads**: `getHaccpStatus` (onLoad, Food-safety checks due and open findings); `listCorrectiveActions` (onLoad, The actions waiting for this supervisor's signature: agreed …)
 
 **Where the user goes next**
 
@@ -1761,6 +1796,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `logTemperature` → `INCIDENT_REPORT` (operate) · staff
 - `signCorrectiveAction` → `INCIDENT_MANAGE` (configure) · staff
 - `getHaccpStatus` → `INCIDENT_VIEW` (read) · staff
+- `listCorrectiveActions` → `INCIDENT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `getHaccpStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `signCorrectiveAction`; `INCIDENT_REPORT` for `logTemperature`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for …
 
@@ -1818,7 +1854,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (37), with its required mark, default, format and its error state (400, 409, 422).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-067?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Record waste, Create stock movement, Log temperature, Sign corrective action, Confirm.
 - [ ] Every transition is wired: `BO-044`.
@@ -2450,9 +2486,11 @@ Method, path, parameters, request and response for every operation these screens
 "getStockTransfer": {"method":"GET","path":"/stock-transfers/{transferId}","contract":"inventory","summary":"One transfer, its manifest and where it is","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"StockTransfer"},
 "getSuggestedRequisitions": {"method":"GET","path":"/requisitions/suggested","contract":"inventory","summary":"Draft requisitions from reorder points","permission":"PROCUREMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"locationId","in":"query","required":null}],"requestBody":null,"responds":null},
 "listAlerts": {"method":"GET","path":"/alerts","contract":"reporting","summary":"What is currently wrong","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"severity","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"itemId","in":"query","required":null}],"requestBody":null,"responds":"Alert"},
+"listCorrectiveActions": {"method":"GET","path":"/food-safety/corrective-actions","contract":"fnb","summary":"The corrective actions","permission":"INCIDENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPurchaseOrders": {"method":"GET","path":"/purchase-orders","contract":"inventory","summary":"List purchase orders","permission":"PROCUREMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"supplierId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRequisitions": {"method":"GET","path":"/requisitions","contract":"inventory","summary":"List requisitions","permission":"PROCUREMENT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"raisedByPrincipalId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSerialisedItems": {"method":"GET","path":"/serialised-items","contract":"inventory","summary":"Where each individual item is","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"serial","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listStockCountLines": {"method":"GET","path":"/stock-counts/{countId}/lines","contract":"inventory","summary":"The lines of a stock count","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"countId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listStockCounts": {"method":"GET","path":"/stock-counts","contract":"inventory","summary":"List stock counts","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"locationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listStockLocations": {"method":"GET","path":"/stock-locations","contract":"inventory","summary":"List stock locations","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listStockMovements": {"method":"GET","path":"/stock-movements","contract":"inventory","summary":"The movement ledger","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"itemId","in":"query","required":null},{"name":"locationId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"recordedFrom","in":"query","required":null},{"name":"recordedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2464,7 +2502,7 @@ Method, path, parameters, request and response for every operation these screens
 "recordWaste": {"method":"POST","path":"/outlets/{outletId}/waste","contract":"fnb","summary":"Record waste","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "rejectReceivedGoods": {"method":"POST","path":"/goods-receipts/{receiptId}/reject","contract":"inventory","summary":"Reject received goods","permission":"PROCUREMENT_RECEIVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GoodsReceipt"},
 "reserveMerchandise": {"method":"POST","path":"/outlets/{outletId}/reserve","contract":"retail","summary":"Reserve an item for collection","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MerchandiseReservation"},
-"setDailyCount": {"method":"PUT","path":"/stock-counts/daily","contract":"inventory","summary":"Which items get counted every day","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"setDailyCount": {"method":"PUT","path":"/stock-counts/daily","contract":"inventory","summary":"Which items get counted every day","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DailyCountList"},
 "signCorrectiveAction": {"method":"POST","path":"/food-safety/corrective-actions/{actionId}/sign","contract":"fnb","summary":"Say what was done, and put a name to it","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CorrectiveAction"},
 "startStockCount": {"method":"POST","path":"/stock-counts","contract":"inventory","summary":"Start a stock count","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"StartStockCountRequest","responds":"StockCount"},
 "updateRequisitionLines": {"method":"PUT","path":"/requisitions/{requisitionId}/lines","contract":"inventory","summary":"Change what an outlet is asking for, before it is approved","permission":"PROCUREMENT_REQUEST","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"}
@@ -2482,11 +2520,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AlertStatus": {"type":"string","description":"Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.","enum":["raised","acknowledged","resolved","expired"]},
 "ColdChainEvent": {"type":"object","x-ticvai-persistence":"fnb.cold_chain_event","description":"Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and the package had `createGoodsReceipt` with nowhere to record the temperature it arrived at.\n**The reading is taken before the receipt is posted**, not after — once stock is received it has entered the kitchen, and a claim against a supplier needs the reading that refused it.\n","required":["id","recordedAt","valueCelsius","decision"],"properties":{"id":{"type":"string","format":"uuid"},"goodsReceiptId":{"type":"string","format":"uuid","nullable":true},"transferId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"valueCelsius":{"type":"number"},"thresholdCelsius":{"type":"number"},"decision":{"type":"string","enum":["accepted","acceptedWithNote","partiallyRejected","rejected"]},"correctiveActionId":{"type":"string","format":"uuid","nullable":true},"supplierClaimRaised":{"type":"boolean","default":false}}},
 "CorrectiveAction": {"type":"object","x-ticvai-persistence":"fnb.corrective_action","description":"What was done about a finding, and who signed it. **Opened automatically by an out-of-range reading or a cold-chain breach**, because an action that depends on somebody remembering to raise it is an action that is not raised.\n**Signed by a named principal, and the signature is the record.** *Discarded and reset* with nobody against it is not a corrective action.\n","required":["id","raisedAt","source","status"],"properties":{"id":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"},"raisedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Who raised it, which is who may not sign it when it is critical** (`signCorrectiveAction`). Null where the action was opened automatically by a reading or a cold-chain breach."},"source":{"type":"string","enum":["temperatureExcursion","coldChainBreach","expiredStock","contamination","pestSighting","equipmentFailure","missedCheck","manual"],"description":"`missedCheck` is raised by the server when a checkpoint goes past its `checkFrequencyMinutes` with no reading (audit R125 (5))."},"sourceRef":{"type":"string","format":"uuid","nullable":true},"severity":{"type":"string","enum":["observation","minor","major","critical"],"description":"**Set by the source when the platform opens it** (decided 28 September, audit R125 (5)): an out-of-range reading or a cold-chain breach opens at `major`, a missed check at `minor`. `critical` is a person's escalation, not a default."},"actionTaken":{"type":"string","nullable":true},"disposal":{"type":"string","enum":["none","discarded","reworked","quarantined","returned"],"nullable":true},"status":{"type":"string","enum":["open","actioned","signed","escalated","closed"]},"signedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"signedAt":{"type":"string","format":"date-time","nullable":true},"escalatedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"**A critical finding a shift cannot close.** Escalation exists so a supervisor signs what a cook should not. Always the venue's food-safety lead at the time of escalation (`fnb.foodSafetyLeadPrincipalId`, audit R096 (9)).\n"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"CountLine": {"type":"object","x-ticvai-persistence":"inventory.count_line","description":"Board 5 of the client F&B pack, 24 August. **`startStockCount` and `postStockCount` existed and this did not** — a count could be opened and posted and **nothing recorded what was counted.**\n**The theoretical quantity is captured at entry, not at post.** Stock moves during a count; a variance computed at post time is measured against a different number from the one the counter was standing in front of.\n**A line may be entered twice and the second replaces the first.** A counter who miskeys and re-counts is the normal case, and a model that refuses the second sends them to a supervisor to undo the first.\n","required":["id","countId","itemId","countedQuantity"],"properties":{"id":{"type":"string","format":"uuid"},"countId":{"type":"string","format":"uuid"},"itemId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid","nullable":true},"batchId":{"type":"string","format":"uuid","nullable":true},"countedQuantity":{"type":"number"},"theoreticalQuantity":{"type":"number","description":"**Snapshotted at entry.** What the platform believed was there at the moment the counter looked.\n"},"uom":{"type":"string"},"variance":{"type":"number","readOnly":true},"variancePercent":{"type":"number","readOnly":true},"status":{"type":"string","enum":["entered","recountRequested","recounted","accepted","rejected"]},"countedByPrincipalId":{"type":"string","format":"uuid"},"countedAt":{"type":"string","format":"date-time"},"note":{"type":"string","nullable":true}}},
 "CountStatus": {"type":"string","enum":["open","counting","closed","variancePending","posted","cancelled"]},
 "CreateGoodsReceiptRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","purchaseOrderId","locationId","lines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"purchaseOrderId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"deliveryNoteReference":{"type":"string","maxLength":128},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","receivedQuantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"receivedQuantity":{"type":"number","minimum":0},"unit":{"type":"string"},"batchNumber":{"type":"string","maxLength":64},"expiryDate":{"type":"string","format":"date","description":"Required for perishable items."},"note":{"type":"string","maxLength":200}}}},"recordedAt":{"type":"string","format":"date-time"}}},
 "CreateRequisitionRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","venueId","lines","requiredBy"],"properties":{"id":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid"},"costCenterId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"},"note":{"type":"string","maxLength":200}}}},"requiredBy":{"type":"string","format":"date"},"justification":{"type":"string","maxLength":1000}}},
 "CreateStockMovementRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","itemId","locationId","kind","quantity","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"itemId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MovementKind"},"quantity":{"type":"number","exclusiveMinimum":0,"description":"Always positive. **The `kind` decides whether it adds or removes stock**, not the sign (decided 28 September, audit R171).\n"},"unit":{"type":"string"},"reason":{"type":"string","maxLength":500,"description":"**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September, audit R171); adjustments are reported separately.\n"},"costCenterId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
 "CreateStockTransferRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","fromLocationId","toLocationId","lines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"fromLocationId":{"type":"string","format":"uuid"},"toLocationId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"}}}},"note":{"type":"string","maxLength":500},"recordedAt":{"type":"string","format":"date-time"}}},
+"DailyCountList": {"x-ticvai-persistence":"inventory.daily_count_list","type":"object","description":"**The items counted every day at one location** (`setDailyCount`, 4 October 2026, CHG-FXC-003: the write had only `inventory.item` to land in, which has no column for any of it). One row per venue and location (`locationId` null is the venue-wide list); `setDailyCount` replaces it.","required":["itemIds","postsAdjustment"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"itemIds":{"type":"array","items":{"type":"string","format":"uuid"}},"locationId":{"type":"string","format":"uuid","nullable":true},"dueBy":{"type":"string","nullable":true,"description":"Local time, e.g. 10:00"},"postsAdjustment":{"type":"boolean","x-ticvai-column":"does_post_adjustment"},"scopePath":{"type":"string","readOnly":true}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"Combined refresh load of every tile."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "DashboardData": {"x-ticvai-persistence":"none — computed","allOf":[{"$ref":"#/components/schemas/Dashboard"},{"type":"object","properties":{"tileData":{"type":"array","items":{"type":"object","properties":{"tileId":{"type":"string","format":"uuid"},"result":{"$ref":"#/components/schemas/ReportResult"},"isCached":{"type":"boolean"},"error":{"type":"string","nullable":true}}}}}}]},
 "GoodsReceipt": {"x-ticvai-persistence":"inventory.goods_receipt + inventory.goods_receipt_line","type":"object","required":["id","receiptNumber","purchaseOrderId","locationId","lines","receivedByPrincipalId","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"receiptNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152), e.g. `MAR-GR-000431`. Not gapless; only tax invoices are gapless, per legal entity. A receipt recorded offline takes the next number from the range its device holds in reserve.\n"},"purchaseOrderId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"deliveryNoteReference":{"type":"string","nullable":true},"lines":{"type":"array","items":{"type":"object","properties":{"lineId":{"type":"string","format":"uuid","readOnly":true,"description":"One batch or expiry line of the receipt. What `rejectReceivedGoods` addresses (decided 28 September, audit R171).\n"},"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"orderedQuantity":{"type":"number"},"receivedQuantity":{"type":"number"},"rejectedQuantity":{"type":"number"},"batchNumber":{"type":"string","nullable":true},"expiryDate":{"type":"string","format":"date","nullable":true},"unitCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"totalValue":{"x-ticvai-column":"net_value_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"receivedByPrincipalId":{"type":"string","format":"uuid"},"journalEntryId":{"type":"string","nullable":true,"description":"The accrual the supplier invoice will later match against."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},

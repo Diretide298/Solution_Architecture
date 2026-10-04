@@ -1,6 +1,6 @@
 # P09-access-identity-01 — P09 · Access & Identity
 
-**4 screens · 24 operations · 24 schemas · 4 permissions**
+**4 screens · 26 operations · 26 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, ROLE_MANAGE, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `PERMISSION_VIEW, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, ROLE_MANAGE, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-001` | Platform Login / MFA | A | 16 | 51 | 10 | 6 | 0 | 0 | — | notStarted (generated) |
 | `ADM-020` | Platform User Directory | B | 18 | 20 | 7 | 2 | 0 | 0 | — | notStarted (generated) |
-| `ADM-021` | Platform Role Management | B | 11 | 22 | 7 | 1 | 1 | 5 | — | notStarted (generated) |
+| `ADM-021` | Platform Role Management | B | 13 | 22 | 7 | 1 | 1 | 5 | — | notStarted (generated) |
 | `ADM-699` | My Account & Security | B | 10 | 16 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

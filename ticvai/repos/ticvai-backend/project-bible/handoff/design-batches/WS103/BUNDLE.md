@@ -1,6 +1,6 @@
 # WS103 — Subscription Licensing AI Self Service board 6
 
-**9 screens · 20 operations · 28 schemas · 11 permissions**
+**9 screens · 21 operations · 28 schemas · 11 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -98,10 +98,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-419` | Provisioning Command Center | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-420` | Tenant & Organization Provisioning | B | 12 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-421` | Venue & Operational Structure Creation | B | 18 | 7 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-421` | Venue & Operational Structure Creation | B | 14 | 7 | 7 | 7 | 0 | 0 | — | notStarted (—) |
 | `ADM-422` | Administrator & Security Initialization | B | 27 | 6 | 7 | 15 | 0 | 0 | — | notStarted (—) |
 | `ADM-423` | License & Entitlement Activation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-424` | Module Activation & Dependency Validation | A | 9 | 57 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
+| `ADM-424` | Module Activation & Dependency Validation | A | 9 | 18 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
 | `ADM-425` | Venue Template Application | B | 6 | 13 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-426` | Initial Configuration & Regional Defaults | B | 114 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
 | `ADM-427` | Provisioning Validation & Exception Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -442,14 +442,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · task APP-CONSOLE-ADM-421 |
-| Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_MANAGE` (1 operate, 1 read, 1 configure); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_MANAGE`, `SCOPE_VIEW` (1 operate, 2 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Venue Settings) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `tenantId` (navigation) |
 | Route | `/tenants-licensing/venue-operational-structure-creation-adm-421` |
 
-**Known gaps.** **Venue & Operational Structure Creation declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue … Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue …
+**What the spec says about it.** **Bound 4 October 2026 to CreateScopeNodeRequest (level, parentId, code, name) with the parent picked from listOrgUnits. Type, address, time zone, currency, region, language and operating model are not part of createOrgUnit: currency and region come from the parent region (ADR-0018), the rest are venue settings set on the venue's own screens** (CHG-FXS-002)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue … Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Onboarding: create the first venues of a tenant from the onboarding answers, under a platform-staff grant.
 
@@ -462,14 +464,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant … | `Tenant.id` |
-| Venue Name | select field | — | — | — | — | — | — |
-| Venue Type | select field | — | — | — | — | — | — |
-| Address | select field | — | — | — | — | — | — |
-| Time Zone | select field | — | — | — | — | — | — |
-| Currency | select field | — | — | — | — | — | — |
-| Operating Region | select field | — | — | — | — | — | — |
-| Default Language | select field | — | — | — | — | — | — |
-| Operating Model | select field | — | — | — | — | — | — |
+| Place under | picker: choose a parent | optional | — | — | shows names, sends the id | Brand and region nodes of the picked tenant (listOrgUnits level brand, region). | `CreateScopeNodeRequest.parentId` |
+| Level | select | optional | — | Tenant · Brand · Region · Venue · Department · Sub department · Workstation · Outlet · Subject | — | venue by default; zone under a venue. | `CreateScopeNodeRequest.level` |
+| Code | text field | optional | — | max length 64; pattern `^[a-z0-9_]+$` | — | Unique in the tenant; letters, digits and hyphens. | `CreateScopeNodeRequest.code` |
+| Venue name | text field | optional | — | max length 200 | — | — | `CreateScopeNodeRequest.name` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -477,6 +475,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Under | text field | — | — | `listOrgUnits` ?under |
+| Level | select | — | Tenant · Brand · Region · Venue · Department · Sub department · Workstation · Outlet · Subject | `listOrgUnits` ?level |
+| Include inactive | toggle | off | — | `listOrgUnits` ?includeInactive |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -492,9 +493,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
-**Form: Create venue structure** (modal, opened by *Create venue structure*; *Create venue structure* calls `createOrgUnit`, *Cancel* sends nothing)
-
-**Collects what `createOrgUnit` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+**Sent by *Create venue structure*** (`createOrgUnit`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -502,8 +501,6 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Parent `parentId` | picker: choose a parent | required | — | — | shows names, sends the id | Required for every level except tenant, which the cell creates at provisioning. | `createOrgUnit` body |
 | Code `code` | text field | required | — | max length 64; pattern `^[a-z0-9_]+$` | — | Becomes the final ltree segment. Immutable once created. | `createOrgUnit` body |
 | Name `name` | text field | required | — | max length 200 | — | — | `createOrgUnit` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -531,13 +528,13 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-| Create venue structure (secondary button) | `createOrgUnit` POST `/org-units` | CreateScopeNodeRequest | OrgUnit | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. | opens modal first |
+| Create venue structure (secondary button) | `createOrgUnit` POST `/org-units` | CreateScopeNodeRequest | OrgUnit | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. | — |
 
 **What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **Open access grant**: Confirmation names the consequence first, then asks for the authentication code (authenticator app, or an emailed code as fallback); only a verified challenge sends openPlatformStaffGrant with its single-use stepUpToken. Wrong code: the action is not sent and nothing changes; five wrong codes lock step-up for the policy's lockout minutes and the screen says when it lifts. Why the control exists: Opens a platform operator's access into a tenant's data. *(source: contracts/spine/identity.yaml#openPlatformStaffGrant; R126; contracts/spine/identity.yaml#createMfaChallenge)*
 
-**Data it reads**: `listTenants` (onLoad, The tenant picker — the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker — the operator picks a tenant before …); `listOrgUnits` (onLoad, The picked tenant's brands and regions, to place the venue …)
 
 **Where the user goes next**
 
@@ -550,7 +547,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Loading (`?state=loading`) | The venue operational structure configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the venue operational structure untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No venue operational structure configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant` … |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 | Offline (`?state=offline`) | online only |
@@ -585,15 +582,22 @@ venue:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `createOrgUnit` → `SCOPE_MANAGE` (configure) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `listOrgUnits` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant` …
 
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
+| 3.3.41 | Venue-Specific Policies - System shall support venue-specific access policies. | Admission and Access | CONTRACTED | `listOrgUnits` |
+| 3.3.43 | Policy Inheritance - System shall support inheritance of policies across organizational structures. | Admission and Access | CONTRACTED | `listOrgUnits` |
+| 7.1.13 | The system shall support permission assignment at company, department, venue, park, attraction, facility, event, sales channel, POS terminal, and product levels. | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.27 | The system shall support management of companies, business units, departments, parks, venues, attractions, facilities, cost centers, and reporting structures. | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.37 | Allow administrators to restrict access by venue, park, facility, attraction, sales channel, POS terminal, country, region, IP address and network range. Policies should support allow/deny logic and … | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.52 | Support policies spanning multiple parks, venues, attractions, departments and business units while maintaining centralized governance. | F&B POS | CONTRACTED | `listOrgUnits` |
 | 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
@@ -612,15 +616,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-421`
 - Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 6
 - Flow F212 *Subscription Licensing AI Self Service board 6: Provisioning Command Center*, step 4: Works in Venue & Operational Structure Creation → Automatically create the initial venue structure using information collected during onboarding.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 403, 409).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403, 409).
 - [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-421?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Create venue structure.
 - [ ] Every transition is wired: `ADM-419`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_MANAGE`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_MANAGE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -970,7 +975,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `tenantId` (navigation) |
 | Route | `/tenants-licensing/module-activation-dependency-validation-adm-424` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-021): Module Activation was wired to listVenueTypeTemplates, which belongs to the next screen (ADM-425 Venue Template Application); activation reads licence data …
+**What the spec says about it.** **One vocabulary 4 October 2026: ModuleListing.moduleCode, LicencePosition.licensedModules[].moduleKey and ModuleEnablement.moduleKey all hold ModuleKey values (the contract is asked to type the first two as ModuleKey, ledger). Activate is enabled for a module only when it is licensed and every module in its requiresModules is licensed and enabled or being enabled; one in incompatibleWithModules blocks it, naming the conflict** (CHG-FXS-002)
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): Module Activation was wired to listVenueTypeTemplates, which belongs to the next screen (ADM-425 Venue Template Application); activation reads licence data …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Activate purchased modules and check their dependencies.
 
@@ -982,7 +989,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1032,65 +1039,22 @@ Errors to draw in the form: 400 Module not licensed, or still referenced by navi
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Tenant** (data table, from `listTenants`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
-| Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
-| Plan name | text | — |
-| Cell count | 1,234 | — |
-| Venue count | 1,234 | — |
-| Region | the name it points at, never the id | The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided … |
-| Billing email | text | — |
-| Billing address | text | Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent. |
-
 **Licensed modules** (detail panel, from `getTenantLicences`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Powered by removable | yes / no (icon or chip) | Whether the tenant's licence lets it switch "Powered by TICVAI" off (Chinmay, 2 October, workbook Q160 and the pre-apply round … |
-| Plan | the name it points at, never the id | — |
-| Licensed modules | list or chips (count when long) | Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it. |
 | Module key | text | — |
-| Display name | text | — |
 | Source | chip: Plan, Add on | — |
 | Valid to | 1 Oct 2026 | — |
-| Limits | list or chips (count when long) | — |
-| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
-| Limit | 1,234 | Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure … |
-| Overage allowed | yes / no (icon or chip) | — |
-| Overage unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Dependencies** (data table, from `listModuleCatalogue`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Module code | text | — |
+| Module code | text | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
 | Name | text | — |
-| Description | text | — |
-| Category | text | — |
-| Requires modules | list or chips (count when long) | — |
-| Incompatible with modules | list or chips (count when long) | — |
-| Included in tiers | list or chips (count when long) | — |
-| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Pricing basis | chip: Included, Flat fee, Per venue, Per unit, Revenue share, Metered | — |
-| Metered metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise. |
-| Metered unit size | 1,234 | For `metered`, how many units `price` buys (e.g. 1000 tokens). |
-| Provisioning minutes | 1,234 | — |
-| Requires professional services | yes / no (icon or chip) | — |
+| Requires modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Incompatible with modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
 | Status | chip: Available, Beta, Deprecated, Withdrawn | — |
 
 **Active modules** (data table, from `getModuleEnablement`)
@@ -1101,7 +1065,6 @@ Errors to draw in the form: 400 Module not licensed, or still referenced by navi
 | Display name | text | — |
 | Is licensed | yes / no (icon or chip) | From the tenant's subscription. False makes enablement impossible. |
 | Is enabled | yes / no (icon or chip) | — |
-| Referenced by | list or chips (count when long) | Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same … |
 
 **Actions and what each produces**
 
@@ -1204,7 +1167,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (57 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-424?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Activate modules.
 - [ ] Every transition is wired: `ADM-419`.
@@ -1921,6 +1884,7 @@ Method, path, parameters, request and response for every operation these screens
 "getVenueSettingsDefaults": {"method":"GET","path":"/venue-settings-defaults","contract":"tenancy","summary":"The tenant's default for every venue setting","permission":"TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"VenueSettings"},
 "listCellJobs": {"method":"GET","path":"/cells/{cellId}/jobs","contract":"subscription","summary":"Provisioning, migration and maintenance jobs","permission":"PLATFORM_CELL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listModuleCatalogue": {"method":"GET","path":"/module-catalogue","contract":"subscription","summary":"Modules, their dependencies and their commercial treatment","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[],"requestBody":null,"responds":"ModuleListing"},
+"listOrgUnits": {"method":"GET","path":"/org-units","contract":"tenancy","summary":"List scope nodes visible to the session","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"under","in":"query","required":null},{"name":"level","in":"query","required":null},{"name":"includeInactive","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listOwnPlatformStaffGrants": {"method":"GET","path":"/platform-staff-grants/mine","contract":"identity","summary":"The calling platform operator's own grants into this tenant","permission":"PLATFORM_TENANT_ACCESS","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"activeOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listVenueTypeTemplates": {"method":"GET","path":"/venue-type-templates","contract":"subscription","summary":"Starting configurations by venue kind","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"VenueTypeTemplate"},
@@ -1946,11 +1910,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "EntitlementLimit": {"type":"object","required":["metric","limit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"limit":{"type":"integer","nullable":true,"x-ticvai-column":"limit_value","description":"Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."},"overageAllowed":{"type":"boolean","default":false},"overageUnitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
 "GoLiveReadiness": {"type":"object","x-ticvai-persistence":"subscription.go_live_readiness","description":"Board 8. **The screen that stops a launch going wrong in public.**","properties":{"tenantId":{"type":"string","format":"uuid"},"runAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["notStarted","running","blocked","readyWithWarnings","ready"]},"groups":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["ticketingAndProducts","salesChannels","payment","ticketQrAccess","usersAndSecurity","integrations","communications","financialSetup"]},"label":{"type":"string"},"checks":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"outcome":{"type":"string","enum":["pass","warn","fail","skipped"]},"detail":{"type":"string","nullable":true},"remediation":{"type":"string","nullable":true}}}}}}},"blockers":{"type":"integer"},"warnings":{"type":"integer"},"signedOffBy":{"type":"string","format":"uuid","nullable":true},"signedOffAt":{"type":"string","format":"date-time","nullable":true}}},
 "LicenceAddOn": {"x-ticvai-persistence":"control.licence_add_on + control.licence_add_on_limit","x-ticvai-retired-columns":["plan_id"],"description":"**Belongs to the tenant, not the plan.** Add-ons survive a plan change unless explicitly removed (`addLicenceAddOn`), so a row keyed on `plan_id` would be lost, or silently re-applied to every tenant on that plan, at the first plan change. The tenant comes from the path. `limitOverrides` are child rows in `control.licence_add_on_limit`.","type":"object","required":["moduleKey"],"properties":{"tenantId":{"type":"string","format":"uuid","readOnly":true,"description":"The tenant the add-on was sold to — the `tenantId` in the path, never the body."},"moduleKey":{"type":"string"},"limitOverrides":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"note":{"type":"string","maxLength":500}}},
-"LicencePosition": {"x-ticvai-persistence":"none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)","type":"object","required":["tenantId","licensedModules","limits"],"properties":{"poweredByRemovable":{"type":"boolean","readOnly":true,"default":false,"description":"**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."},"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true},"licensedModules":{"type":"array","description":"Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n","items":{"type":"object","required":["moduleKey","source"],"properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"source":{"type":"string","enum":["plan","addOn"]},"validTo":{"type":"string","format":"date","nullable":true}}}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}}}},
+"LicencePosition": {"x-ticvai-persistence":"none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)","type":"object","required":["tenantId","licensedModules","limits"],"properties":{"poweredByRemovable":{"type":"boolean","readOnly":true,"default":false,"description":"**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."},"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true},"licensedModules":{"type":"array","description":"Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.","items":{"type":"object","required":["moduleKey","source"],"properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"source":{"type":"string","enum":["plan","addOn"]},"validTo":{"type":"string","format":"date","nullable":true}}}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "ModuleEnablement": {"x-ticvai-persistence":"whitelabel.module_enablement","type":"object","required":["moduleKey","isLicensed","isEnabled"],"properties":{"moduleKey":{"$ref":"#/components/schemas/ModuleKey"},"displayName":{"type":"string"},"isLicensed":{"type":"boolean","description":"From the tenant's subscription. False makes enablement impossible."},"isEnabled":{"type":"boolean"},"referencedBy":{"type":"array","readOnly":true,"x-ticvai-derived":"onWrite","description":"Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.","items":{"type":"string"}}}},
 "ModuleKey": {"$ref":"../shared/common.yaml#/components/schemas/ModuleKey"},
-"ModuleListing": {"type":"object","x-ticvai-persistence":"subscription.module_listing","description":"Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n","required":["moduleCode"],"properties":{"moduleCode":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"category":{"type":"string","nullable":true},"requiresModules":{"type":"array","items":{"type":"string"}},"incompatibleWithModules":{"type":"array","items":{"type":"string"}},"includedInTiers":{"type":"array","items":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"pricingBasis":{"type":"string","enum":["included","flatFee","perVenue","perUnit","revenueShare","metered"]},"meteredMetric":{"allOf":[{"$ref":"#/components/schemas/UsageMetric"}],"nullable":true,"description":"For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."},"meteredUnitSize":{"type":"integer","minimum":1,"nullable":true,"description":"For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."},"provisioningMinutes":{"type":"integer","nullable":true},"requiresProfessionalServices":{"type":"boolean","default":false},"status":{"type":"string","enum":["available","beta","deprecated","withdrawn"]}}},
+"ModuleListing": {"type":"object","x-ticvai-persistence":"subscription.module_listing","description":"Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n","required":["moduleCode"],"properties":{"moduleCode":{"type":"string","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."},"name":{"type":"string"},"description":{"type":"string","nullable":true},"category":{"type":"string","nullable":true},"requiresModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"incompatibleWithModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"includedInTiers":{"type":"array","items":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"pricingBasis":{"type":"string","enum":["included","flatFee","perVenue","perUnit","revenueShare","metered"]},"meteredMetric":{"allOf":[{"$ref":"#/components/schemas/UsageMetric"}],"nullable":true,"description":"For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."},"meteredUnitSize":{"type":"integer","minimum":1,"nullable":true,"description":"For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."},"provisioningMinutes":{"type":"integer","nullable":true},"requiresProfessionalServices":{"type":"boolean","default":false},"status":{"type":"string","enum":["available","beta","deprecated","withdrawn"]}}},
 "OrgUnit": {"x-ticvai-persistence":"platform.scope","type":"object","required":["id","level","path","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"level":{"$ref":"#/components/schemas/ScopeLevel"},"parentId":{"type":"string","format":"uuid","nullable":true},"path":{"type":"string","description":"Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.","pattern":"^[a-z0-9_]+(\\.[a-z0-9_]+)*$"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"isActive":{"type":"boolean","description":"False causes every permission query at or beneath this node to resolve to DENY.\n"},"childCount":{"type":"integer","minimum":0}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PasswordPolicy": {"type":"object","x-ticvai-persistence":"identity.password_policy","description":"BL-144. **Written by `setPasswordPolicy`, which returns it**, at tenant scope. Before BL-144 the package had no password policy, no lockout and no forced change at first logon anywhere.\n**Modelled on NIST SP 800-63B rather than on habit.** Length beats composition, and forced rotation on a schedule makes passwords worse — people increment a digit. Rotation is here because some tenants are contractually required to have it, **not because it helps.**\n","required":["id","scopePath","minLength"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server. Required in the response only; ignored if a request sends it."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005), written by the server from the caller's tenant (`x-ticvai-config-scope: tenant`). Required in the response only; ignored if a request sends it."},"minLength":{"type":"integer","default":12,"minimum":8,"description":"A tenant may raise the length and never set it below 8 (decided 28 September, audit R126 (7))."},"requireBreachCheck":{"type":"boolean","default":true,"description":"**The single most effective rule.** Refusing a password known to be breached stops more account takeovers than every composition rule combined.\n"},"maxAgeDays":{"type":"integer","nullable":true,"description":"**Null is the recommended value.** Forced rotation produces `Summer2026!` becoming `Summer2027!`, and it is offered because some tenants are contractually obliged to have it rather than because it works.\n"},"recoveryMethods":{"type":"array","description":"BL-132. **A guest locked out had no path back** — lockout existed and recovery did not, which turns a forgotten password into a support call.\n**Ordered by strength, and the venue chooses which it offers.** Email is weakest and universal; a verified phone is stronger; an in-person check at a desk is strongest and only available to a guest who is already at the venue.\n","items":{"type":"string","enum":["email","sms","securityQuestions","inPersonVerification","supportAssisted"]}},"maxConcurrentSessions":{"type":"integer","nullable":true,"description":"BL-145. **Null, and that is the decision.** A staff principal has one live session, full stop: ADR-0004 keeps a server-side session registry (the `sid` claim, `ActiveSession`), and §3.1.3 refuses a second sign-in rather than counting towards a limit (confirmed 28 September, audit R184). A number here would only ever mean 1.\nThe requirement asked for it configurable. **Configurable to null is still an answer.**\n"},"deviceRestriction":{"type":"object","nullable":true,"description":"BL-146. **Device, browser, IP and location restriction on access.** Applies to staff principals, not guests — a guest restricted to one device is a guest who cannot use their new phone.\n**Warn before block by default.** An IP restriction that blocks silently is a venue manager locked out on the day their ISP rotates an address.\n","properties":{"allowedIpRanges":{"type":"array","items":{"type":"string"}},"allowedCountries":{"type":"array","items":{"type":"string"}},"requireRegisteredDevice":{"type":"boolean","default":false},"onViolation":{"type":"string","enum":["warn","requireStepUp","block"],"default":"requireStepUp"}}},"lockoutAfterAttempts":{"type":"integer","default":10},"lockoutMinutes":{"type":"integer","default":15,"description":"**A temporary lockout, not a permanent one.** Permanent lockout on failed attempts is a denial-of-service anybody can run against a known username.\n"},"forceChangeOnFirstLogon":{"type":"boolean","default":true},"reusePreventionCount":{"type":"integer","default":5,"minimum":0,"maximum":24,"description":"**How many previous credentials a staff member may not reuse** — the last 5 unless the tenant sets another (decided 28 September, audit R132). `changeOwnCredential` refuses a match with `422`.\n"},"mfaRequiredForPermissions":{"type":"array","description":"**Step-up rather than blanket MFA.** Requiring it for a refund approval and not for reading a rota is what stops people sharing devices to avoid it.\n**MFA is required by permission, not by role** (decided 28 September, audit R135). A principal holding any permission listed here must keep an active method (`removeMfaMethod` refuses to remove the last one). **The default is the platform floor**: `ROLE_MANAGE`, `LEDGER_APPROVE` and every `PLATFORM_*` permission. A tenant may add to the list and never remove a floor entry; a body that drops one is refused `400`.\n","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"},"default":["ROLE_MANAGE","LEDGER_APPROVE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_TENANT_ACCESS","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY"]}}},

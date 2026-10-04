@@ -145,13 +145,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Search active rental operations | search field | — | — | — | — | — | — |
-| Filter by | multi select | — | — | — | — | The pack filters this screen by venue, location, product, customer, rental status, expected return and 2 more — which are present is a decision the pack already made. | — |
+| Filter by | text field | optional | — | — | — | Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status, expected … | `listRentalBookings` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Status | text field | — | — | `listRentalBookings` ?status |
 | Location | picker: choose a location | — | — | `listRentalBookings` ?locationId |
 | From | date and time picker | — | — | `listRentalBookings` ?from |
 | To | date and time picker | — | — | `listRentalBookings` ?to |
@@ -418,7 +417,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Additional duration | select field | — | — | — | — | +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`. | — |
+| Additional duration | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012). +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`. | `getRentalAvailability` ?to |
 | Requested new return | text field | — | — | — | — | Computed from expected return plus the added duration; read-only. | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -428,7 +427,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Product | picker: choose a product | — | — | `getRentalAvailability` ?productId |
 | Location | picker: choose a location | — | — | `getRentalAvailability` ?locationId |
 | From | date and time picker | — | — | `getRentalAvailability` ?from |
-| To | date and time picker | — | — | `getRentalAvailability` ?to |
 | Quantity | number field | 1 | — | `getRentalAvailability` ?quantity |
 
 #### Outputs: what the screen shows and produces

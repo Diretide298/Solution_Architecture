@@ -97,11 +97,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-539` | AI Explainability & Audit Command Center | B | 8 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-540` | AI Decision Explorer & Search | D | 9 | 6 | 7 | 5 | 2 | 0 | — | notStarted (—) |
-| `ADM-541` | AI Decision Explanation Workspace | B | 6 | 6 | 7 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-541` | AI Decision Explanation Workspace | B | 6 | 59 | 7 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-543` | Candidate, Rule & Decision Path Trace | D | 6 | 18 | 7 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-544` | Model, Provider & AI Runtime Trace | D | 6 | 50 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-545` | Governance, Approval & Human Decision Trace | B | 6 | 6 | 7 | 1 | 1 | 3 | — | notStarted (—) |
+| `ADM-545` | Governance, Approval & Human Decision Trace | B | 6 | 41 | 7 | 1 | 1 | 3 | — | notStarted (—) |
 | `ADM-546` | Execution & Business Outcome Trace | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-547` | AI Audit Record & Evidence Package | D | 6 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-548` | AI Trace Investigation & Replay Simulator | D | 6 | 18 | 7 | 1 | 0 | 0 | — | notStarted (—) |
@@ -507,14 +507,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block B · task APP-CONSOLE-ADM-541 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | detail (compact density): One AI decision's a business-readable explanation, read from its trace at depth business (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `decisionRecordId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/ai-decision-explanation-workspace-adm-541` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Defined 4 October 2026 from AiDecisionTrace at depth business: a business-readable explanation** (CHG-FXS-001)
 
 **From the AI & Intelligence process.** One decision explained in business words: what was decided, why (the main reasons), on what basis (stage, Based on), what rule or approval applied, and what happened. The client's example: why AI recommended introducing a fast-pass ticket - customers upgrading at the counter. The one thing to get right: the explanation is built from the trace; no new claims.
 
@@ -524,7 +522,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -552,18 +550,94 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Decision** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Outcome | chip: Answered, Refused, Allowed, Blocked, Executed, Failed… | `approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit). |
+| Created at | 1 Oct 2026, 14:30 | — |
+
+**Explanation** (detail panel, from `getAiDecisionTrace`): Plain language, written for the business user; the reliability and the evidence it rests on follow.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Record | grouped details | The standard record for every governed decision (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast … |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+
+**What it was based on** (data table, from `getAiDecisionTrace`): Each item labelled source, derived or model-inferred (AIC-197).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | chip: Source, Derived, Model inferred | — |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+
+**Model and versions** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Policy version | text | — |
+
+**Human decision** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Record | grouped details | The standard record for every governed decision (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast … |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
 **Actions and what each produces**
 
@@ -575,7 +649,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **explanation**: Plain summary, reasons as bullets with their evidence, producer and version, governing rule, approver, outcome. *(source: contracts/satellite/ai.yaml#getAiDecisionTrace / MoM 18 Sep 4.3)*
 
-**Data it reads**: `getAiDecisionTrace` (onLoad, The full trace of a decision); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getAiDecisionTrace` (onLoad, The decision's trace at depth business (query …); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -585,11 +659,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The decision explanation list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the decision explanation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No decision explanation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The decision header first, then the trace. |
+| Error (`?state=error`) | Could not load the trace. Names the decision record id; nothing else changes. |
+| Empty, first run (`?state=emptyFirstRun`) | Not used: the screen always opens on one decision (decisionRecordId). |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the decision explanation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -610,7 +684,7 @@ explanation: 'Recommended a Wave Rider fast pass product: 412 counter upgrades t
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
 #### Requirements it meets
 
@@ -642,7 +716,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (59 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-541?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-539`.
@@ -663,14 +737,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block B · task APP-CONSOLE-ADM-542 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | detail (compact density): One AI decision's which data and evidence contributed and where each came from, read from its trace at depth technical (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `decisionRecordId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/data-feature-evidence-provenance-adm-542` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Defined 4 October 2026 from AiDecisionTrace at depth technical: which data and evidence contributed and where each came from** (CHG-FXS-001)
 
 **From the AI & Intelligence process.** Provenance: exactly which data and evidence contributed to a decision and where each item came from - source data, derived figures, model-inferred items - with when it was observed. The one thing to get right: the prompt text itself is never shown (inputs are kept by reference), and masked fields appear as masked.
 
@@ -680,7 +752,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -708,18 +780,83 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Decision** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Outcome | chip: Answered, Refused, Allowed, Blocked, Executed, Failed… | `approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit). |
+| Created at | 1 Oct 2026, 14:30 | — |
+
+**Evidence and provenance** (data table, from `getAiDecisionTrace`): label is the origin (source system, derived by a rule or feature, inferred by a model); ref points at the record it was read from.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Name | text | — |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+
+**Inputs and versions** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+| Rule versions | grouped details | — |
+| Model version | text | — |
+
+**Model calls** (data table, from `getAiDecisionTrace`): sources are the retrieved passages each call answered from.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Capability | text | — |
+| Provider | chip: Openai, Gemini, Anthropic, Azure openai, Local llm, Openai compatible | `openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development … |
+| Model | text | — |
+| Sources | list or chips (count when long) | The sources an answer was grounded in, stored with the answer (8.3.70). One `jsonb` column on the row that carries it — … |
+| Masked field count | 1,234 | How many fields were redacted. Zero on a prompt touching guest data is a defect. |
+| Created at | 1 Oct 2026, 14:30 | — |
+
+**Chain verified** (detail panel, from `getAiDecisionTrace`): Whether the record's hash chain verifies; a break is shown as a red banner.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Record | grouped details | The standard record for every governed decision (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast … |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
 **Actions and what each produces**
 
@@ -731,7 +868,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **evidence items**: Label (From your data / Calculated / AI inferred), name, value, source reference, observed at; masked personal fields shown as "masked". *(source: contracts/satellite/ai.yaml#/components/schemas/AiEvidenceItem / contracts/satellite/ai.yaml#/components/schemas/AiDecisionRecord (inputsRef) / ADR-0020)*
 
-**Data it reads**: `getAiDecisionTrace` (onLoad, The full trace of a decision); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getAiDecisionTrace` (onLoad, The decision's trace at depth technical (query …); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -741,11 +878,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The data feature evidence list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the data feature evidence untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No data feature evidence yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The decision header first, then the trace. |
+| Error (`?state=error`) | Could not load the trace. Names the decision record id; nothing else changes. |
+| Empty, first run (`?state=emptyFirstRun`) | Not used: the screen always opens on one decision (decisionRecordId). |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the data feature evidence are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -771,7 +908,7 @@ items:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
 #### Requirements it meets
 
@@ -801,7 +938,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-542?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-539`.
@@ -1223,14 +1360,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block B · task APP-CONSOLE-ADM-545 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | detail (compact density): One AI decision's the governance and human decisions around it, read from its trace at depth governance (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `decisionRecordId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/governance-approval-human-decision-trace-adm-545` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Defined 4 October 2026 from AiDecisionTrace at depth governance: the governance and human decisions around it** (CHG-FXS-001)
 
 **From the AI & Intelligence process.** Governance and human trace: the policy versions evaluated, the decision point's outcome, the approvals, the conditions, any challenge or override - joined to the AI decision. The one thing to get right: a human override (e.g. a manager overriding a price increase because of a configured price ceiling) is shown beside the AI's decision, not replacing it.
 
@@ -1240,7 +1375,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1268,18 +1403,71 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Decision** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Outcome | chip: Answered, Refused, Allowed, Blocked, Executed, Failed… | `approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit). |
+| Created at | 1 Oct 2026, 14:30 | — |
+
+**Governance** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version | text | — |
+| Approvals | grouped details | Approval requests and their decisions. |
+| Human decision | grouped details | Override or intervention, where a person changed the outcome. |
+| Execution result | grouped details | — |
+
+**Interventions** (data table, from `getAiDecisionTrace`): Overrides, pauses, retries and rollbacks by a person, oldest first.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kind | chip: Override, Pause, Resume, Cancel, Retry, Rollback… | — |
+| Target kind | chip: Plan, Step, Decision, Capability | — |
+| Reason | text | — |
+| Principal | the name it points at, never the id | — |
+| Created at | 1 Oct 2026, 14:30 | — |
+
+**Chain verified** (detail panel, from `getAiDecisionTrace`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Record | grouped details | The standard record for every governed decision (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast … |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
 **Actions and what each produces**
 
@@ -1291,7 +1479,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **governance chain**: Policy version → outcome (allow, prepare only, approval required...) → approvers with decisions and times → override with reason. *(source: contracts/satellite/ai.yaml#getAiDecisionTrace / MoM 18 Sep 4.3)*
 
-**Data it reads**: `getAiDecisionTrace` (onLoad, The full trace of a decision); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getAiDecisionTrace` (onLoad, The decision's trace at depth governance (query …); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1301,11 +1489,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The governance approval human list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the governance approval human untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No governance approval human yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The decision header first, then the trace. |
+| Error (`?state=error`) | Could not load the trace. Names the decision record id; nothing else changes. |
+| Empty, first run (`?state=emptyFirstRun`) | Not used: the screen always opens on one decision (decisionRecordId). |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the governance approval human are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -1328,7 +1516,7 @@ chain:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
 #### Requirements it meets
 
@@ -1362,7 +1550,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-545?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-539`.

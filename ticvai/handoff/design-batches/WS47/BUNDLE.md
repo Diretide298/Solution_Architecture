@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-161` | Code Eligibility & Restriction Manager | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-162` | Usage, Capacity & Frequency Control | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-163` | Validity, Date & Time Control | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-164` | Code Distribution & Assignment Manager | A | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-164` | Code Distribution & Assignment Manager | A | 12 | 54 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-165` | Redemption Monitor & Code Lookup | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-166` | Code Security, Fraud & Exception Center | B | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-167` | Redemption Analytics, Audit & AI Optimization | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -995,12 +995,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-ADM-164 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Pattern | listDetail (compact density): The campaign's codes listed with a distribution form beside them; the form's answer is the distribution's counts (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `campaignId` (navigation) |
 | Route | `/commercial/code-distribution-assignment-manager-adm-164` |
 
-**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Defined 4 October 2026: the codes come from listCouponCodes (the campaign's, by status and batch); a distribution is one setCodeDistributionManager call whose answer is the counts. The 'every code distribution' table bound to the PUT is gone (the view is one answer, not a list)** (CHG-FXS-001)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How codes reach people: assign a batch or part of it to a customer, segment, membership account, company, reseller, travel agency, school, hotel, bank or partner, and send it through a channel (email, SMS, WhatsApp, app, CRM journey, portals, POS, call centre, API, exported batch). The funnel generated, assigned, sent, delivered, viewed, redeemed is the output.
 
@@ -1012,6 +1012,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Status | radio group | optional | — | Issued · Assigned · Redeemed · Expired · Voided | — | Filter. | `CouponCode.status` |
+| Batch | picker: choose a batch (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Filter (query batchId). | `CouponCode.batchId` |
+| Batch to distribute | text field | optional | — | — | — | Options are the batch ids of the listed codes. | `CodeDistributionAssignmentManagerInput.batchId` |
+| Assign to | select | optional | — | Individual customer · Customer segment · Membership account · B2B company · Reseller · Travel agency · School · Hotel · Bank · Corporate partner · Marketing campaign | — | Who the codes are assigned to. | `CodeDistributionAssignmentManagerInput.assigneeType` |
+| Assignee | text field | optional | — | — | — | The guest, segment, company or partner reference the assignee type names. | `CodeDistributionAssignmentManagerInput.assigneeReference` |
+| Channel | select | optional | — | Email · SMS · Whatsapp · Mobile app · Crm journey · Guest portal · B2B portal · Partner portal · POS · Call center · API · Exported batch | — | Vocabulary listed under Distribution Channels. | `CodeDistributionAssignmentManagerInput.channelsType` |
+| Quantity | number field | optional | — | — | — | Codes to assign | `CodeDistributionAssignmentManagerInput.quantity` |
+
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
@@ -1019,7 +1031,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Status | radio group | — | Issued · Assigned · Redeemed · Expired · Voided | `listCouponCodes` ?status |
 | Batch | picker: choose a batch | — | — | `listCouponCodes` ?batchId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Distribute*** (`setCodeDistributionManager`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Channels type `channelsType` | select | optional | — | Email · SMS · Whatsapp · Mobile app · Crm journey · Guest portal · B2B portal · Partner portal · POS · Call center · API · Exported batch | — | Vocabulary listed under Distribution Channels. | `setCodeDistributionManager` body |
+| Assignee type `assigneeType` | select | optional | — | Individual customer · Customer segment · Membership account · B2B company · Reseller · Travel agency · School · Hotel · Bank · Corporate partner · Marketing campaign | — | Who the codes are assigned to. | `setCodeDistributionManager` body |
+| Batch `batchId` | text field | optional | — | — | — | Batch ID | `setCodeDistributionManager` body |
+| Assignee reference `assigneeReference` | text field | optional | — | — | — | Customer, segment, account or partner the codes go to | `setCodeDistributionManager` body |
+| Quantity `quantity` | number field | optional | — | — | — | Codes to assign | `setCodeDistributionManager` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1029,62 +1049,90 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every code distribution** (data table, from `setCodeDistributionManager`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Generated | text | Generated |
-| Assigned | text | Assigned |
-| Sent | text | Sent |
-| Delivered | text | Delivered |
-| Viewed | text | Viewed where available |
-| Redeemed | text | Redeemed |
-| Expired | 1,234 | Expired |
-| Cancelled | 1,234 | Cancelled |
-
 **Codes** (data table, from `listCouponCodes`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Items | list or chips (count when long) | — |
 | Code | text | — |
-| Campaign | the name it points at, never the id | — |
 | Batch | the name it points at, never the id | The `generateCouponCodes` batch that issued this code. Null where no batch did. |
 | Status | chip: Issued, Assigned, Redeemed, Expired, Voided | — |
 | Assigned subject | the name it points at, never the id | — |
 | Redemption count | 1,234 | — |
-| Max redemptions | 1,234 | — |
-| Discount | grouped details | — |
-| Kind | chip: Percentage, Fixed amount, Fixed price, Buy x get y, Free item, Tiered percentage | — |
-| Percentage | 12.5% | — |
-| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Fixed price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Buy quantity | 1,234 | — |
-| Get quantity | 1,234 | — |
-| Get discount percentage | 1,234.5 | 100 makes the free items actually free; lower values give a partial discount. |
-| Tiers | list or chips (count when long) | For `tieredPercentage` — more units, larger discount. |
-| Max discount amount | AED 1,234.50 | Cap on a percentage discount. Prevents an unbounded discount on a large basket. |
-| Reward variants | list or chips (count when long) | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` … |
-| Max applications per basket | 1,234 | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (createPromotion; setFixedPriceOffer was … |
+| Valid to | 1 Oct 2026, 14:30 | — |
 
-**The selected code distribution** (detail panel): The pack groups this record's detail under its own headings: “Distribution Channels”, “Codes may be assigned to”, “External Partner Example”.
+**Generated** (metric tile, from `setCodeDistributionManager`)
 
 | Shows | Format | Notes |
 |---|---|---|
+| Channels type | chip: Email, SMS, Whatsapp, Mobile app, Crm journey, Guest portal… | Vocabulary listed under Distribution Channels. |
 | Generated | text | Generated |
 | Assigned | text | Assigned |
 | Sent | text | Sent |
 | Delivered | text | Delivered |
-| Viewed | text | Viewed where available |
 | Redeemed | text | Redeemed |
 | Expired | 1,234 | Expired |
 | Cancelled | 1,234 | Cancelled |
+| Viewed | text | Viewed where available |
+| Assignee type | chip: Individual customer, Customer segment, Membership account, B2B company, Reseller … | Who the codes are assigned to. |
+| Batch | text | Batch ID |
+| Partner | text | Partner, for a partner batch |
+
+**Assigned** (metric tile, from `setCodeDistributionManager`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Channels type | chip: Email, SMS, Whatsapp, Mobile app, Crm journey, Guest portal… | Vocabulary listed under Distribution Channels. |
+| Generated | text | Generated |
+| Assigned | text | Assigned |
+| Sent | text | Sent |
+| Delivered | text | Delivered |
+| Redeemed | text | Redeemed |
+| Expired | 1,234 | Expired |
+| Cancelled | 1,234 | Cancelled |
+| Viewed | text | Viewed where available |
+| Assignee type | chip: Individual customer, Customer segment, Membership account, B2B company, Reseller … | Who the codes are assigned to. |
+| Batch | text | Batch ID |
+| Partner | text | Partner, for a partner batch |
+
+**Sent** (metric tile, from `setCodeDistributionManager`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Channels type | chip: Email, SMS, Whatsapp, Mobile app, Crm journey, Guest portal… | Vocabulary listed under Distribution Channels. |
+| Generated | text | Generated |
+| Assigned | text | Assigned |
+| Sent | text | Sent |
+| Delivered | text | Delivered |
+| Redeemed | text | Redeemed |
+| Expired | 1,234 | Expired |
+| Cancelled | 1,234 | Cancelled |
+| Viewed | text | Viewed where available |
+| Assignee type | chip: Individual customer, Customer segment, Membership account, B2B company, Reseller … | Who the codes are assigned to. |
+| Batch | text | Batch ID |
+| Partner | text | Partner, for a partner batch |
+
+**Redeemed** (metric tile, from `setCodeDistributionManager`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Channels type | chip: Email, SMS, Whatsapp, Mobile app, Crm journey, Guest portal… | Vocabulary listed under Distribution Channels. |
+| Generated | text | Generated |
+| Assigned | text | Assigned |
+| Sent | text | Sent |
+| Delivered | text | Delivered |
+| Redeemed | text | Redeemed |
+| Expired | 1,234 | Expired |
+| Cancelled | 1,234 | Cancelled |
+| Viewed | text | Viewed where available |
+| Assignee type | chip: Individual customer, Customer segment, Membership account, B2B company, Reseller … | Who the codes are assigned to. |
+| Batch | text | Batch ID |
+| Partner | text | Partner, for a partner batch |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save changes (primary button) | navigation or local | — | — | — | — |
+| Distribute (primary button) | `setCodeDistributionManager` PUT `/code-distribution-manager` | CodeDistributionAssignmentManagerInput | CodeDistributionAssignmentManagerView | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1100,11 +1148,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The code distribution list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the code distribution untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No code distribution yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No codes generated for this campaign yet. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the code distribution are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listCouponCodes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setCodeDistributionManager`. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -1126,7 +1174,7 @@ distribution:
 - `setCodeDistributionManager` → `PRICE_CONFIGURE` (configure) · staff
 - `listCouponCodes` → `PRICE_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listCouponCodes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setCodeDistributionManager`.
 
 #### Requirements it meets
 
@@ -1151,10 +1199,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (54 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-164?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save changes.
+- [ ] Every action is wired with its success and its failure: Distribute.
 - [ ] Every transition is wired: `ADM-158`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1693,12 +1741,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CodeDistributionAssignmentManagerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Code Distribution & Assignment Manager submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"channelsType":{"type":"string","enum":["email","sms","whatsapp","mobileApp","crmJourney","guestPortal","b2bPortal","partnerPortal","pos","callCenter","api","exportedBatch"],"description":"Vocabulary listed under Distribution Channels."},"assigneeType":{"type":"string","enum":["individualCustomer","customerSegment","membershipAccount","b2bCompany","reseller","travelAgency","school","hotel","bank","corporatePartner","marketingCampaign"],"description":"Who the codes are assigned to."},"batchId":{"type":"string","description":"Batch ID"},"assigneeReference":{"type":"string","description":"Customer, segment, account or partner the codes go to"},"quantity":{"type":"integer","description":"Codes to assign"}}},
+"CodeDistributionAssignmentManagerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; stored as one promotions.code_assignment row (CouponCodeAssignment) and the coupon codes it assigns (CHG-FXC-005)","description":"**What Code Distribution & Assignment Manager submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"channelsType":{"type":"string","enum":["email","sms","whatsapp","mobileApp","crmJourney","guestPortal","b2bPortal","partnerPortal","pos","callCenter","api","exportedBatch"],"description":"Vocabulary listed under Distribution Channels."},"assigneeType":{"type":"string","enum":["individualCustomer","customerSegment","membershipAccount","b2bCompany","reseller","travelAgency","school","hotel","bank","corporatePartner","marketingCampaign"],"description":"Who the codes are assigned to."},"batchId":{"type":"string","description":"Batch ID"},"assigneeReference":{"type":"string","description":"Customer, segment, account or partner the codes go to"},"quantity":{"type":"integer","description":"Codes to assign"}}},
 "CodeDistributionAssignmentManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Distribution & Assignment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"channelsType":{"type":"string","enum":["email","sms","whatsapp","mobileApp","crmJourney","guestPortal","b2bPortal","partnerPortal","pos","callCenter","api","exportedBatch"],"description":"Vocabulary listed under Distribution Channels."},"generated":{"type":"string","description":"Generated"},"assigned":{"type":"string","description":"Assigned"},"sent":{"type":"string","description":"Sent"},"delivered":{"type":"string","description":"Delivered"},"redeemed":{"type":"string","description":"Redeemed"},"expired":{"type":"integer","description":"Expired"},"cancelled":{"type":"integer","description":"Cancelled"},"viewed":{"type":"string","description":"Viewed where available"},"assigneeType":{"type":"string","enum":["individualCustomer","customerSegment","membershipAccount","b2bCompany","reseller","travelAgency","school","hotel","bank","corporatePartner","marketingCampaign"],"description":"Who the codes are assigned to."},"batchId":{"type":"string","description":"Batch ID"},"partner":{"type":"string","description":"Partner, for a partner batch"}}},
 "CodeEligibilityRestrictionManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Eligibility & Restriction Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partner":{"type":"string","description":"Partner"},"businessEntity":{"type":"string","description":"Business entity"},"venue":{"type":"string","description":"Venue"},"location":{"type":"string","description":"Location"},"operatingArea":{"type":"string","description":"Operating area"},"productScopes":{"type":"array","items":{"type":"string","enum":["ticket","ticketType","product","productCategory","attraction","event","bundle","membership","fB","retail","addOn"]},"description":"Products the code is restricted to."},"customerScopes":{"type":"array","items":{"type":"string","enum":["guestType","crmSegment","loyaltyTier","b2bAccount","corporateGroup","b2b"]},"description":"Customers the code is restricted to."},"channels":{"type":"array","items":{"type":"string","enum":["b2c","pos","mobilePos","kiosk","mobileApp","callCenter","reseller","api"]},"description":"Channels the code is valid on."}}},
 "CodeSecurityFraudExceptionCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"levelsType":{"type":"string","enum":["low","medium","high","critical"],"description":"Vocabulary listed under Risk Levels."},"signalType":{"type":"string","enum":["excessiveRedemptionVelocity","repeatedFailedAttempts","multipleCustomersUsingCustomerSpecificCode","unusualGeographicUsage","highVolumeRedemptionFromOneDevice","suspiciousPosOperatorActivity","codeEnumerationAttempts","partnerCodeLeakage","redemptionAboveExpectedCampaignPattern"],"description":"The fraud signal monitored."},"codeId":{"type":"string","description":"Code or batch ID"},"detectedAt":{"type":"string","format":"date-time","description":"When detected"},"details":{"type":"string","description":"What was observed"}}},
 "CouponCampaign": {"x-ticvai-persistence":"promotions.coupon_campaign","allOf":[{"$ref":"#/components/schemas/CreateCouponCampaignRequest"},{"type":"object","required":["id","generatedCount","redeemedCount"],"properties":{"id":{"type":"string","format":"uuid"},"generatedCount":{"type":"integer"},"redeemedCount":{"type":"integer"},"isActive":{"type":"boolean"}}}]},
-"CouponCode": {"x-ticvai-persistence":"promotions.coupon_code","type":"object","required":["code","campaignId","status"],"properties":{"code":{"type":"string"},"campaignId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The `generateCouponCodes` batch that issued this code. Null where no batch did."},"status":{"$ref":"#/components/schemas/CouponStatus"},"assignedSubjectId":{"type":"string","format":"uuid","nullable":true},"redemptionCount":{"type":"integer"},"maxRedemptions":{"type":"integer"},"discount":{"$ref":"#/components/schemas/Discount"},"invalidReason":{"type":"string","nullable":true,"description":"Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n","enum":["expired","alreadyRedeemed","voided","notYetValid","wrongVenue","conditionsNotMet","notAssignedToGuest"]},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"redeemedOrderId":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"CouponCode": {"x-ticvai-persistence":"promotions.coupon_code","type":"object","required":["code","campaignId","status"],"properties":{"code":{"type":"string"},"campaignId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The `generateCouponCodes` batch that issued this code. Null where no batch did."},"status":{"$ref":"#/components/schemas/CouponStatus"},"assignedSubjectId":{"type":"string","format":"uuid","nullable":true},"redemptionCount":{"type":"integer"},"maxRedemptions":{"type":"integer"},"discount":{"$ref":"#/components/schemas/Discount"},"invalidReason":{"type":"string","nullable":true,"description":"Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n","enum":["expired","alreadyRedeemed","voided","notYetValid","wrongVenue","conditionsNotMet","notAssignedToGuest"]},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"redeemedOrderId":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"},"assignmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005)."},"distributionStatus":{"type":"string","nullable":true,"readOnly":true,"enum":["pending","sent","delivered","viewed","cancelled"],"description":"**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned, `sent` when the channel accepted it, `delivered` on the channel's delivery receipt, `viewed` when the holder opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from `status`, which is the code's redemption life (issued, assigned, redeemed, expired, voided)."}}},
 "CouponCodeBatch": {"x-ticvai-persistence":"promotions.coupon_code_batch","type":"object","description":"One run of `generateCouponCodes`. **The batch is a row** because its status is read after the request that queued it has returned, and its codes point back at it.\n","required":["id","campaignId","quantity","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"The `batchId` that `generateCouponCodes` returned."},"campaignId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","description":"Codes requested."},"generatedCount":{"type":"integer","description":"Codes generated so far."},"prefix":{"type":"string","maxLength":16,"nullable":true},"length":{"type":"integer"},"status":{"type":"string","enum":["queued","generating","complete","failed"]},"failureReason":{"type":"string","nullable":true,"description":"Present only where status is `failed`."},"requestedByPrincipalId":{"type":"string","format":"uuid"},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"downloadUrl":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"The exported file of the batch's codes. Signed and expiring, issued on each read, so it is not stored. Present only while status is `complete`."}}},
 "CouponStatus": {"type":"string","enum":["issued","assigned","redeemed","expired","voided"]},
 "CreateCouponCampaignRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","discount","validFrom"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"isSingleUse":{"type":"boolean","default":true,"description":"True generates individually redeemable codes. False issues one shared code with a redemption limit.\n"},"maxRedemptionsPerCode":{"type":"integer","default":1},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"campaignId":{"type":"string","format":"uuid","nullable":true,"description":"The commercial campaign (`promotions.campaign`) the codes are issued under, as the Coupon & Promo Code Builder names it. (DM5, 29 September: data model for the agreed operations)"}}},

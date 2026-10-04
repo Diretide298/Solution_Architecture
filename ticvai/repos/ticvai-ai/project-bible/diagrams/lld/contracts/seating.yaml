@@ -545,6 +545,14 @@ operations:
   offline: false
   reads:
   - catalogue.performance
+  - seating.accessible
+  - seating.recommendation_rules
+  - seating.seat
+  - seating.seat_block_item
+  - seating.seat_category
+  - seating.seat_hold
+  - seating.seat_hold_item
+  - seating.seat_price_band
   writes: []
 - operation: releaseSeatHoldPool
   verb: POST

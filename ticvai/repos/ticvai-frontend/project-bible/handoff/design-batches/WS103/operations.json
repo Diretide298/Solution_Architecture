@@ -183,6 +183,45 @@
   "requestBody": null,
   "responds": "ModuleListing"
  },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOwnPlatformStaffGrants": {
   "method": "GET",
   "path": "/platform-staff-grants/mine",

@@ -1726,7 +1726,6 @@ paths:
       operationId: listTicketTemplates
       x-ticvai-consumed-by:
         - "P08 BO-344 Media Design Studio Command Center"
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       summary: The ticket templates a venue issues from
       description: 'BL-102. **`orders.ticket_template` was read by `printTicketProof` and `issueWalletPass`
         and written by nothing**, so the proof operation had nothing to print and a venue changing its
@@ -1788,7 +1787,7 @@ paths:
     post:
       operationId: createTicketTemplate
       x-ticvai-consumed-by:
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+        - "P08 BO-344 Media Design Studio Command Center"
       summary: Create a ticket template
       description: '**Selection is automatic.** `selectionPriority`, `mediaType`, `appliesToProductKinds`
         and `appliesToChannels` decide which template a sale issues from, so the caller never chooses
@@ -1849,7 +1848,7 @@ paths:
     patch:
       operationId: updateTicketTemplate
       x-ticvai-consumed-by:
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+        - "P08 BO-344 Media Design Studio Command Center"
       summary: Change or retire a ticket template
       description: '**Tickets already issued keep the template they were issued from.** Changing artwork
         affects the next ticket, never one a guest already holds. Retire with `isActive: false` rather
@@ -1911,7 +1910,7 @@ paths:
     post:
       operationId: printTicketProof
       x-ticvai-consumed-by:
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+        - "P08 BO-344 Media Design Studio Command Center"
       summary: Print a sample without selling anything
       description: '2.16.6. **Artwork is checked by looking at it, and the only way to look at it was
         to sell something.**
@@ -2164,6 +2163,7 @@ paths:
       operationId: listPaymentTokens
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-011 Wallet Overview"
         - "P02 GST-071 Payment Methods"
       security:
       - guestAuth: []
@@ -2370,21 +2370,16 @@ paths:
     post:
       operationId: issueInvitation
       summary: Issue a complimentary entitlement, with no payment expected
-      description: '8.1.3 to 8.1.5. **A complimentary ticket is not a 100% discount** — a discount runs
-        through the order path and produces a zero-value sale; an invitation never enters it. **No payment
-        is expected, so nothing waits for one.**
+      description: |-
+        8.1.3 to 8.1.5. **A complimentary ticket is not a 100% discount** — a discount runs through the order path and produces a zero-value sale; an invitation never enters it. **No payment is expected, so nothing waits for one.**
+        Three requirements and one operation, because they are one act: **issue it, record who offered it, and refuse where the issuer's profile does not allow it.**
+        `x-ticvai-permission-escalated` gates issuance above the configured value. **8.1.5 asks for restriction by profile, and an unbounded comp is how a venue gives away a season** — a host with a ten-ticket allowance and a general manager with none are different people.
+        **Recognised at issue, not at admission.** An invitation has no revenue to defer, so the entitlement is issued and the accounting is a marketing cost rather than a deferral.
 
-        Three requirements and one operation, because they are one act: **issue it, record who offered
-        it, and refuse where the issuer''s profile does not allow it.**
-
-        `x-ticvai-permission-escalated` gates issuance above the configured value. **8.1.5 asks for restriction
-        by profile, and an unbounded comp is how a venue gives away a season** — a host with a ten-ticket
-        allowance and a general manager with none are different people.
-
-        **Recognised at issue, not at admission.** An invitation has no revenue to defer, so the entitlement
-        is issued and the accounting is a marketing cost rather than a deferral.
-
-        '
+        **The entitlement it issues has no order** (4 October 2026, CHG-FXC-007; `access.entitlement.order_id` was NOT NULL
+        with a key to `orders.sales_order`, so the row could not be inserted). The entitlement is written with `orderId` null
+        and `invitationId` set to this invitation; exactly one of the two is set on every entitlement. Nothing is written to
+        `orders.sales_order`.
       tags:
       - orders
       x-ticvai-permission: ORDER_CREATE
@@ -3340,6 +3335,7 @@ paths:
       operationId: checkoutCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-033 Shop"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
@@ -3976,7 +3972,6 @@ paths:
     post:
       operationId: createOrder
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
         - "P02 GST-009 Review & Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
@@ -4113,6 +4108,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
+        - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-011 Collect a booking"
@@ -16530,6 +16526,13 @@ components:
           type: string
           format: date-time
           nullable: true
+        ledgerDepositId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The finance Deposit that holds this deposit''s liability** (4 October 2026, CHG-FXC-010; VM-BO-024):
+            the `depositId` `finance.settleDeposit` takes. Null until the liability is posted.'
     OrdersDiscount:
       type: object
       x-ticvai-persistence: orders.discount
@@ -26179,6 +26182,12 @@ components:
             - missingCredential
             - accessibilityRequirement
           description: Arrival issues raised.
+        groupBookingId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The group booking this row is** (4 October 2026, CHG-FXC-011; POS-031, SVC-ORDER-DRAFTED-1): the id
+            `getGroupBooking` and `recordGroupCheckIn` take.'
     GroupAmendmentsCancellationRefundOperationsView:
       type: object
       x-ticvai-drafted-shape: true

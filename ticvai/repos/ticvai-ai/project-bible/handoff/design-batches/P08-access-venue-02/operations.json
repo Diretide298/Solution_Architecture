@@ -151,6 +151,25 @@
   "requestBody": "VenueMap",
   "responds": "VenueMap"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "getAsset": {
   "method": "GET",
   "path": "/assets/{assetId}",

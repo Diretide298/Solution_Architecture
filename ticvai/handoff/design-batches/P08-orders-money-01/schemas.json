@@ -3604,6 +3604,13 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "ledgerDepositId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The finance Deposit that holds this deposit's liability** (4 October 2026, CHG-FXC-010; VM-BO-024): the `depositId` `finance.settleDeposit` takes. Null until the liability is posted."
    }
   }
  },

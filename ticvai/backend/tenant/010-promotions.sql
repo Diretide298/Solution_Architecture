@@ -1,4 +1,4 @@
--- promotions — 30 tables
+-- promotions — 31 tables
 -- **Derived. Do not hand-edit.**
 
 -- One component’s share, fixed or proportional
@@ -135,6 +135,18 @@ CREATE TABLE IF NOT EXISTS promotions.campaign_budget (
     threshold_policy                  jsonb
 );
 
+CREATE TABLE IF NOT EXISTS promotions.code_assignment (
+    id                                uuid PRIMARY KEY NOT NULL,
+    batch_id                          uuid NOT NULL,
+    channels_type                     text NOT NULL,
+    assignee_type                     text NOT NULL,
+    assignee_reference                text,
+    quantity                          integer NOT NULL,
+    assigned_at                       timestamptz,
+    assigned_by_principal_id          uuid,
+    scope_path                        ltree NOT NULL
+);
+
 -- A batch of codes with shared rules. The codes are children
 CREATE TABLE IF NOT EXISTS promotions.coupon_campaign (
     code                              text NOT NULL CONSTRAINT coupon_campaign_code_chk CHECK (char_length(code) <= 64),
@@ -169,6 +181,8 @@ CREATE TABLE IF NOT EXISTS promotions.coupon_code (
     redeemed_at                       timestamptz,
     redeemed_order_id                 uuid,
     scope_path                        ltree NOT NULL,
+    assignment_id                     uuid,
+    distribution_status               text CONSTRAINT coupon_code_distribution_status_chk CHECK (distribution_status IN ('pending', 'sent', 'delivered', 'viewed', 'cancelled')),
     id                                uuid PRIMARY KEY NOT NULL
 );
 

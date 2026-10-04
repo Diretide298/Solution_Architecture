@@ -28,6 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import ticket_done as td  # noqa: E402  (merge_bindings, CHG-FXP-002)
 
 RULES = {
     "S-SCREEN-COUNT": "a ticket title's screen operation count is not the screen's (CHG-TBF-005)",
@@ -58,6 +59,7 @@ def main() -> int:
         guard.note("handoff/service-docs/plan-tasks.csv missing - run tools/build-service-docs.py")
         return guard.finish()
     screens = {s["id"]: s for _, s in g.screens()}
+    td.merge_bindings(screens)        # a merged screen's operations are built on its target (CHG-FXP-002), as the plan does
     with plan.open(encoding="utf-8", newline="") as fh:
         rows = [r for r in csv.DictReader(fh) if r["type"] == "Task" and r["track"] == "Frontend"
                 and "#" not in r["key"]]

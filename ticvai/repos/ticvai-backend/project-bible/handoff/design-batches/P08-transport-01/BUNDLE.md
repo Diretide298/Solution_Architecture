@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1184` | Transport Routes & Stops | A | 27 | 18 | 7 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-1185` | Transport Fares & Passenger Types | A | 22 | 44 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1186` | Transport Timetables | A | 21 | 14 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1187` | Transport Departure Board | C | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
+| `BO-1187` | Transport Departure Board | A | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
 | `BO-1188` | Transport Pass Types | A | 19 | 18 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1189` | Transport Network Import | A | 6 | 27 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
@@ -1072,7 +1072,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 2 · needs the `transport` module |
-| Block | Block C · task VM-BO-1187 |
+| Block | Block A · task APP-SETUP-BO-1187 |
 | Who uses it | venue staff holding `PERFORMANCE_CONFIGURE`, `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportRouteDepartures` reads the population and the panel acts on one departure — list, select, act |

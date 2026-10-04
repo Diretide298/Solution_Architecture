@@ -1,6 +1,6 @@
 # P09-branding-localisation-01 — P09 · Branding & Localisation
 
-**4 screens · 27 operations · 34 schemas · 5 permissions**
+**4 screens · 30 operations · 39 schemas · 7 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -124,7 +124,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-016` | White-Label Branding Management | A | 53 | 47 | 7 | 12 | 0 | 6 | configures | notStarted (generated) |
+| `ADM-016` | White-Label Branding Management | A | 54 | 50 | 7 | 20 | 0 | 6 | configures | notStarted (generated) |
 | `ADM-017` | Domain & Certificate Management | A | 9 | 27 | 7 | 1 | 1 | 0 | configures | notStarted (generated) |
 | `ADM-018` | Interface Languages | A | 8 | 27 | 7 | 9 | 2 | 6 | configures | notStarted (generated) |
 | `ADM-019` | Global Configuration & Defaults | B | 85 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |

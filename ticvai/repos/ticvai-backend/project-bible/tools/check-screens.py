@@ -27,8 +27,30 @@ import sys
 from pathlib import Path
 
 import json
+import pickle
 import re
 import yaml
+
+# **Each file is parsed once** (CHG-RSPD-001, profiled 4 October). This checker read the sixteen
+# screens files and the 35 contracts about twenty times over, one `yaml.safe_load` per rule, and
+# 99.7% of its 831 seconds were spent inside PyYAML. The parse is now remembered by the exact text it
+# was given, and every caller still gets its own fresh copy (a pickle of the parsed document, loaded
+# anew per call) -- so a rule that mutates what it loaded cannot leak into the next, and the result
+# is the one the plain parser gives, because it is the plain parser's result.
+_YAML_PARSED: dict = {}
+_yaml_safe_load = yaml.safe_load
+
+
+def _safe_load_once(stream):
+    if not isinstance(stream, str):
+        return _yaml_safe_load(stream)
+    blob = _YAML_PARSED.get(stream)
+    if blob is None:
+        blob = _YAML_PARSED[stream] = pickle.dumps(_yaml_safe_load(stream), pickle.HIGHEST_PROTOCOL)
+    return pickle.loads(blob)
+
+
+yaml.safe_load = _safe_load_once
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"

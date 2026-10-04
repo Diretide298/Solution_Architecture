@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 210 operations, 110 tables
+title: TenancyService — 212 operations, 110 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,7 +21,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 210
+  operations: 212
   inAFlow: 50
   percent: 24%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -41,7 +41,7 @@ schemas:
   tables: 30
   stores:
   - postgres
-  largestTable: approvals.request
+  largestTable: approvals.rule
 - schema: accreditation
   tables: 16
   stores:
@@ -59,7 +59,7 @@ schemas:
   largestTable: kernel.inbox
 operationsByContract:
 - contract: approvals
-  count: 57
+  count: 58
   operations:
   - operation: actOnWorkflowInstance
     verb: POST
@@ -123,7 +123,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 4
+    reads: 6
     writes: 2
   - operation: createApprovalEvidencePackage
     verb: POST
@@ -184,6 +184,14 @@ operationsByContract:
   - operation: getApprovalRecord
     verb: GET
     path: /approval-requests/{requestId}/record
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getApprovalRequest
+    verb: GET
+    path: /approval-requests/{requestId}
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
@@ -1372,7 +1380,7 @@ operationsByContract:
     reads: 6
     writes: 0
 - contract: accreditation
-  count: 47
+  count: 48
   operations:
   - operation: cloneAccreditationProgramme
     verb: POST
@@ -1449,6 +1457,14 @@ operationsByContract:
   - operation: getAccreditationHolder
     verb: GET
     path: /accreditation-holders/{holderId}
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getAccreditationValidity
+    verb: GET
+    path: /accreditation-validity
     scope: venue
     permission: ACCREDITATION_VIEW
     offline: false
@@ -1912,6 +1928,71 @@ tables:
   - updateSaleBoard
   - withdrawAccreditationApplication
   - withdrawApprovalRequest
+  keys:
+    createOrgUnit:
+      role: evicts
+      resolvers: &id001
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setConfigurationProfile:
+      role: evicts
+      resolvers: &id002
+      - platform.configuration_profile
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setConnectivityThresholds:
+      role: evicts
+      resolvers: &id003
+      - platform.connectivity_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setOfflinePolicy:
+      role: evicts
+      resolvers: &id004
+      - platform.offline_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setRolePermissions:
+      role: evicts
+      resolvers: &id005
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setVenueSettings:
+      role: evicts
+      resolvers: &id006
+      - platform.venue_settings
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateOrgUnit:
+      role: evicts
+      resolvers: &id007
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateRegionSettings:
+      role: evicts
+      resolvers: &id008
+      - platform.region_settings
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -1939,12 +2020,93 @@ tables:
   - getRegionSettings
   - getVenueSettings
   - listOrgUnits
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    createOrgUnit:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    getOrgUnit:
+      role: fills
+      resolvers:
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    getRegionSettings:
+      role: fills
+      resolvers:
+      - platform.region_settings
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    listOrgUnits:
+      role: fills
+      resolvers:
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    setConfigurationProfile:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setConnectivityThresholds:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setOfflinePolicy:
+      role: evicts
+      resolvers: *id004
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setRolePermissions:
+      role: evicts
+      resolvers: *id005
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setVenueSettings:
+      role: evicts
+      resolvers: *id006
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateOrgUnit:
+      role: evicts
+      resolvers: *id007
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateRegionSettings:
+      role: evicts
+      resolvers: *id008
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    getVenueSettings:
+      role: fills
+      resolvers:
+      - platform.venue_settings
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
 - table: accreditation.access_profile
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -2000,7 +2162,7 @@ tables:
   - accreditation
   foreignWriters: null
 - table: accreditation.holder_access
-  columns: 5
+  columns: 6
   store: postgres
   parent: accreditation.holder
   writtenBy:
@@ -2129,7 +2291,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: approvals.delegation
-  columns: 10
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -2188,7 +2350,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.rule
-  columns: 20
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -2830,6 +2992,7 @@ screens:
 - P04:POS-009 Staff Roster
 - P04:POS-016 Till Configuration
 - P04:POS-020 Shift Exceptions & Alerts
+- P04:POS-021 Sell — Food & Drink
 - P04:POS-025 Till Home
 - P06:EMP-010 Scan — ready
 - P06:EMP-021 Roster
@@ -3067,6 +3230,7 @@ screens:
 - P08:BO-666 Validity Period Configuration
 - P08:BO-667 Event & Venue Accreditation Assignment
 - P08:BO-668 Multi-Venue Accreditation Management
+- P08:BO-669 Temporary & Seasonal Accreditation
 - P08:BO-670 Suspension & Reactivation Management
 - P08:BO-671 Accreditation Revocation Management
 - P08:BO-672 Expiry Monitor & Expiration Rules

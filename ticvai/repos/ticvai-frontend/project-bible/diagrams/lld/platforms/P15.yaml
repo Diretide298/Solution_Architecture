@@ -43,7 +43,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 33
 - service: ReportingService
-  operationCalls: 3
+  operationCalls: 4
 coverage:
   screens: 10
   inAFlow: 6
@@ -343,6 +343,7 @@ screens:
   operations:
   - askReportingQuestion
   - getDashboard
+  - listDashboards
   - recordDashboardView
   states:
   - emptyFirstRun
@@ -355,7 +356,7 @@ screens:
   entryParams:
   - venueId<-session
   - stationId<-session
-  - dashboardId<-KIT-002
+  - dashboardId<-navigation
   goesTo:
   - KIT-001
   boardFrames:

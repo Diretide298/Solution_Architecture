@@ -185,6 +185,83 @@
    }
   }
  },
+ "BookableVenueMapRef": {
+  "type": "object",
+  "description": "One published map with bookable spots on it: enough to pick it and call `getVenueMap` (with `publishedVersion`) and `resources.getMapResourceAvailability`.\n",
+  "required": [
+   "mapId",
+   "name",
+   "kind",
+   "publishedVersion",
+   "placedResourceCount"
+  ],
+  "properties": {
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "park",
+     "floor",
+     "zone",
+     "parking"
+    ]
+   },
+   "floorLevel": {
+    "type": "integer",
+    "nullable": true
+   },
+   "publishedVersion": {
+    "type": "integer",
+    "description": "The `VenueMap.publishedVersion` a guest is served; send it to `getVenueMap` as `version`."
+   },
+   "placedResourceCount": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Placed resources on the published version."
+   },
+   "kinds": {
+    "type": "array",
+    "description": "The kinds of spot on this map, e.g. `[cabana, lounger]`, for the picker's chips.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "cabana",
+      "lounger",
+      "table",
+      "pitch",
+      "other"
+     ]
+    }
+   }
+  }
+ },
+ "BookableVenueMaps": {
+  "type": "object",
+  "description": "What `listBookableVenueMaps` returns: the published maps of one venue that carry bookable spots (decided 29 September, readiness close-out). **Bounded by the venue**: a venue has a handful of maps, so the list is capped at 50 rather than paged.\n",
+  "required": [
+   "venueId",
+   "maps"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "maps": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "$ref": "#/components/schemas/BookableVenueMapRef"
+    }
+   }
+  }
+ },
  "BookedWindow": {
   "type": "object",
   "nullable": true,
@@ -822,6 +899,12 @@
     "type": "integer",
     "nullable": true,
     "description": "From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away is not the same promise as a table by the kitchen.\n"
+   },
+   "codeGeneration": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "**Which printing of the location's ordering code is current** (4 October 2026, CHG-FXC-009). A code carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code printed before."
    }
   }
  },
@@ -1809,6 +1892,12 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The catalogue variant sold for parking here** (4 October 2026, CHG-FXC-010; GST-027, WEB-041): what `addCartLine` sells when a guest buys parking at this car park. Set by staff; readable by guests. Null where the car park does not sell parking through the platform."
    }
   }
  },
@@ -3116,6 +3205,24 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "overriddenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who let the party past the queue** (`overrideWaitingGuest`, 4 October 2026, CHG-FXC-003), with `overrideReason` and `overriddenAt`. Null when the entry was never overridden."
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "overriddenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  }

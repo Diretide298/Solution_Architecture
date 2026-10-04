@@ -1214,8 +1214,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Outcome | segmented control | optional | — | Admitted · Denied · Overridden | — | Sends `?outcome=` to `listScans`. | `listScans` ?outcome |
 | Recorded from | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?recordedFrom=` to `listScans`. | `listScans` ?recordedFrom |
 | Recorded to | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?recordedTo=` to `listScans`. | `listScans` ?recordedTo |
-| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
-|  | scan target | — | — | — | — | **A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or … | — |
+| Search | text area | optional | — | max length 256 | — | Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run. | `lookupTicket` ?mediaCode |
+|  | text area | optional | — | max length 256 | — | Sends `?mediaCode=` to `lookupTicket` (the scanned code is the lookup) (CHG-RFM-012). **A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look … | `lookupTicket` ?mediaCode |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 

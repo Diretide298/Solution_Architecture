@@ -78,7 +78,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** the time sits right after the date and stays hidden until a date is picked; tickets (GST-008) come after the time; Continue stays off until both are chosen (`performanceReveal`, default `dateTimeTicket`). **Times (REV3-1)** paged with part-of-day chips. **Seated events (REV3-4, REV3-7):** this step before the seat map, or a pop-up on it (`seatEventDateMode`); skipped when the event has one on-sale performance; may render with GST-049 as one step. **Language (REV3-17), experience and level (REV3-19), Booking at (REV3-18), Quick tour (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default no longer overrides it, because the order is the flow's. **W5:** surf and session levels appear only after a time slot is chosen. **W11:** guided tours stay date → language → time slot, confirmed unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 3 and 4).** **Choosing a session adds nothing to the cart.** Once a session is chosen its tickets appear (for a surf session: Surfer at the session price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when a quantity is set; until a session is chosen the ticket area says *Choose a session above to see its tickets and prices.* **A question the flow already asks on the page is not asked again** in the consent pop-up: on the water park's swim-ability flow the *Are you able to swim?* answer given on the page stands.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** the time sits right after the date and stays hidden until a date is picked; tickets (GST-008) come after the time; Continue stays off until both are chosen (`performanceReveal`, default `dateTimeTicket`). **Times (REV3-1)** paged with part-of-day chips. **Seated events (REV3-4, REV3-7):** this step before the seat map, or a pop-up on it (`seatEventDateMode`); skipped when the event has one on-sale performance; may render with GST-049 as one step. **Language (REV3-17), experience and level (REV3-19), Booking at (REV3-18), Quick tour (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default no longer overrides it, because the order is the flow's. **W5:** surf and session levels appear only after a time slot is chosen. **W11:** guided tours stay date → language → time slot, confirmed unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 3 and 4).** **Choosing a session adds nothing to the cart.** Once a session is chosen its tickets appear (for a surf session: Surfer at the session price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when a quantity is set; until a session is chosen the ticket area says *Choose a session above to see its tickets and prices.* **A question the flow already asks on the page is not asked again** in the consent pop-up: on the water park's swim-ability flow the *Are you able to swim?* answer given on the page stands.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getAvailability` reads one of them — list, select, act",
@@ -253,7 +253,9 @@
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `eventId`.",
-   "preloaded": []
+   "preloaded": [
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
+   ]
   },
   "wireframe": {
    "status": "notStarted",
@@ -428,7 +430,7 @@
     }
    ]
   },
-  "notes": "**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2); categories (REV3-16); info-only products show their label and open details (REV3-14); ticket-type descriptions (23SEP-6) and tags (23SEP-3); Help me choose as a region and a sheet (REV3-11); Booking at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W4:** Help me choose filters the products (`guidedAnswerIds`) with *Show everything*; `behaviour` `recommend` stays an option. **W8:** in a product-first flow (workshop, experience) this step comes first and the date and time follow (GST-007). **W5:** surf levels (beginner, intermediate …) appear only after the time slot.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1 and 2).** **Guest counters take the chosen ticket's prices:** the guest types (adult, child, senior, infant) are the chosen product's variants and are priced from it (`listProductVariants`), so *2 park ticket* with three adults is one line, *2 park ticket · Adult × 3*, never a ticket line plus a separate adult line; child and senior follow the chosen ticket, and an infant stays free where the ticket says so. **Group and school booking starts from the group tickets** (in the client build: School, Corporate, Tour operator and Community), each card with its per-person price and minimum group size, then **How many people** as a number box the guest can type into (for example 45) or step with − and + (the app adds a +10 step); there is no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking` with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed separately and free, and a water-park group choosing a session, are not in the contract yet (questions of 1 October).",
+  "notes": "**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2); categories (REV3-16); info-only products show their label and open details (REV3-14); ticket-type descriptions (23SEP-6) and tags (23SEP-3); Help me choose as a region and a sheet (REV3-11); Booking at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** **W4:** Help me choose filters the products (`guidedAnswerIds`) with *Show everything*; `behaviour` `recommend` stays an option. **W8:** in a product-first flow (workshop, experience) this step comes first and the date and time follow (GST-007). **W5:** surf levels (beginner, intermediate …) appear only after the time slot.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1 and 2).** **Guest counters take the chosen ticket's prices:** the guest types (adult, child, senior, infant) are the chosen product's variants and are priced from it (`listProductVariants`), so *2 park ticket* with three adults is one line, *2 park ticket · Adult × 3*, never a ticket line plus a separate adult line; child and senior follow the chosen ticket, and an infant stays free where the ticket says so. **Group and school booking starts from the group tickets** (in the client build: School, Corporate, Tour operator and Community), each card with its per-person price and minimum group size, then **How many people** as a number box the guest can type into (for example 45) or step with − and + (the app adds a +10 step); there is no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking` with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed separately and free, and a water-park group choosing a session, are not in the contract yet (questions of 1 October).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProductVariants` reads the ticket types of the product and a stepper sets each quantity — list, select, act (rewritten decided 29 September, rev 3 GAP-D3: the ticket-selection functions the name promises moved onto this screen)",
@@ -586,7 +588,10 @@
      "from": "session"
     }
    ],
-   "coldEntry": "**A link to a product no longer on sale** says so and offers the listing; a performance that has passed offers the next one."
+   "coldEntry": "**A link to a product no longer on sale** says so and offers the listing; a performance that has passed offers the next one.",
+   "preloaded": [
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
+   ]
   },
   "wireframe": {
    "status": "notStarted",
@@ -907,7 +912,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Rev 3 (decided 29 September).** Date and time inline or as a pop-up (REV3-4); view box always below on mobile (REV3-5, 23SEP-14); time bar (REV3-6); at most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7); fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen (REV3-15). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back to the full map; held seats are kept.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Rev 3 (decided 29 September).** Date and time inline or as a pop-up (REV3-4); view box always below on mobile (REV3-5, 23SEP-14); time bar (REV3-6); at most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7); fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen (REV3-15). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back to the full map; held seats are kept.",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4a"
@@ -1036,7 +1041,10 @@
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`; a link or an edge that holds one opens it instead."
     }
    ],
-   "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event."
+   "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event.",
+   "preloaded": [
+    "PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with getPublishedTenantConfig (WEB-001, GST-001, KSK-002)"
+   ]
   },
   "wireframe": {
    "status": "notStarted",
@@ -1568,13 +1576,13 @@
      "to": "GST-074",
      "trigger": "Choose on the map (a venue with its spots on a map)",
      "carries": [
-      "productId"
+      "mapId"
      ],
      "provenance": "decided 29 September, rev 3 REV3-15"
     }
    ]
   },
-  "notes": "**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.\n\n**Rev 3 (decided 29 September).** Where the venue's spots are on an ingested map, availability is shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.",
+  "notes": "**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.\n\n**Rev 3 (decided 29 September).** Where the venue's spots are on an ingested map, availability is shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.\n\n**Availability is the map's (4 October 2026): listBookableVenueMaps gives the mapId and getMapResourceAvailability every cabana's status for the day, as GST-074 books them; getAvailability needs a performance, event or capacity id no cabana product has, and left the screen** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getAvailability` reads one of them — list, select, act",
@@ -1584,36 +1592,38 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
      "components": [
+      {
+       "kind": "selectField",
+       "label": "Map",
+       "bindsTo": "BookableVenueMaps.maps",
+       "operation": "listBookableVenueMaps",
+       "notes": "The venue's published map with cabanas (query kind cabana); picked by itself when there is one, shown when there are several.",
+       "provenance": "contract venue-map.yaml BookableVenueMaps.maps (defined 4 October 2026, CHG-FXS-003)"
+      },
       {
        "kind": "datePicker",
        "label": "Date",
-       "operation": "getAvailability",
-       "notes": "The list is for a date: today by default.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
-       "bindsTo": "PerformanceAvailability.performanceId"
+       "bindsTo": "MapResourceAvailability.from",
+       "operation": "getMapResourceAvailability",
+       "notes": "from and to are the chosen day; today by default.",
+       "provenance": "contract resources.yaml MapResourceAvailability.from (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Area",
+       "bindsTo": "MapResourceAvailability.resources",
+       "operation": "getMapResourceAvailability",
+       "notes": "The zones the spots are in; All by default.",
+       "provenance": "contract resources.yaml MapResourceAvailability.resources (defined 4 October 2026, CHG-FXS-003)"
       },
       {
        "kind": "cardList",
        "label": "Cabanas",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.name",
-        "Product.description",
-        "Product.media"
-       ],
-       "operation": "listProducts",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The venue's cabanas and other bookable spaces. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
-      },
-      {
-       "kind": "dataTable",
-       "label": "Availability",
-       "operation": "getAvailability",
-       "notes": "From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.",
-       "provenance": "contract catalogue.yaml GET /availability",
-       "bindsTo": "PerformanceAvailability"
+       "bindsTo": "MapResourceAvailability.resources",
+       "operation": "getMapResourceAvailability",
+       "notes": "Each cabana with its label, zone, capacity and status (free, held, booked); a free one opens the map booking (GST-074) on it.",
+       "provenance": "contract resources.yaml MapResourceAvailability.resources (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     }
@@ -1624,21 +1634,23 @@
    "error": "Could not load. Names which read failed and leaves the resource availability (cabana) untouched.",
    "emptyFirstRun": "No resource availability (cabana) yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing free on the date picked; offers the next free date.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `listBookableVenueMaps` requires to show this screen, and names that permission (the screen's other reads need `RESOURCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "getAvailability",
-    "contract": "catalogue",
-    "purpose": "Live remaining capacity",
-    "trigger": "onLoad"
+    "operationId": "listBookableVenueMaps",
+    "contract": "venue-map",
+    "purpose": "The venue's published map with bookable cabanas (kind cabana)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    },
    {
-    "operationId": "listProducts",
-    "contract": "catalogue",
-    "purpose": "List products",
-    "trigger": "onLoad"
+    "operationId": "getMapResourceAvailability",
+    "contract": "resources",
+    "purpose": "Every cabana's status for the chosen date, by zone",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -2052,7 +2064,7 @@
     }
    ]
   },
-  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-15 and GAP-C2). **Cabana maps work like the stadium seat map:** the venue's map is ingested with its cabanas, loungers and other bookable spots (number, zone, capacity, price band), and the guest picks a specific one on the map and buys it. This supersedes audit R073 (c) (*cabanas stay staff-booked*) for resources placed on an ingested map. **Tables on the map are non-dining spots sold like cabanas** (decided 29 September by the user); a restaurant table stays the F&B reservation flow (WEB-036 / GST-070). The map comes from `getVenueMap` (its `resources`: label, kind, zone, capacity, price band, boundary) and the status of every spot for the chosen day from one `getMapResourceAvailability` call, joined on `resourceId`; held, booked and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining time* counter from the hold's `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to basket sends `addCartLine` with the spot's price-band `variantId` and the `resourceHoldId`, e.g. *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.",
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-15 and GAP-C2). **Cabana maps work like the stadium seat map:** the venue's map is ingested with its cabanas, loungers and other bookable spots (number, zone, capacity, price band), and the guest picks a specific one on the map and buys it. This supersedes audit R073 (c) (*cabanas stay staff-booked*) for resources placed on an ingested map. **Tables on the map are non-dining spots sold like cabanas** (decided 29 September by the user); a restaurant table stays the F&B reservation flow (WEB-036 / GST-070). The map comes from `getVenueMap` (its `resources`: label, kind, zone, capacity, price band, boundary) and the status of every spot for the chosen day from one `getMapResourceAvailability` call, joined on `resourceId`; held, booked and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining time* counter from the hold's `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to basket sends `addCartLine` with the spot's price-band `variantId` and the `resourceHoldId`, e.g. *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.\n\n**addCartLine's variantId is the placed spot's PlacedResource.variantId (it exists in venue-map; the pull did not carry it), 4 October 2026** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`getMapResourceAvailability` reads the population of spots and a tap holds one of them — list (as a map), select, act",

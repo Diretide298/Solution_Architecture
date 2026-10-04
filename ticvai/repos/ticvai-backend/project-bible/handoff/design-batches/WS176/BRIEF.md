@@ -158,11 +158,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1061` | Platform Command Center | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1062` | Tenant & Brand Context | A | 79 | 12 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1063` | Venue-Specific Configuration | B | 1 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
+| `BO-1062` | Tenant & Brand Context | A | 82 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1063` | Venue-Specific Configuration | B | 85 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
 | `BO-1064` | Naming, Numbering & Localization | C | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1065` | Currency, Timezone & Channels | A | 47 | 17 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `BO-1066` | Roles, Permissions & Masking | B | 0 | 0 | 6 | 12 | 1 | 5 | — | notStarted (—) |
+| `BO-1066` | Roles, Permissions & Masking | B | 92 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |
 | `BO-1067` | Seat Approval Workflows | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1068` | Lifecycle & Environment Promotion | B | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
 | `BO-1069` | Platform Health & Observability | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -170,7 +170,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-1061, BO-1062, BO-1064, BO-1066, BO-1067, BO-1068, BO-1069 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-1061, BO-1064, BO-1067, BO-1068, BO-1069 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

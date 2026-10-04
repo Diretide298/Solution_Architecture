@@ -1,4 +1,4 @@
--- control — 85 tables
+-- control — 86 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS control.api_anomaly_rule (
     threshold                         numeric(18,4) NOT NULL,
     window_minutes                    integer DEFAULT 5,
     action                            text NOT NULL DEFAULT 'flag' CONSTRAINT api_anomaly_rule_action_chk CHECK (action IN ('flag', 'throttle', 'suspend')),
-    is_active                         boolean DEFAULT true
+    is_active                         boolean DEFAULT true,
+    tenant_id                         uuid,
+    scope_path                        ltree NOT NULL
 );
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -63,7 +65,7 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
 );
 
 -- Rate limits per client (13.1.36). A quota protects the venue, not the developer. Hangs off:
--- reaches control.partner through its keys; references control.api_client. Reached by: 1
+-- reaches control.partner through its keys; references control.api_client. Reached by: 2
 -- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_limit (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -366,6 +368,16 @@ CREATE TABLE IF NOT EXISTS control.developer_account (
     partner_id                        uuid,
     status                            text NOT NULL CONSTRAINT developer_account_status_chk CHECK (status IN ('pending', 'verified', 'suspended', 'closed')),
     verified_at                       timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS control.developer_member (
+    id                                uuid PRIMARY KEY NOT NULL,
+    developer_account_id              uuid,
+    email                             text NOT NULL,
+    role                              text NOT NULL CONSTRAINT developer_member_role_chk CHECK (role IN ('owner', 'admin', 'developer', 'readOnly')),
+    status                            text NOT NULL CONSTRAINT developer_member_status_chk CHECK (status IN ('invited', 'active', 'removed')),
+    invited_at                        timestamptz,
+    activated_at                      timestamptz
 );
 
 -- Dev, staging, production — and which cells are in each. Promotion may require approval and a
@@ -1506,7 +1518,9 @@ CREATE TABLE IF NOT EXISTS control.usage_record (
     venue_id                          uuid,
     capability                        text,
     audience                          text CONSTRAINT usage_record_audience_chk CHECK (audience IN ('staff', 'guest')),
-    recorded_at                       timestamptz NOT NULL
+    recorded_at                       timestamptz NOT NULL,
+    tenant_id                         uuid,
+    scope_path                        ltree NOT NULL
 );
 
 -- What a venue of this kind starts with (BL-165). A water park and a theatre need different

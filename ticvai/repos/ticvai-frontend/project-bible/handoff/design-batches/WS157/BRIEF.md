@@ -1,6 +1,6 @@
 # WS157 — Resource Management Configuration board 3
 
-**10 screens · 33 operations · 28 schemas · 6 permissions**
+**10 screens · 34 operations · 37 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `RESOURCE_CONFIGURE, RESOURCE_MANAGE, RESOURCE_VIEW, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `PRODUCT_VIEW, RESOURCE_CONFIGURE, RESOURCE_MANAGE, RESOURCE_VIEW, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-874` | Staff Resource Profile | D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-875` | Skills & Competency Management | D | 0 | 7 | 6 | 9 | 1 | 0 | — | notStarted (—) |
 | `BO-876` | Certification & Expiry Management | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-877` | Qualification & Assignment Rule Engine | A | 11 | 39 | 6 | 22 | 0 | 0 | — | notStarted (—) |
+| `BO-877` | Qualification & Assignment Rule Engine | A | 12 | 41 | 6 | 34 | 0 | 0 | — | notStarted (—) |
 | `BO-878` | Staff Availability & Working Pattern | D | 21 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-879` | Shift Template & Assignment Configuration | D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-880` | Break, Leave & Absence Configuration | D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

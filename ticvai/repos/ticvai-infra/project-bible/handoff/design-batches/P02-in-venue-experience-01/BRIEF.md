@@ -1,6 +1,6 @@
 # P02-in-venue-experience-01 — P02 · In-Venue Experience
 
-**2 screens · 2 operations · 5 schemas · 1 permissions**
+**2 screens · 3 operations · 7 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,8 +51,8 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 1 permissions apply here:
   `ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **1 of these operations work offline**: listMyEntitlements
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-061` | Menu Item Detail | A | 1 | 4 | 5 | 1 | 2 | 2 | guest | notStarted (client-verified) |
-| `GST-062` | Shop & Drop Collection | A | 0 | 20 | 5 | 0 | 2 | 0 | guest | notStarted (client-verified) |
+| `GST-062` | Shop & Drop Collection | A | 0 | 22 | 5 | 2 | 2 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 

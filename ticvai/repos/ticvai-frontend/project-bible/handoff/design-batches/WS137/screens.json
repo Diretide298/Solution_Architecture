@@ -223,29 +223,9 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "The saved segments beside a rule builder with a live count (defined 4 October 2026 from CreateSegmentRequest and SegmentRuleGroup, CHG-FXS-001).",
   "purpose": "Allow authorized users to create automatically refreshed rule-based audiences. Provide nested AND/OR/NOT logic across profile, behavior, transaction, membership, loyalty, wallet and custom attributes. Show live audience count, reachable count, exclusions, consent impact and representative sample guests while rules are edited. Support effective dates, refresh frequency, ownership, tags, descriptions, approvals and reusable rule groups. Validate incompatible conditions, excessive complexity and restricted attributes before save or activation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Dynamic Segment Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 16"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 16"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No preview of unsaved criteria; CreateSegmentRequest has no nested rule groups, effective dates, owner or approval.",
-    "source": "contracts/satellite/marketing-crm.yaml#previewSegment | contracts/satellite/marketing-crm.yaml#createSegment"
-   },
    {
     "operation": "previewSegment",
     "removed": true,
@@ -260,40 +240,165 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Segments",
+       "kind": "searchField",
+       "label": "Find a segment",
+       "bindsTo": "Segment.name",
        "operation": "listSegments",
-       "provenance": "contract marketing-crm.yaml GET /segments; wiring fix, 2 October 2026"
+       "notes": "Query `search`.",
+       "provenance": "contract marketing-crm.yaml Segment.name (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "metricTile",
-       "label": "Matching guests",
-       "operation": "previewSegmentDraft",
-       "notes": "Counts on the rules as edited, before anything is saved.",
-       "provenance": "contract marketing-crm.yaml POST /segments/preview"
+       "kind": "dataTable",
+       "label": "Segments",
+       "bindsTo": "Segment",
+       "operation": "listSegments",
+       "columns": [
+        "Segment.name",
+        "Segment.match",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt",
+        "Segment.effectiveTo"
+       ],
+       "provenance": "contract marketing-crm.yaml Segment (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     },
     {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "name": "contextPanel",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create segment",
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "CreateSegmentRequest.name",
        "operation": "createSegment",
-       "provenance": "contract marketing-crm.yaml POST /segments"
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Description",
+       "bindsTo": "CreateSegmentRequest.description",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.description (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Match",
+       "bindsTo": "CreateSegmentRequest.match",
+       "operation": "createSegment",
+       "notes": "All or any, for the top-level criteria.",
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.match (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attribute",
+       "bindsTo": "SegmentCriterion.attribute",
+       "operation": "createSegment",
+       "notes": "Profile, visits, spend, products bought, membership, tier, wallet, language, wishlist and behaviour. Dietary, accessibility and minors' data are refused for marketing segments, with the reason shown (R205).",
+       "provenance": "contract marketing-crm.yaml SegmentCriterion.attribute (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operator",
+       "bindsTo": "SegmentCriterion.operator",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml SegmentCriterion.operator (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Value",
+       "bindsTo": "SegmentCriterion.value",
+       "operation": "createSegment",
+       "notes": "Two values for between; a list for in and not in; none for exists.",
+       "provenance": "contract marketing-crm.yaml SegmentCriterion.value (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Group logic",
+       "bindsTo": "SegmentRuleGroup.operator",
+       "operation": "createSegment",
+       "notes": "AND, OR or NOT over the group's criteria and child groups; groups nest.",
+       "provenance": "contract marketing-crm.yaml SegmentRuleGroup.operator (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add rule",
+       "notes": "Adds a criterion row to the current group.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add group",
+       "notes": "Adds a nested SegmentRuleGroup.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Exclude segments",
+       "bindsTo": "CreateSegmentRequest.excludeSegmentIds",
+       "operation": "createSegment",
+       "notes": "Options from listSegments.",
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.excludeSegmentIds (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective from",
+       "bindsTo": "CreateSegmentRequest.effectiveFrom",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.effectiveFrom (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective to",
+       "bindsTo": "CreateSegmentRequest.effectiveTo",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.effectiveTo (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Needs approval before use",
+       "bindsTo": "CreateSegmentRequest.requiresApproval",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml CreateSegmentRequest.requiresApproval (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Matching guests",
+       "bindsTo": "SegmentDraftPreview.matchingCount",
+       "operation": "previewSegmentDraft",
+       "notes": "Recounted 1 s after the rules stop changing. Zero shows the rule that removed the most guests, not an empty preview.",
+       "provenance": "contract marketing-crm.yaml SegmentDraftPreview.matchingCount (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reachable",
+       "bindsTo": "SegmentDraftPreview.reachable",
+       "operation": "previewSegmentDraft",
+       "notes": "Per channel, after consent and suppression.",
+       "provenance": "contract marketing-crm.yaml SegmentDraftPreview.reachable (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save segment",
+       "operation": "createSegment",
+       "notes": "Saves the definition, not a list; owner is the signed-in user.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards the unsaved rules; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The dynamic segment list.",
-   "error": "Could not load. Names which read failed and leaves the dynamic segment untouched.",
-   "emptyFirstRun": "No dynamic segment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No segments yet. The builder is open on an empty rule.",
    "emptyNoResults": "The filter narrowed it and the dynamic segment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createSegment`."
   },
   "apis": [
    {
@@ -327,44 +432,18 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-755",
    "workshopBoard": "wireframes/WS72 Marketing CRM Configuration Reference v1.0 Board 3.dc.html#bo-755"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
      "name": "segmentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened with one, the builder starts from a copy of that segment's rules; saving creates a new segment (segments are definitions evaluated when used; there is no edit in place)."
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "formCreateSegment",
-    "component": "modal",
-    "trigger": "Create segment",
-    "body": "**Collects what `createSegment` sends before it is called.** Required: `name`, `criteria`. Optional: `description`, `venueId`, `match`, `excludeSegmentIds`, `ruleGroups`, `effectiveFrom`, `effectiveTo`, `ownerPrincipalId`, `requiresApproval`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create segment",
-     "operation": "createSegment"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "criteria",
-      "description",
-      "venueId",
-      "match",
-      "excludeSegmentIds",
-      "ruleGroups",
-      "effectiveFrom",
-      "effectiveTo",
-      "ownerPrincipalId",
-      "requiresApproval"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /segments"
-   }
-  ],
+  "notes": "**Defined 4 October 2026 from CreateSegmentRequest (criteria, nested ruleGroups, exclusions, effective dates, approval) and SegmentDraftPreview. The stale gaps are closed: the request carries rule groups, dates, owner and approval since CHG-CSA-045** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

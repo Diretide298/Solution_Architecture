@@ -175,6 +175,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDashboards": {
+  "method": "GET",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "List dashboards",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "includeArchived",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "Dashboard"
+ },
  "listFnbOrders": {
   "method": "GET",
   "path": "/fnb-orders",

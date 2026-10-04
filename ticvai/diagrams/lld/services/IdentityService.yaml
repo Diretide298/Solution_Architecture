@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 94 operations, 38 tables
+title: IdentityService — 94 operations, 39 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -17,7 +17,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 33
+  tables: 34
   stores:
   - postgres
   - redis
@@ -45,8 +45,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
-    writes: 3
+    reads: 7
+    writes: 5
   - operation: createAccessReviewCampaign
     verb: POST
     path: /access-review-campaigns
@@ -101,8 +101,8 @@ operationsByContract:
     scope: venue
     permission: ROLE_MANAGE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: decideAccessReviewItem
     verb: POST
     path: /access-review-items/{itemId}/decision
@@ -166,14 +166,14 @@ operationsByContract:
     permission: GUEST_VIEW_PII
     offline: false
     reads: 8
-    writes: 1
+    writes: 2
   - operation: forceLogout
     verb: POST
     path: /auth/sessions/{sessionId}/force-logout
     scope: venue
     permission: SESSION_FORCE_LOGOUT
     offline: false
-    reads: 2
+    reads: 6
     writes: 2
   - operation: getAuthorisationPolicy
     verb: GET
@@ -285,8 +285,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 4
+    writes: 3
   - operation: guestSocialLogin
     verb: POST
     path: /auth/guest/social
@@ -493,7 +493,7 @@ operationsByContract:
     scope: venue
     permission: ROLE_MANAGE
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listSegregationRules
     verb: GET
@@ -566,7 +566,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 5
+    writes: 6
   - operation: removeMfaMethod
     verb: DELETE
     path: /auth/mfa/methods/{methodId}
@@ -875,6 +875,46 @@ tables:
   - verifyGuestOtp
   - verifyMfaChallenge
   - verifyMfaEnrolment
+  keys:
+    createDelegatedAccess:
+      role: evicts
+      resolvers: &id001
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    createRole:
+      role: evicts
+      resolvers: &id002
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    decideAccessReviewItem:
+      role: evicts
+      resolvers: &id003
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    deleteDelegatedAccess:
+      role: evicts
+      resolvers: &id004
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    resolvePermissions:
+      role: fills
+      resolvers: &id005
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -895,10 +935,48 @@ tables:
   readBy:
   - getCurrentSession
   - resolvePermissions
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    createDelegatedAccess:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    createRole:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    decideAccessReviewItem:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    deleteDelegatedAccess:
+      role: evicts
+      resolvers: *id004
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    getCurrentSession:
+      role: fills
+      resolvers:
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    resolvePermissions:
+      role: fills
+      resolvers: *id005
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
 - table: identity.access_decision
   columns: 11
   store: postgres
@@ -927,7 +1005,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.authorisation_policy
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -974,10 +1052,15 @@ tables:
   writtenBy:
   - identity
   - orders
-  - public-api
   foreignWriters:
   - orders
-  - public-api
+- table: identity.guest_credential
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.guest_identity_verification
   columns: 13
   store: postgres
@@ -1099,6 +1182,7 @@ tables:
   store: postgres
   parent: identity.role
   writtenBy:
+  - identity
   - tenancy
   foreignWriters:
   - tenancy
@@ -1171,7 +1255,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: TenancyService
-  operations: 3
+  operations: 4
 - service: MarketingService
   operations: 2
 - service: OrderService
@@ -1182,7 +1266,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 11
+  operations: 12
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -1193,6 +1277,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: deleteGuestAccount
+    tables:
+    - platform.dsar_request
+  - operation: exportSubjectData
     tables:
     - platform.dsar_request
   - operation: guestPasswordLogin

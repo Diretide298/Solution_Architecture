@@ -1,6 +1,6 @@
 # WS187 — Wallet Configuration Backend Structure v1.0 board 2
 
-**10 screens · 7 operations · 8 schemas · 3 permissions**
+**10 screens · 8 operations · 9 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1093` | Funding Command Center | C | 28 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-1094` | Funding Method Configuration | A | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1094` | Funding Method Configuration | A | 38 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1095` | Top-Up Rule Configuration | C | 23 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-1096` | Channel & Funding Source Mapping | C | 20 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1097` | Auto-Reload Configuration | C | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |

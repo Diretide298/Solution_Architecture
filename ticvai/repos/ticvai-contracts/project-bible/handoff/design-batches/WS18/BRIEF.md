@@ -99,7 +99,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-339` | Governance & Compliance Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-340` | Segregation of Duties Policy Manager | B | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | B | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 28 | 6 | 11 | 2 | 0 | — | notStarted (—) |
+| `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 33 | 6 | 11 | 2 | 0 | — | notStarted (—) |
 | `ADM-343` | Sensitive Action Confirmation | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-344` | Digital Signature Management | B | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-345` | Immutable Approval Record & Tamper Detection | B | 0 | 18 | 6 | 0 | 0 | 3 | — | notStarted (—) |

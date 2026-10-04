@@ -1,6 +1,6 @@
 # P13-white-label-02 — P13 · White Label (2 of 3)
 
-**10 screens · 52 operations · 70 schemas · 11 permissions**
+**10 screens · 53 operations · 70 schemas · 11 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-013` | SEO & Metadata | A | 25 | 14 | 5 | 12 | 0 | 0 | configures | notStarted (generated) |
-| `CMS-011` | Translations | A | 4 | 27 | 5 | 10 | 2 | 0 | configures | notStarted (generated) |
+| `CMS-011` | Translations | A | 8 | 27 | 5 | 14 | 2 | 0 | configures | notStarted (generated) |
 | `CMS-012` | RTL Preview | A | 0 | 8 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `CMS-014` | Publishing Workflow | A | 9 | 27 | 5 | 1 | 2 | 6 | — | notStarted (generated) |
 | `CMS-015` | Version History | A | 0 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |

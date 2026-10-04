@@ -198,7 +198,10 @@ CREATE TABLE IF NOT EXISTS approvals.delegation (
     valid_to                          timestamptz NOT NULL,
     reason                            text,
     is_active                         boolean,
-    scope_path                        ltree NOT NULL
+    scope_path                        ltree NOT NULL,
+    delegation_type                   text,
+    max_percentage                    numeric(18,4),
+    required_role_id                  uuid
 );
 
 -- Who was asked, when, and why it moved up. The original approver stays in the record Hangs off:
@@ -279,7 +282,7 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
 -- off: a root — nothing above it in its schema; references identity.principal. Reached by: 34
--- operations read it and 24 write it; 51 tables reference it; written by 3 contracts — approvals,
+-- operations read it and 27 write it; 51 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -351,6 +354,16 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
     subject_types                     text[],
     signature_methods                 text[],
     external_provider_id              uuid,
+    code                              text CONSTRAINT rule_code_chk CHECK (char_length(code) <= 64),
+    minimum_approvals                 integer,
+    required_approver_role_id         uuid,
+    rejection_behavior                text CONSTRAINT rule_rejection_behavior_chk CHECK (rejection_behavior IN ('rejectRequest', 'returnToPreviousLevel', 'returnToRequester')),
+    allow_request_changes             boolean DEFAULT false,
+    allow_delegate                    boolean DEFAULT true,
+    allow_reassign                    boolean DEFAULT false,
+    min_percentage                    numeric(18,4),
+    match_attributes                  jsonb,
+    composite_mode                    text CONSTRAINT rule_composite_mode_chk CHECK (composite_mode IN ('single', 'sequential', 'parallel', 'anyOne', 'allMustApprove', 'conditional', 'multiLevel')),
     matrix_id                         uuid NOT NULL
 );
 

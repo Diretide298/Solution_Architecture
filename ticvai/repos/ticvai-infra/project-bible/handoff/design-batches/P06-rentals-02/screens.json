@@ -45,7 +45,7 @@
        ],
        "kind": "multiSelect",
        "label": "Filter by",
-       "notes": "The pack filters this screen by venue, location, product, customer, rental status, expected return and 2 more — which are present is a decision the pack already made.",
+       "notes": "Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status, expected return and 2 more — which are present is a decision the pack already made.",
        "provenance": "pack Rental_Management.pdf, page 78 §Filters"
       }
      ],
@@ -426,7 +426,7 @@
       {
        "kind": "selectField",
        "label": "Additional duration",
-       "notes": "+30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.",
+       "notes": "Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012). +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.",
        "operation": "getRentalAvailability",
        "provenance": "contract rental.yaml GET /rental-availability"
       },

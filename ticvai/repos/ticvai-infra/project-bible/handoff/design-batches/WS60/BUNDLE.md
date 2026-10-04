@@ -131,9 +131,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | C | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-344` | Media Design Studio Command Center | A | 30 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-345` | Digital QR & Barcode Ticket Designer | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 8 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-346` | PDF, Printable & POS Ticket Designer | A | 43 | 8 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-347` | Apple Wallet Pass Designer | C | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
 | `BO-348` | Google Wallet Pass Designer | C | 18 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
 | `BO-349` | RFID, NFC, Card & Wristband Media Designer | C | 20 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -156,8 +156,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task VM-BO-344 |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (2 configure, 2 read); in the flows as venue manager |
+| Block | Block A · task APP-SETUP-BO-344 |
+| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `ORDER_REPRINT`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (2 configure, 1 operate, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population |
 | Offline | online only |
@@ -183,6 +183,44 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Media type | select | — | Thermal ticket · A4 pdf · Wristband · RFID card · Wallet pass · QR only · SMS | `listTicketTemplates` ?mediaType |
 | Include inactive | toggle | off | — | `listTicketTemplates` ?includeInactive |
 
+**Form: New ticket template** (modal, opened by *New ticket template*; *Create ticket template* calls `createTicketTemplate`, *Cancel* sends nothing)
+
+**Collects what `createTicketTemplate` sends before it is called** (TicketTemplateRequest): name, mediaType, isRecyclable, recycleAfterDays, appliesToProductKinds, appliesToChannels, selectionPriority, layoutRef, localeVariants, isActive. `name` and `mediaType` are what a template cannot be saved without; `selectionPriority` with the product kinds, channels and media type decides which template a sale issues from. Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `createTicketTemplate` body |
+| Media type `mediaType` | select | optional | — | Thermal ticket · A4 pdf · Wristband · RFID card · Wallet pass · QR only · SMS | — | — | `createTicketTemplate` body |
+| Is recyclable `isRecyclable` | toggle | optional | — | — | — | — | `createTicketTemplate` body |
+| Recycle after days `recycleAfterDays` | number field (days) | optional | — | min 0 | — | — | `createTicketTemplate` body |
+| Applies to product kinds `appliesToProductKinds` | list of values (chips) | optional | — | — | — | — | `createTicketTemplate` body |
+| Applies to channels `appliesToChannels` | multi-select chips | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | — | `createTicketTemplate` body |
+| Selection priority `selectionPriority` | number field | optional | — | — | — | — | `createTicketTemplate` body |
+| Layout ref `layoutRef` | text field | optional | — | — | — | The artwork, as a media-asset reference. | `createTicketTemplate` body |
+| Locale variants `localeVariants` | key and value settings | optional | — | — | — | — | `createTicketTemplate` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `createTicketTemplate` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Another active template has the same priority for the same product kind, channel and media type (`duplicateSelectionPriority`). (TicketTemplateConflictProblem)
+
+**Form: Save ticket template** (modal, opened by *Save ticket template*; *Save ticket template* calls `updateTicketTemplate`, *Cancel* sends nothing)
+
+**Collects what `updateTicketTemplate` sends before it is called**, for the template selected: the same fields as a new template; `isActive` false retires it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateTicketTemplate` body |
+| Media type `mediaType` | select | optional | — | Thermal ticket · A4 pdf · Wristband · RFID card · Wallet pass · QR only · SMS | — | — | `updateTicketTemplate` body |
+| Is recyclable `isRecyclable` | toggle | optional | — | — | — | — | `updateTicketTemplate` body |
+| Recycle after days `recycleAfterDays` | number field (days) | optional | — | min 0 | — | — | `updateTicketTemplate` body |
+| Applies to product kinds `appliesToProductKinds` | list of values (chips) | optional | — | — | — | — | `updateTicketTemplate` body |
+| Applies to channels `appliesToChannels` | multi-select chips | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | — | `updateTicketTemplate` body |
+| Selection priority `selectionPriority` | number field | optional | — | — | — | — | `updateTicketTemplate` body |
+| Layout ref `layoutRef` | text field | optional | — | — | — | The artwork, as a media-asset reference. | `updateTicketTemplate` body |
+| Locale variants `localeVariants` | key and value settings | optional | — | — | — | — | `updateTicketTemplate` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `updateTicketTemplate` body |
+
+Errors to draw in the form: 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Another active template has the same priority for the same product kind, channel and media type (`duplicateSelectionPriority`). (TicketTemplateConflictProblem); 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
+
 **Sent by *Duplicate Existing*** (`cloneTicketTemplate`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -199,6 +237,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Format `format` | text field | required | — | max length 30 | — | The definition format of the file. One the service does not read is a 422. | `importTicketTemplate` body |
 | File ref `fileRef` | picker: choose a file ref | required | — | — | shows names, sends the id | The uploaded definition file. | `importTicketTemplate` body |
 | Name `name` | text field | required | — | max length 120 | — | — | `importTicketTemplate` body |
+
+**Sent by *Print a proof*** (`printTicketProof`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Sample product `sampleProductId` | picker: choose a sample product | optional | — | — | shows names, sends the id | — | `printTicketProof` body |
+| Locale `locale` | text field | optional | — | — | — | — | `printTicketProof` body |
 
 **Sent by *Archive media template*** (`archiveMediaTemplate`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -270,6 +315,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Use Venue Template (secondary button) | navigation or local | — | — | — | — |
 | Use Product Template (secondary button) | navigation or local | — | — | — | — |
 | Import supported template definition (secondary button) | `importTicketTemplate` POST `/ticket-templates/imports` | TicketTemplateImportInput | TicketTemplate | 422 The format is not one the service reads (`unsupported-template-format`), or the file does not parse as that format (`template-definition-invalid`). | produces a document or message: Import a ticket template definition |
+| New ticket template (secondary button) | `createTicketTemplate` POST `/ticket-templates` | TicketTemplateRequest | TicketTemplate | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Another active template has the same priority for the same product kind, channel and media type (`duplicateSelectionPriority`). … | opens modal first; produces a document or message: Create a ticket template |
+| Save ticket template (secondary button) | `updateTicketTemplate` PATCH `/ticket-templates/{templateId}` | TicketTemplateRequest | TicketTemplate | 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Another active template has the same priority for … | opens modal first; produces a document or message: Change or retire a ticket template |
+| Print a proof (secondary button) | `printTicketProof` POST `/ticket-templates/{templateId}/proof` | inline | TicketProof | — | produces a document or message: Print a sample without selling anything |
 | Archive media template (destructive button) | `archiveMediaTemplate` POST `/media-templates/{templateId}/archive` | inline | AccessMediaTemplate | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `ACCESS_POINT_CONFIGURE` |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -305,7 +353,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the media design are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 `template-in-flight`: the template is awaiting approval or scheduled.; 422 The format is not one the service reads (`unsupported-template-format`), or the file does not parse as that format (`template-definition-invalid`).; 422 `venueTemplate` with no `venueId`, or `productTemplate` with no `productId` (`clone-source-incomplete`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Another active template has the same priority for the same product kind, channel and media type (`duplicateSelectionPriority`). (TicketTemplateConflictProblem); 409 `template-in-flight`: the template is awaiting approval or scheduled.; 422 The format is not one the service reads (`unsupported-template-format`), or the file does not parse as that format … |
 
 #### Consistency with other screens
 
@@ -329,6 +377,9 @@ templates:
 - `listTicketTemplates` → `PRODUCT_VIEW` (read) · staff
 - `cloneTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
 - `importTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
+- `createTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
+- `updateTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
+- `printTicketProof` → `ORDER_REPRINT` (operate) · staff
 - `archiveMediaTemplate` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -368,12 +419,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every input above is drawn (30), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-344?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Duplicate Existing, Use Venue Template, Use Product Template, Import supported template definition, Archive media template.
+- [ ] Every action is wired with its success and its failure: Duplicate Existing, Use Venue Template, Use Product Template, Import supported template definition, New ticket template, Save ticket template, Print a proof, Archive media template.
 - [ ] Every transition is wired: `BO-100`, `BO-345`, `BO-347`, `BO-348`, `BO-349`, `BO-350`, `BO-351`, `BO-352`, `BO-353`, `BO-346`.
-- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`.
+- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `ORDER_REPRINT`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -547,12 +598,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
 | Block | Block A · task APP-SETUP-BO-346 |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `ORDER_REPRINT`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 operate, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `templateId` (navigation) |
 | Route | `/access-venue/pdf-printable-pos-ticket-designer-bo-346` |
+
+**What the spec says about it.** **Bound 4 October 2026 to PdfPrintablePosTicketDesignerInput: one design per ticket template, keyed by templateId (the orders ticket template from listTicketTemplates); getPdfPrintablePos reads it by templateId (query parameter agreed in the ledger); the output is the outputFormat enum, not two buttons; free-text properties are text inputs** (CHG-FXS-002) **Template model reconciled 4 October 2026 (contracts, ledger): the design belongs to an access media template (access.media_template.id, the row BO-344 opens), read and saved with get/setPdfPrintablePos; the orders ticket-template operations (list, create, update, proof) are another model and left this screen** (CHG-FXS-002) **First-run state names Save design, the screen's own write** (CHG-FXS-002)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The venue's ticket templates: thermal ticket, A4 PDF, wristband, RFID card, wallet pass, QR only, SMS, each with its artwork, dynamic fields and which sales it is selected for. Selection is automatic by priority, media type, product kind and channel, so the screen must show which template a given sale would use.
 
@@ -566,33 +619,60 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Orientation | select field | — | — | — | — | — | — |
-| Margins | select field | — | — | — | — | — | — |
-| Header | select field | — | — | — | — | — | — |
-| Footer | select field | — | — | — | — | — | — |
-| Background | select field | — | — | — | — | — | — |
-| Logo | select field | — | — | — | — | — | — |
-| Images | select field | — | — | — | — | — | — |
-| Text | select field | — | — | — | — | — | — |
-| Dynamic fields | select field | — | — | — | — | — | — |
-| QR/barcode | select field | — | — | — | — | — | — |
-| Terms | select field | — | — | — | — | — | — |
-| Perforation indicators where applicable | text field | — | — | — | — | — | — |
-| Print-safe zones | select field | — | — | — | — | — | — |
-| Printer profile | select field | — | — | — | — | — | — |
-| DPI | select field | — | — | — | — | — | — |
-| Paper/stock type | select field | — | — | — | — | — | — |
-| Thermal layout | select field | — | — | — | — | — | — |
-| Cut behavior | select field | — | — | — | — | — | — |
-| Print margins | select field | — | — | — | — | — | — |
-| Supported printer integration | select field | — | — | — | — | — | — |
+| Orientation | text field | optional | — | — | — | Orientation | `PdfPrintablePosTicketDesignerInput.orientation` |
+| Margins | text field | optional | — | — | — | Margins | `PdfPrintablePosTicketDesignerInput.margins` |
+| Header | text field | optional | — | — | — | Header | `PdfPrintablePosTicketDesignerInput.header` |
+| Footer | text field | optional | — | — | — | Footer | `PdfPrintablePosTicketDesignerInput.footer` |
+| Background | text field | optional | — | — | — | Background | `PdfPrintablePosTicketDesignerInput.background` |
+| Logo | text field | optional | — | — | — | Logo | `PdfPrintablePosTicketDesignerInput.logo` |
+| Images | list of values (chips) | optional | — | — | — | Images | `PdfPrintablePosTicketDesignerInput.images` |
+| Text | text area | optional | — | — | — | Text | `PdfPrintablePosTicketDesignerInput.text` |
+| Dynamic fields | list of values (chips) | optional | — | — | — | Field keys from the dynamic-field library | `PdfPrintablePosTicketDesignerInput.dynamicFields` |
+| QR/barcode | text field | optional | — | — | — | QR/barcode | `PdfPrintablePosTicketDesignerInput.qrBarcode` |
+| Terms | text field | optional | — | — | — | Terms | `PdfPrintablePosTicketDesignerInput.terms` |
+| Perforation indicators where applicable | text field | optional | — | — | — | Perforation indicators where applicable | `PdfPrintablePosTicketDesignerInput.perforationIndicatorsWhereApplicable` |
+| Print-safe zones | text field | optional | — | — | — | Print-safe zones | `PdfPrintablePosTicketDesignerInput.printSafeZones` |
+| Printer profile | text field | optional | — | — | — | Printer profile | `PdfPrintablePosTicketDesignerInput.printerProfile` |
+| DPI | number field | optional | — | — | — | DPI | `PdfPrintablePosTicketDesignerInput.dpi` |
+| Paper/stock type | text field | optional | — | — | — | Paper/stock type | `PdfPrintablePosTicketDesignerInput.paperStockType` |
+| Thermal layout | text field | optional | — | — | — | Thermal layout | `PdfPrintablePosTicketDesignerInput.thermalLayout` |
+| Cut behavior | text field | optional | — | — | — | Cut behavior | `PdfPrintablePosTicketDesignerInput.cutBehavior` |
+| Supported printer integration | text field | optional | — | — | — | Supported printer integration | `PdfPrintablePosTicketDesignerInput.supportedPrinterIntegration` |
+| Output | select | optional | — | Pdf · A4 · A5 · Custom dimensions · POS receipt · Thermal ticket · Box office stock · Pre printed stock | — | PDF, A4, A5, custom, POS receipt, thermal ticket, box office stock, pre-printed stock. | `PdfPrintablePosTicketDesignerInput.outputFormat` |
+| Page size | text field | optional | — | — | — | Page size | `PdfPrintablePosTicketDesignerInput.pageSize` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Media type | select | — | Thermal ticket · A4 pdf · Wristband · RFID card · Wallet pass · QR only · SMS | `listTicketTemplates` ?mediaType |
-| Include inactive | toggle | off | — | `listTicketTemplates` ?includeInactive |
+| Template | picker: choose a template | — | — | `getPdfPrintablePos` ?templateId |
+
+**Sent by *Save design*** (`setPdfPrintablePos`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Template `templateId` | text field | required | — | — | — | Media template being designed | `setPdfPrintablePos` body |
+| Output format `outputFormat` | select | required | — | Pdf · A4 · A5 · Custom dimensions · POS receipt · Thermal ticket · Box office stock · Pre printed stock | — | Print output this template produces | `setPdfPrintablePos` body |
+| Page size `pageSize` | text field | optional | — | — | — | Page size | `setPdfPrintablePos` body |
+| Orientation `orientation` | text field | optional | — | — | — | Orientation | `setPdfPrintablePos` body |
+| Margins `margins` | text field | optional | — | — | — | Margins | `setPdfPrintablePos` body |
+| Header `header` | text field | optional | — | — | — | Header | `setPdfPrintablePos` body |
+| Footer `footer` | text field | optional | — | — | — | Footer | `setPdfPrintablePos` body |
+| Background `background` | text field | optional | — | — | — | Background | `setPdfPrintablePos` body |
+| Logo `logo` | text field | optional | — | — | — | Logo | `setPdfPrintablePos` body |
+| Images `images` | list of values (chips) | optional | — | — | — | Images | `setPdfPrintablePos` body |
+| Text `text` | text area | optional | — | — | — | Text | `setPdfPrintablePos` body |
+| Dynamic fields `dynamicFields` | list of values (chips) | optional | — | — | — | Field keys from the dynamic-field library | `setPdfPrintablePos` body |
+| QR barcode `qrBarcode` | text field | optional | — | — | — | QR/barcode | `setPdfPrintablePos` body |
+| Terms `terms` | text field | optional | — | — | — | Terms | `setPdfPrintablePos` body |
+| Perforation indicators where applicable `perforationIndicatorsWhereApplicable` | text field | optional | — | — | — | Perforation indicators where applicable | `setPdfPrintablePos` body |
+| Print safe zones `printSafeZones` | text field | optional | — | — | — | Print-safe zones | `setPdfPrintablePos` body |
+| Printer profile `printerProfile` | text field | optional | — | — | — | Printer profile | `setPdfPrintablePos` body |
+| Dpi `dpi` | number field | optional | — | — | — | DPI | `setPdfPrintablePos` body |
+| Paper stock type `paperStockType` | text field | optional | — | — | — | Paper/stock type | `setPdfPrintablePos` body |
+| Thermal layout `thermalLayout` | text field | optional | — | — | — | Thermal layout | `setPdfPrintablePos` body |
+| Cut behavior `cutBehavior` | text field | optional | — | — | — | Cut behavior | `setPdfPrintablePos` body |
+| Supported printer integration `supportedPrinterIntegration` | text field | optional | — | — | — | Supported printer integration | `setPdfPrintablePos` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -621,15 +701,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| POS receipt (primary button) | navigation or local | — | — | — | — |
-| Thermal ticket (secondary button) | navigation or local | — | — | — | — |
+| Save design (primary button) | `setPdfPrintablePos` PUT `/pdf-printable-pos` | PdfPrintablePosTicketDesignerInput | PdfPrintablePosTicketDesignerView | — | produces a document or message: PDF, Printable & POS Ticket Designer |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **Print proof**: Produces a sample clearly marked PROOF on the artefact itself, so it can never be presented at a gate. *(source: contracts/spine/orders.yaml#printTicketProof)*
 - **Retire template**: Sets it inactive rather than deleting; tickets already issued keep it. *(source: contracts/spine/orders.yaml#updateTicketTemplate)*
 
-**Data it reads**: `listTicketTemplates` (onLoad, The templates this venue issues from); `getPdfPrintablePos` (onLoad, Load the design as saved)
+**Data it reads**: `getPdfPrintablePos` (onLoad, Load the design of the media template being edited (query …)
 
 **Where the user goes next**
 
@@ -641,10 +720,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The pdf printable pos configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pdf printable pos untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No pdf printable pos configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, first run (`?state=emptyFirstRun`) | No design saved for this media template yet: the designer opens on the defaults; Save design creates it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Another active template has the same priority for the same product kind, channel and media type (`duplicateSelectionPriority`). (TicketTemplateConflictProblem) |
 
 #### Sample data for the mock-up
 
@@ -671,14 +749,10 @@ templates:
 
 #### Permissions
 
-- `listTicketTemplates` → `PRODUCT_VIEW` (read) · staff
-- `createTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
-- `updateTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
-- `printTicketProof` → `ORDER_REPRINT` (operate) · staff
 - `setPdfPrintablePos` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `getPdfPrintablePos` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -706,12 +780,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (400, 403, 404, 409, 412).
+- [ ] Every input above is drawn (43), with its required mark, default, format and its error state (403, 404).
 - [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-346?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: POS receipt, Thermal ticket.
+- [ ] Every action is wired with its success and its failure: Save design.
 - [ ] Every transition is wired: `BO-344`.
-- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `ORDER_REPRINT`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1998,7 +2072,7 @@ Method, path, parameters, request and response for every operation these screens
 "archiveMediaTemplate": {"method":"POST","path":"/media-templates/{templateId}/archive","contract":"access","summary":"Archive a media template","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccessMediaTemplate"},
 "cloneTicketTemplate": {"method":"POST","path":"/ticket-templates/{templateId}/clone","contract":"orders","summary":"Create a ticket template from an existing one","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloneTicketTemplateInput","responds":"TicketTemplate"},
 "createTicketTemplate": {"method":"POST","path":"/ticket-templates","contract":"orders","summary":"Create a ticket template","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateRequest","responds":"TicketTemplate"},
-"getPdfPrintablePos": {"method":"GET","path":"/pdf-printable-pos","contract":"access","summary":"The printable ticket design as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PdfPrintablePosTicketDesignerView"},
+"getPdfPrintablePos": {"method":"GET","path":"/pdf-printable-pos","contract":"access","summary":"The printable ticket design as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"templateId","in":"query","required":false}],"requestBody":null,"responds":"PdfPrintablePosTicketDesignerView"},
 "importTicketTemplate": {"method":"POST","path":"/ticket-templates/imports","contract":"orders","summary":"Import a ticket template definition","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateImportInput","responds":"TicketTemplate"},
 "listBrandingLocalizationTemplate": {"method":"GET","path":"/branding-localization-template","contract":"access","summary":"Branding, Localization & Template Inheritance","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BrandingLocalizationTemplateInheritanceView"},
 "listMediaDesign": {"method":"GET","path":"/media-design","contract":"access","summary":"Media Design Studio Command Center","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mediaType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"brand","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2041,7 +2115,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MultiMediaPreviewTestingApprovalPublicationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Multi-Media Preview, Testing, Approval & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"publishMode":{"type":"string","enum":["publishNow","schedule"],"description":"Publish now or on a schedule"},"templateId":{"type":"string","description":"Media template being published"},"validationChecks":{"type":"array","items":{"type":"string","enum":["dynamicFields","missingFields","qrReadability","barcodeReadability","walletConfiguration","printBoundaries","localization","rtl","branding","imageResolution","credentialPayload","virtualTicketResolution","providerConfiguration"]},"description":"Pre-publication checks run"},"previewTargets":{"type":"array","items":{"type":"string","enum":["desktop","mobile","tablet","printer","pos","wallet","encoder"]},"description":"Targets previewed"},"selectedBrands":{"type":"array","items":{"type":"string"},"description":"Selected Brands"},"selectedVenues":{"type":"array","items":{"type":"string"},"description":"Selected Venues"},"selectedProducts":{"type":"array","items":{"type":"string"},"description":"Selected Products"},"selectedChannels":{"type":"array","items":{"type":"string"},"description":"Selected Channels"},"controlledRollout":{"type":"boolean","description":"Controlled rollout"},"templateVersion":{"type":"string","description":"Version created by this publication"},"scheduledAt":{"type":"string","format":"date-time","description":"Publication time when scheduled"}},"required":["templateId","publishMode"]},
 "MultiMediaPreviewTestingApprovalPublicationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Multi-Media Preview, Testing, Approval & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"publishMode":{"type":"string","enum":["publishNow","schedule"],"description":"Publish now or on a schedule"},"templateId":{"type":"string","description":"Media template being published"},"validationChecks":{"type":"array","items":{"type":"string","enum":["dynamicFields","missingFields","qrReadability","barcodeReadability","walletConfiguration","printBoundaries","localization","rtl","branding","imageResolution","credentialPayload","virtualTicketResolution","providerConfiguration"]},"description":"Pre-publication checks run"},"previewTargets":{"type":"array","items":{"type":"string","enum":["desktop","mobile","tablet","printer","pos","wallet","encoder"]},"description":"Targets previewed"},"selectedBrands":{"type":"array","items":{"type":"string"},"description":"Selected Brands"},"selectedVenues":{"type":"array","items":{"type":"string"},"description":"Selected Venues"},"selectedProducts":{"type":"array","items":{"type":"string"},"description":"Selected Products"},"selectedChannels":{"type":"array","items":{"type":"string"},"description":"Selected Channels"},"controlledRollout":{"type":"boolean","description":"Controlled rollout"},"templateVersion":{"type":"string","description":"Version created by this publication"},"scheduledAt":{"type":"string","format":"date-time","description":"Publication time when scheduled"}},"required":["templateId","publishMode"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"PdfPrintablePosTicketDesignerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What PDF, Printable & POS Ticket Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"outputFormat":{"type":"string","enum":["pdf","a4","a5","customDimensions","posReceipt","thermalTicket","boxOfficeStock","prePrintedStock"],"description":"Print output this template produces"},"pageSize":{"type":"string","description":"Page size"},"orientation":{"type":"string","description":"Orientation"},"margins":{"type":"string","description":"Margins"},"header":{"type":"string","description":"Header"},"footer":{"type":"string","description":"Footer"},"background":{"type":"string","description":"Background"},"logo":{"type":"string","description":"Logo"},"images":{"type":"array","items":{"type":"string"},"description":"Images"},"text":{"type":"string","description":"Text"},"dynamicFields":{"type":"array","items":{"type":"string"},"description":"Field keys from the dynamic-field library"},"qrBarcode":{"type":"string","description":"QR/barcode"},"terms":{"type":"string","description":"Terms"},"perforationIndicatorsWhereApplicable":{"type":"string","description":"Perforation indicators where applicable"},"printSafeZones":{"type":"string","description":"Print-safe zones"},"printerProfile":{"type":"string","description":"Printer profile"},"dpi":{"type":"integer","description":"DPI"},"paperStockType":{"type":"string","description":"Paper/stock type"},"thermalLayout":{"type":"string","description":"Thermal layout"},"cutBehavior":{"type":"string","description":"Cut behavior"},"supportedPrinterIntegration":{"type":"string","description":"Supported printer integration"}},"required":["templateId","outputFormat"]},
+"PdfPrintablePosTicketDesignerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; the whole body is stored as the design document (access.media_template.design, jsonb) of the template named by templateId, designer pdfPrintablePos (CHG-FXC-005)","description":"**What PDF, Printable & POS Ticket Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"outputFormat":{"type":"string","enum":["pdf","a4","a5","customDimensions","posReceipt","thermalTicket","boxOfficeStock","prePrintedStock"],"description":"Print output this template produces"},"pageSize":{"type":"string","description":"Page size"},"orientation":{"type":"string","description":"Orientation"},"margins":{"type":"string","description":"Margins"},"header":{"type":"string","description":"Header"},"footer":{"type":"string","description":"Footer"},"background":{"type":"string","description":"Background"},"logo":{"type":"string","description":"Logo"},"images":{"type":"array","items":{"type":"string"},"description":"Images"},"text":{"type":"string","description":"Text"},"dynamicFields":{"type":"array","items":{"type":"string"},"description":"Field keys from the dynamic-field library"},"qrBarcode":{"type":"string","description":"QR/barcode"},"terms":{"type":"string","description":"Terms"},"perforationIndicatorsWhereApplicable":{"type":"string","description":"Perforation indicators where applicable"},"printSafeZones":{"type":"string","description":"Print-safe zones"},"printerProfile":{"type":"string","description":"Printer profile"},"dpi":{"type":"integer","description":"DPI"},"paperStockType":{"type":"string","description":"Paper/stock type"},"thermalLayout":{"type":"string","description":"Thermal layout"},"cutBehavior":{"type":"string","description":"Cut behavior"},"supportedPrinterIntegration":{"type":"string","description":"Supported printer integration"}},"required":["templateId","outputFormat"]},
 "PdfPrintablePosTicketDesignerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What PDF, Printable & POS Ticket Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"outputFormat":{"type":"string","enum":["pdf","a4","a5","customDimensions","posReceipt","thermalTicket","boxOfficeStock","prePrintedStock"],"description":"Print output this template produces"},"pageSize":{"type":"string","description":"Page size"},"orientation":{"type":"string","description":"Orientation"},"margins":{"type":"string","description":"Margins"},"header":{"type":"string","description":"Header"},"footer":{"type":"string","description":"Footer"},"background":{"type":"string","description":"Background"},"logo":{"type":"string","description":"Logo"},"images":{"type":"array","items":{"type":"string"},"description":"Images"},"text":{"type":"string","description":"Text"},"dynamicFields":{"type":"array","items":{"type":"string"},"description":"Field keys from the dynamic-field library"},"qrBarcode":{"type":"string","description":"QR/barcode"},"terms":{"type":"string","description":"Terms"},"perforationIndicatorsWhereApplicable":{"type":"string","description":"Perforation indicators where applicable"},"printSafeZones":{"type":"string","description":"Print-safe zones"},"printerProfile":{"type":"string","description":"Printer profile"},"dpi":{"type":"integer","description":"DPI"},"paperStockType":{"type":"string","description":"Paper/stock type"},"thermalLayout":{"type":"string","description":"Thermal layout"},"cutBehavior":{"type":"string","description":"Cut behavior"},"supportedPrinterIntegration":{"type":"string","description":"Supported printer integration"}},"required":["templateId","outputFormat"]},
 "RfidNfcCardWristbandMediaDesignerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"mediaKind":{"type":"string","enum":["rfidCard","rfidWristband","nfcCard","nfcWristband","membershipCard","staffGuestCard","customWearable"],"description":"Physical medium"},"reusability":{"type":"string","enum":["disposable","reusable"],"description":"Disposable or reusable medium"},"printed":{"type":"boolean","description":"Printed"},"encoded":{"type":"boolean","description":"Encoded"},"colorCategory":{"type":"string","description":"Color/category"},"sizeWhereApplicable":{"type":"string","description":"Size where applicable"},"activationAtCollection":{"type":"boolean","description":"Activation at collection"},"depositReferenceWhereApplicable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Deposit/reference where applicable"},"mediaDimensions":{"type":"string","description":"Media dimensions"},"front":{"type":"string","description":"Front"},"back":{"type":"string","description":"Back"},"printableArea":{"type":"string","description":"Printable area"},"logo":{"type":"string","description":"Logo"},"printedFields":{"type":"array","items":{"type":"string","enum":["customerName","photo","membershipTier","expiry","serialNumber","qrBarcode"]},"description":"Personal and reference fields printed on the medium"},"customArtwork":{"type":"string","description":"Custom artwork"},"sponsorVenueBranding":{"type":"string","description":"Sponsor/venue branding"},"rfidNfcTechnology":{"type":"string","description":"RFID/NFC technology"},"chipProfile":{"type":"string","description":"Chip/profile"},"uidReferenceHandling":{"type":"string","description":"UID/reference handling"},"encodingProfile":{"type":"string","description":"Encoding profile"},"provider":{"type":"string","description":"Provider"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"Reader compatibility"},"printerEncoderIntegration":{"type":"string","description":"Printer/encoder integration"}},"required":["templateId","mediaKind"]},
 "RfidNfcCardWristbandMediaDesignerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What RFID, NFC, Card & Wristband Media Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"mediaKind":{"type":"string","enum":["rfidCard","rfidWristband","nfcCard","nfcWristband","membershipCard","staffGuestCard","customWearable"],"description":"Physical medium"},"reusability":{"type":"string","enum":["disposable","reusable"],"description":"Disposable or reusable medium"},"printed":{"type":"boolean","description":"Printed"},"encoded":{"type":"boolean","description":"Encoded"},"colorCategory":{"type":"string","description":"Color/category"},"sizeWhereApplicable":{"type":"string","description":"Size where applicable"},"activationAtCollection":{"type":"boolean","description":"Activation at collection"},"depositReferenceWhereApplicable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Deposit/reference where applicable"},"mediaDimensions":{"type":"string","description":"Media dimensions"},"front":{"type":"string","description":"Front"},"back":{"type":"string","description":"Back"},"printableArea":{"type":"string","description":"Printable area"},"logo":{"type":"string","description":"Logo"},"printedFields":{"type":"array","items":{"type":"string","enum":["customerName","photo","membershipTier","expiry","serialNumber","qrBarcode"]},"description":"Personal and reference fields printed on the medium"},"customArtwork":{"type":"string","description":"Custom artwork"},"sponsorVenueBranding":{"type":"string","description":"Sponsor/venue branding"},"rfidNfcTechnology":{"type":"string","description":"RFID/NFC technology"},"chipProfile":{"type":"string","description":"Chip/profile"},"uidReferenceHandling":{"type":"string","description":"UID/reference handling"},"encodingProfile":{"type":"string","description":"Encoding profile"},"provider":{"type":"string","description":"Provider"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"Reader compatibility"},"printerEncoderIntegration":{"type":"string","description":"Printer/encoder integration"}},"required":["templateId","mediaKind"]},

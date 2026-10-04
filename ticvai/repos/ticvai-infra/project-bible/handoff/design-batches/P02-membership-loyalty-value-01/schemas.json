@@ -741,6 +741,19 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**The card's own id** (4 October 2026, CHG-FXC-006): the `{cardId}` of `setGameCardLifecycle`, which had no column to match, and the `id` of the Wallet view `wallet.loadGameCredits` and `wallet.adjustGameCard` return for a card with no wallet."
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Where the card's credits are held** (4 October 2026, CHG-FXC-006). Set when the card is registered to a guest who has a wallet: credits loaded to it are wallet credit lots. Null for an anonymous card, whose credits are held on the card row itself (`credits`, `bonusCredits`)."
    }
   }
  },
@@ -1397,6 +1410,59 @@
    }
   }
  },
+ "PaymentToken": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.token",
+  "description": "BL-116. **A stored credential, held by the provider and referenced here.** The platform never sees a card number, which is what keeps PCI scope where it belongs.\n**A token is provider-scoped.** A card tokenised with one gateway does not work with another, so a routing change does not silently move a guest's saved card — it means asking them again, and the model should make that visible rather than surprising.\n",
+  "required": [
+   "id",
+   "subjectId",
+   "providerId",
+   "token",
+   "isDefault"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**Write-only, never returned.** The provider's reference to a credential it holds. Required on the stored row; absent from every response.\n"
+   },
+   "method": {
+    "type": "string"
+   },
+   "maskedIdentifier": {
+    "type": "string",
+    "description": "What a guest sees — the last four digits, the card brand. **Enough to choose between two saved cards and not enough to use one.**\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isDefault": {
+    "type": "boolean"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Storing a card for future use is a purpose a guest consents to**, separate from the payment they are making now. A token taken without it is a card kept on a guest's behalf that they never agreed to.\n"
+   }
+  }
+ },
  "Product": {
   "x-ticvai-persistence": "catalogue.product",
   "type": "object",
@@ -1643,6 +1709,12 @@
     "type": "string",
     "maxLength": 100,
     "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    }
   }
  },

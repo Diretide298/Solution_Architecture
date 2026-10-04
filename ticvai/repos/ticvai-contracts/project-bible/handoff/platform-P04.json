@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 32,
-  "operations": 152,
+  "operations": 157,
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
@@ -57,7 +57,7 @@
   },
   {
    "contract": "fnb",
-   "operations": 24
+   "operations": 26
   },
   {
    "contract": "shift",
@@ -77,10 +77,14 @@
   },
   {
    "contract": "tenancy",
-   "operations": 6
+   "operations": 7
   },
   {
    "contract": "promotions",
+   "operations": 5
+  },
+  {
+   "contract": "finance",
    "operations": 5
   },
   {
@@ -92,23 +96,15 @@
    "operations": 5
   },
   {
+   "contract": "approvals",
+   "operations": 4
+  },
+  {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "finance",
-   "operations": 4
-  },
-  {
-   "contract": "approvals",
-   "operations": 3
-  },
-  {
    "contract": "access",
-   "operations": 2
-  },
-  {
-   "contract": "workforce",
    "operations": 2
   },
   {
@@ -116,15 +112,19 @@
    "operations": 2
   },
   {
+   "contract": "workforce",
+   "operations": 2
+  },
+  {
+   "contract": "games",
+   "operations": 1
+  },
+  {
    "contract": "inventory",
    "operations": 1
   },
   {
    "contract": "assets",
-   "operations": 1
-  },
-  {
-   "contract": "games",
    "operations": 1
   }
  ],
@@ -161,7 +161,7 @@
    "name": "Sell \u2014 Timed Entry",
    "module": "Sell",
    "wave": 1,
-   "route": "/sell/sell-timed-entry",
+   "route": "/sell/sell-ticket-catalogue/timedentry",
    "operations": 8,
    "drawn": true
   },
@@ -170,7 +170,7 @@
    "name": "Sell \u2014 Seat Map",
    "module": "Sell",
    "wave": 1,
-   "route": "/sell/sell-seat-map",
+   "route": "/sell/sell-ticket-catalogue/seatmap",
    "operations": 7,
    "drawn": true
   },
@@ -198,7 +198,7 @@
    "module": "Shift",
    "wave": 1,
    "route": "/shift/close-shift",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -315,7 +315,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/shift-exceptions-alerts",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -324,7 +324,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell---food-and-drink",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -342,7 +342,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell---merchandise",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -351,7 +351,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/outlet-setup",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -360,7 +360,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/home",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -369,7 +369,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/receipt",
-   "operations": 6,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -396,7 +396,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/queue",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -575,6 +575,12 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Seat-level dynamic pricing rules"
+   },
+   {
+    "operation": "listTaxProfiles",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The tax profiles"
    },
    {
     "operation": "relinquishInventoryHold",
@@ -781,12 +787,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
-   },
-   {
     "operation": "listSegregationRules",
     "contract": "identity",
     "verb": "GET",
@@ -839,6 +839,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -1235,12 +1241,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
    },
    {
     "operation": "listCellEndpoints",

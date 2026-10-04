@@ -1,6 +1,6 @@
 # WS76 — Digital Asset Management DAM board 3
 
-**10 screens · 10 operations · 14 schemas · 6 permissions**
+**10 screens · 11 operations · 16 schemas · 7 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW, ROLE_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-083` | Rights, License & Usage Policy Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-084` | Asset Approval Workflow Management | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `CMS-085` | Publication Eligibility & Governance Validation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-086` | Role-Based Asset Access & Permission Management | B | 19 | 20 | 6 | 3 | 1 | 5 | — | notStarted (—) |
+| `CMS-086` | Role-Based Asset Access & Permission Management | B | 24 | 5 | 6 | 6 | 1 | 5 | — | notStarted (—) |
 | `CMS-087` | Secure Internal & External Sharing | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-088` | Rights Expiry, Renewal & Usage Impact | B | 0 | 8 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-089` | Governance Audit Trail & Compliance Evidence | B | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**CMS-082, CMS-083, CMS-085, CMS-086, CMS-089, CMS-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-082, CMS-083, CMS-085, CMS-089, CMS-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

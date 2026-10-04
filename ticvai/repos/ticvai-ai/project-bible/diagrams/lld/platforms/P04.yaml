@@ -33,15 +33,15 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 91
+  operationCalls: 94
 - service: FnbService
-  operationCalls: 27
+  operationCalls: 31
 - service: CatalogueService
   operationCalls: 26
 - service: RetailService
-  operationCalls: 19
+  operationCalls: 18
 - service: TenancyService
-  operationCalls: 15
+  operationCalls: 17
 - service: IdentityService
   operationCalls: 9
 - service: MarketingService
@@ -49,7 +49,7 @@ servicesCalled:
 - service: ReportingService
   operationCalls: 7
 - service: LedgerService
-  operationCalls: 6
+  operationCalls: 7
 - service: VenueOpsService
   operationCalls: 2
 - service: WalletService
@@ -411,6 +411,7 @@ screens:
   - getShiftCountLines
   - listCashMovements
   - listDenominations
+  - listShifts
   - rejectShiftVariance
   - submitShiftCount
   states:
@@ -819,6 +820,7 @@ screens:
   - createApprovalRequest
   - decideApprovalRequest
   - listAlerts
+  - listApprovalRequests
   - recordNoSale
   - runReport
   states:
@@ -852,6 +854,7 @@ screens:
   - addCartLine
   - evaluatePromotions
   - getGuestMenu
+  - getOutlet
   - setItemAvailability
   states:
   - denied
@@ -917,7 +920,6 @@ screens:
   density: touchLarge
   operations:
   - addCartLine
-  - createRetailSale
   - evaluatePromotions
   - lookupMerchandise
   states:
@@ -949,6 +951,7 @@ screens:
   operations:
   - getGuestMenu
   - getTableMap
+  - listTableCombinations
   - setItemAvailability
   - setTableCombinations
   - setTableLayout
@@ -981,6 +984,7 @@ screens:
   - listAlerts
   - listDevices
   - listSaleBoards
+  - listShifts
   - reopenShift
   - suspendShift
   states:
@@ -1021,9 +1025,11 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - getOrder
   - getTaxDocumentRendition
   - getTaxInvoice
   - issueTaxInvoice
+  - listTaxInvoices
   - reissueEntitlement
   - reprintOrder
   - reprintReceipt
@@ -1122,7 +1128,10 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - acceptFnbOrder
   - listFnbOrders
+  - recordOrderHandover
+  - setKitchenTicketStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1133,6 +1142,8 @@ screens:
   entryParams:
   - workstationId<-session
   - outletId<-session
+  - orderId<-navigation
+  - ticketId<-navigation
   goesTo:
   - POS-022
   - POS-025

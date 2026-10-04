@@ -40,7 +40,7 @@
     }
    ]
   },
-  "notes": "CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.",
+  "notes": "CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.\n\n**The reference content is the published OpenAPI document of the selected version, a static file built from the release's public contract and served with the portal (`/reference/{version}/openapi.json`); listApiVersions picks the version and listApiScopes groups the operations (ApiScope.operations). The operation panel, code samples and search read that file, so no API call returns them (default taken 4 October 2026, Chinmay to review)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listApiVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -70,9 +70,10 @@
       },
       {
        "kind": "detailPanel",
-       "bindsTo": "operation",
-       "notes": "Request, response, scopes and error codes. **The error codes are what a developer comes back for**, and they are the section most documentation buries.\n",
-       "provenance": "carried from the previous definition"
+       "bindsTo": null,
+       "notes": "Method, path, summary, scopes, request and response schemas and error codes of the operation picked in the tree, read from the version's OpenAPI file.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)",
+       "label": "Operation"
       },
       {
        "kind": "codeBlock",
@@ -124,7 +125,8 @@
       {
        "kind": "searchField",
        "label": "Search operations",
-       "provenance": "carried from the previous definition"
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)",
+       "notes": "Searches operation ids, paths and summaries in the selected version's OpenAPI file."
       },
       {
        "kind": "treeNav",
@@ -226,7 +228,7 @@
     }
    ]
   },
-  "notes": "13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR.\n **Form rebuilt 2 October 2026 (CHG-SOT-014, design-notes corrections DEV-002).** Registration asks name, email, website and country; the eight raw schema names (id, status, verifiedAt, partnerId among them) are gone from the form. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's.",
+  "notes": "13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR.\n **Form rebuilt 2 October 2026 (CHG-SOT-014, design-notes corrections DEV-002).** Registration asks name, email, website and country; the eight raw schema names (id, status, verifiedAt, partnerId among them) are gone from the form. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's.\n\n**The members table reads listDeveloperMembers (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`registerDeveloper`, `setDeveloperMembers`) and no read of a population — it is settings, not a list",
@@ -287,9 +289,11 @@
       },
       {
        "kind": "dataTable",
-       "bindsTo": "members",
+       "bindsTo": "DeveloperMember",
        "notes": "Role per member — owner, admin, developer, read-only.",
-       "provenance": "carried from the previous definition"
+       "provenance": "agreed operation `listDeveloperMembers`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)",
+       "label": "Members",
+       "operation": "listDeveloperMembers"
       },
       {
        "kind": "primaryButton",
@@ -322,7 +326,7 @@
    "loading": "The organisation and its members.",
    "error": "Could not load. Your credentials are unaffected.",
    "emptyFirstRun": "**You are the first member and you are the owner.** An integration outlives the engineer who built it, so this is an organisation rather than a personal account — and the invite action is the point of the state.\n",
-   "emptyNoAccess": "**You are a member and not an owner.** Stated plainly rather than shown as an empty list, because a developer who sees no colleagues assumes the page is broken.\n"
+   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `getDeveloperAccount` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `setDeveloperMembers`."
   },
   "apis": [
    {
@@ -343,6 +347,13 @@
     "purpose": "Show the registered organisation and its members",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listDeveloperMembers",
+    "contract": "public-api",
+    "purpose": "The organisation's members: added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -1696,7 +1707,7 @@
     }
    ]
   },
-  "notes": "**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota.\n\n**Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s. **Quota form labelled 2 October 2026 (CHG-SOT-014, design-notes correction DEV-008):** number fields with units and a client picker replace the raw schema names; the quota id is the server's.",
+  "notes": "**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota.\n\n**Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s. **Quota form labelled 2 October 2026 (CHG-SOT-014, design-notes correction DEV-008):** number fields with units and a client picker replace the raw schema names; the quota id is the server's.\n\n**The certification queue is read with listIntegrationListings (4 October 2026); certifyIntegration acts on the selected listing** (CHG-FXS-003)",
   "density": "compact",
   "audience": "staff",
   "pattern": "configEditor",
@@ -1819,6 +1830,20 @@
        "bindsTo": "ProductionAccessRequest",
        "operation": "listProductionAccessRequests",
        "provenance": "29 September pass (group A)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Certification queue",
+       "bindsTo": "IntegrationListing",
+       "operation": "listIntegrationListings",
+       "columns": [
+        "IntegrationListing.name",
+        "IntegrationListing.category",
+        "IntegrationListing.developerId",
+        "IntegrationListing.visibility"
+       ],
+       "notes": "Pending certifications first; selecting one gives Certify its listingId.",
+       "provenance": "contract public-api.yaml IntegrationListing (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1881,7 +1906,7 @@
    "loading": "Pending certifications first.",
    "error": "Could not load.",
    "emptyFirstRun": "Nothing awaiting review.",
-   "emptyNoAccess": "**This is a Softlabs screen and you are a developer.** Said plainly — a blank administration page shown to a partner is worse than a refusal, because they will file a support ticket about it.\n",
+   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `listProductionAccessRequests` requires to show this screen, and names that permission (the screen's other reads need `DEVELOPER_ADMIN` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "No production access request with this status. Names the filter and offers to clear it."
   },
   "apis": [
@@ -1953,23 +1978,32 @@
     "purpose": "Show the licences per client",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listIntegrationListings",
+    "contract": "public-api",
+    "purpose": "The certification queue: listings waiting for a decision, whose id certifyIntegration takes",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "listingId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Otherwise picked from the certification queue."
     },
     {
      "name": "version",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true
     },
     {
      "name": "requestId",
      "from": "navigation",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProductionAccessRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
+     "optional": true
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`."

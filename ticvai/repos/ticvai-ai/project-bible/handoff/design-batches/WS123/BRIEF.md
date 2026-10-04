@@ -97,11 +97,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-539` | AI Explainability & Audit Command Center | B | 8 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-540` | AI Decision Explorer & Search | D | 9 | 6 | 7 | 5 | 2 | 0 | — | notStarted (—) |
-| `ADM-541` | AI Decision Explanation Workspace | B | 6 | 6 | 7 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-541` | AI Decision Explanation Workspace | B | 6 | 59 | 7 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-543` | Candidate, Rule & Decision Path Trace | D | 6 | 18 | 7 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-544` | Model, Provider & AI Runtime Trace | D | 6 | 50 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-545` | Governance, Approval & Human Decision Trace | B | 6 | 6 | 7 | 1 | 1 | 3 | — | notStarted (—) |
+| `ADM-545` | Governance, Approval & Human Decision Trace | B | 6 | 41 | 7 | 1 | 1 | 3 | — | notStarted (—) |
 | `ADM-546` | Execution & Business Outcome Trace | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-547` | AI Audit Record & Evidence Package | D | 6 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-548` | AI Trace Investigation & Replay Simulator | D | 6 | 18 | 7 | 1 | 0 | 0 | — | notStarted (—) |

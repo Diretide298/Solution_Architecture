@@ -1011,6 +1011,13 @@
    },
    "elapsedSeconds": {
     "type": "integer"
+   },
+   "visitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The table visit the ticket is for** (4 October 2026, CHG-FXC-011; KIT-002): the `{visitId}` `notifyServer` takes. Null for a counter or delivery order with no visit."
    }
   }
  },
@@ -1891,6 +1898,12 @@
     "type": "boolean",
     "default": false,
     "description": "**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."
+   },
+   "codeGeneration": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "**Which printing of the location's ordering code is current** (4 October 2026, CHG-FXC-009). A code carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code printed before."
    }
   }
  },
@@ -2227,6 +2240,18 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "serviceStage": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Where the table is in its service** (4 October 2026, CHG-FXC-003): the last stage `setServiceStage` recorded (its `stage` value), null before the first. Kept with `serviceStageRecordedAt` so the last-writer-wins rule compares the incoming `recordedAt` with the stored one and ignores an older write."
+   },
+   "serviceStageRecordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },

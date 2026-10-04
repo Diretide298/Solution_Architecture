@@ -108,11 +108,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-694` | Event Catalogue Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-696` | Event Duplication & Clone Configuration | A | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-696` | Event Duplication & Clone Configuration | A | 6 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-694, BO-695, BO-696 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-694, BO-695 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

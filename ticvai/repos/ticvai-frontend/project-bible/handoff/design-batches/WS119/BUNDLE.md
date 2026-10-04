@@ -99,10 +99,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-500` | Forecast Configuration & Forecasting Strategy | A | 39 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
 | `ADM-501` | Forecast Data & Signal Configuration | D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
 | `ADM-502` | Attendance & Visitation Forecast | D | 6 | 6 | 7 | 43 | 0 | 0 | — | notStarted (—) |
-| `ADM-503` | Ticket, Product & Timeslot Demand Forecast | B | 6 | 18 | 7 | 39 | 1 | 0 | — | notStarted (—) |
-| `ADM-504` | Channel & Booking Pace Forecast | B | 6 | 30 | 7 | 39 | 0 | 6 | — | notStarted (—) |
-| `ADM-505` | Revenue & Commercial Forecast | B | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
-| `ADM-506` | Forecast Drivers, Confidence & Explainability | A | 6 | 30 | 7 | 44 | 0 | 0 | — | notStarted (—) |
+| `ADM-503` | Ticket, Product & Timeslot Demand Forecast | B | 9 | 26 | 7 | 44 | 1 | 0 | — | notStarted (—) |
+| `ADM-504` | Channel & Booking Pace Forecast | B | 9 | 22 | 7 | 41 | 0 | 6 | — | notStarted (—) |
+| `ADM-505` | Revenue & Commercial Forecast | B | 14 | 26 | 7 | 42 | 0 | 0 | — | notStarted (—) |
+| `ADM-506` | Forecast Drivers, Confidence & Explainability | A | 14 | 36 | 7 | 46 | 0 | 0 | — | notStarted (—) |
 | `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 40 | 0 | 0 | — | notStarted (—) |
 | `ADM-508` | Forecast Accuracy, Review & Publication Center | A | 13 | 24 | 7 | 6 | 0 | 0 | — | notStarted (—) |
 
@@ -963,14 +963,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block B · task APP-CONSOLE-ADM-503 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Pattern | listDetail (compact density): Forecast values of one product and timeslot demand definition, picked on the screen (4 October 2026, CHG-FXS-004). |
 | Offline | online only |
 | Opens with | `tenantId` (navigation) |
 | Route | `/analytics/ticket-product-timeslot-demand-forecast-adm-503` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject productDemand or timeslotDemand) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)
 
 **From the AI & Intelligence process.** Demand by ticket, product and timeslot: the booking curve so far, the expected final demand and the remaining opportunity per slot, so slots can be added, merged or repriced. The one thing to get right: a suggested slot or price change is a suggestion with a person's approval, never applied from the forecast.
 
@@ -984,7 +982,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
+| Forecast | text field | optional | — | — | — | Query subject productDemand or timeslotDemand; the first active definition is picked by default. | `AiForecastDefinition.definitionKey` |
+| From | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query from; today by default. | `AiForecastPoint.targetStart` |
+| To | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query to; the definition's horizon by default. | `AiForecastPoint.targetEnd` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -998,6 +999,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Subject | select | — | Attendance · Arrival pattern · Product demand · Timeslot demand · Channel pace · Revenue · Occupancy · Attraction utilisation · Queue · Entry flow · Staffing · POS demand … | `listForecastDefinitions` ?subject |
+| Definition key | text field | — | — | `getForecastAccuracy` ?definitionKey |
+| Horizon days | number field (days) | — | — | `getForecastAccuracy` ?horizonDays |
+| From | date and time picker | — | — | `getForecastAccuracy` ?from |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -1017,38 +1022,56 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every ticket product timeslot** (data table)
+**Forecast** (data table, from `getForecast`): a range, never a bare number (design 5.6).
 
 | Shows | Format | Notes |
 |---|---|---|
-| Days before visit | text | not in the schema: `Days Before Visit` |
-| Cumulative sales | text | not in the schema: `Cumulative Sales` |
-| Current booking curve | text | not in the schema: `Current Booking Curve` |
-| Historical average | text | not in the schema: `Historical Average` |
-| Forecast final demand | text | not in the schema: `Forecast Final Demand` |
-| Product relationships | text | not in the schema: `Product Relationships` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
 
-**The selected ticket product timeslot** (detail panel): The pack groups this record's detail under its own headings: “Family Meal demand typically increases”, “Where enough evidence exists, estimate”.
+**The selected value** (detail panel, from `getForecast`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Days before visit | text | not in the schema: `Days Before Visit` |
-| Cumulative sales | text | not in the schema: `Cumulative Sales` |
-| Current booking curve | text | not in the schema: `Current Booking Curve` |
-| Historical average | text | not in the schema: `Historical Average` |
-| Forecast final demand | text | not in the schema: `Forecast Final Demand` |
-| Product relationships | text | not in the schema: `Product Relationships` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+
+**Version** (detail panel, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Version number | 1,234 | — |
+| Status | chip: Running, Draft, Awaiting approval, Published, Superseded, Rejected… | — |
+| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
+| Maturity | grouped details | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| Data cutoff at | 1 Oct 2026, 14:30 | The analytical replica watermark the snapshot was taken at. |
+
+**Accuracy by horizon** (data table, from `getForecastAccuracy`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Horizon days | 1,234 | — |
+| Wape | 1,234.5 | — |
+| Bias | 1,234.5 | — |
+| Interval coverage | 1,234.5 | Share of actuals inside the 10th-90th percentile band. |
 
 **Actions and what each produces**
 
@@ -1061,7 +1084,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 - **booking curve**: Days before visit on the x-axis, cumulative sales, the historical average curve (or the starting pattern's while history is short) and the forecast final demand as a range. *(source: contracts/satellite/ai.yaml#getForecast / screens/P09-platform-admin-console.yaml#ADM-503)*
 - **slot suggestions**: Add, remove or merge an under-sold slot (with guest notification of the time change), raise price above about 80% sold, lower below about 20-30% - each shown as a suggestion that opens the owning screen; approval by a person. *(source: DI-454 / ADR-0050 (pricing inputs L2))*
 
-**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listForecastDefinitions` (onLoad, The product and timeslot demand forecast definitions …); `getForecastAccuracy` (onLoad, How accurate the picked demand forecast has been, by …)
 
 **Where the user goes next**
 
@@ -1071,11 +1094,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The ticket product timeslot list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the ticket product timeslot untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No ticket product timeslot yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the ticket product timeslot are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No product and timeslot demand forecast defined for this tenant yet. |
+| Empty, no results (`?state=emptyNoResults`) | No values in this window. Names the window and offers the definition's horizon. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -1100,12 +1123,14 @@ slot:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `listForecastDefinitions` → `AI_USE` (operate) · staff
+- `getForecastAccuracy` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
 #### Requirements it meets
 
-39 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+44 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1121,7 +1146,7 @@ slot:
 | 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
-| … 27 more | | | | `traceability.json` |
+| … 32 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1144,8 +1169,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-503?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-499`.
@@ -1167,14 +1192,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block B · task APP-CONSOLE-ADM-504 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Forecast) and no metric row |
+| Pattern | listDetail (compact density): Forecast values of one channel booking pace definition, picked on the screen (4 October 2026, CHG-FXS-004). |
 | Offline | online only |
 | Opens with | `tenantId` (navigation) |
 | Route | `/analytics/channel-booking-pace-forecast-adm-504` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject channelPace) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)
 
 **From the AI & Intelligence process.** Where and when the remaining sales will come from: per channel (website, app, POS, flying POS, kiosk, B2B, reseller, OTA/API, call centre, walk-in) the bookings so far, the expected additional and the expected final. The one thing to get right: current + expected additional = forecast final, shown per channel, with walk-in as its own line.
 
@@ -1188,7 +1211,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
+| Forecast | text field | optional | — | — | — | Query subject channelPace; the first active definition is picked by default. | `AiForecastDefinition.definitionKey` |
+| From | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query from; today by default. | `AiForecastPoint.targetStart` |
+| To | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query to; the definition's horizon by default. | `AiForecastPoint.targetEnd` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1202,6 +1228,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Subject | select | — | Attendance · Arrival pattern · Product demand · Timeslot demand · Channel pace · Revenue · Occupancy · Attraction utilisation · Queue · Entry flow · Staffing · POS demand … | `listForecastDefinitions` ?subject |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -1221,50 +1248,47 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every channel booking pace** (data table)
+**Forecast** (data table, from `getForecast`): dimensionKey is the sales channel; a range, never a bare number (design 5.6).
 
 | Shows | Format | Notes |
 |---|---|---|
-| B2 c website | text | not in the schema: `B2C Website` |
-| Mobile app | text | not in the schema: `Mobile App` |
-| POS | text | not in the schema: `POS` |
-| Flying POS | text | not in the schema: `Flying POS` |
-| Kiosk | text | not in the schema: `Kiosk` |
-| B2 b | text | not in the schema: `B2B` |
-| Reseller | text | not in the schema: `Reseller` |
-| OTA / API partners where applicable | text | not in the schema: `OTA / API Partners where applicable` |
-| Call center / agent | text | not in the schema: `Call Center / Agent` |
-| Walk in | text | not in the schema: `Walk-In` |
-| Channel forecast | text | not in the schema: `Channel Forecast` |
-| Channel current expected additional final forecast | text | not in the schema: `Channel Current Expected Additional Final Forecast` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
 
-**The selected channel booking pace** (detail panel): The pack groups this record's detail under its own headings: “POS/Walk-In 0 2,950 2,950”.
+**The selected value** (detail panel, from `getForecast`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| B2 c website | text | not in the schema: `B2C Website` |
-| Mobile app | text | not in the schema: `Mobile App` |
-| POS | text | not in the schema: `POS` |
-| Flying POS | text | not in the schema: `Flying POS` |
-| Kiosk | text | not in the schema: `Kiosk` |
-| B2 b | text | not in the schema: `B2B` |
-| Reseller | text | not in the schema: `Reseller` |
-| OTA / API partners where applicable | text | not in the schema: `OTA / API Partners where applicable` |
-| Call center / agent | text | not in the schema: `Call Center / Agent` |
-| Walk in | text | not in the schema: `Walk-In` |
-| Channel forecast | text | not in the schema: `Channel Forecast` |
-| Channel current expected additional final forecast | text | not in the schema: `Channel Current Expected Additional Final Forecast` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+
+**Version** (detail panel, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Version number | 1,234 | — |
+| Status | chip: Running, Draft, Awaiting approval, Published, Superseded, Rejected… | — |
+| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
+| Maturity | grouped details | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| Data cutoff at | 1 Oct 2026, 14:30 | The analytical replica watermark the snapshot was taken at. |
 
 **Actions and what each produces**
 
@@ -1276,7 +1300,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **channel table**: Channel rows (not columns): current, expected additional (range), forecast final (range), pace vs usual. *(source: contracts/satellite/ai.yaml#getForecast (dimensionKey "channel=web") / screens/P09-platform-admin-console.yaml#ADM-504)*
 
-**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listForecastDefinitions` (onLoad, The channel booking pace forecast definitions (subject …)
 
 **Where the user goes next**
 
@@ -1286,11 +1310,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The channel booking pace list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the channel booking pace untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No channel booking pace yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the channel booking pace are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No channel booking pace forecast defined for this tenant yet. |
+| Empty, no results (`?state=emptyNoResults`) | No values in this window. Names the window and offers the definition's horizon. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -1316,12 +1340,13 @@ rows:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `listForecastDefinitions` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
 #### Requirements it meets
 
-39 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+41 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1337,7 +1362,7 @@ rows:
 | 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
-| … 27 more | | | | `traceability.json` |
+| … 29 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1363,8 +1388,8 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-504?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-499`.
@@ -1386,12 +1411,12 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Block | Block B · task APP-CONSOLE-ADM-505 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Revenue KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Pattern | listDetail (compact density): Forecast values of one revenue definition, picked on the screen (4 October 2026, CHG-FXS-004). |
 | Offline | online only |
 | Opens with | `tenantId` (navigation) |
 | Route | `/analytics/revenue-commercial-forecast-adm-505` |
 
-**What the spec says about it.** **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`). **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
+**What the spec says about it.** **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`). **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject revenue) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)
 
 **From the AI & Intelligence process.** Revenue forecast: ticket, membership, add-on, F&B and retail revenue, revenue per visitor and against budget, each as a range. The one thing to get right: revenue is forecast from forecast volume and current published prices; it never invents prices and always shows the range.
 
@@ -1405,7 +1430,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
+| Forecast | text field | optional | — | — | — | Query subject revenue; the first active definition is picked by default. | `AiForecastDefinition.definitionKey` |
+| From | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query from; today by default. | `AiForecastPoint.targetStart` |
+| To | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query to; the definition's horizon by default. | `AiForecastPoint.targetEnd` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1419,6 +1447,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Subject | select | — | Attendance · Arrival pattern · Product demand · Timeslot demand · Channel pace · Revenue · Occupancy · Attraction utilisation · Queue · Entry flow · Staffing · POS demand … | `listForecastDefinitions` ?subject |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -1434,50 +1463,83 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by *Why did it change*** (`explainMetricChange`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Metric key `metricKey` | text field | required | — | — | — | — | `explainMetricChange` body |
+| Period `period` | text field | required | — | — | — | ISO period, e.g. `2026-09-21/2026-09-27`. | `explainMetricChange` body |
+| Comparison `comparison` | segmented control | optional | Previous period | Previous period · Same period last year · Forecast | — | — | `explainMetricChange` body |
+| Dimensions `dimensions` | list of values (chips) | optional | — | — | — | — | `explainMetricChange` body |
+| Keep `keep` | toggle | optional | off | — | — | — | `explainMetricChange` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Forecast Ticket Revenue** (metric tile)
+**Forecast** (data table, from `getForecast`): dimensionKey is the revenue stream (ticket, membership, add-on, F&B, retail); a range, never a bare number (design 5.6).
 
-**Forecast Membership Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Target start | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
 
-**Forecast Add-On Revenue** (metric tile)
+**The selected value** (detail panel, from `getForecast`)
 
-**Forecast F&B Revenue where supported** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
 
-**Forecast Retail Revenue where supported** (metric tile)
+**Version** (detail panel, from `getForecast`)
 
-**Total Forecast Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Version number | 1,234 | — |
+| Status | chip: Running, Draft, Awaiting approval, Published, Superseded, Rejected… | — |
+| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
+| Maturity | grouped details | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| Data cutoff at | 1 Oct 2026, 14:30 | The analytical replica watermark the snapshot was taken at. |
 
-**Revenue per Visitor** (metric tile)
+**Explanation** (detail panel, from `explainMetricChange`)
 
-**Net revenue vs budget or target** (metric tile): (CHG-FIN-002: never a bare "Revenue")
-
-**Revenue Confidence Range** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Change | 1,234.5 | — |
+| Change percent | 1,234.5 | — |
+| Drivers | list or chips (count when long) | — |
+| Narrative | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Why did it change (secondary button) | `explainMetricChange` POST `/insights/explain-metric-change` | inline | AiMetricChangeExplanation | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **revenue tiles**: "AED 412,000 (AED 318,000-503,000)" per line; F&B and retail only where those modules are licensed; vs budget only where a budget exists. *(source: contracts/satellite/ai.yaml#getForecast / ADR-0051)*
 
-**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listForecastDefinitions` (onLoad, The revenue forecast definitions (subject revenue); the …)
 
 **Where the user goes next**
 
@@ -1487,11 +1549,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The revenue commercial forecast list; the counts above it resolve separately. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the revenue commercial forecast untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No revenue commercial forecast yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the revenue commercial forecast are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No revenue forecast defined for this tenant yet. |
+| Empty, no results (`?state=emptyNoResults`) | No values in this window. Names the window and offers the definition's horizon. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -1513,12 +1575,14 @@ next7:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `listForecastDefinitions` → `AI_USE` (operate) · staff
+- `explainMetricChange` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
 #### Requirements it meets
 
-39 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+42 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1534,7 +1598,7 @@ next7:
 | 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
-| … 27 more | | | | `traceability.json` |
+| … 30 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1552,13 +1616,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-505`
 - Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 1
 - Flow F228 *AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center*, step 12: Works in Revenue & Commercial Forecast → Forecast future revenue based on predicted sales, attendance, product mix, current pricing and other approved commercial signals.
+- ADR-0054 *Natural-language analytics goes through the semantic layer* (`docs/adr/0054-natural-language-analytics-goes-through-the-semantic-layer.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-505?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
-- [ ] Every action is wired with its success and its failure: Open access grant.
+- [ ] Every action is wired with its success and its failure: Open access grant, Why did it change.
 - [ ] Every transition is wired: `ADM-499`.
 - [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1578,14 +1643,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-ADM-506 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Pattern | listDetail (compact density): Forecast values of one any definition, picked on the screen (4 October 2026, CHG-FXS-004). |
 | Offline | online only |
 | Opens with | `tenantId` (navigation) |
 | Route | `/analytics/forecast-drivers-confidence-explainability-adm-506` |
 
-**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `explainMetricChange` (AI_USE), `listForecastVersions` (AI_USE), `getForecast` (AI_USE), `getForecastAccuracy` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `explainMetricChange` (AI_USE), `listForecastVersions` (AI_USE), `getForecast` (AI_USE), `getForecastAccuracy` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it. **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject any) supplies the definitionKey getForecast requires; columns are AiForecastPoint's (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)
 
 **From the AI & Intelligence process.** Why the forecast is what it is and why it changed: the drivers (booking pace, weekday pattern, events, weather, price, cancellations) with direction and strength, the change from the previous version, the uncertainty by horizon and what limits it (limited history, a new product, a missing signal). The one thing to get right: uncertainty is shown as ranges by horizon and measured accuracy, not as "92% / High".
 
@@ -1597,7 +1660,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
+| Forecast | text field | optional | — | — | — | Query subject any; the first active definition is picked by default. | `AiForecastDefinition.definitionKey` |
+| From | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query from; today by default. | `AiForecastPoint.targetStart` |
+| To | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Query to; the definition's horizon by default. | `AiForecastPoint.targetEnd` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1616,6 +1682,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date and time picker | — | — | `getForecastAccuracy` ?from |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Subject | select | — | Attendance · Arrival pattern · Product demand · Timeslot demand · Channel pace · Revenue · Occupancy · Attraction utilisation · Queue · Entry flow · Staffing · POS demand … | `listForecastDefinitions` ?subject |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -1631,67 +1698,104 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by *Why did it change*** (`explainMetricChange`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Metric key `metricKey` | text field | required | — | — | — | — | `explainMetricChange` body |
+| Period `period` | text field | required | — | — | — | ISO period, e.g. `2026-09-21/2026-09-27`. | `explainMetricChange` body |
+| Comparison `comparison` | segmented control | optional | Previous period | Previous period · Same period last year · Forecast | — | — | `explainMetricChange` body |
+| Dimensions `dimensions` | list of values (chips) | optional | — | — | — | — | `explainMetricChange` body |
+| Keep `keep` | toggle | optional | off | — | — | — | `explainMetricChange` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Operator display name | text | — |
 | Permissions | list or chips (count when long) | — |
 | Reason | text | — |
-| Ticket ref | text | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every forecast drivers confidence** (data table)
+**Forecast** (data table, from `getForecast`): a range, never a bare number (design 5.6).
 
 | Shows | Format | Notes |
 |---|---|---|
-| Limited historical data | text | not in the schema: `Limited Historical Data` |
-| New product | text | not in the schema: `New Product` |
-| New event | text | not in the schema: `New Event` |
-| Missing weather | text | not in the schema: `Missing Weather` |
-| Abnormal promotion | text | not in the schema: `Abnormal Promotion` |
-| High cancellation variability | text | not in the schema: `High Cancellation Variability` |
-| Unusual booking pattern | text | not in the schema: `Unusual Booking Pattern` |
-| Confidence by horizon | text | not in the schema: `Confidence by Horizon` |
-| 92% / high | text | not in the schema: `92% / High` |
-| 84% / high | text | not in the schema: `84% / High` |
-| 71% / medium | text | not in the schema: `71% / Medium` |
-| 58% / lower | text | not in the schema: `58% / Lower` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
 
-**The selected forecast drivers confidence** (detail panel): The pack groups this record's detail under its own headings: “Where applicable”, “Ensemble”.
+**The selected value** (detail panel, from `getForecast`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Limited historical data | text | not in the schema: `Limited Historical Data` |
-| New product | text | not in the schema: `New Product` |
-| New event | text | not in the schema: `New Event` |
-| Missing weather | text | not in the schema: `Missing Weather` |
-| Abnormal promotion | text | not in the schema: `Abnormal Promotion` |
-| High cancellation variability | text | not in the schema: `High Cancellation Variability` |
-| Unusual booking pattern | text | not in the schema: `Unusual Booking Pattern` |
-| Confidence by horizon | text | not in the schema: `Confidence by Horizon` |
-| 92% / high | text | not in the schema: `92% / High` |
-| 84% / high | text | not in the schema: `84% / High` |
-| 71% / medium | text | not in the schema: `71% / Medium` |
-| 58% / lower | text | not in the schema: `58% / Lower` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+
+**Version** (detail panel, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Version number | 1,234 | — |
+| Status | chip: Running, Draft, Awaiting approval, Published, Superseded, Rejected… | — |
+| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
+| Maturity | grouped details | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| Data cutoff at | 1 Oct 2026, 14:30 | The analytical replica watermark the snapshot was taken at. |
+
+**Accuracy by horizon** (data table, from `getForecastAccuracy`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Horizon days | 1,234 | — |
+| Period start | 1 Oct 2026, 14:30 | — |
+| Wape | 1,234.5 | — |
+| Bias | 1,234.5 | — |
+| Interval coverage | 1,234.5 | Share of actuals inside the 10th-90th percentile band. |
+
+**Versions** (data table, from `listForecastVersions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Version number | 1,234 | — |
+| Status | chip: Running, Draft, Awaiting approval, Published, Superseded, Rejected… | — |
+| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
+| Data cutoff at | 1 Oct 2026, 14:30 | The analytical replica watermark the snapshot was taken at. |
+
+**Explanation** (detail panel, from `explainMetricChange`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Change | 1,234.5 | — |
+| Change percent | 1,234.5 | — |
+| Drivers | list or chips (count when long) | — |
+| Narrative | text | — |
+| Reliability | chip: Grounded, Partial, Conflicting sources, Insufficient evidence | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Why did it change (secondary button) | `explainMetricChange` POST `/insights/explain-metric-change` | inline | AiMetricChangeExplanation | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **change explanation**: Previous vs current most-likely and range, with the drivers that moved it; the decomposition is plain arithmetic and the model only words it. *(source: contracts/satellite/ai.yaml#explainMetricChange / ADR-0054)*
 - **uncertainty by horizon**: Range width at 1, 7, 28 days and measured WAPE/coverage where it exists; flags such as "Limited historical data", "New product", "Missing weather" as chips. *(source: contracts/satellite/ai.yaml#getForecastAccuracy / contracts/satellite/ai.yaml#/components/schemas/AiMaturity)*
 
-**Data it reads**: `listForecastVersions` (onLoad, Forecast versions); `getForecast` (onLoad, Forecast values); `getForecastAccuracy` (onLoad, Measured forecast accuracy); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listForecastVersions` (onLoad, Forecast versions); `getForecast` (onLoad, Forecast values); `getForecastAccuracy` (onLoad, Measured forecast accuracy); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listForecastDefinitions` (onLoad, The any forecast definitions (subject any); the picked …)
 
 **Where the user goes next**
 
@@ -1701,11 +1805,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The forecast drivers confidence list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the forecast drivers confidence untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No forecast drivers confidence yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the forecast drivers confidence are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No any forecast defined for this tenant yet. |
+| Empty, no results (`?state=emptyNoResults`) | No values in this window. Names the window and offers the definition's horizon. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listForecastVersions` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -1746,12 +1850,13 @@ narrative: Booking pace is above the usual Saturday pattern and the weather fore
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `listForecastDefinitions` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listForecastVersions` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
 #### Requirements it meets
 
-44 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1767,7 +1872,7 @@ narrative: Booking pace is above the usual Saturday pattern and the weather fore
 | 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
-| … 32 more | | | | `traceability.json` |
+| … 34 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1790,10 +1895,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-506?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
-- [ ] Every action is wired with its success and its failure: Open access grant.
+- [ ] Every action is wired with its success and its failure: Open access grant, Why did it change.
 - [ ] Every transition is wired: `ADM-499`.
 - [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.

@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "AccreditationProgramme"
  },
+ "getAccreditationValidity": {
+  "method": "GET",
+  "path": "/accreditation-validity",
+  "contract": "accreditation",
+  "summary": "The validity and renewal rules of a programme",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationValidity"
+ },
  "listAccessProfiles": {
   "method": "GET",
   "path": "/accreditation-access-profiles",

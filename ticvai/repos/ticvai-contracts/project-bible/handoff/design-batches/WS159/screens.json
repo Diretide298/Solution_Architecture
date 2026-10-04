@@ -51,7 +51,10 @@
     {
      "to": "BO-895",
      "trigger": "Resource Combination Builder",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "packageId"
+     ]
     },
     {
      "to": "BO-896",

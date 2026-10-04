@@ -1148,85 +1148,134 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**Defined 4 October 2026: the codes come from listCouponCodes (the campaign's, by status and batch); a distribution is one setCodeDistributionManager call whose answer is the counts. The 'every code distribution' table bound to the PUT is gone (the view is one answer, not a list)** (CHG-FXS-001)",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "patternReason": "The campaign's codes listed with a distribution form beside them; the form's answer is the distribution's counts (defined 4 October 2026, CHG-FXS-001).",
   "purpose": "Manage how promotional codes are allocated and distributed.",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every code distribution",
-       "columns": [
-        "CodeDistributionAssignmentManagerView.generated",
-        "CodeDistributionAssignmentManagerView.assigned",
-        "CodeDistributionAssignmentManagerView.sent",
-        "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewed",
-        "CodeDistributionAssignmentManagerView.redeemed",
-        "CodeDistributionAssignmentManagerView.expired",
-        "CodeDistributionAssignmentManagerView.cancelled"
-       ],
-       "bindsTo": "CodeDistributionAssignmentManagerView",
-       "operation": "setCodeDistributionManager",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 42 §Show"
+       "kind": "selectField",
+       "label": "Status",
+       "bindsTo": "CouponCode.status",
+       "operation": "listCouponCodes",
+       "notes": "Filter.",
+       "provenance": "contract promotions.yaml CouponCode.status (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Batch",
+       "bindsTo": "CouponCode.batchId",
+       "operation": "listCouponCodes",
+       "notes": "Filter (query batchId).",
+       "provenance": "contract promotions.yaml CouponCode.batchId (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "dataTable",
        "label": "Codes",
+       "bindsTo": "CouponCode",
        "operation": "listCouponCodes",
-       "provenance": "contract promotions.yaml GET /coupon-campaigns/{campaignId}/codes; wiring fix, 2 October 2026"
+       "columns": [
+        "CouponCode.code",
+        "CouponCode.batchId",
+        "CouponCode.status",
+        "CouponCode.assignedSubjectId",
+        "CouponCode.redemptionCount",
+        "CouponCode.validTo"
+       ],
+       "provenance": "contract promotions.yaml CouponCode (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     },
     {
      "name": "contextPanel",
-     "slot": "selection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected code distribution",
-       "bindsTo": "CodeDistributionAssignmentManagerView",
-       "columns": [
-        "CodeDistributionAssignmentManagerView.generated",
-        "CodeDistributionAssignmentManagerView.assigned",
-        "CodeDistributionAssignmentManagerView.sent",
-        "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewed",
-        "CodeDistributionAssignmentManagerView.redeemed",
-        "CodeDistributionAssignmentManagerView.expired",
-        "CodeDistributionAssignmentManagerView.cancelled"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Distribution Channels”, “Codes may be assigned to”, “External Partner Example”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 42 §Show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+       "kind": "selectField",
+       "label": "Batch to distribute",
+       "bindsTo": "CodeDistributionAssignmentManagerInput.batchId",
+       "operation": "setCodeDistributionManager",
+       "notes": "Options are the batch ids of the listed codes.",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerInput.batchId (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Assign to",
+       "bindsTo": "CodeDistributionAssignmentManagerInput.assigneeType",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerInput.assigneeType (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Assignee",
+       "bindsTo": "CodeDistributionAssignmentManagerInput.assigneeReference",
+       "operation": "setCodeDistributionManager",
+       "notes": "The guest, segment, company or partner reference the assignee type names.",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerInput.assigneeReference (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "bindsTo": "CodeDistributionAssignmentManagerInput.channelsType",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerInput.channelsType (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Quantity",
+       "bindsTo": "CodeDistributionAssignmentManagerInput.quantity",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerInput.quantity (defined 4 October 2026, CHG-FXS-001)"
+      },
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCodeDistributionManager"
+       "label": "Distribute",
+       "operation": "setCodeDistributionManager",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Generated",
+       "bindsTo": "CodeDistributionAssignmentManagerView.generated",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerView.generated (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Assigned",
+       "bindsTo": "CodeDistributionAssignmentManagerView.assigned",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerView.assigned (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Sent",
+       "bindsTo": "CodeDistributionAssignmentManagerView.sent",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerView.sent (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Redeemed",
+       "bindsTo": "CodeDistributionAssignmentManagerView.redeemed",
+       "operation": "setCodeDistributionManager",
+       "provenance": "contract promotions.yaml CodeDistributionAssignmentManagerView.redeemed (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The code distribution list.",
-   "error": "Could not load. Names which read failed and leaves the code distribution untouched.",
-   "emptyFirstRun": "No code distribution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No codes generated for this campaign yet.",
    "emptyNoResults": "The filter narrowed it and the code distribution are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listCouponCodes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setCodeDistributionManager`."
   },
   "apis": [
    {
@@ -1265,7 +1314,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#adm-164",
    "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-164"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 42. 8 of 8 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

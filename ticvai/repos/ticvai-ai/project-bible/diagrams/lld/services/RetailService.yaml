@@ -87,7 +87,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: disposeShopAndDrop
     verb: POST
     path: /shop-and-drop/{dropId}/dispose
@@ -198,8 +198,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: setReturnPolicy
     verb: PUT
     path: /outlets/{outletId}/return-policy
@@ -264,6 +264,15 @@ tables:
   - reserveMerchandise
   - setReturnPolicy
   - updateMerchandise
+  keys:
+    setReturnPolicy:
+      role: evicts
+      resolvers: &id001
+      - retail.return_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -279,10 +288,21 @@ tables:
   - setReturnPolicy
   readBy:
   - getReturnPolicy
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    getReturnPolicy:
+      role: fills
+      resolvers:
+      - retail.return_policy
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    setReturnPolicy:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: retail.exchange
   columns: 8
   store: postgres
@@ -363,7 +383,8 @@ tables:
   columns: 7
   store: postgres
   parent: retail.shop_and_drop
-  writtenBy: []
+  writtenBy:
+  - retail
   foreignWriters: null
 - table: retail.store_rule
   columns: 12
@@ -373,13 +394,13 @@ tables:
   - retail
   foreignWriters: null
 readsFrom:
+- service: InventoryService
+  operations: 3
 - service: TenancyService
   operations: 3
-- service: InventoryService
-  operations: 2
 writesOutside:
 - service: InventoryService
-  operations: 4
+  operations: 5
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -398,6 +419,9 @@ writesOutside:
   - operation: createRetailSale
     tables:
     - inventory.movement
+  - operation: reserveMerchandise
+    tables:
+    - inventory.stock_reservation
 screens:
 - P01:WEB-033 Shop
 - P01:WEB-042 Retail & Shop and Drop

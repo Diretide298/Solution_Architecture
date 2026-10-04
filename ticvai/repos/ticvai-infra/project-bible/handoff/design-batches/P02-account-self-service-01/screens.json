@@ -1997,7 +1997,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one implementation with several screen ids; the ids are kept (GAP-D3).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one implementation with several screen ids; the ids are kept (GAP-D3).\n\n**The tickets to send are read with listMyEntitlements (4 October 2026); orderId is optional and comes from the chosen tickets' orderId when the screen opens from Home** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
@@ -2036,9 +2036,15 @@
       {
        "kind": "cardList",
        "label": "Tickets to send",
-       "operation": "transferOrderTickets",
-       "notes": "The guest's tickets as cards; ticking a card picks it.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "operation": "listMyEntitlements",
+       "notes": "Valid, unused tickets of one order at a time (a transfer is per order); opened from a link, the link's order is preselected.",
+       "provenance": "contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.productId",
+        "Entitlement.validFrom",
+        "Entitlement.status"
+       ]
       },
       {
        "kind": "textField",
@@ -2077,13 +2083,27 @@
     "purpose": "Show the tickets the guest has sent and received",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The guest's own tickets to choose from; each carries its orderId, which transferOrderTickets takes in its path",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "From Home there is none: the guest picks tickets from listMyEntitlements and the order is the tickets' orderId."
+    },
+    {
+     "name": "subjectId",
+     "from": "session",
+     "notes": "The signed-in guest: the screen reads their own tickets (4 October 2026)."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."

@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-184` | Biometric Access Command Center | C | 0 | 240 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-185` | Biometric Verification Profile Builder | A | 8 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-185` | Biometric Verification Profile Builder | A | 16 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-186` | Face Pass Enrollment Configuration | A | 19 | 8 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-187` | Biometric Consent & Guardian Management | B | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
 | `BO-188` | Face Tag Temporary Enrollment | A | 10 | 17 | 5 | 0 | 1 | 6 | — | notStarted (generated) |

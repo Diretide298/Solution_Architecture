@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `inventory` |
 | Schemas owned | `inventory` |
-| Operations in the slice | 8 of 58 |
+| Operations in the slice | 7 of 59 |
 | Scale | Mixed. Counting is bursty; procurement is not. |
 | If it is down | Down blocks receiving and counting; selling continues from the till's cache. |
 
@@ -27,7 +27,6 @@
 |---|---|---|---|---|---|---|
 | inventory | [`bulkUpdateProducts`](#bulkupdateproducts) | POST | `/products/bulk` | setup | 1 |  |
 | inventory | [`listSerialisedItems`](#listserialiseditems) | GET | `/serialised-items` | core | 1 | BO-114, EMP-069, POS-011 |
-| inventory | [`setDailyCount`](#setdailycount) | PUT | `/stock-counts/daily` | setup | 1 | EMP-066 |
 | item | [`createInventoryItem`](#createinventoryitem) | POST | `/inventory-items` | setup | 1 | BO-081, BO-105 |
 | item | [`setInventoryKitDefinition`](#setinventorykitdefinition) | PUT | `/inventory-items/{itemId}/kit-definition` | setup | 1 | BO-081 |
 | item | [`updateInventoryItem`](#updateinventoryitem) | PATCH | `/inventory-items/{itemId}` | setup | 1 | BO-081 |
@@ -54,6 +53,7 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Status | **Deprecated**: superseded; do not build |
 | Reads | `cache:idempotency`, `catalogue.price`, `catalogue.product`, `inventory.item` |
 | Writes | `cache:idempotency`, `cache:resolution`, `catalogue.price`, `catalogue.product`, `inventory.item` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
@@ -142,58 +142,6 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Items |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### setDailyCount
-
-**`PUT /stock-counts/daily`**: Which items get counted every day
-
-Board 2H. **A full count is a shift; a daily count is twenty items and ten minutes.** The package had `startStockCount` for the first and nothing for the second, so venues either counted everything weekly or nothing at all.
-**High-value and high-variance items, not a rotation.** Counting spirits daily and napkins monthly is the whole point — **a daily list that includes everything is a daily list nobody completes.**
-**Feeds the variance trend rather than posting an adjustment.** A daily count is a check, not a correction; **a count that silently adjusts stock hides the shrinkage it was meant to find.**
-
-|  |  |
-|---|---|
-| Permission | `PRODUCT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `inventory.item` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | venue |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `inventory.item` |
-| Writes | `cache:idempotency`, `cache:resolution`, `inventory.item` |
-| Called by | EMP-066 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| itemIds | array of string (uuid) | yes |  |
-| locationId | string (uuid) |  | (nullable) |
-| dueBy | string |  | Local time, e.g. (nullable) |
-| postsAdjustment | boolean |  | False, and it should stay false. (default False) |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| itemIds | array of string (uuid) | yes |  |
-| locationId | string (uuid) |  | (nullable) |
-| dueBy | string |  | Local time, e.g. (nullable) |
-| postsAdjustment | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Set. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -727,12 +675,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-50 operations, added to this service in later releases without changing any of the above.
+52 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| count | `cancelStockCount`, `getCountVariance`, `listStockCounts`, `postStockCount`, `recountStockCount`, `startStockCount`, `submitCountLines` |
-| inventory | `createStockReservation`, `getStockTransfer`, `listExpiringBatches`, `listStockReservations`, `releaseStockReservation`, `updateRequisitionLines`, `updateSupplier` |
+| count | `cancelStockCount`, `getCountVariance`, `listStockCountLines`, `listStockCounts`, `postStockCount`, `recountStockCount`, `startStockCount`, `submitCountLines` |
+| inventory | `createStockReservation`, `getStockTransfer`, `listExpiringBatches`, `listStockReservations`, `releaseStockReservation`, `setDailyCount`, `updateRequisitionLines`, `updateSupplier` |
 | item | `getInventoryItem`, `getInventoryKitDefinition`, `listInventoryItems`, `lookupInventoryItem` |
 | movement | `createStockMovement`, `listStockMovements` |
 | procurement | `acknowledgePurchaseOrder`, `cancelRequisition`, `closePurchaseOrderShort`, `rejectRequisition`, `returnRequisition`, `sendPurchaseOrder` |

@@ -100,13 +100,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-081` | Active Rental Operations Command Center | C | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-082` | Active Rental Detail & Live Timeline | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-083` | Rental Extension Request | C | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-084` | Extension Pricing & Confirmation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-085` | Equipment Swap / Replacement | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-086` | Rental Incident & Operational Exception | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-087` | Due Soon & Customer Notification Management | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-081` | Active Rental Operations Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-082` | Active Rental Detail & Live Timeline | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-083` | Rental Extension Request | D | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-084` | Extension Pricing & Confirmation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-085` | Equipment Swap / Replacement | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-086` | Rental Incident & Operational Exception | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-087` | Due Soon & Customer Notification Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-088` | Overdue Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `EMP-089` | Active Group Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `EMP-090` | Active Rental Intelligence & Operational Alerts | D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (generated) |

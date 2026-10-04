@@ -1655,6 +1655,21 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure",
        "operation": "setGateModePolicy",
        "bindsTo": "AccessGateModePolicy.automaticNotification"
+      },
+      {
+       "kind": "selectField",
+       "label": "Gate mode",
+       "bindsTo": "AccessGateModePolicy.mode",
+       "operation": "setGateModePolicy",
+       "notes": "Free flow or drop arm; required, half of the upsert key with the venue.",
+       "provenance": "contract access.yaml AccessGateModePolicy.mode (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open an incident",
+       "bindsTo": "AccessGateModePolicy.createsIncident",
+       "operation": "setGateModePolicy",
+       "provenance": "contract access.yaml AccessGateModePolicy.createsIncident (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -1733,6 +1748,7 @@
     "provenance": "contract access.yaml PUT /gate-mode-policies"
    }
   ],
+  "notes": "**Mode (the upsert key) and createsIncident added to the form 4 October 2026** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

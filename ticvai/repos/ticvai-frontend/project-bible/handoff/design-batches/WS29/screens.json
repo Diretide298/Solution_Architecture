@@ -95,7 +95,9 @@
      "provenance": "flow F138 step 17→18",
      "operation": "listMembershipAnnualPass",
      "carries": [
-      "challengeId"
+      "challengeId",
+      "membershipCode",
+      "version"
      ]
     }
    ]
@@ -2109,85 +2111,125 @@
   "patternReason": "the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population",
   "purpose": "Provide the final governance layer before a membership/pass configuration becomes commercially available.",
   "layout": {
-   "template": "form",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "B2C",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
+       "kind": "detailPanel",
+       "label": "Version",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioView",
+       "operation": "getMembershipProductValidation",
+       "columns": [
+        "MembershipProductValidationApprovalPublicationVersioView.membershipCode",
+        "MembershipProductValidationApprovalPublicationVersioView.version",
+        "MembershipProductValidationApprovalPublicationVersioView.approvalStage",
+        "MembershipProductValidationApprovalPublicationVersioView.effectiveFrom",
+        "MembershipProductValidationApprovalPublicationVersioView.migrationPolicy"
+       ],
+       "provenance": "agreed operation `getMembershipProductValidation`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "POS",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
+       "kind": "dataTable",
+       "label": "Validation checks",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioView.validationChecks",
+       "operation": "getMembershipProductValidation",
+       "provenance": "agreed operation `getMembershipProductValidation`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Mobile App",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
+       "kind": "dataTable",
+       "label": "Issues",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioView.validationIssues",
+       "operation": "getMembershipProductValidation",
+       "provenance": "agreed operation `getMembershipProductValidation`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Call Center",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
+       "kind": "dataTable",
+       "label": "Publication targets",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioView.publicationTargets",
+       "operation": "getMembershipProductValidation",
+       "notes": "B2C, POS, mobile app, call centre, B2B, access control, ticketing and other dependent services, each with its state (the pack's eight, read, not chosen).",
+       "provenance": "agreed operation `getMembershipProductValidation`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "B2B",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Access Control",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Ticketing",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Other dependent services",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
+       "kind": "detailPanel",
+       "label": "Impact",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioView",
+       "operation": "getMembershipProductValidation",
+       "columns": [
+        "MembershipProductValidationApprovalPublicationVersioView.activeMembersAffected",
+        "MembershipProductValidationApprovalPublicationVersioView.futureRenewals",
+        "MembershipProductValidationApprovalPublicationVersioView.entitlementsAffected",
+        "MembershipProductValidationApprovalPublicationVersioView.channels"
+       ],
+       "provenance": "agreed operation `getMembershipProductValidation`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
     {
-     "name": "actionBar",
-     "slot": "publish",
+     "name": "contextPanel",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Action",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioInput.action",
+       "operation": "approveMembershipProductValidation",
+       "notes": "Only the actions the approval stage allows next are offered.",
+       "provenance": "contract subscription.yaml MembershipProductValidationApprovalPublicationVersioInput.action (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective from",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioInput.effectiveFrom",
+       "operation": "approveMembershipProductValidation",
+       "notes": "For schedule and publish.",
+       "provenance": "contract subscription.yaml MembershipProductValidationApprovalPublicationVersioInput.effectiveFrom (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing members",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioInput.migrationPolicy",
+       "operation": "approveMembershipProductValidation",
+       "notes": "Stay on the current version, move at next renewal, or move on the effective date.",
+       "provenance": "contract subscription.yaml MembershipProductValidationApprovalPublicationVersioInput.migrationPolicy (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "textField",
+       "label": "Reason",
+       "bindsTo": "MembershipProductValidationApprovalPublicationVersioInput.reason",
+       "operation": "approveMembershipProductValidation",
+       "notes": "Required for reject and suspend.",
+       "provenance": "contract subscription.yaml MembershipProductValidationApprovalPublicationVersioInput.reason (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Approve",
-       "provenance": "contract operation approveMembershipProductValidation"
+       "label": "Submit",
+       "operation": "approveMembershipProductValidation",
+       "notes": "Sends membershipCode and version from the entry, with the step-up token.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       },
       {
        "kind": "textField",
        "label": "Authentication code",
        "operation": "verifyMfaChallenge",
-       "notes": "Asked in the confirmation of the approval: `approveMembershipProductValidation` is step-up mfa and refuses without a fresh token.",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       },
       {
        "kind": "secondaryButton",
        "label": "Email me a code instead",
        "operation": "createMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The membership product validation configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the membership product validation untouched.",
-   "emptyFirstRun": "No membership product validation configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The version's checks and impact load first.",
+   "error": "Could not load. Names the read that failed; no action is offered until it loads.",
+   "emptyFirstRun": "Not used: the screen opens on one product version.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2209,6 +2251,13 @@
     "purpose": "Answers the step-up; its token goes into the approval",
     "trigger": "onAction",
     "provenance": "design-note correction, 2 October 2026 (BO-293)"
+   },
+   {
+    "operationId": "getMembershipProductValidation",
+    "contract": "subscription",
+    "purpose": "The product version's validation checks, issues, impact, publication targets and approval stage, read by membershipCode and version: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
    }
   ],
   "wireframe": {
@@ -2217,17 +2266,25 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-293",
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-293"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-002) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
+     "name": "membershipCode",
+     "from": "BO-284"
+    },
+    {
+     "name": "version",
+     "from": "BO-284"
+    },
+    {
      "name": "challengeId",
      "from": "navigation",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
+     "optional": true
     }
    ]
   },
+  "notes": "**Bound 4 October 2026: the screen reads the version it works on (getMembershipProductValidation, agreed in the ledger) by the membershipCode and version BO-284 carries; the eight publication targets are read, and the action, effective date, migration policy and reason are the inputs the PUT takes** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

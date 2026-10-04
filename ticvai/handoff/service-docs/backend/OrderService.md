@@ -74,7 +74,7 @@
 | order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-034 … |
 | orders | [`cloneTicketTemplate`](#clonetickettemplate) | POST | `/ticket-templates/{templateId}/clone` | setup | 1 | BO-344 |
 | orders | [`createResaleListing`](#createresalelisting) | POST | `/resale-listings` | core | 1 | GST-067, WEB-030 |
-| orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-346 |
+| orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-344 |
 | orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 1 | GST-015, WEB-023 |
 | orders | [`getGroupBooking`](#getgroupbooking) | GET | `/group-bookings/{groupBookingId}` | core | 1 | BO-026, BO-273, GST-072, POS-031, WEB-031 |
 | orders | [`getPaymentLink`](#getpaymentlink) | GET | `/payment-links/{token}` | core | 1 | ADM-593, GST-009, WEB-014 |
@@ -82,7 +82,7 @@
 | orders | [`issueWalletPass`](#issuewalletpass) | POST | `/wallet-passes` | core | 1 | GST-018, WEB-018 |
 | orders | [`listBillingStatements`](#listbillingstatements) | GET | `/billing-statements` | core | 1 | GST-015, WEB-023 |
 | orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026 … |
-| orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 1 | GST-071, WEB-021 |
+| orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 1 | GST-011, GST-071, WEB-021 |
 | orders | [`payByLink`](#paybylink) | POST | `/payment-links/{token}/pay` | core | 1 | GST-009, WEB-014 |
 | orders | [`previewProductTickets`](#previewproducttickets) | GET | `/products/{productId}/ticket-previews` | core | 1 | BO-008, CMS-006 |
 | orders | [`recordGroupCheckIn`](#recordgroupcheckin) | POST | `/group-bookings/{groupBookingId}/check-in` | core | 1 | BO-280, POS-031 |
@@ -91,7 +91,7 @@
 | orders | [`setPaymentProvider`](#setpaymentprovider) | PUT | `/payment-providers` | setup | 1 | ADM-412, SGN-021 |
 | orders | [`shareEntitlement`](#shareentitlement) | POST | `/entitlements/{entitlementId}/share` | core | 1 | GST-072, WEB-018 |
 | orders | [`storePaymentToken`](#storepaymenttoken) | POST | `/payment-tokens` | core | 1 | GST-071, WEB-021 |
-| orders | [`updateTicketTemplate`](#updatetickettemplate) | PATCH | `/ticket-templates/{templateId}` | setup | 1 | BO-346 |
+| orders | [`updateTicketTemplate`](#updatetickettemplate) | PATCH | `/ticket-templates/{templateId}` | setup | 1 | BO-344 |
 | payment | [`addTip`](#addtip) | POST | `/payments/{paymentId}/tip` | core | 1 | EMP-035, POS-005 |
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004 … |
@@ -99,6 +99,7 @@
 | payments | [`createInstalmentPlan`](#createinstalmentplan) | POST | `/instalment-plans` | core | 1 | BO-324, GST-015, WEB-023 |
 | payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
 | payments | [`listInstalmentPlans`](#listinstalmentplans) | GET | `/instalment-plans` | core | 1 | BO-324, GST-015, WEB-023 |
+| payments | [`setDunningPolicy`](#setdunningpolicy) | PUT | `/dunning-policy` | setup | 1 | ADM-606 |
 | payments | [`setInstalmentPolicy`](#setinstalmentpolicy) | PUT | `/instalment-policy` | setup | 1 | ADM-603 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
@@ -112,7 +113,6 @@
 | reservation | [`listReservations`](#listreservations) | GET | `/reservations` | core | 1 | GST-016, POS-031, WEB-031 |
 | shift | [`acceptShiftVariance`](#acceptshiftvariance) | POST | `/shifts/{shiftId}/accept-variance` | core | 1 | BO-040, BO-043, EMP-009, POS-007 |
 | shift | [`allocateDepositBox`](#allocatedepositbox) | POST | `/deposit-boxes` | core | 1 | POS-016 |
-| shift | [`approveShiftClose`](#approveshiftclose) | POST | `/shifts/{shiftId}/approve-close` | setup | 1 |  |
 | shift | [`approveShiftOpen`](#approveshiftopen) | POST | `/shifts/{shiftId}/approve-open` | core | 1 | POS-001 |
 | shift | [`closeShift`](#closeshift) | POST | `/shifts/{shiftId}/close` | core | 1 | BO-040, BO-043, POS-007 |
 | shift | [`getCurrentShift`](#getcurrentshift) | GET | `/shifts/current` | core | 1 | EMP-008, EMP-009, POS-001, POS-007, POS-012 |
@@ -492,7 +492,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Conflict policy | serverWins |
 | Reads | `catalogue.inventory_hold`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `marketing.consent_record`, `orders.cart`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
-| Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033 |
+| Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-012, WEB-033 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
 **Parameters**
@@ -1698,8 +1698,8 @@ Charges the case's amount again, on a different saved card if one is given. **A 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `payments.dunning_case` |
-| Writes | `cache:idempotency`, `payments.dunning_case` |
+| Reads | `cache:idempotency`, `orders.payment`, `payments.dunning_case`, `payments.dunning_policy` |
+| Writes | `cache:idempotency`, `orders.payment`, `payments.dunning_case` |
 | Called by | GST-015, WEB-023 |
 
 **Parameters**
@@ -1936,7 +1936,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-034, POS-002, POS-006, POS-014 |
 
 **Parameters**
@@ -2191,7 +2191,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Guest callable | True |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox`, `promotions.promotion_evaluation_trace` |
-| Called by | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015, WEB-012 |
+| Called by | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
 **Parameters**
@@ -2564,7 +2564,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Read routing | primary |
 | Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305, BO-315, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, GST-067, KSK-009, KSK-011, POS-002, POS-006, POS-014, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305, BO-315, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, GST-067, KSK-009, KSK-011, POS-002, POS-006, POS-014, POS-026, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
 
 **Parameters**
 
@@ -4110,8 +4110,8 @@ Check the artwork with `printTicketProof` before activating.
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
-| Writes | `cache:idempotency`, `orders.ticket_template` |
-| Called by | BO-346 |
+| Writes | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
+| Called by | BO-344 |
 
 **Parameters**
 
@@ -4752,7 +4752,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Guest callable | True |
 | Reads | `payments.token` |
 | Writes | - |
-| Called by | GST-071, WEB-021 |
+| Called by | GST-011, GST-071, WEB-021 |
 
 **Parameters**
 
@@ -5314,7 +5314,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
 | Writes | `cache:idempotency`, `orders.ticket_template` |
-| Called by | BO-346 |
+| Called by | BO-344 |
 
 **Parameters**
 
@@ -5836,6 +5836,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | status | enum (draft, testing, active, degraded, disabled) |  |  |
 | lastTestedAt | string (date-time) |  | (nullable) |
 | scopePath | string |  |  |
+| credentialRef | string |  | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as SetPaymentProviderRequest.credentialRef. |
 
 **Response**: `PaymentProviderConnection`
 
@@ -5860,6 +5861,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | status | enum (draft, testing, active, degraded, disabled) |  |  |
 | lastTestedAt | string (date-time) |  | (nullable) |
 | scopePath | string |  |  |
+| credentialRef | string |  | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as SetPaymentProviderRequest.credentialRef. |
 
 **Responses**
 
@@ -5934,6 +5936,69 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Plans |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setDunningPolicy
+
+**`PUT /dunning-policy`**: Set the retry schedule and what happens when it runs out
+
+2.14.19-2.14.23, BL-100. **Dunning retry and gateway retry are different axes and must never share a counter.** `setPaymentFailoverPolicy` governs retry *inside* one attempt — a timeout or a 5xx moves to the next provider within seconds, and a decline is final there. This governs retry *across days*: a fresh authorisation, the same guest, a card that may since have been replaced. **Both are called retry, and treating a dunning attempt as a failover attempt is how a guest is charged twice.**
+**A hard decline exits immediately and is never scheduled.** A closed account, a stolen card or a do-not-honour retried on a timetable is how a merchant ID gets flagged by the scheme — so the classification is explicit rather than "anything that was not a success".
+**Dunning cannot revoke admission.** `terminalAction` tops out at `suspendBilling`, and the reason is a person rather than a principle: a guest at a gate on a family day out, refused because a card expired and a retry ran at 3am. Ending someone's access stays a staff decision with a name attached to it.
+
+|  |  |
+|---|---|
+| Permission | `PAYMENT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `payments.dunning_policy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `payments.dunning_policy` |
+| Writes | `payments.dunning_policy` |
+| Called by | ADM-606 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `DunningPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| maxAttempts | integer | yes | Capped at eight and defaulted to four. (min 1; max 8; default 4) |
+| attemptOffsetDays | array of integer |  | Days after the first failure, and the spacing is the part that matters. (default [0, 3, 7, 14]) |
+| minimumHoursBetweenAttempts | integer |  | A floor under the offsets, because a schedule is edited by hand. (default 24) |
+| retryableDeclineClasses | array of DeclineClass: enum (soft, hard, unknown) |  | soft alone, and widening it is a deliberate act. (default ['soft']) |
+| notifyGuestOnEachAttempt | boolean |  | False by default. (default False) |
+| terminalAction | enum (suspendBilling, cancelRenewal) | yes | What happens when the attempts run out, and it deliberately stops short of admission. (default suspendBilling) |
+| scopePath | string |  | The partition key (ADR-0005). |
+
+**Response**: `DunningPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| maxAttempts | integer | yes | Capped at eight and defaulted to four. (min 1; max 8; default 4) |
+| attemptOffsetDays | array of integer |  | Days after the first failure, and the spacing is the part that matters. (default [0, 3, 7, 14]) |
+| minimumHoursBetweenAttempts | integer |  | A floor under the offsets, because a schedule is edited by hand. (default 24) |
+| retryableDeclineClasses | array of DeclineClass: enum (soft, hard, unknown) |  | soft alone, and widening it is a deliberate act. (default ['soft']) |
+| notifyGuestOnEachAttempt | boolean |  | False by default. (default False) |
+| terminalAction | enum (suspendBilling, cancelRenewal) | yes | What happens when the attempts run out, and it deliberately stops short of admission. (default suspendBilling) |
+| scopePath | string |  | The partition key (ADR-0005). |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 200 |  | Set |
+| 422 |  | An attempt schedule that would breach the policy's own guard — more attempts than maxAttempts, two attempts inside minimumHoursBetweenAttempts, or a terminalAction the caller is not permitted to set. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setInstalmentPolicy
@@ -6875,8 +6940,8 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
-| Writes | `cache:idempotency`, `orders.pos_shift`, `platform.outbox` |
+| Reads | `cache:idempotency`, `orders.deposit_box`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Writes | `cache:idempotency`, `orders.deposit_box`, `orders.pos_shift`, `platform.outbox` |
 | Called by | BO-040, BO-043, EMP-009, POS-007 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `closed` -> `reconciled`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`<br/>Shift variance review ([states/variance-review.yaml](../../../states/variance-review.yaml)): moves `pendingReview` -> `reviewed` |
 
@@ -7118,117 +7183,6 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Allocated |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### approveShiftClose
-
-**`POST /shifts/{shiftId}/approve-close`**: Release a shift held for close approval
-
-26 September, pull audit R207. **`ShiftStatus.pendingClosure` said "awaiting SHIFT_APPROVE_CLOSE where configured" and no operation carried that permission**, so a venue that configured approval on close had shifts that could never leave `pendingClosure`.
-Where the venue requires approval on close, the counted shift waits here for a supervisor. Approval moves it to `closed` when the variance is within the configured threshold, and to `pendingVariance` when it is beyond it — **approving the close is not accepting the over/short**, which still needs `acceptShiftVariance` (OVERSHORT_ACCEPT). The approving principal is recorded in `Shift.approvals` as kind `close`.
-**This never accepts a variance** (decided 28 September, audit R080 (e)): it releases a close the venue chose to supervise, and a variance above the threshold still goes to `acceptShiftVariance`, the only path for one.
-
-|  |  |
-|---|---|
-| Permission | `SHIFT_APPROVE_CLOSE` |
-| Scope level | venue |
-| Part of slice | setup, changes rows of `orders.pos_shift_approval` that another operation creates |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
-| Writes | `orders.pos_shift`, `orders.pos_shift_approval`, `platform.outbox` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| shiftId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| reason | string | yes | (min length 3; max length 300) |
-
-**Response**: `Shift`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes | Client-generated UUIDv7. |
-| workstationId | string (uuid) | yes |  |
-| venueId | string (uuid) | yes |  |
-| scopePath | string | yes |  |
-| principalId | string (uuid) | yes | Who opened it. |
-| principalDisplayName | string |  |  |
-| incidents | array of object |  | BL-097. |
-| incidents[].kind | enum (noSale, drawerOpen, override, voidAfterPayment, guestDispute, tillJam, priceQuery, other) |  |  |
-| incidents[].at | string (date-time) |  |  |
-| incidents[].principalId | string (uuid) |  |  |
-| incidents[].note | string |  | (nullable) |
-| status | ShiftStatus: enum (pendingApproval, open, suspended, pendingVariance, pendingClosure, closed, autoClosed) | yes |  |
-| currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
-| currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
-| depositBoxCode | string |  | (nullable) |
-| bagNumber | string |  | (nullable) |
-| openingFloat | Money |  | On the wire this is three fields; in the database it is one column. |
-| openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| openingFloat.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| openingFloat.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| salesTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| salesTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| salesTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| salesTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| refundsTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| refundsTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| refundsTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| refundsTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| liftsTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| liftsTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| liftsTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| liftsTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| expectedCash | object |  | 26 September, pull audit R207. (read-only; nullable) |
-| expectedCash.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| expectedCash.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| expectedCash.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| countedCash | object |  | What the close count found. (read-only; nullable) |
-| countedCash.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| countedCash.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| countedCash.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| variance | object |  | Counted minus expected, as ShiftCloseResult.variance. (read-only; nullable) |
-| variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
-| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
-| heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
-| openedAt | string (date-time) | yes |  |
-| recordedAt | string (date-time) |  | When the device recorded the open. |
-| suspendedAt | string (date-time) |  | (nullable) |
-| suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
-| closedAt | string (date-time) |  | (nullable) |
-| closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
-| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
-| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
-| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
-| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
-| syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
-| approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
-| approvals[].principalId | string (uuid) | yes |  |
-| approvals[].at | string (date-time) | yes |  |
-| approvals[].reason | string |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Released — closed, or pendingVariance where the variance needs acceptance |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Shift is not pendingClosure (problem type shift-not-pending-closure) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### approveShiftOpen
@@ -7940,7 +7894,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Read routing | primary |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008, EMP-009, POS-009, POS-019 |
+| Called by | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008, EMP-009, POS-007, POS-009, POS-019, POS-025 |
 
 **Parameters**
 
@@ -8049,7 +8003,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | Offline | no |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `identity.principal`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings`, `platform.workstation` |
-| Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift` |
+| Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Called by | POS-001 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `allocated` -> `open`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): created as `pendingApproval` or `open` |
 
@@ -8888,7 +8842,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | Conflict policy | append |
 | Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
-| Writes | `cache:idempotency`, `orders.cash_movement`, `orders.deposit_box` |
+| Writes | `cache:idempotency`, `orders.cash_movement`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
 | Called by | BO-042, POS-018 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): created as `allocated` |
 
@@ -9780,6 +9734,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resolved_by_principal_id | uuid | no | Who closed it. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `payments.dunning_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| max_attempts | integer | yes | Capped at eight and defaulted to four. |
+| attempt_offset_days | integer[] | no | Days after the first failure, and the spacing is the part that matters. |
+| minimum_hours_between_attempts | integer | no | A floor under the offsets, because a schedule is edited by hand. |
+| retryable_decline_classes | text[] | no | soft alone, and widening it is a deliberate act. |
+| notify_guest_on_each_attempt | boolean | no | False by default. |
+| terminal_action | text | yes | What happens when the attempts run out, and it deliberately stops short of admission. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `payments.instalment`
 
 | Column | Type | Required | Notes |
@@ -9884,6 +9851,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | last_tested_at | timestamptz | no |  |
 | scope_path | text | no |  |
+| credential_ref | text | no | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as SetPaymentProviderRequest.credentialRef. |
 
 ### `payments.routing_rule`
 
@@ -9924,8 +9892,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `setDepositPolicy` |
 | orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
-| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
+| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |
-| shift | `adjustDepositBoxFloat`, `closeDepositBoxes`, `getShift` |
+| shift | `adjustDepositBoxFloat`, `approveShiftClose`, `closeDepositBoxes`, `getShift` |
 | sync | `resolveSyncRejection` |

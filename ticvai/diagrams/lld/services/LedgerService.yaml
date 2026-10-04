@@ -33,7 +33,7 @@ operationsByContract:
     permission: LEDGER_APPROVE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: approveJournalEntry
     verb: POST
     path: /journal-entries/{entryId}/approve
@@ -49,7 +49,7 @@ operationsByContract:
     permission: LEDGER_APPROVE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: calculateTax
     verb: POST
     path: /tax/calculate
@@ -64,8 +64,8 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 9
+    writes: 4
   - operation: createAccount
     verb: POST
     path: /accounts
@@ -449,7 +449,7 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 5
-    writes: 2
+    writes: 4
   - operation: rejectJournal
     verb: POST
     path: /journal-entries/{entryId}/reject
@@ -489,7 +489,7 @@ operationsByContract:
     permission: LEDGER_APPROVE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: reviewPriceVariance
     verb: POST
     path: /price-variances/{varianceId}/review
@@ -561,7 +561,7 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 3
-    writes: 3
+    writes: 5
   - operation: transmitEInvoices
     verb: POST
     path: /e-invoicing/transmissions
@@ -690,6 +690,23 @@ tables:
   - transmitEInvoices
   - updateAccount
   - updateTaxCode
+  keys:
+    setEInvoicingProvider:
+      role: evicts
+      resolvers: &id001
+      - ledger.einvoicing_provider
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setTaxInvoiceTemplate:
+      role: evicts
+      resolvers: &id002
+      - ledger.tax_invoice_template
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -704,10 +721,21 @@ tables:
   - setEInvoicingProvider
   - setTaxInvoiceTemplate
   readBy: null
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    setEInvoicingProvider:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setTaxInvoiceTemplate:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: ledger.account
   columns: 15
   store: postgres
@@ -781,7 +809,8 @@ tables:
   columns: 7
   store: postgres
   parent: ledger.fiscal_period
-  writtenBy: []
+  writtenBy:
+  - finance
   foreignWriters: null
 - table: ledger.fx_provider_assignment
   columns: 6
@@ -798,7 +827,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.inter_entity_obligation
-  columns: 12
+  columns: 14
   store: postgres
   parent: null
   writtenBy:

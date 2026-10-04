@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 21 operations · 27 schemas · 5 permissions**
+**10 screens · 24 operations · 37 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `AI_CONFIGURE, AI_USE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AI_CONFIGURE, AI_USE, ASSET_LIBRARY_MANAGE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -107,8 +107,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-795` | Unified Inbox | D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-796` | Guest Conversation 360 | D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-797` | AI Chatbot Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-798` | Intent & Knowledge Management | A | 5 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-799` | Agent Workspace | A | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `BO-798` | Intent & Knowledge Management | A | 28 | 29 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-799` | Agent Workspace | A | 16 | 33 | 6 | 19 | 0 | 0 | — | notStarted (—) |
 | `BO-800` | Routing & Queue Management | D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-801` | Sales & Service Actions | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-802` | Sentiment, Quality & Escalation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
@@ -116,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-794, BO-795, BO-796, BO-797, BO-799, BO-801, BO-802, BO-803 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-794, BO-795, BO-796, BO-797, BO-801, BO-802, BO-803 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

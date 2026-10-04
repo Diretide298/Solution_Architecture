@@ -1167,7 +1167,16 @@
   "whitelabel.site_package": "2026-10-02",
   "maintenance.incident_media": "2026-10-03",
   "fnb.kitchen_sla": "2026-10-04",
-  "orders.guest_credit_account": "2026-10-04"
+  "orders.guest_credit_account": "2026-10-04",
+  "control.developer_member": "2026-10-04",
+  "fnb.combo_slot_option": "2026-10-04",
+  "identity.guest_credential": "2026-10-04",
+  "inventory.daily_count_list": "2026-10-04",
+  "maintenance.incident_history": "2026-10-04",
+  "promotions.code_assignment": "2026-10-04",
+  "wallet.risk_rule": "2026-10-04",
+  "whitelabel.homepage_layout": "2026-10-04",
+  "whitelabel.navigation_config": "2026-10-04"
  },
  "renames": [
   {

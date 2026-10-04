@@ -1,4 +1,4 @@
--- fnb — 52 tables
+-- fnb — 53 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS fnb.allergen_verdict (
     matches                           boolean NOT NULL,
     declared                          text[],
     actual                            text[],
+    undeclared                        jsonb,
     over_declared                     text[],
     checked_at                        timestamptz NOT NULL,
     trigger                           text NOT NULL CONSTRAINT allergen_verdict_trigger_chk CHECK (trigger IN ('manual', 'recipeChanged', 'substitutionChanged', 'modifierChanged')),
@@ -58,6 +59,14 @@ CREATE TABLE IF NOT EXISTS fnb.combo_slot (
     sort_order                        integer DEFAULT 100
 );
 
+CREATE TABLE IF NOT EXISTS fnb.combo_slot_option (
+    id                                uuid PRIMARY KEY NOT NULL,
+    combo_slot_id                     uuid NOT NULL,
+    menu_item_id                      uuid NOT NULL,
+    upcharge                          numeric(18,4),
+    is_default                        boolean
+);
+
 -- What was done about a finding and who signed it. The signature is the record — *discarded and
 -- reset* with nobody against it is not a corrective action
 CREATE TABLE IF NOT EXISTS fnb.corrective_action (
@@ -101,7 +110,8 @@ CREATE TABLE IF NOT EXISTS fnb.delivery_location (
     serving_outlet_ids                text[],
     is_serviceable                    boolean NOT NULL,
     unserviceable_reason              text,
-    walk_time_minutes                 integer
+    walk_time_minutes                 integer,
+    code_generation                   integer DEFAULT 1
 );
 
 -- join table. Which outlets serve which locations Hangs off: a child of fnb.delivery_location;
@@ -144,6 +154,7 @@ CREATE TABLE IF NOT EXISTS fnb.dining_table (
     position                          jsonb,
     shape                             text CONSTRAINT dining_table_shape_chk CHECK (shape IN ('round', 'square', 'rectangle', 'booth', 'bar')),
     is_out_of_service                 boolean DEFAULT false,
+    code_generation                   integer DEFAULT 1,
     outlet_id                         uuid
 );
 
@@ -159,7 +170,8 @@ CREATE TABLE IF NOT EXISTS fnb.ingredient_substitute (
     allergens_removed_json            text,
     requires_approval                 boolean NOT NULL,
     is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL
+    created_at                        timestamptz NOT NULL,
+    recipe_id                         uuid
 );
 
 -- Something that cost the kitchen a service and left no other trace — equipment down, an item run
@@ -188,6 +200,8 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_routing_rule (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS fnb.kitchen_sla (
     outlet_id                         uuid PRIMARY KEY NOT NULL,
     targets                           jsonb,
@@ -225,7 +239,8 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_ticket (
     prioritise_reason                 text,
     created_at                        timestamptz NOT NULL,
     target_ready_at                   timestamptz,
-    elapsed_seconds                   integer
+    elapsed_seconds                   integer,
+    visit_id                          uuid
 );
 
 -- One item the kitchen is making, bumped independently
@@ -699,7 +714,9 @@ CREATE TABLE IF NOT EXISTS fnb.table_visit (
     running_total                     numeric(18,4),
     gratuity                          numeric(18,4),
     opened_at                         timestamptz NOT NULL,
-    closed_at                         timestamptz
+    closed_at                         timestamptz,
+    service_stage                     text,
+    service_stage_recorded_at         timestamptz
 );
 
 -- A unit that gets read, and the range it must hold. fnb.temperature_log.check_point_id was NOT

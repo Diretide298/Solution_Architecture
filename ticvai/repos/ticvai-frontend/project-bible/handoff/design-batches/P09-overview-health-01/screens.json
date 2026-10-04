@@ -75,6 +75,9 @@
     "ADM-412",
     "ADM-424",
     "ADM-500",
+    "ADM-503",
+    "ADM-504",
+    "ADM-505",
     "ADM-506",
     "ADM-508",
     "ADM-523",
@@ -495,6 +498,30 @@
      ]
     },
     {
+     "to": "ADM-503",
+     "trigger": "Opens Ticket, Product & Timeslot Demand Forecast",
+     "provenance": "CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when it went back to Block B with Identity & Security (Chinmay, 4 October)",
+     "carries": [
+      "tenantId"
+     ]
+    },
+    {
+     "to": "ADM-504",
+     "trigger": "Opens Channel & Booking Pace Forecast",
+     "provenance": "CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when it went back to Block B with Identity & Security (Chinmay, 4 October)",
+     "carries": [
+      "tenantId"
+     ]
+    },
+    {
+     "to": "ADM-505",
+     "trigger": "Opens Revenue & Commercial Forecast",
+     "provenance": "CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when it went back to Block B with Identity & Security (Chinmay, 4 October)",
+     "carries": [
+      "tenantId"
+     ]
+    },
+    {
      "to": "ADM-506",
      "trigger": "Opens Forecast Drivers, Confidence & Explainability",
      "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
@@ -840,7 +867,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Drawn 26 August** — `Dashboards Board` frame `adm-003`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Drawn 26 August** — `Dashboards Board` frame `adm-003`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.\n\n**Cross-tenant: the cells are listed with listCells (agreed with contracts in the ledger, 4 October 2026); cellId is optional and comes from the selected row** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "Dashboards Board.dc.html#adm-003"
@@ -870,6 +897,22 @@
        ],
        "operation": "listCellJobs",
        "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Cells",
+       "bindsTo": "CellDetail",
+       "operation": "listCells",
+       "columns": [
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt"
+       ],
+       "notes": "Every cell, unhealthy first; selecting one loads its health, capacity and jobs.",
+       "provenance": "agreed operation `listCells`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1073,13 +1116,22 @@
     "invalidates": [
      "listCellJobs"
     ]
+   },
+   {
+    "operationId": "listCells",
+    "contract": "subscription",
+    "purpose": "Every cell across tenants with its health summary, to pick one: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "cellId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "From ADM-002 there is none: the operator picks a cell from the list."
     }
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`, `rightId`.",

@@ -114,8 +114,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-173` | Gift, Free Product & Added-Value Offer Builder | B–D | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-174` | Cross-Category Promotion Builder | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-175` | Reward Selection, Substitution & Customer Choice | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-176` | Advanced Offer Guardrails & Conflict Controls | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | C | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-176` | Advanced Offer Guardrails & Conflict Controls | B | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | B | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -1096,7 +1096,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-176 |
+| Block | Block B · task VM-ADM-176 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define preliminary behavior; Prevent configurations such as) and no display directory — it is settings, not a population |
@@ -1213,7 +1213,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-177 |
+| Block | Block B · task VM-ADM-177 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

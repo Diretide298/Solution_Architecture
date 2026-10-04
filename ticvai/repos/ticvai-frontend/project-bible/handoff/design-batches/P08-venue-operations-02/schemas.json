@@ -548,6 +548,69 @@
    }
   }
  },
+ "CreateReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "category",
+   "dataSource",
+   "columns",
+   "requiredPermission"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "category": {
+    "$ref": "#/components/schemas/ReportCategory"
+   },
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "parameters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportParameter"
+    }
+   },
+   "requiredPermission": {
+    "$ref": "../shared/permissions.yaml#/components/schemas/Permission",
+    "description": "Permission needed to run this report, from the shared `Permission` vocabulary. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
+   },
+   "maxDateRangeDays": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "default": 366,
+    "description": "Guards against a query spanning years of scan events. **When a report sets none, 366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always has a limit."
+   }
+  }
+ },
  "DeploymentProfile": {
   "type": "string",
   "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
@@ -1176,6 +1239,68 @@
     "readOnly": true
    }
   }
+ },
+ "ReportDefinition": {
+  "x-ticvai-persistence": "reporting.report_definition + reporting.report_column + reporting.report_filter",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateReportRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isSystem",
+     "isRetired",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string",
+      "description": "The current version. Assigned by the server on each publish; earlier ones are kept as `ReportDefinitionVersion`."
+     },
+     "isSystem": {
+      "type": "boolean",
+      "description": "Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.\n"
+     },
+     "isRetired": {
+      "type": "boolean"
+     },
+     "estimatedCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Informs whether it may run inline or must be queued."
+     },
+     "createdByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "scopePath": {
+      "type": "string",
+      "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+     }
+    }
+   }
+  ]
  },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",

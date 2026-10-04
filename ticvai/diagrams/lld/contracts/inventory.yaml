@@ -1,5 +1,5 @@
 id: LLD-inventory
-title: inventory — 58 operations
+title: inventory — 59 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -352,7 +352,8 @@ operations:
   reads:
   - inventory.item
   - inventory.location
-  - inventory.stock_level
+  - inventory.movement
+  - inventory.stock_reservation
   writes: []
 - operation: getStockTransfer
   verb: GET
@@ -378,7 +379,7 @@ operations:
   offline: false
   reads:
   - inventory.item
-  - inventory.stock_level
+  - inventory.movement
   - ledger.account
   writes: []
 - operation: getSuggestedRequisitions
@@ -463,6 +464,18 @@ operations:
   - inventory.item
   - inventory.serialised_item
   - inventory.stock_batch
+  writes: []
+- operation: listStockCountLines
+  verb: GET
+  path: /stock-counts/{countId}/lines
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.count
+  - inventory.count_line
   writes: []
 - operation: listStockCounts
   verb: GET
@@ -704,11 +717,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - inventory.daily_count_list
   - inventory.item
   writes:
   - cache:idempotency
   - cache:resolution
-  - inventory.item
+  - inventory.daily_count_list
 - operation: setInventoryKitDefinition
   verb: PUT
   path: /inventory-items/{itemId}/kit-definition
@@ -741,6 +755,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.count
+  - inventory.count_line
 - operation: submitCountLines
   verb: POST
   path: /stock-counts/{countId}/lines

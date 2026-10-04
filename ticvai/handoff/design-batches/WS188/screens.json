@@ -1596,50 +1596,25 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every credit expiry extension",
-       "columns": [
-        "Expiring today",
-        "Expiring in 7 days",
-        "Expiring in 30 days",
-        "Expired",
-        "Extended",
-        "Forfeited",
-        "Suspended"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 31 §Display"
-      },
-      {
-       "kind": "dataTable",
-       "label": "The tranches behind a balance, with their expiry",
+       "label": "Credit lots",
        "bindsTo": "CreditLot",
        "operation": "listCreditLots",
-       "provenance": "contract wallet.yaml GET /credit-lots; wiring fix, 2 October 2026"
+       "provenance": "contract wallet.yaml CreditLot (defined 4 October 2026, CHG-FXS-003)",
+       "notes": "Across the venue's wallets when no wallet is picked; selecting lots gives expireCreditLots its lots to expire, extend or forfeit."
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiring within",
+       "operation": "listCreditLots",
+       "notes": "Query expiringWithinDays: today, 7 or 30 days.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected credit expiry extension",
-       "bindsTo": null,
-       "columns": [
-        "Expiring today",
-        "Expiring in 7 days",
-        "Expiring in 30 days",
-        "Expired",
-        "Extended",
-        "Forfeited",
-        "Suspended"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Authorized administrators may”, “Require”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 31 §Display"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1665,7 +1640,7 @@
    {
     "operationId": "listCreditLots",
     "contract": "wallet",
-    "purpose": "The tranches behind a balance, with their expiry",
+    "purpose": "Every wallet's credit lots at this venue (no walletId), filtered by expiringWithinDays (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
@@ -1686,6 +1661,7 @@
    "workshopBoard": "wireframes/WS188 Wallet Configuration Backend Structure v1.0 Board 3.dc.html#bo-1111"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 31. 0 of 7 labels bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Credit lots are listed across the venue by expiry window (listCreditLots without walletId, expiringWithinDays), 4 October 2026; the pack-label tables left** (CHG-FXS-003)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

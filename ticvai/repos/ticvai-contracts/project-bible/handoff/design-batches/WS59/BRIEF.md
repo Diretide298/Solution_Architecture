@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-334` | Virtual Ticket Command Center | C | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 9 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 19 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-336` | Virtual Ticket Status & Lifecycle Model | C | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-337` | Media Type & Credential Technology Registry | C | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-338` | Multi-Media Binding & Association Rules | C | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |

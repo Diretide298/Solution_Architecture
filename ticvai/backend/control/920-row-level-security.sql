@@ -118,13 +118,14 @@ BEGIN
 END
 $$;
 
--- **85 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 0 by subject, 0 to the tenant root only, 51 with no policy.**
+-- **86 tables: 30 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 0 by subject, 0 to the tenant root only, 51 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
 
 
 -- Scoped by path.
+SELECT platform.apply_scope_rls('control.api_anomaly_rule'::regclass);
 SELECT platform.apply_scope_rls('control.channel_listing'::regclass);
 SELECT platform.apply_scope_rls('control.content_block'::regclass);
 SELECT platform.apply_scope_rls('control.migration_plan'::regclass);
@@ -153,9 +154,7 @@ SELECT platform.apply_scope_rls('control.partner_status_history'::regclass);
 SELECT platform.apply_scope_rls('control.seo_metadata'::regclass);
 SELECT platform.apply_scope_rls('control.support_notice'::regclass);
 SELECT platform.apply_scope_rls('control.url_redirect'::regclass);
-
--- Carries venue_id but not scoped here: the control database has no scope tree to resolve a venue against, and these are operator records read across tenants.
---   control.usage_record
+SELECT platform.apply_scope_rls('control.usage_record'::regclass);
 
 -- Scoped through the parent that owns the row (a NOT NULL declared foreign key).
 SELECT platform.apply_parent_rls('control.migration_plan_cell'::regclass, 'migration_plan_id', 'control.migration_plan'::regclass, 'id');
@@ -167,7 +166,6 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 -- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a
 -- NOT NULL owning reference) before row-level security can hold for it.
 --   control.api_anomaly  -- its owner control.api_client has no policy either
---   control.api_anomaly_rule  -- only nullable references (client_id -> control.api_client)
 --   control.api_client  -- only nullable references (certification_listing_id -> control.integration_listing)
 --   control.api_licence  -- its owner control.tenant has no policy either
 --   control.api_limit  -- no scope column and no declared owner
@@ -187,6 +185,7 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 --   control.credit_note  -- no scope column and no declared owner
 --   control.credit_note_line  -- its owner control.credit_note has no policy either
 --   control.developer_account  -- no scope column and no declared owner
+--   control.developer_member  -- no scope column and no declared owner
 --   control.environment  -- its owner control.cell has no policy either
 --   control.integration_listing  -- no scope column and no declared owner
 --   control.invoice  -- no scope column and no declared owner

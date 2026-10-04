@@ -256,11 +256,13 @@ operations:
   - platform.outlet
   - venuemap.map
   - venuemap.path
+  - venuemap.placed_resource
   - venuemap.point
   writes:
   - cache:idempotency
   - cache:resolution
   - venuemap.map
+  - venuemap.map_version
 - operation: setPathClosure
   verb: POST
   path: /venue-maps/{mapId}/paths/{pathId}/closure

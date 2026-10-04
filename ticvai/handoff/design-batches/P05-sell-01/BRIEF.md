@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | C | 0 | 2 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-001` | Attract Loop | A | 0 | 2 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-002` | Language Select | B | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |

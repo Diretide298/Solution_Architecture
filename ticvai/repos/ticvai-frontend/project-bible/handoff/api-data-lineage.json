@@ -245,7 +245,17 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "price-list"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setPrices": {
   "contract": "catalogue",
@@ -274,7 +284,17 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "price-list"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "listEvents": {
   "contract": "catalogue",
@@ -510,7 +530,13 @@
   "path": "/catalogue/bundles",
   "reads": [
    "cache:idempotency",
-   "catalogue.published_bundle"
+   "catalogue.price",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.published_bundle",
+   "catalogue.variant",
+   "platform.sale_board",
+   "platform.sale_board_tile"
   ],
   "writes": [
    "cache:idempotency",
@@ -529,7 +555,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards"
  },
  "getLatestBundle": {
   "contract": "catalogue",
@@ -728,9 +755,11 @@
   "verb": "POST",
   "path": "/products/{productId}/lifecycle",
   "reads": [
+   "access.entitlement",
    "cache:idempotency",
    "catalogue.product",
-   "catalogue.product_media"
+   "catalogue.product_media",
+   "catalogue.published_bundle"
   ],
   "writes": [
    "cache:idempotency",
@@ -751,7 +780,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the archive rule and isSellable"
  },
  "listAlternativeCodes": {
   "contract": "catalogue",
@@ -1162,7 +1192,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "createOrgUnit": {
   "contract": "tenancy",
@@ -1190,7 +1230,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getOrgUnit": {
   "contract": "tenancy",
@@ -1216,7 +1266,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "updateOrgUnit": {
   "contract": "tenancy",
@@ -1244,7 +1304,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getRegionSettings": {
   "contract": "tenancy",
@@ -1270,7 +1340,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "platform.region_settings"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "updateRegionSettings": {
   "contract": "tenancy",
@@ -1298,7 +1378,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "platform.region_settings"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "listWorkstations": {
   "contract": "tenancy",
@@ -1787,6 +1877,7 @@
   "writes": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1804,7 +1895,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the discount it records (the ledger posts from the order events)"
  },
  "voidOrder": {
   "contract": "orders",
@@ -2017,7 +2109,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "orders.refund_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setRefundPolicy": {
   "contract": "orders",
@@ -2047,7 +2149,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "orders.refund_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "createPayment": {
   "contract": "orders",
@@ -3346,7 +3458,9 @@
   "writes": [
    "cache:idempotency",
    "orders.cash_count_line",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "routing": "",
   "scope": "workstation",
@@ -3571,12 +3685,14 @@
   "path": "/shifts/{shiftId}/accept-variance",
   "reads": [
    "cache:idempotency",
+   "orders.deposit_box",
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident"
   ],
   "writes": [
    "cache:idempotency",
+   "orders.deposit_box",
    "orders.pos_shift",
    "platform.outbox"
   ],
@@ -3593,7 +3709,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the shift's deposit boxes become reconciled"
  },
  "recordNoSale": {
   "contract": "shift",
@@ -4182,7 +4299,11 @@
   "path": "/auth/sessions/{sessionId}/force-logout",
   "reads": [
    "cache:idempotency",
-   "identity.session"
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.principal_credential",
+   "identity.session",
+   "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
@@ -4201,7 +4322,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the supervisor's PIN and SESSION_FORCE_LOGOUT at the till's venue"
  },
  "getCurrentSession": {
   "contract": "identity",
@@ -4231,7 +4353,17 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "listPrincipals": {
   "contract": "identity",
@@ -4341,7 +4473,8 @@
   "verb": "GET",
   "path": "/roles",
   "reads": [
-   "identity.role"
+   "identity.role",
+   "identity.role_permission"
   ],
   "writes": [],
   "routing": "replica",
@@ -4356,7 +4489,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): each role's permissions"
  },
  "createRole": {
   "contract": "identity",
@@ -4364,12 +4498,16 @@
   "path": "/roles",
   "reads": [
    "cache:idempotency",
-   "identity.role"
+   "identity.capability_template",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.role"
+   "identity.role",
+   "identity.role_permission"
   ],
   "routing": "",
   "scope": "venue",
@@ -4384,7 +4522,18 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): the permissions, preset template and segregation rules"
  },
  "listDelegatedAccess": {
   "contract": "identity",
@@ -4436,7 +4585,17 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "deleteDelegatedAccess": {
   "contract": "identity",
@@ -4465,7 +4624,17 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "resolvePermissions": {
   "contract": "identity",
@@ -4499,7 +4668,17 @@
   "audience": [
    "staff"
   ],
-  "pure": "computes effective permissions; nothing is granted"
+  "pure": "computes effective permissions; nothing is granted",
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "registerGuest": {
   "contract": "identity",
@@ -4512,6 +4691,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.guest_credential",
    "identity.guest_session",
    "pii.subject",
    "pii.subject_contact",
@@ -4531,7 +4711,8 @@
   "audience": [
    "anonymous"
   ],
-  "lineageNote": "emits identity.loginRecorded (first sign-in)"
+  "lineageNote": "emits identity.loginRecorded (first sign-in)",
+  "fixNote": "4 October 2026 (CHG-FXC-004): the optional password's hash"
  },
  "requestGuestOtp": {
   "contract": "identity",
@@ -4815,12 +4996,17 @@
   "path": "/auth/sso/{providerId}/callback",
   "reads": [
    "cache:idempotency",
+   "identity.delegated_access",
    "identity.mfa_method",
    "identity.principal",
+   "identity.role",
+   "identity.sso_group_mapping",
    "identity.sso_provider"
   ],
   "writes": [
    "cache:idempotency",
+   "identity.delegated_access",
+   "identity.principal",
    "identity.session",
    "platform.outbox"
   ],
@@ -4838,7 +5024,8 @@
   "audience": [
    "anonymous"
   ],
-  "lineageNote": "emits identity.loginRecorded"
+  "lineageNote": "emits identity.loginRecorded",
+  "fixNote": "4 October 2026 (CHG-FXC-004): group-to-role mapping, availableRoles and requiresMfa"
  },
  "getSsoConfig": {
   "contract": "identity",
@@ -5718,7 +5905,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.journal_entry"
+   "ledger.journal_entry",
+   "ledger.journal_line"
   ],
   "routing": "",
   "scope": "region",
@@ -6170,7 +6358,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "routing": "",
   "scope": "region",
@@ -6185,7 +6374,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): every close step is a fiscal_period_event"
  },
  "abandonPeriodClose": {
   "contract": "finance",
@@ -6198,7 +6388,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "routing": "",
   "scope": "region",
@@ -6213,7 +6404,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): every close step is a fiscal_period_event"
  },
  "reopenPeriod": {
   "contract": "finance",
@@ -6250,11 +6442,18 @@
   "reads": [
    "cache:idempotency",
    "ledger.fiscal_period",
-   "ledger.fiscal_period_event"
+   "ledger.fiscal_period_event",
+   "ledger.journal_entry",
+   "ledger.journal_line",
+   "ledger.price_variance",
+   "ledger.recognition_schedule",
+   "ledger.settlement",
+   "ledger.settlement_exception"
   ],
   "writes": [
    "cache:idempotency",
    "ledger.fiscal_period",
+   "ledger.fiscal_period_event",
    "platform.outbox"
   ],
   "routing": "",
@@ -6270,7 +6469,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the close checks (PeriodCloseResult.checks) and the run record"
  },
  "getFinancialReport": {
   "contract": "finance",
@@ -6508,7 +6708,17 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "marketing.consent_purpose"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setConsentPurposes": {
   "contract": "marketing-crm",
@@ -6538,7 +6748,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "marketing.consent_purpose"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getSuppressionList": {
   "contract": "marketing-crm",
@@ -6825,7 +7045,9 @@
   "verb": "GET",
   "path": "/segments/{segmentId}/members",
   "reads": [
-   "marketing.guest_profile"
+   "marketing.guest_profile",
+   "marketing.segment",
+   "marketing.segment_criterion"
   ],
   "writes": [],
   "routing": "replica",
@@ -6840,7 +7062,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the definition evaluated live"
  },
  "listCampaigns": {
   "contract": "marketing-crm",
@@ -6937,6 +7160,7 @@
    "cache:idempotency",
    "marketing.campaign",
    "marketing.campaign_target",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "routing": "",
@@ -7559,10 +7783,12 @@
   "path": "/reviews",
   "reads": [
    "cache:idempotency",
+   "marketing.case",
    "marketing.review"
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.case",
    "marketing.review"
   ],
   "routing": "",
@@ -7578,7 +7804,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): a low rating opens a service case"
  },
  "respondToReview": {
   "contract": "marketing-crm",
@@ -7831,7 +8058,8 @@
   "writes": [
    "cache:idempotency",
    "subscription.plan",
-   "subscription.plan_limit"
+   "subscription.plan_limit",
+   "subscription.plan_module"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7887,7 +8115,8 @@
   "writes": [
    "cache:idempotency",
    "subscription.plan",
-   "subscription.plan_limit"
+   "subscription.plan_limit",
+   "subscription.plan_module"
   ],
   "routing": "",
   "scope": "tenant",
@@ -8095,7 +8324,8 @@
   "verb": "GET",
   "path": "/tenants/{tenantId}/cells",
   "reads": [
-   "control.cell"
+   "control.cell",
+   "control.cell_tenant"
   ],
   "writes": [],
   "routing": "replica",
@@ -8110,7 +8340,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): Cell.tenant_id is retired (ADR-0039 section 4)"
  },
  "provisionCell": {
   "contract": "subscription",
@@ -8763,11 +8994,15 @@
   "path": "/location-sessions",
   "reads": [
    "cache:idempotency",
-   "fnb.location_session"
+   "fnb.delivery_location",
+   "fnb.dining_table",
+   "fnb.location_session",
+   "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.location_session"
+   "fnb.location_session",
+   "fnb.table_visit"
   ],
   "routing": "",
   "scope": "venue",
@@ -8782,7 +9017,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the location the code names and its codeGeneration; a table's open visit"
  },
  "recordOrderHandover": {
   "contract": "fnb",
@@ -8819,11 +9055,15 @@
   "path": "/table-sessions",
   "reads": [
    "cache:idempotency",
-   "fnb.table_session"
+   "fnb.dining_table",
+   "fnb.table_session",
+   "fnb.table_visit",
+   "platform.outlet"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.table_session"
+   "fnb.table_session",
+   "fnb.table_visit"
   ],
   "routing": "",
   "scope": "venue",
@@ -8838,7 +9078,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the table the code names, the open visit it joins or starts, the outlet's opening"
  },
  "createGuestFnbOrder": {
   "contract": "fnb",
@@ -8850,7 +9091,7 @@
    "fnb.location_session",
    "fnb.menu_item",
    "fnb.menu_item_modifier",
-   "inventory.stock_level"
+   "inventory.movement"
   ],
   "writes": [
    "cache:idempotency",
@@ -8873,7 +9114,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): derived from movements"
  },
  "getGuestOrderStatus": {
   "contract": "fnb",
@@ -9218,6 +9460,8 @@
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "platform.outbox"
   ],
@@ -9234,7 +9478,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): accepting creates the kitchen ticket"
  },
  "cancelFnbOrder": {
   "contract": "fnb",
@@ -9304,7 +9549,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.service_order"
+   "fnb.service_order",
+   "fnb.service_order_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -9319,14 +9565,16 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): lines added and removed"
  },
  "getTableMap": {
   "contract": "fnb",
   "verb": "GET",
   "path": "/outlets/{outletId}/tables",
   "reads": [
-   "fnb.dining_table"
+   "fnb.dining_table",
+   "fnb.table_visit"
   ],
   "writes": [],
   "routing": "replica",
@@ -9341,7 +9589,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): TableState is the table and its open visit"
  },
  "setTableLayout": {
   "contract": "fnb",
@@ -9349,7 +9598,8 @@
   "path": "/outlets/{outletId}/tables",
   "reads": [
    "cache:idempotency",
-   "fnb.dining_table"
+   "fnb.dining_table",
+   "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
@@ -9368,7 +9618,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): a table with an open visit cannot be removed or resized"
  },
  "openTableVisit": {
   "contract": "fnb",
@@ -9583,11 +9834,13 @@
   "path": "/tables/{tableId}/clear",
   "reads": [
    "cache:idempotency",
-   "fnb.dining_table"
+   "fnb.dining_table",
+   "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.dining_table"
+   "fnb.dining_table",
+   "fnb.table_visit"
   ],
   "routing": "",
   "scope": "venue",
@@ -9602,7 +9855,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): clearing closes the open visit"
  },
  "listKitchenTickets": {
   "contract": "fnb",
@@ -9762,11 +10016,17 @@
   "path": "/recipes",
   "reads": [
    "cache:idempotency",
+   "fnb.menu_item",
+   "fnb.modifier_group",
    "fnb.recipe",
-   "fnb.recipe_ingredient"
+   "fnb.recipe_ingredient",
+   "fnb.substitution_rule",
+   "inventory.item"
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.allergen_verdict",
+   "fnb.menu_item",
    "fnb.recipe",
    "fnb.recipe_ingredient"
   ],
@@ -9783,7 +10043,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): costs from inventory items; the menu item marked stock-tracked; verifyAllergens re-run"
  },
  "recordWaste": {
   "contract": "fnb",
@@ -10498,7 +10759,15 @@
   "verb": "POST",
   "path": "/performances/{performanceId}/seat-recommendations",
   "reads": [
-   "catalogue.performance"
+   "catalogue.performance",
+   "seating.accessible",
+   "seating.recommendation_rules",
+   "seating.seat",
+   "seating.seat_block_item",
+   "seating.seat_category",
+   "seating.seat_hold",
+   "seating.seat_hold_item",
+   "seating.seat_price_band"
   ],
   "writes": [],
   "routing": "",
@@ -10516,7 +10785,8 @@
    "staff",
    "guest"
   ],
-  "pure": "computed; seats are held only by createSeatHold"
+  "pure": "computed; seats are held only by createSeatHold",
+  "fixNote": "4 October 2026 (CHG-FXC-004): seat ids, contiguity, category and price"
  },
  "listInventoryItems": {
   "contract": "inventory",
@@ -10645,7 +10915,8 @@
   "reads": [
    "inventory.item",
    "inventory.location",
-   "inventory.stock_level"
+   "inventory.movement",
+   "inventory.stock_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -10661,7 +10932,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): on hand is derived from movements; allocated from reservations; stock_level is not stored"
  },
  "listStockLocations": {
   "contract": "inventory",
@@ -10718,7 +10990,7 @@
   "path": "/stock/valuation",
   "reads": [
    "inventory.item",
-   "inventory.stock_level",
+   "inventory.movement",
    "ledger.account"
   ],
   "writes": [],
@@ -10735,7 +11007,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): derived from movements"
  },
  "listStockMovements": {
   "contract": "inventory",
@@ -10820,7 +11093,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.count"
+   "inventory.count",
+   "inventory.count_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -11974,7 +12248,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "retail.return_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setReturnPolicy": {
   "contract": "retail",
@@ -12002,7 +12286,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "retail.return_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getWallet": {
   "contract": "wallet",
@@ -12034,13 +12328,17 @@
   "path": "/wallets/{subjectId}/top-ups",
   "reads": [
    "cache:idempotency",
+   "wallet.balance",
    "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
-   "wallet.wallet"
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "workstation",
@@ -12055,7 +12353,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the one balance writer (SD-027)"
  },
  "listWalletTransactions": {
   "contract": "wallet",
@@ -12219,7 +12518,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "retail.shop_and_drop"
+   "retail.shop_and_drop",
+   "retail.shop_and_drop_line"
   ],
   "routing": "",
   "scope": "workstation",
@@ -12294,11 +12594,14 @@
   "path": "/outlets/{outletId}/reserve",
   "reads": [
    "cache:idempotency",
+   "inventory.movement",
+   "inventory.stock_reservation",
    "retail.reservation",
    "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
+   "inventory.stock_reservation",
    "retail.reservation",
    "retail.reservation_line"
   ],
@@ -12316,7 +12619,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): stock available to allocate, and the allocation"
  },
  "listAssets": {
   "contract": "maintenance",
@@ -13025,7 +13329,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.incident"
+   "maintenance.incident",
+   "maintenance.incident_history"
   ],
   "routing": "",
   "scope": "venue",
@@ -13040,7 +13345,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the append-only history"
  },
  "recordAuthorityNotification": {
   "contract": "maintenance",
@@ -13120,11 +13426,13 @@
   "path": "/media/{mediaId}",
   "reads": [
    "assets.media_asset",
+   "assets.media_collection",
    "assets.media_usage",
    "cache:idempotency"
   ],
   "writes": [
    "assets.media_asset",
+   "assets.media_collection_member",
    "cache:idempotency"
   ],
   "routing": "",
@@ -13140,7 +13448,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): collectionIds replaces the asset's collection members"
  },
  "deleteMediaAsset": {
   "contract": "assets",
@@ -13312,7 +13621,8 @@
   "verb": "GET",
   "path": "/media/rights-expiring",
   "reads": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "assets.media_usage"
   ],
   "writes": [],
   "routing": "replica",
@@ -13327,7 +13637,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): isInUse and liveUsageCount count live usage"
  },
  "listReports": {
   "contract": "reporting",
@@ -16236,10 +16547,12 @@
   "path": "/queues/{queueId}/call-next",
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue"
   ],
   "writes": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue"
   ],
   "routing": "",
@@ -16255,7 +16568,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): entries move to called"
  },
  "listQueueEntries": {
   "contract": "queue",
@@ -16386,6 +16700,7 @@
   "path": "/queue-feeds/readings",
   "reads": [
    "cache:idempotency",
+   "queue.feed",
    "queue.reading"
   ],
   "writes": [
@@ -16405,7 +16720,8 @@
   ],
   "audience": [
    "device"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the feed names the queue"
  },
  "testQueueFeed": {
   "contract": "queue",
@@ -16558,12 +16874,18 @@
   "reads": [
    "cache:idempotency",
    "games.card",
+   "wallet.balance",
    "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "games.card"
+   "games.card",
+   "platform.outbox",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "workstation",
@@ -16578,7 +16900,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): a registered card's credits are wallet movements; wallet.credited through the outbox"
  },
  "transferGameCard": {
   "contract": "games",
@@ -16662,7 +16985,8 @@
   "path": "/games/{gameId}",
   "reads": [
    "cache:idempotency",
-   "games.game"
+   "games.game",
+   "games.play"
   ],
   "writes": [
    "cache:idempotency",
@@ -16681,7 +17005,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): no price or payout change while a play is in flight"
  },
  "recordGamePlay": {
   "contract": "games",
@@ -16825,12 +17150,17 @@
   "reads": [
    "cache:idempotency",
    "games.card",
+   "wallet.balance",
    "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "games.card"
+   "games.card",
+   "platform.outbox",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",
@@ -16845,7 +17175,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): as loadGameCredits"
  },
  "getTenantConfig": {
   "contract": "white-label",
@@ -16858,8 +17189,10 @@
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
    "whitelabel.footer_config_social_link",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
@@ -17054,7 +17387,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setTheme": {
   "contract": "white-label",
@@ -17082,7 +17425,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getFonts": {
   "contract": "white-label",
@@ -17166,6 +17519,7 @@
   "path": "/tenant-config/navigation",
   "reads": [
    "cache:resolution",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item"
   ],
   "writes": [
@@ -17184,7 +17538,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setNavigation": {
   "contract": "white-label",
@@ -17192,11 +17556,13 @@
   "path": "/tenant-config/navigation",
   "reads": [
    "cache:idempotency",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item"
   ],
   "routing": "",
@@ -17212,13 +17578,24 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getHomepageLayout": {
   "contract": "white-label",
   "verb": "GET",
   "path": "/tenant-config/homepage",
   "reads": [
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section"
   ],
   "writes": [],
@@ -17242,10 +17619,12 @@
   "path": "/tenant-config/homepage",
   "reads": [
    "cache:idempotency",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section"
   ],
   "writes": [
    "cache:idempotency",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section"
   ],
   "routing": "",
@@ -17702,7 +18081,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setModuleEnablement": {
   "contract": "white-label",
@@ -17733,7 +18122,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getFeatureToggles": {
   "contract": "white-label",
@@ -17759,7 +18158,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setFeatureToggles": {
   "contract": "white-label",
@@ -17787,7 +18196,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setLanguages": {
   "contract": "white-label",
@@ -17936,8 +18355,10 @@
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
    "whitelabel.footer_config_social_link",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
@@ -17963,7 +18384,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "diffConfigVersion": {
   "contract": "white-label",
@@ -18436,6 +18867,8 @@
   "path": "/delegations",
   "reads": [
    "approvals.delegation",
+   "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal"
@@ -18457,7 +18890,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): exceedsDelegatorAuthority compares with what the matrix lets the delegator approve"
  },
  "revokeApprovalDelegation": {
   "contract": "approvals",
@@ -19606,6 +20040,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "fnb.table_session",
    "fnb.table_visit"
@@ -19623,7 +20058,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): a table assignment is one reservation_table row"
  },
  "listParkingFacilities": {
   "contract": "access",
@@ -20484,7 +20920,9 @@
   "writes": [
    "cache:idempotency",
    "orders.cash_movement",
-   "orders.deposit_box"
+   "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination"
   ],
   "routing": "",
   "scope": "venue",
@@ -21906,12 +22344,14 @@
    "platform.outlet",
    "venuemap.map",
    "venuemap.path",
+   "venuemap.placed_resource",
    "venuemap.point"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "venuemap.map"
+   "venuemap.map",
+   "venuemap.map_version"
   ],
   "routing": "",
   "scope": "venue",
@@ -21926,7 +22366,18 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "venue-map"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): the version snapshot with its placed resources"
  },
  "getVenueMapLive": {
   "contract": "venue-map",
@@ -22010,7 +22461,17 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "venue-map"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "validateVenueMapGraph": {
   "contract": "venue-map",
@@ -22065,7 +22526,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "venue-map"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "proposeWalkways": {
   "contract": "ai",
@@ -22152,7 +22623,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "fills",
+   "resolvers": [
+    "platform.venue_settings"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": null,
+   "affects": null
+  }
  },
  "setVenueSettings": {
   "contract": "tenancy",
@@ -22181,7 +22662,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "platform.venue_settings"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "listResources": {
   "contract": "resources",
@@ -22479,6 +22970,8 @@
   "writes": [
    "cache:idempotency",
    "ledger.deposit",
+   "ledger.journal_entry",
+   "ledger.journal_line",
    "ledger.posting"
   ],
   "routing": "",
@@ -22495,7 +22988,8 @@
   "audience": [
    "staff",
    "service"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the posting needs its journal entry"
  },
  "getUnifiedReconciliation": {
   "contract": "finance",
@@ -23166,7 +23660,7 @@
    "cache:idempotency",
    "fnb.production_run",
    "fnb.recipe",
-   "inventory.stock_level",
+   "inventory.movement",
    "platform.outlet"
   ],
   "writes": [
@@ -23187,7 +23681,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): derived from movements"
  },
  "completeProductionRun": {
   "contract": "fnb",
@@ -23294,6 +23789,8 @@
   ],
   "writes": [
    "cache:idempotency",
+   "ledger.journal_entry",
+   "ledger.journal_line",
    "ledger.posting"
   ],
   "routing": "",
@@ -23570,7 +24067,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "submitOnboardingApplication": {
   "contract": "subscription",
@@ -23791,7 +24298,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "createUrlRedirect": {
   "contract": "marketing-crm",
@@ -23819,7 +24336,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "createForm": {
   "contract": "marketing-crm",
@@ -24073,7 +24600,8 @@
    "pii.subject"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.dsar_request"
   ],
   "routing": "",
   "scope": "tenant",
@@ -24091,7 +24619,7 @@
    "guest"
   ],
   "guestCallable": true,
-  "pure": "assembles the subject's data for download; the request is audited by the platform's audit trail, not a table of this operation"
+  "fixNote": "4 October 2026 (CHG-FXC-004): the 202 raises a dsar_request"
  },
  "simulatePromotion": {
   "contract": "promotions",
@@ -24307,12 +24835,12 @@
   "reads": [
    "cache:idempotency",
    "control.developer_account",
-   "identity.principal"
+   "control.developer_member"
   ],
   "writes": [
    "cache:idempotency",
    "control.developer_account",
-   "identity.delegated_access"
+   "control.developer_member"
   ],
   "routing": "",
   "scope": "tenant",
@@ -24327,7 +24855,8 @@
   ],
   "audience": [
    "partner"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): portal members are control.developer_member rows, not tenant grants"
  },
  "listApiClients": {
   "contract": "public-api",
@@ -24675,7 +25204,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "control.api_limit"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getApiUsage": {
   "contract": "public-api",
@@ -24858,7 +25397,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "control.api_licence"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setFooter": {
   "contract": "white-label",
@@ -24890,7 +25439,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "transferWalletBalance": {
   "contract": "wallet",
@@ -25469,7 +26028,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "platform.configuration_profile"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "deployConfigurationProfile": {
   "contract": "tenancy",
@@ -25527,7 +26096,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "platform.offline_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setConnectivityThresholds": {
   "contract": "tenancy",
@@ -25555,7 +26134,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "platform.connectivity_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "listSerialisedItems": {
   "contract": "inventory",
@@ -25684,7 +26273,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "orders.fraud_rule"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getGroupBooking": {
   "contract": "orders",
@@ -26081,7 +26680,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "fnb.course_rule"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "quoteWaitTime": {
   "contract": "fnb",
@@ -26225,7 +26834,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "menu"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "rollbackMenu": {
   "contract": "fnb",
@@ -26241,7 +26860,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.menu"
+   "fnb.menu",
+   "fnb.menu_version"
   ],
   "routing": "",
   "scope": "venue",
@@ -26256,7 +26876,18 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "menu"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): a rollback writes the new MenuVersion it creates"
  },
  "setSectionLayout": {
   "contract": "fnb",
@@ -26284,7 +26915,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "table-layout"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setTableCombinations": {
   "contract": "fnb",
@@ -26314,7 +26955,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "table-layout"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setServiceStage": {
   "contract": "fnb",
@@ -26462,7 +27113,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "fnb.kitchen_station"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "logKitchenException": {
   "contract": "fnb",
@@ -26518,7 +27179,17 @@
   "audience": [
    "staff"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "fnb.kitchen_sla"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "list86Events": {
   "contract": "fnb",
@@ -26686,7 +27357,17 @@
   "audience": [
    "staff"
   ],
-  "lineageNote": "Shadow assignment is the release pipeline shadow stage (ai.release)."
+  "lineageNote": "Shadow assignment is the release pipeline shadow stage (ai.release).",
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "ai.policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "createCombo": {
   "contract": "fnb",
@@ -26697,12 +27378,14 @@
    "catalogue.product",
    "fnb.combo",
    "fnb.combo_slot",
+   "fnb.combo_slot_option",
    "fnb.menu_item"
   ],
   "writes": [
    "cache:idempotency",
    "fnb.combo",
-   "fnb.combo_slot"
+   "fnb.combo_slot",
+   "fnb.combo_slot_option"
   ],
   "routing": "",
   "scope": "venue",
@@ -26727,11 +27410,13 @@
    "cache:idempotency",
    "fnb.combo",
    "fnb.combo_slot",
+   "fnb.combo_slot_option",
    "fnb.menu_item"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.combo_slot"
+   "fnb.combo_slot",
+   "fnb.combo_slot_option"
   ],
   "routing": "",
   "scope": "venue",
@@ -26776,7 +27461,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "menu"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "matchGuest": {
   "contract": "marketing-crm",
@@ -26918,7 +27613,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "table-layout"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "updateTable": {
   "contract": "fnb",
@@ -26947,7 +27652,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "table-layout"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "scheduleMenuPublish": {
   "contract": "fnb",
@@ -26961,7 +27676,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.menu"
+   "fnb.menu",
+   "fnb.menu_schedule"
   ],
   "routing": "",
   "scope": "venue",
@@ -26976,7 +27692,18 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "menu"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): creates or cancels the MenuSchedule"
  },
  "applyMenuActions": {
   "contract": "fnb",
@@ -27007,7 +27734,18 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "menu",
+    "price-list"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "printOrderLabel": {
   "contract": "fnb",
@@ -27096,12 +27834,13 @@
   "path": "/stock-counts/daily",
   "reads": [
    "cache:idempotency",
+   "inventory.daily_count_list",
    "inventory.item"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "inventory.item"
+   "inventory.daily_count_list"
   ],
   "routing": "",
   "scope": "venue",
@@ -27117,7 +27856,18 @@
   "audience": [
    "staff"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "inventory.daily_count_list"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): the daily list is its own row (DailyCountList)"
  },
  "bulkUpdateProducts": {
   "contract": "inventory",
@@ -27149,7 +27899,19 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "catalogue.product",
+    "inventory.item",
+    "price-list"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "sendBookingConfirmation": {
   "contract": "fnb",
@@ -27278,7 +28040,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "fnb.substitution_rule"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "verifyAllergens": {
   "contract": "fnb",
@@ -27286,10 +28058,15 @@
   "path": "/menu-items/{menuItemId}/verify-allergens",
   "reads": [
    "fnb.allergen_verdict",
+   "fnb.ingredient_substitute",
    "fnb.menu_item",
+   "fnb.menu_item_modifier",
    "fnb.modifier_group",
+   "fnb.modifier_option",
    "fnb.recipe",
-   "fnb.substitution_rule"
+   "fnb.recipe_ingredient",
+   "fnb.substitution_rule",
+   "inventory.item"
   ],
   "writes": [
    "fnb.allergen_verdict"
@@ -27307,7 +28084,8 @@
   "audience": [
    "staff"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "fixNote": "4 October 2026 (CHG-FXC-004): the actual allergens come from the recipe's ingredients (inventory items' allergens), their substitutes and the modifier options"
  },
  "buildProductionPlan": {
   "contract": "fnb",
@@ -27429,7 +28207,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "updateSupplier": {
   "contract": "inventory",
@@ -27459,7 +28247,17 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "inventory.supplier"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getStockTransfer": {
   "contract": "inventory",
@@ -27549,6 +28347,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.case",
    "marketing.case_message"
   ],
   "routing": "",
@@ -30266,7 +31065,9 @@
   "contract": "access",
   "verb": "GET",
   "path": "/biometric-lifecycle-retention",
-  "reads": [],
+  "reads": [
+   "tenancy.data_retention_setting"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -30281,7 +31082,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
  },
  "listBiometricValidationGate": {
   "contract": "access",
@@ -41410,11 +42212,13 @@
   "path": "/code-distribution-manager",
   "reads": [
    "cache:idempotency",
+   "promotions.code_assignment",
    "promotions.coupon_code",
    "promotions.coupon_code_batch"
   ],
   "writes": [
    "cache:idempotency",
+   "promotions.code_assignment",
    "promotions.coupon_code",
    "promotions.promotion_audit"
   ],
@@ -41432,7 +42236,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Assigning codes sets coupon_code.status=assigned and assigned_subject_id (as assignCoupon neighbour), recorded as an assigned event in promotions.promotion_audit; sending/delivery runs through marketing communication services (agreed note), no marketing write here"
+  "lineageNote": "Assigning codes sets coupon_code.status=assigned and assigned_subject_id (as assignCoupon neighbour), recorded as an assigned event in promotions.promotion_audit; sending/delivery runs through marketing communication services (agreed note), no marketing write here",
+  "fixNote": "4 October 2026 (CHG-FXC-004): the assignment row and the codes it assigns"
  },
  "setCommunicationPreferenceMarketing": {
   "contract": "marketing-crm",
@@ -44691,6 +45496,7 @@
    "resources.resource_requirement"
   ],
   "writes": [
+   "resources.booking",
    "resources.resource_requirement"
   ],
   "routing": null,
@@ -52337,9 +53143,11 @@
   "verb": "PUT",
   "path": "/wallet-risk-rules",
   "reads": [
+   "wallet.risk_rule",
    "wallet.risk_rules"
   ],
   "writes": [
+   "wallet.risk_rule",
    "wallet.risk_rules"
   ],
   "routing": null,
@@ -52755,7 +53563,10 @@
   "verb": "GET",
   "path": "/resource-suggestions",
   "reads": [
-   "resources.resource"
+   "resources.booking",
+   "resources.resource",
+   "resources.resource_block",
+   "resources.resource_type"
   ],
   "writes": [],
   "routing": "replica",
@@ -52771,7 +53582,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the type filter and what is free"
  },
  "swapRentalEquipment": {
   "contract": "rental",
@@ -54832,7 +55644,8 @@
   "verb": "GET",
   "path": "/recipes/{recipeId}/substitutes",
   "reads": [
-   "fnb.ingredient_substitute"
+   "fnb.ingredient_substitute",
+   "fnb.recipe"
   ],
   "writes": [],
   "routing": "replica",
@@ -54850,7 +55663,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the recipe the path names"
  },
  "listOrderDiscounts": {
   "contract": "orders",
@@ -55196,7 +56010,8 @@
   "verb": "PUT",
   "path": "/recipes/{recipeId}/substitutes",
   "reads": [
-   "fnb.ingredient_substitute"
+   "fnb.ingredient_substitute",
+   "fnb.recipe"
   ],
   "writes": [
    "fnb.ingredient_substitute"
@@ -55216,7 +56031,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the recipe the path names"
  },
  "setPaymentRules": {
   "contract": "payments",
@@ -56063,7 +56879,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "orders.ticket_template"
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
   ],
   "routing": null,
   "scope": "venue",
@@ -56625,10 +57442,13 @@
   "path": "/dunning-cases/{caseId}/retry",
   "reads": [
    "cache:idempotency",
-   "payments.dunning_case"
+   "orders.payment",
+   "payments.dunning_case",
+   "payments.dunning_policy"
   ],
   "writes": [
    "cache:idempotency",
+   "orders.payment",
    "payments.dunning_case"
   ],
   "routing": null,
@@ -56643,7 +57463,8 @@
   "service": "OrderService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the retry charges the stored card as a payment"
  },
  "setBookingFlowConfig": {
   "contract": "white-label",
@@ -56671,7 +57492,17 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "tenant-config"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setDepositPolicy": {
   "contract": "orders",
@@ -57472,9 +58303,14 @@
   "verb": "POST",
   "path": "/auth/guest/password",
   "reads": [
-   "identity.mfa_method"
+   "identity.guest_credential",
+   "identity.mfa_method",
+   "identity.password_policy",
+   "pii.subject_contact"
   ],
   "writes": [
+   "identity.guest_credential",
+   "identity.guest_session",
    "platform.outbox"
   ],
   "routing": null,
@@ -57491,7 +58327,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "emits identity.loginRecorded; the derived entry writes nothing else (session writes not traced here)"
+  "lineageNote": "emits identity.loginRecorded; the derived entry writes nothing else (session writes not traced here)",
+  "fixNote": "4 October 2026 (CHG-FXC-004): the account by identifier, its hash and lockout, the per-device session"
  },
  "leaveRestaurantWaitlist": {
   "contract": "fnb",
@@ -57818,10 +58655,16 @@
   "verb": "POST",
   "path": "/games/{gameId}/clone",
   "reads": [
-   "games.game"
+   "games.game",
+   "games.operational_config",
+   "games.pricing",
+   "games.reader_profile"
   ],
   "writes": [
-   "games.game"
+   "games.game",
+   "games.operational_config",
+   "games.pricing",
+   "games.reader_profile"
   ],
   "routing": null,
   "scope": "venue",
@@ -57837,7 +58680,8 @@
    "postgres",
    "redis"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "fixNote": "4 October 2026 (CHG-FXC-004): pricing, operational settings and reader configuration are copied"
  },
  "cloneReaderConfiguration": {
   "contract": "games",
@@ -58006,7 +58850,12 @@
   "verb": "POST",
   "path": "/resource-holds",
   "reads": [
-   "resources.resource_hold"
+   "resources.booking",
+   "resources.resource",
+   "resources.resource_block",
+   "resources.resource_hold",
+   "venuemap.map",
+   "venuemap.placed_resource"
   ],
   "writes": [
    "resources.resource_hold"
@@ -58026,7 +58875,8 @@
    "postgres",
    "redis"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "fixNote": "4 October 2026 (CHG-FXC-004): bookability, capacity, setup and teardown, existing bookings and blocks, the published map"
  },
  "createTransportPassType": {
   "contract": "transport",
@@ -61083,6 +61933,8 @@
   "verb": "PUT",
   "path": "/transport/routes/{routeId}/status",
   "reads": [
+   "transport.departure",
+   "transport.fare_table",
    "transport.route",
    "transport.route_stop",
    "transport.station"
@@ -61104,7 +61956,8 @@
    "postgres",
    "redis"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "fixNote": "4 October 2026 (CHG-FXC-004): the fare-table and sold-departure refusals"
  },
  "setWaiverAssociation": {
   "contract": "marketing-crm",
@@ -61289,6 +62142,7 @@
   "verb": "POST",
   "path": "/wallet-risk-rules/{ruleCode}/status",
   "reads": [
+   "wallet.risk_rule",
    "wallet.risk_rules"
   ],
   "writes": [
@@ -61636,7 +62490,8 @@
   "reads": [
    "transport.route",
    "transport.route_stop",
-   "transport.station"
+   "transport.station",
+   "transport.timetable"
   ],
   "writes": [
    "transport.route",
@@ -61655,7 +62510,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): a stops change is refused under a published timetable"
  },
  "updateTransportStation": {
   "contract": "transport",
@@ -62180,6 +63036,7 @@
   "writes": [
    "cache:idempotency",
    "promotions.campaign",
+   "promotions.campaign_budget",
    "promotions.promotion_audit"
   ],
   "routing": null,
@@ -65961,7 +66818,17 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "revoke ends the grant (delegated_access valid_to = now) and the holder's sessions, invalidating the resolution cache as createDelegatedAccess does; campaign counters and completed status in the same write"
+  "lineageNote": "revoke ends the grant (delegated_access valid_to = now) and the holder's sessions, invalidating the resolution cache as createDelegatedAccess does; campaign counters and completed status in the same write",
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "decideAiGovernanceAlert": {
   "contract": "ai",
@@ -69159,6 +70026,8 @@
    "ledger.journal_line",
    "ledger.posting",
    "orders.chargeback",
+   "orders.chargeback_evidence",
+   "orders.chargeback_investigation_log",
    "platform.outbox"
   ],
   "routing": null,
@@ -70279,7 +71148,17 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "fnb.delivery_location_outlet"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setDeviceFirmwareStatus": {
   "contract": "tenancy",
@@ -70342,7 +71221,17 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "ledger.einvoicing_provider"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setForecastDefinition": {
   "contract": "ai",
@@ -70427,7 +71316,17 @@
   "service": "OrderService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "payments.instalment_policy"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setInventoryKitDefinition": {
   "contract": "inventory",
@@ -70458,7 +71357,17 @@
    "derived",
    "postgres",
    "redis"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "inventory.kit_component"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setTaxInvoiceTemplate": {
   "contract": "finance",
@@ -70488,7 +71397,17 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "ledger.tax_invoice_template"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "setWalletAutoReloadSetting": {
   "contract": "wallet",
@@ -70520,7 +71439,17 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "wallet.auto_reload_setting"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "settleWalletAtExit": {
   "contract": "wallet",
@@ -72755,7 +73684,9 @@
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
    "whitelabel.footer_config_social_link",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item"
   ],
   "writes": [],
@@ -73604,7 +74535,9 @@
   "contract": "ai",
   "verb": "GET",
   "path": "/ai/translate/{translationJobId}",
-  "reads": [],
+  "reads": [
+   "ai.proposed_action"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "tenant",
@@ -73621,7 +74554,8 @@
    "postgres-analytical",
    "qdrant",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the job's proposals"
  },
  "getWalletMovementSummary": {
   "contract": "wallet",
@@ -73765,6 +74699,7 @@
   "verb": "GET",
   "path": "/landing-page-templates",
   "reads": [
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section"
   ],
   "writes": [],
@@ -73922,10 +74857,14 @@
   "contract": "marketing-crm",
   "verb": "POST",
   "path": "/segments/preview",
-  "reads": [],
-  "writes": [
-   "marketing.segment_criterion"
+  "reads": [
+   "marketing.consent_record",
+   "marketing.guest_profile",
+   "marketing.segment",
+   "marketing.segment_criterion",
+   "marketing.suppression"
   ],
+  "writes": [],
   "routing": null,
   "scope": "venue",
   "perm": "MARKETING_VIEW",
@@ -73939,7 +74878,9 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): a preview counts and stores nothing (the contract says it writes nothing)",
+  "pure": "a preview counts and stores nothing (the contract says it writes nothing)"
  },
  "printPrepSheet": {
   "contract": "fnb",
@@ -74736,7 +75677,9 @@
   "contract": "access",
   "verb": "GET",
   "path": "/biometric-verification-profile",
-  "reads": [],
+  "reads": [
+   "access.biometric_profile"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -74751,13 +75694,17 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
  },
  "getBleBeaconGeofence": {
   "contract": "access",
   "verb": "GET",
   "path": "/ble-beacon-geofence",
-  "reads": [],
+  "reads": [
+   "access.access_point",
+   "access.device_placement"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -74772,7 +75719,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
  },
  "getCustomerServiceCopilot": {
   "contract": "marketing-crm",
@@ -74848,7 +75796,9 @@
   "contract": "access",
   "verb": "GET",
   "path": "/face-pass-enrollment",
-  "reads": [],
+  "reads": [
+   "access.biometric_profile"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -74863,7 +75813,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
  },
  "getPackagePricingDefinition": {
   "contract": "catalogue",
@@ -74915,7 +75866,9 @@
   "contract": "access",
   "verb": "GET",
   "path": "/pdf-printable-pos",
-  "reads": [],
+  "reads": [
+   "access.media_template"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -74930,7 +75883,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the template's design document"
  },
  "getProductAttributes": {
   "contract": "catalogue",
@@ -74959,7 +75913,9 @@
   "contract": "catalogue",
   "verb": "GET",
   "path": "/tax-profile-jurisdiction",
-  "reads": [],
+  "reads": [
+   "catalogue.tax_profile"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -74974,7 +75930,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
  },
  "getTransportDeparture": {
   "contract": "transport",
@@ -75012,7 +75969,9 @@
   "contract": "access",
   "verb": "GET",
   "path": "/virtual-ticket-identity",
-  "reads": [],
+  "reads": [
+   "access.credential_policy"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -75027,7 +75986,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
  },
  "listApiAnomalyRules": {
   "contract": "public-api",
@@ -75104,7 +76064,8 @@
   "path": "/combos",
   "reads": [
    "fnb.combo",
-   "fnb.combo_slot"
+   "fnb.combo_slot",
+   "fnb.combo_slot_option"
   ],
   "writes": [],
   "routing": "replica",
@@ -75192,6 +76153,465 @@
   "service": "VenueOpsService",
   "stores": [
    "postgres",
+   "redis"
+  ]
+ },
+ "getMembershipProductValidation": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/membership-product-validation",
+  "reads": [
+   "approvals.request",
+   "catalogue.product",
+   "subscription.membership_eligibility_rule",
+   "subscription.membership_entitlement",
+   "subscription.membership_household_policy",
+   "subscription.membership_product",
+   "subscription.membership_product_history",
+   "subscription.membership_renewal_policy",
+   "subscription.membership_usage_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PLATFORM_CELL_MANAGE",
+  "offline": false,
+  "summary": "A membership product's validation, as the approver sees it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): what approveMembershipProductValidation checks"
+ },
+ "getWalletRefundPolicy": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-refund-policy",
+  "reads": [
+   "wallet.refund_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The wallet refund policy in force",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listVisualAccessRules": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/visual-access-rules",
+  "reads": [
+   "access.admission_rules",
+   "access.entry_rule_point"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "The visual access rules at a venue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the rules setVisualAccessRule writes"
+ },
+ "updateLoyaltyProgramme": {
+  "contract": "marketing-crm",
+  "verb": "PATCH",
+  "path": "/loyalty/programmes/{programmeId}",
+  "reads": [
+   "cache:idempotency",
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule",
+   "marketing.programme_tier"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Change a loyalty programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): earning rules replaced; tiers are not changed here"
+ },
+ "updateMessageTemplate": {
+  "contract": "marketing-crm",
+  "verb": "PATCH",
+  "path": "/message-templates/{templateId}",
+  "reads": [
+   "cache:idempotency",
+   "marketing.message_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_template",
+   "marketing.message_template_version"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Change a message template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): every change is a new template version"
+ },
+ "listTaxProfiles": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/tax-profiles",
+  "reads": [
+   "catalogue.tax_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The tax profiles",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
+ },
+ "getAccreditationValidity": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-validity",
+  "reads": [
+   "accreditation.validity"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "The validity and renewal rules of a programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getApprovalRequest": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approval-requests/{requestId}",
+  "reads": [
+   "approvals.decision",
+   "approvals.request"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "One approval request",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceBooking": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-bookings/{bookingId}",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "One resource booking",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWalletRiskRules": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-risk-rules",
+  "reads": [
+   "wallet.risk_rule",
+   "wallet.risk_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The wallet risk rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCells": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/cells",
+  "reads": [
+   "control.cell",
+   "control.cell_instance",
+   "control.cell_job",
+   "control.cell_tenant"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_CELL_VIEW",
+  "offline": false,
+  "summary": "The cells, with their health",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the cells and health"
+ },
+ "listContentBlocks": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/content-blocks",
+  "reads": [
+   "control.content_block"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The content blocks of a page",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCorrectiveActions": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/food-safety/corrective-actions",
+  "reads": [
+   "fnb.corrective_action"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "INCIDENT_VIEW",
+  "offline": false,
+  "summary": "The corrective actions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listDeveloperMembers": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/developers/{developerId}/members",
+  "reads": [
+   "control.developer_member"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "Who is in a developer organisation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductionPlans": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/production-plans",
+  "reads": [
+   "fnb.production_plan",
+   "fnb.production_plan_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The production plans",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listStockCountLines": {
+  "contract": "inventory",
+  "verb": "GET",
+  "path": "/stock-counts/{countId}/lines",
+  "reads": [
+   "inventory.count",
+   "inventory.count_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The lines of a stock count",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the count's lines"
+ },
+ "updateContentBlock": {
+  "contract": "white-label",
+  "verb": "PATCH",
+  "path": "/content-blocks/{blockId}",
+  "reads": [
+   "control.content_block"
+  ],
+  "writes": [
+   "control.content_block"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Change a draft content block",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTableCombinations": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlets/{outletId}/table-combinations",
+  "reads": [
+   "fnb.table_combination"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The outlet's table combinations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
    "redis"
   ]
  }

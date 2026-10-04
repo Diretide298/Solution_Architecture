@@ -1,30 +1,30 @@
 id: LLD-InventoryService
-title: InventoryService — 58 operations, 22 tables
+title: InventoryService — 59 operations, 23 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
 why: '**Stock, counting and procurement.** Its own service because `inventory.stock_level` is derived
-  from movements — a rule 58 operations broke on 20 August — and that derivation is expensive enough
+  from movements — a rule 59 operations broke on 20 August — and that derivation is expensive enough
   to want its own read path.'
 scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
-  operations: 58
+  operations: 59
   inAFlow: 42
-  percent: 72%
+  percent: 71%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: inventory
-  tables: 22
+  tables: 23
   stores:
   - derived
   - postgres
   largestTable: inventory.purchase_order
 operationsByContract:
 - contract: inventory
-  count: 58
+  count: 59
   operations:
   - operation: acknowledgePurchaseOrder
     verb: POST
@@ -216,7 +216,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getStockTransfer
     verb: GET
@@ -289,6 +289,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 3
+    writes: 0
+  - operation: listStockCountLines
+    verb: GET
+    path: /stock-counts/{countId}/lines
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: listStockCounts
     verb: GET
@@ -432,7 +440,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setInventoryKitDefinition
     verb: PUT
@@ -449,7 +457,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: true
     reads: 3
-    writes: 2
+    writes: 3
   - operation: submitCountLines
     verb: POST
     path: /stock-counts/{countId}/lines
@@ -574,6 +582,41 @@ tables:
   - updateRequisitionLines
   - updateSupplier
   - updateSupplierContract
+  keys:
+    bulkUpdateProducts:
+      role: evicts
+      resolvers: &id001
+      - catalogue.product
+      - inventory.item
+      - price-list
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setDailyCount:
+      role: evicts
+      resolvers: &id002
+      - inventory.daily_count_list
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setInventoryKitDefinition:
+      role: evicts
+      resolvers: &id003
+      - inventory.kit_component
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateSupplier:
+      role: evicts
+      resolvers: &id004
+      - inventory.supplier
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -590,10 +633,35 @@ tables:
   - setInventoryKitDefinition
   - updateSupplier
   readBy: null
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    bulkUpdateProducts:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setDailyCount:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setInventoryKitDefinition:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    updateSupplier:
+      role: evicts
+      resolvers: *id004
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: inventory.count
   columns: 19
   store: postgres
@@ -610,6 +678,13 @@ tables:
   - inventory
   foreignWriters:
   - fnb
+- table: inventory.daily_count_list
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
 - table: inventory.goods_receipt
   columns: 11
   store: postgres
@@ -727,8 +802,10 @@ tables:
   writtenBy:
   - inventory
   - maintenance
+  - retail
   foreignWriters:
   - maintenance
+  - retail
 - table: inventory.supplier
   columns: 16
   store: postgres
@@ -814,6 +891,7 @@ screens:
 - P06:EMP-069 Barcode, RFID, Serialized Stock & Traceability
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
 - P08:ADM-189 Component Inventory & Availability Matrix
+- P08:BO-048 Retail Products
 - P08:BO-049 Stock Levels
 - P08:BO-050 Stock Position & Valuation
 - P08:BO-051 Purchase Orders

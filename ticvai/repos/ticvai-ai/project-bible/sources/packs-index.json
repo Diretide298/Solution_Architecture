@@ -6,10 +6,10 @@
   "documents": 316,
   "duplicateSets": 34,
   "redundantBytes": 121378838,
-  "drafted": 5,
-  "undrafted": 311,
+  "drafted": 6,
+  "undrafted": 310,
   "withPlatform": 36,
-  "platformConfirmed": 5,
+  "platformConfirmed": 6,
   "authorityConflicts": 32,
   "reusedFromCache": 316
  },
@@ -162,7 +162,6 @@
   "place-downtown.jpg",
   "place-old-dubai.jpg",
   "power-bank.jpg",
-  "Pricing___Revenue_Management_Reference.pdf",
   "Privacy__Consent___Preference_Management_Reference.pdf",
   "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
   "progress-dots.png",
@@ -5104,19 +5103,22 @@
     "P08",
     "P09"
    ],
-   "platformsConfirmed": [],
+   "platformsConfirmed": [
+    "P08"
+   ],
    "platformsFromContractsOnly": [],
    "platformsFromPackScreensOnly": [
-    "P08",
     "P09"
    ],
    "platformNames": {
     "P08": "Venue Management \u2014 Back Office",
     "P09": "TICVAI Web \u2014 Platform Console"
    },
-   "operations": [],
+   "operations": [
+    "setTaxProfileJurisdiction"
+   ],
    "packScreensMatched": 70,
-   "drafted": false,
+   "drafted": true,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-10-04"
   },

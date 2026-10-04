@@ -416,49 +416,68 @@
        "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "ID generation pattern",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.idGenerationPattern (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.idGenerationPattern",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Ticket classification",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.ticketClassification (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.ticketClassification",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Ticket ownership model",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.ticketOwnershipModel (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.ticketOwnershipModel",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Holder assignment requirements",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.holderAssignmentRequirements (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.holderAssignmentRequirements",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Transferability reference",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.transferabilityReference (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.transferabilityReference",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Validity model",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.validityModel (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.validityModel",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Consumption model",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.consumptionModel (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.consumptionModel",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Entitlement model",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.entitlementModel (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.entitlementModel",
+       "operation": "setVirtualTicketIdentity"
       },
       {
-       "kind": "selectField",
+       "kind": "multiSelect",
        "label": "Media requirements",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+       "provenance": "contract access.yaml VirtualTicketIdentityMasterRecordConfigurationInput.mediaRequirements (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationInput.mediaRequirements",
+       "operation": "setVirtualTicketIdentity",
+       "notes": "Free entries."
       }
      ]
     },
@@ -469,7 +488,9 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "provenance": "contract operation setVirtualTicketIdentity"
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)",
+       "operation": "setVirtualTicketIdentity",
+       "notes": "venueId from the session."
       }
      ]
     }
@@ -503,6 +524,7 @@
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-335"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 9 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**The nine inputs are text inputs bound to VirtualTicketIdentityMasterRecordConfigurationInput (free strings in the contract, so no invented options), 4 October 2026** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

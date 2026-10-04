@@ -14637,10 +14637,11 @@ screens:
     transitions:
     - to: BO-008
       trigger: Product Detail & Variants
-      provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-048
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+      carries:
+      - productId
+      - variantId
+      provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-048
+        holds productId, variantId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Cross-platform
@@ -14820,6 +14821,10 @@ screens:
     params:
     - name: merchandiseId
       from: deepLink
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProducts`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -25335,8 +25340,8 @@ screens:
       trigger: Map Editor & Publish
       carries:
       - mapId
-      provenance: derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds mapId, so
-        an edge into it carries them
+      provenance: derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-092 holds
+        mapId, so an edge into it carries them
     - to: BO-093
       trigger: The plan is uploaded and read
       provenance: flow F26 step 1→2
@@ -25480,6 +25485,7 @@ screens:
       provenance: flow F26 step 3→4
       carries:
       - mapId
+      - uploadId
   notes: 'CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic
     and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer
     and a bad suggestion look identical if the screen blurs them**, and the operator is left saying only
@@ -25775,6 +25781,10 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
+    - name: actionId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProposedActions`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -27841,20 +27851,20 @@ screens:
         3 October 2026); its command centre is not in Block A'
     - to: ADM-340
       trigger: Opens Segregation of Duties Policy Manager
-      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever
+        A, CHG-RONEP-007); its command centre is not in Block A'
     - to: ADM-606
       trigger: Opens Partial Payment, Failure & Recovery Manager
-      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever
+        A, CHG-RONEP-007); its command centre is not in Block A'
     - to: BO-1018
       trigger: Opens Accessible Seating Master
-      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever
+        A, CHG-RONEP-007); its command centre is not in Block A'
     - to: BO-1034
       trigger: Opens Best Seat Recommendations
-      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever
+        A, CHG-RONEP-007); its command centre is not in Block A'
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
@@ -28841,14 +28851,14 @@ screens:
         on its own'
     - to: BO-093
       trigger: Map Import & Labelling
-      provenance: 'derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them.
-        The edge carries nothing: mapId, jobId only pre-select (deep link or optional), and BO-093 opens
-        on its own'
+      provenance: 'derived — BO-093 declares entryState.params jobId, mapId, uploadId and BO-103 holds
+        none of them. The edge carries nothing: mapId, jobId, uploadId only pre-select (deep link or optional),
+        and BO-093 opens on its own'
     - to: BO-094
       trigger: Map Editor & Publish
-      provenance: 'derived — BO-094 declares entryState.params mapId, pathId and BO-103 holds none of
-        them. The edge carries nothing: mapId, pathId only pre-select (deep link or optional), and BO-094
-        opens on its own'
+      provenance: 'derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-103 holds
+        none of them. The edge carries nothing: mapId, pathId, uploadId only pre-select (deep link or
+        optional), and BO-094 opens on its own'
     - to: BO-096
       trigger: Resource Calendar
       provenance: 'derived — BO-096 declares entryState.params resourceId and BO-103 holds none of them.
@@ -62752,15 +62762,18 @@ screens:
       - kind: secondaryButton
         label: New ticket template
         operation: createTicketTemplate
-        provenance: contract orders.yaml POST /ticket-templates (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
+        provenance: contract orders.yaml POST /ticket-templates (4 October 2026, the ticket-template operations
+          moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
       - kind: secondaryButton
         label: Save ticket template
         operation: updateTicketTemplate
-        provenance: contract orders.yaml PATCH /ticket-templates/{templateId} (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
+        provenance: contract orders.yaml PATCH /ticket-templates/{templateId} (4 October 2026, the ticket-template
+          operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
       - kind: secondaryButton
         label: Print a proof
         operation: printTicketProof
-        provenance: contract orders.yaml POST /ticket-templates/{templateId}/proof (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
+        provenance: contract orders.yaml POST /ticket-templates/{templateId}/proof (4 October 2026, the
+          ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
       - kind: destructiveButton
         label: Archive media template
         operation: archiveMediaTemplate
@@ -62843,9 +62856,11 @@ screens:
   - id: formCreateTicketTemplate
     component: modal
     trigger: New ticket template
-    body: '**Collects what `createTicketTemplate` sends before it is called** (TicketTemplateRequest): name, mediaType, isRecyclable, recycleAfterDays, appliesToProductKinds, appliesToChannels, selectionPriority, layoutRef, localeVariants, isActive.
-      `name` and `mediaType` are what a template cannot be saved without; `selectionPriority` with the product kinds,
-      channels and media type decides which template a sale issues from. Dismissing sends nothing.'
+    body: '**Collects what `createTicketTemplate` sends before it is called** (TicketTemplateRequest):
+      name, mediaType, isRecyclable, recycleAfterDays, appliesToProductKinds, appliesToChannels, selectionPriority,
+      layoutRef, localeVariants, isActive. `name` and `mediaType` are what a template cannot be saved
+      without; `selectionPriority` with the product kinds, channels and media type decides which template
+      a sale issues from. Dismissing sends nothing.'
     bindsTo: TicketTemplateRequest
     confirm:
       label: Create ticket template
@@ -62856,8 +62871,9 @@ screens:
   - id: formUpdateTicketTemplate
     component: modal
     trigger: Save ticket template
-    body: '**Collects what `updateTicketTemplate` sends before it is called**, for the template selected: the same fields
-      as a new template; `isActive` false retires it. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `updateTicketTemplate` sends before it is called**, for the template selected:
+      the same fields as a new template; `isActive` false retires it. Dismissing sends nothing; the screen
+      behind is unchanged.'
     bindsTo: TicketTemplateRequest
     confirm:
       label: Save ticket template
@@ -75537,9 +75553,13 @@ screens:
     - to: BO-460
       trigger: Card Block, Suspend & Reactivation Control
       provenance: structural — pack board 7 wiring, 11 September 2026
+      carries:
+      - cardId
     - to: BO-461
       trigger: Card Replacement & Wallet Relinking
       provenance: structural — pack board 7 wiring, 11 September 2026
+      carries:
+      - cardId
     - to: BO-462
       trigger: Customer Balance & Credential Status View
       provenance: structural — pack board 7 wiring, 11 September 2026
@@ -85058,8 +85078,9 @@ screens:
         - Group/Individual
         - Readiness
         - Status
-        notes: Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type, group/individual,
-          readiness and 1 more — which are present is a decision the pack already made.
+        notes: Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`)
+          (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type,
+          group/individual, readiness and 1 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 64 §Filters
     - name: contentBody
       slot: headline
@@ -85435,7 +85456,8 @@ screens:
         derived: true
         impliedBy: lookupAsset
         label: Search
-        notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012).
+          A search that returns nothing must say so differently from a search not yet run.
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -86015,8 +86037,9 @@ screens:
         - Expected return
         - Overdue duration
         - Group/Individual
-        notes: Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status, expected
-          return and 2 more — which are present is a decision the pack already made.
+        notes: Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`)
+          (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status,
+          expected return and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 78 §Filters
     - name: contentBody
       slot: headline
@@ -86217,7 +86240,8 @@ screens:
       components:
       - kind: selectField
         label: Additional duration
-        notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012). +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
+        notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012).
+          +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
         operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability
       - kind: textField
@@ -110794,8 +110818,12 @@ screens:
     - name: translationJobId
       from: BO-785
       optional: true
-      notes: The translation job this screen started with proposeTranslations; getTranslationProposals reads its
-        drafts back by it (CHG-RFM-009, as CMS-011).
+      notes: The translation job this screen started with proposeTranslations; getTranslationProposals
+        reads its drafts back by it (CHG-RFM-009, as CMS-011).
+    - name: templateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listMessageTemplates`.'
   apis:
   - operationId: listMessageTemplates
     contract: marketing-crm
@@ -112233,6 +112261,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKnowledgeCollections`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: uploadId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
   notes: '**Defined 4 October 2026 from the copilot''s knowledge workspace, KnowledgeCollection, KnowledgeDocument
     and AiKnowledgeGap. Intents, phrases, entities and synonyms are not part of the retrieval design (the
     assistant answers from collections, ADR-0049) and left the purpose; an intent model is a later change
@@ -123912,6 +123944,8 @@ screens:
     - to: BO-895
       trigger: Resource Combination Builder
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - packageId
     - to: BO-896
       trigger: Ticket Demand & Resource Capacity Mapping
       provenance: structural — pack board 5 wiring, 19 September 2026
@@ -182238,8 +182272,10 @@ screens:
         - Payment
         - Contextual
         - AI-generated
-        notes: Sends `?guestType=` to `listTargetingEligibility`; each other dimension is its own query parameter of that read (CHG-RFM-012). The pack filters this screen by guest type, crm segment, membership, loyalty, demographic,
-          behavioral and 8 more — which are present is a decision the pack already made.
+        notes: Sends `?guestType=` to `listTargetingEligibility`; each other dimension is its own query
+          parameter of that read (CHG-RFM-012). The pack filters this screen by guest type, crm segment,
+          membership, loyalty, demographic, behavioral and 8 more — which are present is a decision the
+          pack already made.
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 94 §Filter by
     - name: contentBody
       slot: headline

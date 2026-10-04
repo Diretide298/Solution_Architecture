@@ -274,6 +274,81 @@
    }
   }
  },
+ "CountLine": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.count_line",
+  "description": "Board 5 of the client F&B pack, 24 August. **`startStockCount` and `postStockCount` existed and this did not** — a count could be opened and posted and **nothing recorded what was counted.**\n**The theoretical quantity is captured at entry, not at post.** Stock moves during a count; a variance computed at post time is measured against a different number from the one the counter was standing in front of.\n**A line may be entered twice and the second replaces the first.** A counter who miskeys and re-counts is the normal case, and a model that refuses the second sends them to a supervisor to undo the first.\n",
+  "required": [
+   "id",
+   "countId",
+   "itemId",
+   "countedQuantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "countId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "countedQuantity": {
+    "type": "number"
+   },
+   "theoreticalQuantity": {
+    "type": "number",
+    "description": "**Snapshotted at entry.** What the platform believed was there at the moment the counter looked.\n"
+   },
+   "uom": {
+    "type": "string"
+   },
+   "variance": {
+    "type": "number",
+    "readOnly": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "entered",
+     "recountRequested",
+     "recounted",
+     "accepted",
+     "rejected"
+    ]
+   },
+   "countedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "countedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
  "CountStatus": {
   "type": "string",
   "enum": [
@@ -523,6 +598,47 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "DailyCountList": {
+  "x-ticvai-persistence": "inventory.daily_count_list",
+  "type": "object",
+  "description": "**The items counted every day at one location** (`setDailyCount`, 4 October 2026, CHG-FXC-003: the write had only `inventory.item` to land in, which has no column for any of it). One row per venue and location (`locationId` null is the venue-wide list); `setDailyCount` replaces it.",
+  "required": [
+   "itemIds",
+   "postsAdjustment"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "itemIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dueBy": {
+    "type": "string",
+    "nullable": true,
+    "description": "Local time, e.g. 10:00"
+   },
+   "postsAdjustment": {
+    "type": "boolean",
+    "x-ticvai-column": "does_post_adjustment"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
    }
   }
  },

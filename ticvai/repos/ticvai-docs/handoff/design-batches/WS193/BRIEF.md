@@ -1,6 +1,6 @@
 # WS193 — Wallet Configuration Backend Structure v1.0 board 8
 
-**10 screens · 15 operations · 13 schemas · 6 permissions**
+**10 screens · 16 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1159` | Automated Security Action Orchestration | C | 12 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-1160` | Fraud Alert & Investigation Case Management | D | 0 | 90 | 6 | 15 | 1 | 0 | — | notStarted (—) |
 | `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | B | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1162` | Security Governance, Audit & Rule Publication | A | 4 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1162` | Security Governance, Audit & Rule Publication | A | 4 | 33 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

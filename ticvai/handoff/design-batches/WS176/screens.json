@@ -208,21 +208,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure the hierarchy and isolation boundary for seat management. Maintain tenant, legal entity, brand, region, venue ownership, status and data-residency classification. Configure tenant isolation, encryption context, export restriction, cross-brand sharing and support-access policy. Show inherited platform settings and the venues, users, integrations and environments within each context. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
-   }
-  ],
+  "pattern": "configEditor",
+  "patternReason": "The organisation node in context, with the tenant's venue-setting defaults edited beside it (defined 4 October 2026, CHG-FXS-001).",
+  "purpose": "See where this venue sits in the tenant's hierarchy (tenant, brand, region, venue) and set the defaults every venue inherits unless it overrides them.",
   "layout": {
    "template": "split",
    "regions": [
@@ -231,56 +219,85 @@
      "components": [
       {
        "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getOrgUnit",
-       "notes": "One record, read-only."
-      },
+       "label": "Where this sits",
+       "bindsTo": "OrgUnit",
+       "operation": "getOrgUnit",
+       "columns": [
+        "OrgUnit.name",
+        "OrgUnit.code",
+        "OrgUnit.level",
+        "OrgUnit.path",
+        "OrgUnit.isActive",
+        "OrgUnit.childCount"
+       ],
+       "notes": "path is shown as tenant > brand > region > venue.",
+       "provenance": "contract tenancy.yaml OrgUnit (defined 4 October 2026, CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
       {
        "kind": "detailPanel",
        "label": "Venue setting defaults",
        "bindsTo": "VenueSettings",
+       "operation": "getVenueSettingsDefaults",
        "columns": [
         "VenueSettings.supportHours",
         "VenueSettings.quietHours",
         "VenueSettings.alerting",
         "VenueSettings.displayCurrencies",
-        "VenueSettings.shiftVarianceThreshold",
-        "VenueSettings.catalogue",
-        "VenueSettings.inventory",
-        "VenueSettings.seating",
-        "VenueSettings.promotions",
-        "VenueSettings.fnb",
-        "VenueSettings.queue",
-        "VenueSettings.reporting"
+        "VenueSettings.cartLeaseSeconds"
        ],
-       "operation": "getVenueSettingsDefaults",
-       "notes": "**The inherited settings** — the tenant's default for every venue setting, which a venue inherits wherever it leaves a limit null (decided 28 September, audit R094).",
-       "provenance": "contract tenancy.yaml GET /venue-settings-defaults"
+       "provenance": "contract tenancy.yaml VenueSettings (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Cart hold (seconds)",
+       "bindsTo": "VenueSettings.cartLeaseSeconds",
+       "operation": "setVenueSettingsDefaults",
+       "provenance": "contract tenancy.yaml VenueSettings.cartLeaseSeconds (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Display currencies",
+       "bindsTo": "VenueSettings.displayCurrencies",
+       "operation": "setVenueSettingsDefaults",
+       "provenance": "contract tenancy.yaml VenueSettings.displayCurrencies (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Calendar day starts at (hour)",
+       "bindsTo": "VenueSettings.calendarDayStartHour",
+       "operation": "setVenueSettingsDefaults",
+       "provenance": "contract tenancy.yaml VenueSettings.calendarDayStartHour (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save venue setting defaults",
        "operation": "setVenueSettingsDefaults",
+       "notes": "Sends the defaults read by getVenueSettingsDefaults with these changed (a PUT).",
        "permission": "TENANT_CONFIGURE",
-       "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The tenant brand context list.",
-   "error": "Could not load. Names which read failed and leaves the tenant brand context untouched.",
-   "emptyFirstRun": "No tenant brand context yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The node and the defaults.",
+   "error": "Could not load. Names the read that failed.",
+   "emptyFirstRun": "Never saved: the platform defaults show.",
    "emptyNoResults": "The filter narrowed it and the tenant brand context are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `getOrgUnit` requires to show this screen, and names that permission (the screen's other reads need `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setVenueSettingsDefaults`."
   },
   "apis": [
    {
     "operationId": "getOrgUnit",
     "contract": "tenancy",
-    "purpose": "Tenant and brand context",
-    "trigger": "onAction",
+    "purpose": "The node opened (orgUnitId), or the venue in session, with its place in the hierarchy",
+    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
@@ -304,7 +321,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1062",
    "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1062"
   },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -345,6 +362,7 @@
     "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
    }
   ],
+  "notes": "**Defined 4 October 2026 from OrgUnit (getOrgUnit) and the tenant's venue-setting defaults. Legal entity, isolation, encryption and residency are set on their own screens (finance, BO-1065)** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -403,65 +421,79 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Set local defaults without creating separate seat systems. Configure default map, lock/hold duration, naming, accessibility, sales channels, approvals and publishing policy. Map local entrances, devices, price/seat categories, operating calendars and venue-specific exceptions. Display which settings inherit from platform/tenant/brand and require justification for permitted overrides. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Configuration Scope of Work | Version 1.0 50 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
-   }
-  ],
+  "pattern": "configEditor",
+  "patternReason": "One venue's seating defaults in one form (defined 4 October 2026 from VenueSettings.seating and the cart hold settings, CHG-FXS-001).",
+  "purpose": "Set this venue's seating and hold defaults without a separate seat system: how long a cart and a seat hold last, how often they extend, and how many seats a guest may book in one order.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
      "components": [
       {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getVenueSettings",
-       "notes": "One record, read-only. **Shows the configured limits** (decided 28 September, audit R094); a limit the venue has not set is null and shows the tenant default it inherits."
+       "kind": "numberField",
+       "label": "Cart hold (seconds)",
+       "bindsTo": "VenueSettings.cartLeaseSeconds",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml VenueSettings.cartLeaseSeconds (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setVenueSettings",
-       "label": "Save venue settings",
-       "notes": "The act the screen exists for. Saves the venue's own limits; clearing one sends null, which inherits the tenant default (audit R094)."
+       "kind": "numberField",
+       "label": "Cart extension (minutes)",
+       "bindsTo": "VenueSettings.cartHoldExtensionMinutes",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml VenueSettings.cartHoldExtensionMinutes (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setVenueSettings"
+       "kind": "numberField",
+       "label": "Cart extensions allowed",
+       "bindsTo": "VenueSettings.cartMaxExtensions",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml VenueSettings.cartMaxExtensions (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Seat hold extension (seconds)",
+       "bindsTo": "VenueSettings.seating.seatHoldExtensionSeconds",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml VenueSettings.seating.seatHoldExtensionSeconds (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Seat hold extensions allowed",
+       "bindsTo": "VenueSettings.seating.seatHoldMaxExtensions",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml VenueSettings.seating.seatHoldMaxExtensions (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "numberField",
        "label": "Seats per guest booking",
        "bindsTo": "VenueSettings.seating.maxSeatsPerGuestOrder",
        "operation": "setVenueSettings",
-       "notes": "**How many seats one guest may take in one booking on Guest Web and the Guest App** (decided 29 September, rev 3 REV3-7). Default 10, from 1 to 50; left empty, the venue inherits the tenant default. `createSeatHold` counts the seats asked for plus those the guest already holds on the performance and refuses above it with `seat-limit-exceeded`. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read it.",
-       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+       "provenance": "contract tenancy.yaml VenueSettings.seating.maxSeatsPerGuestOrder (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save venue settings",
+       "operation": "setVenueSettings",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The venue-specific list.",
-   "error": "Could not load. Names which read failed and leaves the venue-specific untouched.",
-   "emptyFirstRun": "No venue-specific yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The form with the venue's saved values.",
+   "error": "Could not load. Names the read that failed; nothing is editable until it loads.",
+   "emptyFirstRun": "Never saved: the form shows the defaults getVenueSettings returns.",
    "emptyNoResults": "The filter narrowed it and the venue-specific are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setVenueSettings`."
   },
   "apis": [
    {
@@ -484,7 +516,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1063",
    "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1063"
   },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -493,6 +525,7 @@
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from VenueSettings (cart lease and extensions, seat hold extensions, seats per order). Default map, naming, approvals and publishing policy are not venue settings in the contract and left the purpose** (CHG-FXS-001)\n\n**setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -703,18 +736,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Set the region's currency, rounding, date and number formats, time zone and fiscal year, the notes and coins every till counts, and the AI residency class the AI engine routes this tenant's calls by (the residency section, drawn and built in Block A; Chinmay, 3 October 2026, r1 additions).",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -933,6 +954,7 @@
     "provenance": "contract shift.yaml PUT /denominations"
    }
   ],
+  "notes": "**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -992,20 +1014,8 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "Access policies listed with the selected one edited, simulated and moved through its states, and the findings and reviews beside them (defined 4 October 2026, CHG-FXS-001).",
   "purpose": "Enforce least-privilege access to seat administration and operational data. Configure RBAC/PBAC for maps, layouts, inventory, locks, holds, pricing, reports, integrations and audit. Apply venue/region scope, field masking, temporary/delegated access, segregation of duties and emergency override. Preview effective access for a user/context and log sensitive read, export and administrative actions. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1014,34 +1024,135 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuthorisationPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Access policies",
+       "bindsTo": "AuthorisationPolicy",
+       "operation": "listAuthorisationPolicies",
+       "columns": [
+        "AuthorisationPolicy.name",
+        "AuthorisationPolicy.effect",
+        "AuthorisationPolicy.permissions",
+        "AuthorisationPolicy.appliesToRoleIds",
+        "AuthorisationPolicy.priority",
+        "AuthorisationPolicy.effectiveTo"
+       ],
+       "provenance": "contract identity.yaml AuthorisationPolicy (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Policy name",
+       "bindsTo": "AuthorisationPolicy.name",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Policy code",
+       "bindsTo": "AuthorisationPolicy.code",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effect",
+       "bindsTo": "AuthorisationPolicy.effect",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.effect (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Permissions",
+       "bindsTo": "AuthorisationPolicy.permissions",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.permissions (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Combine conditions",
+       "bindsTo": "AuthorisationPolicy.combining",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "contract identity.yaml AuthorisationPolicy.combining (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAuthorisationPolicy",
        "label": "Create access policy",
-       "notes": "The act the screen exists for."
+       "operation": "createAuthorisationPolicy",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAuthorisationPolicy"
+       "label": "Save as new version",
+       "operation": "updateAuthorisationPolicy",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Simulate",
+       "operation": "simulateAuthorisationPolicy",
+       "notes": "What the policy would decide for sample contexts, before it decides anything.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Submit / approve / activate / retire",
+       "operation": "setAuthorisationPolicyState",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Emergency override",
+       "operation": "createEmergencyAccessOverride",
+       "notes": "Needs a reason and an expiry; loud by design.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Permission findings",
+       "bindsTo": "IdentityPermissionFinding",
+       "operation": "listPermissionFindings",
+       "columns": [
+        "IdentityPermissionFinding.kind",
+        "IdentityPermissionFinding.principalId",
+        "IdentityPermissionFinding.permission",
+        "IdentityPermissionFinding.recommendation",
+        "IdentityPermissionFinding.lastUsedAt"
+       ],
+       "provenance": "contract identity.yaml IdentityPermissionFinding (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Access reviews",
+       "bindsTo": "IdentityAccessReviewCampaign",
+       "operation": "listAccessReviewCampaigns",
+       "columns": [
+        "IdentityAccessReviewCampaign.name",
+        "IdentityAccessReviewCampaign.dueAt",
+        "IdentityAccessReviewCampaign.status",
+        "IdentityAccessReviewCampaign.itemCount",
+        "IdentityAccessReviewCampaign.decidedCount"
+       ],
+       "provenance": "contract identity.yaml IdentityAccessReviewCampaign (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start access review",
+       "operation": "createAccessReviewCampaign",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The roles permissions masking list.",
-   "error": "Could not load. Names which read failed and leaves the roles permissions masking untouched.",
-   "emptyFirstRun": "No roles permissions masking yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No access policies yet: roles alone decide. Carries Create access policy.",
    "emptyNoResults": "The filter narrowed it and the roles permissions masking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_GRANT` for `decideAccessReviewItem`; `PERMISSION_MANAGE` for `createAuthorisationPolicy`, `updateAuthorisationPolicy`, `setAuthorisationPolicyState`, `createEmergencyAccessOverride` and 2 more."
   },
   "apis": [
    {
@@ -1157,7 +1268,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1066",
    "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1066"
   },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -1180,7 +1291,7 @@
     }
    ]
   },
-  "notes": "**No default roles (DEC-007):** the access policy reads the role's per-module checklist; presets only fill it.",
+  "notes": "**No default roles (DEC-007):** the access policy reads the role's per-module checklist; presets only fill it.\n\n**Defined 4 October 2026 from AuthorisationPolicy, IdentityPermissionFinding and IdentityAccessReviewCampaign with the screen's bound operations** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

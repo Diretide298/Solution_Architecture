@@ -107,8 +107,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-569` | Payment Orchestration Command Center | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-570` | Gateway, PSP & Acquirer Directory | A | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-570` | Gateway, PSP & Acquirer Directory | A | 25 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 41 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-573` | Payment Routing Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-574` | Routing Strategy, Priority & Load Distribution | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**ADM-570, ADM-572, ADM-578 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-572, ADM-578 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -316,14 +316,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-ADM-570 |
 | Who uses it | venue staff holding `PAYMENT_PROVIDER_MANAGE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): The provider directory with the selected or new connection beside it (defined 4 October 2026 from PaymentProviderConnection, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/gateway-psp-acquirer-directory-t28-adm-570` |
 
-**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Payment Gateway, Wallet Provider, Alternative Payment Provider. Each needs an operation, or needs removing … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Defined 4 October 2026 from PaymentProviderConnection. The credential is written as a vault reference (credentialRef, write-only; agreed with contracts in the ledger), as setPaymentProvider already does, and read back only as its fingerprint** (CHG-FXS-001)
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The tenant's directory of payment providers (gateways, PSPs, acquirers, wallet and BNPL providers) and what each can do: methods, currencies, partial and multiple capture, refund windows. Capability mapping is the part that gets skipped and later causes an incident, so it is the centre of the screen. Credentials are written and never read back.
 
@@ -337,7 +335,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Code | text field | optional | — | — | — | — | `PaymentProviderConnection.code` |
+| Name | text field | optional | — | — | — | — | `PaymentProviderConnection.name` |
+| Kind | radio group | optional | — | Gateway · Psp · Acquirer · Wallet provider · Bnpl provider | — | Gateway, PSP, acquirer, wallet provider or BNPL provider (the pack's three buttons). | `PaymentProviderConnection.providerKind` |
+| Environment | segmented control | optional | — | Sandbox · Production | — | Sandbox first; production after a passing test. | `PaymentProviderConnection.environment` |
+| Merchant account | picker: choose a merchant account (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | — | `PaymentProviderConnection.merchantAccountId` |
+| Credential reference | text field | optional | — | — | — | The vault reference of the key, write-only; the key itself never passes through a screen (ADR-0020 as applied to payments). Agreed field, ledger. | `PaymentProviderConnection.credentialRef` |
+
+**Sent by *Connect*** (`createPaymentProviderConnection`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createPaymentProviderConnection` body |
+| Code `code` | text field | required | — | — | — | — | `createPaymentProviderConnection` body |
+| Name `name` | text field | optional | — | — | — | — | `createPaymentProviderConnection` body |
+| Provider kind `providerKind` | radio group | required | — | Gateway · Psp · Acquirer · Wallet provider · Bnpl provider | — | — | `createPaymentProviderConnection` body |
+| Environment `environment` | segmented control | optional | — | Sandbox · Production | — | — | `createPaymentProviderConnection` body |
+| Capabilities `capabilities` | group | optional | — | — | — | — | `createPaymentProviderConnection` body |
+| Methods `capabilities.methods` | list of values (chips) | optional | — | — | — | — | `createPaymentProviderConnection` body |
+| Currencies `capabilities.currencies` | list of values (chips) | optional | — | — | — | — | `createPaymentProviderConnection` body |
+| Partial capture `capabilities.partialCapture` | toggle | optional | off | — | — | — | `createPaymentProviderConnection` body |
+| Multiple capture `capabilities.multipleCapture` | toggle | optional | off | — | — | — | `createPaymentProviderConnection` body |
+| Refund window days `capabilities.refundWindowDays` | number field (days) | optional | — | — | — | — | `createPaymentProviderConnection` body |
+| Tokenisation `capabilities.tokenisation` | toggle | optional | off | — | — | — | `createPaymentProviderConnection` body |
+| Three d secure `capabilities.threeDSecure` | toggle | optional | off | — | — | — | `createPaymentProviderConnection` body |
+| Card present `capabilities.cardPresent` | toggle | optional | off | — | — | — | `createPaymentProviderConnection` body |
+| Merchant account `merchantAccountId` | picker: choose a merchant account | optional | — | — | shows names, sends the id | — | `createPaymentProviderConnection` body |
+| Status `status` | radio group | optional | — | Draft · Testing · Active · Degraded · Disabled | — | — | `createPaymentProviderConnection` body |
+| Last tested at `lastTestedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createPaymentProviderConnection` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createPaymentProviderConnection` body |
+| Credential ref `credentialRef` | text field | optional | — | — | — | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. | `createPaymentProviderConnection` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -346,13 +377,74 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Connected providers** (data table, from `listPaymentProviderConnections`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
+| Environment | chip: Sandbox, Production | — |
+| Status | chip: Draft, Testing, Active, Degraded, Disabled | — |
+| Last tested at | 1 Oct 2026, 14:30 | — |
+
+**Key in use** (detail panel, from `listPaymentProviderConnections`): The fingerprint, so a person can confirm which key is in use without reading it.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
+| Environment | chip: Sandbox, Production | — |
+| Credential fingerprint | text | Written, never read back. Enough to confirm which key is in use without the key being retrievable from a screen. |
+| Capabilities | grouped details | — |
+| Methods | list or chips (count when long) | — |
+| Currencies | list or chips (count when long) | — |
+| Partial capture | yes / no (icon or chip) | — |
+| Multiple capture | yes / no (icon or chip) | — |
+| Refund window days | 1,234 | — |
+| Tokenisation | yes / no (icon or chip) | — |
+| Three d secure | yes / no (icon or chip) | — |
+| Card present | yes / no (icon or chip) | — |
+| Merchant account | the name it points at, never the id | — |
+| Status | chip: Draft, Testing, Active, Degraded, Disabled | — |
+| Last tested at | 1 Oct 2026, 14:30 | — |
+| Credential ref | text | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as … |
+
+**Capabilities** (detail panel, from `listPaymentProviderConnections`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
+| Environment | chip: Sandbox, Production | — |
+| Credential fingerprint | text | Written, never read back. Enough to confirm which key is in use without the key being retrievable from a screen. |
+| Capabilities | grouped details | — |
+| Methods | list or chips (count when long) | — |
+| Currencies | list or chips (count when long) | — |
+| Partial capture | yes / no (icon or chip) | — |
+| Multiple capture | yes / no (icon or chip) | — |
+| Refund window days | 1,234 | — |
+| Tokenisation | yes / no (icon or chip) | — |
+| Three d secure | yes / no (icon or chip) | — |
+| Card present | yes / no (icon or chip) | — |
+| Merchant account | the name it points at, never the id | — |
+| Status | chip: Draft, Testing, Active, Degraded, Disabled | — |
+| Last tested at | 1 Oct 2026, 14:30 | — |
+| Credential ref | text | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as … |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Payment Gateway (primary button) | navigation or local | — | — | — | — |
-| Wallet Provider (secondary button) | navigation or local | — | — | — | — |
-| Alternative Payment Provider (secondary button) | navigation or local | — | — | — | — |
+| Connect a provider (primary button) | navigation or local | — | — | — | — |
+| Connect (primary button) | `createPaymentProviderConnection` POST `/payment-providers` | PaymentProviderConnection | PaymentProviderConnection | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -368,11 +460,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The gateway psp acquirer list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the gateway psp acquirer untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No gateway psp acquirer yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No providers connected yet. Carries Connect a provider. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the gateway psp acquirer are still there. The pack's own statuses are Draft — the state names which is selected. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PAYMENT_VIEW`, which `listPaymentProviderConnections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PAYMENT_PROVIDER_MANAGE` for `createPaymentProviderConnection`. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -399,7 +491,7 @@ providers:
 - `listPaymentProviderConnections` → `PAYMENT_VIEW` (read) · staff
 - `createPaymentProviderConnection` → `PAYMENT_PROVIDER_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PAYMENT_VIEW`, which `listPaymentProviderConnections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PAYMENT_PROVIDER_MANAGE` for `createPaymentProviderConnection`.
 
 #### Requirements it meets
 
@@ -421,13 +513,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS88 Payment Payment Orchestration Board 2.dc.html#adm-570`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 2
 - Flow F257 *Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27*, step 2: Works in Gateway, PSP & Acquirer Directory\t28 → Maintain the centralized directory of payment-processing providers connected to TICVAI.
+- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (25), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-570?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Payment Gateway, Wallet Provider, Alternative Payment Provider.
+- [ ] Every action is wired with its success and its failure: Connect a provider, Connect, Cancel.
 - [ ] Every transition is wired: `ADM-569`.
 - [ ] Every gated control is gated: `PAYMENT_PROVIDER_MANAGE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -510,6 +603,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Merchant account | the name it points at, never the id | — |
 | Status | chip: Draft, Testing, Active, Degraded, Disabled | — |
 | Last tested at | 1 Oct 2026, 14:30 | — |
+| Credential ref | text | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as … |
 
 **The selected provider connection adapter** (detail panel): The pack groups this record's detail under its own headings: “Credential Management”, “Never expose full”, “Result”.
 
@@ -604,7 +698,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-571?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: API endpoint reference, Webhook configuration, Callback configuration, Retry configuration.
 - [ ] Every transition is wired: `ADM-569`.
@@ -1631,7 +1725,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "PaymentFailoverPolicy": {"type":"object","x-ticvai-persistence":"payments.failover_policy","description":"Board 2.7. **A decline is final; a timeout is not. Retrying the first is how a guest gets charged twice.**\n","properties":{"retryableOutcomes":{"type":"array","items":{"type":"string","enum":["timeout","connectionRefused","providerError5xx","rateLimited","issuerUnavailable"]},"description":"**Explicit, rather than \"anything that was not a success\".**"},"maxAttempts":{"type":"integer","default":2},"backoffMs":{"type":"integer","default":500},"failoverToNextProvider":{"type":"boolean","default":true},"circuitBreaker":{"type":"object","description":"**A hundred tills each discovering an outage independently is a hundred queues.**\n","properties":{"failureThresholdPercent":{"type":"number","default":25},"windowSeconds":{"type":"integer","default":60},"minimumSample":{"type":"integer","default":20},"openForSeconds":{"type":"integer","default":300},"alertOnOpen":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}},
-"PaymentProviderConnection": {"type":"object","x-ticvai-persistence":"payments.provider_connection","description":"Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**","required":["code","providerKind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"providerKind":{"type":"string","enum":["gateway","psp","acquirer","walletProvider","bnplProvider"]},"environment":{"type":"string","enum":["sandbox","production"]},"credentialFingerprint":{"type":"string","readOnly":true,"description":"**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"},"capabilities":{"type":"object","properties":{"methods":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"partialCapture":{"type":"boolean","default":false},"multipleCapture":{"type":"boolean","default":false},"refundWindowDays":{"type":"integer","nullable":true},"tokenisation":{"type":"boolean","default":false},"threeDSecure":{"type":"boolean","default":false},"cardPresent":{"type":"boolean","default":false}}},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","testing","active","degraded","disabled"]},"lastTestedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"PaymentProviderConnection": {"type":"object","x-ticvai-persistence":"payments.provider_connection","description":"Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**","required":["code","providerKind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"providerKind":{"type":"string","enum":["gateway","psp","acquirer","walletProvider","bnplProvider"]},"environment":{"type":"string","enum":["sandbox","production"]},"credentialFingerprint":{"type":"string","readOnly":true,"description":"**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"},"capabilities":{"type":"object","properties":{"methods":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"partialCapture":{"type":"boolean","default":false},"multipleCapture":{"type":"boolean","default":false},"refundWindowDays":{"type":"integer","nullable":true},"tokenisation":{"type":"boolean","default":false},"threeDSecure":{"type":"boolean","default":false},"cardPresent":{"type":"boolean","default":false}}},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","testing","active","degraded","disabled"]},"lastTestedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"},"credentialRef":{"type":"string","writeOnly":true,"description":"**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned; `credentialFingerprint` is what reads show."}}},
 "PaymentRoutingRule": {"type":"object","x-ticvai-persistence":"payments.routing_rule","description":"Boards 2.5 and 2.6. **Priority and distribution are both needed.**","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"priority":{"type":"integer","default":0},"conditions":{"type":"object","properties":{"methodIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currencies":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"channels":{"type":"array","items":{"type":"string"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"cardSchemes":{"type":"array","items":{"type":"string"}},"cardIssuerCountries":{"type":"array","items":{"type":"string"}}}},"targets":{"type":"array","items":{"type":"object","properties":{"connectionId":{"type":"string","format":"uuid"},"sharePercent":{"type":"integer","nullable":true},"rank":{"type":"integer"}}}},"strategy":{"type":"string","enum":["priorityOrder","loadShare","lowestCost","highestAuthRate"],"default":"priorityOrder"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "ProviderEconomics": {"type":"object","description":"Board 2.9. **Cost per transaction is a routing input.**","properties":{"connectionId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"transactions":{"type":"integer"},"grossVolume":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"schemeFees":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"interchange":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerMargin":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fxSpread":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargebackCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"effectiveRatePercent":{"type":"number"}}},
 "ProviderHealth": {"type":"object","description":"Board 2.8. **Authorisation rate is the number, and it is not uptime.**","properties":{"connectionId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"transactions":{"type":"integer"},"authorisationRate":{"type":"number"},"baselineAuthorisationRate":{"type":"number","nullable":true},"declineRate":{"type":"number"},"errorRate":{"type":"number"},"p50LatencyMs":{"type":"integer"},"p95LatencyMs":{"type":"integer"},"circuitState":{"type":"string","enum":["closed","open","halfOpen"]},"status":{"type":"string","enum":["healthy","degraded","failing","disabled"]}}},

@@ -911,7 +911,8 @@
    "orderId": {
     "type": "string",
     "format": "uuid",
-    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
+    "nullable": true,
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). **Null for an entitlement an invitation issued** (`invitationId`; 4 October 2026, CHG-FXC-007)."
    },
    "orderLineId": {
     "type": "string",
@@ -1099,6 +1100,12 @@
     "x-ticvai-persisted": false,
     "x-ticvai-derived": "onRead",
     "description": "The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`), or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** — the PII split keeps the biometric on its own side, and this carries only its id. It is how a screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.\n"
+   },
+   "invitationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The invitation that issued it** (4 October 2026, CHG-FXC-007): `orders.issueInvitation` issues the entitlement without an order, because an invitation never enters the order path. Exactly one of `orderId` and `invitationId` is set."
    }
   }
  },
@@ -1633,7 +1640,10 @@
   }
  },
  "HomepageLayout": {
-  "x-ticvai-persistence": "whitelabel.homepage_section",
+  "x-ticvai-persistence": "whitelabel.homepage_layout + whitelabel.homepage_section",
+  "x-ticvai-retired-columns": [
+   "whitelabel.homepage_section.homepage_section_id"
+  ],
   "type": "object",
   "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
@@ -1865,7 +1875,10 @@
   }
  },
  "NavigationConfig": {
-  "x-ticvai-persistence": "whitelabel.navigation_item",
+  "x-ticvai-persistence": "whitelabel.navigation_config + whitelabel.navigation_item",
+  "x-ticvai-retired-columns": [
+   "whitelabel.navigation_item.navigation_item_id"
+  ],
   "type": "object",
   "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [
@@ -2370,6 +2383,12 @@
     "type": "string",
     "maxLength": 100,
     "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    }
   }
  },
@@ -2876,6 +2895,28 @@
     "description": "**The analytics platforms the storefront and app load** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): a guest reads them here instead of `listAnalyticsProviders`, which needs `TENANT_CONFIGURE`. The enabled `StorefrontAnalyticsProvider` rows in force for the venue being browsed (that venue's own rows when `venueId` was sent and it has any, else the tenant-wide ones), read live, with only what the tag loader needs. **A provider loads only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58).",
     "items": {
      "$ref": "#/components/schemas/PublishedAnalyticsProvider"
+    }
+   },
+   "paymentTokenisation": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The provider the guest app tokenises cards with** (4 October 2026, CHG-FXC-010; GST-071): the `providerId` `storePaymentToken` requires, its kind and the publishable key the client SDK needs. Never a secret. Null where no provider with tokenisation is connected.",
+    "required": [
+     "providerId",
+     "providerKind"
+    ],
+    "properties": {
+     "providerId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "providerKind": {
+      "type": "string"
+     },
+     "publishableKey": {
+      "type": "string",
+      "nullable": true
+     }
     }
    }
   }

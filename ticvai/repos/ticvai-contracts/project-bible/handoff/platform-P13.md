@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 103 |
-| Operations | 194 |
+| Operations | 197 |
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
@@ -37,6 +37,7 @@
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
+| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
@@ -53,7 +54,6 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
@@ -83,14 +83,14 @@
 | `CMS-001` | Tenant Workspace | White Label | 1 | 7 | yes |
 | `CMS-002` | Brand Kit | White Label | 1 | 4 | yes |
 | `CMS-003` | Typography | White Label | 1 | 2 | yes |
-| `CMS-004` | Logo & Assets | White Label | 1 | 4 | yes |
+| `CMS-004` | Logo & Assets | White Label | 1 | 7 | yes |
 | `CMS-005` | Theme Editor | White Label | 1 | 2 | yes |
 | `CMS-006` | Component Preview | White Label | 1 | 6 | yes |
-| `CMS-007` | Page Builder | White Label | 1 | 12 | yes |
+| `CMS-007` | Page Builder | White Label | 1 | 14 | yes |
 | `CMS-008` | Content Blocks | White Label | 1 | 10 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 1 | 7 | yes |
 | `CMS-010` | Media Library | White Label | 1 | 11 | yes |
-| `CMS-011` | Translations | White Label | 1 | 3 | yes |
+| `CMS-011` | Translations | White Label | 1 | 4 | yes |
 | `CMS-012` | RTL Preview | White Label | 1 | 2 | yes |
 | `CMS-013` | SEO & Metadata | White Label | 1 | 3 | yes |
 | `CMS-014` | Publishing Workflow | White Label | 1 | 10 | yes |
@@ -164,7 +164,7 @@
 | `CMS-083` | Rights, License & Usage Policy Management | Media Library | 3 | 1 | yes |
 | `CMS-084` | Asset Approval Workflow Management | Media Library | 3 | 1 | yes |
 | `CMS-085` | Publication Eligibility & Governance Validation | Media Library | 3 | 1 | yes |
-| `CMS-086` | Role-Based Asset Access & Permission Management | Media Library | 3 | 2 | yes |
+| `CMS-086` | Role-Based Asset Access & Permission Management | Media Library | 3 | 3 | yes |
 | `CMS-087` | Secure Internal & External Sharing | Media Library | 3 | 1 | yes |
 | `CMS-088` | Rights Expiry, Renewal & Usage Impact | Media Library | 3 | 2 | yes |
 | `CMS-089` | Governance Audit Trail & Compliance Evidence | Media Library | 3 | 1 | yes |

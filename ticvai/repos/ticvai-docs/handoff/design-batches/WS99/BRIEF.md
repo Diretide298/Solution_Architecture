@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-379` | Welcome & Start Your TICVAI Journey | B | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `ADM-380` | Customer & Organization Registration | B | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-380` | Customer & Organization Registration | B | 35 | 0 | 6 | 14 | 1 | 0 | — | notStarted (—) |
 | `ADM-381` | Venue Type & Business Profile | B | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-382` | Visitor, Capacity & Operational Scale | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-383` | Sales Channel Assessment | B | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |

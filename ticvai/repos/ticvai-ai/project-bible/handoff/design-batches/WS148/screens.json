@@ -300,64 +300,125 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**Defined 4 October 2026 from PaymentProviderConnection. The credential is written as a vault reference (credentialRef, write-only; agreed with contracts in the ledger), as setPaymentProvider already does, and read back only as its fingerprint** (CHG-FXS-001)",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "The provider directory with the selected or new connection beside it (defined 4 October 2026 from PaymentProviderConnection, CHG-FXS-001).",
   "purpose": "Maintain the centralized directory of payment-processing providers connected to TICVAI.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Payment Gateway, Wallet Provider, Alternative Payment Provider. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 26 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 26"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 26"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
     {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Connected providers",
+       "bindsTo": "PaymentProviderConnection",
+       "operation": "listPaymentProviderConnections",
+       "columns": [
+        "PaymentProviderConnection.code",
+        "PaymentProviderConnection.name",
+        "PaymentProviderConnection.providerKind",
+        "PaymentProviderConnection.environment",
+        "PaymentProviderConnection.status",
+        "PaymentProviderConnection.lastTestedAt"
+       ],
+       "provenance": "contract payments.yaml PaymentProviderConnection (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Payment Gateway",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 26 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Wallet Provider",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 26 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Alternative Payment Provider",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 26 §Support"
+       "label": "Connect a provider",
+       "notes": "Opens an empty form; the kind picks gateway, PSP, acquirer, wallet or BNPL provider.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     },
     {
-     "name": "contentBody",
-     "components": []
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Code",
+       "bindsTo": "PaymentProviderConnection.code",
+       "operation": "createPaymentProviderConnection",
+       "provenance": "contract payments.yaml PaymentProviderConnection.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "PaymentProviderConnection.name",
+       "operation": "createPaymentProviderConnection",
+       "provenance": "contract payments.yaml PaymentProviderConnection.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "bindsTo": "PaymentProviderConnection.providerKind",
+       "operation": "createPaymentProviderConnection",
+       "notes": "Gateway, PSP, acquirer, wallet provider or BNPL provider (the pack's three buttons).",
+       "provenance": "contract payments.yaml PaymentProviderConnection.providerKind (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Environment",
+       "bindsTo": "PaymentProviderConnection.environment",
+       "operation": "createPaymentProviderConnection",
+       "notes": "Sandbox first; production after a passing test.",
+       "provenance": "contract payments.yaml PaymentProviderConnection.environment (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Merchant account",
+       "bindsTo": "PaymentProviderConnection.merchantAccountId",
+       "operation": "createPaymentProviderConnection",
+       "provenance": "contract payments.yaml PaymentProviderConnection.merchantAccountId (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Credential reference",
+       "bindsTo": "PaymentProviderConnection.credentialRef",
+       "operation": "createPaymentProviderConnection",
+       "notes": "The vault reference of the key, write-only; the key itself never passes through a screen (ADR-0020 as applied to payments). Agreed field, ledger.",
+       "provenance": "contract payments.yaml PaymentProviderConnection.credentialRef (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Key in use",
+       "bindsTo": "PaymentProviderConnection.credentialFingerprint",
+       "operation": "listPaymentProviderConnections",
+       "notes": "The fingerprint, so a person can confirm which key is in use without reading it.",
+       "provenance": "contract payments.yaml PaymentProviderConnection.credentialFingerprint (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Capabilities",
+       "bindsTo": "PaymentProviderConnection.capabilities",
+       "operation": "listPaymentProviderConnections",
+       "provenance": "contract payments.yaml PaymentProviderConnection.capabilities (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Connect",
+       "operation": "createPaymentProviderConnection",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards the form; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The gateway psp acquirer list.",
-   "error": "Could not load. Names which read failed and leaves the gateway psp acquirer untouched.",
-   "emptyFirstRun": "No gateway psp acquirer yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No providers connected yet. Carries Connect a provider.",
    "emptyNoResults": "The filter narrowed it and the gateway psp acquirer are still there. The pack's own statuses are Draft — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PAYMENT_VIEW`, which `listPaymentProviderConnections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PAYMENT_PROVIDER_MANAGE` for `createPaymentProviderConnection`."
   },
   "apis": [
    {
@@ -383,7 +444,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#adm-570",
    "workshopBoard": "wireframes/WS88 Payment Payment Orchestration Board 2.dc.html#adm-570"
   },
-  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 26. 0 of 0 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

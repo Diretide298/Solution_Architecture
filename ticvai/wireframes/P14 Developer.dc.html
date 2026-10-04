@@ -153,8 +153,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every API version</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Request, response, scopes and error codes. **The error codes are what a developer comes back for**, and they are the section most documentation buries.
-</span></div><div class="panel"><span class="kind">codeBlock</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A working example per language. **Copy-paste that runs** — an example with a placeholder token teaches nothing about auth, which is where integrations fail.
+              <div class="two"><div class="grow"><div class="panel"><b>Every API version</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Operation</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Method, path, summary, scopes, request and response schemas and error codes of the operation picked in the tree, read from the version&#x27;s OpenAPI file.</span></div><div class="panel"><span class="kind">codeBlock</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A working example per language. **Copy-paste that runs** — an example with a placeholder token teaches nothing about auth, which is where integrations fail.
 </span></div></div><div class="side"><div class="panel"><b>Try it</b><div class="chip cta">Try it</div><span class="why">Runs against the sandbox, never production. **The environment is stated on the button**, because a try-it that quietly hits production is how somebody refunds a real orde</span></div><div class="panel"><b>Changelog for the selected version</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Every operation added, changed, deprecated or removed, with breaking changes marked** (17 September minutes, M17-14; ADR-0026).</span></div></div></div>
             </div>
           </div>
@@ -190,7 +189,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; registerDeveloper · setDeveloperMembers · getDeveloperAccount</div>
+          <div><b>OPERATIONS</b> &middot; registerDeveloper · setDeveloperMembers · getDeveloperAccount · listDeveloperMembers</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; developerId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#dev-003">DEV-003</a>  &mdash; <i>They create a sandbox client and take the se</i></div>
@@ -373,7 +372,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setApiQuota · certifyIntegration · setApiLicensing · deprecateApiVersion +6</div>
+          <div><b>OPERATIONS</b> &middot; setApiQuota · certifyIntegration · setApiLicensing · deprecateApiVersion +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; listingId&larr;deepLink, version&larr;deepLink, requestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#dev-001">DEV-001</a> <br><a href="#dev-003">DEV-003</a>  &mdash; <i>They request production access for the certi</i> <span class="car">clientId</span></div>

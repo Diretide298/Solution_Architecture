@@ -103,6 +103,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listWalletTypes": {
+  "method": "GET",
+  "path": "/wallet-types",
+  "contract": "wallet",
+  "summary": "The kinds of wallet that may exist — who owns one",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletType"
+ },
  "reverseWalletFunding": {
   "method": "POST",
   "path": "/wallet-funding/reversals",

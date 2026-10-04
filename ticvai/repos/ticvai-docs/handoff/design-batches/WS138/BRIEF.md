@@ -1,6 +1,6 @@
 # WS138 — Marketing CRM Configuration Reference v1.0 board 4
 
-**10 screens · 15 operations · 29 schemas · 7 permissions**
+**10 screens · 16 operations · 31 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -186,13 +186,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-764` | Campaign Command Center | D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-765` | Campaign Library & Calendar | C | 0 | 7 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-766` | Campaign Builder | A | 44 | 0 | 6 | 21 | 0 | 6 | — | notStarted (—) |
+| `BO-766` | Campaign Builder | A | 63 | 6 | 6 | 25 | 0 | 6 | — | notStarted (—) |
 | `BO-767` | Audience & Offer Selection | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `BO-768` | Multichannel Composer | D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-769` | Schedule & Trigger Rules | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-770` | Campaign Approval Workflow | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-771` | Budget, Goals & Forecast | B | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-772` | A/B & AI Optimization | A | 0 | 0 | 6 | 26 | 0 | 0 | — | notStarted (—) |
+| `BO-772` | A/B & AI Optimization | A | 48 | 21 | 6 | 31 | 0 | 0 | — | notStarted (—) |
 | `BO-773` | Attribution & Audit | D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

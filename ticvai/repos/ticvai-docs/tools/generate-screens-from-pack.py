@@ -88,6 +88,11 @@ from pathlib import Path
 
 import yaml
 
+# The words NP in tools/screen_patterns.py reads (CHG-FXS-007): a screen the plan schedules in Sprint 1
+# or 2 must not carry them, so the generator says them in exactly these words.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from screen_patterns import NEEDS_PERSON  # noqa: E402
+
 # Provenance prefixes this generator owns; anything else on an overlay is somebody's
 # decision and is carried through a rebuild.
 GAPS_MINE = ("pack ", "contract ")
@@ -747,15 +752,14 @@ def build(screen: dict, entry: dict, ops: dict, schemas: dict, report: Counter,
             "why": ("**The pack gives this screen nothing that can be drawn.** Its sections are "
                     "prose — purpose, acceptance conditions, worked examples — with no directory "
                     "of metrics, columns or fields anywhere in them. The screen has no content "
-                    "region rather than an empty one, and it needs a person before it is built."),
+                    "region rather than an empty one, and it " + NEEDS_PERSON + "."),
             "source": cite(entry)})
         report["no drawable content"] += 1
     if pattern == "listDetail" and reason.startswith("**nothing"):
         gaps.append({
             "operation": None,
             "why": ("**The pack gives this screen no display, metric or configuration directory**, "
-                    "so its shape is a default rather than a reading. It needs a person before it "
-                    "is built."),
+                    "so its shape is a default rather than a reading. It " + NEEDS_PERSON + "."),
             "source": cite(entry)})
 
     # --- states -----------------------------------------------------------------------------------

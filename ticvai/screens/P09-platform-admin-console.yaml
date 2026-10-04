@@ -708,20 +708,20 @@ screens:
       - tenantId
     - to: ADM-503
       trigger: Opens Ticket, Product & Timeslot Demand Forecast
-      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when
-        it went back to Block B with Identity & Security (Chinmay, 4 October)'
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007);
+        kept when it went back to Block B with Identity & Security (Chinmay, 4 October)'
       carries:
       - tenantId
     - to: ADM-504
       trigger: Opens Channel & Booking Pace Forecast
-      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when
-        it went back to Block B with Identity & Security (Chinmay, 4 October)'
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007);
+        kept when it went back to Block B with Identity & Security (Chinmay, 4 October)'
       carries:
       - tenantId
     - to: ADM-505
       trigger: Opens Revenue & Commercial Forecast
-      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when
-        it went back to Block B with Identity & Security (Chinmay, 4 October)'
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007);
+        kept when it went back to Block B with Identity & Security (Chinmay, 4 October)'
       carries:
       - tenantId
     - to: ADM-506
@@ -5333,6 +5333,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConfigVersions`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: uploadId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -19359,6 +19363,8 @@ screens:
     - to: ADM-460
       trigger: Billing Calculation & Charge Breakdown
       provenance: structural — pack board 10 wiring, 11 September 2026
+      carries:
+      - tenantId
     - to: ADM-461
       trigger: Consumption Reconciliation & Billing Approval
       provenance: structural — pack board 10 wiring, 11 September 2026

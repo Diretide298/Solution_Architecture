@@ -17,14 +17,14 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 275
+  operations: 277
   holds: null
   service: MarketingService
   verbs:
     GET: 133
     POST: 75
     PUT: 60
-    PATCH: 5
+    PATCH: 7
     DELETE: 2
   guestCallable: 49
   offlineCapable: 11
@@ -32,11 +32,11 @@ contracts:
   ref: diagrams/lld/contracts/marketing-crm.yaml
 - contract: access
   tier: spine
-  operations: 256
+  operations: 257
   holds: null
   service: AccessService
   verbs:
-    GET: 133
+    GET: 134
     PUT: 81
     POST: 32
     DELETE: 8
@@ -51,11 +51,11 @@ contracts:
   ref: diagrams/lld/contracts/access.yaml
 - contract: catalogue
   tier: spine
-  operations: 248
+  operations: 249
   holds: null
   service: CatalogueService
   verbs:
-    GET: 127
+    GET: 128
     PUT: 64
     POST: 47
     PATCH: 8
@@ -96,11 +96,11 @@ contracts:
   ref: diagrams/lld/contracts/orders.yaml
 - contract: subscription
   tier: satellite
-  operations: 150
+  operations: 152
   holds: null
   service: PlatformService
   verbs:
-    GET: 68
+    GET: 70
     POST: 45
     PUT: 33
     PATCH: 3
@@ -152,12 +152,12 @@ contracts:
   ref: diagrams/lld/contracts/promotions.yaml
 - contract: fnb
   tier: satellite
-  operations: 135
+  operations: 138
   holds: null
   service: FnbService
   verbs:
     POST: 61
-    GET: 42
+    GET: 45
     PUT: 27
     PATCH: 5
   guestCallable: 17
@@ -167,6 +167,21 @@ contracts:
   - fnb-menuPublished
   - fnb-orderReady
   ref: diagrams/lld/contracts/fnb.yaml
+- contract: white-label
+  tier: satellite
+  operations: 95
+  holds: null
+  service: WhiteLabelService
+  verbs:
+    GET: 41
+    POST: 23
+    PUT: 20
+    DELETE: 6
+    PATCH: 5
+  guestCallable: 12
+  offlineCapable: 9
+  events: null
+  ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
   operations: 94
@@ -184,21 +199,6 @@ contracts:
   - identity-credentialResetRequested
   - identity-loginRecorded
   ref: diagrams/lld/contracts/identity.yaml
-- contract: white-label
-  tier: satellite
-  operations: 93
-  holds: null
-  service: WhiteLabelService
-  verbs:
-    GET: 40
-    POST: 23
-    PUT: 20
-    DELETE: 6
-    PATCH: 4
-  guestCallable: 12
-  offlineCapable: 9
-  events: null
-  ref: diagrams/lld/contracts/white-label.yaml
 - contract: finance
   tier: spine
   operations: 72
@@ -215,12 +215,12 @@ contracts:
   ref: diagrams/lld/contracts/finance.yaml
 - contract: wallet
   tier: satellite
-  operations: 68
+  operations: 70
   holds: null
   service: WalletService
   verbs:
     POST: 31
-    GET: 21
+    GET: 23
     PUT: 16
   guestCallable: 10
   offlineCapable: 1
@@ -230,11 +230,11 @@ contracts:
   ref: diagrams/lld/contracts/wallet.yaml
 - contract: resources
   tier: satellite
-  operations: 61
+  operations: 62
   holds: null
   service: VenueOpsService
   verbs:
-    GET: 25
+    GET: 26
     POST: 18
     PUT: 13
     DELETE: 4
@@ -245,12 +245,12 @@ contracts:
   ref: diagrams/lld/contracts/resources.yaml
 - contract: inventory
   tier: satellite
-  operations: 58
+  operations: 59
   holds: null
   service: InventoryService
   verbs:
     POST: 29
-    GET: 23
+    GET: 24
     PUT: 4
     PATCH: 2
   guestCallable: 0
@@ -261,11 +261,11 @@ contracts:
   ref: diagrams/lld/contracts/inventory.yaml
 - contract: approvals
   tier: spine
-  operations: 57
+  operations: 58
   holds: null
   service: TenancyService
   verbs:
-    GET: 23
+    GET: 24
     POST: 17
     PUT: 16
     DELETE: 1
@@ -365,12 +365,12 @@ contracts:
   ref: diagrams/lld/contracts/workforce.yaml
 - contract: accreditation
   tier: satellite
-  operations: 47
+  operations: 48
   holds: null
   service: TenancyService
   verbs:
     POST: 20
-    GET: 18
+    GET: 19
     PUT: 9
   guestCallable: 10
   offlineCapable: 0
@@ -440,12 +440,12 @@ contracts:
   ref: diagrams/lld/contracts/platform-ops.yaml
 - contract: public-api
   tier: satellite
-  operations: 35
+  operations: 36
   holds: null
   service: PlatformService
   verbs:
+    GET: 16
     POST: 15
-    GET: 15
     PUT: 4
     DELETE: 1
   guestCallable: 0

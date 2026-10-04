@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 38 of 94 |
+| Operations in the slice | 40 of 94 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -22,6 +22,7 @@
 | [AccessService](AccessService.md) | `access.entitlement` |
 | [MarketingService](MarketingService.md) | `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
 | [OrderService](OrderService.md) | `orders.sales_order` |
+| [TenancyService](TenancyService.md) | `platform.workstation` |
 | [VenueOpsService](VenueOpsService.md) | `assets.media_asset` |
 
 ## Operations in the first release
@@ -31,8 +32,9 @@
 | administration | [`createRole`](#createrole) | POST | `/roles` | setup | 1 | ADM-021, BO-054 |
 | administration | [`listOwnPlatformStaffGrants`](#listownplatformstaffgrants) | GET | `/platform-staff-grants/mine` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
 | administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 1 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
-| administration | [`listRoles`](#listroles) | GET | `/roles` | core | 1 | ADM-021, BO-054, BO-106, CMS-019 |
+| administration | [`listRoles`](#listroles) | GET | `/roles` | core | 1 | ADM-021, BO-054, BO-106, CMS-019, CMS-086 |
 | administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
+| administration | [`setCapabilityTemplate`](#setcapabilitytemplate) | PUT | `/capability-templates` | setup | 1 | BO-054 |
 | administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 1 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
 | administration | [`updateRole`](#updaterole) | PATCH | `/roles/{roleId}` | setup | 1 |  |
 | guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 1 | GST-066, WEB-024 |
@@ -43,7 +45,7 @@
 | guestAuth | [`guestSocialLogin`](#guestsociallogin) | POST | `/auth/guest/social` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`guestUaePassLogin`](#guestuaepasslogin) | POST | `/auth/guest/uae-pass` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`linkGuestCheckout`](#linkguestcheckout) | POST | `/auth/guest/link-checkout` | core | 1 | GST-010, GST-042, WEB-013, WEB-016 |
-| guestAuth | [`registerGuest`](#registerguest) | POST | `/auth/guest/register` | core | 1 | GST-042, WEB-016 |
+| guestAuth | [`registerGuest`](#registerguest) | POST | `/auth/guest/register` | core | 1 | GST-010, GST-042, WEB-013, WEB-016 |
 | guestAuth | [`requestGuestOtp`](#requestguestotp) | POST | `/auth/guest/otp` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`submitGuestIdentityDocument`](#submitguestidentitydocument) | POST | `/auth/guest/identity-verifications` | core | 1 | WEB-020 |
 | guestAuth | [`verifyGuestOtp`](#verifyguestotp) | POST | `/auth/guest/otp/verify` | core | 1 | GST-042, WEB-016 |
@@ -58,7 +60,8 @@
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
 | identity | [`setGuestVerificationPolicy`](#setguestverificationpolicy) | PUT | `/guest-verification-policy` | setup | 1 | ADM-342 |
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
-| identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-073, WEB-020 |
+| identity | [`setSegregationRules`](#setsegregationrules) | PUT | `/segregation-rules` | setup | 1 | ADM-340 |
+| identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-073, WEB-013, WEB-020 |
 | mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
 | mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
 | mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
@@ -79,12 +82,12 @@
 |---|---|
 | Permission | `ROLE_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `identity.role` non-empty |
+| Part of slice | setup, makes `identity.role`, `identity.role_permission` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.role` |
-| Writes | `cache:idempotency`, `cache:resolution`, `identity.role` |
+| Reads | `cache:idempotency`, `identity.capability_template`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
+| Writes | `cache:idempotency`, `cache:resolution`, `identity.role`, `identity.role_permission` |
 | Called by | ADM-021, BO-054 |
 
 **Parameters**
@@ -254,9 +257,9 @@ A role is a grouping for permission management — code, name, description and t
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 24 August: servable from a local cache. |
-| Reads | `identity.role` |
+| Reads | `identity.role`, `identity.role_permission` |
 | Writes | - |
-| Called by | ADM-021, BO-054, BO-106, CMS-019 |
+| Called by | ADM-021, BO-054, BO-106, CMS-019, CMS-086 |
 
 **Parameters**
 
@@ -349,6 +352,64 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | 201 |  | Open. |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setCapabilityTemplate
+
+**`PUT /capability-templates`**: Save a tick-set under a name
+
+|  |  |
+|---|---|
+| Permission | `ROLE_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `identity.capability_template` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `identity.capability_template` |
+| Writes | `identity.capability_template` |
+| Called by | BO-054 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CapabilityTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| description | string |  | (nullable) |
+| capabilities | array of string | yes |  |
+| module | string |  | The module a per-module preset belongs to (a contract name, as listModuleCapabilities; CHG-CSP-003). (nullable) |
+| presetLevel | enum (all, viewer, midLevel) |  | Which of the three per-module presets this is (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): All, Viewer or Mid-level. (nullable) |
+| isPreset | boolean |  | Seeded by the platform, not saved by the tenant (CHG-CSP-003). (default False; read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `CapabilityTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| description | string |  | (nullable) |
+| capabilities | array of string | yes |  |
+| module | string |  | The module a per-module preset belongs to (a contract name, as listModuleCapabilities; CHG-CSP-003). (nullable) |
+| presetLevel | enum (all, viewer, midLevel) |  | Which of the three per-module presets this is (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): All, Viewer or Mid-level. (nullable) |
+| isPreset | boolean |  | Seeded by the platform, not saved by the tenant (CHG-CSP-003). (default False; read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePrincipal
@@ -655,8 +716,8 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `identity.mfa_method` |
-| Writes | `platform.outbox` |
+| Reads | `identity.guest_credential`, `identity.mfa_method`, `identity.password_policy`, `pii.subject_contact` |
+| Writes | `identity.guest_credential`, `identity.guest_session`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -911,8 +972,8 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject` |
-| Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_contact`, `platform.outbox` |
-| Called by | GST-042, WEB-016 |
+| Writes | `cache:idempotency`, `identity.guest_credential`, `identity.guest_session`, `pii.subject`, `pii.subject_contact`, `platform.outbox` |
+| Called by | GST-010, GST-042, WEB-013, WEB-016 |
 
 **Parameters**
 
@@ -1216,7 +1277,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `access.entitlement`, `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile`, `orders.sales_order`, `pii.subject` |
-| Writes | `cache:idempotency` |
+| Writes | `cache:idempotency`, `platform.dsar_request` |
 | Called by | GST-066, WEB-024 |
 
 **Parameters**
@@ -1263,7 +1324,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `cache:idempotency`, `identity.session` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `identity.principal_credential`, `identity.session`, `platform.workstation` |
 | Writes | `cache:idempotency`, `identity.session` |
 | Called by | BO-053, POS-000 |
 | State model | Operator session ([states/operator-session.yaml](../../../states/operator-session.yaml)): moves `active` -> `terminated` |
@@ -1888,6 +1949,54 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setSegregationRules
+
+**`PUT /segregation-rules`**: Which permissions may not be held together
+
+BL-147, 3.3.31. **Checked at grant time, not at use time** — discovering the conflict when somebody exercises it means the conflict already existed.
+**`allowWithCompensatingControl` is there because a small venue cannot always separate duties**, and a rule that cannot be satisfied is a rule that gets disabled entirely.
+
+|  |  |
+|---|---|
+| Permission | `ROLE_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `identity.segregation_rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.segregation_rule` |
+| Writes | `cache:idempotency`, `identity.segregation_rule` |
+| Called by | ADM-340 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rules | array of SegregationRule | yes |  |
+| rules[].id | string (uuid) | yes | Assigned by the server. (read-only) |
+| rules[].name | string |  |  |
+| rules[].permissionA | string | yes |  |
+| rules[].permissionB | string | yes |  |
+| rules[].severity | enum (block, requireApproval, warn) | yes |  |
+| rules[].rationale | string |  | Why these two conflict, in words an auditor reads. |
+| rules[].scopeSensitive | boolean |  | Whether the two permissions must overlap in scope to conflict, and this is not scopePath below — that one is the partition key and says where the rule *row* lives (ADR-0005), not where the *conflict*… (default True) |
+| rules[].allowWithCompensatingControl | boolean |  | A small venue cannot always separate duties, and pretending otherwise means the rule gets disabled entirely. (default False) |
+| rules[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### verifyGuestEmail
 
 **`POST /auth/guest/verify-email`**: Send a verification link, or consume one
@@ -1914,7 +2023,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 | Guest callable | True |
 | Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject` |
 | Writes | `cache:idempotency`, `identity.otp_challenge`, `marketing.message_dispatch`, `pii.subject` |
-| Called by | GST-073, WEB-020 |
+| Called by | GST-010, GST-073, WEB-013, WEB-020 |
 
 **Parameters**
 
@@ -2308,6 +2417,20 @@ Who is logged in, on which workstation, since when. There was previously no way 
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
 
+### `identity.capability_template`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| description | text | no |  |
+| capabilities | text[] | yes |  |
+| module | text | no | The module a per-module preset belongs to (a contract name, as listModuleCapabilities; CHG-CSP-003). |
+| preset_level | text | no | Which of the three per-module presets this is (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): All, Viewer or Mid-level. |
+| is_preset | boolean | no | Seeded by the platform, not saved by the tenant (CHG-CSP-003). |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `identity.delegated_access`
 
 | Column | Type | Required | Notes |
@@ -2333,6 +2456,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | granted_by_principal_id | uuid | yes | Points at identity.principal. |
 | revoked_by_principal_id | uuid | no | Points at identity.principal. |
 | scope_id | uuid | yes | Points at platform.org_unit. |
+
+### `identity.guest_credential`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| subject_id | uuid | yes |  |
+| password_hash | text | yes | Argon2id, with its parameters, never the password. |
+| failed_attempts | integer | yes |  |
+| locked_until | timestamptz | no |  |
+| password_set_at | timestamptz | no |  |
 
 ### `identity.guest_identity_verification`
 
@@ -2495,6 +2629,31 @@ Every table this service owns that the slice reads or writes, with its columns a
 | principal_count | integer | no |  |
 | grant_count | integer | no |  |
 
+### `identity.role_permission`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| role_id | uuid | yes |  |
+| permission | text | yes |  |
+| granted_at | timestamptz | no |  |
+| granted_by_principal_id | uuid | no | Null for a system role. |
+| is_active | boolean | no | Revoked rather than deleted. |
+| id | uuid | yes | Synthesised key. |
+
+### `identity.segregation_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Assigned by the server. |
+| name | text | no |  |
+| permission_a | text | yes |  |
+| permission_b | text | yes |  |
+| severity | text | yes |  |
+| rationale | text | no | Why these two conflict, in words an auditor reads. |
+| scope_sensitive | boolean | no | Whether the two permissions must overlap in scope to conflict, and this is not scopePath below — that one is the partition key and says where the rule *row* lives (ADR-0005), not where the *conflict*… |
+| allow_with_compensating_control | boolean | no | A small venue cannot always separate duties, and pretending otherwise means the rule gets disabled entirely. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `identity.session`
 
 | Column | Type | Required | Notes |
@@ -2562,12 +2721,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-56 operations, added to this service in later releases without changing any of the above.
+54 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
-| identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
+| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
+| identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |
 | sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

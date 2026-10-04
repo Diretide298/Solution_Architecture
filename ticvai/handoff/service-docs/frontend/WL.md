@@ -26,21 +26,21 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 1 | 16 |
+| [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 1 | 19 |
 | [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 1 | 10 |
 | [ADM-018](#adm-018-interface-languages) | Interface Languages | Branding & Localisation | 1 | 5 |
 | [ADM-424](#adm-424-module-activation-dependency-validation) | Module Activation & Dependency Validation | Tenants & Licensing | 1 | 7 |
 | [CMS-001](#cms-001-tenant-workspace) | Tenant Workspace | White Label | 1 | 7 |
 | [CMS-002](#cms-002-brand-kit) | Brand Kit | White Label | 1 | 4 |
 | [CMS-003](#cms-003-typography) | Typography | White Label | 1 | 2 |
-| [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 1 | 4 |
+| [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 1 | 7 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 1 | 2 |
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 6 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 12 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 14 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 10 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 7 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 11 |
-| [CMS-011](#cms-011-translations) | Translations | White Label | 1 | 3 |
+| [CMS-011](#cms-011-translations) | Translations | White Label | 1 | 4 |
 | [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 1 | 2 |
 | [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 1 | 3 |
 | [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 1 | 10 |
@@ -74,6 +74,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | tenantId | navigation |
 | packageId | navigation |
 | version | navigation |
+| uploadId | navigation |
 
 **Operations**
 
@@ -95,6 +96,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
 | `exportSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#exportsitepackage) | onAction | Generate a site package (self-hosted) | `TENANT_PUBLISH` |
 | `getSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitepackage) | onLoad | Follow the generated package until it is ready | `TENANT_PUBLISH` |
+| `searchMedia` | [VenueOpsService](../backend/VenueOpsService.md#searchmedia) | onLoad | The media library, to pick an existing asset by name | `ASSET_LIBRARY_VIEW` |
+| `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Upload a new asset | `ASSET_LIBRARY_MANAGE` |
+| `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | background | Finish the upload once the file PUT succeeds; the asset id fills the field | `ASSET_LIBRARY_MANAGE` |
 
 **States**
 
@@ -104,7 +108,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | error | Could not load. Names which read failed and leaves the white-label branding untouched. |
 | emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |
 | emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
 | grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 
 **Goes to**
@@ -424,6 +428,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Component | `apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx` |
 | Pattern | statusTracker |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| uploadId | navigation |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
@@ -432,6 +442,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | The app icon set at every size | `TENANT_CONFIGURE` |
 | `setAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#setappicons) | onAction | Replace the app icon set | `TENANT_CONFIGURE` |
 | `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Replace a logo, favicon or splash | `TENANT_CONFIGURE` |
+| `searchMedia` | [VenueOpsService](../backend/VenueOpsService.md#searchmedia) | onLoad | The media library, to pick an existing asset by name | `ASSET_LIBRARY_VIEW` |
+| `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Upload a new asset | `ASSET_LIBRARY_MANAGE` |
+| `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | background | Finish the upload once the file PUT succeeds; the asset id fills the field | `ASSET_LIBRARY_MANAGE` |
 
 **States**
 
@@ -440,14 +453,14 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | loading | The logo assets, read by `getBrandIdentity`. |
 | error | Could not load. Names which read failed and leaves the logo assets untouched. |
 | emptyFirstRun | No logo assets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
+| CMS-002 | Brand Kit | uploadId |  |
 | CMS-003 | Typography |  |  |
 
 ## CMS-005 Theme Editor
@@ -575,6 +588,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `createContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#createcontentblock) | onAction | Author a scheduled or personalised content block (BL-172) | `TENANT_CONFIGURE` |
 | `publishContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#publishcontentblock) | onAction | Publish a block now or on its schedule; follows the publish review policy (CHG-CSA-042) | `TENANT_PUBLISH` |
 | `listLandingPageTemplates` | [WhiteLabelService](../backend/WhiteLabelService.md#listlandingpagetemplates) | onLoad | The landing-page templates TICVAI provides (DEC-548) | `TENANT_CONFIGURE` |
+| `listContentBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentblocks) | onLoad | The page's existing blocks, in order: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026 | `TENANT_CONFIGURE` |
+| `updateContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#updatecontentblock) | onAction | Edit or reorder a block (position): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026 | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -769,7 +784,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|---|
 | `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | Set enabled languages and default | `TENANT_CONFIGURE` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Languages and translation gaps | `TENANT_CONFIGURE` |
-| `getTranslationProposals` | [AiService](../backend/AiService.md#gettranslationproposals) | onAction | Follow a translation job and review its proposals (CHG-CSA-045) | `TENANT_CONFIGURE` |
+| `getTranslationProposals` | [AiService](../backend/AiService.md#gettranslationproposals) | onInterval | Follow the job started here (every 3 s until completed or failed) and review its drafts | `TENANT_CONFIGURE` |
+| `proposeTranslations` | [AiService](../backend/AiService.md#proposetranslations) | onAction | Start machine translation of what a language is missing; its translationJobId is what getTranslationProposals follows (R288 is answered by that read, CHG-CSA-045) | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -778,7 +794,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | loading | The saved translations. |
 | error | Could not load. Names which read failed and leaves the translations untouched. |
 | emptyFirstRun | No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 

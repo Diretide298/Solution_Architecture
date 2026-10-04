@@ -82,11 +82,11 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "white-label",
    "operations": 1
   },
   {
-   "contract": "white-label",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -513,12 +513,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
-   },
-   {
     "operation": "listSegregationRules",
     "contract": "identity",
     "verb": "GET",
@@ -553,6 +547,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
    },
    {
     "operation": "getCaseInvestigationResolution",

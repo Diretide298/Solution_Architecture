@@ -23,11 +23,31 @@ Checks:
 Run: python3 tools/check-wireframes.py
 """
 import json
+import pickle
 import re
 import sys
 from pathlib import Path
 
 import yaml
+
+# **Each file is parsed once** (CHG-RSPD-001, profiled 4 October). Nine rules each re-read the sixteen
+# screens files: 144 `yaml.safe_load` calls, 99% of this checker's time. The parse is remembered by
+# the exact text it was given and every caller gets its own fresh copy (a pickle of the parsed
+# document, loaded anew per call), so the result is the plain parser's and no rule sees another's edits.
+_YAML_PARSED: dict = {}
+_yaml_safe_load = yaml.safe_load
+
+
+def _safe_load_once(stream):
+    if not isinstance(stream, str):
+        return _yaml_safe_load(stream)
+    blob = _YAML_PARSED.get(stream)
+    if blob is None:
+        blob = _YAML_PARSED[stream] = pickle.dumps(_yaml_safe_load(stream), pickle.HIGHEST_PROTOCOL)
+    return pickle.loads(blob)
+
+
+yaml.safe_load = _safe_load_once
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"

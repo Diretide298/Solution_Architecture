@@ -23,6 +23,45 @@
   "requestBody": null,
   "responds": "GuestMenu"
  },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "lookupShopAndDrop": {
   "method": "GET",
   "path": "/shop-and-drop/lookup",

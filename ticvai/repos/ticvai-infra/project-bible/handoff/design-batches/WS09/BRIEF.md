@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-227` | Validation Exception & Reason Code Manager | C | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-228` | Manual Override & Supervisor Approval | C | 11 | 0 | 5 | 0 | 1 | 3 | — | notStarted (generated) |
 | `BO-229` | Credential Disable, Blacklist & Whitelist Operations | C | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-230` | Live Gate Mode & Lane Control | A | 8 | 8 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
+| `BO-230` | Live Gate Mode & Lane Control | A | 8 | 7 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
 | `BO-231` | Queue, Throughput & Lane Optimization | C | 0 | 2 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-232` | Operational Incident & Exception Workspace | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-233` | Operations Audit, Shift Handover & Control Summary | C | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |

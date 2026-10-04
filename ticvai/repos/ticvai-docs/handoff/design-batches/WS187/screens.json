@@ -347,121 +347,94 @@
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§For each method configure) and no display directory — it is settings, not a population",
-  "purpose": "Configure which funding methods TICVAI wallets can accept. The source requires multiple methods for funding wallet value, including bank-linked funding, credit/debit cards through digital channels, and cash/cards through physical channels.",
+  "purpose": "Configure how wallets at this venue may be funded: which funding sources and channels are accepted, the minimum, maximum and preset top-ups, the amount above which a top-up needs approval, and automatic reload.",
   "purposeNote": "Administrators can introduce, modify or deactivate wallet funding methods through configuration without changing application code.",
   "layout": {
    "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
      "components": [
       {
        "kind": "selectField",
-       "label": "Funding method name",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "label": "Wallet type",
+       "bindsTo": "WalletFundingRules.walletTypeId",
+       "operation": "listWalletTypes",
+       "notes": "Options from listWalletTypes.",
+       "provenance": "contract wallet.yaml WalletFundingRules.walletTypeId (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Internal code",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "kind": "multiSelect",
+       "label": "Funding sources",
+       "bindsTo": "WalletFundingRules.allowedFundingSources",
+       "operation": "setWalletFundingRules",
+       "notes": "Card, cash, bank transfer, voucher, corporate account, loyalty conversion.",
+       "provenance": "contract wallet.yaml WalletFundingRules.allowedFundingSources (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Funding category",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "kind": "multiSelect",
+       "label": "Channels",
+       "bindsTo": "WalletFundingRules.allowedChannels",
+       "operation": "setWalletFundingRules",
+       "provenance": "contract wallet.yaml WalletFundingRules.allowedChannels (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Payment service/provider",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Supported currencies",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Minimum top-up",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "bindsTo": "WalletFundingRules.minimumTopUp",
+       "operation": "setWalletFundingRules",
+       "provenance": "contract wallet.yaml WalletFundingRules.minimumTopUp (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Maximum top-up",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "bindsTo": "WalletFundingRules.maximumTopUp",
+       "operation": "setWalletFundingRules",
+       "provenance": "contract wallet.yaml WalletFundingRules.maximumTopUp (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Applicable wallet types",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "kind": "multiSelect",
+       "label": "Preset amounts",
+       "bindsTo": "WalletFundingRules.presetAmounts",
+       "operation": "setWalletFundingRules",
+       "provenance": "contract wallet.yaml WalletFundingRules.presetAmounts (defined 4 October 2026, CHG-FXS-002)"
       },
       {
-       "kind": "selectField",
-       "label": "Applicable credit types",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Applicable tenants",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Applicable venues",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Applicable channels",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Customer verification requirement",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Authorization requirement",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund/reversal eligibility",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fees",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective dates",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Active/inactive status",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+       "kind": "numberField",
+       "label": "Approval above",
+       "bindsTo": "WalletFundingRules.approvalAboveAmount",
+       "operation": "setWalletFundingRules",
+       "provenance": "contract wallet.yaml WalletFundingRules.approvalAboveAmount (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "detailPanel",
-       "label": "How a wallet may be topped up",
-       "bindsTo": "WalletFundingRules",
+       "label": "Automatic reload",
+       "bindsTo": "WalletFundingRules.autoReload",
        "operation": "getWalletFundingRules",
-       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
+       "provenance": "contract wallet.yaml WalletFundingRules.autoReload (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save funding rules",
+       "operation": "setWalletFundingRules",
+       "notes": "If-Match carries the version getWalletFundingRules returned.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The funding method configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the funding method untouched.",
-   "emptyFirstRun": "No funding method configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The form with the saved rules.",
+   "error": "Could not load. Names the read that failed; the form stays read-only.",
+   "emptyFirstRun": "Never saved: the defaults getWalletFundingRules returns.",
+   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `getWalletFundingRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_CONFIGURE` for `setWalletFundingRules`.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
@@ -481,6 +454,13 @@
     "purpose": "How a wallet may be topped up",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "The wallet type the rules apply to (walletTypeId)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
    }
   ],
   "wireframe": {
@@ -488,8 +468,9 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1094",
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1094"
   },
-  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 14. 0 of 0 labels bound to a contract property; 18 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-002) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {},
+  "notes": "**Bound 4 October 2026 to WalletFundingRules, one rules object per venue: funding sources are a fixed list in the contract, not records, so the screen edits which are allowed rather than creating methods. Per-method fees and provider choice are not in the contract and left the screen** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

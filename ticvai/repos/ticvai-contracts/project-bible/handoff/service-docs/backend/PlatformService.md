@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 22 of 225 |
+| Operations in the slice | 22 of 228 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -19,9 +19,7 @@ Splitting them would give three services writing one schema, which is the arrang
 
 ## Depends on
 
-| Service | Tables it reads |
-|---|---|
-| [IdentityService](IdentityService.md) | `identity.principal` |
+Nothing outside itself.
 
 ## Operations in the first release
 
@@ -200,7 +198,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
-| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
+| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
 | Called by | ADM-008, ADM-392 |
 
 **Parameters**
@@ -329,7 +327,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
-| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
+| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
 | Called by | ADM-008, ADM-398 |
 
 **Parameters**
@@ -953,6 +951,11 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 
 13.1.10. **The organisation administers its own people**, because TICVAI maintaining every integrator's staff list is TICVAI doing their HR — the same reasoning as `PartnerUser`.
 
+**What the PUT does** (4 October 2026, CHG-FXC-005). Replaces the organisation's member list in
+`control.developer_member` (DeveloperMember): an email not on the list is invited, a listed email's role is
+updated, a member left off is `removed`. Exactly one `owner` must remain, or 409. Nothing is written to the tenant's
+identity tables; the portal signs a member in by the email.
+
 |  |  |
 |---|---|
 | Permission | `DEVELOPER_MANAGE` |
@@ -961,8 +964,8 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.developer_account`, `identity.principal` |
-| Writes | `cache:idempotency`, `control.developer_account`, `identity.delegated_access` |
+| Reads | `cache:idempotency`, `control.developer_account`, `control.developer_member` |
+| Writes | `cache:idempotency`, `control.developer_account`, `control.developer_member` |
 | Called by | DEV-002 |
 
 **Parameters**
@@ -1041,12 +1044,12 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| moduleCode | string | yes |  |
+| moduleCode | string | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | string |  |  |
 | description | string |  | (nullable) |
 | category | string |  | (nullable) |
-| requiresModules | array of string |  |  |
-| incompatibleWithModules | array of string |  |  |
+| requiresModules | array of string |  | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
+| incompatibleWithModules | array of string |  | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | includedInTiers | array of string |  |  |
 | price | Money |  | On the wire this is three fields; in the database it is one column. |
 | price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1063,12 +1066,12 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| moduleCode | string | yes |  |
+| moduleCode | string | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | string |  |  |
 | description | string |  | (nullable) |
 | category | string |  | (nullable) |
-| requiresModules | array of string |  |  |
-| incompatibleWithModules | array of string |  |  |
+| requiresModules | array of string |  | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
+| incompatibleWithModules | array of string |  | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | includedInTiers | array of string |  |  |
 | price | Money |  | On the wire this is three fields; in the database it is one column. |
 | price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1248,7 +1251,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Read routing | replica |
 | Reads | `control.tenant` |
 | Writes | - |
-| Called by | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-369, ADM-370, ADM-374, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619, BO-594 |
+| Called by | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-369, ADM-370, ADM-374, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-460, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619, BO-594 |
 
 **Parameters**
 
@@ -1433,6 +1436,11 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 Deliberately harder to reach than suspension. Starts a retention window during which data is exportable and the decision remains reversible by a platform administrator. Cells are destroyed only when the window closes.
 A tenant with unsettled ledger balances cannot be terminated — the money has to be resolved first.
 
+**The unsettled-balance refusal** (4 October 2026, CHG-FXC-004). The tenant's ledger lives in its own cell database,
+which the control plane does not read. Before terminating, the Control Plane asks the tenant's cell (`serviceAuth`) for
+`finance.getTrialBalance` at today's date for every legal entity; any non-zero receivable, payable or inter-entity
+balance refuses the termination with 409 `unsettledBalances`, naming the legal entities.
+
 |  |  |
 |---|---|
 | Permission | `PLATFORM_TENANT_TERMINATE` |
@@ -1615,6 +1623,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | verified_at | timestamptz | no |  |
 
+### `control.developer_member`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| developer_account_id | uuid | no |  |
+| email | text | yes |  |
+| role | text | yes |  |
+| status | text | yes |  |
+| invited_at | timestamptz | no |  |
+| activated_at | timestamptz | no |  |
+
 ### `control.integration_listing`
 
 | Column | Type | Required | Notes |
@@ -1723,12 +1743,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| module_code | text | yes |  |
+| module_code | text | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | text | no |  |
 | description | text | no |  |
 | category | text | no |  |
-| requires_modules | text[] | no |  |
-| incompatible_with_modules | text[] | no |  |
+| requires_modules | text[] | no | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
+| incompatible_with_modules | text[] | no | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | included_in_tiers | text[] | no |  |
 | list_price | numeric(18,4) | no |  |
 | pricing_basis | text | no |  |
@@ -1781,13 +1801,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-203 operations, added to this service in later releases without changing any of the above.
+206 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `getBillingEntity`, `issueCreditNote`, `listCreditNotes`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute`, `setBillingEntity` |
-| cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
-| drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
+| cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listCells`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
+| drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `getMembershipProductValidation`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
 | environment | `listEnvironments`, `registerEnvironment` |
 | general | `getDeveloperAccount`, `listApiAnomalyRules`, `listApiLicences`, `listApiQuotas` |
 | licensing | `getEntitlementUsage`, `removeLicenceAddOn` |
@@ -1798,7 +1818,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan | `getPlan`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
 | platform-ops | `cancelOutboxRepublish`, `getOutboxRepublish`, `listDeadLetters`, `listOutboxRepublishes`, `replayDeadLetter`, `republishOutbox`, `skipRolloutCell` |
-| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
+| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listDeveloperMembers`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
 | subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |

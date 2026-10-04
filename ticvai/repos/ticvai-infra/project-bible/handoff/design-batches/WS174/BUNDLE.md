@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1043` | Revenue Command Center | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-1044` | Dynamic Seat Pricing | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1045` | Price Bands & Categories | A | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1045` | Price Bands & Categories | A | 36 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1046` | Inventory Forecasting | B | 0 | 0 | 6 | 3 | 0 | 4 | — | notStarted (—) |
 | `BO-1047` | Section Revenue Forecast | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-1048` | Seat Upsell Recommendations | D | 0 | 0 | 6 | 40 | 0 | 6 | — | notStarted (—) |
@@ -140,7 +140,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-1043, BO-1044, BO-1045, BO-1046, BO-1047, BO-1048, BO-1049, BO-1050 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-1043, BO-1044, BO-1046, BO-1047, BO-1048, BO-1049, BO-1050 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -412,12 +412,14 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Block | Block A · task APP-SETUP-BO-1045 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): Seat categories listed with the selected one's price bands edited beside it (defined 4 October 2026 from SeatCategory and SeatPriceBand, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `seatCategoryId` (navigation) |
 | Route | `/access-venue/price-bands-categories-bo-1045` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Mapping bands to sections, rows or seats, and event or performance overrides, are not in the contract (SeatCategory carries priceBands since R275 d).
+**What the spec says about it.** **Defined 4 October 2026 from SeatCategory and SeatPriceBand (R275 d): categories in rank order, each with its price bands by channel and effective period. Mapping bands to sections, rows or seats is the seat map editor's (the remaining gap)** (CHG-FXS-001)
+
+**Known gaps.** Mapping bands to sections, rows or seats, and event or performance overrides, are not in the contract (SeatCategory carries priceBands since R275 d).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The seat categories of a venue and the priced bands on each (code, label, colour, amount, channel, customer segment, from and to dates), with rank used for best-seat assignment. Bands apply to sales from their date and never to seats already sold.
 
@@ -430,7 +432,56 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Code | text field | optional | — | — | — | Set at creation. | `SeatCategory.code` |
+| Name | text field | optional | — | — | — | — | `SeatCategory.name` |
+| Colour | text field | optional | — | — | — | Hex colour shown on the seat map; keeps 3:1 contrast with the map background. | `SeatCategory.displayColour` |
+| Rank | number field | optional | — | — | — | Ordering for best-seat assignment. Lower is better. | `SeatCategory.rank` |
+| Band code | text field | optional | — | max length 64 | — | Unique within the category. | `SeatPriceBand.code` |
+| Band label | text field | optional | — | max length 200 | — | — | `SeatPriceBand.displayLabel` |
+| Band price | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | In the venue's currency (Money; the currency comes from the region). | `SeatPriceBand.amount` |
+| Band channel | select | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Empty means every channel. | `SeatPriceBand.channel` |
+| Effective from | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `SeatPriceBand.effectiveFrom` |
+| Effective to | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Null means open-ended. | `SeatPriceBand.effectiveTo` |
+
+**Sent by *Create seat category*** (`createSeatCategory`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Code `code` | text field | required | — | max length 64 | — | — | `createSeatCategory` body |
+| Name `name` | text field | required | — | max length 200 | — | — | `createSeatCategory` body |
+| Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `createSeatCategory` body |
+| Display colour `displayColour` | colour picker | optional | — | — | #RRGGBB | — | `createSeatCategory` body |
+| Rank `rank` | number field | optional | — | — | — | Ordering for best-seat assignment. Lower is better. | `createSeatCategory` body |
+| Price bands `priceBands` | repeatable rows | optional | — | — | — | The category's price bands (decided 28 September, audit R275 (d)). | `createSeatCategory` body |
+| Code `priceBands[].code` | text field | required | — | max length 64 | — | Unique within the category. | `createSeatCategory` body |
+| Display label `priceBands[].displayLabel` | text field | required | — | max length 200 | — | — | `createSeatCategory` body |
+| Display colour `priceBands[].displayColour` | colour picker | optional | — | — | #RRGGBB | — | `createSeatCategory` body |
+| Amount `priceBands[].amount` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createSeatCategory` body |
+| Channel `priceBands[].channel` | select | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Null means every channel. | `createSeatCategory` body |
+| Customer segment `priceBands[].customerSegmentId` | picker: choose a customer segment | optional | — | — | shows names, sends the id | A `marketing-crm` customer segment; null means everyone. | `createSeatCategory` body |
+| Effective from `priceBands[].effectiveFrom` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createSeatCategory` body |
+| Effective to `priceBands[].effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Null means open-ended. | `createSeatCategory` body |
+
+**Sent by *Save changes*** (`updateSeatCategory`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateSeatCategory` body |
+| Display colour `displayColour` | colour picker | optional | — | — | #RRGGBB | — | `updateSeatCategory` body |
+| Rank `rank` | number field | optional | — | — | — | — | `updateSeatCategory` body |
+| Price bands `priceBands` | repeatable rows | optional | — | — | — | — | `updateSeatCategory` body |
+| Code `priceBands[].code` | text field | required | — | max length 64 | — | Unique within the category. | `updateSeatCategory` body |
+| Display label `priceBands[].displayLabel` | text field | required | — | max length 200 | — | — | `updateSeatCategory` body |
+| Display colour `priceBands[].displayColour` | colour picker | optional | — | — | #RRGGBB | — | `updateSeatCategory` body |
+| Amount `priceBands[].amount` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `updateSeatCategory` body |
+| Channel `priceBands[].channel` | select | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Null means every channel. | `updateSeatCategory` body |
+| Customer segment `priceBands[].customerSegmentId` | picker: choose a customer segment | optional | — | — | shows names, sends the id | A `marketing-crm` customer segment; null means everyone. | `updateSeatCategory` body |
+| Effective from `priceBands[].effectiveFrom` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateSeatCategory` body |
+| Effective to `priceBands[].effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Null means open-ended. | `updateSeatCategory` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -441,13 +492,35 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Each seat category shows its price bands** (label, currency, channel, customer segment, effective period) — kept by the client (decided 28 September, audit R275 (d)) and handed to the contracts group, since `SeatCategory` has no price band yet.
+**Seat categories** (data table, from `listSeatCategories`): The venue in session (query venueId), in rank order.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Rank | 1,234 | Ordering for best-seat assignment. Lower is better. |
+| Code | text | — |
+| Name | text | — |
+| Display colour | text | — |
+| Seat count | 1,234 | — |
+
+**Price bands** (data table, from `listSeatCategories`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | Unique within the category. |
+| Display label | text | — |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Null means every channel. |
+| Effective from | 1 Oct 2026, 14:30 | — |
+| Effective to | 1 Oct 2026, 14:30 | Null means open-ended. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create seat category (primary button) | navigation or local | — | — | — | — |
+| New seat category (primary button) | navigation or local | — | — | — | — |
+| Add band (secondary button) | navigation or local | — | — | — | — |
+| Create seat category (primary button) | `createSeatCategory` POST `/seat-categories` | inline | SeatCategory | — | — |
+| Save changes (primary button) | `updateSeatCategory` PATCH `/seat-categories/{seatCategoryId}` | inline | SeatCategory | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Two bands with the same `code`, or a band whose `effectiveTo` is not after its `effectiveFrom` (audit R275 (d)). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `listSeatCategories` (onLoad, Price bands against categories)
@@ -460,11 +533,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The price bands categories list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the price bands categories untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No price bands categories yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No seat categories yet. Carries New seat category. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the price bands categories are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatCategory`, `updateSeatCategory`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 Two bands with the same `code`, or a band whose `effectiveTo` is not after its `effectiveFrom` (audit R275 (d)). |
 
@@ -502,7 +575,7 @@ categories:
 - `createSeatCategory` → `CAPACITY_CONFIGURE` (configure) · staff
 - `updateSeatCategory` → `CAPACITY_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatCategory`, `updateSeatCategory`.
 
 #### Requirements it meets
 
@@ -527,10 +600,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (36), with its required mark, default, format and its error state (404, 422).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1045?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create seat category, Cancel.
+- [ ] Every action is wired with its success and its failure: New seat category, Add band, Create seat category, Save changes, Cancel.
 - [ ] Every transition is wired: `BO-1043`.
 - [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.

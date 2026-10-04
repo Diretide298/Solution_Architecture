@@ -269,6 +269,24 @@
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
       },
       {
+       "kind": "secondaryButton",
+       "label": "New ticket template",
+       "operation": "createTicketTemplate",
+       "provenance": "contract orders.yaml POST /ticket-templates (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save ticket template",
+       "operation": "updateTicketTemplate",
+       "provenance": "contract orders.yaml PATCH /ticket-templates/{templateId} (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Print a proof",
+       "operation": "printTicketProof",
+       "provenance": "contract orders.yaml POST /ticket-templates/{templateId}/proof (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)"
+      },
+      {
        "kind": "destructiveButton",
        "label": "Archive media template",
        "operation": "archiveMediaTemplate",
@@ -313,6 +331,30 @@
     "trigger": "onAction"
    },
    {
+    "operationId": "createTicketTemplate",
+    "contract": "orders",
+    "purpose": "Create a ticket template (the orders template a sale issues from)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTicketTemplates"
+    ]
+   },
+   {
+    "operationId": "updateTicketTemplate",
+    "contract": "orders",
+    "purpose": "Change or retire a ticket template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTicketTemplates"
+    ]
+   },
+   {
+    "operationId": "printTicketProof",
+    "contract": "orders",
+    "purpose": "Print a sample without selling anything",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "archiveMediaTemplate",
     "contract": "access",
     "purpose": "Archive a media template",
@@ -345,6 +387,36 @@
     "trigger": "Archive media template",
     "body": "**Names what `archiveMediaTemplate` changes and what it leaves alone**, in the consequence rather than the verb. A access media template this affects should be identified in the dialog, not just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
     "provenance": "contract access.yaml POST /media-templates/{templateId}/archive"
+   },
+   {
+    "id": "formCreateTicketTemplate",
+    "component": "modal",
+    "trigger": "New ticket template",
+    "body": "**Collects what `createTicketTemplate` sends before it is called** (TicketTemplateRequest): name, mediaType, isRecyclable, recycleAfterDays, appliesToProductKinds, appliesToChannels, selectionPriority, layoutRef, localeVariants, isActive. `name` and `mediaType` are what a template cannot be saved without; `selectionPriority` with the product kinds, channels and media type decides which template a sale issues from. Dismissing sends nothing.",
+    "bindsTo": "TicketTemplateRequest",
+    "confirm": {
+     "label": "Create ticket template",
+     "operation": "createTicketTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml POST /ticket-templates (CHG-RFM-014)"
+   },
+   {
+    "id": "formUpdateTicketTemplate",
+    "component": "modal",
+    "trigger": "Save ticket template",
+    "body": "**Collects what `updateTicketTemplate` sends before it is called**, for the template selected: the same fields as a new template; `isActive` false retires it. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TicketTemplateRequest",
+    "confirm": {
+     "label": "Save ticket template",
+     "operation": "updateTicketTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml PATCH /ticket-templates/{templateId} (CHG-RFM-014)"
    }
   ],
   "_platform": {
@@ -632,104 +704,152 @@
        "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Orientation",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.orientation (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.orientation",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Margins",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.margins (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.margins",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Header",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.header (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.header",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Footer",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.footer (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.footer",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Background",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.background (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.background",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Logo",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.logo (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.logo",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "multiSelect",
        "label": "Images",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.images (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.images",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Text",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.text (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.text",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "multiSelect",
        "label": "Dynamic fields",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.dynamicFields (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.dynamicFields",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "QR/barcode",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.qrBarcode (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.qrBarcode",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Terms",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.terms (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.terms",
+       "operation": "setPdfPrintablePos"
       },
       {
        "kind": "textField",
        "label": "Perforation indicators where applicable",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.perforationIndicatorsWhereApplicable (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.perforationIndicatorsWhereApplicable",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Print-safe zones",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.printSafeZones (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.printSafeZones",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Printer profile",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.printerProfile (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.printerProfile",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "DPI",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.dpi (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.dpi",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Paper/stock type",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.paperStockType (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.paperStockType",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Thermal layout",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.thermalLayout (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.thermalLayout",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Cut behavior",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.cutBehavior (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.cutBehavior",
+       "operation": "setPdfPrintablePos"
       },
       {
-       "kind": "selectField",
-       "label": "Print margins",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
-      },
-      {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Supported printer integration",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.supportedPrinterIntegration (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.supportedPrinterIntegration",
+       "operation": "setPdfPrintablePos"
+      },
+      {
+       "kind": "selectField",
+       "label": "Output",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.outputFormat",
+       "operation": "setPdfPrintablePos",
+       "notes": "PDF, A4, A5, custom, POS receipt, thermal ticket, box office stock, pre-printed stock.",
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.outputFormat (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "textField",
+       "label": "Page size",
+       "bindsTo": "PdfPrintablePosTicketDesignerInput.pageSize",
+       "operation": "setPdfPrintablePos",
+       "provenance": "contract access.yaml PdfPrintablePosTicketDesignerInput.pageSize (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -739,13 +859,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "POS receipt",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Thermal ticket",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
+       "label": "Save design",
+       "operation": "setPdfPrintablePos",
+       "notes": "templateId is the access media template the screen was opened for (BO-344's row, access.media_template.id).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       }
      ]
     }
@@ -754,40 +871,10 @@
   "states": {
    "loading": "The pdf printable pos configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the pdf printable pos untouched.",
-   "emptyFirstRun": "No pdf printable pos configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No design saved for this media template yet: the designer opens on the defaults; Save design creates it.",
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listTicketTemplates",
-    "contract": "orders",
-    "purpose": "The templates this venue issues from",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createTicketTemplate",
-    "contract": "orders",
-    "purpose": "Create a template",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTicketTemplates"
-    ]
-   },
-   {
-    "operationId": "updateTicketTemplate",
-    "contract": "orders",
-    "purpose": "Change or retire a template",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTicketTemplates"
-    ]
-   },
-   {
-    "operationId": "printTicketProof",
-    "contract": "orders",
-    "purpose": "Print a sample without selling anything",
-    "trigger": "onAction"
-   },
    {
     "operationId": "setPdfPrintablePos",
     "contract": "access",
@@ -797,7 +884,7 @@
    {
     "operationId": "getPdfPrintablePos",
     "contract": "access",
-    "purpose": "Load the design as saved",
+    "purpose": "Load the design of the media template being edited (query templateId = access.media_template.id)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
@@ -817,6 +904,7 @@
     }
    ]
   },
+  "notes": "**Bound 4 October 2026 to PdfPrintablePosTicketDesignerInput: one design per ticket template, keyed by templateId (the orders ticket template from listTicketTemplates); getPdfPrintablePos reads it by templateId (query parameter agreed in the ledger); the output is the outputFormat enum, not two buttons; free-text properties are text inputs** (CHG-FXS-002)\n\n**Template model reconciled 4 October 2026 (contracts, ledger): the design belongs to an access media template (access.media_template.id, the row BO-344 opens), read and saved with get/setPdfPrintablePos; the orders ticket-template operations (list, create, update, proof) are another model and left this screen** (CHG-FXS-002)\n\n**First-run state names Save design, the screen's own write** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

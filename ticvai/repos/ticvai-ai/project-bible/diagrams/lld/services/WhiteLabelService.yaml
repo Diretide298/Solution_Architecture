@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 93 operations, 27 tables
+title: WhiteLabelService — 95 operations, 29 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -10,20 +10,20 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 93
+  operations: 95
   inAFlow: 20
-  percent: 22%
+  percent: 21%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 27
+  tables: 29
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 93
+  count: 95
   operations:
   - operation: buildDeepLink
     verb: POST
@@ -223,7 +223,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getModuleEnablement
     verb: GET
@@ -239,7 +239,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 1
   - operation: getPlatformSubdomain
     verb: GET
@@ -279,7 +279,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: true
-    reads: 5
+    reads: 7
     writes: 0
   - operation: getSitePackage
     verb: GET
@@ -327,7 +327,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 10
+    reads: 12
     writes: 0
   - operation: getTheme
     verb: GET
@@ -385,6 +385,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listContentBlocks
+    verb: GET
+    path: /content-blocks
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listContentPages
     verb: GET
     path: /tenant-config/pages
@@ -423,7 +431,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listPolicies
     verb: GET
@@ -535,7 +543,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 11
+    reads: 13
     writes: 7
   - operation: setAnalyticsProvider
     verb: PUT
@@ -615,8 +623,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setLanguages
     verb: PUT
     path: /tenant-config/languages
@@ -647,8 +655,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 3
+    writes: 4
   - operation: setPolicy
     verb: PUT
     path: /tenant-config/policies/{policyKind}
@@ -721,6 +729,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: updateContentBlock
+    verb: PATCH
+    path: /content-blocks/{blockId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updateContentPage
     verb: PUT
     path: /tenant-config/pages/{pageId}
@@ -861,6 +877,71 @@ tables:
   - updateGuidedChoice
   - updatePromoBlock
   - verifyCustomDomain
+  keys:
+    publishContentBlock:
+      role: evicts
+      resolvers: &id001
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    restoreConfigVersion:
+      role: evicts
+      resolvers: &id002
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setBookingFlowConfig:
+      role: evicts
+      resolvers: &id003
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setFeatureToggles:
+      role: evicts
+      resolvers: &id004
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setFooter:
+      role: evicts
+      resolvers: &id005
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setModuleEnablement:
+      role: evicts
+      resolvers: &id006
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setNavigation:
+      role: evicts
+      resolvers: &id007
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setTheme:
+      role: evicts
+      resolvers: &id008
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -889,10 +970,91 @@ tables:
   - getModuleEnablement
   - getNavigation
   - getTheme
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    getFeatureToggles:
+      role: fills
+      resolvers:
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    getModuleEnablement:
+      role: fills
+      resolvers:
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    getNavigation:
+      role: fills
+      resolvers:
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    getTheme:
+      role: fills
+      resolvers:
+      - tenant-config
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    publishContentBlock:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    restoreConfigVersion:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setBookingFlowConfig:
+      role: evicts
+      resolvers: *id003
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setFeatureToggles:
+      role: evicts
+      resolvers: *id004
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setFooter:
+      role: evicts
+      resolvers: *id005
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setModuleEnablement:
+      role: evicts
+      resolvers: *id006
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setNavigation:
+      role: evicts
+      resolvers: *id007
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setTheme:
+      role: evicts
+      resolvers: *id008
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: whitelabel.analytics_provider
   columns: 13
   store: postgres
@@ -1012,10 +1174,17 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
-- table: whitelabel.homepage_section
-  columns: 5
+- table: whitelabel.homepage_layout
+  columns: 3
   store: postgres
   parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.homepage_section
+  columns: 10
+  store: postgres
+  parent: whitelabel.homepage_layout
   writtenBy:
   - white-label
   foreignWriters: null
@@ -1026,10 +1195,17 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
-- table: whitelabel.navigation_item
-  columns: 4
+- table: whitelabel.navigation_config
+  columns: 3
   store: postgres
   parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.navigation_item
+  columns: 7
+  store: postgres
+  parent: whitelabel.navigation_config
   writtenBy:
   - white-label
   foreignWriters: null
@@ -1076,7 +1252,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.tenant_config
-  columns: 25
+  columns: 27
   store: postgres
   parent: platform.tenant
   writtenBy:
@@ -1084,7 +1260,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: PlatformService
-  operations: 5
+  operations: 7
 - service: CatalogueService
   operations: 2
 - service: IdentityService
@@ -1093,7 +1269,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: PlatformService
-  operations: 2
+  operations: 3
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -1104,6 +1280,9 @@ writesOutside:
     tables:
     - control.content_block
   - operation: publishContentBlock
+    tables:
+    - control.content_block
+  - operation: updateContentBlock
     tables:
     - control.content_block
 - service: TenancyService
@@ -1148,6 +1327,7 @@ screens:
 - P02:GST-047 Maintenance / Upgrade Page
 - P02:GST-051 Plan
 - P02:GST-057 Accessibility Information
+- P02:GST-071 Payment Methods
 - P05:KSK-002 Language Select
 - P05:KSK-014 Out of service
 - P08:BO-007 Product Directory

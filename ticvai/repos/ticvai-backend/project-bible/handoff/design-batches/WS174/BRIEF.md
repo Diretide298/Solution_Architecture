@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1043` | Revenue Command Center | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-1044` | Dynamic Seat Pricing | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1045` | Price Bands & Categories | A | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1045` | Price Bands & Categories | A | 36 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1046` | Inventory Forecasting | B | 0 | 0 | 6 | 3 | 0 | 4 | — | notStarted (—) |
 | `BO-1047` | Section Revenue Forecast | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-1048` | Seat Upsell Recommendations | D | 0 | 0 | 6 | 40 | 0 | 6 | — | notStarted (—) |
@@ -140,7 +140,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-1043, BO-1044, BO-1045, BO-1046, BO-1047, BO-1048, BO-1049, BO-1050 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-1043, BO-1044, BO-1046, BO-1047, BO-1048, BO-1049, BO-1050 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

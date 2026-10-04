@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 68 operations
+title: wallet — 70 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -30,11 +30,16 @@ operations:
   reads:
   - cache:idempotency
   - games.card
+  - wallet.balance
   - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
   - games.card
+  - platform.outbox
+  - wallet.balance
+  - wallet.credit_lot
+  - wallet.wallet_transaction
 - operation: adjustWallet
   verb: POST
   path: /wallets/{subjectId}/adjust
@@ -327,6 +332,29 @@ operations:
   - wallet.reconciliation_source
   - wallet.wallet_transaction
   writes: []
+- operation: getWalletRefundPolicy
+  verb: GET
+  path: /wallet-refund-policy
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.refund_policy
+  writes: []
+- operation: getWalletRiskRules
+  verb: GET
+  path: /wallet-risk-rules
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.risk_rule
+  - wallet.risk_rules
+  writes: []
 - operation: holdWalletFunds
   verb: POST
   path: /wallets/{walletId}/holds
@@ -484,11 +512,17 @@ operations:
   reads:
   - cache:idempotency
   - games.card
+  - wallet.balance
   - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
   - games.card
+  - platform.outbox
+  - wallet.balance
+  - wallet.credit_lot
+  - wallet.wallet
+  - wallet.wallet_transaction
 - operation: publishWalletConfiguration
   verb: POST
   path: /wallet-configuration/publish
@@ -799,6 +833,7 @@ operations:
   - staff
   offline: false
   reads:
+  - wallet.risk_rule
   - wallet.risk_rules
   writes:
   - wallet.risk_rules
@@ -811,8 +846,10 @@ operations:
   - staff
   offline: false
   reads:
+  - wallet.risk_rule
   - wallet.risk_rules
   writes:
+  - wallet.risk_rule
   - wallet.risk_rules
 - operation: setWalletTransferRules
   verb: PUT
@@ -893,12 +930,16 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - wallet.balance
   - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
   - platform.outbox
+  - wallet.balance
+  - wallet.credit_lot
   - wallet.wallet
+  - wallet.wallet_transaction
 - operation: transferWalletBalance
   verb: POST
   path: /wallets/{walletId}/transfer

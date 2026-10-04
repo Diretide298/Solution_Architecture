@@ -41,7 +41,7 @@
    "operations": 30
   },
   {
-   "contract": "identity",
+   "contract": "finance",
    "operations": 4
   },
   {
@@ -49,19 +49,19 @@
    "operations": 4
   },
   {
-   "contract": "finance",
+   "contract": "identity",
    "operations": 4
-  },
-  {
-   "contract": "inventory",
-   "operations": 3
   },
   {
    "contract": "marketing-crm",
    "operations": 3
   },
   {
-   "contract": "promotions",
+   "contract": "inventory",
+   "operations": 3
+  },
+  {
+   "contract": "orders",
    "operations": 1
   },
   {
@@ -69,7 +69,7 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -819,6 +819,12 @@
     "summary": "Seat-level dynamic pricing rules"
    },
    {
+    "operation": "listTaxProfiles",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The tax profiles"
+   },
+   {
     "operation": "relinquishInventoryHold",
     "contract": "catalogue",
     "verb": "DELETE",
@@ -963,12 +969,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
-   },
-   {
     "operation": "listSegregationRules",
     "contract": "identity",
     "verb": "GET",
@@ -1021,6 +1021,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -1387,12 +1393,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
    },
    {
     "operation": "listCellEndpoints",

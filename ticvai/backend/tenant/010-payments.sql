@@ -364,7 +364,8 @@ CREATE TABLE IF NOT EXISTS payments.provider_connection (
     merchant_account_id               uuid,
     status                            text CONSTRAINT provider_connection_status_chk CHECK (status IN ('draft', 'testing', 'active', 'degraded', 'disabled')),
     last_tested_at                    timestamptz,
-    scope_path                        ltree NOT NULL
+    scope_path                        ltree NOT NULL,
+    credential_ref                    text
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

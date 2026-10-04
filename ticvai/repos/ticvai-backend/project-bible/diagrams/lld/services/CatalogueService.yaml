@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 446 operations, 137 tables
+title: CatalogueService — 447 operations, 138 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -16,7 +16,7 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 446
+  operations: 447
   inAFlow: 240
   percent: 54%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -33,7 +33,7 @@ schemas:
   - postgres
   largestTable: pricing.dynamic_price_rule
 - schema: promotions
-  tables: 30
+  tables: 31
   stores:
   - postgres
   largestTable: promotions.promotion
@@ -44,7 +44,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 248
+  count: 249
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -444,7 +444,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getWaitingRoomPosition
     verb: GET
@@ -1294,6 +1294,14 @@ operationsByContract:
     offline: false
     reads: 8
     writes: 0
+  - operation: listTaxProfiles
+    verb: GET
+    path: /tax-profiles
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listTimeslotPerformanceTime
     verb: GET
     path: /timeslot-performance-time
@@ -1340,7 +1348,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 8
     writes: 2
   - operation: publishChannelAvailability
     verb: PUT
@@ -1964,7 +1972,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 5
     writes: 3
   - operation: updateChannelCapacity
     verb: PATCH
@@ -2088,7 +2096,7 @@ operationsByContract:
     permission: PRICE_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: createCouponCampaign
     verb: POST
     path: /coupon-campaigns
@@ -3055,8 +3063,8 @@ operationsByContract:
     scope: venue
     permission: PRICE_CONFIGURE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: setProductRelationships
     verb: PUT
     path: /product-relationships
@@ -3498,7 +3506,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 9
     writes: 0
   - operation: releaseSeatHoldPool
     verb: POST
@@ -3931,6 +3939,15 @@ tables:
   - validateSeatMap
   - voidCouponCode
   - voidVoucher
+  keys:
+    setPrices:
+      role: evicts
+      resolvers: &id001
+      - price-list
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -3946,10 +3963,21 @@ tables:
   - setPrices
   readBy:
   - listPrices
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    listPrices:
+      role: fills
+      resolvers:
+      - price-list
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    setPrices:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: catalogue.ai_catalogue_session
   columns: 13
   store: postgres
@@ -4108,7 +4136,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.event
-  columns: 8
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -4391,7 +4419,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 41
+  columns: 42
   store: postgres
   parent: null
   writtenBy:
@@ -4623,6 +4651,13 @@ tables:
   writtenBy:
   - promotions
   foreignWriters: null
+- table: promotions.code_assignment
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
 - table: promotions.coupon_campaign
   columns: 14
   store: postgres
@@ -4631,7 +4666,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.coupon_code
-  columns: 15
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -4927,17 +4962,17 @@ tables:
 readsFrom:
 - service: OrderService
   operations: 53
+- service: AccessService
+  operations: 10
 - service: MarketingService
   operations: 10
-- service: AccessService
-  operations: 9
 - service: WhiteLabelService
   operations: 5
+- service: TenancyService
+  operations: 2
 - service: FnbService
   operations: 1
 - service: LedgerService
-  operations: 1
-- service: TenancyService
   operations: 1
 - service: VenueOpsService
   operations: 1
@@ -5087,7 +5122,6 @@ screens:
 - P02:GST-052 Suggested Itineraries
 - P02:GST-053 Your Plan
 - P02:GST-056 Bundle Package
-- P02:GST-058 Resource Availability (Cabana)
 - P02:GST-063 Explore – Search Results
 - P02:GST-072 Share & Group Booking
 - P02:GST-075 Book a Space by the Hour
@@ -5377,6 +5411,7 @@ screens:
 - P08:BO-018 Allocation & Holds
 - P08:BO-019 Closures & Blackouts
 - P08:BO-037 Offline Package Status
+- P08:BO-048 Retail Products
 - P08:BO-094 Map Editor & Publish
 - P08:BO-1000 Mobile & Accessible Selection
 - P08:BO-1001 View Preview, Compare & Heat Map
@@ -5490,6 +5525,7 @@ screens:
 - P08:BO-761 AI Audience Discovery
 - P08:BO-765 Campaign Library & Calendar
 - P08:BO-770 Campaign Approval Workflow
+- P08:BO-877 Qualification & Assignment Rule Engine
 - P08:BO-913 Event Resource Planning Command Center
 - P08:BO-914 Event Resource Requirement Builder
 - P08:BO-915 Venue & Space Allocation

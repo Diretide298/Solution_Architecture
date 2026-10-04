@@ -72,8 +72,8 @@
 | `GST-007` | Select Date & Time | Booking & Selection | 1 | 9 | yes |
 | `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 6 | yes |
 | `GST-009` | Review & Payment | Cart & Checkout | 1 | 9 | yes |
-| `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
-| `GST-011` | Wallet Overview | Membership, Loyalty & Value | 1 | 7 | yes |
+| `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 5 | yes |
+| `GST-011` | Wallet Overview | Membership, Loyalty & Value | 1 | 8 | yes |
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 6 | yes |
 | `GST-013` | Ticket Details | Account & Self-Service | 1 | 5 | yes |
 | `GST-014` | Ticket Transfer | Ticketing | 1 | 3 | yes |
@@ -83,14 +83,14 @@
 | `GST-018` | Add to Calendar / Reminders | Account & Self-Service | 1 | 5 | yes |
 | `GST-019` | Order History | Account & Self-Service | 1 | 7 | yes |
 | `GST-020` | Saved Items / Wishlist | Account & Self-Service | 1 | 3 | yes |
-| `GST-021` | Interactive Map | In-venue Services | 1 | 4 | yes |
+| `GST-021` | Interactive Map | In-venue Services | 1 | 5 | yes |
 | `GST-022` | Attraction Wait Times | In-venue Services | 1 | 1 | yes |
 | `GST-023` | Virtual Queue | In-venue Services | 1 | 5 | yes |
 | `GST-024` | F&B – Browse & Order | In-venue Services | 1 | 8 | yes |
 | `GST-025` | F&B – Order Tracking | In-venue Services | 1 | 2 | yes |
 | `GST-026` | Retail / Merchandise | Retail | 1 | 4 | yes |
 | `GST-027` | Parking – Reserve & Pay | In-venue Services | 1 | 4 | yes |
-| `GST-028` | Parking – Reservation Confirmed | In-venue Services | 1 | 2 | yes |
+| `GST-028` | Parking – Reservation Confirmed | In-venue Services | 1 | 4 | yes |
 | `GST-029` | Venue Info & Services | In-venue Services | 1 | 3 | yes |
 | `GST-030` | In-Venue Notifications | Engagement & Support | 1 | 2 | yes |
 | `GST-031` | AI Concierge – Home | Engagement & Support | 1 | 9 | yes |
@@ -107,7 +107,7 @@
 | `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 13 | yes |
 | `GST-043` | Arabic / RTL Experience | System States | 1 | 1 | yes |
 | `GST-044` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |
-| `GST-045` | Ticket Delivery & Sharing | Account & Self-Service | 1 | 2 | yes |
+| `GST-045` | Ticket Delivery & Sharing | Account & Self-Service | 1 | 3 | yes |
 | `GST-046` | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 | yes |
 | `GST-047` | Maintenance / Upgrade Page | System States | 1 | 2 | yes |
 | `GST-048` | Upsell / Cross-Sell | Booking & Selection | 1 | 4 | yes |
@@ -123,15 +123,15 @@
 | `GST-058` | Resource Availability (Cabana) | Booking & Selection | 1 | 2 | yes |
 | `GST-059` | Plan in Progress | Engagement & Support | 1 | 4 | yes |
 | `GST-061` | Menu Item Detail | In-Venue Experience | 1 | 1 | yes |
-| `GST-062` | Shop & Drop Collection | In-Venue Experience | 1 | 1 | yes |
+| `GST-062` | Shop & Drop Collection | In-Venue Experience | 1 | 2 | yes |
 | `GST-063` | Explore – Search Results | Discovery | 1 | 1 | yes |
 | `GST-065` | Newsletter & Preferences | Marketing | 1 | 5 | yes |
 | `GST-066` | Privacy & My Data | Account & Self-Service | 1 | 9 | yes |
 | `GST-067` | Refunds & Resale | Account & Self-Service | 1 | 3 | yes |
 | `GST-068` | Help & My Cases | Engagement & Support | 1 | 4 | yes |
-| `GST-069` | Face Pass | Account & Self-Service | 1 | 4 | yes |
+| `GST-069` | Face Pass | Account & Self-Service | 1 | 5 | yes |
 | `GST-070` | Reserve a Table | In-venue Services | 1 | 7 | yes |
-| `GST-071` | Payment Methods | Account & Self-Service | 1 | 5 | yes |
+| `GST-071` | Payment Methods | Account & Self-Service | 1 | 8 | yes |
 | `GST-072` | Share & Group Booking | Booking & Selection | 1 | 6 | yes |
 | `GST-073` | Security & Sign-in | Account & Self-Service | 1 | 12 | yes |
 | `GST-074` | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 | yes |

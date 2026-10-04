@@ -69,10 +69,13 @@ def main() -> int:
     mp = json.loads((DOCS / "pms-map.json").read_text(encoding="utf-8"))
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
 
-    screen_ops = {}
+    screens = {}
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
-            screen_ops[s["id"]] = [a["operationId"] for a in s.get("apis") or [] if a.get("operationId")]
+            screens[s["id"]] = s
+    ticket_done.merge_bindings(screens)     # a merged screen's operations are built on its target (CHG-FXP-002)
+    screen_ops = {sid: [a["operationId"] for a in s.get("apis") or [] if a.get("operationId")]
+                  for sid, s in screens.items()}
     touches = touches_from(rows, lineage, screen_ops)
     token = os.environ.get("TICVAI_OP_TOKEN", "")
     snap = snapshot(token) if token else {}

@@ -935,7 +935,13 @@ def main() -> int:
                 "writtenBy": w_ops or None,
                 "readBy": r_ops or None,
             }
-            if w_ops and t in CACHE_GAP:
+            # **The key each operation fills or evicts is on its lineage entry** (4 October 2026, CHG-FXC-001,
+            # tools/resolution_cache.py). The gap sentence stays only for a writer that still has none.
+            keyed = {o: lin[o]["cache"] for o in (w_ops + r_ops) if lin[o].get("cache")}
+            if keyed:
+                entry["keys"] = {o: {"role": c.get("role"), "resolvers": c.get("resolvers"), "key": c.get("key"),
+                                     "bump": c.get("bump"), "affects": c.get("affects")} for o, c in keyed.items()}
+            if t in CACHE_GAP and [o for o in w_ops if o not in keyed]:
                 entry["gap"] = CACHE_GAP[t]
             tables.append(entry)
         for t in sorted(t for t in real if t.split(".")[0] in v["schemas"]):

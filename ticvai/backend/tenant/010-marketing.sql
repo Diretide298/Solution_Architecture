@@ -672,7 +672,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation (
 -- One message. The sender is resolved, never declared, and the assistant is labelled as one — a
 -- guest talking to a bot that presents as a person is a complaint waiting to happen Hangs off: a
 -- child of marketing.conversation; reaches marketing.guest_profile through its keys; references
--- ai.activity, identity.principal, marketing.conversation. Reached by: 8 operations read it and 1
+-- ai.activity, identity.principal, marketing.conversation. Reached by: 8 operations read it and 2
 -- write it; 1 tables re
 CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     id                                uuid PRIMARY KEY NOT NULL,

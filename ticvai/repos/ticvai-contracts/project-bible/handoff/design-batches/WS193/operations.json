@@ -88,6 +88,19 @@
   "requestBody": null,
   "responds": "AiRiskCaseDetail"
  },
+ "getWalletRiskRules": {
+  "method": "GET",
+  "path": "/wallet-risk-rules",
+  "contract": "wallet",
+  "summary": "The wallet risk rules",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletRiskRules"
+ },
  "linkWalletCredential": {
   "method": "POST",
   "path": "/wallet-credentials",

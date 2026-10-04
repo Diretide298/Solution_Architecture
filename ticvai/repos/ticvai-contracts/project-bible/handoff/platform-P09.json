@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 211,
-  "operations": 270,
-  "contracts": 14,
+  "operations": 276,
+  "contracts": 15,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 105
+  "operationsWithNoScreen": 104
  },
  "waves": {
   "wave1": 28,
@@ -132,7 +132,7 @@
   },
   {
    "contract": "subscription",
-   "operations": 56
+   "operations": 57
   },
   {
    "contract": "platform-ops",
@@ -140,7 +140,7 @@
   },
   {
    "contract": "identity",
-   "operations": 28
+   "operations": 30
   },
   {
    "contract": "white-label",
@@ -167,11 +167,15 @@
    "operations": 4
   },
   {
+   "contract": "assets",
+   "operations": 3
+  },
+  {
    "contract": "orders",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "payments",
    "operations": 1
   },
   {
@@ -179,7 +183,7 @@
    "operations": 1
   },
   {
-   "contract": "payments",
+   "contract": "workforce",
    "operations": 1
   }
  ],
@@ -208,7 +212,7 @@
    "module": "Overview & Health",
    "wave": 1,
    "route": "/general/cross-tenant-health-dashboard",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -325,7 +329,7 @@
    "module": "Branding & Localisation",
    "wave": 1,
    "route": "/general/white-label-branding-management",
-   "operations": 16,
+   "operations": 19,
    "drawn": true
   },
   {
@@ -370,7 +374,7 @@
    "module": "Access & Identity",
    "wave": 1,
    "route": "/general/platform-role-management",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -1009,7 +1013,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/venue-operational-structure-creation-adm-421",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1171,7 +1175,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/billing-calculation-charge-breakdown-adm-460",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1558,7 +1562,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ticket-product-timeslot-demand-forecast-adm-503",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -1567,7 +1571,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/channel-booking-pace-forecast-adm-504",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1576,7 +1580,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/revenue-commercial-forecast-adm-505",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -1585,7 +1589,7 @@
    "module": "Analytics",
    "wave": 1,
    "route": "/analytics/forecast-drivers-confidence-explainability-adm-506",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -2249,6 +2253,12 @@
     "summary": "Seat-level dynamic pricing rules"
    },
    {
+    "operation": "listTaxProfiles",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The tax profiles"
+   },
+   {
     "operation": "relinquishInventoryHold",
     "contract": "catalogue",
     "verb": "DELETE",
@@ -2391,12 +2401,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "The module tree permissions are grouped under"
-   },
-   {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
    },
    {
     "operation": "listSegregationRules",
@@ -2655,12 +2659,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
    },
    {
     "operation": "listCellEndpoints",

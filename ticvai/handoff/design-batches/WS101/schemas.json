@@ -142,7 +142,8 @@
   ],
   "properties": {
    "moduleCode": {
-    "type": "string"
+    "type": "string",
+    "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."
    },
    "name": {
     "type": "string"
@@ -157,12 +158,14 @@
    },
    "requiresModules": {
     "type": "array",
+    "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.",
     "items": {
      "type": "string"
     }
    },
    "incompatibleWithModules": {
     "type": "array",
+    "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.",
     "items": {
      "type": "string"
     }

@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
-  "operations": 26,
+  "operations": 27,
   "contracts": 2,
   "modules": 1,
   "undrawn": 0,
@@ -36,7 +36,7 @@
   },
   {
    "contract": "reporting",
-   "operations": 3
+   "operations": 4
   }
  ],
  "screens": [
@@ -127,7 +127,7 @@
    "module": "Kitchen",
    "wave": 1,
    "route": "/kitchen/kitchen-performance-ai-operational-optimization",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   }
  ],

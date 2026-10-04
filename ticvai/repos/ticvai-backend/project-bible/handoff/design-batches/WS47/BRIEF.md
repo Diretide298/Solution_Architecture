@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-161` | Code Eligibility & Restriction Manager | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-162` | Usage, Capacity & Frequency Control | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-163` | Validity, Date & Time Control | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-164` | Code Distribution & Assignment Manager | A | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-164` | Code Distribution & Assignment Manager | A | 12 | 54 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-165` | Redemption Monitor & Code Lookup | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-166` | Code Security, Fraud & Exception Center | B | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-167` | Redemption Analytics, Audit & AI Optimization | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

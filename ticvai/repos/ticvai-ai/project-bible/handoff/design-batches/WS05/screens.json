@@ -348,44 +348,41 @@
        "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
       },
       {
-       "kind": "selectField",
-       "label": "Ticket Product",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
+       "kind": "textField",
+       "label": "Profile name",
+       "bindsTo": "BiometricVerificationProfileBuilderInput.name",
+       "operation": "setBiometricVerificationProfile",
+       "provenance": "contract access.yaml BiometricVerificationProfileBuilderInput.name (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "selectField",
-       "label": "Ticket Type",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
+       "label": "Applies to",
+       "bindsTo": "BiometricVerificationProfileBuilderInput.selectType",
+       "operation": "setBiometricVerificationProfile",
+       "notes": "One of ticket product, ticket type, membership, annual pass, multi-day, multi-attraction, VIP credential, accreditation (the pack's eight).",
+       "provenance": "contract access.yaml BiometricVerificationProfileBuilderInput.selectType (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "selectField",
-       "label": "Membership",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
+       "label": "Biometric",
+       "bindsTo": "BiometricVerificationProfileBuilderInput.biometricType",
+       "operation": "setBiometricVerificationProfile",
+       "provenance": "contract access.yaml BiometricVerificationProfileBuilderInput.biometricType (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "selectField",
-       "label": "Annual Pass",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
+       "label": "Face check",
+       "bindsTo": "BiometricVerificationProfileBuilderInput.faceRequirement",
+       "operation": "setBiometricVerificationProfile",
+       "notes": "Not used, optional or required.",
+       "provenance": "contract access.yaml BiometricVerificationProfileBuilderInput.faceRequirement (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "selectField",
-       "label": "Multi-Day Ticket",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
-      },
-      {
-       "kind": "selectField",
-       "label": "Multi-Attraction Ticket",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
-      },
-      {
-       "kind": "selectField",
-       "label": "VIP Credential",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
-      },
-      {
-       "kind": "selectField",
-       "label": "Accreditation",
-       "provenance": "pack Access Control Module_Reference.pdf, page 58 §Select"
+       "label": "Status",
+       "bindsTo": "BiometricVerificationProfileBuilderInput.status",
+       "operation": "setBiometricVerificationProfile",
+       "provenance": "contract access.yaml BiometricVerificationProfileBuilderInput.status (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -396,7 +393,9 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "provenance": "contract operation setBiometricVerificationProfile"
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)",
+       "operation": "setBiometricVerificationProfile",
+       "notes": "Sends profileId (the loaded one, or a new UUIDv7) and venueId from the session; park, zone, attraction and gate stay empty, so the profile applies venue-wide."
       }
      ]
     }
@@ -430,13 +429,7 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of biometric verification profiles (setBiometricVerificationProfile has no list or get).",
-    "source": "contracts/spine/access.yaml#setBiometricVerificationProfile"
-   }
-  ],
+  "notes": "**Bound 4 October 2026 to BiometricVerificationProfileBuilderInput: the eight pack labels are the values of one selectType, not eight fields; venueId comes from the session. The read gap is closed (getBiometricVerificationProfile is bound)** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -822,7 +815,7 @@
     "id": "formSetVenueSettings",
     "component": "modal",
     "trigger": "Save minors and consent",
-    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `biometrics`. Only the biometrics section: the consent form, the minors switch. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `biometrics`. Only the biometrics section: the consent form, the minors switch. Dismissing sends nothing; the screen behind is unchanged. **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
     "confirm": {
      "label": "Save minors and consent",
      "operation": "setVenueSettings"
@@ -844,6 +837,7 @@
     }
    ]
   },
+  "notes": "**setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
   "_platform": {
    "code": "P08",
    "audience": "staff",

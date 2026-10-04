@@ -495,18 +495,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure when the guest is permitted to see/use the credential. The matrix specifies that after registration, a ticket may appear as a blurred QR and only become clear and usable near the park entrance.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Access Control Module_Reference.pdf, page 32"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Access Control Module_Reference.pdf, page 32"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -600,6 +588,7 @@
     "provenance": "contract access.yaml PUT /credential-activation-display"
    }
   ],
+  "notes": "**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -679,16 +668,15 @@
         "DeviceBindingSessionSecurityView.user",
         "DeviceBindingSessionSecurityView.credential",
         "DeviceBindingSessionSecurityView.appInstallation",
-        "DeviceBindingSessionSecurityView.os",
         "DeviceBindingSessionSecurityView.registrationDate",
         "DeviceBindingSessionSecurityView.lastActivation",
         "DeviceBindingSessionSecurityView.lastKnownVenue",
-        "DeviceBindingSessionSecurityView.deviceId",
-        "DeviceBindingSessionSecurityView.deviceReference"
+        "DeviceBindingSessionSecurityView.deviceId"
        ],
        "bindsTo": "DeviceBindingSessionSecurityView",
        "operation": "listDeviceBindingSession",
-       "provenance": "pack Access Control Module_Reference.pdf, page 33 §Show"
+       "provenance": "contract access.yaml DeviceBindingSessionSecurityView (defined 4 October 2026, CHG-FXS-003)",
+       "notes": "Each row carries its bindingId (DeviceBindingSessionSecurityView.bindingId), which Release takes and the optional entry bindingId selects."
       }
      ]
     },
@@ -838,6 +826,7 @@
     "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
    }
   ],
+  "notes": "**Release acts on the row's bindingId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

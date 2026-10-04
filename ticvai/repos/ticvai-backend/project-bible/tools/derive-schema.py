@@ -483,7 +483,16 @@ def main() -> int:
                     persisted[sname] = table
                     schema_contract[sname] = name
                     for rc in retired_of(body):
-                        retired.setdefault(table, set()).add(rc)
+                        # **A child table's column is withdrawn by naming it in full** (4 October 2026,
+                        # CHG-FXC-003): `whitelabel.navigation_item.navigation_item_id`. When NavigationConfig
+                        # moved to `navigation_config + navigation_item`, the old self-pointer on the item
+                        # table survived as a relationship-graph column, and a bare name here only reaches
+                        # the parent table.
+                        if rc.count(".") == 2:
+                            _t, _c = rc.rsplit(".", 1)
+                            retired.setdefault(_t, set()).add(_c)
+                        else:
+                            retired.setdefault(table, set()).add(rc)
 
     # **A summary is a projection of a row, not a second source of its columns** (audit R109).
     # `orders.EntitlementSummary` — one entitlement a guest holds — carried

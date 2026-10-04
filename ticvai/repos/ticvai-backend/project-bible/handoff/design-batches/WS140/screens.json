@@ -201,20 +201,8 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "A library of message templates with the selected one edited beside it (defined 4 October 2026 from MessageTemplate and the design notes, CHG-FXS-001).",
   "purpose": "Centrally manage reusable message templates. Organize marketing, ticketing, reservation, membership, loyalty, wallet and operational templates by channel and purpose. Maintain brand, venue, language, version, owner, approval, validity and active/inactive status. Preview test data, validate required tokens, links, attachments and channel-specific constraints. Clone, archive and compare templates while preserving lineage and complete change history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 31"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 31"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -222,35 +210,160 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Channel",
+       "bindsTo": "MessageTemplate.channel",
+       "operation": "listMessageTemplates",
+       "notes": "Filters the list (query `channel`); All by default.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.channel (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMessageTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Templates",
+       "bindsTo": "MessageTemplate",
+       "operation": "listMessageTemplates",
+       "columns": [
+        "MessageTemplate.code",
+        "MessageTemplate.name",
+        "MessageTemplate.channel",
+        "MessageTemplate.ownership",
+        "MessageTemplate.missingLanguages"
+       ],
+       "notes": "Each row shows a warning chip listing enabled languages with no body. Platform templates (ownership platform) are listed read-only beside the venue's own.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createMessageTemplate",
-       "label": "Create message template",
-       "notes": "The act the screen exists for."
+       "label": "New template",
+       "notes": "Opens an empty form in the side panel.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Code",
+       "bindsTo": "MessageTemplate.code",
+       "operation": "createMessageTemplate",
+       "notes": "Set at creation; read-only afterwards.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "MessageTemplate.name",
+       "operation": "createMessageTemplate",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Template channel",
+       "bindsTo": "MessageTemplate.channel",
+       "operation": "createMessageTemplate",
+       "notes": "Email, SMS, WhatsApp, push, in-app. Set at creation.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.channel (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Subject per language",
+       "bindsTo": "MessageTemplate.subjects",
+       "operation": "createMessageTemplate",
+       "notes": "Email only. English and Arabic side by side; Arabic right to left.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.subjects (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Body per language",
+       "bindsTo": "MessageTemplate.bodies",
+       "operation": "createMessageTemplate",
+       "notes": "English and Arabic side by side; Arabic right to left. Merge fields inserted from the picker, never typed.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.bodies (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Merge fields",
+       "bindsTo": "MessageTemplate.mergeFields",
+       "operation": "createMessageTemplate",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.mergeFields (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Provider template id",
+       "bindsTo": "MessageTemplate.providerTemplateId",
+       "operation": "createMessageTemplate",
+       "notes": "Shown only for WhatsApp, where the provider pre-approves the template.",
+       "provenance": "contract marketing-crm.yaml MessageTemplate.providerTemplateId (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Create template",
+       "operation": "createMessageTemplate",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMessageTemplate",
+       "notes": "Venue templates only; a platform template has no Save. Sends the same fields as create except code and channel.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Draft with AI",
+       "operation": "proposeMarketingContent",
+       "notes": "Drafts a subject and body from a brief into the form; nothing is saved until the author saves.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Translate missing languages",
+       "operation": "proposeTranslations",
+       "notes": "scope messageTemplates; protected terms come from the glossary. Starts a job whose translationJobId the screen keeps for getTranslationProposals.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Translation drafts",
+       "bindsTo": "TranslationProposals.drafts",
+       "operation": "getTranslationProposals",
+       "notes": "Each draft is reviewed and applied to the template with Save changes.",
+       "provenance": "contract ai.yaml TranslationProposals.drafts (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createMessageTemplate"
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The template list.",
-   "error": "Could not load. Names which read failed and leaves the template untouched.",
-   "emptyFirstRun": "No template yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the template are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No templates yet. Carries New template.",
+   "emptyNoResults": "No template on this channel. Names the channel and offers All.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`; `MARKETING_MANAGE` for `createMessageTemplate`."
+  },
+  "entryState": {
+   "params": [
+    {
+     "name": "translationJobId",
+     "from": "BO-785",
+     "optional": true,
+     "notes": "The translation job this screen started with proposeTranslations; getTranslationProposals reads its drafts back by it (CHG-RFM-009, as CMS-011)."
+    },
+    {
+     "name": "templateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listMessageTemplates`."
+    }
+   ]
   },
   "apis": [
    {
@@ -280,6 +393,20 @@
     "purpose": "Draft other languages of a message template (any channel) for review",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateMessageTemplate",
+    "contract": "marketing-crm",
+    "purpose": "Save an edit to a venue template, or apply reviewed translation drafts to it: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "getTranslationProposals",
+    "contract": "ai",
+    "purpose": "The drafts of a translation job started here, polled every 3 s until it completes",
+    "trigger": "onInterval",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -287,8 +414,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-785",
    "workshopBoard": "wireframes/WS75 Marketing CRM Configuration Reference v1.0 Board 6.dc.html#bo-785"
   },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**One template library** (decided 2 October 2026, merge as proposed; CHG-SBO-021): accreditation communication templates are message templates filtered to the accreditation purpose; BO-677 is merged in.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
+  "notes": "**One template library** (decided 2 October 2026, merge as proposed; CHG-SBO-021): accreditation communication templates are message templates filtered to the accreditation purpose; BO-677 is merged in.\n\n**Defined 4 October 2026 from MessageTemplate and the customer-marketing design notes (BO-785): list, create and edit a template, draft with AI and translate. Editing needs updateMessageTemplate (agreed in the ledger; correction CHG-SBO-005 asked for it). Version, approval, clone and archive stay out until the contract has them** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

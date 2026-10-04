@@ -229,7 +229,9 @@ CREATE TABLE IF NOT EXISTS ledger.inter_entity_obligation (
     status                            text NOT NULL CONSTRAINT inter_entity_obligation_status_chk CHECK (status IN ('outstanding', 'settled', 'disputed')),
     settled_at                        timestamptz,
     settlement_rate                   numeric(18,6),
-    fx_movement                       numeric(18,4)
+    fx_movement                       numeric(18,4),
+    agreed_amount                     numeric(18,4),
+    dispute_note                      text
 );
 
 -- A balanced set of postings. Append-only: a correction is another entry, never an edit, which is
@@ -401,7 +403,7 @@ CREATE TABLE IF NOT EXISTS ledger.tax_code (
 );
 
 -- Who does not pay, and on what evidence. Hangs off: reaches ledger.account through its keys;
--- references accreditation.document, ledger.tax_code. Reached by: 3 operations read it and 1 write
+-- references accreditation.document, ledger.tax_code. Reached by: 4 operations read it and 2 write
 -- it.
 CREATE TABLE IF NOT EXISTS ledger.tax_exemption (
     id                                uuid PRIMARY KEY NOT NULL,

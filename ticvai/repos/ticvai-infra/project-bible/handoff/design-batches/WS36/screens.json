@@ -46,160 +46,243 @@
   "density": "compact",
   "purposeNote": "jurisdictions.",
   "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Sales Tax, Entertainment Tax, Tourism Tax, Municipality Tax, Service Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
-   }
-  ],
+  "patternReason": "The venue's tax profile in one form, with the picked legal entity's invoice templates and e-invoicing beside it (defined 4 October 2026, CHG-FXS-001).",
+  "purpose": "Set this venue's tax profile (one per venue: tax type, jurisdiction, rate, base, legal entity and registration, effective dates) and, for the legal entity it invoices under, the invoice templates and the e-invoicing connection.",
   "layout": {
-   "template": "form",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "Load the tax profile and jurisdiction as saved",
-       "operation": "getTaxProfileJurisdiction",
+       "label": "Tax profile in force",
        "bindsTo": "TaxProfileJurisdictionConfigurationView",
+       "operation": "getTaxProfileJurisdiction",
        "columns": [
         "TaxProfileJurisdictionConfigurationView.taxProfileName",
-        "TaxProfileJurisdictionConfigurationView.taxProfileCode",
-        "TaxProfileJurisdictionConfigurationView.country",
-        "TaxProfileJurisdictionConfigurationView.taxRegistrationNumber",
-        "TaxProfileJurisdictionConfigurationView.status",
+        "TaxProfileJurisdictionConfigurationView.taxType",
         "TaxProfileJurisdictionConfigurationView.ratePercent",
-        "TaxProfileJurisdictionConfigurationView.consumingProductCount",
-        "TaxProfileJurisdictionConfigurationView.consumingVenueCount"
+        "TaxProfileJurisdictionConfigurationView.jurisdiction",
+        "TaxProfileJurisdictionConfigurationView.effectiveFrom",
+        "TaxProfileJurisdictionConfigurationView.consumingProductCount"
        ],
-       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationView (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Tax profile name",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.taxProfileName",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.taxProfileName (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Tax profile code",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.taxProfileCode",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.taxProfileCode (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
-       "label": "Tax Profile Name",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+       "label": "Tax type",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.taxType",
+       "operation": "setTaxProfileJurisdiction",
+       "notes": "VAT, sales, entertainment, tourism, municipality, service or another regulatory tax.",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.taxType (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "selectField",
-       "label": "Tax Profile Code",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Tax Type",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+       "kind": "numberField",
+       "label": "Rate (%)",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.ratePercent",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.ratePercent (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
        "label": "Country",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.country",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.country (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
-       "label": "Region/Jurisdiction",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+       "label": "Jurisdiction level",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.jurisdictionLevel",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.jurisdictionLevel (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Jurisdiction",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.jurisdiction",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.jurisdiction (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
-       "label": "Legal Entity",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+       "label": "Legal entity",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.legalEntity",
+       "operation": "setTaxProfileJurisdiction",
+       "notes": "Options from listLegalEntities.",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.legalEntity (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "selectField",
-       "label": "Tax Registration Number",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective From",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective To",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Status",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Owner",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+       "kind": "textField",
+       "label": "Tax registration number",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.taxRegistrationNumber",
+       "operation": "setTaxProfileJurisdiction",
+       "notes": "Prefilled from the legal entity's TRN.",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.taxRegistrationNumber (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "selectField",
        "label": "Taxable base",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.taxBase",
        "operation": "setTaxProfileJurisdiction",
-       "notes": "**The one place the taxable base is set** (decided 2 October 2026, Chinmay; CHG-FIN-004): \"Price after discount\" (default) or \"Price before discount\" (`TaxProfile.taxBase`). Shown with a worked example that recalculates as it changes: Egypt, VAT 14%, a ticket listed at EGP 100.00 with 20% off is paid at EGP 80.00; after discount the VAT is EGP 11.20 (guest pays EGP 91.20), before discount it is EGP 14.00 (guest pays EGP 94.00). The tax calculation reads it from here and nowhere else.",
-       "provenance": "contract catalogue.yaml TaxProfile.taxBase; MoM 1 Sep 2026 4.5 (DI-598); CHG-FIN-004"
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.taxBase (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "textField",
-       "label": "Document title",
-       "operation": "setTaxInvoiceTemplate",
-       "notes": "Per language. In the UAE fixed by law: \"Tax Invoice\" for the tax invoice and the simplified tax invoice, \"Tax Credit Note\" for the credit note (Executive Regulation Art. 59(1)(a), 59(2)(a), 60(1)(a); CHG-FIN-011). The Arabic wording is the client's tax adviser's to confirm.",
-       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.title; CHG-FIN-011"
+       "kind": "datePicker",
+       "label": "Effective from",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.effectiveFrom",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.effectiveFrom (defined 4 October 2026, CHG-FXS-001)"
       },
       {
-       "kind": "toggle",
-       "label": "Issue a tax invoice on every paid order",
-       "operation": "setTaxInvoiceTemplate",
-       "notes": "`autoIssueOnPayment`. On and locked for a UAE VAT-registered legal entity (Decree-Law Art. 65(1), Executive Regulation Art. 59(13)(1)); CHG-FIN-011.",
-       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.autoIssueOnPayment; CHG-FIN-011"
+       "kind": "datePicker",
+       "label": "Effective to",
+       "bindsTo": "TaxProfileJurisdictionConfigurationInput.effectiveTo",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "contract catalogue.yaml TaxProfileJurisdictionConfigurationInput.effectiveTo (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save tax profile",
+       "operation": "setTaxProfileJurisdiction",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     },
     {
-     "name": "actionBar",
-     "slot": "publish",
+     "name": "contextPanel",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Sales Tax",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+       "kind": "selectField",
+       "label": "Invoicing legal entity",
+       "bindsTo": "LegalEntity.id",
+       "operation": "listLegalEntities",
+       "columns": [
+        "LegalEntity.code",
+        "LegalEntity.name",
+        "LegalEntity.countryCode",
+        "LegalEntity.taxRegistrationNumber"
+       ],
+       "notes": "A UAE VAT registrant is a legal entity with countryCode AE and a taxRegistrationNumber.",
+       "provenance": "contract finance.yaml LegalEntity.id (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Invoice templates",
+       "bindsTo": "FinTaxInvoiceTemplate",
+       "operation": "listTaxInvoiceTemplates",
+       "columns": [
+        "FinTaxInvoiceTemplate.documentKind",
+        "FinTaxInvoiceTemplate.numberPrefix",
+        "FinTaxInvoiceTemplate.nextNumber",
+        "FinTaxInvoiceTemplate.languages",
+        "FinTaxInvoiceTemplate.autoIssueOnPayment",
+        "FinTaxInvoiceTemplate.isActive"
+       ],
+       "notes": "Query legalEntityId the picked one.",
+       "provenance": "contract finance.yaml FinTaxInvoiceTemplate (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Document title",
+       "bindsTo": "FinTaxInvoiceTemplate.title",
+       "operation": "setTaxInvoiceTemplate",
+       "notes": "Per language. In the UAE fixed by law: Tax Invoice, Simplified Tax Invoice.",
+       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.title (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Number prefix",
+       "bindsTo": "FinTaxInvoiceTemplate.numberPrefix",
+       "operation": "setTaxInvoiceTemplate",
+       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.numberPrefix (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Issue a tax invoice on every paid order",
+       "bindsTo": "FinTaxInvoiceTemplate.autoIssueOnPayment",
+       "operation": "setTaxInvoiceTemplate",
+       "notes": "On and locked for a UAE VAT-registered legal entity.",
+       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.autoIssueOnPayment (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Entertainment Tax",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+       "label": "Save template",
+       "operation": "setTaxInvoiceTemplate",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "E-invoicing",
+       "bindsTo": "FinEInvoicingProvider",
+       "operation": "listEInvoicingProviders",
+       "columns": [
+        "FinEInvoicingProvider.providerName",
+        "FinEInvoicingProvider.mode",
+        "FinEInvoicingProvider.participantId",
+        "FinEInvoicingProvider.lastAcceptedTestAt"
+       ],
+       "provenance": "contract finance.yaml FinEInvoicingProvider (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "E-invoicing mode",
+       "bindsTo": "FinEInvoicingProvider.mode",
+       "operation": "setEInvoicingProvider",
+       "provenance": "contract finance.yaml FinEInvoicingProvider.mode (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Provider name",
+       "bindsTo": "FinEInvoicingProvider.providerName",
+       "operation": "setEInvoicingProvider",
+       "provenance": "contract finance.yaml FinEInvoicingProvider.providerName (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Participant id",
+       "bindsTo": "FinEInvoicingProvider.participantId",
+       "operation": "setEInvoicingProvider",
+       "provenance": "contract finance.yaml FinEInvoicingProvider.participantId (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Credential reference",
+       "bindsTo": "FinEInvoicingProvider.credentialRef",
+       "operation": "setEInvoicingProvider",
+       "provenance": "contract finance.yaml FinEInvoicingProvider.credentialRef (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Tourism Tax",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Municipality Tax",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Service Tax",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+       "label": "Save e-invoicing",
+       "operation": "setEInvoicingProvider",
+       "notes": "legalEntityId the picked one.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The tax profile jurisdiction configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the tax profile jurisdiction untouched.",
-   "emptyFirstRun": "No tax profile jurisdiction configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The form with the venue's saved tax profile.",
+   "error": "Could not load. Names the read that failed; the form stays read-only until it loads.",
+   "emptyFirstRun": "No tax profile saved yet: the form is empty and Save creates it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listTaxInvoiceTemplates` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTaxProfileJurisdiction`; `TAX_CONFIGURE` for `setTaxInvoiceTemplate`, `setEInvoicingProvider`."
   },
   "apis": [
    {
@@ -242,6 +325,13 @@
     "purpose": "Load the tax profile and jurisdiction as saved",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listLegalEntities",
+    "contract": "finance",
+    "purpose": "The legal entities: the tax profile's entity, and the one whose invoice templates and e-invoicing are edited",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -250,8 +340,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#adm-069",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-069"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000 limit above which a VAT-registered buyer gets a full tax invoice.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000 limit above which a VAT-registered buyer gets a full tax invoice.\n\n**Defined 4 October 2026: one tax profile per venue, read and saved as one record (Chinmay's default of 3 October: one tax-profile read, a list only if the design needs it); the legal entities come from listLegalEntities, which fills the invoice-template and e-invoicing calls and tells whether the entity is UAE VAT-registered** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1732,24 +1822,12 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Defined 4 October 2026 from CalculationValidationReconciliationServiceInterfaceView, FinEInvoicingProvider and FinEInvoiceTransmission, with the legal entity picked from listLegalEntities for the transmission log and a resend** (CHG-FXS-001)",
   "density": "compact",
   "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "Validation findings and test results listed and filtered, with the e-invoicing connection and its transmission log beside them (defined 4 October 2026, CHG-FXS-001).",
   "purpose": "Provide final technical and commercial validation of the pricing calculation engine and define how other TICVAI modules consume it. Boards 1–3 established the commercial and calculation engines: Board 1: What prices exist? Board 2: Which price applies? Board 3: How is the final payable amount calculated?",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 52"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 52"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1757,34 +1835,135 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Area",
+       "bindsTo": "CalculationValidationReconciliationServiceInterfaceView.area",
+       "operation": "listCalculationValidationReconciliation",
+       "notes": "Filter: tax, fees, formula, currency, reconciliation, test suite.",
+       "provenance": "contract catalogue.yaml CalculationValidationReconciliationServiceInterfaceView.area (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Severity",
+       "bindsTo": "CalculationValidationReconciliationServiceInterfaceView.severity",
+       "operation": "listCalculationValidationReconciliation",
+       "provenance": "contract catalogue.yaml CalculationValidationReconciliationServiceInterfaceView.severity (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCalculationValidationReconciliation",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Findings and test results",
+       "bindsTo": "CalculationValidationReconciliationServiceInterfaceView",
+       "operation": "listCalculationValidationReconciliation",
+       "columns": [
+        "CalculationValidationReconciliationServiceInterfaceView.resultKind",
+        "CalculationValidationReconciliationServiceInterfaceView.area",
+        "CalculationValidationReconciliationServiceInterfaceView.code",
+        "CalculationValidationReconciliationServiceInterfaceView.severity",
+        "CalculationValidationReconciliationServiceInterfaceView.message",
+        "CalculationValidationReconciliationServiceInterfaceView.scenarioName",
+        "CalculationValidationReconciliationServiceInterfaceView.passed",
+        "CalculationValidationReconciliationServiceInterfaceView.calculationVersion"
+       ],
+       "notes": "Critical first. A test scenario row shows passed or failed with its reconciliation.",
+       "provenance": "contract catalogue.yaml CalculationValidationReconciliationServiceInterfaceView (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The selected result",
+       "bindsTo": "CalculationValidationReconciliationServiceInterfaceView",
+       "operation": "listCalculationValidationReconciliation",
+       "columns": [
+        "CalculationValidationReconciliationServiceInterfaceView.message",
+        "CalculationValidationReconciliationServiceInterfaceView.subjectId",
+        "CalculationValidationReconciliationServiceInterfaceView.scenarioType",
+        "CalculationValidationReconciliationServiceInterfaceView.reconciliation"
+       ],
+       "provenance": "contract catalogue.yaml CalculationValidationReconciliationServiceInterfaceView (defined 4 October 2026, CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "E-invoicing connection",
+       "bindsTo": "FinEInvoicingProvider",
+       "operation": "listEInvoicingProviders",
+       "columns": [
+        "FinEInvoicingProvider.legalEntityId",
+        "FinEInvoicingProvider.providerName",
+        "FinEInvoicingProvider.mode",
+        "FinEInvoicingProvider.documentFormat",
+        "FinEInvoicingProvider.lastAcceptedTestAt"
+       ],
+       "provenance": "contract finance.yaml FinEInvoicingProvider (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal entity",
+       "bindsTo": "LegalEntity.id",
+       "operation": "listLegalEntities",
+       "columns": [
+        "LegalEntity.code",
+        "LegalEntity.name"
+       ],
+       "provenance": "contract finance.yaml LegalEntity.id (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "bindsTo": "FinEInvoiceTransmission.status",
+       "operation": "listEInvoiceTransmissions",
+       "provenance": "contract finance.yaml FinEInvoiceTransmission.status (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Transmissions",
+       "bindsTo": "FinEInvoiceTransmission",
+       "operation": "listEInvoiceTransmissions",
+       "columns": [
+        "FinEInvoiceTransmission.documentNumber",
+        "FinEInvoiceTransmission.documentKind",
+        "FinEInvoiceTransmission.mode",
+        "FinEInvoiceTransmission.status",
+        "FinEInvoiceTransmission.attempt",
+        "FinEInvoiceTransmission.errorMessage",
+        "FinEInvoiceTransmission.sentAt"
+       ],
+       "provenance": "contract finance.yaml FinEInvoiceTransmission (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Issued from",
+       "operation": "transmitEInvoices",
+       "notes": "Body issuedFrom; with Issued to, resends every document of the legal entity in the window.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Issued to",
+       "operation": "transmitEInvoices",
+       "notes": "Body issuedTo.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "transmitEInvoices",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transmitEInvoices"
+       "label": "Send to e-invoicing",
+       "operation": "transmitEInvoices",
+       "notes": "legalEntityId the picked one; documentIds the selected failed rows, or the window. Accepted documents are skipped and counted.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The calculation validation reconciliation list.",
-   "error": "Could not load. Names which read failed and leaves the calculation validation reconciliation untouched.",
-   "emptyFirstRun": "No calculation validation reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the calculation validation reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No findings: every check passed.",
+   "emptyNoResults": "Nothing matches the filters. Names them and offers to clear them.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listCalculationValidationReconciliation` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `transmitEInvoices`."
   },
   "apis": [
    {
@@ -1813,6 +1992,13 @@
     "purpose": "Send / resend documents to e-invoicing",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listLegalEntities",
+    "contract": "finance",
+    "purpose": "The legal entities whose documents are transmitted",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "entryState": {
@@ -1826,7 +2012,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#adm-077",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-077"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

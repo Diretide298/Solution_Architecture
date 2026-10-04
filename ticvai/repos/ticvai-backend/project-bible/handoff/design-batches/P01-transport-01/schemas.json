@@ -745,6 +745,12 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**The guest who saved it** (4 October 2026, CHG-FXC-003; transport.favourite_route had no owner column). Taken from the guest session, never from the body. Unique per (subjectId, venueId, fromStationId, toStationId); `saveFavouriteRoute` counts this column for the 20-per-guest limit and `listMyFavouriteRoutes` and `deleteFavouriteRoute` match on it (`x-ticvai-self-scoped: subject`)."
    }
   }
  },
@@ -854,6 +860,27 @@
    },
    "saving": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "variants": {
+    "type": "array",
+    "description": "**What `addCartLine` sells for this pass** (4 October 2026, CHG-FXC-011; GST-050, GST-056): one catalogue variant of `catalogueProductId` per passenger type.",
+    "items": {
+     "type": "object",
+     "required": [
+      "passengerTypeId",
+      "variantId"
+     ],
+     "properties": {
+      "passengerTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    }
   }
  },

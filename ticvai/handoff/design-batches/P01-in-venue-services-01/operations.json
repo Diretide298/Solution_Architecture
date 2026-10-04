@@ -323,6 +323,35 @@
   "requestBody": null,
   "responds": "RestaurantWaitlist"
  },
+ "listBookableVenueMaps": {
+  "method": "GET",
+  "path": "/bookable-venue-maps",
+  "contract": "venue-map",
+  "summary": "The published maps of a venue that carry bookable spots",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookableVenueMaps"
+ },
  "listDeliveryLocations": {
   "method": "GET",
   "path": "/venues/{venueId}/delivery-locations",

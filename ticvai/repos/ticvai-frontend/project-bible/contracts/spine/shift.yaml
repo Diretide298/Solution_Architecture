@@ -116,8 +116,10 @@ paths:
     get:
       operationId: listShifts
       x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
         - "P04 POS-019 Shift Templates & Policies"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"

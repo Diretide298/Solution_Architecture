@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 103,
-  "operations": 194,
+  "operations": 197,
   "contracts": 8,
   "modules": 3,
   "undrawn": 0,
@@ -48,7 +48,7 @@
  "contracts": [
   {
    "contract": "white-label",
-   "operations": 83
+   "operations": 85
   },
   {
    "contract": "marketing-crm",
@@ -60,22 +60,22 @@
   },
   {
    "contract": "ai",
-   "operations": 8
-  },
-  {
-   "contract": "identity",
-   "operations": 5
+   "operations": 9
   },
   {
    "contract": "catalogue",
    "operations": 5
   },
   {
-   "contract": "orders",
-   "operations": 1
+   "contract": "identity",
+   "operations": 5
   },
   {
    "contract": "tenancy",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -113,7 +113,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/logo-assets",
-   "operations": 4,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -140,7 +140,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/page-builder",
-   "operations": 12,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -176,7 +176,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/translations",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -842,7 +842,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/role-based-asset-access-permission-management-cms-086",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1113,6 +1113,12 @@
     "summary": "Seat-level dynamic pricing rules"
    },
    {
+    "operation": "listTaxProfiles",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The tax profiles"
+   },
+   {
     "operation": "relinquishInventoryHold",
     "contract": "catalogue",
     "verb": "DELETE",
@@ -1209,12 +1215,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listPermissions",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every permission key the contracts enforce"
-   },
-   {
     "operation": "listSegregationRules",
     "contract": "identity",
     "verb": "GET",
@@ -1249,6 +1249,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -1555,12 +1561,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
    },
    {
     "operation": "listCellEndpoints",

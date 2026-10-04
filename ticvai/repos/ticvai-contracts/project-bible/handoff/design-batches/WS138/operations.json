@@ -266,6 +266,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listSegments": {
+  "method": "GET",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "proposeMarketingContent": {
   "method": "POST",
   "path": "/ai/content-drafts",

@@ -15,11 +15,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.deposit_box
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
   writes:
   - cache:idempotency
+  - orders.deposit_box
   - orders.pos_shift
   - platform.outbox
 - operation: adjustDepositBoxFloat
@@ -285,6 +287,8 @@ operations:
   - cache:idempotency
   - orders.cash_count_line
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
 - operation: recordNoSale
   verb: POST
   path: /shifts/{shiftId}/no-sale
@@ -429,3 +433,5 @@ operations:
   - cache:idempotency
   - orders.cash_movement
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination

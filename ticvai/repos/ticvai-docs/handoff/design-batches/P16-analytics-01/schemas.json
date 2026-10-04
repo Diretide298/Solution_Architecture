@@ -1908,6 +1908,12 @@
     "type": "string",
     "maxLength": 100,
     "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    }
   }
  },
@@ -2064,6 +2070,13 @@
    "interactionId": {
     "type": "string",
     "format": "uuid"
+   },
+   "translationJobId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
    },
    "kind": {
     "type": "string",

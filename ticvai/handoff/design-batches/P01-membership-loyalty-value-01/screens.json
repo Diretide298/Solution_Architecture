@@ -936,7 +936,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.\n\n**Rev 3 (decided 29 September).** **Security (GAP-D1):** the devices list and signing out a lost device are here (`listGuestDevices`, `revokeGuestDevice`, already declared). **Face Pass stays mobile-only** (GST-069) until the facial-reader vendor SDK is named and supports web capture; viewing and withdrawing an enrolment stay here. **Two-step verification (GAP-B1, per venue):** enrolment appears only when a venue of the tenant enabled it. **One implementation, several ids (GAP-D3):** WEB-009 and WEB-024 are built as one account area; both ids are kept.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.\n\n**Rev 3 (decided 29 September).** **Security (GAP-D1):** the devices list and signing out a lost device are here (`listGuestDevices`, `revokeGuestDevice`, already declared). **Face Pass stays mobile-only** (GST-069) until the facial-reader vendor SDK is named and supports web capture; viewing and withdrawing an enrolment stay here. **Two-step verification (GAP-B1, per venue):** enrolment appears only when a venue of the tenant enabled it. **One implementation, several ids (GAP-D3):** WEB-009 and WEB-024 are built as one account area; both ids are kept.\n\n**The Face Pass enrolmentId comes from the guest's passes (listMyEntitlements, Entitlement.facePassEnrolmentId), bound 4 October 2026** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
@@ -1007,6 +1007,19 @@
        "notes": "Per purpose and channel; recorded at once on change, append-only.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
        "bindsTo": "ConsentState.purposes"
+      },
+      {
+       "kind": "cardList",
+       "label": "Passes with a face",
+       "bindsTo": "Entitlement",
+       "operation": "listMyEntitlements",
+       "columns": [
+        "Entitlement.productId",
+        "Entitlement.validTo",
+        "Entitlement.facePassEnrolmentId"
+       ],
+       "notes": "Only passes with a facePassEnrolmentId; selecting one reads it.",
+       "provenance": "contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -1169,7 +1182,7 @@
    "error": "Could not load",
    "emptyFirstRun": "No points yet — explains how they accrue",
    "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestConsents` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `revokeFacePass`; `GUEST_VIEW_PII` for `exportSubjectData`.",
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [
@@ -1311,6 +1324,13 @@
     "contract": "marketing-crm",
     "purpose": "The purposes the consent rows show",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The guest's passes, each with its facePassEnrolmentId for getFacePassEnrolment and revokeFacePass",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

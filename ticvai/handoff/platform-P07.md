@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 44 |
+| Operations with no screen | 43 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 44 operations with no screen here
+### 43 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -45,7 +45,6 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
@@ -60,7 +59,8 @@
 | `overrideCreditLimit` | orders | POST | Authorise an order beyond the credit limit |
 | `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
-| … | | | 4 more |
+| `setB2bCreditLimit` | orders | PUT | Set a partner credit limit |
+| … | | | 3 more |
 
 ## Modules
 

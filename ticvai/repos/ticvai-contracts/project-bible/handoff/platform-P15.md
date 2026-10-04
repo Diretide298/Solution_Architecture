@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 10 |
-| Operations | 26 |
+| Operations | 27 |
 | Contracts | 2 |
 | Modules | 1 |
 | Undrawn | 0 |
@@ -48,5 +48,5 @@
 | `KIT-007` | Guest Collection, Buzzer & Digital Notification | Kitchen | 1 | 1 | yes |
 | `KIT-008` | Exceptions, Re-Fire & Unavailable Items | Kitchen | 1 | 5 | yes |
 | `KIT-009` | SLA, Priority & Service Rules | Kitchen | 1 | 3 | yes |
-| `KIT-010` | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 3 | yes |
+| `KIT-010` | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 4 | yes |
 

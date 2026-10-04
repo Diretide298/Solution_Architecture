@@ -104,7 +104,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-198` | Validation Outcome & Guest Feedback Designer | C | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | C | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-200` | Handheld & Mobile Access Device Configuration | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-201` | Gate Modes, Free Spin & Emergency Controls | A | 15 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
+| `BO-201` | Gate Modes, Free Spin & Emergency Controls | A | 17 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
 | `BO-202` | Device Software, Content & Remote Configuration | C | 6 | 0 | 5 | 0 | 4 | 0 | — | notStarted (generated) |
 | `BO-203` | Hardware Compatibility, Health, Testing & Deployment | C | 10 | 0 | 6 | 0 | 8 | 0 | — | notStarted (generated) |
 
@@ -1836,6 +1836,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/gate-modes-free-spin-emergency-controls-bo-201` |
 
+**What the spec says about it.** **Mode (the upsert key) and createsIncident added to the form 4 October 2026** (CHG-FXS-002)
+
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Governs the non-standard gate modes: Free flow (free spin - reading off, turnstile still counts), Drop arm (emergency - validation off, counting off, gate released) and, by extension, Closed and Count only. For each it sets who may activate it, on which gate group, whether a reason and an emergency code are needed, and whether activation notifies people and opens an incident. The pack also wants a bulk command ("Main Entrance - 18 gates - Activate emergency mode"). The one thing to get right: emergency controls are fast to reach and impossible to trigger by accident.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
@@ -1856,6 +1858,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reason required | toggle | optional | on | — | — | — | `AccessGateModePolicy.reasonRequired` |
 | Emergency code | text field | optional | — | — | — | Masked; never shown back once saved. | `AccessGateModePolicy.emergencyCode` |
 | Notify automatically | toggle | optional | off | — | — | — | `AccessGateModePolicy.automaticNotification` |
+| Gate mode | segmented control | optional | — | Free flow · Drop arm | — | Free flow or drop arm; required, half of the upsert key with the venue. | `AccessGateModePolicy.mode` |
+| Open an incident | toggle | optional | off | — | — | Activation creates an incident record | `AccessGateModePolicy.createsIncident` |
 
 **Form: Save gate mode policy** (modal, opened by *Save gate mode policy*; *Save gate mode policy* calls `setGateModePolicy`, *Cancel* sends nothing)
 
@@ -1981,7 +1985,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 403, 404).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-201?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save gate mode policy.

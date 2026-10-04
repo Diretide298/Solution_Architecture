@@ -838,7 +838,7 @@
  },
  "WalletRiskRules": {
   "type": "object",
-  "x-ticvai-persistence": "wallet.risk_rules",
+  "x-ticvai-persistence": "wallet.risk_rules + wallet.risk_rule",
   "description": "Boards 8.2 to 8.7. **A risk rule with no action is a report.**",
   "properties": {
    "rules": {
@@ -889,6 +889,7 @@
       },
       "alertOnAction": {
        "type": "boolean",
+       "x-ticvai-column": "does_alert_on_action",
        "default": true
       },
       "status": {

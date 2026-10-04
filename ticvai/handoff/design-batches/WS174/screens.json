@@ -304,19 +304,9 @@
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "Seat categories listed with the selected one's price bands edited beside it (defined 4 October 2026 from SeatCategory and SeatPriceBand, CHG-FXS-001).",
   "purpose": "Maintain the commercial hierarchy applied to seat inventory. Configure price band, seat category, display label, color, currency, channel, customer segment and effective period. Map bands to venue sections, rows or seats and support event/performance overrides with inheritance. Detect overlapping dates, unmapped inventory, invalid currency, missing products and conflicting priority. Configuration Scope of Work | Version 1.0 42 Pricing changes require explainable inputs, min/max guardrails, effective dates, approval, versioning and rollback; AI may recommend but cannot publish outside delegated authority. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 42"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 42"
-   },
    {
     "operation": null,
     "why": "Mapping bands to sections, rows or seats, and event or performance overrides, are not in the contract (SeatCategory carries priceBands since R275 d).",
@@ -331,34 +321,154 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatCategories",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Each seat category shows its price bands** (label, currency, channel, customer segment, effective period) — kept by the client (decided 28 September, audit R275 (d)) and handed to the contracts group, since `SeatCategory` has no price band yet."
+       "label": "Seat categories",
+       "bindsTo": "SeatCategory",
+       "operation": "listSeatCategories",
+       "columns": [
+        "SeatCategory.rank",
+        "SeatCategory.code",
+        "SeatCategory.name",
+        "SeatCategory.displayColour",
+        "SeatCategory.seatCount"
+       ],
+       "notes": "The venue in session (query venueId), in rank order.",
+       "provenance": "contract seating.yaml SeatCategory (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createSeatCategory",
+       "label": "New seat category",
+       "notes": "Opens an empty form in the side panel.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Code",
+       "bindsTo": "SeatCategory.code",
+       "operation": "createSeatCategory",
+       "notes": "Set at creation.",
+       "provenance": "contract seating.yaml SeatCategory.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Name",
+       "bindsTo": "SeatCategory.name",
+       "operation": "createSeatCategory",
+       "provenance": "contract seating.yaml SeatCategory.name (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Colour",
+       "bindsTo": "SeatCategory.displayColour",
+       "operation": "createSeatCategory",
+       "notes": "Hex colour shown on the seat map; keeps 3:1 contrast with the map background.",
+       "provenance": "contract seating.yaml SeatCategory.displayColour (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Rank",
+       "bindsTo": "SeatCategory.rank",
+       "operation": "createSeatCategory",
+       "provenance": "contract seating.yaml SeatCategory.rank (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Price bands",
+       "bindsTo": "SeatCategory.priceBands",
+       "operation": "listSeatCategories",
+       "columns": [
+        "SeatPriceBand.code",
+        "SeatPriceBand.displayLabel",
+        "SeatPriceBand.amount",
+        "SeatPriceBand.channel",
+        "SeatPriceBand.effectiveFrom",
+        "SeatPriceBand.effectiveTo"
+       ],
+       "provenance": "contract seating.yaml SeatCategory.priceBands (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Band code",
+       "bindsTo": "SeatPriceBand.code",
+       "operation": "updateSeatCategory",
+       "provenance": "contract seating.yaml SeatPriceBand.code (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Band label",
+       "bindsTo": "SeatPriceBand.displayLabel",
+       "operation": "updateSeatCategory",
+       "provenance": "contract seating.yaml SeatPriceBand.displayLabel (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Band price",
+       "bindsTo": "SeatPriceBand.amount",
+       "operation": "updateSeatCategory",
+       "notes": "In the venue's currency (Money; the currency comes from the region).",
+       "provenance": "contract seating.yaml SeatPriceBand.amount (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Band channel",
+       "bindsTo": "SeatPriceBand.channel",
+       "operation": "updateSeatCategory",
+       "notes": "Empty means every channel.",
+       "provenance": "contract seating.yaml SeatPriceBand.channel (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective from",
+       "bindsTo": "SeatPriceBand.effectiveFrom",
+       "operation": "updateSeatCategory",
+       "provenance": "contract seating.yaml SeatPriceBand.effectiveFrom (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective to",
+       "bindsTo": "SeatPriceBand.effectiveTo",
+       "operation": "updateSeatCategory",
+       "provenance": "contract seating.yaml SeatPriceBand.effectiveTo (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add band",
+       "notes": "Adds a row to the category's priceBands.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
        "label": "Create seat category",
-       "notes": "The act the screen exists for."
+       "operation": "createSeatCategory",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateSeatCategory",
+       "notes": "Sends name, colour, rank and the whole priceBands list.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createSeatCategory"
+       "notes": "Discards unsaved edits; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The price bands categories list.",
-   "error": "Could not load. Names which read failed and leaves the price bands categories untouched.",
-   "emptyFirstRun": "No price bands categories yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "No seat categories yet. Carries New seat category.",
    "emptyNoResults": "The filter narrowed it and the price bands categories are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatCategory`, `updateSeatCategory`."
   },
   "apis": [
    {
@@ -391,7 +501,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1045",
    "workshopBoard": "wireframes/WS149 Seat Management Venue Mapping Reference v1.0 Board 10.dc.html#bo-1045"
   },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -402,6 +512,7 @@
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from SeatCategory and SeatPriceBand (R275 d): categories in rank order, each with its price bands by channel and effective period. Mapping bands to sections, rows or seats is the seat map editor's (the remaining gap)** (CHG-FXS-001)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

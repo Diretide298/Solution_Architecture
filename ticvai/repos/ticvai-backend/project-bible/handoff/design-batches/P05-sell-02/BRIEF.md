@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `KSK-011` | Collect a booking | C | 1 | 3 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
 | `KSK-012` | Booking found | C | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
 | `KSK-013` | Call staff | D | 3 | 0 | 4 | 4 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-014` | Out of service | C | 0 | 20 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-014` | Out of service | B | 0 | 20 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-016` | Order Food | C | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-017` | Shop | C | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
 

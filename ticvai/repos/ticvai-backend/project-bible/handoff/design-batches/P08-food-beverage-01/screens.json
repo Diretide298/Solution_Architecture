@@ -2119,7 +2119,7 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.\n\n**setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
   "density": "compact",
   "boardFrames": [
    "FnB Board 1.dc.html#fnb-1k"
@@ -2274,7 +2274,7 @@
     "id": "formSetVenueSettings",
     "component": "modal",
     "trigger": "Save venue settings",
-    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `fnb`. Only the F&B group (recall window, comp escalation, table reserved lead, food-safety lead); the other venue settings are other screens'. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `fnb`. Only the F&B group (recall window, comp escalation, table reserved lead, food-safety lead); the other venue settings are other screens'. Dismissing sends nothing; the screen behind is unchanged. **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
     "confirm": {
      "label": "Save venue settings",
      "operation": "setVenueSettings"

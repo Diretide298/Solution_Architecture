@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-754` | Audience Intelligence | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-755` | Dynamic Segment Builder | A | 21 | 23 | 6 | 10 | 1 | 6 | — | notStarted (—) |
+| `BO-755` | Dynamic Segment Builder | A | 33 | 11 | 6 | 12 | 1 | 6 | — | notStarted (—) |
 | `BO-756` | Static Lists & Imports | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-757` | Behavioral Segmentation | D | 0 | 20 | 6 | 13 | 1 | 6 | — | notStarted (—) |
 | `BO-758` | Membership & Loyalty Segments | D | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-754, BO-755, BO-756, BO-758, BO-759, BO-760, BO-761, BO-762 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-754, BO-756, BO-758, BO-759, BO-760, BO-761, BO-762 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -311,22 +311,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-BO-755 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): The saved segments beside a rule builder with a live count (defined 4 October 2026 from CreateSegmentRequest and SegmentRuleGroup, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | `segmentId` (navigation) |
 | Route | `/engagement-support/dynamic-segment-builder-bo-755` |
 
-**Known gaps.** **Dynamic Segment Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from CreateSegmentRequest (criteria, nested ruleGroups, exclusions, effective dates, approval) and SegmentDraftPreview. The stale gaps are closed: the request carries rule groups, dates, owner and approval since CHG-CSA-045** (CHG-FXS-001)
+
+**Known gaps.** previewSegment works only on a saved segment; the builder previews unsaved criteria with previewSegmentDraft (CHG-CSA-045).
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The marketer builds a rule-based segment that refreshes itself. It shows a live matching count and, separately, the REACHABLE count per channel after consent and suppression. A segment of 50,000 with 3,000 email consents is a 3,000-person campaign, and the builder must say so before anyone plans a send.
 
-**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
-
-- CreateSegmentRequest supports a flat list of criteria with match all or any; the purpose requires nested AND/OR/NOT groups, effective dates, refresh frequency, ownership, tags and approval. (CHG-SBO-005)
-
-**Fixed on main** (the package already carries these; draw what it says): previewSegment works only on a saved segment (POST /segments/{segmentId}/preview). (CHG-SBO-013); The screen has list states but no list operation (listSegments is not declared here). (CHG-WIR-005).
+**Fixed on main** (the package already carries these; draw what it says): previewSegment works only on a saved segment (POST /segments/{segmentId}/preview). (CHG-SBO-013); CreateSegmentRequest supports a flat list of criteria with match all or any; the purpose requires nested AND/OR/NOT groups, effective … (CHG-FXS-001); The screen has list states but no list operation (listSegments is not declared here). (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Find a segment | text field | optional | — | max length 200 | — | Query `search`. | `Segment.name` |
+| Name | text field | optional | — | max length 200 | — | — | `CreateSegmentRequest.name` |
+| Description | text area | optional | — | max length 1000 | — | — | `CreateSegmentRequest.description` |
+| Match | segmented control | optional | All | All · Any | — | All or any, for the top-level criteria. | `CreateSegmentRequest.match` |
+| Attribute | text field | optional | — | — | — | Profile, visits, spend, products bought, membership, tier, wallet, language, wishlist and behaviour. Dietary, accessibility and minors' data are refused for marketing segments, with the reason shown … | `SegmentCriterion.attribute` |
+| Operator | select | optional | — | Equals · Not equals · Greater than · Less than · Between · In · Not in · Exists · Not exists · Within days | — | — | `SegmentCriterion.operator` |
+| Value | field | optional | — | — | — | Two values for between; a list for in and not in; none for exists. | `SegmentCriterion.value` |
+| Group logic | segmented control | optional | — | And · Or · Not | — | AND, OR or NOT over the group's criteria and child groups; groups nest. | `SegmentRuleGroup.operator` |
+| Exclude segments | multi-picker: choose exclude segments | optional | — | — | — | Options from listSegments. | `CreateSegmentRequest.excludeSegmentIds` |
+| Effective from | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | The segment is evaluated for sends only from this time. | `CreateSegmentRequest.effectiveFrom` |
+| Effective to | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `CreateSegmentRequest.effectiveTo` |
+| Needs approval before use | toggle | optional | off | — | — | Where true, a campaign may use the segment only after an `approvals` request on it is approved. | `CreateSegmentRequest.requiresApproval` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -334,9 +349,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Search | text field | — | max length 200 | `listSegments` ?search |
 
-**Form: Create segment** (modal, opened by *Create segment*; *Create segment* calls `createSegment`, *Cancel* sends nothing)
-
-**Collects what `createSegment` sends before it is called.** Required: `name`, `criteria`. Optional: `description`, `venueId`, `match`, `excludeSegmentIds`, `ruleGroups`, `effectiveFrom`, `effectiveTo`, `ownerPrincipalId`, `requiresApproval`. Dismissing sends nothing; the screen behind is unchanged.
+**Sent by *Save segment*** (`createSegment`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -362,8 +375,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | Who answers for the segment; defaults to its creator. | `createSegment` body |
 | Requires approval `requiresApproval` | toggle | optional | off | — | — | Where true, a campaign may use the segment only after an `approvals` request on it is approved. | `createSegment` body |
 
-Errors to draw in the form: 400 Criteria are contradictory or reference unknown attributes
-
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
 - **Rules**: Attribute, operator, value rows (equals, not equals, greater than, less than, between, in, not in, exists, not exists, within days). Attributes cover profile, visits, spend, products bought, membership, tier, wallet, language, wishlist and behaviour. Match all or any. The purpose asks for nested AND/OR/NOT groups (see corrections). *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/SegmentCriterion; contracts/satellite/marketing-crm.yaml#createSegment; DI-381)*
@@ -379,28 +390,21 @@ Errors to draw in the form: 400 Criteria are contradictory or reference unknown 
 
 | Shows | Format | Notes |
 |---|---|---|
-| Items | list or chips (count when long) | — |
 | Name | text | — |
-| Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Match | chip: All, Any | — |
-| Criteria | list or chips (count when long) | — |
-| Attribute | text | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
-| Operator | chip: Equals, Not equals, Greater than, Less than, Between, In… | — |
-| Value | text | — |
-| Values | list or chips (count when long) | — |
-| Exclude segments | list or chips (count when long) | — |
-| Rule groups | list or chips (count when long) | Nested AND / OR / NOT groups (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by … |
-| Operator | chip: And, Or, Not | — |
-| Criteria | list or chips (count when long) | Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). |
-| Groups | list or chips (count when long) | — |
-| Effective from | 1 Oct 2026, 14:30 | The segment is evaluated for sends only from this time. |
+| Last evaluated size | 1,234 | — |
+| Last evaluated at | 1 Oct 2026, 14:30 | — |
 | Effective to | 1 Oct 2026, 14:30 | — |
-| Owner principal | the name it points at, never the id | Who answers for the segment; defaults to its creator. |
-| Requires approval | yes / no (icon or chip) | Where true, a campaign may use the segment only after an `approvals` request on it is approved. |
-| ID | the name it points at, never the id | — |
 
-**Matching guests** (metric tile, from `previewSegmentDraft`): Counts on the rules as edited, before anything is saved.
+**Matching guests** (metric tile, from `previewSegmentDraft`): Recounted 1 s after the rules stop changing. Zero shows the rule that removed the most guests, not an empty preview.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Matching count | 1,234 | — |
+| Reachable | text | — |
+| Evaluated at | 1 Oct 2026, 14:30 | — |
+
+**Reachable** (metric tile, from `previewSegmentDraft`): Per channel, after consent and suppression.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -412,7 +416,10 @@ Errors to draw in the form: 400 Criteria are contradictory or reference unknown 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create segment (primary button) | `createSegment` POST `/segments` | CreateSegmentRequest | Segment | 400 Criteria are contradictory or reference unknown attributes | opens modal first |
+| Add rule (secondary button) | navigation or local | — | — | — | — |
+| Add group (secondary button) | navigation or local | — | — | — | — |
+| Save segment (primary button) | `createSegment` POST `/segments` | CreateSegmentRequest | Segment | 400 Criteria are contradictory or reference unknown attributes | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -433,11 +440,11 @@ Errors to draw in the form: 400 Criteria are contradictory or reference unknown 
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The dynamic segment list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic segment untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No dynamic segment yet. Carries the create action; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No segments yet. The builder is open on an empty rule. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dynamic segment are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createSegment`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Criteria are contradictory or reference unknown attributes; 400 Validation failed |
 
@@ -477,11 +484,11 @@ counts:
 - `listSegments` → `MARKETING_VIEW` (read) · staff
 - `previewSegmentDraft` → `MARKETING_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createSegment`.
 
 #### Requirements it meets
 
-10 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -495,6 +502,8 @@ counts:
 | 22.14.7 | Loyalty Segmentation | Marketing & CRM | CONTRACTED | `createSegment` |
 | 22.14.9 | Revenue-Based Segmentation | Marketing & CRM | CONTRACTED | `createSegment` |
 | 22.14.25 | Segmentation & Attribution Audit Trail | Marketing & CRM | CONTRACTED | `listSegments` |
+| 5.5.17 | Provide analytics including spending behavior, visit frequency, utilization, wallet consumption, and loyalty activity. | F&B & Guest Management | CONTRACTED | data `SegmentCriterion` |
+| 22.14.8 | Wallet Segmentation | Marketing & CRM | CONTRACTED | data `SegmentCriterion` |
 
 #### Client meeting inputs
 
@@ -522,10 +531,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-755?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create segment.
+- [ ] Every action is wired with its success and its failure: Add rule, Add group, Save segment, Cancel.
 - [ ] Every transition is wired: `BO-754`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1692,7 +1701,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"ruleGroups":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.","items":{"$ref":"#/components/schemas/SegmentRuleGroup"}},"effectiveFrom":{"type":"string","format":"date-time","nullable":true,"description":"The segment is evaluated for sends only from this time."},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who answers for the segment; defaults to its creator."},"requiresApproval":{"type":"boolean","default":false,"description":"Where true, a campaign may use the segment only after an `approvals` request on it is approved."}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"ProposedAction": {"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
+"ProposedAction": {"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
 "Segment": {"x-ticvai-persistence":"marketing.segment + marketing.segment_criterion","allOf":[{"$ref":"#/components/schemas/CreateSegmentRequest"},{"type":"object","required":["id","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"lastEvaluatedSize":{"type":"integer","nullable":true},"lastEvaluatedAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"}}}]},
 "SegmentCriterion": {"x-ticvai-persistence":"marketing.segment_criterion","type":"object","required":["attribute","operator"],"properties":{"attribute":{"type":"string","description":"Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n`entitlementExpiringWithinDays` (29 September, build pass, group G2; 5.5.30): the guest holds a ticket or pass in `issued` or `partiallyConsumed` whose `validTo` is within that many days, kept current from `entitlement.expiringSoon` and the entitlement read model. **Unused passes about to lapse** are this attribute with `entitlementRemainingUses` greater than zero.\n"},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","exists","notExists","withinDays"]},"value":{},"values":{"type":"array","items":{}}}},
 "SegmentDraftPreview": {"x-ticvai-persistence":"none — evaluated live","type":"object","description":"The preview of an unsaved segment (`previewSegmentDraft`, CHG-CSA-045); `SegmentPreview` without a segment id.","properties":{"matchingCount":{"type":"integer"},"reachable":{"$ref":"#/components/schemas/SegmentPreview/properties/reachable"},"evaluatedAt":{"type":"string","format":"date-time"}}},

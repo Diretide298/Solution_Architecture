@@ -23,17 +23,17 @@ modulesUsed:
   screens: 103
 servicesCalled:
 - service: WhiteLabelService
-  operationCalls: 107
+  operationCalls: 109
+- service: VenueOpsService
+  operationCalls: 73
 - service: MarketingService
   operationCalls: 71
-- service: VenueOpsService
-  operationCalls: 70
 - service: AiService
-  operationCalls: 11
+  operationCalls: 12
 - service: CatalogueService
   operationCalls: 7
 - service: IdentityService
-  operationCalls: 5
+  operationCalls: 6
 - service: OrderService
   operationCalls: 1
 - service: TenancyService
@@ -153,8 +153,11 @@ screens:
   wave: 1
   density: compact
   operations:
+  - completeUpload
+  - createUpload
   - getAppIcons
   - getBrandIdentity
+  - searchMedia
   - setAppIcons
   - setBrandIdentity
   states:
@@ -241,11 +244,13 @@ screens:
   - deleteContentPage
   - getHomepageLayout
   - getModuleEnablement
+  - listContentBlocks
   - listContentPages
   - listLandingPageTemplates
   - proposeMarketingContent
   - publishContentBlock
   - setHomepageLayout
+  - updateContentBlock
   - updateContentPage
   states:
   - emptyFirstRun
@@ -397,6 +402,7 @@ screens:
   operations:
   - getTenantConfig
   - getTranslationProposals
+  - proposeTranslations
   - setLanguages
   states:
   - emptyFirstRun
@@ -2180,6 +2186,7 @@ screens:
   operations:
   - createAuthorisationPolicy
   - listAuthorisationPolicies
+  - listRoles
   states:
   - emptyFirstRun
   - emptyNoAccess

@@ -390,7 +390,7 @@
 - `BO-060` Attendance & Footfall — wave 2, 2 operations
 - `BO-084` Approval Inbox — wave 1, 1 operation
 - `BO-091` AI Policy & Spend — wave 1, 11 operations
-- `BO-093` Map Import & Labelling — wave 1, 3 operations
+- `BO-093` Map Import & Labelling — wave 1, 4 operations
 - `BO-102` Sell — wave 1, 1 operation
 - `BO-1048` Seat Upsell Recommendations — wave 3, 1 operation
 - `BO-1160` Fraud Alert & Investigation Case Management — wave 3, 5 operations
@@ -409,13 +409,13 @@
 - `BO-766` Campaign Builder — wave 1, 1 operation
 - `BO-772` A/B & AI Optimization — wave 1, 4 operations
 - `BO-782` AI Journey Optimization — wave 3, 3 operations
-- `BO-785` Template Library — wave 1, 2 operations
+- `BO-785` Template Library — wave 1, 3 operations
 - `BO-786` Newsletter Builder — wave 3, 1 operation
 - `BO-787` Content Blocks & Product Feed — wave 3, 1 operation
 - `BO-789` Transactional Notification Rules — wave 3, 1 operation
 - `BO-793` AI Content, Translation & Audit — wave 3, 3 operations
 - `BO-798` Intent & Knowledge Management — wave 1, 3 operations
-- `BO-919` AI Event Resource Forecasting — wave 1, 3 operations
+- `BO-919` AI Event Resource Forecasting — wave 1, 4 operations
 - `BO-925` AI Staff Recommendation & Workforce Matching — wave 3, 2 operations
 - `BO-926` Resource Demand Forecasting — wave 3, 2 operations
 - `BO-927` AI Staffing Requirement Forecast — wave 1, 5 operations
@@ -466,10 +466,10 @@
 - `ADM-500` Forecast Configuration & Forecasting Strategy — wave 1, 3 operations
 - `ADM-501` Forecast Data & Signal Configuration — wave 3, 3 operations
 - `ADM-502` Attendance & Visitation Forecast — wave 3, 3 operations
-- `ADM-503` Ticket, Product & Timeslot Demand Forecast — wave 3, 1 operation
-- `ADM-504` Channel & Booking Pace Forecast — wave 3, 1 operation
-- `ADM-505` Revenue & Commercial Forecast — wave 3, 1 operation
-- `ADM-506` Forecast Drivers, Confidence & Explainability — wave 1, 4 operations
+- `ADM-503` Ticket, Product & Timeslot Demand Forecast — wave 3, 3 operations
+- `ADM-504` Channel & Booking Pace Forecast — wave 3, 2 operations
+- `ADM-505` Revenue & Commercial Forecast — wave 3, 3 operations
+- `ADM-506` Forecast Drivers, Confidence & Explainability — wave 1, 5 operations
 - `ADM-507` Forecast Scenario & What-If Simulator — wave 3, 3 operations
 - `ADM-508` Forecast Accuracy, Review & Publication Center — wave 1, 5 operations
 - `ADM-509` Operational Forecasting Command Center — wave 3, 2 operations
@@ -538,7 +538,7 @@
 - `CMS-007` Page Builder — wave 1, 2 operations
 - `CMS-008` Content Blocks — wave 1, 2 operations
 - `CMS-010` Media Library — wave 1, 1 operation
-- `CMS-011` Translations — wave 1, 1 operation
+- `CMS-011` Translations — wave 1, 2 operations
 - `CMS-062` Central Digital Asset Library — wave 3, 1 operation
 - `CMS-101` Help Me Choose — wave 1, 2 operations
 - `CMS-104` App Build & Store Publishing — wave 1, 2 operations

@@ -772,16 +772,6 @@
   "purposeNote": "Staff assignment requirements are machine-readable, testable and automatically enforced before assignment confirmation.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 39"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 39"
-   },
-   {
     "operation": "setResourceQualifications",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-001): Recording a person's qualifications is BO-098 and BO-876; this screen defines requirements (design-notes correction venue-operations BO-877).",
@@ -846,6 +836,18 @@
        "label": "Who qualifies",
        "operation": "suggestResources",
        "provenance": "contract resources.yaml GET /resource-suggestions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Experience",
+       "bindsTo": "Product.id",
+       "operation": "listProducts",
+       "columns": [
+        "Product.name",
+        "Product.kind"
+       ],
+       "notes": "Opened without experienceId, the user picks one here.",
+       "provenance": "contract catalogue.yaml Product.id (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     }
@@ -856,7 +858,7 @@
    "error": "Could not load. Names which read failed and leaves the qualification rule untouched.",
    "emptyFirstRun": "No qualification rule yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the qualification rule are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `RESOURCE_VIEW`, which `getExperienceResourceRequirements` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_CONFIGURE` for `setExperienceResourceRequirements`."
   },
   "apis": [
    {
@@ -889,6 +891,13 @@
     "purpose": "List the resources the assignment rules choose from",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The experiences to pick from: experienceId is the catalogue product's id (agreed with contracts in the ledger)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "wireframe": {
@@ -933,6 +942,7 @@
     "provenance": "contract resources.yaml PUT /experiences/{experienceId}/resource-requirements"
    }
   ],
+  "notes": "**The experience is picked on the screen 4 October 2026 (listProducts; experienceId is the product's id), so a cold entry has a list to pick from** (CHG-FXS-003)\n\n**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -749,7 +749,7 @@
     "WEB-001"
    ]
   },
-  "notes": "**`getVenueMap` was already `guest` audience and offline-capable and no web screen drew it.** A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "notes": "**`getVenueMap` was already `guest` audience and offline-capable and no web screen drew it.** A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists), so a normal visit has a map to load** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "Seat Board 3.dc.html#seat-3c"
@@ -786,6 +786,14 @@
        "kind": "detailPanel",
        "label": "Detail",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "selectField",
+       "label": "Map",
+       "bindsTo": "BookableVenueMaps.maps",
+       "operation": "listBookableVenueMaps",
+       "notes": "Picked by itself when the venue has one published map.",
+       "provenance": "contract venue-map.yaml BookableVenueMaps.maps (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -845,7 +853,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "No attraction of the category picked; the other categories stay.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "apis": [
@@ -872,13 +880,22 @@
     "contract": "queue",
     "purpose": "List queues",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBookableVenueMaps",
+    "contract": "venue-map",
+    "purpose": "The venue's published map (query venueId), whose mapId getVenueMap and getVenueMapGraph take",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "mapId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Otherwise the venue's published map from listBookableVenueMaps."
     },
     {
      "name": "venueId",
@@ -1176,7 +1193,7 @@
     "WEB-001"
    ]
   },
-  "notes": "**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring an install for a car park is requiring an install to arrive. **Renamed 31 August** from *Parking — Reserve & Pay*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Rebound 28 September** (decided 28 September, audit R166): parking is sold through the normal cart and checkout (`addCartLine`, `checkoutCart`, `createPayment`), so the entitlement gets its `orderId`; the guest no longer calls `createParkingEntitlement`, which the order service issues at payment. No live availability; a full car park is the `soldOutForDay` refusal.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).",
+  "notes": "**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring an install for a car park is requiring an install to arrive. **Renamed 31 August** from *Parking — Reserve & Pay*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Rebound 28 September** (decided 28 September, audit R166): parking is sold through the normal cart and checkout (`addCartLine`, `checkoutCart`, `createPayment`), so the entitlement gets its `orderId`; the guest no longer calls `createParkingEntitlement`, which the order service issues at payment. No live availability; a full car park is the `soldOutForDay` refusal.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\n**The car park's parking product is ParkingFacility.productVariantId (agreed with contracts in the ledger 4 October 2026): Add parking to my cart sends it as addCartLine's variantId** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1210,11 +1227,13 @@
        "label": "Car parks",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.name"
+        "ParkingFacility.name",
+        "ParkingFacility.capacity",
+        "ParkingFacility.productVariantId"
        ],
        "operation": "listParkingFacilities",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The venue's car parks by name; no live free-bay count in the first release. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every parking facility'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "provenance": "contract access.yaml ParkingFacility (defined 4 October 2026, CHG-FXS-003)",
+       "notes": "Choosing one puts its parking product (productVariantId, agreed field) in the basket with addCartLine."
       },
       {
        "kind": "cardList",

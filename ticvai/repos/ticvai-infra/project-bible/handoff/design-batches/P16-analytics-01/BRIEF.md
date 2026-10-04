@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | D | 15 | 17 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `ANL-001` | Executive Command Center | A | 15 | 17 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
 | `ANL-002` | Sales, Revenue & Channel | D | 6 | 1 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `ANL-003` | Operational Performance | D | 11 | 27 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `ANL-004` | Product Performance | D | 9 | 15 | 6 | 17 | 0 | 0 | — | notStarted (generated) |

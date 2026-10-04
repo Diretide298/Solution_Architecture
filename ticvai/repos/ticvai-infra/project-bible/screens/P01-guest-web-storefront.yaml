@@ -253,6 +253,7 @@ screens:
       trigger: Opens a product and decides
       provenance: flow F01 step 1→2
       carries:
+      - eventId
       - productId
     entryFrom:
     - WEB-049
@@ -267,9 +268,9 @@ screens:
     `BookingFlowConfig.eventBannerDates` is on (default off; 23SEP-19); the date picker always sits at
     the top of the booking step. The venue picked here (audit R267) is the venue whose booking-flow settings
     apply on every booking screen, and the booking screens'' *Booking at* bar changes it (REV3-18). Every
-    booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue
-    the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid
-    over field by field (decided 29 September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset`
+    booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for
+    the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
+    entry laid over field by field (decided 29 September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset`
     (CFG-1, no change); the search box in the banner is off by default (`searchInBanner` default false,
     CFG-6). The in-venue notifications link is live again: WEB-046 is back in the first release (GAP-C1,
     reversing audit R242).
@@ -511,13 +512,17 @@ screens:
     23SEP-4). **Book** opens the ticket counters (WEB-005) as a side panel on this listing rather than
     a new page (23SEP-5). Card layout, size and density are the enums `cardLayout` [stackedRows, splitRows,
     cardsAcross, posterCards], `cardSize` [compact, standard, large, extraLarge] and `density` [compact,
-    standard, roomy] (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`,
-    resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+    standard, roomy] (DG-6). Every booking-flow setting named here is read from `getPublishedTenantConfig`
+    `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
+    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
 
     **29 September.** W4: Help me choose filters this list, with *Show everything*. W3: view-only products
-    show Call sales / Email sales. W7: `categoryDisplay` retired.'
+    show Call sales / Email sales. W7: `categoryDisplay` retired.
+
+
+    **A product''s event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
+    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -648,6 +653,8 @@ screens:
     - WaitTime.attractionProductId
     - WaitTime.status
     - WaitTime.waitMinutes
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -683,15 +690,17 @@ screens:
     transitions:
     - to: WEB-002
       trigger: Event & Attraction Listing
-      provenance: 'derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them.
-        The edge carries nothing: eventId only pre-selects (deep link or optional), and WEB-002 opens
-        on its own'
+      carries:
+      - eventId
+      provenance: derived — WEB-002 declares entryState.params eventId and WEB-003 holds eventId, so an
+        edge into it carries them
     - to: WEB-004
       trigger: Attraction Details
       carries:
+      - eventId
       - productId
-      provenance: derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds productId,
-        so an edge into it carries them
+      provenance: derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds eventId,
+        productId, so an edge into it carries them
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 
 
@@ -876,7 +885,11 @@ screens:
     **Video plays directly (client meeting 30 September, MoM 4.8, Qossai; the same page as the app''s
     GST-004, so the same behaviour).** The ride or attraction video starts in place with no loader in
     front of it; its poster frame shows while it buffers, and a video that cannot play leaves the poster
-    and the details, never an error screen.'
+    and the details, never an error screen.
+
+
+    **A product''s event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
+    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getProduct` reads one of them — list, select,
@@ -1287,6 +1300,8 @@ screens:
     - ProductVariant.sku
     - ProductVariant.axisValues
     - ProductVariant.isActive
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -1352,16 +1367,16 @@ screens:
     under the products. **Quick tour** (REV3-20). **Cart (REV3-10):** `cartLayout` may be `floatingIcon`,
     a round basket button with the count that opens the cart; the cart stays on the right in Arabic unless
     `cartSideInRtl` is `mirror`. Card layout, size and density are enums (DG-6). Every booking-flow setting
-    named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
-    R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).
+    named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest
+    picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field
+    by field (decided 29 September, rev 3 CFG-11).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -1458,16 +1473,16 @@ screens:
     guardian signature and *Remove this guest* are `checkBookingEligibility`, unchanged (DG-3). **Guest-facing
     copy may say *Session*** (CFG-10, a glossary exception like *Booking* under audit R145); code and
     contracts keep `Performance`. Floating basket icon and cart side (REV3-10). Every booking-flow setting
-    named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
-    R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).
+    named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest
+    picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field
+    by field (decided 29 September, rev 3 CFG-11).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -1655,6 +1670,9 @@ screens:
       from: WEB-004
     - name: venueId
       from: session
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   overlays:
   - id: eligibilityDeclaration
     component: drawer
@@ -1757,16 +1775,16 @@ screens:
     Fixture strip and a direct WEB-004 → WEB-007 path (23SEP-16). With WEB-006 this may render as one
     step (REV3-7). Seat picker defaults to the bowl (`seatPicker` default `bowl`, CFG-6). **The cabana
     map is no longer this screen:** a cabana, lounger or other spot placed on a venue map is booked on
-    WEB-047 (REV3-15, GAP-C2). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`,
-    resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+    WEB-047 (REV3-15, GAP-C2). Every booking-flow setting named here is read from `getPublishedTenantConfig`
+    `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
+    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -1913,6 +1931,9 @@ screens:
       from: session
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -2031,16 +2052,16 @@ screens:
     **Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns`
     (default), leaving this step asks the guest to sign in, or for a guest code when guest checkout is
     on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and
-    cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`,
-    resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+    cart side (REV3-10). Every booking-flow setting named here is read from `getPublishedTenantConfig`
+    `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
+    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.'
   density: compact
   pattern: statusTracker
@@ -2151,6 +2172,9 @@ screens:
     - name: venueId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -2633,6 +2657,9 @@ screens:
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the identity
       fork waits until checkout (ADR-0045).'
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -2659,7 +2686,7 @@ screens:
     (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered,
     and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions
     (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`,
-    `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig`
+    `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getPublishedTenantConfig`
     `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
     venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
@@ -2668,7 +2695,7 @@ screens:
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -2742,13 +2769,20 @@ screens:
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
     **29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs
     attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile
-    is created and completed later (WEB-020).'
+    is created and completed later (WEB-020).
+
+
+    **The holder details are written by checkoutCart on WEB-012 (attendees), which turns the cart into
+    the order (4 October 2026): this step collects them and hands them over, because a verified or signed-in
+    guest whose cart needs no forms skips this step (W1) and WEB-012 must make the order either way. recordConsentAnswers''
+    answers are typed in the contract (questionId, questionVersion, answer, cartLineId, personIndex);
+    the pull cut them (ledger)** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
@@ -2774,18 +2808,16 @@ screens:
         operation: getMyProfile
       - kind: detailPanel
         bindsTo: Cart.lines
-        notes: One block per holder, titled "Ticket 2 of 4 - Child", only for lines whose ticket is name-bound;
-          the buyer is separate from the holders.
-        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        notes: One holder name per cart line that needs one; handed to WEB-012, which sends them as checkoutCart
+          attendees[] (lineId, holderName).
+        provenance: contract orders.yaml Cart.lines (defined 4 October 2026, CHG-FXS-003)
         operation: getCart
         label: Ticket holder details
       - kind: consentBlock
         bindsTo: ConsentPurposeConfig[]
-        notes: One unticked checkbox per configured marketing channel and purpose, beside the terms, never
-          pre-ticked. The ticks travel with checkout as `marketingConsents[]` and are recorded by `recordCheckoutConsents`
-          with source checkout, bound to the order and the verified contact (M18-15); nothing is recorded
-          from this step, so an unpaid order records no consent.
-        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        notes: Unticked by default; the ticked purposes go to WEB-012 and into checkoutCart marketingConsents
+          (DEC-275).
+        provenance: contract marketing-crm.yaml ConsentPurposeConfig[] (defined 4 October 2026, CHG-FXS-003)
         label: Send me offers and news
         operation: listConsentPurposes
       - kind: consentBlock
@@ -2816,7 +2848,9 @@ screens:
         provenance: contract marketing-crm.yaml PATCH /guests/me/profile
       - kind: primaryButton
         label: Continue to payment
-        provenance: carried from the previous definition
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+        notes: Records the consent answers (recordConsentAnswers), then opens WEB-012 with the holder
+          names and the ticked opt-ins; nothing else is sent here.
       - kind: secondaryButton
         label: Keep my seats longer
         operation: extendSeatHold
@@ -2913,6 +2947,8 @@ screens:
     - GuestDevice.platform
     - GuestDevice.tokenFingerprint
     - GuestDevice.tokenRef
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -2961,10 +2997,11 @@ screens:
     - to: WEB-010
       trigger: Shopping Cart
       carries:
+      - cartId
       - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-012 holds lineId, performanceId, so an edge into it carries them
+        and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
       provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-012 holds none of them.
@@ -3005,7 +3042,7 @@ screens:
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -3027,7 +3064,12 @@ screens:
     base amount and the rate beneath ("USD 81.72 · AED 300.00 at 3.6710, held until 14:25"); when the
     hold lapses the amount is re-quoted and the guest confirms the new figure before paying. The earlier
     rule above ("both in base currency, so tender currency equals base currency") is superseded for card
-    and wallet.'
+    and wallet.
+
+
+    **createOrder left 4 October 2026: the order is made from the cart by checkoutCart (the cart''s lines,
+    holder names and opt-ins), then paid with createPayment; F01 step 7 and F02 step 5 say the same**
+    (CHG-FXS-003)'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3072,9 +3114,8 @@ screens:
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
-        operation: createOrder
-        notes: After the code the guest goes straight to the T&Cs tick and completes (W1).
-        provenance: decided 29 September 2026, W1
+        notes: Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).
+        provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: detailPanel
         label: Read the terms
         bindsTo: PublishedPolicy
@@ -3088,10 +3129,10 @@ screens:
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)
       - kind: toggle
         label: Send me offers and news
-        operation: createOrder
-        notes: 'Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]`
-          on the order, bound to the verified contact.'
-        provenance: decided 29 September 2026, M18-15
+        operation: checkoutCart
+        notes: Unticked by default; sent as checkoutCart marketingConsents. Prefilled from WEB-011 when
+          it ran.
+        provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: banner
         label: Checking your payment
         operation: inquirePaymentStatus
@@ -3103,27 +3144,21 @@ screens:
       components:
       - kind: primaryButton
         label: Pay now
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+        provenance: defined 4 October 2026 (CHG-FXS-003)
         operation: createPayment
-        notes: 'One Pay: creates the order (`createOrder`, with the T&Cs tick and the opt-in above) and
-          then the payment (`createPayment`) for card, Apple Pay, Google Pay or wallet (R080).'
+        notes: checkoutCart (once; its idempotency key is the cart's), then createPayment against the
+          order it returns; an unknown payment outcome has the order to attach to.
   states:
     loading: The checkout payment, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the checkout payment untouched.
     emptyFirstRun: No checkout payment yet. Offers Create order (`createOrder`).
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data). No access here
-      means one of two things, told apart by the response: not signed in, where the guest is offered sign-in
-      and brought back to this screen, or a record that is not theirs, which says so without saying whose
-      it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`.'
     offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
       otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
-  - operationId: createOrder
-    contract: orders
-    purpose: Create an order
-    trigger: onAction
   - operationId: createPayment
     contract: orders
     purpose: Take a payment against an order
@@ -3149,16 +3184,32 @@ screens:
       (GFIX-2)
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)
+  - operationId: checkoutCart
+    contract: orders
+    purpose: 'Pay now, first step: turn the session''s cart into the order pending payment, with the holder
+      names (attendees) and opt-ins (marketingConsents) from WEB-011 when it ran'
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
+    - name: cartId
+      from: session
     - name: orderId
       from: deepLink
+      optional: true
+      notes: A link to an order already pending payment opens it; otherwise checkoutCart makes the order
+        from the cart.
     - name: paymentId
       from: navigation
+      optional: true
     - name: venueId
       from: session
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
+    preloaded:
+    - the holder names and marketing opt-ins typed on WEB-011, when it ran
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: review
     provenance: client-verified
@@ -3242,7 +3293,17 @@ screens:
         The edge carries nothing: token only pre-selects (deep link or optional), and WEB-014 opens on
         its own'
   notes: '**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings**
-    — a screen named differently on web and app is two screens to a developer and one journey to a guest.'
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
+
+
+    **''Set a password'' is ''Create an account'' (4 October 2026): registerGuest and verifyGuestEmail
+    make and prove the account (no password field exists), then linkGuestCheckout** (CHG-FXS-003)
+
+
+    **Create an account collects the email and the code its two calls send** (CHG-FXS-003)
+
+
+    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)'
   density: compact
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -3276,6 +3337,20 @@ screens:
       - kind: secondaryButton
         label: Add to wallet
         provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Send me a code
+        operation: registerGuest
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: secondaryButton
+        label: Verify the code
+        operation: verifyGuestEmail
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: textField
+        label: Email for the account
+        bindsTo: RegisterGuestRequest.identifier
+        operation: registerGuest
+        notes: The order's email, prefilled; channel email.
+        provenance: contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
       components:
@@ -3288,21 +3363,21 @@ screens:
         notes: Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
       - kind: secondaryButton
-        label: Set a password
+        label: Create an account
         operation: linkGuestCheckout
-        notes: 'Offered after a guest checkout: keeps these tickets in an account.'
-        provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+        notes: 'Guest accounts are passwordless: registerGuest with the order''s email, verifyGuestEmail
+          with the code, then linkGuestCheckout.'
+        provenance: defined 4 October 2026 (CHG-FXS-003)
   states:
     loading: The booking confirmation, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the booking confirmation untouched.
     emptyFirstRun: No booking confirmation yet. **Offers no create action** — this screen declares no
       operation that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data). No access here
-      means one of two things, told apart by the response: not signed in, where the guest is offered sign-in
-      and brought back to this screen, or a record that is not theirs, which says so without saying whose
-      it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT`
+      for `reprintOrder`.'
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -3321,6 +3396,16 @@ screens:
     contract: identity
     purpose: 'Set a password: turn the guest-checkout order into an account (parity with GST-010)'
     trigger: onAction
+  - operationId: registerGuest
+    contract: identity
+    purpose: 'Create an account for the order''s email: sends a code'
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: verifyGuestEmail
+    contract: identity
+    purpose: Prove the code; then linkGuestCheckout moves the order to the account
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: orderId
@@ -3370,6 +3455,19 @@ screens:
     dismiss:
       label: Cancel
     provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+  - id: formVerifyGuestEmail
+    component: modal
+    trigger: Verify the code
+    body: '**Collects what `verifyGuestEmail` sends before it is called.** Required: `mode` (code), the
+      six-digit `code` sent to the order''s email. Dismissing sends nothing.'
+    confirm:
+      label: Verify the code
+      operation: verifyGuestEmail
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+    provenance: contract identity.yaml POST /auth/guest/verify-email (4 October 2026, CHG-FXS-003)
   gaps:
   - operation: transferOrderTickets
     removed: true
@@ -4063,10 +4161,16 @@ screens:
       - orderId
       provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017
         holds orderId, so an edge into it carries them
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across
     five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard
     is a shape rather than a domain, and the pack recognised that before the package did.
+
+
+    **The loyalty tile''s programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)
+
+
+    **The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)'
   density: compact
   boardFrames:
   - Dashboards Board.dc.html#web-017
@@ -4100,8 +4204,15 @@ screens:
       - kind: metricTile
         label: Loyalty
         operation: getLoyaltyPosition
-        notes: Tier, points and points to the next tier; expiring points within 30 days; opens WEB-043.
-        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        notes: The guest's position in the programme from listLoyaltyProgrammes (the first active one).
+        provenance: contract marketing-crm.yaml LoyaltyPosition (defined 4 October 2026, CHG-FXS-003)
+        bindsTo: LoyaltyPosition
+      - kind: selectField
+        label: Programme
+        bindsTo: LoyaltyProgramme.id
+        operation: listLoyaltyProgrammes
+        notes: Shown only when the venue runs more than one; the first active one otherwise.
+        provenance: contract marketing-crm.yaml LoyaltyProgramme.id (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -4156,12 +4267,11 @@ screens:
     emptyFirstRun: A new account with no orders — offers what to do next
     emptyNoResults: 'Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data). No access here
-      means one of two things, told apart by the response: not signed in, where the guest is offered sign-in
-      and brought back to this screen, or a record that is not theirs, which says so without saying whose
-      it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `getMyChallenges` requires to
+      show this screen, and names that permission (the screen''s other reads need `ORDER_VIEW`, `WALLET_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `respondToInvitation`.'
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -4194,6 +4304,12 @@ screens:
     contract: marketing-crm
     purpose: Loyalty tile
     trigger: onLoad
+  - operationId: listLoyaltyProgrammes
+    contract: marketing-crm
+    purpose: The venue's loyalty programme, whose id getLoyaltyPosition takes (guest-callable, Pattern
+      4 group 1)
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: subjectId
@@ -5753,7 +5869,11 @@ screens:
     (GST-069) until the facial-reader vendor SDK is named and supports web capture; viewing and withdrawing
     an enrolment stay here. **Two-step verification (GAP-B1, per venue):** enrolment appears only when
     a venue of the tenant enabled it. **One implementation, several ids (GAP-D3):** WEB-009 and WEB-024
-    are built as one account area; both ids are kept.'
+    are built as one account area; both ids are kept.
+
+
+    **The Face Pass enrolmentId comes from the guest''s passes (listMyEntitlements, Entitlement.facePassEnrolmentId),
+    bound 4 October 2026** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
@@ -5823,6 +5943,16 @@ screens:
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
         bindsTo: ConsentState.purposes
+      - kind: cardList
+        label: Passes with a face
+        bindsTo: Entitlement
+        operation: listMyEntitlements
+        columns:
+        - Entitlement.productId
+        - Entitlement.validTo
+        - Entitlement.facePassEnrolmentId
+        notes: Only passes with a facePassEnrolmentId; selecting one reads it.
+        provenance: contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -5959,12 +6089,12 @@ screens:
       — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data). No access here
-      means one of two things, told apart by the response: not signed in, where the guest is offered sign-in
-      and brought back to this screen, or a record that is not theirs, which says so without saying whose
-      it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `GUEST_VIEW`, which `getGuestConsents` requires to show
+      this screen, and names that permission (the screen''s other reads need `ORDER_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `GUEST_MANAGE` for `revokeFacePass`; `GUEST_VIEW_PII`
+      for `exportSubjectData`.'
     offline: '**Nothing here is offered offline, and the banner says so.** An erasure request or a device
       change queued and never sent is worse than one that could not be made — the legal clock starts when
       the platform receives it, and a device signed out offline is still signed in.'
@@ -6063,6 +6193,11 @@ screens:
     contract: marketing-crm
     purpose: The purposes the consent rows show
     trigger: onLoad
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: The guest's passes, each with its facePassEnrolmentId for getFacePassEnrolment and revokeFacePass
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: deviceId
@@ -8572,7 +8707,11 @@ screens:
     A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The frame
     names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and
     Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense.
-    **A board that says what it draws removes the guess entirely.**'
+    **A board that says what it draws removes the guess entirely.**
+
+
+    **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
+    so a normal visit has a map to load** (CHG-FXS-003)'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3c
@@ -8604,6 +8743,12 @@ screens:
       - kind: detailPanel
         label: Detail
         provenance: carried from the previous definition
+      - kind: selectField
+        label: Map
+        bindsTo: BookableVenueMaps.maps
+        operation: listBookableVenueMaps
+        notes: Picked by itself when the venue has one published map.
+        provenance: contract venue-map.yaml BookableVenueMaps.maps (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -8649,12 +8794,10 @@ screens:
     emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
       empty panel.'
     emptyNoResults: No attraction of the category picked; the other categories stay.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show
+      this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: '**The offline banner shows.** A map and route graph already loaded stay usable, so directions
       do not need a signal. Wait times show their last reading marked out of date, never as live — a queue
       length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks
@@ -8676,10 +8819,17 @@ screens:
     contract: queue
     purpose: List queues
     trigger: onLoad
+  - operationId: listBookableVenueMaps
+    contract: venue-map
+    purpose: The venue's published map (query venueId), whose mapId getVenueMap and getVenueMapGraph take
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: mapId
       from: deepLink
+      optional: true
+      notes: Otherwise the venue's published map from listBookableVenueMaps.
     - name: venueId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -8894,7 +9044,11 @@ screens:
 
 
     **Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they
-    are aligned to one wave once the client picks it (open, client to choose).'
+    are aligned to one wave once the client picks it (open, client to choose).
+
+
+    **The car park''s parking product is ParkingFacility.productVariantId (agreed with contracts in the
+    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -8925,12 +9079,12 @@ screens:
         bindsTo: ParkingFacility
         columns:
         - ParkingFacility.name
+        - ParkingFacility.capacity
+        - ParkingFacility.productVariantId
         operation: listParkingFacilities
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue's car parks by name; no live free-bay count in the first release. The venue is
-          the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was
-          the generated table 'Every parking facility'; staff and plumbing columns removed (decided by
-          Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+        provenance: contract access.yaml ParkingFacility (defined 4 October 2026, CHG-FXS-003)
+        notes: Choosing one puts its parking product (productVariantId, agreed field) in the basket with
+          addCartLine.
       - kind: cardList
         label: Parking — Reserve & Pay
         provenance: carried from the previous definition

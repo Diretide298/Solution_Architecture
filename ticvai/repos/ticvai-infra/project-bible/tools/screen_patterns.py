@@ -19,6 +19,8 @@ find what it fixed (CHG-SPF-001..006).
     P7b  an implementation route or component that belongs to another screen (shared by two
          screens, or named for something else)
     P8   a Block A screen that says it is not in the first release, or carries a wave other than 1
+    NP   a screen a Sprint 1 or 2 task builds still says a person must define it, or binds no
+         operation (the Sprint 1-2 judging of 4 October, CHG-FXS-007)
 
 The helpers (`pick_columns`, `no_access_text`, `reads_itself`) are what the generators use so they
 cannot write the pattern again.
@@ -232,6 +234,58 @@ def block_a_screens(root: str = ROOT) -> set | None:
                 kind, _, val = b.partition(" ")
                 if kind == "screen":
                     out.add(val)
+    return out
+
+
+# ── NP: a screen planned in the first sprints that still waits for a person ─────────────────────
+# **The Sprint 1-2 judging of 4 October found 43 screens planned in Sprints 1-2 whose spec said a
+# person must define them before they are built** (CHG-FXS-001..007). The generator writes that gap
+# honestly when a pack page is prose only (`generate-screens-from-pack.py` takes its words from
+# NEEDS_PERSON below, so the generator and this rule cannot drift apart); nothing stopped the plan from
+# scheduling such a screen. NP holds the line: a screen a Sprint 1 or 2 task builds carries no such gap
+# and binds at least one operation (a hub that only links, `commandCentre` with no data, is the one
+# screen that may bind none).
+NEEDS_PERSON = "needs a person before it is built"
+NEEDS_PERSON_PHRASES = (NEEDS_PERSON, "gives this screen nothing that can be drawn",
+                        "no display, metric or configuration directory")
+
+
+def planned_sprints(root: str = ROOT) -> dict | None:
+    """screen id -> the earliest sprint a task that builds it starts in.
+
+    The sprint is the schedule's (`block-a-schedule.json`, derived from the plan: the sprint a task
+    starts in, which is what the tickets carry); what a task builds is the release's
+    (`op-release.json`). None when either is absent."""
+    sd = os.path.join(root, "handoff", "service-docs")
+    p, q = os.path.join(sd, "op-release.json"), os.path.join(sd, "block-a-schedule.json")
+    if not (os.path.exists(p) and os.path.exists(q)):
+        return None
+    with open(p, encoding="utf-8") as fh:
+        rel = json.load(fh)
+    with open(q, encoding="utf-8") as fh:
+        when = json.load(fh).get("sprint") or {}
+    out: dict = {}
+    for t in rel["tickets"]:
+        try:
+            sprint = int(when.get(t["key"]))
+        except (TypeError, ValueError):
+            continue
+        for b in t.get("builds") or []:
+            kind, _, val = b.partition(" ")
+            if kind == "screen":
+                out[val] = min(sprint, out.get(val, sprint))
+    return out
+
+
+def p_np(pk: Package, sid: str, s: dict) -> list:
+    out = []
+    for g in s.get("gaps") or []:
+        why = str((g or {}).get("why") or "")
+        if any(p in why for p in NEEDS_PERSON_PHRASES):
+            out.append(("NP", sid, "the spec says a person must define it before it is built"))
+            break
+    if not apis(s) and s.get("pattern") != "commandCentre":
+        out.append(("NP", sid, "binds no operation: nothing to load, show or save"))
     return out
 
 

@@ -7254,11 +7254,6 @@ screens:
   purpose: Provide centralized security for reports, dashboards and analytical information. The matrix
     specifically requires reporting access based on group rights, operating-area rights and user access
     rights.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47
   layout:
     template: split
     regions:
@@ -7439,6 +7434,8 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAuthorisationPolicies`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+  notes: '**The generator''s ''needs a person'' gap removed 4 October 2026: the screen''s content is defined
+    (tables, panels and actions bound to its operations)** (CHG-FXS-005)'
 - id: ANL-048
   name: Delivery Monitoring & Failure Management
   module: Analytics

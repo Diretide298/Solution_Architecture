@@ -1,6 +1,6 @@
 # WS107 — Subscription Licensing AI Self Service board 10
 
-**10 screens · 13 operations · 16 schemas · 5 permissions**
+**10 screens · 14 operations · 20 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-459` | Billing & Commercial Command Center | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-460` | Billing Calculation & Charge Breakdown | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-460` | Billing Calculation & Charge Breakdown | B | 6 | 70 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `ADM-461` | Consumption Reconciliation & Billing Approval | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 | `ADM-462` | Invoice & Payment Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**ADM-460, ADM-461, ADM-462, ADM-463, ADM-465, ADM-468 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-461, ADM-462, ADM-463, ADM-465, ADM-468 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

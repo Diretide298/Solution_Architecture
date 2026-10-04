@@ -3306,6 +3306,21 @@ components:
           type: string
           format: date-time
           nullable: true
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The card''s own id** (4 October 2026, CHG-FXC-006): the `{cardId}` of `setGameCardLifecycle`,
+            which had no column to match, and the `id` of the Wallet view `wallet.loadGameCredits` and
+            `wallet.adjustGameCard` return for a card with no wallet.'
+        walletId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Where the card''s credits are held** (4 October 2026, CHG-FXC-006). Set when the card is registered
+            to a guest who has a wallet: credits loaded to it are wallet credit lots. Null for an anonymous card, whose
+            credits are held on the card row itself (`credits`, `bonusCredits`).'
     Game:
       x-ticvai-persistence: games.game
       type: object

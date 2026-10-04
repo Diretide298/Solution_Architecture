@@ -225,7 +225,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-339"
+    "ADM-339",
+    "BO-100"
    ],
    "exitTo": [
     "ADM-339"
@@ -519,28 +520,11 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.\n\n**Stale gaps removed 4 October 2026: the content is defined and getPasswordPolicy is bound, so setPasswordPolicy saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define the authentication strength required before an approver can execute sensitive approval decisions. The source requires authentication before approval actions and supports MFA for sensitive approvals.",
-  "gaps": [
-   {
-    "operation": "setPasswordPolicy",
-    "why": "**`setPasswordPolicy` replaces the whole policy and nothing reads it.** identity has no `getPasswordPolicy`, so this screen cannot show the tenant's current `mfaRequiredForPermissions` (or the rest of the policy it must send back unchanged). Handed to the contracts group (audit R135).",
-    "source": "contract identity.yaml PUT /password-policy"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 53"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 53"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -567,9 +551,18 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listStepUpPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "Query effective=true. Raising one sends setStepUpPolicy for that action; never below contractFloor.",
+       "label": "Step-up per action",
+       "bindsTo": "StepUpPolicy",
+       "operation": "listStepUpPolicies",
+       "columns": [
+        "StepUpPolicy.operationId",
+        "StepUpPolicy.required",
+        "StepUpPolicy.contractFloor",
+        "StepUpPolicy.scopeLevel",
+        "StepUpPolicy.reason"
+       ],
+       "provenance": "contract approvals.yaml StepUpPolicy (4 October 2026, CHG-FXS-005)"
       },
       {
        "kind": "secondaryButton",
@@ -605,8 +598,9 @@
        "label": "Guest identity verification",
        "operation": "getGuestVerificationPolicy",
        "notes": "**A separate section, not a staff factor**: which identity checks a guest must pass and when (UAE Pass and the ICP check are in release 1, DEC-457; CHG-CSP-034). The staff MFA policy above covers staff factors only.",
-       "provenance": "contract identity.yaml GET /guest-verification-policy",
-       "tab": "Guest identity verification"
+       "provenance": "contract identity.yaml IdentityGuestVerificationPolicy (defined 4 October 2026, CHG-FXS-005)",
+       "tab": "Guest identity verification",
+       "bindsTo": "IdentityGuestVerificationPolicy"
       }
      ]
     }

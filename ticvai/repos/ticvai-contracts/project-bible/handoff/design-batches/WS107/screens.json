@@ -43,7 +43,10 @@
     {
      "to": "ADM-460",
      "trigger": "Billing Calculation & Charge Breakdown",
-     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-461",
@@ -310,21 +313,9 @@
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "configEditor",
+  "patternReason": "Pick a tenant and a period, calculate the charge as a dry run, read the lines, then issue (defined 4 October 2026 from generateInvoice, CHG-FXS-001).",
   "purpose": "Calculate exactly what TICVAI should charge for the billing period. This screen must dynamically change according to the commercial model.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 124"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 124"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -332,28 +323,110 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "operation": "listTenants",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "provenance": "contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period start",
+       "bindsTo": "SubscriptionInvoice.periodStart",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml SubscriptionInvoice.periodStart (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period end",
+       "bindsTo": "SubscriptionInvoice.periodEnd",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml SubscriptionInvoice.periodEnd (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "generateInvoice",
-       "notes": "The act the screen exists for."
+       "label": "Calculate",
+       "operation": "generateInvoice",
+       "notes": "dryRun true: prices the period and changes nothing.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Charge lines",
+       "bindsTo": "SubscriptionInvoice.lines",
+       "operation": "generateInvoice",
+       "columns": [
+        "SubscriptionInvoice.lines.kind",
+        "SubscriptionInvoice.lines.moduleCode",
+        "SubscriptionInvoice.lines.description",
+        "SubscriptionInvoice.lines.quantity",
+        "SubscriptionInvoice.lines.unitPrice",
+        "SubscriptionInvoice.lines.amount"
+       ],
+       "notes": "One line per licensed module at its listed price, the package's base line, and metered usage lines; the commercial model decides which lines appear.",
+       "provenance": "contract subscription.yaml SubscriptionInvoice.lines (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Subtotal",
+       "bindsTo": "SubscriptionInvoice.subtotal",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml SubscriptionInvoice.subtotal (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tax",
+       "bindsTo": "SubscriptionInvoice.taxAmount",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml SubscriptionInvoice.taxAmount (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Total",
+       "bindsTo": "SubscriptionInvoice.total",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml SubscriptionInvoice.total (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "generateInvoice"
+       "label": "Issue invoice",
+       "operation": "generateInvoice",
+       "notes": "dryRun false; idempotent per tenant and period, so a second issue returns the same invoice.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Invoices issued",
+       "bindsTo": "SubscriptionInvoice",
+       "operation": "listSubscriptionInvoices",
+       "columns": [
+        "SubscriptionInvoice.periodStart",
+        "SubscriptionInvoice.periodEnd",
+        "SubscriptionInvoice.status",
+        "SubscriptionInvoice.total"
+       ],
+       "provenance": "contract subscription.yaml SubscriptionInvoice (defined 4 October 2026, CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The billing calculation charge list.",
-   "error": "Could not load. Names which read failed and leaves the billing calculation charge untouched.",
-   "emptyFirstRun": "No billing calculation charge yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
+   "loading": "The list skeleton, with the filters already drawn.",
+   "error": "Could not load. Names which read failed and leaves what is on screen untouched.",
+   "emptyFirstRun": "Nothing calculated yet: pick a tenant and a period.",
    "emptyNoResults": "The filter narrowed it and the billing calculation charge are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for `generateInvoice`."
   },
   "apis": [
    {
@@ -362,6 +435,20 @@
     "purpose": "Calculate the charge",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker (audit R098)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+   },
+   {
+    "operationId": "listSubscriptionInvoices",
+    "contract": "subscription",
+    "purpose": "The tenant's invoices already issued, to show a period that is billed",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-001)"
    }
   ],
   "wireframe": {
@@ -369,15 +456,18 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-460",
    "workshopBoard": "wireframes/WS162 Subscription Licensing AI Self Service Board 10.dc.html#adm-460"
   },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 124. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
      "name": "tenantId",
-     "from": "session"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the operator picks a tenant."
     }
    ]
   },
+  "notes": "**Defined 4 October 2026 from generateInvoice: the dry run (dryRun true) is the calculation and its lines are the charge breakdown; the same call without dryRun issues it** (CHG-FXS-001)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

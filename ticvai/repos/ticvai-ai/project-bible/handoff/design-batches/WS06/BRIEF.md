@@ -104,7 +104,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-198` | Validation Outcome & Guest Feedback Designer | C | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | C | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-200` | Handheld & Mobile Access Device Configuration | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-201` | Gate Modes, Free Spin & Emergency Controls | A | 15 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
+| `BO-201` | Gate Modes, Free Spin & Emergency Controls | A | 17 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
 | `BO-202` | Device Software, Content & Remote Configuration | C | 6 | 0 | 5 | 0 | 4 | 0 | — | notStarted (generated) |
 | `BO-203` | Hardware Compatibility, Health, Testing & Deployment | C | 10 | 0 | 6 | 0 | 8 | 0 | — | notStarted (generated) |
 

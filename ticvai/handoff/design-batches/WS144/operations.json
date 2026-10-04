@@ -61,25 +61,6 @@
   "requestBody": "Challenge",
   "responds": "Challenge"
  },
- "createLoyaltyProgramme": {
-  "method": "POST",
-  "path": "/loyalty/programmes",
-  "contract": "marketing-crm",
-  "summary": "Create a loyalty programme",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LoyaltyProgramme",
-  "responds": "LoyaltyProgramme"
- },
  "createReferral": {
   "method": "POST",
   "path": "/referrals",
@@ -456,5 +437,29 @@
   ],
   "requestBody": "MarketingReward",
   "responds": "MarketingReward"
+ },
+ "updateLoyaltyProgramme": {
+  "method": "PATCH",
+  "path": "/loyalty/programmes/{programmeId}",
+  "contract": "marketing-crm",
+  "summary": "Change a loyalty programme",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "programmeId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyProgramme"
  }
 }

@@ -541,6 +541,13 @@
     "type": "string",
     "format": "uuid"
    },
+   "translationJobId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
    "kind": {
     "type": "string",
     "enum": [

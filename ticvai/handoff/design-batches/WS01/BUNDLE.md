@@ -1399,7 +1399,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `groupId` (navigation) |
 | Route | `/access-venue/access-location-grouping-bo-151` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Groups access points into named, nestable groups (Main Entrance = Gates 01-04; Adventure Zone = Coaster, Drop Tower, Adventure Hall gates) whose scans roll up into one occupancy, entries, exits and throughput figure. Gate mode policies and capacity rules then name a group instead of individual gates. The one thing to get right: a tree with live roll-up numbers, so the manager sees why a group exists.
 

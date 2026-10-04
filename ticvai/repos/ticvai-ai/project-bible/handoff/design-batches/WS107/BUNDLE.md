@@ -1,6 +1,6 @@
 # WS107 — Subscription Licensing AI Self Service board 10
 
-**10 screens · 13 operations · 16 schemas · 5 permissions**
+**10 screens · 14 operations · 20 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-459` | Billing & Commercial Command Center | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-460` | Billing Calculation & Charge Breakdown | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-460` | Billing Calculation & Charge Breakdown | B | 6 | 70 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `ADM-461` | Consumption Reconciliation & Billing Approval | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 | `ADM-462` | Invoice & Payment Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**ADM-460, ADM-461, ADM-462, ADM-463, ADM-465, ADM-468 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-461, ADM-462, ADM-463, ADM-465, ADM-468 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -214,7 +214,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
-- → `ADM-460` Billing Calculation & Charge Breakdown: *Billing Calculation & Charge Breakdown*
+- → `ADM-460` Billing Calculation & Charge Breakdown: *Billing Calculation & Charge Breakdown*; carries `tenantId`
 - → `ADM-461` Consumption Reconciliation & Billing Approval: *Consumption Reconciliation & Billing Approval*
 - → `ADM-462` Invoice & Payment Management: *Invoice & Payment Management*; carries `invoiceId`
 - → `ADM-463` Subscription & Commercial Change Management: *Subscription & Commercial Change Management*
@@ -339,14 +339,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · task APP-CONSOLE-ADM-460 |
-| Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE` (1 configure); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | configEditor (compact density): Pick a tenant and a period, calculate the charge as a dry run, read the lines, then issue (defined 4 October 2026 from generateInvoice, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | `tenantId` (session) |
+| Opens with | `tenantId` (navigation) |
 | Route | `/tenants-licensing/billing-calculation-charge-breakdown-adm-460` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Defined 4 October 2026 from generateInvoice: the dry run (dryRun true) is the calculation and its lines are the charge breakdown; the same call without dryRun issues it** (CHG-FXS-001)
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** What TICVAI charges for a period, broken down by fee type for the customer's commercial model.
 
@@ -354,16 +354,137 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | — | `Tenant.id` |
+| Period start | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `SubscriptionInvoice.periodStart` |
+| Period end | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `SubscriptionInvoice.periodEnd` |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Status | select | — | Draft · Issued · Paid · Overdue · Disputed · Cancelled | `listSubscriptionInvoices` ?status |
+
+**Sent by *Calculate*** (`generateInvoice`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Period start `periodStart` | date picker | required | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `generateInvoice` body |
+| Period end `periodEnd` | date picker | required | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `generateInvoice` body |
+| Dry run `dryRun` | toggle | optional | off | — | — | — | `generateInvoice` body |
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Charge lines** (data table, from `generateInvoice`): One line per licensed module at its listed price, the package's base line, and metered usage lines; the commercial model decides which lines appear.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kind | chip: Base plan, Module, Add on, Overage, Metered, One off… | `module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September). |
+| Module code | text | The module a `module` or `metered` line charges for. |
+| Description | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**Subtotal** (metric tile, from `generateInvoice`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
+| Period start | 1 Oct 2026 | — |
+| Period end | 1 Oct 2026 | — |
+| Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
+| Lines | list or chips (count when long) | — |
+| Description | text | — |
+| Kind | chip: Base plan, Module, Add on, Overage, Metered, One off… | `module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September). |
+| Module code | text | The module a `module` or `metered` line charges for. |
+| Audience | chip: Staff, Guest | For an AI `metered` line, whose usage it is. |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Plan version used | text | Priced against the version the tenant is subscribed to, not the latest. |
+| Credited total | AED 1,234.50 | The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. |
+| Issued at | 1 Oct 2026, 14:30 | — |
+
+**Tax** (metric tile, from `generateInvoice`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
+| Period start | 1 Oct 2026 | — |
+| Period end | 1 Oct 2026 | — |
+| Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
+| Lines | list or chips (count when long) | — |
+| Description | text | — |
+| Kind | chip: Base plan, Module, Add on, Overage, Metered, One off… | `module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September). |
+| Module code | text | The module a `module` or `metered` line charges for. |
+| Audience | chip: Staff, Guest | For an AI `metered` line, whose usage it is. |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Plan version used | text | Priced against the version the tenant is subscribed to, not the latest. |
+| Credited total | AED 1,234.50 | The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. |
+| Issued at | 1 Oct 2026, 14:30 | — |
+
+**Total** (metric tile, from `generateInvoice`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
+| Period start | 1 Oct 2026 | — |
+| Period end | 1 Oct 2026 | — |
+| Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
+| Lines | list or chips (count when long) | — |
+| Description | text | — |
+| Kind | chip: Base plan, Module, Add on, Overage, Metered, One off… | `module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September). |
+| Module code | text | The module a `module` or `metered` line charges for. |
+| Audience | chip: Staff, Guest | For an AI `metered` line, whose usage it is. |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Plan version used | text | Priced against the version the tenant is subscribed to, not the latest. |
+| Credited total | AED 1,234.50 | The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. |
+| Issued at | 1 Oct 2026, 14:30 | — |
+
+**Invoices issued** (data table, from `listSubscriptionInvoices`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period start | 1 Oct 2026 | — |
+| Period end | 1 Oct 2026 | — |
+| Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
+| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Calculate (primary button) | `generateInvoice` POST `/tenants/{tenantId}/invoices` | inline | SubscriptionInvoice | 409 An invoice already exists for this period | — |
+| Issue invoice (secondary button) | `generateInvoice` POST `/tenants/{tenantId}/invoices` | inline | SubscriptionInvoice | 409 An invoice already exists for this period | — |
+
+**Data it reads**: `listTenants` (onLoad, The tenant picker (audit R098)); `listSubscriptionInvoices` (onLoad, The tenant's invoices already issued, to show a period that …)
 
 **Where the user goes next**
 
@@ -373,11 +494,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The billing calculation charge list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the billing calculation charge untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No billing calculation charge yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing calculated yet: pick a tenant and a period. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the billing calculation charge are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for `generateInvoice`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 An invoice already exists for this period |
 
@@ -400,17 +521,20 @@ total: AED 60,742.50 incl. VAT 5%
 #### Permissions
 
 - `generateInvoice` → `PLATFORM_BILLING_MANAGE` (configure) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listSubscriptionInvoices` → `PLATFORM_BILLING_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for `generateInvoice`.
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 20.7.1 | Subscription Invoicing - System shall generate subscription invoices. | Subscription & Licensing Management | CONTRACTED | `generateInvoice` |
 | 20.7.5 | Billing History - System shall maintain billing history. | Subscription & Licensing Management | CONTRACTED | `generateInvoice` |
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -433,12 +557,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (403, 409).
+- [ ] Every output is drawn (70 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-460?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Calculate, Issue invoice.
 - [ ] Every transition is wired: `ADM-459`.
-- [ ] Every gated control is gated: `PLATFORM_BILLING_MANAGE`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1598,6 +1722,7 @@ Method, path, parameters, request and response for every operation these screens
 "issueCreditNote": {"method":"POST","path":"/invoices/{invoiceId}/credit-notes","contract":"subscription","summary":"Issue a credit note against a tenant invoice, in full or in part","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"IssueCreditNoteRequest","responds":"SubscriptionCreditNote"},
 "listCreditNotes": {"method":"GET","path":"/tenants/{tenantId}/credit-notes","contract":"subscription","summary":"List a tenant's credit notes","permission":"PLATFORM_BILLING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"invoiceId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSubscriptionInvoices": {"method":"GET","path":"/tenants/{tenantId}/invoices","contract":"subscription","summary":"List subscription invoices","permission":"PLATFORM_BILLING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "previewSubscriptionChange": {"method":"POST","path":"/tenants/{tenantId}/subscription/preview","contract":"subscription","summary":"Preview the effect of a plan change","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"SubscriptionPreview"},
 "recordInvoicePayment": {"method":"POST","path":"/invoices/{invoiceId}/payment","contract":"subscription","summary":"Record payment against an invoice","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "setSubscription": {"method":"PUT","path":"/tenants/{tenantId}/subscription","contract":"subscription","summary":"Assign or change a subscription","permission":"PLATFORM_TENANT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"Subscription"},
@@ -1617,6 +1742,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DowngradeConflictProblem": {"x-ticvai-persistence":"none — error shape","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Problem"},{"type":"object","properties":{"modulesInUse":{"type":"array","description":"Enabled by the tenant but not licensed by the target plan.","items":{"type":"object","properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"isEnabled":{"type":"boolean"}}}},"limitsExceeded":{"type":"array","items":{"type":"object","properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"currentUsage":{"type":"integer"},"targetLimit":{"type":"integer"}}}}}}]},
 "InvoiceStatus": {"type":"string","enum":["draft","issued","paid","overdue","disputed","cancelled"]},
 "IssueCreditNoteRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["reasonCode","settlement","lines"],"properties":{"reasonCode":{"type":"string","enum":["billingError","serviceCredit","disputeResolution","goodwill","other"]},"reason":{"type":"string","maxLength":500,"nullable":true},"settlement":{"type":"string","enum":["offsetNextInvoice","refund"]},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["invoiceLineIndex"],"properties":{"invoiceLineIndex":{"type":"integer","minimum":0,"description":"The line of the invoice being credited, by its position in `SubscriptionInvoice.lines`."},"quantity":{"type":"number","minimum":0,"nullable":true,"description":"Part of the line's quantity; null with `amount`, or for the whole line."},"amount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Part of the line's amount, net of tax; null with `quantity`, or for the whole line."}}}}}},
+"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "PackageSimulation": {"type":"object","description":"Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**","properties":{"lines":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["baseTier","module","addOn","capacityPack","overage","professionalServices","discount"]},"label":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"recurringTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"oneOffTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"contractTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning","advisory"]},"code":{"type":"string"},"message":{"type":"string"}}}},"provisionable":{"type":"boolean"}}},
 "PackageSimulationRequest": {"type":"object","required":["tierCode"],"properties":{"tierCode":{"type":"string"},"licensingModelId":{"type":"string","format":"uuid","nullable":true},"moduleCodes":{"type":"array","items":{"type":"string"}},"venueCount":{"type":"integer","default":1},"projectedVolumes":{"type":"object","additionalProperties":{"type":"integer"}},"contractMonths":{"type":"integer","default":12},"billingCycle":{"type":"string","nullable":true},"currency":{"type":"string","nullable":true}}},
@@ -1627,6 +1753,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "SubscriptionInvoice": {"x-ticvai-persistence":"control.invoice + control.invoice_line","type":"object","required":["id","invoiceNumber","tenantId","periodStart","periodEnd","status","total"],"properties":{"id":{"type":"string","format":"uuid"},"invoiceNumber":{"type":"string","readOnly":true,"description":"A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"},"tenantId":{"type":"string","format":"uuid"},"periodStart":{"type":"string","format":"date"},"periodEnd":{"type":"string","format":"date"},"status":{"$ref":"#/components/schemas/InvoiceStatus"},"lines":{"type":"array","items":{"type":"object","properties":{"description":{"type":"string"},"kind":{"type":"string","enum":["basePlan","module","addOn","overage","metered","oneOff","credit"],"description":"`module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September)."},"moduleCode":{"type":"string","nullable":true,"description":"The module a `module` or `metered` line charges for."},"audience":{"type":"string","enum":["staff","guest"],"nullable":true,"description":"For an AI `metered` line, whose usage it is."},"metric":{"$ref":"#/components/schemas/UsageMetric"},"quantity":{"type":"number"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"planVersionUsed":{"type":"string","description":"Priced against the version the tenant is subscribed to, not the latest."},"creditedTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. Null with none."},"issuedAt":{"type":"string","format":"date-time","nullable":true},"dueAt":{"type":"string","format":"date","nullable":true},"paidAt":{"type":"string","format":"date-time","nullable":true}}},
 "SubscriptionPlanRecommendation": {"type":"object","x-ticvai-persistence":"none — computed from control.usage_record, the plan, tier and add-on limits and capacity packs, priced as simulateCommercialPackage prices","description":"One plan-fit move for a tenant, priced against staying as it is (20.8.4, 20.8.5; decided 29 September, build pass, group G2).","required":["kind","reason","projectedMonthlyCost"],"properties":{"kind":{"type":"string","enum":["upgrade","downgrade","addModule","removeModule","removeAddOn","capacityPack"]},"targetPlanId":{"type":"string","format":"uuid","nullable":true,"description":"The tier to move to, for `upgrade` and `downgrade`."},"moduleCode":{"type":"string","nullable":true,"description":"For `addModule` and `removeModule`."},"addOnCode":{"type":"string","nullable":true,"description":"For `removeAddOn`."},"billableUnit":{"type":"string","nullable":true,"description":"The unit that drives it (for `upgrade`, `downgrade` and `capacityPack`), as `getLicenceEnforcement` names it."},"capacityPackSize":{"type":"integer","nullable":true,"description":"For `capacityPack`, the pack size that covers the projected overage."},"projectedMonthlyCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"projectedSaving":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Against staying as it is over the horizon, monthly. Set where the move saves money."},"projectedAddedCost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Where the move costs more than today but less than the alternative named in `comparedWith`."},"comparedWith":{"type":"string","enum":["currentPackage","projectedOverage","nextTier","capacityPack"],"description":"What the move is cheaper than. An `upgrade` is compared with paying the projected overage; a `capacityPack` with the next tier."},"reason":{"type":"string","maxLength":500,"description":"One sentence a person can repeat to the customer."},"basis":{"type":"object","description":"The numbers it rests on.","properties":{"usageWindowDays":{"type":"integer"},"usedAverage":{"type":"number","nullable":true},"usedPeak":{"type":"number","nullable":true},"projectedPeak":{"type":"number","nullable":true},"currentLimit":{"type":"number","nullable":true},"targetLimit":{"type":"number","nullable":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"description":"For `removeModule` and `removeAddOn`, the last metered use; null for never."}}},"applyWith":{"type":"string","enum":["setSubscription","addCapacityPack"],"description":"The operation a person uses to carry it out (after `previewSubscriptionChange` for `setSubscription`)."}}},
 "SubscriptionPreview": {"x-ticvai-persistence":"none — computed","type":"object","required":["canApply","priceChange"],"properties":{"canApply":{"type":"boolean"},"priceChange":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"proratedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"modulesGained":{"type":"array","items":{"type":"string"}},"modulesLost":{"type":"array","items":{"type":"string"}},"conflicts":{"$ref":"#/components/schemas/DowngradeConflictProblem"},"cellTierChange":{"type":"object","nullable":true,"properties":{"from":{"$ref":"#/components/schemas/CellTier"},"to":{"$ref":"#/components/schemas/CellTier"},"requiresMigration":{"type":"boolean"}}}}},
+"SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]},
 "UsageMetric": {"type":"string","enum":["venues","workstations","activeUsers","devices","brandedApps","aiTokens","apiCalls","storageGb","transactions","guestProfiles"]}
 }
 ```

@@ -774,133 +774,145 @@
   "purpose": "Configure when refunds from TICVAI transactions may be returned directly to a digital wallet. Requirement 4.3.15 specifically requires instant refund to the digital wallet with customer notification. Refund Sources Ticket cancellation Event cancellation F&B refund Retail return Rental refund Parking refund Membership adjustment Attraction cancellation Failed service Customer-service compensation Refund Destinations",
   "purposeNote": "Refunds follow configured tender and wallet policies while preserving a direct relationship with the original transaction.",
   "layout": {
-   "template": "form",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Venue refund policy",
+       "bindsTo": "RefundPolicy",
+       "operation": "getRefundPolicy",
+       "columns": [
+        "RefundPolicy.selfAuthoriseLimit",
+        "RefundPolicy.requiresApprovalAbove",
+        "RefundPolicy.allowPartial",
+        "RefundPolicy.refundWindowDays"
+       ],
+       "provenance": "contract orders.yaml RefundPolicy (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Self-authorise up to",
+       "bindsTo": "RefundPolicy.selfAuthoriseLimit",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml RefundPolicy.selfAuthoriseLimit (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Second user above",
+       "bindsTo": "RefundPolicy.requiresSecondUserAbove",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml RefundPolicy.requiresSecondUserAbove (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Approval above",
+       "bindsTo": "RefundPolicy.requiresApprovalAbove",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml RefundPolicy.requiresApprovalAbove (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Partial refunds",
+       "bindsTo": "RefundPolicy.allowPartial",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml RefundPolicy.allowPartial (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Refund window (days)",
+       "bindsTo": "RefundPolicy.refundWindowDays",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml RefundPolicy.refundWindowDays (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save refund policy",
+       "operation": "setRefundPolicy",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
      "components": [
       {
        "kind": "selectField",
-       "label": "Original wallet",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund Credit bucket",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Cash Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Original gift-card balance",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Original credit bucket",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "External payment method",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Rules",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Instant wallet refund",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Full refund",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Partial refund",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund amount limit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund fee",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund validity",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund-credit expiry",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Transferability",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Withdrawal eligibility",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Original tender dependency",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Original customer requirement",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Approval requirement",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Example",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Configure"
+       "label": "Refund goes to",
+       "bindsTo": "WalletRefundPolicy.defaultDestination",
+       "operation": "setWalletRefundPolicy",
+       "notes": "Original tender, wallet (instant, with the guest notified) or the guest's choice.",
+       "provenance": "contract wallet.yaml WalletRefundPolicy.defaultDestination (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "textField",
-       "label": "Wallet → AED 200 returned",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Refund policy can define"
+       "label": "Refund credit type",
+       "bindsTo": "WalletRefundPolicy.walletRefundCreditTypeId",
+       "operation": "setWalletRefundPolicy",
+       "provenance": "contract wallet.yaml WalletRefundPolicy.walletRefundCreditTypeId (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Restore to the original lots",
+       "bindsTo": "WalletRefundPolicy.restoreToOriginalLots",
+       "operation": "setWalletRefundPolicy",
+       "provenance": "contract wallet.yaml WalletRefundPolicy.restoreToOriginalLots (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Keep the original expiry",
+       "bindsTo": "WalletRefundPolicy.restoreOriginalExpiry",
+       "operation": "setWalletRefundPolicy",
+       "provenance": "contract wallet.yaml WalletRefundPolicy.restoreOriginalExpiry (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Bonus for choosing the wallet (%)",
+       "bindsTo": "WalletRefundPolicy.walletRefundBonusPercent",
+       "operation": "setWalletRefundPolicy",
+       "provenance": "contract wallet.yaml WalletRefundPolicy.walletRefundBonusPercent (defined 4 October 2026, CHG-FXS-002)"
       },
       {
        "kind": "detailPanel",
-       "label": "Read a venue's refund policy",
-       "bindsTo": "RefundPolicy",
-       "operation": "getRefundPolicy",
-       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy; wiring fix, 2 October 2026"
+       "label": "Wallet refund policy in force",
+       "bindsTo": "WalletRefundPolicy",
+       "operation": "getWalletRefundPolicy",
+       "columns": [
+        "WalletRefundPolicy.defaultDestination",
+        "WalletRefundPolicy.restoreToOriginalLots",
+        "WalletRefundPolicy.walletRefundBonusPercent"
+       ],
+       "provenance": "agreed operation `getWalletRefundPolicy`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Destination by source",
+       "bindsTo": "WalletRefundPolicy.destinationsBySource",
+       "operation": "getWalletRefundPolicy",
+       "columns": [
+        "WalletRefundPolicy.destinationsBySource.source",
+        "WalletRefundPolicy.destinationsBySource.destination"
+       ],
+       "provenance": "agreed operation `getWalletRefundPolicy`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save wallet refund policy",
+       "operation": "setWalletRefundPolicy",
+       "notes": "If-Match carries the version getWalletRefundPolicy returned; a 412 reloads the form.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The refund-to-wallet policy configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the refund-to-wallet policy untouched.",
-   "emptyFirstRun": "No refund-to-wallet policy configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "Both policies load together.",
+   "error": "Could not load. Names the policy whose read failed; the other stays editable.",
+   "emptyFirstRun": "Never saved: each section shows its defaults.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE` for `setRefundPolicy`; `WALLET_CONFIGURE` for `setWalletRefundPolicy`.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
@@ -923,6 +935,13 @@
     "purpose": "Read a venue's refund policy",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getWalletRefundPolicy",
+    "contract": "wallet",
+    "purpose": "The wallet refund policy as saved, with its version for If-Match: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
    }
   ],
   "wireframe": {
@@ -930,7 +949,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1146",
    "workshopBoard": "wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1146"
   },
-  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 79. 0 of 0 labels bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-002) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "entryState": {
    "params": [
     {
@@ -940,14 +959,7 @@
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
   },
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A per-source refund destination in the wallet refund policy (ticket, event, F&B, retail, rental, parking, membership, compensation), or a narrowed purpose.",
-    "source": "screens/P08-venue-back-office.yaml#BO-1146 | contracts/satellite/wallet.yaml#setWalletRefundPolicy"
-   }
-  ],
-  "notes": "**Two sections, gated separately (PR-6; design-note correction, 2 October 2026):** the venue refund policy (`setRefundPolicy`, region configuration) and the refund-to-wallet policy (`setWalletRefundPolicy`, wallet configuration). A user holding one sees the other read-only.",
+  "notes": "**Two sections, gated separately (PR-6; design-note correction, 2 October 2026):** the venue refund policy (`setRefundPolicy`, region configuration) and the refund-to-wallet policy (`setWalletRefundPolicy`, wallet configuration). A user holding one sees the other read-only.\n\n**Bound 4 October 2026 to RefundPolicy and WalletRefundPolicy, each read before it is saved (getWalletRefundPolicy agreed with contracts in the ledger). The 21 pack labels with no contract property left the screen** (CHG-FXS-002)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

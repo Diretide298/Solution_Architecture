@@ -535,7 +535,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.\n\n**The loyalty tile's programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)\n\n**The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "Dashboards Board.dc.html#web-017"
@@ -576,8 +576,17 @@
        "kind": "metricTile",
        "label": "Loyalty",
        "operation": "getLoyaltyPosition",
-       "notes": "Tier, points and points to the next tier; expiring points within 30 days; opens WEB-043.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+       "notes": "The guest's position in the programme from listLoyaltyProgrammes (the first active one).",
+       "provenance": "contract marketing-crm.yaml LoyaltyPosition (defined 4 October 2026, CHG-FXS-003)",
+       "bindsTo": "LoyaltyPosition"
+      },
+      {
+       "kind": "selectField",
+       "label": "Programme",
+       "bindsTo": "LoyaltyProgramme.id",
+       "operation": "listLoyaltyProgrammes",
+       "notes": "Shown only when the venue runs more than one; the first active one otherwise.",
+       "provenance": "contract marketing-crm.yaml LoyaltyProgramme.id (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -655,7 +664,7 @@
    "error": "Partial. Each tile fails independently",
    "emptyFirstRun": "A new account with no orders — offers what to do next",
    "emptyNoResults": "Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `getMyChallenges` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `WALLET_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `respondToInvitation`.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -700,6 +709,13 @@
     "contract": "marketing-crm",
     "purpose": "Loyalty tile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listLoyaltyProgrammes",
+    "contract": "marketing-crm",
+    "purpose": "The venue's loyalty programme, whose id getLoyaltyPosition takes (guest-callable, Pattern 4 group 1)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {

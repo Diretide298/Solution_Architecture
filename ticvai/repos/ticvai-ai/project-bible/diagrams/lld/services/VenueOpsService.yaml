@@ -1,17 +1,17 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 290 operations, 124 tables
+title: VenueOpsService — 291 operations, 125 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Six small domains, 290 operations, one team.** Queue, maintenance, bookable resources, venue
+why: '**Six small domains, 291 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
   is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
   none of them should not be running six idle services.'
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 290
+  operations: 291
   inAFlow: 55
   percent: 19%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   - postgres
   largestTable: queue.queue
 - schema: maintenance
-  tables: 18
+  tables: 19
   stores:
   - postgres
   largestTable: maintenance.work_order
@@ -59,7 +59,7 @@ schemas:
   largestTable: transport.pass_type
 operationsByContract:
 - contract: resources
-  count: 61
+  count: 62
   operations:
   - operation: allocateResources
     verb: POST
@@ -68,7 +68,7 @@ operationsByContract:
     permission: RESOURCE_BOOK
     offline: false
     reads: 3
-    writes: 1
+    writes: 2
   - operation: bookResource
     verb: POST
     path: /resource-bookings
@@ -155,7 +155,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 1
+    reads: 6
     writes: 1
   - operation: createResourcePackage
     verb: POST
@@ -244,6 +244,14 @@ operationsByContract:
     permission: RESOURCE_VIEW
     offline: false
     reads: 5
+    writes: 0
+  - operation: getResourceBooking
+    verb: GET
+    path: /resource-bookings/{bookingId}
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getResourceCalendar
     verb: GET
@@ -507,7 +515,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 1
+    reads: 4
     writes: 0
   - operation: updateResource
     verb: PUT
@@ -863,7 +871,7 @@ operationsByContract:
     permission: INCIDENT_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: updateMaintenancePlan
     verb: PATCH
     path: /maintenance-plans/{planId}
@@ -1268,8 +1276,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 4
+    writes: 4
   - operation: cloneReaderConfiguration
     verb: POST
     path: /readers/{readerId}/clone
@@ -1564,7 +1572,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: validateGameConfiguration
     verb: POST
@@ -1783,7 +1791,7 @@ operationsByContract:
     scope: venue
     permission: TRANSPORT_MANAGE
     offline: false
-    reads: 3
+    reads: 5
     writes: 1
   - operation: updateTransportDeparture
     verb: PATCH
@@ -1807,7 +1815,7 @@ operationsByContract:
     scope: venue
     permission: TRANSPORT_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: updateTransportStation
     verb: PATCH
@@ -1906,7 +1914,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getMediaAsset
     verb: GET
@@ -2042,8 +2050,8 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_MANAGE
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
 - contract: venue-map
   count: 22
   operations:
@@ -2173,8 +2181,8 @@ operationsByContract:
     scope: venue
     permission: VENUE_MAP_PUBLISH
     offline: false
-    reads: 6
-    writes: 3
+    reads: 7
+    writes: 4
   - operation: setPathClosure
     verb: POST
     path: /venue-maps/{mapId}/paths/{pathId}/closure
@@ -2232,8 +2240,8 @@ operationsByContract:
     scope: venue
     permission: QUEUE_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: configureQueueFeed
     verb: PUT
     path: /queue-feeds
@@ -2384,7 +2392,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: testQueueFeed
     verb: POST
@@ -2592,6 +2600,23 @@ tables:
   - validateGameConfiguration
   - validateRentalProduct
   - verifyWorkOrder
+  keys:
+    publishVenueMap:
+      role: evicts
+      resolvers: &id001
+      - venue-map
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setPathClosure:
+      role: evicts
+      resolvers: &id002
+      - venue-map
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -2608,10 +2633,28 @@ tables:
   - setPathClosure
   readBy:
   - getVenueMapGraph
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    getVenueMapGraph:
+      role: fills
+      resolvers:
+      - venue-map
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: null
+      affects: null
+    publishVenueMap:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setPathClosure:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: assets.approval
   columns: 7
   store: postgres
@@ -2725,7 +2768,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.card
-  columns: 13
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2914,6 +2957,13 @@ tables:
   parent: maintenance.incident
   writtenBy: []
   foreignWriters: null
+- table: maintenance.incident_history
+  columns: 8
+  store: postgres
+  parent: maintenance.incident
+  writtenBy:
+  - maintenance
+  foreignWriters: null
 - table: maintenance.incident_investigation_note
   columns: 8
   store: postgres
@@ -2998,7 +3048,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: queue.entry
-  columns: 22
+  columns: 25
   store: postgres
   parent: null
   writtenBy:
@@ -3235,7 +3285,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.resource
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -3305,7 +3355,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.resource_requirement
-  columns: 10
+  columns: 12
   store: postgres
   parent: resources.resource
   writtenBy:
@@ -3368,7 +3418,7 @@ tables:
   - transport
   foreignWriters: null
 - table: transport.favourite_route
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -3441,7 +3491,8 @@ tables:
   columns: 10
   store: postgres
   parent: venuemap.map
-  writtenBy: []
+  writtenBy:
+  - venue-map
   foreignWriters: null
 - table: venuemap.path
   columns: 10
@@ -3589,6 +3640,7 @@ screens:
 - P02:GST-052 Suggested Itineraries
 - P02:GST-053 Your Plan
 - P02:GST-054 AI Planner
+- P02:GST-058 Resource Availability (Cabana)
 - P02:GST-059 Plan in Progress
 - P02:GST-074 Map Booking — Cabanas & Spots
 - P02:GST-075 Book a Space by the Hour
@@ -3837,6 +3889,7 @@ screens:
 - P08:BO-588 Rental Duration, Extension & Return Analytics
 - P08:BO-589 Damage, Loss, Deposit & Exception Analytics
 - P08:BO-592 Audit, Governance & Operational Control
+- P08:BO-798 Intent & Knowledge Management
 - P08:BO-854 Resource Management Command Center
 - P08:BO-855 Resource Type Configuration
 - P08:BO-856 Resource Category Management
@@ -3903,8 +3956,10 @@ screens:
 - P08:BO-952 Executive Resource Intelligence & AI Improvement Center
 - P08:BO-955 Sections & Zones
 - P08:BO-990 Maintenance & Out of Service
+- P09:ADM-016 White-Label Branding Management
 - P12:SUP-013 Case Investigation & Resolution Workspace
 - P13:CMS-002 Brand Kit
+- P13:CMS-004 Logo & Assets
 - P13:CMS-010 Media Library
 - P13:CMS-061 Digital Asset Management Command Center
 - P13:CMS-062 Central Digital Asset Library

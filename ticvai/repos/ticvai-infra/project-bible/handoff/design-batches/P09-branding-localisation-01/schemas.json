@@ -852,7 +852,10 @@
   }
  },
  "HomepageLayout": {
-  "x-ticvai-persistence": "whitelabel.homepage_section",
+  "x-ticvai-persistence": "whitelabel.homepage_layout + whitelabel.homepage_section",
+  "x-ticvai-retired-columns": [
+   "whitelabel.homepage_section.homepage_section_id"
+  ],
   "type": "object",
   "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
@@ -1033,6 +1036,237 @@
    "type": "string"
   }
  },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive",
+   "model3d"
+  ],
+  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -1085,7 +1319,10 @@
   }
  },
  "NavigationConfig": {
-  "x-ticvai-persistence": "whitelabel.navigation_item",
+  "x-ticvai-persistence": "whitelabel.navigation_config + whitelabel.navigation_item",
+  "x-ticvai-retired-columns": [
+   "whitelabel.navigation_item.navigation_item_id"
+  ],
   "type": "object",
   "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [
@@ -2095,6 +2332,73 @@
    "text": {
     "type": "string",
     "pattern": "^#[0-9A-Fa-f]{6}$"
+   }
+  }
+ },
+ "UploadTicket": {
+  "x-ticvai-persistence": "assets.media_upload",
+  "type": "object",
+  "required": [
+   "uploadId",
+   "uploadUrl",
+   "method",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "uploadId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "uploadUrl": {
+    "type": "string",
+    "description": "Signed. PUT the file here, then confirm with `/complete`."
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "PUT",
+     "POST"
+    ]
+   },
+   "headers": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "maxSizeBytes": {
+    "type": "integer"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"
    }
   }
  },

@@ -35,7 +35,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.\n\n**Hosted with TICVAI: platform staff may publish the tenant's site under the open grant (decided 2 October 2026 by Chinmay, DEC-144); self-hosted: Generate site package.** Publishing here is simulate (Create preview) then publish; an optional review step applies when the venue switched it on (DEC-156).",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.\n\n**Hosted with TICVAI: platform staff may publish the tenant's site under the open grant (decided 2 October 2026 by Chinmay, DEC-144); self-hosted: Generate site package.** Publishing here is simulate (Create preview) then publish; an optional review step applies when the venue switched it on (DEC-156).\n\n**Asset ids (the brand identity and app icon fields) come from the media library (searchMedia) or an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listConfigVersions` reads the population and `getAppIcons` reads one of them — list, select, act",
@@ -104,6 +104,27 @@
        "impliedBy": "publishTenantConfig",
        "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "Media library",
+       "bindsTo": "MediaAsset",
+       "operation": "searchMedia",
+       "columns": [
+        "MediaAsset.filename",
+        "MediaAsset.kind",
+        "MediaAsset.contentType"
+       ],
+       "notes": "Picking one fills the brand identity and app icon fields with its id.",
+       "provenance": "contract assets.yaml MediaAsset (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Upload new",
+       "bindsTo": "MediaAsset.id",
+       "operation": "createUpload",
+       "notes": "createUpload, the file PUT, completeUpload; the asset id fills the field being edited.",
+       "provenance": "contract assets.yaml MediaAsset.id (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -252,7 +273,7 @@
    "error": "Could not load. Names which read failed and leaves the white-label branding untouched.",
    "emptyFirstRun": "No white-label branding yet. Offers Create preview (`createPreview`).",
    "emptyNoResults": "Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -371,6 +392,27 @@
     "purpose": "Follow the generated package until it is ready",
     "trigger": "onLoad",
     "provenance": "design-note correction, 2 October 2026 (ADM-016)"
+   },
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "The media library, to pick an existing asset by name",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "createUpload",
+    "contract": "assets",
+    "purpose": "Upload a new asset",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "completeUpload",
+    "contract": "assets",
+    "purpose": "Finish the upload once the file PUT succeeds; the asset id fills the field",
+    "trigger": "background",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -399,6 +441,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConfigVersions` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "uploadId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `createUpload`."
     }
    ]
   },

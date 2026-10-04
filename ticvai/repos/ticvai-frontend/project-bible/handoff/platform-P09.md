@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 211 |
-| Operations | 270 |
-| Contracts | 14 |
+| Operations | 276 |
+| Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 105 |
+| Operations with no screen | 104 |
 | Waves | wave1 28 · wave2 13 · wave3 170 |
 
 ## Gaps
 
-### 105 operations with no screen here
+### 104 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -47,6 +47,7 @@
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
+| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
@@ -59,8 +60,7 @@
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
-| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
-| … | | | 65 more |
+| … | | | 64 more |
 
 ### 8 modules split across waves
 
@@ -99,7 +99,7 @@
 |---|---|---|---|---|---|
 | `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 11 | yes |
 | `ADM-002` | Platform Dashboard | Overview & Health | 1 | 5 | yes |
-| `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 1 | 7 | yes |
+| `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 1 | 8 | yes |
 | `ADM-004` | Platform Audit Log | Overview & Health | 2 | 6 | yes |
 | `ADM-005` | Tenant Directory | Tenants & Licensing | 1 | 17 | yes |
 | `ADM-006` | Tenant Hierarchy Explorer | Tenants & Licensing | 1 | 10 | yes |
@@ -112,12 +112,12 @@
 | `ADM-013` | Tenant Performance Monitor | Overview & Health | 2 | 4 | yes |
 | `ADM-014` | Auto-Scaling Configuration | Infrastructure & Resilience | 3 | 5 | yes |
 | `ADM-015` | API Rate Limit & Quota Management | Tenants & Licensing | 3 | 13 | yes |
-| `ADM-016` | White-Label Branding Management | Branding & Localisation | 1 | 16 | yes |
+| `ADM-016` | White-Label Branding Management | Branding & Localisation | 1 | 19 | yes |
 | `ADM-017` | Domain & Certificate Management | Branding & Localisation | 1 | 10 | yes |
 | `ADM-018` | Interface Languages | Branding & Localisation | 1 | 5 | yes |
 | `ADM-019` | Global Configuration & Defaults | Branding & Localisation | 2 | 5 | yes |
 | `ADM-020` | Platform User Directory | Access & Identity | 1 | 7 | yes |
-| `ADM-021` | Platform Role Management | Access & Identity | 1 | 5 | yes |
+| `ADM-021` | Platform Role Management | Access & Identity | 1 | 7 | yes |
 | `ADM-022` | Release & Version Management | Releases & Environments | 2 | 7 | yes |
 | `ADM-023` | Staging Promotion & Approval | Releases & Environments | 2 | 5 | yes |
 | `ADM-024` | Release Notification Composer | Releases & Environments | 3 | 3 | yes |
@@ -188,7 +188,7 @@
 | `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-419` | Provisioning Command Center | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-420` | Tenant & Organization Provisioning | Tenants & Licensing | 3 | 5 | yes |
-| `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 4 | yes |
+| `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 5 | yes |
 | `ADM-422` | Administrator & Security Initialization | Tenants & Licensing | 3 | 7 | yes |
 | `ADM-423` | License & Entitlement Activation | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-424` | Module Activation & Dependency Validation | Tenants & Licensing | 1 | 7 | yes |
@@ -206,7 +206,7 @@
 | `ADM-457` | AI Usage Forecast & Commercial Optimization | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-458` | License, Metering & Commercial Synchronization Audit | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-459` | Billing & Commercial Command Center | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-460` | Billing Calculation & Charge Breakdown | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-460` | Billing Calculation & Charge Breakdown | Tenants & Licensing | 3 | 3 | yes |
 | `ADM-461` | Consumption Reconciliation & Billing Approval | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-462` | Invoice & Payment Management | Tenants & Licensing | 3 | 4 | yes |
 | `ADM-463` | Subscription & Commercial Change Management | Tenants & Licensing | 3 | 2 | yes |
@@ -249,10 +249,10 @@
 | `ADM-500` | Forecast Configuration & Forecasting Strategy | Analytics | 1 | 6 | yes |
 | `ADM-501` | Forecast Data & Signal Configuration | Analytics | 3 | 6 | yes |
 | `ADM-502` | Attendance & Visitation Forecast | Analytics | 3 | 6 | yes |
-| `ADM-503` | Ticket, Product & Timeslot Demand Forecast | Analytics | 3 | 4 | yes |
-| `ADM-504` | Channel & Booking Pace Forecast | Analytics | 3 | 4 | yes |
-| `ADM-505` | Revenue & Commercial Forecast | Analytics | 3 | 4 | yes |
-| `ADM-506` | Forecast Drivers, Confidence & Explainability | Analytics | 1 | 7 | yes |
+| `ADM-503` | Ticket, Product & Timeslot Demand Forecast | Analytics | 3 | 6 | yes |
+| `ADM-504` | Channel & Booking Pace Forecast | Analytics | 3 | 5 | yes |
+| `ADM-505` | Revenue & Commercial Forecast | Analytics | 3 | 6 | yes |
+| `ADM-506` | Forecast Drivers, Confidence & Explainability | Analytics | 1 | 8 | yes |
 | `ADM-507` | Forecast Scenario & What-If Simulator | Analytics | 3 | 6 | yes |
 | `ADM-508` | Forecast Accuracy, Review & Publication Center | AI | 1 | 8 | yes |
 | `ADM-509` | Operational Forecasting Command Center | Analytics | 3 | 5 | yes |

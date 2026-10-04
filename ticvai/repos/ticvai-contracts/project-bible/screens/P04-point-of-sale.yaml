@@ -2083,9 +2083,10 @@ screens:
   capability: C81
   implementation:
     app: venue-pos
-    route: /sell/sell-timed-entry
-    component: apps/venue-pos/src/routes/sell/SellTimedEntryForm.tsx
+    route: /sell/sell-ticket-catalogue/timedentry
+    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
+    sectionOf: POS-002
   navigation:
     entryFrom:
     - POS-002
@@ -2133,17 +2134,18 @@ screens:
 
 
     **Drawn as a step of the POS-002 drawer, not a page** (the 3 August decision, kept by v2; design-notes
-    correction ticketing-guest POS-003; CHG-SPO-015).'
+    correction ticketing-guest POS-003; CHG-SPO-015).
+
+
+    **Built as step two of the POS-002 sale drawer (date, session and ticket quantities), not a page of
+    its own: the plan''s default of 4 October 2026, carried by the tickets (block-a-extra-tasks.json screenNotes),
+    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
     list, select, act'
   purpose: Pick a date, a session and ticket quantities.
   gaps:
-  - why: '**This screen is the full-page navigation the 3 August workshop replaced.** Date and session
-      selection is now step two of the drawer on `POS-002`. Same decision as `POS-004`, same reason for
-      recording it rather than acting on it.'
-    source: minute 2026-08-03 §Point-of-Sale (Cashier) UI Walkthrough
   - operation: relinquishInventoryHold
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-018): The hold is taken when the line is added; the cashier
@@ -2400,9 +2402,10 @@ screens:
   capability: C51
   implementation:
     app: venue-pos
-    route: /sell/sell-seat-map
-    component: apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx
+    route: /sell/sell-ticket-catalogue/seatmap
+    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
+    sectionOf: POS-002
   navigation:
     entryFrom:
     - POS-002
@@ -2454,7 +2457,12 @@ screens:
     run a cash shift.** **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3a`. **The frame names
     this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail
     boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board
-    that says what it draws removes the guess entirely.**'
+    that says what it draws removes the guess entirely.**
+
+
+    **Built as step three of the POS-002 sale drawer (section, then seats), not a page of its own: the
+    plan''s default of 4 October 2026, carried by the tickets (block-a-extra-tasks.json screenNotes),
+    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)'
   density: touchLarge
   boardFrames:
   - Seat Board 3.dc.html#seat-3a
@@ -2463,11 +2471,6 @@ screens:
     about that one thing'
   purpose: Choose specific seats for a seated event.
   gaps:
-  - why: '**This screen is the full-page navigation the 3 August workshop replaced.** Seat selection is
-      now step three of the drawer on `POS-002`, which is where the cashier stays. Whether this survives
-      as a screen of its own is a decision nobody has made: a seat map may still be wanted full-screen
-      on a tablet, and a screen id is never reissued, so it is recorded rather than deleted.'
-    source: minute 2026-08-03 §Point-of-Sale (Cashier) UI Walkthrough
   - operation: evaluateApprovalRequirement
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-018): A till does not edit performances, and approval is asked
@@ -3968,7 +3971,11 @@ screens:
     till, and is resolved by a supervisor with their PIN on any till (accept, or ask for a recount) or
     in the daily cash reconciliation (BO-043). The supervisor''s close is on this screen: `closeShift`
     behind SHIFT_CLOSE_OTHER and the supervisor''s PIN, any till (pre-apply round; CHG-SPO-021; check-finance-rules
-    admits closeShift on a till only from a supervisor''s control).'
+    admits closeShift on a till only from a supervisor''s control).
+
+
+    **A supervisor finds a shift waiting on another till with listShifts (status pendingVariance), bound
+    4 October 2026 (F32: accept or reject from whichever till they are at)** (CHG-FXS-003)'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3f
@@ -4062,6 +4069,18 @@ screens:
       - kind: timeline
         notes: No-sale count, manual discounts, voids — the numbers a supervisor reviews
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Shifts waiting at any till
+        bindsTo: Shift
+        operation: listShifts
+        columns:
+        - Shift.principalDisplayName
+        - Shift.status
+        - Shift.openedAt
+        notes: Query status pendingVariance; selecting one gives accept, reject and close its shiftId,
+          and getShiftCountLines its lines.
+        permission: OVERSHORT_ACCEPT
+        provenance: contract shift.yaml Shift (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: item
       components:
@@ -4277,6 +4296,12 @@ screens:
       pre-apply round; DEC-059; CHG-CSP-012, CHG-SPO-021)
     invalidates:
     - listCashMovements
+  - operationId: listShifts
+    contract: shift
+    purpose: 'Shifts of the venue waiting for a supervisor (status pendingVariance) or a recount, on any
+      till: F32''s ''from whichever till they are at'''
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: shiftId
@@ -7298,7 +7323,11 @@ screens:
 
 
     Workstation and shift are this till''s by default and are picked, never typed as ids (design-notes
-    correction finance-insights POS-020; CHG-SPO-015).'
+    correction finance-insights POS-020; CHG-SPO-015).
+
+
+    **The approval inbox lists approval requests with listApprovalRequests (4 October 2026); alerts carry
+    no requestId, so decisions come from this list** (CHG-FXS-003)'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3e
@@ -7343,6 +7372,13 @@ screens:
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Approval requests
+        bindsTo: ApprovalRequest
+        operation: listApprovalRequests
+        notes: Query assignedToMe and status pending; selecting one gives Decide its requestId. Alerts
+          stay in their own table.
+        provenance: contract approvals.yaml ApprovalRequest (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: item
       components:
@@ -7395,9 +7431,10 @@ screens:
     emptyNoResults: Nothing matches the filter on status, severity, workstationId, shiftId, itemId and
       the shift exceptions alerts are still there. Names the active filter and offers to clear it.
     emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show
-      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
-      what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`;
+      this screen, and names that permission (the screen''s other reads need `APPROVAL_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`;
       `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`.'
     offline: '**The till keeps taking money; this screen does not keep showing alerts.** `listAlerts`
       reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading
@@ -7432,6 +7469,12 @@ screens:
     trigger: onAction
     invalidates:
     - listAlerts
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: The approval requests waiting for this supervisor (assignedToMe, status pending); each row's
+      id is what decideApprovalRequest takes
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: workstationId
@@ -7610,7 +7653,11 @@ screens:
     **Outlet decisions of 2 October** (Chinmay; CHG-SPO-004): payment timing is an outlet setting, send
     first or pay first (DEC-064, refining audit R261 per outlet); a dish can carry a daily count that
     sells it out at zero (DEC-194); and F&B owns its prices in its own catalogue (DEC-034), so the till
-    prices a dish from the guest menu, never from the ticketing catalogue.'
+    prices a dish from the guest menu, never from the ticketing catalogue.
+
+
+    **Outlet.paymentTiming is read with getOutlet (4 October 2026); the Block A rule ''payment timing
+    follows POS-021: pay first or send first, both configurations'' decides which button leads** (CHG-FXS-003)'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listMenus` reads the population and `getGuestMenu` reads one of them — list, select,
@@ -7648,6 +7695,16 @@ screens:
           Charge. Pay first: Charge, and the order reaches the kitchen only once paid. The button order
           and labels follow `Outlet.paymentTiming`; the header never says "kitchen fires on payment" on
           a send-first outlet.'
+      - kind: detailPanel
+        label: How this outlet takes payment
+        bindsTo: Outlet
+        operation: getOutlet
+        columns:
+        - Outlet.name
+        - Outlet.paymentTiming
+        notes: 'payFirst: Pay opens POS-005, then the order goes to the kitchen. sendFirst: Send to kitchen,
+          payment at the end (POS-022).'
+        provenance: contract tenancy.yaml Outlet (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -7688,7 +7745,11 @@ screens:
     emptyFirstRun: '**No menu published for this outlet.** Names the back-office screen that publishes
       one rather than showing an empty board.'
     emptyNoResults: Nothing matches this section.
-    emptyNoAccess: You do not have permission to sell at this outlet.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `getOutlet` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`;
+      `PRODUCT_CONFIGURE` for `setItemAvailability`.'
     offline: '**Selling continues from the cached menu.** 86 changes made while offline arrive on sync,
       which is why an item can be sold that the kitchen has just marked unavailable — the kitchen refuses
       it and the guest is refunded at the counter.'
@@ -7713,6 +7774,12 @@ screens:
     contract: fnb
     purpose: Mark an item available or eighty-sixed
     trigger: onAction
+  - operationId: getOutlet
+    contract: tenancy
+    purpose: The outlet's paymentTiming (pay first or send first, POS-021 decision), which decides whether
+      Pay or Send to kitchen comes first
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: workstationId
@@ -7724,9 +7791,6 @@ screens:
     - name: itemId
       from: deepLink
       optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
-        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
-        it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
       signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
       something a cashier picks.'
@@ -8153,10 +8217,9 @@ screens:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       carries:
-      - orderId
       - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-023 holds orderId, promotionId, so an edge into it carries them
+        and POS-023 holds promotionId, so an edge into it carries them
     uses:
     - posPrimaryRail
     - posSaleToPayment
@@ -8167,7 +8230,14 @@ screens:
 
     **Offline: the design follows the contract until one rule is chosen** (design-notes correction fnb-retail
     POS-023; CHG-SPO-016): `createRetailSale` is not offline-capable, so the offline state says a retail
-    sale needs the link. The question of offline overselling (DI-075 against DI-294) is logged in CHG-SPO-020.'
+    sale needs the link. The question of offline overselling (DI-075 against DI-294) is logged in CHG-SPO-020.
+
+
+    **createRetailSale left 4 October 2026: a merchandise sale at the till is a cart line (addCartLine),
+    charged with everything else on POS-005 (one cart, one order, one receipt, 14 August)** (CHG-FXS-003)
+
+
+    **The createRetailSale form left with the operation; the search scans or looks up by barcode** (CHG-FXS-003)'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
@@ -8181,7 +8251,8 @@ screens:
       components:
       - kind: searchField
         label: Scan or search
-        provenance: carried from the previous definition
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+        operation: lookupMerchandise
       - kind: dataTable
         label: Basket
         provenance: carried from the previous definition
@@ -8215,10 +8286,6 @@ screens:
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
       - kind: secondaryButton
-        label: Create retail sale
-        operation: createRetailSale
-        provenance: contract retail.yaml POST /retail-sales
-      - kind: secondaryButton
         label: Evaluate promotions
         operation: evaluatePromotions
         provenance: contract promotions.yaml POST /promotions/evaluate
@@ -8228,7 +8295,11 @@ screens:
     emptyFirstRun: '**No merchandise published to this outlet.**'
     emptyNoResults: Nothing matches. **A scan that finds nothing is a barcode not in the catalogue** —
       said plainly, because the cashier will otherwise scan it four more times.
-    emptyNoAccess: You do not have permission to sell at this store.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `lookupMerchandise` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for
+      `evaluatePromotions`.'
     offline: '**A retail sale needs the link** (`createRetailSale` is not offline-capable). The tiles
       stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail
       POS-023; the offline-overselling rule is an open question, CHG-SPO-020.)'
@@ -8244,10 +8315,6 @@ screens:
   - operationId: addCartLine
     contract: orders
     purpose: Add something
-    trigger: onAction
-  - operationId: createRetailSale
-    contract: retail
-    purpose: Sell merchandise
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
@@ -8320,27 +8387,6 @@ screens:
       - parentLineId
       - attributes
     provenance: client-verified
-  - id: formCreateRetailSale
-    component: modal
-    trigger: Create retail sale
-    body: '**Collects what `createRetailSale` sends before it is called.** Required: `id`, `outletId`,
-      `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `couponCodes`. Dismissing sends nothing;
-      the screen behind is unchanged.'
-    bindsTo: CreateRetailSaleRequest
-    confirm:
-      label: Create retail sale
-      operation: createRetailSale
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - outletId
-      - lines
-      - recordedAt
-      - shiftId
-      - subjectId
-      - couponCodes
-    provenance: client-verified
   - id: formEvaluatePromotions
     component: modal
     trigger: Evaluate promotions
@@ -8397,7 +8443,11 @@ screens:
 
     **A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops
     push together, which is why `setTableLayout` and `setTableCombinations` belong within reach of the
-    floor and not only in the back office.'
+    floor and not only in the back office.
+
+
+    **The combinations are read with listTableCombinations before the whole-set PUT (added by the contracts
+    agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)'
   density: touchLarge
   densityReason: '**A tablet on a POS platform is still a POS platform.**  refused comfortable and was
     right: the same person configuring the floor is the person who was selling on it ten minutes ago,
@@ -8419,9 +8469,11 @@ screens:
         notes: Each table has Remove (marks it Out of service, DEC-067) rather than Delete.
       - kind: detailPanel
         label: Combinations
-        notes: '**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step,
-          a service run. A host knows which pairs work and a floor plan does not.'
-        provenance: carried from the previous definition
+        notes: Saved with setTableCombinations as the whole set read here.
+        provenance: agreed operation `listTableCombinations`, runs/fix-s12/LEDGER.md (defined 4 October
+          2026, CHG-FXS-003)
+        bindsTo: TableCombination
+        operation: listTableCombinations
       - kind: multiSelect
         label: 86 an item
         provenance: carried from the previous definition
@@ -8463,8 +8515,11 @@ screens:
     error: Could not load configuration. **Selling is unaffected.**
     emptyFirstRun: '**A new outlet with no layout.** The one action that draws the first table.'
     emptyNoResults: Nothing matches.
-    emptyNoAccess: '**You are signed in as a cashier.** Configuration needs a manager role — ADR-0002
-      makes that the person, not the device, so signing in again on this same till is the way through.'
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`,
+      `setTableCombinations`, `setItemAvailability`.'
     offline: '**Configuration is refused offline.** A table layout edited on two disconnected tablets
       is two layouts, and the room only has one.'
   apis:
@@ -8490,6 +8545,12 @@ screens:
     purpose: List the outlet's menu items for the '86 an item' picker
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listTableCombinations
+    contract: fnb
+    purpose: The combinations already declared, read before the whole-set save (added by the contracts
+      agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: workstationId
@@ -8660,7 +8721,11 @@ screens:
   notes: '**P04 had no entry surface.** Eleven of its screens declared `entryFrom: POS-001`, which is
     the sign-in — so the model said a cashier signs in and is somehow already inside a sale. The prototype''s
     `home` is the missing step, and it is what makes the rail in `posPrimaryRail` mean something: **twelve
-    screens named that set and shared no destination**, because the destination they share is this one.'
+    screens named that set and shared no destination**, because the destination they share is this one.
+
+
+    **Reopen acts on the till''s last closed shift, read with listShifts (4 October 2026): the shift on
+    screen is open or suspended, and reopenShift takes a closed one** (CHG-FXS-003)'
   density: touchLarge
   pattern: dashboard
   patternReason: '`getWorkstationShift` reads the one thing that is true right now and the tiles read
@@ -8703,6 +8768,15 @@ screens:
       - kind: banner
         label: Alerts for this workstation
         bindsTo: Alert
+      - kind: detailPanel
+        label: Last closed shift
+        bindsTo: Shift
+        operation: listShifts
+        columns:
+        - Shift.principalDisplayName
+        - Shift.status
+        - Shift.openedAt
+        provenance: contract shift.yaml Shift (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -8712,7 +8786,9 @@ screens:
       - kind: secondaryButton
         label: Reopen shift
         operation: reopenShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/reopen; wiring fix, 2 October 2026
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+        notes: 'Shown only when the till has no open shift: reopens the till''s last closed shift from
+          listShifts, with the supervisor''s PIN (F32).'
   states:
     loading: The saved till home.
     error: Could not load. Names which read failed and leaves the till home untouched.
@@ -8720,8 +8796,12 @@ screens:
       layout is set per outlet in the back office (with a till override on POS-016) and names who at the
       venue configures it, and the launcher shows only what needs no board (design-notes correction platform-foundation
       POS-025).'
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift`
+      requires to show this screen, and names that permission (the screen''s other reads need `DEVICE_VIEW`,
+      `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that
+      reads as *there is no data* and sends somebody to support with the wrong question. A caller who
+      can see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `SHIFT_REOPEN` for `reopenShift`; `SHIFT_SUSPEND` for `suspendShift`.'
     offline: '**Working from the local journal.** The tiles show what this workstation knows; the queue
       and alerts are last-known and say so.'
     denied: Names the permission the operator does not hold and who at this venue does. **Never a disabled
@@ -8759,6 +8839,12 @@ screens:
     purpose: Supervisor reopens a shift closed in error (PIN step-up, R144)
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: listShifts
+    contract: shift
+    purpose: This till's last closed shift (query workstationId, status closed), the one a supervisor
+      may reopen
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: workstationId
@@ -8879,7 +8965,18 @@ screens:
     Whether a venue auto-issues is a template setting (`FinTaxInvoiceTemplate.autoIssueOnPayment`, off
     by default), but the only read of it (`listTaxInvoiceTemplates`) is tenant-scoped under LEDGER_VIEW,
     which a till does not hold; a till-scoped read is logged as a contract gap (open entry CHG-SPO-019;
-    design-notes correction finance-insights POS-026).'
+    design-notes correction finance-insights POS-026).
+
+
+    **The order and what was issued against it are read with getOrder (4 October 2026): Order.lines[]
+    carries each line''s entitlementIds, which Reissue entitlement acts on** (CHG-FXS-003)
+
+
+    **The order''s tax invoice is found with listTaxInvoices?orderId when no invoiceId is carried (contracts,
+    ledger, 4 October 2026)** (CHG-FXS-003)
+
+
+    **Reprint and reissue collect their bodies in their own forms (delivery; reason)** (CHG-FXS-003)'
   density: touchLarge
   pattern: detail
   patternReason: One order is named and acted on — detail, not a list
@@ -8893,19 +8990,48 @@ screens:
       - kind: detailPanel
         label: The order, as it was sold
         bindsTo: Order
+        operation: getOrder
+        columns:
+        - Order.orderNumber
+        - Order.status
+        - Order.grossAmount
+        - Order.createdAt
+        provenance: contract orders.yaml Order (defined 4 October 2026, CHG-FXS-003)
       - kind: dataTable
         label: What was issued against it
-        bindsTo: Entitlement
+        bindsTo: Order.lines
+        operation: getOrder
+        columns:
+        - OrderLine.variantId
+        - OrderLine.holderName
+        - OrderLine.quantity
+        - OrderLine.entitlementIds
+        notes: Each line with the entitlements issued for it; choosing one gives Reissue its entitlementId.
+        provenance: contract orders.yaml Order.lines (defined 4 October 2026, CHG-FXS-003)
       - kind: primaryButton
         label: Reprint receipt
+        operation: reprintReceipt
+        provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: secondaryButton
         label: Reissue entitlement
+        operation: reissueEntitlement
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: dataTable
+        label: Tax invoices
+        bindsTo: FinTaxInvoice
+        operation: listTaxInvoices
+        notes: Query orderId; opening one shows it (getTaxInvoice) and offers the PDF.
+        provenance: contract finance.yaml FinTaxInvoice (defined 4 October 2026, CHG-FXS-003)
   states:
     loading: The saved receipt.
     error: Could not load. Names which read failed and leaves the receipt untouched.
     emptyFirstRun: No receipt yet. Carries the create action and says what the till does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `getTaxInvoice` requires to show
+      this screen, and names that permission (the screen''s other reads need `ORDER_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`; `ORDER_EXCHANGE`
+      for `reissueEntitlement`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`.'
     offline: '**Reprint is available offline; reissue is not.** A reissue changes what the gate will admit,
       and the gate cannot be told from here.'
   apis:
@@ -8936,6 +9062,16 @@ screens:
     purpose: Download the invoice / credit memo PDF
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getOrder
+    contract: orders
+    purpose: The order as it was sold, with each line's entitlementIds
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: The order's simplified tax invoice when the entry carries no invoiceId (query orderId)
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: orderId
@@ -8972,6 +9108,38 @@ screens:
       view: After a successful payment (receipt screen); reprint via Home F4 or cart 'History' -> 'Reprint'
       differences: The post-payment receipt is drawn and answers the POS-005 exitTo gap. Reprint is only
         a toast from the hot key or History, and there is no entitlement reissue (reissueEntitlement).
+  overlays:
+  - id: formReprintReceipt
+    component: modal
+    trigger: Reprint receipt
+    body: '**Collects what `reprintReceipt` sends before it is called.** Required: `delivery` (print,
+      email, SMS or WhatsApp; print by default). Optional: `destination` (asked for anything but print).
+      Dismissing sends nothing.'
+    confirm:
+      label: Reprint receipt
+      operation: reprintReceipt
+    dismiss:
+      label: Cancel
+      discards:
+      - delivery
+      - destination
+    provenance: contract retail.yaml POST /retail-sales/{saleId}/reprint (4 October 2026, CHG-FXS-003)
+  - id: formReissueEntitlement
+    component: modal
+    trigger: Reissue entitlement
+    body: '**Collects what `reissueEntitlement` sends before it is called.** Required: `reason` (venue
+      closure, weather, goodwill, system error, medical issue, bereavement). Optional: `validFrom`, `note`.
+      Dismissing sends nothing.'
+    confirm:
+      label: Reissue entitlement
+      operation: reissueEntitlement
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+      - validFrom
+      - note
+    provenance: contract orders.yaml POST /entitlements/{entitlementId}/reissue (4 October 2026, CHG-FXS-003)
 - id: POS-027
   name: Guest Lookup
   module: Sell
@@ -9001,7 +9169,16 @@ screens:
   notes: '**`identifyGuest` was called from the catalogue and had no screen of its own**, so the model
     could attach a guest to a sale and could not say how the cashier found them. The prototype makes lookup
     a surface, which is also where the wallet and open reservations become visible before the sale rather
-    than after it.'
+    than after it.
+
+
+    **Attach to sale is the edge to POS-002 carrying subjectId (4 October 2026): the sale screen takes
+    subjectId and the order it creates carries it; search and scan are bound to searchGuests and identifyGuest**
+    (CHG-FXS-003)
+
+
+    **The search box is a query input (searchGuests search, identifyGuest token), not a bound field**
+    (CHG-FXS-003)'
   density: touchLarge
   pattern: listDetail
   patternReason: '`searchGuests` reads the population and `identifyGuest` reads one of them — list, select,
@@ -9015,16 +9192,31 @@ screens:
       components:
       - kind: searchField
         label: Name, phone, booking reference or scan a wristband
+        operation: searchGuests
+        notes: Typed text searches searchGuests (query search); a scanned wristband, card or QR goes to
+          identifyGuest, which answers with the guest and their live entitlements in one call.
+        provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: dataTable
         label: Matching guests
         bindsTo: GuestProfile
+        operation: searchGuests
+        provenance: contract marketing-crm.yaml GuestProfile (defined 4 October 2026, CHG-FXS-003)
       - kind: detailPanel
         label: Wallet, passes and open reservations
-        bindsTo: GuestProfile
+        bindsTo: GuestIdentification
         notes: Open reservations are drawn on the guest card before the sale (design-notes correction
           customer-marketing POS-027; the prototype omits them).
+        operation: identifyGuest
+        columns:
+        - GuestIdentification.subjectId
+        - GuestIdentification.entitlements
+        - GuestIdentification.matchedOn
+        provenance: contract marketing-crm.yaml GuestIdentification (defined 4 October 2026, CHG-FXS-003)
       - kind: primaryButton
         label: Attach to sale
+        notes: 'Returns to the sale (POS-002) carrying the guest''s subjectId; the order is then created
+          with that subjectId. No call of its own: the sale carries the guest.'
+        provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: detailPanel
         label: Loyalty
         bindsTo: LoyaltyPosition
@@ -9485,7 +9677,22 @@ screens:
 
 
     **Refined in the F&B and retail process** (design-notes correction venue-operations POS-029; CHG-SPO-015):
-    the order queue is the counter''s F&B queue (module Sell), not a ride queue.'
+    the order queue is the counter''s F&B queue (module Sell), not a ride queue.
+
+
+    **Stage changes bound 4 October 2026: accept (acceptFnbOrder) and ready (setKitchenTicketStatus);
+    dispatch and delivered are asked of contracts in the ledger** (CHG-FXS-003)
+
+
+    **Accept and Mark ready collect their bodies (estimated ready time; ticket status) and Mark ready
+    acts on the selected order''s ticketId (check-screens, check-screen-wiring)** (CHG-FXS-003)
+
+
+    **Accept collects its body in its own form (formAcceptFnbOrder)** (CHG-FXS-003)
+
+
+    **After ready the order is handed over with recordOrderHandover (contracts: FnbOrderStatus served,
+    collected, delivered; no dispatched stage)** (CHG-FXS-003)'
   density: touchLarge
   pattern: board
   patternReason: Orders move between named stages and are acted on in place — a board
@@ -9504,6 +9711,9 @@ screens:
         bindsTo: FnbOrder
       - kind: primaryButton
         label: Advance stage
+        notes: 'Received: acceptFnbOrder. Preparing: setKitchenTicketStatus ready. Ready: recordOrderHandover
+          (served, collected or delivered).'
+        provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: cardList
         label: Guest status board — the mirror of the kitchen display's
         bindsTo: FnbOrder
@@ -9514,13 +9724,34 @@ screens:
       - kind: cardList
         label: Feed health
         bindsTo: QueueFeed
+      - kind: secondaryButton
+        label: Accept order
+        operation: acceptFnbOrder
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: secondaryButton
+        label: Mark ready
+        operation: setKitchenTicketStatus
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: selectField
+        label: Ticket status
+        bindsTo: KitchenTicket.status
+        operation: setKitchenTicketStatus
+        notes: ready by default when Mark ready is pressed.
+        provenance: contract fnb.yaml KitchenTicket.status (defined 4 October 2026, CHG-FXS-003)
+      - kind: secondaryButton
+        label: Hand over
+        operation: recordOrderHandover
+        provenance: defined 4 October 2026 (CHG-FXS-003)
   states:
     loading: The saved queue.
     error: Could not load. Names which read failed and leaves the queue untouched.
     emptyFirstRun: No queue yet. Offers no create action — this screen declares no operation that makes
       one and says what the till does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `acceptFnbOrder`,
+      `setKitchenTicketStatus`, `recordOrderHandover`.'
     offline: '**The queue is the one thing that must never look current when it is not.** Offline, every
       card carries the time it was last known and the advance action is withheld.'
   apis:
@@ -9528,12 +9759,36 @@ screens:
     contract: fnb
     purpose: Every order this outlet is working
     trigger: onLoad
+  - operationId: acceptFnbOrder
+    contract: fnb
+    purpose: 'Received to preparing: the outlet takes the order'
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: setKitchenTicketStatus
+    contract: fnb
+    purpose: 'Preparing to ready: advance the order''s kitchen ticket'
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: recordOrderHandover
+    contract: fnb
+    purpose: 'Hand the order over: served, collected or delivered (contracts, ledger: these are the stages
+      after ready)'
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: workstationId
       from: session
     - name: outletId
       from: session
+    - name: orderId
+      from: navigation
+      optional: true
+      notes: The order selected on the board, for Accept and Hand over.
+    - name: ticketId
+      from: navigation
+      optional: true
+      notes: The selected order's kitchen ticket (KitchenTicket for the order), for Mark ready.
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: fnb
@@ -9583,6 +9838,35 @@ screens:
       getQueue, getQueueFeedHealth) sat on an F&B order board; an outlet''s order flow reads listFnbOrders
       (ADR-0012; design-notes correction venue-operations POS-029).'
     source: contracts/satellite/queue.yaml#listQueueEntries | ADR-0012 | R254
+  overlays:
+  - id: formAcceptFnbOrder
+    component: modal
+    trigger: Accept order
+    body: '**Collects what `acceptFnbOrder` sends before it is called.** Required: `recordedAt` (now,
+      set by the till). Optional: `estimatedReadyAt` (now plus the outlet''s target prep time by default),
+      `stationId`. Dismissing sends nothing.'
+    confirm:
+      label: Accept order
+      operation: acceptFnbOrder
+    dismiss:
+      label: Cancel
+      discards:
+      - estimatedReadyAt
+      - stationId
+    provenance: contract fnb.yaml acceptFnbOrder (4 October 2026, CHG-FXS-003)
+  - id: formRecordOrderHandover
+    component: modal
+    trigger: Hand over
+    body: '**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome` (served,
+      collected or delivered), `recordedAt` (now). Dismissing sends nothing.'
+    confirm:
+      label: Hand over
+      operation: recordOrderHandover
+    dismiss:
+      label: Cancel
+      discards:
+      - outcome
+    provenance: contract fnb.yaml recordOrderHandover (4 October 2026, CHG-FXS-003)
 - id: POS-030
   name: Sales Journal
   module: Sell
@@ -9985,7 +10269,11 @@ screens:
     is converted (`convertReservation`), paid (POS-005) and the tickets are issued then. **v2 encodes
     a group''s tickets as inactive before payment and activates them on payment; that is not built**:
     nothing is encoded before the order is paid. Groups use the group operations the back office already
-    uses (BO-026, BO-280): the group, its leader and manifest, and the arrival check-in.'
+    uses (BO-026, BO-280): the group, its leader and manifest, and the arrival check-in.
+
+
+    **The group rows carry groupBookingId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
+    4 October 2026)** (CHG-FXS-003)'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listReservations` and `listGroupArrivalCheck` read who is due and `getReservation`
@@ -10031,7 +10319,10 @@ screens:
         - GroupArrivalCheckInAdmissionOperationsView.remaining
         - GroupArrivalCheckInAdmissionOperationsView.readiness
         operation: listGroupArrivalCheck
-        provenance: contract orders.yaml GET /group-arrival-check (as on BO-280)
+        provenance: contract orders.yaml GroupArrivalCheckInAdmissionOperationsView (defined 4 October
+          2026, CHG-FXS-003)
+        notes: Each row carries groupBookingId; selecting one loads getGroupBooking and gives recordGroupCheckIn
+          its id.
       - kind: primaryButton
         label: New reservation
         operation: createReservation

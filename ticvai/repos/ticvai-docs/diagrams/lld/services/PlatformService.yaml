@@ -1,10 +1,10 @@
 id: LLD-PlatformService
-title: PlatformService — 225 operations, 108 tables
+title: PlatformService — 228 operations, 109 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 108 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 109 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -14,14 +14,14 @@ why: '**Three contracts, two schemas, 108 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 225
+  operations: 228
   inAFlow: 80
-  percent: 36%
+  percent: 35%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 85
+  tables: 86
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -32,7 +32,7 @@ schemas:
   largestTable: subscription.membership_product
 operationsByContract:
 - contract: subscription
-  count: 150
+  count: 152
   operations:
   - operation: actOnPartnerApplicationReview
     verb: POST
@@ -185,7 +185,7 @@ operationsByContract:
     permission: PLATFORM_PLAN_MANAGE
     offline: false
     reads: 5
-    writes: 3
+    writes: 4
   - operation: createPlanVersion
     verb: POST
     path: /plans/{planId}
@@ -193,7 +193,7 @@ operationsByContract:
     permission: PLATFORM_PLAN_MANAGE
     offline: false
     reads: 5
-    writes: 3
+    writes: 4
   - operation: createTenant
     verb: POST
     path: /tenants
@@ -330,6 +330,14 @@ operationsByContract:
     offline: false
     reads: 7
     writes: 0
+  - operation: getMembershipProductValidation
+    verb: GET
+    path: /membership-product-validation
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 9
+    writes: 0
   - operation: getPlan
     verb: GET
     path: /plans/{planId}
@@ -433,6 +441,14 @@ operationsByContract:
     permission: PLATFORM_CELL_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: listCells
+    verb: GET
+    path: /cells
+    scope: platform
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 4
     writes: 0
   - operation: listChannelListings
     verb: GET
@@ -776,7 +792,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listTenantMigrations
     verb: GET
@@ -1558,7 +1574,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: public-api
-  count: 35
+  count: 36
   operations:
   - operation: certifyIntegration
     verb: POST
@@ -1683,6 +1699,14 @@ operationsByContract:
   - operation: listApiVersions
     verb: GET
     path: /api-versions
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDeveloperMembers
+    verb: GET
+    path: /developers/{developerId}/members
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
@@ -2056,6 +2080,23 @@ tables:
   - updatePartnerAgreement
   - updateTenant
   - withdrawRelease
+  keys:
+    setApiLicensing:
+      role: evicts
+      resolvers: &id001
+      - control.api_licence
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setApiQuota:
+      role: evicts
+      resolvers: &id002
+      - control.api_limit
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -2070,10 +2111,21 @@ tables:
   - setApiLicensing
   - setApiQuota
   readBy: null
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
+  keys:
+    setApiLicensing:
+      role: evicts
+      resolvers: *id001
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    setApiQuota:
+      role: evicts
+      resolvers: *id002
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: control.api_anomaly
   columns: 9
   store: postgres
@@ -2081,7 +2133,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: control.api_anomaly_rule
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2228,6 +2280,13 @@ tables:
   foreignWriters: null
 - table: control.developer_account
   columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.developer_member
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -2639,7 +2698,7 @@ tables:
   foreignWriters:
   - marketing-crm
 - table: control.usage_record
-  columns: 7
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2795,7 +2854,8 @@ tables:
   columns: 3
   store: postgres
   parent: subscription.plan
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: subscription.tier_allowance
   columns: 10
@@ -2834,17 +2894,17 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: CatalogueService
-  operations: 32
+  operations: 33
 - service: OrderService
   operations: 31
 - service: TenancyService
-  operations: 24
+  operations: 25
 - service: LedgerService
   operations: 14
 - service: AccessService
   operations: 13
 - service: IdentityService
-  operations: 13
+  operations: 12
 - service: AiService
   operations: 2
 writesOutside:
@@ -2925,17 +2985,6 @@ writesOutside:
   - operation: reconcileBurstEnvironment
     tables:
     - sync.rejection
-- service: IdentityService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event IdentityService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: setDeveloperMembers
-    tables:
-    - identity.delegated_access
 - service: MarketingService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

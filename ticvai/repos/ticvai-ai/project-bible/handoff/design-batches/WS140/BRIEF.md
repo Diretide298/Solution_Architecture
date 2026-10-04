@@ -1,6 +1,6 @@
 # WS140 — Marketing CRM Configuration Reference v1.0 board 6
 
-**10 screens · 13 operations · 12 schemas · 6 permissions**
+**10 screens · 15 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-784` | Communications Center | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-785` | Template Library | A | 0 | 0 | 6 | 18 | 1 | 0 | — | notStarted (—) |
+| `BO-785` | Template Library | A | 35 | 12 | 6 | 18 | 1 | 0 | — | notStarted (—) |
 | `BO-786` | Newsletter Builder | D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
 | `BO-787` | Content Blocks & Product Feed | D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
 | `BO-788` | Subscriptions & Preferences | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-784, BO-785, BO-786, BO-787, BO-788, BO-789, BO-790, BO-791, BO-792, BO-793 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-784, BO-786, BO-787, BO-788, BO-789, BO-790, BO-791, BO-792, BO-793 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

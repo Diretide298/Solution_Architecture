@@ -1545,18 +1545,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Detect meaningful changes in AI behavior that may increase governance risk. This is not the full model monitoring platform. Board 4 focuses specifically on governance-relevant behavioral changes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 90"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Governance_Reference.pdf, page 90"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1853,7 +1841,7 @@
     "provenance": "contract ai.yaml POST /releases/{releaseId}/rollback"
    }
   ],
-  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `runAiEvaluation` (AI_CONFIGURE), `listAiEvaluations` (AI_USE), `promoteAiRelease` (AI_USE), `rollbackAiRelease` (AI_APPROVE), `listAiGovernanceAlerts` (AI_USE), `listAiTrainingRuns` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `runAiEvaluation` (AI_CONFIGURE), `listAiEvaluations` (AI_USE), `promoteAiRelease` (AI_USE), `rollbackAiRelease` (AI_APPROVE), `listAiGovernanceAlerts` (AI_USE), `listAiTrainingRuns` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**The generator's 'needs a person' gap removed 4 October 2026: the screen's content is defined (tables, panels and actions bound to its operations)** (CHG-FXS-005)",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 73 of 275 |
+| Operations in the slice | 75 of 277 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -42,7 +42,7 @@
 | consent | [`getDeviceConsentHistory`](#getdeviceconsenthistory) | GET | `/consent/device/history` | core | 1 | GST-066, WEB-024 |
 | consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 1 | BO-737, BO-749, GST-039, GST-065, GST-066, WEB-020 … |
 | consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 1 | CMS-018 |
-| consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-039, GST-065, GST-066, WEB-011 … |
+| consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-039, GST-065, GST-066, GST-071 … |
 | consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 1 | BO-008, CMS-018, CMS-103 |
 | consent | [`listPublishedTrackingTechnologies`](#listpublishedtrackingtechnologies) | GET | `/storefront/cookie-consent/technologies` | core | 1 | GST-066, WEB-024 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, GST-066, POS-027, WEB-020 … |
@@ -62,15 +62,16 @@
 | guest | [`revokeGuestDevice`](#revokeguestdevice) | DELETE | `/guests/{subjectId}/devices/{deviceId}` | core | 1 | GST-073, WEB-024 |
 | guest | [`searchGuests`](#searchguests) | GET | `/guests` | core | 1 | BO-734, BO-735, EMP-026, POS-027, POS-030 |
 | loyalty | [`awardBadge`](#awardbadge) | POST | `/customers/{customerId}/badges` | setup | 1 | BO-826 |
-| loyalty | [`createLoyaltyProgramme`](#createloyaltyprogramme) | POST | `/loyalty/programmes` | setup | 1 | BO-828 |
+| loyalty | [`createLoyaltyProgramme`](#createloyaltyprogramme) | POST | `/loyalty/programmes` | setup | 1 |  |
 | loyalty | [`getGuestLoyalty`](#getguestloyalty) | GET | `/guests/{subjectId}/loyalty` | core | 1 | BO-735, BO-737, BO-831, POS-002, POS-027 |
 | loyalty | [`listCustomerBadges`](#listcustomerbadges) | GET | `/customers/{customerId}/badges` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`listLeaderboard`](#listleaderboard) | GET | `/loyalty/leaderboard` | core | 1 | GST-036, WEB-043 |
-| loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 1 | BO-828, BO-833, GST-036, WEB-043 |
+| loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 1 | BO-827, BO-828, BO-833, GST-036, WEB-017, WEB-043 |
 | loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | BO-828, GST-036, WEB-043 |
 | loyalty | [`setLeaderboardNickname`](#setleaderboardnickname) | PUT | `/loyalty/leaderboard-nickname` | core | 1 | GST-036, WEB-043 |
-| loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827 |
+| loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827, BO-828 |
 | loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards` | setup | 1 | BO-828 |
+| loyalty | [`updateLoyaltyProgramme`](#updateloyaltyprogramme) | PATCH | `/loyalty/programmes/{programmeId}` | setup | 1 | BO-827 |
 | marketing | [`createChallenge`](#createchallenge) | POST | `/challenges` | setup | 1 | BO-825, BO-829 |
 | marketing | [`createForm`](#createform) | POST | `/forms` | setup | 1 | BO-618, BO-747, BO-815, CMS-042, CMS-043 |
 | marketing | [`createInvitationCampaign`](#createinvitationcampaign) | POST | `/invitation-campaigns` | setup | 1 |  |
@@ -104,6 +105,7 @@
 | message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 1 | BO-785, BO-786, BO-787, SUP-007 |
 | message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 1 | GST-030, WEB-046 |
 | message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 1 | GST-030, WEB-046 |
+| message | [`updateMessageTemplate`](#updatemessagetemplate) | PATCH | `/message-templates/{templateId}` | setup | 1 | BO-785 |
 | segment | [`createSegment`](#createsegment) | POST | `/segments` | setup | 1 | ANL-007, BO-755, BO-757, BO-758, BO-759, BO-760 … |
 
 ## Group: campaign
@@ -424,6 +426,10 @@ Halts remaining sends immediately. Messages already dispatched cannot be recalle
 Content and audience are editable only in draft. A live campaign may be paused, rescheduled or stopped — nothing else. Changing the audience mid-send produces a campaign nobody can report on afterwards.
 **One more change on a live A/B campaign** (29 September, build pass, group G2; 22.1.17): with `abTest.winnerRule` `manual`, a person sets `abTest.winningVariantId` once the test phase has run, and the winner goes to the rest of the audience. Variants themselves, like all content, are editable only in draft.
 
+**Variants and the A/B test are editable here** (4 October 2026, CHG-FXC-010; BO-772): `variants` and `abTest` take
+the shapes `createCampaign` takes. While the campaign is a draft both may change; once it is live only
+`abTest.winningVariantId` may be set (409 otherwise), and only where `abTest.winnerRule` is `manual`.
+
 |  |  |
 |---|---|
 | Permission | `MARKETING_MANAGE` |
@@ -433,7 +439,7 @@ Content and audience are editable only in draft. A live campaign may be paused, 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
-| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_target`, `marketing.segment_criterion` |
+| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_target`, `marketing.campaign_variant`, `marketing.segment_criterion` |
 | Called by | BO-767, BO-768, BO-769, BO-772 |
 
 **Parameters**
@@ -455,6 +461,24 @@ Content and audience are editable only in draft. A live campaign may be paused, 
 | content.subjectOverride | object |  |  |
 | content.mergeDefaults | object |  | Fallback values for the template's mergeFields, by name, used where a guest has no value. |
 | content.promotionId | string (uuid) |  | Offer carried by the campaign. (nullable) |
+| variants | array of MarketingCampaignVariant |  | A/B (or up to five-way) content and subject variants (29 September, build pass, group G2; 22.1.17, BO-772). (max items 5; nullable) |
+| variants[].id | string (uuid) |  | (read-only) |
+| variants[].campaignId | string (uuid) |  | (read-only) |
+| variants[].label | string | yes | A, B, C... (max length 20) |
+| variants[].subjectOverride | object |  | Subject line by locale. (nullable) |
+| variants[].templateId | string (uuid) |  | A different template for this variant; null uses the campaign's content.templateId. (nullable) |
+| variants[].splitPercent | integer |  | Share of the test group; null splits evenly. (min 1; max 100; nullable) |
+| variants[].source | enum (manual, aiDraft) |  | (default manual) |
+| variants[].aiDecisionRecordId | string |  | The decision record of the ai.proposeMarketingContent draft it came from, for aiDraft. (nullable) |
+| variants[].isWinner | boolean |  | (default False; read-only) |
+| variants[].scopePath | string |  | The partition key (ADR-0005), the campaign's. (read-only) |
+| abTest | object |  | How the variants are tested. (nullable) |
+| abTest.testPercent | integer |  | Share of the audience the variants are tested on; 100 splits everyone and picks no winner. (min 5; max 100; default 20) |
+| abTest.successMetric | enum (openRate, clickRate, conversionRate, attributedRevenue) |  | (default clickRate) |
+| abTest.decideAfterHours | integer |  | (min 1; max 168; default 4) |
+| abTest.winnerRule | enum (automatic, manual) |  | (default automatic) |
+| abTest.minimumSamplePerVariant | integer |  | Below this many sends per variant no winner is declared automatically; a person picks. (min 1; default 500) |
+| abTest.winningVariantId | string (uuid) |  | Set by the automatic rule, or by a person through updateCampaign. (nullable) |
 
 **Response**: `Campaign`
 
@@ -956,7 +980,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Guest callable | True |
 | Reads | `cache:resolution`, `marketing.consent_purpose`, `marketing.consent_purpose_channel` |
 | Writes | `cache:resolution` |
-| Called by | BO-747, CMS-018, GST-039, GST-065, GST-066, WEB-011, WEB-020, WEB-024, WEB-027 |
+| Called by | BO-747, CMS-018, GST-039, GST-065, GST-066, GST-071, WEB-011, WEB-020, WEB-024, WEB-027 |
 
 **Parameters**
 
@@ -1731,8 +1755,8 @@ Guest-facing. A low rating may open a service case automatically where the venue
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `marketing.review` |
-| Writes | `cache:idempotency`, `marketing.review` |
+| Reads | `cache:idempotency`, `marketing.case`, `marketing.review` |
+| Writes | `cache:idempotency`, `marketing.case`, `marketing.review` |
 | Called by | GST-035, WEB-026 |
 
 **Parameters**
@@ -2239,7 +2263,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.loyalty_programme`, `marketing.points_earning_rule`, `marketing.programme_tier` |
 | Writes | `cache:idempotency`, `marketing.loyalty_programme`, `marketing.points_earning_rule`, `marketing.programme_tier` |
-| Called by | BO-828 |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
 
@@ -2482,7 +2506,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Guest callable | True |
 | Reads | `marketing.loyalty_programme`, `marketing.points_earning_rule`, `marketing.programme_tier` |
 | Writes | - |
-| Called by | BO-828, BO-833, GST-036, WEB-043 |
+| Called by | BO-827, BO-828, BO-833, GST-036, WEB-017, WEB-043 |
 
 **Parameters**
 
@@ -2656,7 +2680,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Conflict policy | serverWins |
 | Reads | `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
 | Writes | `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
-| Called by | BO-827 |
+| Called by | BO-827, BO-828 |
 
 **Parameters**
 
@@ -2815,6 +2839,85 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### updateLoyaltyProgramme
+
+**`PATCH /loyalty/programmes/{programmeId}`**: Change a loyalty programme
+
+**Added 4 October 2026 (CHG-FXC-010; BO-827).** The earning rules are `LoyaltyProgramme.earnRules` and nothing wrote
+them after `createLoyaltyProgramme`. Changes `name`, `earnRules` (replaced whole, as `marketing.points_earning_rule`
+rows), `pointsExpireAfterMonths` and `isActive`. Points already earned keep the rule and the expiry they were earned
+under; the change applies to what is earned from now. Tiers are not changed here.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, changes rows of `marketing.loyalty_programme`, `marketing.points_earning_rule` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.loyalty_programme`, `marketing.points_earning_rule`, `marketing.programme_tier` |
+| Writes | `cache:idempotency`, `marketing.loyalty_programme`, `marketing.points_earning_rule` |
+| Called by | BO-827 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| programmeId | path | yes | string (uuid) |  |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 200) |
+| earnRules | array of object |  | Replaces the programme's earning rules; each item as LoyaltyProgramme.earnRules[]. |
+| earnRules[].trigger | string | yes |  |
+| earnRules[].points | number | yes |  |
+| earnRules[].productKinds | array of ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) |  |  |
+| earnRules[].multiplier | number |  |  |
+| pointsExpireAfterMonths | integer |  | (nullable) |
+| isActive | boolean |  |  |
+
+**Response**: `LoyaltyProgramme`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| tiers | array of MarketingProgrammeTier | yes | Rows of marketing.programme_tier, the same shape MarketingProgrammeTier has — one definition of a tier, not a second copy that cannot round-trip. |
+| tiers[].id | string (uuid) |  | (read-only) |
+| tiers[].loyaltyProgrammeId | string (uuid) | yes | (read-only) |
+| tiers[].code | string | yes | (max length 40) |
+| tiers[].name | string | yes | (max length 120) |
+| tiers[].rank | integer | yes | Order, not threshold. |
+| tiers[].minLifetimePoints | integer |  | What reaching this tier requires. (nullable) |
+| tiers[].retainLifetimePoints | integer |  | What keeping it requires, per review period. (nullable) |
+| tiers[].validityMonths | integer |  | Null means the tier does not lapse on its own. (nullable) |
+| tiers[].benefits | array of string |  | What the tier gives, as the guest reads it. |
+| tiers[].earnMultiplier | number |  | Applied to every earn rule while the guest holds this tier. (nullable) |
+| tiers[].isActive | boolean |  | (default True) |
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | Unique per tenant (decided 28 September, audit R108). |
+| name | string | yes |  |
+| venueId | string (uuid) |  | (nullable) |
+| pointsLiabilityAccountId | string (uuid) |  | Points post here on accrual. |
+| earnRules | array of object | yes |  |
+| earnRules[].trigger | enum (perCurrencyUnit, perVisit, perProduct, onSignup, onBirthday, onReview) | yes |  |
+| earnRules[].points | number | yes |  |
+| earnRules[].productKinds | array of ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) |  | Limits a perProduct or perCurrencyUnit rule to these kinds. |
+| earnRules[].multiplier | number |  |  |
+| pointsExpireAfterMonths | integer |  | (nullable) |
+| isActive | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Changed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -3377,6 +3480,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Status | **Stub**: its shape is a proposal; do not build until confirmed |
 | Reads | `marketing.subscription` |
 | Writes | - |
 | Called by | GST-065, WEB-027 |
@@ -3879,6 +3983,10 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 
 **One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner hands in. **Modelling them separately would mean matching across two shapes**, which is how a match gets missed.
 
+**A guest caller** (4 October 2026, CHG-FXC-011; WEB-034): reports only, with `kind` `lost`, under their guest
+session; CASE_MANAGE is what a staff caller needs (a cleaner handing in, `kind` `found`). A guest's report is tied to
+their own subject and they can read back only their own reports.
+
 |  |  |
 |---|---|
 | Permission | `CASE_MANAGE` |
@@ -4028,7 +4136,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Conflict policy | append |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.case`, `marketing.case_message` |
-| Writes | `cache:idempotency`, `marketing.case_message` |
+| Writes | `cache:idempotency`, `marketing.case`, `marketing.case_message` |
 | Called by | GST-034, GST-040, GST-068, WEB-025, WEB-034 |
 | State model | Service case ([states/case.yaml](../../../states/case.yaml)): created as `open` |
 
@@ -4099,6 +4207,11 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 
 **The token is single-use.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use ends up there.
 **Accepting issues the entitlement**, which is why this is not a marketing operation with a follow-up.
+
+**How accepting issues the entitlement** (4 October 2026, CHG-FXC-004). Accepting calls `orders.issueInvitation`
+(OrderService) with the invitation campaign's product, performance and quantity and the invited guest as holder;
+`entitlementIds` are the ids that call returns. This operation writes only `marketing.invitation`; the entitlement is
+written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 
 |  |  |
 |---|---|
@@ -4336,6 +4449,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Status | **Stub**: its shape is a proposal; do not build until confirmed |
 | Reads | `marketing.subscription` |
 | Writes | `marketing.subscription` |
 | Called by | GST-065, WEB-027 |
@@ -4879,6 +4993,70 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Marked. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### updateMessageTemplate
+
+**`PATCH /message-templates/{templateId}`**: Change a message template
+
+**Added 4 October 2026 (CHG-FXC-010; BO-785, design-notes correction CHG-SBO-005).** A tenant's own template is
+edited in place: `name`, `subjects`, `bodies`, `mergeFields` and `providerTemplateId`. Every change writes a new
+`marketing.message_template_version`, so a campaign already sent keeps the version it used. A template whose
+`ownership` is `platform` is TICVAI's and is refused with 409; copy it with `createMessageTemplate` instead.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, changes rows of `marketing.message_template`, `marketing.message_template_version` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.message_template` |
+| Writes | `cache:idempotency`, `marketing.message_template`, `marketing.message_template_version` |
+| Called by | BO-785 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| templateId | path | yes | string (uuid) |  |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 200) |
+| subjects | object |  | Per language, as MessageTemplate.subjects. |
+| bodies | object |  | Per language, as MessageTemplate.bodies. |
+| mergeFields | array of string |  |  |
+| providerTemplateId | string |  | (nullable) |
+
+**Response**: `MessageTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| subjects | object |  | Per language. |
+| bodies | object | yes | Per language, keyed by ISO 639-1 code. |
+| mergeFields | array of string |  |  |
+| missingLanguages | array of string |  | Enabled languages without a body. (read-only) |
+| providerTemplateId | string |  | Required for WhatsApp, where templates are pre-approved by the provider. (nullable) |
+| brandId | string (uuid) |  | The brand whose identity the template carries; null for the tenant default. (nullable) |
+| ownership | enum (platform, crm) |  | platform = a transactional template owned by the communication service; crm = a marketing template owned by CRM (listSystemTransactionalTemplate). (default crm) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Changed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The template is platform-owned (template-platform-owned) and cannot be edited by a tenant. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 

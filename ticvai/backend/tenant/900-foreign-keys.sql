@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 777 of 810 declared references. The ones that reach the
+-- 784 of 817 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -185,6 +185,7 @@ ALTER TABLE catalogue.waitlist_entry ADD CONSTRAINT waitlist_entry_performance_i
 ALTER TABLE catalogue.waitlist_entry ADD CONSTRAINT waitlist_entry_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE catalogue.waitlist_entry ADD CONSTRAINT waitlist_entry_variant_id_fkey FOREIGN KEY (variant_id) REFERENCES catalogue.variant(id);
 ALTER TABLE fnb.bill_split ADD CONSTRAINT bill_split_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES fnb.table_visit(id);
+ALTER TABLE fnb.combo_slot_option ADD CONSTRAINT combo_slot_option_combo_slot_id_fkey FOREIGN KEY (combo_slot_id) REFERENCES fnb.combo_slot(id);
 ALTER TABLE fnb.delivery_location ADD CONSTRAINT delivery_location_seat_id_fkey FOREIGN KEY (seat_id) REFERENCES seating.seat(id);
 ALTER TABLE fnb.delivery_location ADD CONSTRAINT delivery_location_table_id_fkey FOREIGN KEY (table_id) REFERENCES fnb.dining_table(id);
 ALTER TABLE fnb.delivery_location ADD CONSTRAINT delivery_location_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
@@ -234,7 +235,7 @@ ALTER TABLE fnb.waitlist_entry ADD CONSTRAINT waitlist_entry_outlet_id_fkey FORE
 ALTER TABLE fnb.waitlist_entry ADD CONSTRAINT waitlist_entry_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE games.card ADD CONSTRAINT card_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE games.card ADD CONSTRAINT card_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
-ALTER TABLE games.credit_ledger ADD CONSTRAINT credit_ledger_card_id_fkey FOREIGN KEY (card_id) REFERENCES games.card(card_code);
+ALTER TABLE games.credit_ledger ADD CONSTRAINT credit_ledger_card_id_fkey FOREIGN KEY (card_id) REFERENCES games.card(id);
 ALTER TABLE games.game ADD CONSTRAINT game_venue_id_asset_id_fkey FOREIGN KEY (venue_id, asset_id) REFERENCES maintenance.asset(venue_id, id);
 ALTER TABLE games.game ADD CONSTRAINT game_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE games.play ADD CONSTRAINT play_game_id_fkey FOREIGN KEY (game_id) REFERENCES games.game(id);
@@ -724,7 +725,10 @@ ALTER TABLE transport.route_stop ADD CONSTRAINT route_stop_route_id_fkey FOREIGN
 ALTER TABLE transport.timetable_run ADD CONSTRAINT timetable_run_timetable_id_fkey FOREIGN KEY (timetable_id) REFERENCES transport.timetable(id);
 ALTER TABLE venuemap.import_job ADD CONSTRAINT import_job_map_id_fkey FOREIGN KEY (map_id) REFERENCES venuemap.map(id);
 ALTER TABLE venuemap.map ADD CONSTRAINT map_base_asset_id_fkey FOREIGN KEY (base_asset_id) REFERENCES assets.media_asset(id);
+ALTER TABLE venuemap.map ADD CONSTRAINT map_model_asset_id_fkey FOREIGN KEY (model_asset_id) REFERENCES assets.media_asset(id);
+ALTER TABLE venuemap.map ADD CONSTRAINT map_navigation_file_asset_id_fkey FOREIGN KEY (navigation_file_asset_id) REFERENCES assets.media_asset(id);
 ALTER TABLE venuemap.map ADD CONSTRAINT map_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
+ALTER TABLE venuemap.map_version ADD CONSTRAINT map_version_base_asset_id_fkey FOREIGN KEY (base_asset_id) REFERENCES assets.media_asset(id);
 ALTER TABLE venuemap.path ADD CONSTRAINT path_map_id_fkey FOREIGN KEY (map_id) REFERENCES venuemap.map(id);
 ALTER TABLE venuemap.placed_resource ADD CONSTRAINT placed_resource_resource_id_fkey FOREIGN KEY (resource_id) REFERENCES resources.resource(id);
 ALTER TABLE venuemap.placed_resource ADD CONSTRAINT placed_resource_variant_id_fkey FOREIGN KEY (variant_id) REFERENCES catalogue.variant(id);
@@ -743,6 +747,7 @@ ALTER TABLE wallet.configuration_version_snapshot ADD CONSTRAINT configuration_v
 ALTER TABLE wallet.credit_lot ADD CONSTRAINT credit_lot_wallet_id_fkey FOREIGN KEY (wallet_id) REFERENCES wallet.wallet(id);
 ALTER TABLE wallet.gift_card ADD CONSTRAINT gift_card_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE wallet.hold ADD CONSTRAINT hold_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
+ALTER TABLE wallet.risk_rule ADD CONSTRAINT risk_rule_risk_rules_id_fkey FOREIGN KEY (risk_rules_id) REFERENCES wallet.risk_rules(id);
 ALTER TABLE wallet.wallet ADD CONSTRAINT wallet_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
@@ -759,7 +764,9 @@ ALTER TABLE whitelabel.guided_choice_answer ADD CONSTRAINT guided_choice_answer_
 ALTER TABLE whitelabel.guided_choice_answer ADD CONSTRAINT guided_choice_answer_guided_choice_question_id_fkey FOREIGN KEY (guided_choice_question_id) REFERENCES whitelabel.guided_choice_question(id);
 ALTER TABLE whitelabel.guided_choice_question ADD CONSTRAINT guided_choice_question_guided_choice_id_fkey FOREIGN KEY (guided_choice_id) REFERENCES whitelabel.guided_choice(id);
 ALTER TABLE whitelabel.homepage_section ADD CONSTRAINT homepage_section_content_page_id_fkey FOREIGN KEY (content_page_id) REFERENCES whitelabel.content_page(id);
+ALTER TABLE whitelabel.homepage_section ADD CONSTRAINT homepage_section_homepage_layout_id_fkey FOREIGN KEY (homepage_layout_id) REFERENCES whitelabel.homepage_layout(id);
 ALTER TABLE whitelabel.module_enablement ADD CONSTRAINT module_enablement_tenant_config_id_fkey FOREIGN KEY (tenant_config_id) REFERENCES whitelabel.tenant_config(id);
+ALTER TABLE whitelabel.navigation_item ADD CONSTRAINT navigation_item_navigation_config_id_fkey FOREIGN KEY (navigation_config_id) REFERENCES whitelabel.navigation_config(id);
 ALTER TABLE whitelabel.policy ADD CONSTRAINT policy_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE whitelabel.promo_block ADD CONSTRAINT promo_block_promotion_id_fkey FOREIGN KEY (promotion_id) REFERENCES promotions.promotion(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);

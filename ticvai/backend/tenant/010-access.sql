@@ -826,7 +826,7 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     id                                uuid PRIMARY KEY NOT NULL,
     template_id                       uuid NOT NULL,
     product_id                        uuid NOT NULL,
-    order_id                          uuid NOT NULL,
+    order_id                          uuid,
     order_line_id                     uuid,
     subject_id                        uuid,
     venue_id                          uuid,
@@ -851,7 +851,8 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     shared_with_subject_ids           text[],
     issued_via                        text CONSTRAINT entitlement_issued_via_chk CHECK (issued_via IN ('sale', 'invitation', 'reissue', 'transfer', 'resale', 'membership', 'groupBooking')),
     supersedes_entitlement_id         uuid,
-    wallet_value_id                   uuid
+    wallet_value_id                   uuid,
+    invitation_id                     uuid
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
@@ -1383,7 +1384,7 @@ CREATE TABLE IF NOT EXISTS access.operating_calendar_entry (
 
 -- A guest bought parking. Carries the plate where the mode is plateWhitelist — personal data,
 -- since a plate identifies a person Hangs off: reaches access.entitlement through its keys;
--- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 2 operations
+-- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 3 operations
 -- read it and 3 write it.
 CREATE TABLE IF NOT EXISTS access.parking_entitlement (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -1416,7 +1417,8 @@ CREATE TABLE IF NOT EXISTS access.parking_facility (
     credential_ref                    text,
     push_lead_minutes                 integer,
     access_point_ids                  text[],
-    is_active                         boolean
+    is_active                         boolean,
+    product_variant_id                uuid
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

@@ -90,6 +90,19 @@
   "requestBody": "ResourceBlock",
   "responds": "ResourceBlock"
  },
+ "getResource": {
+  "method": "GET",
+  "path": "/resources/{resourceId}",
+  "contract": "resources",
+  "summary": "One resource, with every configured section",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Resource"
+ },
  "getResourceAvailability": {
   "method": "GET",
   "path": "/resources/{resourceId}/availability",

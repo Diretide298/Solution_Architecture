@@ -361,7 +361,7 @@
    },
    "licensedModules": {
     "type": "array",
-    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n",
+    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.",
     "items": {
      "type": "object",
      "required": [
@@ -450,7 +450,8 @@
   ],
   "properties": {
    "moduleCode": {
-    "type": "string"
+    "type": "string",
+    "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."
    },
    "name": {
     "type": "string"
@@ -465,12 +466,14 @@
    },
    "requiresModules": {
     "type": "array",
+    "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.",
     "items": {
      "type": "string"
     }
    },
    "incompatibleWithModules": {
     "type": "array",
+    "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.",
     "items": {
      "type": "string"
     }

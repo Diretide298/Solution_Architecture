@@ -33,8 +33,8 @@
 | [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 9 |
 | [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 6 |
 | [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
-| [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
-| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 1 | 7 |
+| [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 5 |
+| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 1 | 8 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 5 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 3 |
@@ -44,14 +44,14 @@
 | [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 1 | 5 |
 | [GST-019](#gst-019-order-history) | Order History | Account & Self-Service | 1 | 7 |
 | [GST-020](#gst-020-saved-items-wishlist) | Saved Items / Wishlist | Account & Self-Service | 1 | 3 |
-| [GST-021](#gst-021-interactive-map) | Interactive Map | In-venue Services | 1 | 4 |
+| [GST-021](#gst-021-interactive-map) | Interactive Map | In-venue Services | 1 | 5 |
 | [GST-022](#gst-022-attraction-wait-times) | Attraction Wait Times | In-venue Services | 1 | 1 |
 | [GST-023](#gst-023-virtual-queue) | Virtual Queue | In-venue Services | 1 | 5 |
 | [GST-024](#gst-024-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 1 | 8 |
 | [GST-025](#gst-025-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 1 | 2 |
 | [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 1 | 4 |
 | [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 4 |
-| [GST-028](#gst-028-parking-reservation-confirmed) | Parking – Reservation Confirmed | In-venue Services | 1 | 2 |
+| [GST-028](#gst-028-parking-reservation-confirmed) | Parking – Reservation Confirmed | In-venue Services | 1 | 4 |
 | [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 1 | 3 |
 | [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
 | [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 9 |
@@ -68,7 +68,7 @@
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 1 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
-| [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 1 | 2 |
+| [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 1 | 3 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 2 |
 | [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 1 | 4 |
@@ -84,15 +84,15 @@
 | [GST-058](#gst-058-resource-availability-cabana) | Resource Availability (Cabana) | Booking & Selection | 1 | 2 |
 | [GST-059](#gst-059-plan-in-progress) | Plan in Progress | Engagement & Support | 1 | 4 |
 | [GST-061](#gst-061-menu-item-detail) | Menu Item Detail | In-Venue Experience | 1 | 1 |
-| [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 1 | 1 |
+| [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 1 | 2 |
 | [GST-063](#gst-063-explore-search-results) | Explore – Search Results | Discovery | 1 | 1 |
 | [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 1 | 5 |
 | [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 1 | 9 |
 | [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 1 | 3 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 1 | 4 |
-| [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 1 | 4 |
+| [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 1 | 5 |
 | [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 1 | 7 |
-| [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 1 | 5 |
+| [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 1 | 8 |
 | [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 1 | 6 |
 | [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 1 | 12 |
 | [GST-074](#gst-074-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
@@ -157,7 +157,7 @@
 | GST-002 | Explore Categories |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 | GST-004 | Attraction Details | productId |  |
-| GST-005 | What's On |  |  |
+| GST-005 | What's On | eventId |  |
 | GST-006 | Event / Exhibition Details | productId |  |
 | GST-007 | Select Date & Time | eventId |  |
 | GST-008 | Tickets & Add-ons | productId |  |
@@ -189,7 +189,7 @@
 | GST-041 | Checkout Entry | productId |  |
 | GST-042 | Simple Registration & OTP | subjectId |  |
 | GST-045 | Ticket Delivery & Sharing | orderId |  |
-| GST-049 | Interactive Seat Selection |  |  |
+| GST-049 | Interactive Seat Selection | eventId |  |
 | GST-052 | Suggested Itineraries |  |  |
 | GST-054 | AI Optimized Itinerary |  |  |
 | GST-055 | Dynamic QR Ticket | entitlementId, orderId |  |
@@ -257,8 +257,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-| GST-004 | Attraction Details | productId |  |
+| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-004 | Attraction Details | eventId, productId |  |
 | GST-063 | Searches (results in place) |  |  |
 
 ## GST-003 Buy Tickets
@@ -660,6 +660,8 @@
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Reprint or resend tickets | `ORDER_REPRINT` |
 | `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Set a password: turn the guest-checkout order into an account | `None` |
+| `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create an account for the order's email: sends a code | `None` |
+| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Prove the code; then linkGuestCheckout moves the order to the account | `GUEST_VIEW` |
 
 **States**
 
@@ -668,7 +670,7 @@
 | loading | The booking confirmation, read by `getOrder`. |
 | error | Could not load. Names which read failed and leaves the booking confirmation untouched. |
 | emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT` for `reprintOrder`. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -694,8 +696,8 @@
 
 | Parameter | From |
 |---|---|
-| cardCode | deepLink |
 | subjectId | session |
+| cardCode | deepLink |
 | walletId | navigation |
 
 **Operations**
@@ -709,6 +711,7 @@
 | `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
 | `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
 | `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `None` |
+| `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | The guest's saved cards: the auto top-up card and a stored-card exit settlement pick one (paymentTokenId) | `ORDER_VIEW` |
 
 **States**
 
@@ -718,7 +721,7 @@
 | error | Could not load. Names which read failed and leaves the wallet overview untouched. |
 | emptyFirstRun | No wallet overview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_OPERATE` for `setWalletAutoReloadSetting`, `settleWalletAtExit`. |
 | offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 
 **Goes to**
@@ -1177,6 +1180,7 @@
 | Parameter | From |
 |---|---|
 | mapId | deepLink |
+| venueId | session |
 
 **Operations**
 
@@ -1186,6 +1190,7 @@
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `getVenueMap` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemap) | onLoad | A map with its points and paths | `VENUE_MAP_VIEW` |
 | `getVenueMapGraph` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemapgraph) | onLoad | The navigation graph, ready to route over | `VENUE_MAP_VIEW` |
+| `listBookableVenueMaps` | [VenueOpsService](../backend/VenueOpsService.md#listbookablevenuemaps) | onLoad | The venue's published map (query venueId), whose mapId getVenueMap and getVenueMapGraph take | `VENUE_MAP_VIEW` |
 
 **States**
 
@@ -1195,7 +1200,7 @@
 | error | Could not load. Names which read failed and leaves the interactive map untouched. |
 | emptyFirstRun | No interactive map yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | No point of that category on this map; the other categories stay. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `VENUE_MAP_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
 | map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error. |
 | weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D. |
@@ -1506,6 +1511,8 @@
 | Parameter | From |
 |---|---|
 | orderId | previousScreen |
+| subjectId | session |
+| entitlementId | navigation |
 
 **Operations**
 
@@ -1513,6 +1520,8 @@
 |---|---|---|---|---|
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | The paid order that carries the parking entitlement (audit R166) With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
+| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's parking entitlement from this order | `ORDER_VIEW` |
+| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | The plate, car park and pass of that entitlement | `None` |
 
 **States**
 
@@ -1522,7 +1531,7 @@
 | error | Could not load. Names which read failed and leaves the parking reservation confirmed untouched. |
 | emptyFirstRun | Paid, entitlement not yet shown. The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166). |
 | emptyNoResults | Never shown: the confirmation shows one order's parking. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission (the screen's other reads need `PARKING_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
 
 **Goes to**
@@ -1530,7 +1539,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-012 | They open their tickets | orderId |  |
+| GST-012 | They open their tickets | entitlementId, orderId |  |
 
 ## GST-029 Venue Info & Services
 
@@ -2312,6 +2321,7 @@
 | Parameter | From |
 |---|---|
 | orderId | deepLink |
+| subjectId | session |
 
 **Operations**
 
@@ -2319,6 +2329,7 @@
 |---|---|---|---|---|
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `listTicketTransfers` | [OrderService](../backend/OrderService.md#listtickettransfers) | onLoad | Show the tickets the guest has sent and received | `None` |
+| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's own tickets to choose from; each carries its orderId, which transferOrderTickets takes in its path | `ORDER_VIEW` |
 
 **States**
 
@@ -2905,8 +2916,8 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `listBookableVenueMaps` | [VenueOpsService](../backend/VenueOpsService.md#listbookablevenuemaps) | onLoad | The venue's published map with bookable cabanas (kind cabana) | `VENUE_MAP_VIEW` |
+| `getMapResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getmapresourceavailability) | onLoad | Every cabana's status for the chosen date, by zone | `RESOURCE_VIEW` |
 
 **States**
 
@@ -2916,7 +2927,7 @@
 | error | Could not load. Names which read failed and leaves the resource availability (cabana) untouched. |
 | emptyFirstRun | No resource availability (cabana) yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing free on the date picked; offers the next free date. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `VENUE_MAP_VIEW`, which `listBookableVenueMaps` requires to show this screen, and names that permission (the screen's other reads need `RESOURCE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2925,7 +2936,7 @@
 |---|---|---|---|
 | GST-050 | They book and pay |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-074 | Choose on the map (a venue with its spots on a map) | productId |  |
+| GST-074 | Choose on the map (a venue with its spots on a map) | mapId |  |
 
 ## GST-059 Plan in Progress
 
@@ -3033,11 +3044,18 @@
 | Component | `apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx` |
 | Pattern | statusTracker |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| subjectId | session |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onLoad | Find a guest's dropped goods | `ORDER_VIEW` |
+| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's tickets; lookupShopAndDrop is called once per entitlementId to find the goods waiting | `ORDER_VIEW` |
 
 **States**
 
@@ -3046,7 +3064,7 @@
 | loading | Finding what is waiting for you. |
 | error | Could not load. Names which read failed and leaves the shop drop collection untouched. |
 | emptyFirstRun | Nothing waiting: no shop-and-drop for this guest. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
 
 **Goes to**
@@ -3296,8 +3314,8 @@
 
 | Parameter | From |
 |---|---|
-| enrolmentId | deepLink |
 | subjectId | session |
+| enrolmentId | deepLink |
 
 **Operations**
 
@@ -3307,6 +3325,7 @@
 | `enrolFacePass` | [AccessService](../backend/AccessService.md#enrolfacepass) | onAction | Register a facial profile against an entitlement | `GUEST_MANAGE` |
 | `getFacePassEnrolment` | [AccessService](../backend/AccessService.md#getfacepassenrolment) | onLoad | Whether a pass has a face registered, and when | `GUEST_VIEW` |
 | `revokeFacePass` | [AccessService](../backend/AccessService.md#revokefacepass) | onAction | Remove a facial profile | `GUEST_MANAGE` |
+| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The passes a face can be registered on (entitlementId), each with its facePassEnrolmentId | `ORDER_VIEW` |
 
 **States**
 
@@ -3316,7 +3335,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Not enrolled. What a face pass is for, where it works, and what withdrawing it does — before the camera opens. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `listDelegations` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFacePass`, `revokeFacePass`. |
 | offline | Not available, and the offline banner says why. Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. |
 | subjectNotLinked | Refused: that person is not linked to you (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to Who is this for, which is refreshed in case the link was just removed (decided 28 September, audit R205). |
 
@@ -3409,6 +3428,9 @@
 | `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Send balance to another guest | `WALLET_OPERATE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
 | `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onAction | Balance on a gift card | `WALLET_VIEW` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The consent purpose a saved card is stored under (consentPurposeId: storing a card for future payments) | `GUEST_VIEW` |
+| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The provider the app tokenises cards with (paymentTokenisation.providerId, agreed field) | `None` |
+| `getWallet` | [WalletService](../backend/WalletService.md#getwallet) | onLoad | The guest's wallet and its id, for a balance transfer | `WALLET_VIEW` |
 
 **States**
 
@@ -3418,7 +3440,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No stored cards. A guest arrives here after a first purchase, so the empty state is the common one. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW`, `WALLET_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `storePaymentToken`; `WALLET_OPERATE` for `transferWalletBalance`. |
 | offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 
 **Goes to**

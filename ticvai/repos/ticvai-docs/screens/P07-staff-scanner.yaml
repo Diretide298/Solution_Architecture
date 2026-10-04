@@ -1157,14 +1157,16 @@ screens:
         derived: true
         impliedBy: lookupTicket
         label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012).
+          A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
       - kind: scanTarget
         derived: true
         impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
+        notes: Sends `?mediaCode=` to `lookupTicket` (the scanned code is the lookup) (CHG-RFM-012). **A
+          screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError`
+          look different because an operator facing a guest needs to know whether to try again or explain
+          something.
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection

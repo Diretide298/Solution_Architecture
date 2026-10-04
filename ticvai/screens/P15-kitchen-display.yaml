@@ -130,6 +130,7 @@ screens:
       provenance: flow F83 step 1→2
       carries:
       - ticketId
+      - visitId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -1216,6 +1217,7 @@ screens:
       provenance: flow F88 step 1→2
       carries:
       - ticketId
+      - visitId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled**
     — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is a
     kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here**

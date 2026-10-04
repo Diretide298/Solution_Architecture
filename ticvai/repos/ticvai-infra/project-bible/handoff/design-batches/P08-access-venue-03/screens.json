@@ -212,7 +212,7 @@
     }
    ]
   },
-  "notes": "CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions and a fee. **Damage routes the resource to maintenance directly**, because routing through available leaves a window where the next guest books a broken item. **The deposit operations are declared here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not, which the flow checker refused. **A step calling an operation its screen does not declare is one of the two out of step**, and in this case it was the screen.",
+  "notes": "CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions and a fee. **Damage routes the resource to maintenance directly**, because routing through available leaves a window where the next guest books a broken item. **The deposit operations are declared here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not, which the flow checker refused. **A step calling an operation its screen does not declare is one of the two out of step**, and in this case it was the screen.\n\n**The writes act on the resource booking, read with getResourceBooking (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026); the rental booking panel stays for its timeline** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`checkOutResource`, `checkInResource`, `authoriseStoredValue`) and no read of a population — it is settings, not a list",
@@ -269,6 +269,14 @@
        "bindsTo": "RentalBooking",
        "operation": "getRentalBooking",
        "provenance": "contract rental.yaml GET /rental-bookings/{bookingId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Resource booking",
+       "bindsTo": "ResourceBooking",
+       "operation": "getResourceBooking",
+       "notes": "status, condition out and in, deposit authorisation.",
+       "provenance": "agreed operation `getResourceBooking`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -314,7 +322,7 @@
    "loading": "The booking and its condition history",
    "error": "Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync.",
    "emptyFirstRun": "Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation.",
-   "emptyNoAccess": "Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_BOOK`.",
+   "emptyNoAccess": "Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`, `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource`, `checkInResource`.",
    "offline": "Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**."
   },
   "apis": [
@@ -358,6 +366,13 @@
     "purpose": "One booking, its timeline and its readiness",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getResourceBooking",
+    "contract": "resources",
+    "purpose": "The resource booking the check-out and check-in act on: status, conditionOut, conditionIn, depositAuthorisationId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -940,12 +955,12 @@
     {
      "to": "BO-093",
      "trigger": "Map Import & Labelling",
-     "provenance": "derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them. The edge carries nothing: mapId, jobId only pre-select (deep link or optional), and BO-093 opens on its own"
+     "provenance": "derived — BO-093 declares entryState.params jobId, mapId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, jobId, uploadId only pre-select (deep link or optional), and BO-093 opens on its own"
     },
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-103 holds none of them. The edge carries nothing: mapId, pathId only pre-select (deep link or optional), and BO-094 opens on its own"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, pathId, uploadId only pre-select (deep link or optional), and BO-094 opens on its own"
     },
     {
      "to": "BO-096",

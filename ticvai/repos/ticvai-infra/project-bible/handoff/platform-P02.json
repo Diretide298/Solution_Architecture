@@ -171,11 +171,11 @@
    "operations": 12
   },
   {
-   "contract": "wallet",
+   "contract": "white-label",
    "operations": 8
   },
   {
-   "contract": "white-label",
+   "contract": "wallet",
    "operations": 8
   },
   {
@@ -187,11 +187,11 @@
    "operations": 7
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -199,11 +199,7 @@
    "operations": 5
   },
   {
-   "contract": "seating",
-   "operations": 4
-  },
-  {
-   "contract": "retail",
+   "contract": "promotions",
    "operations": 4
   },
   {
@@ -211,7 +207,11 @@
    "operations": 4
   },
   {
-   "contract": "promotions",
+   "contract": "retail",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -307,7 +307,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/booking-confirmation",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -316,7 +316,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/general/wallet-overview",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -406,7 +406,7 @@
    "module": "In-venue Services",
    "wave": 1,
    "route": "/general/interactive-map",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -469,7 +469,7 @@
    "module": "In-venue Services",
    "wave": 1,
    "route": "/general/parking-reservation-confirmed",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -622,7 +622,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/ticket-delivery-and-sharing",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -766,7 +766,7 @@
    "module": "In-Venue Experience",
    "wave": 1,
    "route": "/in-venue-experience/shop-and-drop-collection",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -820,7 +820,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/face-pass",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -838,7 +838,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/payment-methods",
-   "operations": 5,
+   "operations": 8,
    "drawn": true
   },
   {

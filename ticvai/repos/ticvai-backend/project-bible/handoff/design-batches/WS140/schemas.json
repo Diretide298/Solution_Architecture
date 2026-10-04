@@ -636,6 +636,13 @@
     "type": "string",
     "format": "uuid"
    },
+   "translationJobId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
    "kind": {
     "type": "string",
     "enum": [
@@ -1251,6 +1258,66 @@
    "updatedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "TranslationProposals": {
+  "type": "object",
+  "x-ticvai-persistence": "none — each draft is an ai.proposed_action row (one per block and language), applied to the block only when an operator saves it through the block's own write (ADR-0020); CHG-FXC-004",
+  "description": "What `proposeTranslations` drafted. **Every entry is a draft, never a publish** — a person edits and publishes it through the contract that owns the block.\n",
+  "required": [
+   "targetLocale",
+   "drafts"
+  ],
+  "properties": {
+   "targetLocale": {
+    "type": "string"
+   },
+   "translationJobId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The job to follow with `getTranslationProposals` (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045)."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "running",
+     "completed",
+     "failed"
+    ],
+    "description": "`running` while drafts are still being written; `drafts` then holds those done so far."
+   },
+   "drafts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "targetKind",
+      "targetRef",
+      "draftText"
+     ],
+     "properties": {
+      "targetKind": {
+       "type": "string",
+       "enum": [
+        "contentBlock",
+        "productName",
+        "emailTemplate",
+        "messageTemplate"
+       ]
+      },
+      "targetRef": {
+       "type": "string",
+       "description": "The id of the block, product or template the draft sits on."
+      },
+      "draftText": {
+       "type": "string",
+       "description": "The first-pass translation, as saved on the draft."
+      }
+     }
+    }
    }
   }
  }

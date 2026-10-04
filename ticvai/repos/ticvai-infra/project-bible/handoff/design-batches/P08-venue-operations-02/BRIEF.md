@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 20 operations · 28 schemas · 11 permissions**
+**5 screens · 21 operations · 30 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -164,7 +164,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-130` | Offline Policy & Rules Configuration | A | 14 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-131` | Connectivity & Auto-Switch Settings | B | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
-| `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-133` | Offline Alerts, Limits & Audit | A | 26 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

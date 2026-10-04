@@ -909,6 +909,12 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The catalogue variant sold for parking here** (4 October 2026, CHG-FXC-010; GST-027, WEB-041): what `addCartLine` sells when a guest buys parking at this car park. Set by staff; readable by guests. Null where the car park does not sell parking through the platform."
    }
   }
  },
@@ -1631,6 +1637,24 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "overriddenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who let the party past the queue** (`overrideWaitingGuest`, 4 October 2026, CHG-FXC-003), with `overrideReason` and `overriddenAt`. Null when the entry was never overridden."
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "overriddenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },

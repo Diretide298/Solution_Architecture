@@ -1,6 +1,6 @@
 # P02-cart-checkout-01 — P02 · Cart & Checkout
 
-**3 screens · 21 operations · 32 schemas · 4 permissions**
+**3 screens · 23 operations · 36 schemas · 5 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `GUEST_VIEW, ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **8 of these operations work offline**: createOrder, createPayment, getOrder, getPerformance, getPublishedBookingFlow, listProductVariants, listPublishedPolicies, reprintOrder
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-009` | Review & Payment | A | 14 | 74 | 5 | 31 | 23 | 0 | guest | notStarted (designed) |
-| `GST-010` | Booking Confirmation | A | 7 | 5 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
+| `GST-010` | Booking Confirmation | A | 19 | 5 | 5 | 14 | 4 | 6 | guest | notStarted (client-verified) |
 | `GST-041` | Checkout Entry | A | 13 | 29 | 6 | 23 | 14 | 6 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings

@@ -47,13 +47,13 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
 | `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
+| `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
 | `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
 | `getDigitalWaiverForm` | marketing-crm | GET | Load the layout of a waiver version |
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |

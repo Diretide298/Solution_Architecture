@@ -37,6 +37,7 @@
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
+| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
@@ -59,7 +60,6 @@
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
-| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | … | | | 78 more |
 
 ### 1 modules split across waves

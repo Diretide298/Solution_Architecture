@@ -107,8 +107,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-569` | Payment Orchestration Command Center | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-570` | Gateway, PSP & Acquirer Directory | A | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-570` | Gateway, PSP & Acquirer Directory | A | 25 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 41 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-573` | Payment Routing Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-574` | Routing Strategy, Priority & Load Distribution | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**ADM-570, ADM-572, ADM-578 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-572, ADM-578 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

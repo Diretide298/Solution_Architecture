@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 47
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -228,6 +228,7 @@ paths:
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-412 Payment Method & Settlement Setup"
+        - "P09 ADM-421 Venue & Operational Structure Creation"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1601,6 +1602,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutlet
+      x-ticvai-consumed-by:
+        - "P04 POS-021 Sell — Food & Drink"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an outlet

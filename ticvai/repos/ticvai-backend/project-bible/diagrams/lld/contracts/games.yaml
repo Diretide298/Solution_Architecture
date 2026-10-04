@@ -27,8 +27,14 @@ operations:
   offline: false
   reads:
   - games.game
+  - games.operational_config
+  - games.pricing
+  - games.reader_profile
   writes:
   - games.game
+  - games.operational_config
+  - games.pricing
+  - games.reader_profile
 - operation: cloneReaderConfiguration
   verb: POST
   path: /readers/{readerId}/clone
@@ -508,6 +514,7 @@ operations:
   reads:
   - cache:idempotency
   - games.game
+  - games.play
   writes:
   - cache:idempotency
   - games.game

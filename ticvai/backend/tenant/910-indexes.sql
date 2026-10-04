@@ -1191,6 +1191,12 @@ CREATE INDEX IF NOT EXISTS refresh_token_replaced_by_token_id_idx ON identity.re
 CREATE INDEX IF NOT EXISTS role_inherits_from_role_id_idx ON identity.role (inherits_from_role_id);
 -- convention, not declared: identity.role_permission.granted_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS role_permission_granted_by_principal_id_idx ON identity.role_permission (granted_by_principal_id);
+-- convention, not declared: identity.session.role_id -> identity.role
+CREATE INDEX IF NOT EXISTS session_role_id_idx ON identity."session" (role_id);
+-- convention, not declared: identity.session.venue_id -> platform.scope
+CREATE INDEX IF NOT EXISTS session_venue_id_idx ON identity."session" (venue_id);
+-- convention, not declared: identity.session.workstation_id -> platform.workstation
+CREATE INDEX IF NOT EXISTS session_workstation_id_idx ON identity."session" (workstation_id);
 -- convention, not declared: identity.sso_provider.client_id -> control.api_client
 CREATE INDEX IF NOT EXISTS sso_provider_client_id_idx ON identity.sso_provider (client_id);
 -- convention, not declared: inventory.count.location_id -> inventory.location
@@ -1817,6 +1823,8 @@ CREATE INDEX IF NOT EXISTS group_visit_plan_checked_in_by_principal_id_idx ON or
 CREATE INDEX IF NOT EXISTS group_visit_plan_handover_acknowledged_by_principal_id_idx ON orders.group_visit_plan (handover_acknowledged_by_principal_id);
 -- convention, not declared: orders.group_visit_plan.operational_owner_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS group_visit_plan_operational_owner_principal_id_idx ON orders.group_visit_plan (operational_owner_principal_id);
+-- convention, not declared: orders.guest_credit_account.subject_id -> pii.subject
+CREATE INDEX IF NOT EXISTS guest_credit_account_subject_id_idx ON orders.guest_credit_account (subject_id);
 -- convention, not declared: orders.invitation.issued_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS invitation_issued_by_principal_id_idx ON orders.invitation (issued_by_principal_id);
 -- convention, not declared: orders.invitation.offered_by_principal_id -> identity.principal
@@ -2565,6 +2573,10 @@ CREATE INDEX IF NOT EXISTS site_package_platform_staff_grant_id_idx ON whitelabe
 CREATE INDEX IF NOT EXISTS site_package_requested_by_principal_id_idx ON whitelabel.site_package (requested_by_principal_id);
 -- convention, not declared: whitelabel.store_account.developer_account_id -> control.developer_account
 CREATE INDEX IF NOT EXISTS store_account_developer_account_id_idx ON whitelabel.store_account (developer_account_id);
+-- convention, not declared: whitelabel.tenant_config.homepage_layout_id -> whitelabel.homepage_layout
+CREATE INDEX IF NOT EXISTS tenant_config_homepage_layout_id_idx ON whitelabel.tenant_config (homepage_layout_id);
+-- convention, not declared: whitelabel.tenant_config.navigation_config_id -> whitelabel.navigation_config
+CREATE INDEX IF NOT EXISTS tenant_config_navigation_config_id_idx ON whitelabel.tenant_config (navigation_config_id);
 -- convention, not declared: workforce.announcement.published_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS announcement_published_by_principal_id_idx ON workforce.announcement (published_by_principal_id);
 -- convention, not declared: workforce.attendance.amended_by_principal_id -> identity.principal
@@ -2967,6 +2979,8 @@ CREATE INDEX IF NOT EXISTS waitlist_entry_subject_id_idx ON catalogue.waitlist_e
 CREATE INDEX IF NOT EXISTS waitlist_entry_variant_id_idx ON catalogue.waitlist_entry (variant_id);
 -- declared: fnb.bill_split.visit_id -> fnb.table_visit
 CREATE INDEX IF NOT EXISTS bill_split_visit_id_idx ON fnb.bill_split (visit_id);
+-- declared: fnb.combo_slot_option.combo_slot_id -> fnb.combo_slot
+CREATE INDEX IF NOT EXISTS combo_slot_option_combo_slot_id_idx ON fnb.combo_slot_option (combo_slot_id);
 -- declared: fnb.delivery_location.seat_id -> seating.seat
 CREATE INDEX IF NOT EXISTS delivery_location_seat_id_idx ON fnb.delivery_location (seat_id);
 -- declared: fnb.delivery_location.table_id -> fnb.dining_table
@@ -4045,8 +4059,14 @@ CREATE INDEX IF NOT EXISTS timetable_run_timetable_id_idx ON transport.timetable
 CREATE INDEX IF NOT EXISTS import_job_map_id_idx ON venuemap.import_job (map_id);
 -- declared: venuemap.map.base_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS map_base_asset_id_idx ON venuemap.map (base_asset_id);
+-- declared: venuemap.map.model_asset_id -> assets.media_asset
+CREATE INDEX IF NOT EXISTS map_model_asset_id_idx ON venuemap.map (model_asset_id);
+-- declared: venuemap.map.navigation_file_asset_id -> assets.media_asset
+CREATE INDEX IF NOT EXISTS map_navigation_file_asset_id_idx ON venuemap.map (navigation_file_asset_id);
 -- declared: venuemap.map.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS map_venue_id_idx ON venuemap.map (venue_id);
+-- declared: venuemap.map_version.base_asset_id -> assets.media_asset
+CREATE INDEX IF NOT EXISTS map_version_base_asset_id_idx ON venuemap.map_version (base_asset_id);
 -- declared: venuemap.path.map_id -> venuemap.map
 CREATE INDEX IF NOT EXISTS path_map_id_idx ON venuemap.path (map_id);
 -- declared: venuemap.placed_resource.resource_id -> resources.resource
@@ -4083,6 +4103,8 @@ CREATE INDEX IF NOT EXISTS credit_lot_wallet_id_idx ON wallet.credit_lot (wallet
 CREATE INDEX IF NOT EXISTS gift_card_subject_id_idx ON wallet.gift_card (subject_id);
 -- declared: wallet.hold.order_id -> orders.sales_order
 CREATE INDEX IF NOT EXISTS hold_order_id_idx ON wallet.hold (order_id);
+-- declared: wallet.risk_rule.risk_rules_id -> wallet.risk_rules
+CREATE INDEX IF NOT EXISTS risk_rule_risk_rules_id_idx ON wallet.risk_rule (risk_rules_id);
 -- declared: wallet.wallet.subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS wallet_subject_id_idx ON wallet.wallet (subject_id);
 -- declared: wallet.wallet_transaction.order_id -> orders.sales_order
@@ -4115,8 +4137,12 @@ CREATE INDEX IF NOT EXISTS guided_choice_answer_guided_choice_question_id_idx ON
 CREATE INDEX IF NOT EXISTS guided_choice_question_guided_choice_id_idx ON whitelabel.guided_choice_question (guided_choice_id);
 -- declared: whitelabel.homepage_section.content_page_id -> whitelabel.content_page
 CREATE INDEX IF NOT EXISTS homepage_section_content_page_id_idx ON whitelabel.homepage_section (content_page_id);
+-- declared: whitelabel.homepage_section.homepage_layout_id -> whitelabel.homepage_layout
+CREATE INDEX IF NOT EXISTS homepage_section_homepage_layout_id_idx ON whitelabel.homepage_section (homepage_layout_id);
 -- declared: whitelabel.module_enablement.tenant_config_id -> whitelabel.tenant_config
 CREATE INDEX IF NOT EXISTS module_enablement_tenant_config_id_idx ON whitelabel.module_enablement (tenant_config_id);
+-- declared: whitelabel.navigation_item.navigation_config_id -> whitelabel.navigation_config
+CREATE INDEX IF NOT EXISTS navigation_item_navigation_config_id_idx ON whitelabel.navigation_item (navigation_config_id);
 -- declared: whitelabel.policy.published_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS policy_published_by_principal_id_idx ON whitelabel.policy (published_by_principal_id);
 -- declared: whitelabel.promo_block.promotion_id -> promotions.promotion
@@ -4302,6 +4328,7 @@ CREATE INDEX IF NOT EXISTS channel_rules_scope_path_idx ON wallet.channel_rules 
 CREATE INDEX IF NOT EXISTS channel_sales_rule_scope_path_idx ON catalogue.channel_sales_rule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS channel_sync_scope_path_idx ON catalogue.channel_sync USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS chargeback_evidence_scope_path_idx ON payments.chargeback_evidence USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS code_assignment_scope_path_idx ON promotions.code_assignment USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS communication_preference_type_scope_path_idx ON marketing.communication_preference_type USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS communication_provider_scope_path_idx ON marketing.communication_provider USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS communication_routing_rule_scope_path_idx ON marketing.communication_routing_rule USING gist (scope_path);
@@ -4351,6 +4378,7 @@ CREATE INDEX IF NOT EXISTS credit_lot_scope_path_idx ON wallet.credit_lot USING 
 CREATE INDEX IF NOT EXISTS credit_memo_scope_path_idx ON ledger.credit_memo USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS credit_type_scope_path_idx ON wallet.credit_type USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS currency_rule_scope_path_idx ON payments.currency_rule USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS daily_count_list_scope_path_idx ON inventory.daily_count_list USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS damage_assessment_scope_path_idx ON rental.damage_assessment USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS data_export_scope_path_idx ON accreditation.data_export USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS data_retention_setting_scope_path_idx ON tenancy.data_retention_setting USING gist (scope_path);

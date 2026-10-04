@@ -1,5 +1,5 @@
 id: LLD-accreditation
-title: accreditation — 47 operations
+title: accreditation — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -156,6 +156,17 @@ operations:
   offline: false
   reads:
   - accreditation.holder
+  writes: []
+- operation: getAccreditationValidity
+  verb: GET
+  path: /accreditation-validity
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.validity
   writes: []
 - operation: importAccreditationHolders
   verb: POST

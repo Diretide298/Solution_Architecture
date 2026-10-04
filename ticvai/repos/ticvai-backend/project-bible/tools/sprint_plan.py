@@ -12,7 +12,7 @@ completion for each platform so each block can be completely tested. Block B is 
 Modules completed - tickets for web, tickets for app."):
 
 - **Two-week sprints.** Sprint 1 is Monday 5 October to Friday 16 October 2026; Sprint 13 is 22 March to 2 April
-  2027. Holidays are skipped (below).
+  2027. Every weekday is a working day (no holidays, below).
 - **App-modules.** A business module is split by the app it lands in: "Ticketing · Guest Web" (P01), "Ticketing ·
   Guest App" (P02), "Ticketing · POS" (P04), "Ticketing · Venue Management" (P08). The back end an app-module
   needs (operations, tables) is attached to it; shared back end goes with the first app-module that needs it and
@@ -33,12 +33,10 @@ ROOT = Path(__file__).resolve().parents[1]
 # ---------------------------------------------------------------------------------------------- calendar
 START = dt.date(2026, 10, 5)            # Monday; Block A starts (decided 29 September)
 PLAN_END = dt.date(2027, 4, 2)          # end of the six months
-HOLIDAYS = {                            # UAE public holidays; Eid dates move with the moon, to be confirmed
-    dt.date(2026, 12, 1): "Commemoration Day", dt.date(2026, 12, 2): "National Day",
-    dt.date(2026, 12, 3): "National Day", dt.date(2027, 1, 1): "New Year",
-    dt.date(2027, 3, 9): "Eid al-Fitr", dt.date(2027, 3, 10): "Eid al-Fitr",
-    dt.date(2027, 3, 11): "Eid al-Fitr",
-}
+# **No holidays: every weekday is a working day** (Chinmay, 4 October 2026, CHG-RFM-013: "No holidays at all"; "1-3
+# are not holidays"; leave is handled when it comes up). Until then 1-3 December, 1 January and 9-11 March 2027 were
+# taken off as UAE public holidays. The dict stays so a decided day off can be entered here, with its decision.
+HOLIDAYS: dict = {}
 HOURS_PER_DAY = 8
 # Points per developer per working day: Block A as sized on 23 September (3,018 points, 35 days, 9 developers).
 # Replaced by the measured pace after the first sprints (re-run, not re-estimate).

@@ -198,6 +198,19 @@
   "requestBody": null,
   "responds": "ResourceAvailability"
  },
+ "getResourceBooking": {
+  "method": "GET",
+  "path": "/resource-bookings/{bookingId}",
+  "contract": "resources",
+  "summary": "One resource booking",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
  "getResourceQualifications": {
   "method": "GET",
   "path": "/resources/{resourceId}/qualifications",

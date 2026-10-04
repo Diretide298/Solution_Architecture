@@ -385,6 +385,7 @@ CREATE INDEX IF NOT EXISTS tenant_migration_tenant_id_idx ON control.tenant_migr
 CREATE INDEX IF NOT EXISTS tenant_migration_plan_tenant_id_idx ON control.tenant_migration_plan (tenant_id);
 -- unique per tenant (x-ticvai-unique): control.tenant_domain.hostname
 CREATE UNIQUE INDEX IF NOT EXISTS tenant_domain_tenant_id_hostname_uniq ON control.tenant_domain (tenant_id, hostname);
+CREATE INDEX IF NOT EXISTS api_anomaly_rule_scope_path_idx ON control.api_anomaly_rule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS channel_listing_scope_path_idx ON control.channel_listing USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS content_block_scope_path_idx ON control.content_block USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS migration_plan_scope_path_idx ON control.migration_plan USING gist (scope_path);
@@ -413,3 +414,4 @@ CREATE INDEX IF NOT EXISTS partner_status_history_scope_path_idx ON control.part
 CREATE INDEX IF NOT EXISTS seo_metadata_scope_path_idx ON control.seo_metadata USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS support_notice_scope_path_idx ON control.support_notice USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS url_redirect_scope_path_idx ON control.url_redirect USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS usage_record_scope_path_idx ON control.usage_record USING gist (scope_path);

@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 46 operations · 42 schemas · 12 permissions**
+**10 screens · 47 operations · 42 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -128,9 +128,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-057` | Training & Certification | B | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-066` | Notification Settings | D | 12 | 23 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-084` | Approval Inbox | A | 11 | 11 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
-| `BO-085` | Approval Request | A | 8 | 8 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
-| `BO-086` | Approval Matrix | B | 24 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
-| `BO-087` | Approval Delegations | B | 8 | 12 | 6 | 2 | 0 | 3 | — | notStarted (generated) |
+| `BO-085` | Approval Request | A | 8 | 12 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
+| `BO-086` | Approval Matrix | B | 34 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
+| `BO-087` | Approval Delegations | B | 43 | 22 | 6 | 51 | 0 | 3 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

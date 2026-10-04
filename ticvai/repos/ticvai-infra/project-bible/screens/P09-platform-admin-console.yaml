@@ -408,6 +408,9 @@ screens:
     - ADM-412
     - ADM-424
     - ADM-500
+    - ADM-503
+    - ADM-504
+    - ADM-505
     - ADM-506
     - ADM-508
     - ADM-523
@@ -703,6 +706,24 @@ screens:
         3 October 2026); its command centre is not in Block A'
       carries:
       - tenantId
+    - to: ADM-503
+      trigger: Opens Ticket, Product & Timeslot Demand Forecast
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007);
+        kept when it went back to Block B with Identity & Security (Chinmay, 4 October)'
+      carries:
+      - tenantId
+    - to: ADM-504
+      trigger: Opens Channel & Booking Pace Forecast
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007);
+        kept when it went back to Block B with Identity & Security (Chinmay, 4 October)'
+      carries:
+      - tenantId
+    - to: ADM-505
+      trigger: Opens Revenue & Commercial Forecast
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007);
+        kept when it went back to Block B with Identity & Security (Chinmay, 4 October)'
+      carries:
+      - tenantId
     - to: ADM-506
       trigger: Opens Forecast Drivers, Confidence & Explainability
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -981,7 +1002,11 @@ screens:
     with `crossesDevice` rather than a screen pretending there is a link. **Drawn 26 August** — `Dashboards
     Board` frame `adm-003`. **One board draws five dashboards across five platforms** — platform admin,
     partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain,
-    and the pack recognised that before the package did.'
+    and the pack recognised that before the package did.
+
+
+    **Cross-tenant: the cells are listed with listCells (agreed with contracts in the ledger, 4 October
+    2026); cellId is optional and comes from the selected row** (CHG-FXS-003)'
   density: compact
   boardFrames:
   - Dashboards Board.dc.html#adm-003
@@ -1008,6 +1033,19 @@ screens:
         - CellJob.completedAt
         operation: listCellJobs
         provenance: contract subscription.yaml GET /cells/{cellId}/jobs
+      - kind: dataTable
+        label: Cells
+        bindsTo: CellDetail
+        operation: listCells
+        columns:
+        - CellDetail.name
+        - CellDetail.kind
+        - CellDetail.tier
+        - CellDetail.status
+        - CellDetail.isReachable
+        - CellDetail.lastContactAt
+        notes: Every cell, unhealthy first; selecting one loads its health, capacity and jobs.
+        provenance: agreed operation `listCells`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -1162,10 +1200,18 @@ screens:
     trigger: onAction
     invalidates:
     - listCellJobs
+  - operationId: listCells
+    contract: subscription
+    purpose: 'Every cell across tenants with its health summary, to pick one: agreed with the contracts
+      agent, runs/fix-s12/LEDGER.md, 4 October 2026'
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: cellId
       from: deepLink
+      optional: true
+      notes: 'From ADM-002 there is none: the operator picks a cell from the list.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -4963,7 +5009,11 @@ screens:
 
     **Hosted with TICVAI: platform staff may publish the tenant''s site under the open grant (decided
     2 October 2026 by Chinmay, DEC-144); self-hosted: Generate site package.** Publishing here is simulate
-    (Create preview) then publish; an optional review step applies when the venue switched it on (DEC-156).'
+    (Create preview) then publish; an optional review step applies when the venue switched it on (DEC-156).
+
+
+    **Asset ids (the brand identity and app icon fields) come from the media library (searchMedia) or
+    an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listConfigVersions` reads the population and `getAppIcons` reads one of them — list,
@@ -5029,6 +5079,22 @@ screens:
 
           '
         provenance: carried from the previous definition
+      - kind: cardList
+        label: Media library
+        bindsTo: MediaAsset
+        operation: searchMedia
+        columns:
+        - MediaAsset.filename
+        - MediaAsset.kind
+        - MediaAsset.contentType
+        notes: Picking one fills the brand identity and app icon fields with its id.
+        provenance: contract assets.yaml MediaAsset (defined 4 October 2026, CHG-FXS-003)
+      - kind: fileUpload
+        label: Upload new
+        bindsTo: MediaAsset.id
+        operation: createUpload
+        notes: createUpload, the file PUT, completeUpload; the asset id fills the field being edited.
+        provenance: contract assets.yaml MediaAsset.id (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -5138,11 +5204,11 @@ screens:
     emptyNoResults: 'Never shown: `listConfigVersions` takes no filter, so an empty list is always the
       first-run state above.'
     emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to
-      show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`,
-      `TENANT_PUBLISH` and say so in their own panels). **Never an empty table** — that reads as *there
-      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
-      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS`
-      for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
+      show this screen, and names that permission (the screen''s other reads need `ASSET_LIBRARY_MANAGE`,
+      `ASSET_LIBRARY_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). **Never
+      an empty table** — that reads as *there is no data* and sends somebody to support with the wrong
+      question. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
@@ -5227,6 +5293,21 @@ screens:
     purpose: Follow the generated package until it is ready
     trigger: onLoad
     provenance: design-note correction, 2 October 2026 (ADM-016)
+  - operationId: searchMedia
+    contract: assets
+    purpose: The media library, to pick an existing asset by name
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: createUpload
+    contract: assets
+    purpose: Upload a new asset
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: completeUpload
+    contract: assets
+    purpose: Finish the upload once the file PUT succeeds; the asset id fills the field
+    trigger: background
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
@@ -5252,6 +5333,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConfigVersions`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: uploadId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -6483,7 +6568,11 @@ screens:
 
     **No default roles (decided 2 October 2026 by Chinmay, DEC-007; CHG-CSP-003):** roles start from per-module
     presets (All, Viewer, Mid-level) that fill an editable checklist; the role can be renamed. Created
-    inside the picked tenant under the open grant.'
+    inside the picked tenant under the open grant.
+
+
+    **The create-role modal''s preset picker and checklist read listCapabilityTemplates and listPermissions
+    (4 October 2026)** (CHG-FXS-003)'
   density: compact
   pattern: listDetail
   patternReason: '`listRoles` reads a population and nothing reads one of them; the detail is the row
@@ -6543,6 +6632,21 @@ screens:
         - Role.grantCount
         operation: listRoles
         provenance: contract identity.yaml GET /roles
+      - kind: multiSelect
+        label: Start from presets
+        bindsTo: CapabilityTemplate.code
+        operation: listCapabilityTemplates
+        columns:
+        - CapabilityTemplate.name
+        - CapabilityTemplate.module
+        - CapabilityTemplate.presetLevel
+        provenance: contract identity.yaml CapabilityTemplate.code (defined 4 October 2026, CHG-FXS-003)
+      - kind: multiSelect
+        label: Permissions by module
+        bindsTo: Role.permissions
+        operation: listPermissions
+        notes: Grouped by IdentityPermission.moduleId; a preset ticks its capabilities.
+        provenance: contract identity.yaml Role.permissions (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -6575,10 +6679,10 @@ screens:
     emptyNoResults: 'Never shown: `listRoles` takes no filter, so an empty list is always the first-run
       state above.'
     emptyNoAccess: 'Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this
-      screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and say
-      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question. A caller who can see the screen but lacks what an action needs
-      sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      screen, and names that permission (the screen''s other reads need `PERMISSION_VIEW`, `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
       `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
@@ -6609,6 +6713,16 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listCapabilityTemplates
+    contract: identity
+    purpose: The presets (All, Viewer, Mid-level) per module for the create-role modal (DEC-007)
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listPermissions
+    contract: identity
+    purpose: The per-module permission checklist
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     preloaded:
     - Role.id
@@ -12715,68 +12829,105 @@ screens:
       provenance: structural — pack board 2 wiring, 11 September 2026
       back: true
   density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  pattern: wizard
+  patternReason: 'Three steps on one form: prove the email, then the organisation, then submit (defined
+    4 October 2026 from OnboardingApplication, CHG-FXS-001).'
   purpose: Create the initial customer account and organization profile.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 22
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 22
   layout:
-    template: split
+    template: form
     regions:
     - name: contentBody
       components:
       - kind: textField
         label: Work email
         bindsTo: StartProspectSignupRequest.email
-        notes: 'Step one of the prospect sign-up session (DEC-167, "Email + one-time code"): the code
-          goes to this address; "Continue saved setup" is the same field (CHG-CLN-019).'
-        provenance: contract identity.yaml POST /auth/prospect/signup
+        operation: startProspectSignup
+        provenance: contract identity.yaml StartProspectSignupRequest.email (defined 4 October 2026, CHG-FXS-001)
       - kind: secondaryButton
         label: Send code
         operation: startProspectSignup
-        notes: Sends the one-time code; the answer is the same whether or not the email has a saved setup.
-        provenance: contract identity.yaml POST /auth/prospect/signup
+        provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: textField
         label: One-time code
         bindsTo: VerifyProspectSignupCodeRequest.code
-        notes: Six digits from the email; a right code opens the sign-up session (prospectAuth) the rest
-          of the journey runs on and resumes a saved setup (CHG-CLN-019).
-        provenance: contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify
+        operation: verifyProspectSignupCode
+        notes: Six digits; five attempts, then a new code is needed.
+        provenance: contract identity.yaml VerifyProspectSignupCodeRequest.code (defined 4 October 2026,
+          CHG-FXS-001)
       - kind: secondaryButton
         label: Verify code
         operation: verifyProspectSignupCode
-        notes: A wrong code says so and counts against the challenge; after five, Send code again.
-        provenance: contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify
+        notes: On success the organisation fields unlock; the verified email becomes contactEmail and
+          is not editable.
+        provenance: defined 4 October 2026 (CHG-FXS-001)
+      - kind: textField
+        label: Company name
+        bindsTo: OnboardingApplication.companyName
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml OnboardingApplication.companyName (defined 4 October 2026,
+          CHG-FXS-001)
+      - kind: textField
+        label: Contact email
+        bindsTo: OnboardingApplication.contactEmail
+        operation: submitOnboardingApplication
+        notes: The verified email, read-only.
+        provenance: contract subscription.yaml OnboardingApplication.contactEmail (defined 4 October 2026,
+          CHG-FXS-001)
+      - kind: textField
+        label: Contact phone
+        bindsTo: OnboardingApplication.contactPhone
+        operation: submitOnboardingApplication
+        notes: E.164, +971 by default.
+        provenance: contract subscription.yaml OnboardingApplication.contactPhone (defined 4 October 2026,
+          CHG-FXS-001)
+      - kind: selectField
+        label: Country
+        bindsTo: OnboardingApplication.countryCode
+        operation: submitOnboardingApplication
+        notes: ISO 3166-1 alpha-2; AE by default.
+        provenance: contract subscription.yaml OnboardingApplication.countryCode (defined 4 October 2026,
+          CHG-FXS-001)
+      - kind: textField
+        label: Legal name
+        bindsTo: OnboardingApplication.billingEntity.legalName
+        operation: submitOnboardingApplication
+        notes: Optional here; required before the first invoice.
+        provenance: contract subscription.yaml OnboardingApplication.billingEntity.legalName (defined
+          4 October 2026, CHG-FXS-001)
+      - kind: textField
+        label: Trade licence number
+        bindsTo: OnboardingApplication.billingEntity.tradeLicenceNumber
+        operation: submitOnboardingApplication
+        notes: Optional here.
+        provenance: contract subscription.yaml OnboardingApplication.billingEntity.tradeLicenceNumber
+          (defined 4 October 2026, CHG-FXS-001)
+      - kind: textField
+        label: Tax registration number (TRN)
+        bindsTo: OnboardingApplication.billingEntity.trn
+        operation: submitOnboardingApplication
+        notes: Optional; 15 digits for a UAE VAT registrant.
+        provenance: contract subscription.yaml OnboardingApplication.billingEntity.trn (defined 4 October
+          2026, CHG-FXS-001)
       - kind: primaryButton
-        derived: true
-        impliedBy: submitOnboardingApplication
         label: Submit
-        notes: The act the screen exists for.
+        operation: submitOnboardingApplication
+        notes: Sends a client UUIDv7 id and status submitted. The venue type and the plan are chosen in
+          the next steps (venueTypeTemplateId and requestedPlanId are optional here).
+        provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: submitOnboardingApplication
+        notes: Leaves without submitting; nothing is sent.
+        provenance: defined 4 October 2026 (CHG-FXS-001)
   states:
-    loading: The customer organization registration list.
-    error: Could not load. Names which read failed and leaves the customer organization registration untouched.
+    loading: 'Not used: the form renders at once.'
+    error: The call that failed is named beside its button (code, verify or submit); what was typed stays.
     emptyFirstRun: No customer organization registration yet. Carries the create action; distinct from
       a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the customer organization registration are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `submitOnboardingApplication`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads as
+      *there is no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: submitOnboardingApplication
     contract: subscription
@@ -12797,10 +12948,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-380
     workshopBoard: wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-380
-  apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of
-    0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
-    acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
-    than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   entryState:
     params:
     - name: challengeId
@@ -12808,6 +12957,9 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `startProspectSignup`;
         a link or an edge that holds one opens it instead.'
+  notes: '**Defined 4 October 2026 from StartProspectSignupRequest, VerifyProspectSignupCodeRequest and
+    OnboardingApplication (companyName, contactEmail, contactPhone, countryCode, billingEntity); the operator-led
+    path of SGN-002** (CHG-FXS-001)'
 - id: ADM-381
   name: Venue Type & Business Profile
   module: Tenants & Licensing
@@ -15981,38 +16133,17 @@ screens:
     rather than passed off as a decision'
   purpose: Set up a tenant's payment provider and settlement for a venue, from the console under an open
     grant.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 61
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 61
   layout:
     template: split
     regions:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: multiSelect
-        label: Payment methods
-        bindsTo: PaymentProvider.id
-        columns:
-        - PaymentProvider.supportedMethods
-        operation: setPaymentProvider
-        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options
-          are the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s
-          Credit / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method
-          is not in the contract and is dropped.'
-        provenance: contract orders.yaml PUT /payment-providers
       - kind: primaryButton
         label: Save payment provider
         operation: setPaymentProvider
-        provenance: contract orders.yaml PUT /payment-providers
+        notes: Upsert on id; If-Match carries the version read by listPaymentProviders.
+        provenance: defined 4 October 2026 (CHG-FXS-002)
     - name: contentBody
       components:
       - kind: cardList
@@ -16072,6 +16203,64 @@ screens:
         notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: textField
+        label: Provider name
+        bindsTo: SetPaymentProviderRequest.name
+        operation: setPaymentProvider
+        provenance: contract orders.yaml SetPaymentProviderRequest.name (defined 4 October 2026, CHG-FXS-002)
+      - kind: selectField
+        label: Gateway
+        bindsTo: SetPaymentProviderRequest.kind
+        operation: setPaymentProvider
+        notes: Network International and Stripe for Phase 1 (CF-131).
+        provenance: contract orders.yaml SetPaymentProviderRequest.kind (defined 4 October 2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Payment methods
+        bindsTo: SetPaymentProviderRequest.supportedMethods
+        operation: setPaymentProvider
+        provenance: contract orders.yaml SetPaymentProviderRequest.supportedMethods (defined 4 October
+          2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Currencies
+        bindsTo: SetPaymentProviderRequest.supportedCurrencies
+        operation: setPaymentProvider
+        provenance: contract orders.yaml SetPaymentProviderRequest.supportedCurrencies (defined 4 October
+          2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Channels
+        bindsTo: SetPaymentProviderRequest.acceptedOnChannels
+        operation: setPaymentProvider
+        provenance: contract orders.yaml SetPaymentProviderRequest.acceptedOnChannels (defined 4 October
+          2026, CHG-FXS-002)
+      - kind: textField
+        label: Credential reference
+        bindsTo: SetPaymentProviderRequest.credentialRef
+        operation: setPaymentProvider
+        notes: The vault reference the operator was given, never the key itself.
+        provenance: contract orders.yaml SetPaymentProviderRequest.credentialRef (defined 4 October 2026,
+          CHG-FXS-002)
+      - kind: selectField
+        label: Applies at
+        bindsTo: SetPaymentProviderRequest.scopeLevel
+        operation: setPaymentProvider
+        notes: 'Venue by default: the venue picked above.'
+        provenance: contract orders.yaml SetPaymentProviderRequest.scopeLevel (defined 4 October 2026,
+          CHG-FXS-002)
+      - kind: toggle
+        label: Active
+        bindsTo: SetPaymentProviderRequest.isActive
+        operation: setPaymentProvider
+        provenance: contract orders.yaml SetPaymentProviderRequest.isActive (defined 4 October 2026, CHG-FXS-002)
+      - kind: cardList
+        label: Routing
+        bindsTo: SetPaymentProviderRequest.routing
+        operation: setPaymentProvider
+        columns:
+        - PaymentRouting.priority
+        - PaymentRouting.conditions
+        - PaymentRouting.fallbackProviderId
+        notes: Ordered rules, first match wins; a fallback provider is required.
+        provenance: contract orders.yaml SetPaymentProviderRequest.routing (defined 4 October 2026, CHG-FXS-002)
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -16150,6 +16339,9 @@ screens:
   purposeNote: 'Purpose corrected 2 October 2026 (CHG-SBO-011): `setPaymentProvider` configures how a
     tenant''s venue collects from guests; TICVAI''s own fees are subscription billing (ADM-009), not this
     screen.'
+  notes: '**Save form bound 4 October 2026 to SetPaymentProviderRequest: name, kind, methods, currencies,
+    channels, credential reference, scope, active and routing (the methods multiSelect alone could not
+    send a provider)** (CHG-FXS-002)'
 - id: ADM-413
   name: Trial Configuration & Conversion Rules
   module: Tenants & Licensing
@@ -17117,12 +17309,6 @@ screens:
     directory — it is settings, not a population
   purpose: Automatically create the initial venue structure using information collected during onboarding.
   gaps:
-  - operation: null
-    why: '**Venue & Operational Structure Creation declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: createPrincipal
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and
@@ -17180,29 +17366,32 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
-        label: Venue Name
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
+        label: Place under
+        bindsTo: CreateScopeNodeRequest.parentId
+        operation: listOrgUnits
+        columns:
+        - OrgUnit.name
+        - OrgUnit.level
+        - OrgUnit.path
+        notes: Brand and region nodes of the picked tenant (listOrgUnits level brand, region).
+        provenance: contract tenancy.yaml CreateScopeNodeRequest.parentId (defined 4 October 2026, CHG-FXS-002)
       - kind: selectField
-        label: Venue Type
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
-      - kind: selectField
-        label: Address
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
-      - kind: selectField
-        label: Time Zone
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
-      - kind: selectField
-        label: Currency
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
-      - kind: selectField
-        label: Operating Region
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
-      - kind: selectField
-        label: Default Language
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
-      - kind: selectField
-        label: Operating Model
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
+        label: Level
+        bindsTo: CreateScopeNodeRequest.level
+        operation: createOrgUnit
+        notes: venue by default; zone under a venue.
+        provenance: contract tenancy.yaml CreateScopeNodeRequest.level (defined 4 October 2026, CHG-FXS-002)
+      - kind: textField
+        label: Code
+        bindsTo: CreateScopeNodeRequest.code
+        operation: createOrgUnit
+        notes: Unique in the tenant; letters, digits and hyphens.
+        provenance: contract tenancy.yaml CreateScopeNodeRequest.code (defined 4 October 2026, CHG-FXS-002)
+      - kind: textField
+        label: Venue name
+        bindsTo: CreateScopeNodeRequest.name
+        operation: createOrgUnit
+        provenance: contract tenancy.yaml CreateScopeNodeRequest.name (defined 4 October 2026, CHG-FXS-002)
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -17229,24 +17418,17 @@ screens:
       - ticketRef
       - expiresAt
     provenance: contract identity.yaml POST /platform-staff-grants
-  - id: formCreateOrgUnit
-    component: modal
-    trigger: Create venue structure
-    body: '**Collects what `createOrgUnit` sends before it is called.** Dismissing sends nothing; the
-      screen behind is unchanged.'
-    confirm:
-      label: Create venue structure
-      operation: createOrgUnit
-    dismiss:
-      label: Cancel
-    provenance: contract tenancy.yaml POST /org-units; wiring fix, 2 October 2026
   states:
     loading: The venue operational structure configuration as saved.
     error: Could not load. Names which read failed and leaves the venue operational structure untouched.
     emptyFirstRun: No venue operational structure configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to
+      show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`,
+      `listOwnPlatformStaffGrants`; `SCOPE_MANAGE` for `createOrgUnit`.'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
@@ -17272,6 +17454,11 @@ screens:
     contract: identity
     purpose: Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)
     trigger: onAction
+  - operationId: listOrgUnits
+    contract: tenancy
+    purpose: The picked tenant's brands and regions, to place the venue under
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-002)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-421
@@ -17285,6 +17472,10 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+  notes: '**Bound 4 October 2026 to CreateScopeNodeRequest (level, parentId, code, name) with the parent
+    picked from listOrgUnits. Type, address, time zone, currency, region, language and operating model
+    are not part of createOrgUnit: currency and region come from the parent region (ADR-0018), the rest
+    are venue settings set on the venue''s own screens** (CHG-FXS-002)'
 - id: ADM-422
   name: Administrator & Security Initialization
   module: Tenants & Licensing
@@ -17591,16 +17782,6 @@ screens:
     rather than passed off as a decision'
   purpose: Activate the modules purchased in Board 4/5 and verify all required dependencies.
   gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 77
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 77
   - operation: listVenueTypeTemplates
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-021): Module Activation was wired to listVenueTypeTemplates,
@@ -17615,19 +17796,6 @@ screens:
     regions:
     - name: contentBody
       components:
-      - kind: selectField
-        label: Tenant
-        bindsTo: Tenant.id
-        columns:
-        - Tenant.code
-        - Tenant.name
-        - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
@@ -17644,26 +17812,46 @@ screens:
           action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
           The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
         provenance: contract identity.yaml GET /platform-staff-grants/mine
-      - kind: dataTable
-        label: Tenant
-        operation: listTenants
-        provenance: contract subscription.yaml GET /tenants; wiring fix, 2 October 2026
       - kind: detailPanel
         label: Licensed modules
-        bindsTo: LicencePosition
+        bindsTo: LicencePosition.licensedModules
         operation: getTenantLicences
-        provenance: contract subscription.yaml GET /tenants/{tenantId}/licences; wiring fix, 2 October
-          2026
+        provenance: contract subscription.yaml LicencePosition.licensedModules (defined 4 October 2026,
+          CHG-FXS-002)
+        columns:
+        - LicencePosition.licensedModules.moduleKey
+        - LicencePosition.licensedModules.source
+        - LicencePosition.licensedModules.validTo
       - kind: dataTable
         label: Dependencies
         bindsTo: ModuleListing
         operation: listModuleCatalogue
-        provenance: contract subscription.yaml GET /module-catalogue; wiring fix, 2 October 2026
+        provenance: contract subscription.yaml ModuleListing (defined 4 October 2026, CHG-FXS-002)
+        columns:
+        - ModuleListing.moduleCode
+        - ModuleListing.name
+        - ModuleListing.requiresModules
+        - ModuleListing.incompatibleWithModules
+        - ModuleListing.status
       - kind: dataTable
         label: Active modules
         bindsTo: ModuleEnablement
         operation: getModuleEnablement
-        provenance: contract white-label.yaml GET /tenant-config/modules; wiring fix, 2 October 2026
+        provenance: contract white-label.yaml ModuleEnablement (defined 4 October 2026, CHG-FXS-002)
+        columns:
+        - ModuleEnablement.moduleKey
+        - ModuleEnablement.displayName
+        - ModuleEnablement.isLicensed
+        - ModuleEnablement.isEnabled
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant.id
+        operation: listTenants
+        columns:
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-002)
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -17759,6 +17947,11 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+  notes: '**One vocabulary 4 October 2026: ModuleListing.moduleCode, LicencePosition.licensedModules[].moduleKey
+    and ModuleEnablement.moduleKey all hold ModuleKey values (the contract is asked to type the first
+    two as ModuleKey, ledger). Activate is enabled for a module only when it is licensed and every module
+    in its requiresModules is licensed and enabled or being enabled; one in incompatibleWithModules blocks
+    it, naming the conflict** (CHG-FXS-002)'
 - id: ADM-425
   name: Venue Template Application
   module: Tenants & Licensing
@@ -19170,6 +19363,8 @@ screens:
     - to: ADM-460
       trigger: Billing Calculation & Charge Breakdown
       provenance: structural — pack board 10 wiring, 11 September 2026
+      carries:
+      - tenantId
     - to: ADM-461
       trigger: Consumption Reconciliation & Billing Approval
       provenance: structural — pack board 10 wiring, 11 September 2026
@@ -19343,64 +19538,131 @@ screens:
       provenance: structural — pack board 10 wiring, 11 September 2026
       back: true
   density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  pattern: configEditor
+  patternReason: Pick a tenant and a period, calculate the charge as a dry run, read the lines, then issue
+    (defined 4 October 2026 from generateInvoice, CHG-FXS-001).
   purpose: Calculate exactly what TICVAI should charge for the billing period. This screen must dynamically
     change according to the commercial model.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 124
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 124
   layout:
     template: split
     regions:
     - name: contentBody
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant.id
+        operation: listTenants
+        columns:
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)
+      - kind: datePicker
+        label: Period start
+        bindsTo: SubscriptionInvoice.periodStart
+        operation: generateInvoice
+        provenance: contract subscription.yaml SubscriptionInvoice.periodStart (defined 4 October 2026,
+          CHG-FXS-001)
+      - kind: datePicker
+        label: Period end
+        bindsTo: SubscriptionInvoice.periodEnd
+        operation: generateInvoice
+        provenance: contract subscription.yaml SubscriptionInvoice.periodEnd (defined 4 October 2026,
+          CHG-FXS-001)
       - kind: primaryButton
-        derived: true
-        impliedBy: generateInvoice
-        notes: The act the screen exists for.
+        label: Calculate
+        operation: generateInvoice
+        notes: 'dryRun true: prices the period and changes nothing.'
+        provenance: defined 4 October 2026 (CHG-FXS-001)
+      - kind: dataTable
+        label: Charge lines
+        bindsTo: SubscriptionInvoice.lines
+        operation: generateInvoice
+        columns:
+        - SubscriptionInvoice.lines.kind
+        - SubscriptionInvoice.lines.moduleCode
+        - SubscriptionInvoice.lines.description
+        - SubscriptionInvoice.lines.quantity
+        - SubscriptionInvoice.lines.unitPrice
+        - SubscriptionInvoice.lines.amount
+        notes: One line per licensed module at its listed price, the package's base line, and metered
+          usage lines; the commercial model decides which lines appear.
+        provenance: contract subscription.yaml SubscriptionInvoice.lines (defined 4 October 2026, CHG-FXS-001)
+      - kind: metricTile
+        label: Subtotal
+        bindsTo: SubscriptionInvoice.subtotal
+        operation: generateInvoice
+        provenance: contract subscription.yaml SubscriptionInvoice.subtotal (defined 4 October 2026, CHG-FXS-001)
+      - kind: metricTile
+        label: Tax
+        bindsTo: SubscriptionInvoice.taxAmount
+        operation: generateInvoice
+        provenance: contract subscription.yaml SubscriptionInvoice.taxAmount (defined 4 October 2026,
+          CHG-FXS-001)
+      - kind: metricTile
+        label: Total
+        bindsTo: SubscriptionInvoice.total
+        operation: generateInvoice
+        provenance: contract subscription.yaml SubscriptionInvoice.total (defined 4 October 2026, CHG-FXS-001)
       - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: generateInvoice
+        label: Issue invoice
+        operation: generateInvoice
+        notes: dryRun false; idempotent per tenant and period, so a second issue returns the same invoice.
+        provenance: defined 4 October 2026 (CHG-FXS-001)
+    - name: contextPanel
+      components:
+      - kind: dataTable
+        label: Invoices issued
+        bindsTo: SubscriptionInvoice
+        operation: listSubscriptionInvoices
+        columns:
+        - SubscriptionInvoice.periodStart
+        - SubscriptionInvoice.periodEnd
+        - SubscriptionInvoice.status
+        - SubscriptionInvoice.total
+        provenance: contract subscription.yaml SubscriptionInvoice (defined 4 October 2026, CHG-FXS-001)
   states:
-    loading: The billing calculation charge list.
-    error: Could not load. Names which read failed and leaves the billing calculation charge untouched.
-    emptyFirstRun: No billing calculation charge yet. Offers no create action — this screen declares no
-      operation that makes one; distinct from a filter that matched nothing.
+    loading: The list skeleton, with the filters already drawn.
+    error: Could not load. Names which read failed and leaves what is on screen untouched.
+    emptyFirstRun: 'Nothing calculated yet: pick a tenant and a period.'
     emptyNoResults: The filter narrowed it and the billing calculation charge are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to
+      show this screen, and names that permission (the screen''s other reads need `PLATFORM_BILLING_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for
+      `generateInvoice`.'
   apis:
   - operationId: generateInvoice
     contract: subscription
     purpose: Calculate the charge
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker (audit R098)
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-001)
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: The tenant's invoices already issued, to show a period that is billed
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-001)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-460
     workshopBoard: wireframes/WS162 Subscription Licensing AI Self Service Board 10.dc.html#adm-460
-  apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 124. 0 of
-    0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
-    acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
-    than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   entryState:
     params:
     - name: tenantId
-      from: session
+      from: navigation
+      optional: true
+      notes: Opened without it, the operator picks a tenant.
+  notes: '**Defined 4 October 2026 from generateInvoice: the dry run (dryRun true) is the calculation
+    and its lines are the charge breakdown; the same call without dryRun issues it** (CHG-FXS-001)'
 - id: ADM-461
   name: Consumption Reconciliation & Billing Approval
   module: Tenants & Licensing
@@ -27346,6 +27608,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -27357,93 +27620,122 @@ screens:
       - versionId
   density: compact
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Show) and no metric row
+  patternReason: Forecast values of one product and timeslot demand definition, picked on the screen (4
+    October 2026, CHG-FXS-004).
   purpose: Predict demand at the product and inventory level so TICVAI can understand what customers are
     likely to buy, not only total attendance.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show
   layout:
     template: split
     regions:
     - name: contentBody
-      slot: collection
       components:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: dataTable
-        label: Every ticket product timeslot
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-004)
+      - kind: selectField
+        label: Forecast
+        bindsTo: AiForecastDefinition.definitionKey
+        operation: listForecastDefinitions
         columns:
-        - Days Before Visit
-        - Cumulative Sales
-        - Current Booking Curve
-        - Historical Average
-        - Forecast Final Demand
-        - Product Relationships
-        bindsTo: null
-        operation: null
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show
+        - AiForecastDefinition.name
+        - AiForecastDefinition.grain
+        - AiForecastDefinition.horizonDays
+        notes: Query subject productDemand or timeslotDemand; the first active definition is picked by
+          default.
+        provenance: contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: From
+        bindsTo: AiForecastPoint.targetStart
+        operation: getForecast
+        notes: Query from; today by default.
+        provenance: contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: To
+        bindsTo: AiForecastPoint.targetEnd
+        operation: getForecast
+        notes: Query to; the definition's horizon by default.
+        provenance: contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Forecast
+        bindsTo: AiForecastPoint
+        operation: getForecast
+        columns:
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.dimensionKey
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.unit
+        notes: a range, never a bare number (design 5.6).
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
     - name: contextPanel
-      slot: selection
       components:
       - kind: detailPanel
-        label: The selected ticket product timeslot
-        bindsTo: null
+        label: The selected value
+        bindsTo: AiForecastPoint
+        operation: getForecast
         columns:
-        - Days Before Visit
-        - Cumulative Sales
-        - Current Booking Curve
-        - Historical Average
-        - Forecast Final Demand
-        - Product Relationships
-        notes: 'The pack groups this record''s detail under its own headings: “Family Meal demand typically
-          increases”, “Where enough evidence exists, estimate”.'
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.targetEnd
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.drivers
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
+      - kind: detailPanel
+        label: Version
+        bindsTo: AiForecastVersion
+        operation: getForecast
+        columns:
+        - AiForecastVersion.versionNumber
+        - AiForecastVersion.status
+        - AiForecastVersion.basis
+        - AiForecastVersion.maturity
+        - AiForecastVersion.dataCutoffAt
+        provenance: contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Accuracy by horizon
+        bindsTo: AiForecastAccuracy
+        operation: getForecastAccuracy
+        columns:
+        - AiForecastAccuracy.horizonDays
+        - AiForecastAccuracy.wape
+        - AiForecastAccuracy.bias
+        - AiForecastAccuracy.intervalCoverage
+        provenance: contract ai.yaml AiForecastAccuracy (defined 4 October 2026, CHG-FXS-004)
   states:
-    loading: The ticket product timeslot list.
-    error: Could not load. Names which read failed and leaves the ticket product timeslot untouched.
-    emptyFirstRun: No ticket product timeslot yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the ticket product timeslot are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The list skeleton, with the filters already drawn.
+    error: Could not load. Names which read failed and leaves what is on screen untouched.
+    emptyFirstRun: No product and timeslot demand forecast defined for this tenant yet.
+    emptyNoResults: No values in this window. Names the window and offers the definition's horizon.
+    emptyNoAccess: 'Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen,
+      and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
@@ -27470,6 +27762,18 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: The product and timeslot demand forecast definitions (subject productDemand or timeslotDemand);
+      the picked one's definitionKey is what getForecast reads
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-004)
+  - operationId: getForecastAccuracy
+    contract: ai
+    purpose: How accurate the picked demand forecast has been, by horizon, so a planner knows how far
+      to trust it
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-004)
   entryState:
     preloaded:
     - Days Before Visit
@@ -27486,10 +27790,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-503
     workshopBoard: wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-503
-  apisNote: Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
-    page 12. 0 of 6 labels bound to a contract property; 6 of 35 pack bullets carried onto the screen
-    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
-    the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -27514,7 +27816,12 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token
     until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every
-    action under it.'
+    action under it.
+
+
+    **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject productDemand
+    or timeslotDemand) supplies the definitionKey getForecast requires; columns are AiForecastPoint''s
+    (p10, p50, p90). Pack labels with no contract field left the screen** (CHG-FXS-004)'
 - id: ADM-504
   name: Channel & Booking Pace Forecast
   module: Analytics
@@ -27533,6 +27840,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -27544,105 +27852,112 @@ screens:
       - versionId
   density: compact
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
+  patternReason: Forecast values of one channel booking pace definition, picked on the screen (4 October
+    2026, CHG-FXS-004).
   purpose: Predict where and when future sales are expected to arrive. This is particularly useful because
     a venue with 10,000 current bookings may still receive significant B2C, POS, reseller and walk-in
     volume.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast
   layout:
     template: split
     regions:
     - name: contentBody
-      slot: collection
       components:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: dataTable
-        label: Every channel booking pace
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-004)
+      - kind: selectField
+        label: Forecast
+        bindsTo: AiForecastDefinition.definitionKey
+        operation: listForecastDefinitions
         columns:
-        - B2C Website
-        - Mobile App
-        - POS
-        - Flying POS
-        - Kiosk
-        - B2B
-        - Reseller
-        - OTA / API Partners where applicable
-        - Call Center / Agent
-        - Walk-In
-        - Channel Forecast
-        - Channel Current Expected Additional Final Forecast
-        bindsTo: null
-        operation: null
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast
+        - AiForecastDefinition.name
+        - AiForecastDefinition.grain
+        - AiForecastDefinition.horizonDays
+        notes: Query subject channelPace; the first active definition is picked by default.
+        provenance: contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: From
+        bindsTo: AiForecastPoint.targetStart
+        operation: getForecast
+        notes: Query from; today by default.
+        provenance: contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: To
+        bindsTo: AiForecastPoint.targetEnd
+        operation: getForecast
+        notes: Query to; the definition's horizon by default.
+        provenance: contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Forecast
+        bindsTo: AiForecastPoint
+        operation: getForecast
+        columns:
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.dimensionKey
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.unit
+        notes: dimensionKey is the sales channel; a range, never a bare number (design 5.6).
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
     - name: contextPanel
-      slot: selection
       components:
       - kind: detailPanel
-        label: The selected channel booking pace
-        bindsTo: null
+        label: The selected value
+        bindsTo: AiForecastPoint
+        operation: getForecast
         columns:
-        - B2C Website
-        - Mobile App
-        - POS
-        - Flying POS
-        - Kiosk
-        - B2B
-        - Reseller
-        - OTA / API Partners where applicable
-        - Call Center / Agent
-        - Walk-In
-        - Channel Forecast
-        - Channel Current Expected Additional Final Forecast
-        notes: 'The pack groups this record''s detail under its own headings: “POS/Walk-In 0 2,950 2,950”.'
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.targetEnd
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.drivers
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
+      - kind: detailPanel
+        label: Version
+        bindsTo: AiForecastVersion
+        operation: getForecast
+        columns:
+        - AiForecastVersion.versionNumber
+        - AiForecastVersion.status
+        - AiForecastVersion.basis
+        - AiForecastVersion.maturity
+        - AiForecastVersion.dataCutoffAt
+        provenance: contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)
   states:
-    loading: The channel booking pace list.
-    error: Could not load. Names which read failed and leaves the channel booking pace untouched.
-    emptyFirstRun: No channel booking pace yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the channel booking pace are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The list skeleton, with the filters already drawn.
+    error: Could not load. Names which read failed and leaves what is on screen untouched.
+    emptyFirstRun: No channel booking pace forecast defined for this tenant yet.
+    emptyNoResults: No values in this window. Names the window and offers the definition's horizon.
+    emptyNoAccess: 'Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen,
+      and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
@@ -27669,6 +27984,12 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: The channel booking pace forecast definitions (subject channelPace); the picked one's definitionKey
+      is what getForecast reads
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-004)
   entryState:
     preloaded:
     - B2C Website
@@ -27685,10 +28006,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-504
     workshopBoard: wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-504
-  apisNote: Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
-    page 13. 0 of 12 labels bound to a contract property; 12 of 45 pack bullets carried onto the screen
-    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
-    the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -27713,7 +28032,12 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token
     until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every
-    action under it.'
+    action under it.
+
+
+    **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject channelPace)
+    supplies the definitionKey getForecast requires; columns are AiForecastPoint''s (p10, p50, p90). Pack
+    labels with no contract field left the screen** (CHG-FXS-004)'
 - id: ADM-505
   name: Revenue & Commercial Forecast
   module: Analytics
@@ -27732,6 +28056,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -27742,90 +28067,127 @@ screens:
       carries:
       - versionId
   density: compact
-  pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Revenue KPIs) and no per-row directory
-    — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
-    licence's
+  pattern: listDetail
+  patternReason: Forecast values of one revenue definition, picked on the screen (4 October 2026, CHG-FXS-004).
   purpose: Forecast future revenue based on predicted sales, attendance, product mix, current pricing
     and other approved commercial signals.
   layout:
-    template: dashboard
+    template: split
     regions:
     - name: contentBody
-      slot: headline
       components:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: metricTile
-        label: Forecast Ticket Revenue
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Forecast Membership Revenue
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Forecast Add-On Revenue
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Forecast F&B Revenue where supported
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Forecast Retail Revenue where supported
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Total Forecast Revenue
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Revenue per Visitor
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-      - kind: metricTile
-        label: Net revenue vs budget or target
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
-        notes: '(CHG-FIN-002: never a bare "Revenue")'
-      - kind: metricTile
-        label: Revenue Confidence Range
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-004)
+      - kind: selectField
+        label: Forecast
+        bindsTo: AiForecastDefinition.definitionKey
+        operation: listForecastDefinitions
+        columns:
+        - AiForecastDefinition.name
+        - AiForecastDefinition.grain
+        - AiForecastDefinition.horizonDays
+        notes: Query subject revenue; the first active definition is picked by default.
+        provenance: contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: From
+        bindsTo: AiForecastPoint.targetStart
+        operation: getForecast
+        notes: Query from; today by default.
+        provenance: contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: To
+        bindsTo: AiForecastPoint.targetEnd
+        operation: getForecast
+        notes: Query to; the definition's horizon by default.
+        provenance: contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Forecast
+        bindsTo: AiForecastPoint
+        operation: getForecast
+        columns:
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.dimensionKey
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.unit
+        notes: dimensionKey is the revenue stream (ticket, membership, add-on, F&B, retail); a range,
+          never a bare number (design 5.6).
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
+    - name: contextPanel
+      components:
+      - kind: detailPanel
+        label: The selected value
+        bindsTo: AiForecastPoint
+        operation: getForecast
+        columns:
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.targetEnd
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.drivers
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
+      - kind: detailPanel
+        label: Version
+        bindsTo: AiForecastVersion
+        operation: getForecast
+        columns:
+        - AiForecastVersion.versionNumber
+        - AiForecastVersion.status
+        - AiForecastVersion.basis
+        - AiForecastVersion.maturity
+        - AiForecastVersion.dataCutoffAt
+        provenance: contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)
+      - kind: secondaryButton
+        label: Why did it change
+        operation: explainMetricChange
+        notes: metricKey the definition's, period the selected value's, comparison previousPeriod.
+        provenance: defined 4 October 2026 (CHG-FXS-004)
+      - kind: detailPanel
+        label: Explanation
+        bindsTo: AiMetricChangeExplanation
+        operation: explainMetricChange
+        columns:
+        - AiMetricChangeExplanation.change
+        - AiMetricChangeExplanation.changePercent
+        - AiMetricChangeExplanation.drivers
+        - AiMetricChangeExplanation.narrative
+        provenance: contract ai.yaml AiMetricChangeExplanation (defined 4 October 2026, CHG-FXS-004)
   states:
-    loading: The revenue commercial forecast list; the counts above it resolve separately.
-    error: Could not load. Names which read failed and leaves the revenue commercial forecast untouched.
-    emptyFirstRun: No revenue commercial forecast yet. Carries the create action; distinct from a filter
-      that matched nothing.
-    emptyNoResults: The filter narrowed it and the revenue commercial forecast are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The list skeleton, with the filters already drawn.
+    error: Could not load. Names which read failed and leaves what is on screen untouched.
+    emptyFirstRun: No revenue forecast defined for this tenant yet.
+    emptyNoResults: No values in this window. Names the window and offers the definition's horizon.
+    emptyNoAccess: 'Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen,
+      and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
@@ -27852,14 +28214,23 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: The revenue forecast definitions (subject revenue); the picked one's definitionKey is what
+      getForecast reads
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-004)
+  - operationId: explainMetricChange
+    contract: ai
+    purpose: Why the revenue forecast moved against the previous period, by driver
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-004)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-505
     workshopBoard: wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-505
-  apisNote: Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
-    page 15. 0 of 0 labels bound to a contract property; 9 of 48 pack bullets carried onto the screen
-    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
-    the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
     Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
     excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
@@ -27871,7 +28242,12 @@ screens:
     console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside
     every cell; `getForecast` (AI_USE) are tenant operations, refused 403 to a platform token until a
     time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action
-    under it.'
+    under it.
+
+
+    **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject revenue)
+    supplies the definitionKey getForecast requires; columns are AiForecastPoint''s (p10, p50, p90). Pack
+    labels with no contract field left the screen** (CHG-FXS-004)'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -27927,103 +28303,146 @@ screens:
       - versionId
   density: compact
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Show) and no metric row
+  patternReason: Forecast values of one any definition, picked on the screen (4 October 2026, CHG-FXS-004).
   purpose: Explain why the forecast changed and how much uncertainty it carries.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show
   layout:
     template: split
     regions:
     - name: contentBody
-      slot: collection
       components:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-004)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-004)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: dataTable
-        label: Every forecast drivers confidence
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-004)
+      - kind: selectField
+        label: Forecast
+        bindsTo: AiForecastDefinition.definitionKey
+        operation: listForecastDefinitions
         columns:
-        - Limited Historical Data
-        - New Product
-        - New Event
-        - Missing Weather
-        - Abnormal Promotion
-        - High Cancellation Variability
-        - Unusual Booking Pattern
-        - Confidence by Horizon
-        - 92% / High
-        - 84% / High
-        - 71% / Medium
-        - 58% / Lower
-        bindsTo: null
-        operation: null
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show
+        - AiForecastDefinition.name
+        - AiForecastDefinition.grain
+        - AiForecastDefinition.horizonDays
+        notes: Query subject any; the first active definition is picked by default.
+        provenance: contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: From
+        bindsTo: AiForecastPoint.targetStart
+        operation: getForecast
+        notes: Query from; today by default.
+        provenance: contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)
+      - kind: datePicker
+        label: To
+        bindsTo: AiForecastPoint.targetEnd
+        operation: getForecast
+        notes: Query to; the definition's horizon by default.
+        provenance: contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Forecast
+        bindsTo: AiForecastPoint
+        operation: getForecast
+        columns:
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.dimensionKey
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.unit
+        notes: a range, never a bare number (design 5.6).
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
     - name: contextPanel
-      slot: selection
       components:
       - kind: detailPanel
-        label: The selected forecast drivers confidence
-        bindsTo: null
+        label: The selected value
+        bindsTo: AiForecastPoint
+        operation: getForecast
         columns:
-        - Limited Historical Data
-        - New Product
-        - New Event
-        - Missing Weather
-        - Abnormal Promotion
-        - High Cancellation Variability
-        - Unusual Booking Pattern
-        - Confidence by Horizon
-        - 92% / High
-        - 84% / High
-        - 71% / Medium
-        - 58% / Lower
-        notes: 'The pack groups this record''s detail under its own headings: “Where applicable”, “Ensemble”.'
-        provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show
+        - AiForecastPoint.targetStart
+        - AiForecastPoint.targetEnd
+        - AiForecastPoint.p10
+        - AiForecastPoint.p50
+        - AiForecastPoint.p90
+        - AiForecastPoint.drivers
+        provenance: contract ai.yaml AiForecastPoint (defined 4 October 2026, CHG-FXS-004)
+      - kind: detailPanel
+        label: Version
+        bindsTo: AiForecastVersion
+        operation: getForecast
+        columns:
+        - AiForecastVersion.versionNumber
+        - AiForecastVersion.status
+        - AiForecastVersion.basis
+        - AiForecastVersion.maturity
+        - AiForecastVersion.dataCutoffAt
+        provenance: contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Accuracy by horizon
+        bindsTo: AiForecastAccuracy
+        operation: getForecastAccuracy
+        columns:
+        - AiForecastAccuracy.horizonDays
+        - AiForecastAccuracy.periodStart
+        - AiForecastAccuracy.wape
+        - AiForecastAccuracy.bias
+        - AiForecastAccuracy.intervalCoverage
+        provenance: contract ai.yaml AiForecastAccuracy (defined 4 October 2026, CHG-FXS-004)
+      - kind: dataTable
+        label: Versions
+        bindsTo: AiForecastVersion
+        operation: listForecastVersions
+        columns:
+        - AiForecastVersion.versionNumber
+        - AiForecastVersion.status
+        - AiForecastVersion.basis
+        - AiForecastVersion.dataCutoffAt
+        provenance: contract ai.yaml AiForecastVersion (defined 4 October 2026, CHG-FXS-004)
+      - kind: secondaryButton
+        label: Why did it change
+        operation: explainMetricChange
+        notes: metricKey the definition's, period the selected value's, comparison forecast.
+        provenance: defined 4 October 2026 (CHG-FXS-004)
+      - kind: detailPanel
+        label: Explanation
+        bindsTo: AiMetricChangeExplanation
+        operation: explainMetricChange
+        columns:
+        - AiMetricChangeExplanation.change
+        - AiMetricChangeExplanation.changePercent
+        - AiMetricChangeExplanation.drivers
+        - AiMetricChangeExplanation.narrative
+        - AiMetricChangeExplanation.reliability
+        provenance: contract ai.yaml AiMetricChangeExplanation (defined 4 October 2026, CHG-FXS-004)
   states:
-    loading: The forecast drivers confidence list.
-    error: Could not load. Names which read failed and leaves the forecast drivers confidence untouched.
-    emptyFirstRun: No forecast drivers confidence yet. Carries the create action; distinct from a filter
-      that matched nothing.
-    emptyNoResults: The filter narrowed it and the forecast drivers confidence are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The list skeleton, with the filters already drawn.
+    error: Could not load. Names which read failed and leaves what is on screen untouched.
+    emptyFirstRun: No any forecast defined for this tenant yet.
+    emptyNoResults: No values in this window. Names the window and offers the definition's horizon.
+    emptyNoAccess: 'Shown when the caller lacks `AI_USE`, which `listForecastVersions` requires to show
+      this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
@@ -28065,6 +28484,12 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: The any forecast definitions (subject any); the picked one's definitionKey is what getForecast
+      reads
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-004)
   entryState:
     preloaded:
     - Limited Historical Data
@@ -28081,10 +28506,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-506
     workshopBoard: wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-506
-  apisNote: Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
-    page 16. 0 of 12 labels bound to a contract property; 12 of 64 pack bullets carried onto the screen
-    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
-    the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-004) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-013): The board example (attendance figure,
     confidence range, "Confidence Status High") was pasted into the purpose; it belongs in sample data,
     and confidence is never a bare percentage (ADR-0051; design-notes correction ai ADM-506).'
@@ -28113,7 +28536,12 @@ screens:
     outside every cell; `explainMetricChange` (AI_USE), `listForecastVersions` (AI_USE), `getForecast`
     (AI_USE), `getForecastAccuracy` (AI_USE) are tenant operations, refused 403 to a platform token until
     a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action
-    under it.'
+    under it.
+
+
+    **Forecast definition picked on the screen 4 October 2026: listForecastDefinitions (subject any) supplies
+    the definitionKey getForecast requires; columns are AiForecastPoint''s (p10, p50, p90). Pack labels
+    with no contract field left the screen** (CHG-FXS-004)'
 - id: ADM-507
   name: Forecast Scenario & What-If Simulator
   module: Analytics
@@ -31400,16 +31828,6 @@ screens:
   purpose: Define granular rules controlling what AI is allowed to read, recommend, prepare, modify or
     execute. This should work alongside TICVAI's existing RBAC/PBAC, not replace it.
   gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 11
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 11
   - operation: setAiTool
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-012): setAiTool (PLATFORM_AI_MANAGE) was declared on a tenant
@@ -31474,15 +31892,6 @@ screens:
         - AiGovernancePolicyVersion.publishedAt
         operation: listAiGovernancePolicyVersions
         provenance: contract ai.yaml GET /governance/policy-versions
-      - kind: multiSelect
-        label: Actions the rule covers
-        bindsTo: AiGovernancePolicyVersion.rules
-        operation: createAiGovernancePolicyDraft
-        notes: 'Per rule, the verbs it governs (`AiGovernanceRule.actions`: read, analyze, recommend,
-          generate, prepare, create, modify, publish, execute, delete). The board''s Analyze ... Publish
-          buttons were these verbs, not screen actions; the ten contract verbs are grouped under the minutes''
-          five (read, recommend, prepare, execute, publish; DEC-004 default).'
-        provenance: contract ai.yaml POST /governance/policy-drafts
       - kind: dataTable
         label: Tools the rules may allow
         bindsTo: AiTool
@@ -31493,6 +31902,60 @@ screens:
         operation: listAiTools
         notes: 'Read-only: tools are platform facts replicated into the tenant.'
         provenance: contract ai.yaml GET /tools
+      - kind: textField
+        label: Policy name
+        bindsTo: AiGovernancePolicy.name
+        operation: createAiGovernancePolicyDraft
+        provenance: contract ai.yaml AiGovernancePolicy.name (defined 4 October 2026, CHG-FXS-002)
+      - kind: selectField
+        label: Policy kind
+        bindsTo: AiGovernancePolicy.kind
+        operation: createAiGovernancePolicyDraft
+        provenance: contract ai.yaml AiGovernancePolicy.kind (defined 4 October 2026, CHG-FXS-002)
+      - kind: dataTable
+        label: Rules
+        bindsTo: AiGovernancePolicyVersion.rules
+        operation: createAiGovernancePolicyDraft
+        columns:
+        - AiGovernanceRule.effect
+        - AiGovernanceRule.capabilityKeys
+        - AiGovernanceRule.actions
+        - AiGovernanceRule.dataCategories
+        - AiGovernanceRule.roleIds
+        notes: At least one rule. Conflicts resolve to the more restrictive (AIC-161).
+        provenance: contract ai.yaml AiGovernancePolicyVersion.rules (defined 4 October 2026, CHG-FXS-002)
+      - kind: selectField
+        label: Effect
+        bindsTo: AiGovernanceRule.effect
+        operation: createAiGovernancePolicyDraft
+        notes: An AiGovernanceOutcome value; block is an answer, not an error.
+        provenance: contract ai.yaml AiGovernanceRule.effect (defined 4 October 2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Capabilities
+        bindsTo: AiGovernanceRule.capabilityKeys
+        operation: createAiGovernancePolicyDraft
+        provenance: contract ai.yaml AiGovernanceRule.capabilityKeys (defined 4 October 2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Actions the rule covers
+        bindsTo: AiGovernanceRule.actions
+        operation: createAiGovernancePolicyDraft
+        notes: Options are the tools' actions from listAiTools.
+        provenance: contract ai.yaml AiGovernanceRule.actions (defined 4 October 2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Data categories
+        bindsTo: AiGovernanceRule.dataCategories
+        operation: createAiGovernancePolicyDraft
+        provenance: contract ai.yaml AiGovernanceRule.dataCategories (defined 4 October 2026, CHG-FXS-002)
+      - kind: multiSelect
+        label: Roles
+        bindsTo: AiGovernanceRule.roleIds
+        operation: createAiGovernancePolicyDraft
+        provenance: contract ai.yaml AiGovernanceRule.roleIds (defined 4 October 2026, CHG-FXS-002)
+      - kind: textField
+        label: Change note
+        bindsTo: AiGovernancePolicyVersion.changeNote
+        operation: createAiGovernancePolicyDraft
+        provenance: contract ai.yaml AiGovernancePolicyVersion.changeNote (defined 4 October 2026, CHG-FXS-002)
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -31594,7 +32057,11 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions`
     (AI_USE), `listAiTools` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed,
-    audited grant into the picked tenant is open. The tenant sees the grant and every action under it.'
+    audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
+
+
+    **Rule fields bound 4 October 2026 to AiGovernanceRule (effect, capabilities, actions, data categories,
+    roles); effect is required on every rule** (CHG-FXS-002)'
 - id: ADM-524
   name: AI Data Access & Usage Policy
   module: Platform
@@ -32250,17 +32717,6 @@ screens:
     rather than passed off as a decision'
   purpose: Test governance policies before activating them, so a policy mistake neither gives AI too much
     authority nor blocks legitimate operations.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 18
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 18
   layout:
     template: split
     regions:
@@ -32419,7 +32875,11 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `simulateAiGovernancePolicy` (AI_CONFIGURE), `listAiGovernancePolicyVersions`
     (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant
-    into the picked tenant is open. The tenant sees the grant and every action under it.'
+    into the picked tenant is open. The tenant sees the grant and every action under it.
+
+
+    **The generator''s ''needs a person'' gap removed 4 October 2026: the screen''s content is defined
+    (tables, panels and actions bound to its operations)** (CHG-FXS-005)'
 - id: ADM-528
   name: AI Governance Policy Publication & Effective Policy Map
   module: Platform
@@ -32455,17 +32915,6 @@ screens:
     rather than passed off as a decision'
   purpose: Provide the final review, approval, versioning and publication layer for AI governance policies.
     No material governance policy should become active without a controlled lifecycle.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 20
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 20
   layout:
     template: split
     regions:
@@ -32642,7 +33091,11 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `getEffectiveAiPolicy` (AI_USE), `publishAiGovernancePolicy` (AI_APPROVE), `listAiGovernancePolicyVersions`
     (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant
-    into the picked tenant is open. The tenant sees the grant and every action under it.'
+    into the picked tenant is open. The tenant sees the grant and every action under it.
+
+
+    **The generator''s ''needs a person'' gap removed 4 October 2026: the screen''s content is defined
+    (tables, panels and actions bound to its operations)** (CHG-FXS-005)'
 - id: ADM-529
   name: AI Human Oversight Command Center
   module: Platform
@@ -35371,22 +35824,10 @@ screens:
       carries:
       - tenantId
   density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  pattern: detail
+  patternReason: One AI decision's a business-readable explanation, read from its trace at depth business
+    (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001).
   purpose: Explain a selected AI decision in a clear business-readable format.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 58
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 58
   layout:
     template: split
     regions:
@@ -35395,51 +35836,85 @@ screens:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-001)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: detailPanel
-        derived: true
-        impliedBy: getAiDecisionTrace
-        notes: One record, read-only.
+        label: Decision
+        bindsTo: AiDecisionRecord
+        operation: getAiDecisionTrace
+        columns:
+        - AiDecisionRecord.capabilityKey
+        - AiDecisionRecord.task
+        - AiDecisionRecord.subjectKind
+        - AiDecisionRecord.subjectRef
+        - AiDecisionRecord.outcome
+        - AiDecisionRecord.createdAt
+        provenance: contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Explanation
+        bindsTo: AiDecisionTrace.explanation
+        operation: getAiDecisionTrace
+        notes: Plain language, written for the business user; the reliability and the evidence it rests
+          on follow.
+        provenance: contract ai.yaml AiDecisionTrace.explanation (defined 4 October 2026, CHG-FXS-001)
+      - kind: dataTable
+        label: What it was based on
+        bindsTo: AiDecisionRecord.evidence
+        operation: getAiDecisionTrace
+        columns:
+        - AiEvidenceItem.label
+        - AiEvidenceItem.name
+        - AiEvidenceItem.value
+        - AiEvidenceItem.observedAt
+        notes: Each item labelled source, derived or model-inferred (AIC-197).
+        provenance: contract ai.yaml AiDecisionRecord.evidence (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Model and versions
+        bindsTo: AiDecisionRecord
+        operation: getAiDecisionTrace
+        columns:
+        - AiDecisionRecord.producer
+        - AiDecisionRecord.modelVersion
+        - AiDecisionRecord.promptTemplateVersion
+        - AiDecisionRecord.policyVersion
+        provenance: contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Human decision
+        bindsTo: AiDecisionRecord.humanDecision
+        operation: getAiDecisionTrace
+        provenance: contract ai.yaml AiDecisionRecord.humanDecision (defined 4 October 2026, CHG-FXS-001)
   states:
-    loading: The decision explanation list.
-    error: Could not load. Names which read failed and leaves the decision explanation untouched.
-    emptyFirstRun: No decision explanation yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    loading: The decision header first, then the trace.
+    error: Could not load the trace. Names the decision record id; nothing else changes.
+    emptyFirstRun: 'Not used: the screen always opens on one decision (decisionRecordId).'
     emptyNoResults: The filter narrowed it and the decision explanation are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to
+      show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns
@@ -35447,7 +35922,7 @@ screens:
   apis:
   - operationId: getAiDecisionTrace
     contract: ai
-    purpose: The full trace of a decision
+    purpose: 'The decision''s trace at depth business (query depth=business): a business-readable explanation'
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -35470,9 +35945,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-541
     workshopBoard: wireframes/WS16 AI Governance Board 3.dc.html#adm-541
-  apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 58. 0 of 0 labels bound
-    to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   entryState:
     params:
     - name: decisionRecordId
@@ -35504,7 +35978,11 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform
     token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant
-    and every action under it.'
+    and every action under it.
+
+
+    **Defined 4 October 2026 from AiDecisionTrace at depth business: a business-readable explanation**
+    (CHG-FXS-001)'
 - id: ADM-542
   name: Data, Feature & Evidence Provenance
   module: Platform
@@ -35533,23 +36011,11 @@ screens:
       carries:
       - tenantId
   density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  pattern: detail
+  patternReason: One AI decision's which data and evidence contributed and where each came from, read
+    from its trace at depth technical (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001).
   purpose: Show exactly which data and evidence contributed to an AI decision and where each item originated.
     This is critical for trust.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 60
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 60
   layout:
     template: split
     regions:
@@ -35558,51 +36024,96 @@ screens:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-001)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: detailPanel
-        derived: true
-        impliedBy: getAiDecisionTrace
-        notes: One record, read-only.
+        label: Decision
+        bindsTo: AiDecisionRecord
+        operation: getAiDecisionTrace
+        columns:
+        - AiDecisionRecord.capabilityKey
+        - AiDecisionRecord.task
+        - AiDecisionRecord.subjectKind
+        - AiDecisionRecord.subjectRef
+        - AiDecisionRecord.outcome
+        - AiDecisionRecord.createdAt
+        provenance: contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)
+      - kind: dataTable
+        label: Evidence and provenance
+        bindsTo: AiDecisionRecord.evidence
+        operation: getAiDecisionTrace
+        columns:
+        - AiEvidenceItem.label
+        - AiEvidenceItem.kind
+        - AiEvidenceItem.name
+        - AiEvidenceItem.ref
+        - AiEvidenceItem.value
+        - AiEvidenceItem.observedAt
+        notes: label is the origin (source system, derived by a rule or feature, inferred by a model);
+          ref points at the record it was read from.
+        provenance: contract ai.yaml AiDecisionRecord.evidence (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Inputs and versions
+        bindsTo: AiDecisionRecord
+        operation: getAiDecisionTrace
+        columns:
+        - AiDecisionRecord.inputsRef
+        - AiDecisionRecord.featureSetVersion
+        - AiDecisionRecord.knowledgeVersion
+        - AiDecisionRecord.ruleVersions
+        - AiDecisionRecord.modelVersion
+        provenance: contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)
+      - kind: dataTable
+        label: Model calls
+        bindsTo: AiDecisionTrace.activity
+        operation: getAiDecisionTrace
+        columns:
+        - AiInteraction.capability
+        - AiInteraction.provider
+        - AiInteraction.model
+        - AiInteraction.sources
+        - AiInteraction.maskedFieldCount
+        - AiInteraction.createdAt
+        notes: sources are the retrieved passages each call answered from.
+        provenance: contract ai.yaml AiDecisionTrace.activity (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Chain verified
+        bindsTo: AiDecisionTrace.chainVerified
+        operation: getAiDecisionTrace
+        notes: Whether the record's hash chain verifies; a break is shown as a red banner.
+        provenance: contract ai.yaml AiDecisionTrace.chainVerified (defined 4 October 2026, CHG-FXS-001)
   states:
-    loading: The data feature evidence list.
-    error: Could not load. Names which read failed and leaves the data feature evidence untouched.
-    emptyFirstRun: No data feature evidence yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    loading: The decision header first, then the trace.
+    error: Could not load the trace. Names the decision record id; nothing else changes.
+    emptyFirstRun: 'Not used: the screen always opens on one decision (decisionRecordId).'
     emptyNoResults: The filter narrowed it and the data feature evidence are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to
+      show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns
@@ -35610,7 +36121,8 @@ screens:
   apis:
   - operationId: getAiDecisionTrace
     contract: ai
-    purpose: The full trace of a decision
+    purpose: 'The decision''s trace at depth technical (query depth=technical): which data and evidence
+      contributed and where each came from'
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -35633,9 +36145,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-542
     workshopBoard: wireframes/WS16 AI Governance Board 3.dc.html#adm-542
-  apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 60. 0 of 0 labels bound
-    to a contract property; 0 of 60 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   entryState:
     params:
     - name: decisionRecordId
@@ -35667,7 +36178,11 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform
     token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant
-    and every action under it.'
+    and every action under it.
+
+
+    **Defined 4 October 2026 from AiDecisionTrace at depth technical: which data and evidence contributed
+    and where each came from** (CHG-FXS-001)'
 - id: ADM-543
   name: Candidate, Rule & Decision Path Trace
   module: Platform
@@ -36123,22 +36638,10 @@ screens:
       carries:
       - tenantId
   density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  pattern: detail
+  patternReason: One AI decision's the governance and human decisions around it, read from its trace at
+    depth governance (defined 4 October 2026 from AiDecisionTrace, CHG-FXS-001).
   purpose: Connect Board 1 and Board 2 governance activity to the AI decision.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 66
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 66
   layout:
     template: split
     regions:
@@ -36147,51 +36650,80 @@ screens:
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
+        operation: listTenants
         columns:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        operation: listTenants
-        notes: '**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens
-          get the tenant picker and grant, CHG-SBO-001). This screen''s operations run in that tenant''s
-          cell, and a platform token carries no tenant permission there until a platform-staff grant into
-          it is open.'
-        provenance: contract subscription.yaml GET /tenants
+        provenance: contract subscription.yaml Tenant.id (defined 4 October 2026, CHG-FXS-001)
       - kind: banner
         label: Open grant into this tenant
         bindsTo: PlatformStaffGrant
+        operation: listOwnPlatformStaffGrants
         columns:
         - PlatformStaffGrant.operatorDisplayName
         - PlatformStaffGrant.permissions
         - PlatformStaffGrant.reason
-        - PlatformStaffGrant.ticketRef
         - PlatformStaffGrant.openedAt
         - PlatformStaffGrant.expiresAt
-        operation: listOwnPlatformStaffGrants
-        notes: '**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern):
-          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
-          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
-          The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
-        provenance: contract identity.yaml GET /platform-staff-grants/mine
+        provenance: contract identity.yaml PlatformStaffGrant (defined 4 October 2026, CHG-FXS-001)
       - kind: primaryButton
         label: Open access grant
         operation: openPlatformStaffGrant
-        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
-          audit R135).
-        provenance: contract identity.yaml POST /platform-staff-grants
+        notes: Shown when no grant into the picked tenant is open (audit R098).
+        provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: detailPanel
-        derived: true
-        impliedBy: getAiDecisionTrace
-        notes: One record, read-only.
+        label: Decision
+        bindsTo: AiDecisionRecord
+        operation: getAiDecisionTrace
+        columns:
+        - AiDecisionRecord.capabilityKey
+        - AiDecisionRecord.task
+        - AiDecisionRecord.subjectKind
+        - AiDecisionRecord.subjectRef
+        - AiDecisionRecord.outcome
+        - AiDecisionRecord.createdAt
+        provenance: contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Governance
+        bindsTo: AiDecisionRecord
+        operation: getAiDecisionTrace
+        columns:
+        - AiDecisionRecord.governanceOutcome
+        - AiDecisionRecord.policyVersion
+        - AiDecisionRecord.approvals
+        - AiDecisionRecord.humanDecision
+        - AiDecisionRecord.executionResult
+        provenance: contract ai.yaml AiDecisionRecord (defined 4 October 2026, CHG-FXS-001)
+      - kind: dataTable
+        label: Interventions
+        bindsTo: AiDecisionTrace.interventions
+        operation: getAiDecisionTrace
+        columns:
+        - AiIntervention.kind
+        - AiIntervention.targetKind
+        - AiIntervention.reason
+        - AiIntervention.principalId
+        - AiIntervention.createdAt
+        notes: Overrides, pauses, retries and rollbacks by a person, oldest first.
+        provenance: contract ai.yaml AiDecisionTrace.interventions (defined 4 October 2026, CHG-FXS-001)
+      - kind: detailPanel
+        label: Chain verified
+        bindsTo: AiDecisionTrace.chainVerified
+        operation: getAiDecisionTrace
+        provenance: contract ai.yaml AiDecisionTrace.chainVerified (defined 4 October 2026, CHG-FXS-001)
   states:
-    loading: The governance approval human list.
-    error: Could not load. Names which read failed and leaves the governance approval human untouched.
-    emptyFirstRun: No governance approval human yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    loading: The decision header first, then the trace.
+    error: Could not load the trace. Names the decision record id; nothing else changes.
+    emptyFirstRun: 'Not used: the screen always opens on one decision (decisionRecordId).'
     emptyNoResults: The filter narrowed it and the governance approval human are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to
+      show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns
@@ -36199,7 +36731,8 @@ screens:
   apis:
   - operationId: getAiDecisionTrace
     contract: ai
-    purpose: The full trace of a decision
+    purpose: 'The decision''s trace at depth governance (query depth=governance): the governance and human
+      decisions around it'
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -36222,9 +36755,8 @@ screens:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-545
     workshopBoard: wireframes/WS16 AI Governance Board 3.dc.html#adm-545
-  apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 66. 0 of 0 labels bound
-    to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  apisNote: Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design
+    notes and the decisions; every field names its contract property.
   entryState:
     params:
     - name: decisionRecordId
@@ -36256,7 +36788,11 @@ screens:
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `getAiDecisionTrace` (AI_AUDIT_VIEW) are tenant operations, refused 403 to a platform
     token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant
-    and every action under it.'
+    and every action under it.
+
+
+    **Defined 4 October 2026 from AiDecisionTrace at depth governance: the governance and human decisions
+    around it** (CHG-FXS-001)'
 - id: ADM-546
   name: Execution & Business Outcome Trace
   module: Platform
@@ -37987,17 +38523,6 @@ screens:
     rather than passed off as a decision'
   purpose: Detect meaningful changes in AI behavior that may increase governance risk. This is not the
     full model monitoring platform. Board 4 focuses specifically on governance-relevant behavioral changes.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack AI_Governance_Reference.pdf, page 90
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack AI_Governance_Reference.pdf, page 90
   layout:
     template: split
     regions:
@@ -38248,7 +38773,11 @@ screens:
     outside every cell; `runAiEvaluation` (AI_CONFIGURE), `listAiEvaluations` (AI_USE), `promoteAiRelease`
     (AI_USE), `rollbackAiRelease` (AI_APPROVE), `listAiGovernanceAlerts` (AI_USE), `listAiTrainingRuns`
     (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant
-    into the picked tenant is open. The tenant sees the grant and every action under it.'
+    into the picked tenant is open. The tenant sees the grant and every action under it.
+
+
+    **The generator''s ''needs a person'' gap removed 4 October 2026: the screen''s content is defined
+    (tables, panels and actions bound to its operations)** (CHG-FXS-005)'
 - id: ADM-555
   name: AI Governance Alert & Detection Center
   module: Platform

@@ -961,7 +961,10 @@
   }
  },
  "HomepageLayout": {
-  "x-ticvai-persistence": "whitelabel.homepage_section",
+  "x-ticvai-persistence": "whitelabel.homepage_layout + whitelabel.homepage_section",
+  "x-ticvai-retired-columns": [
+   "whitelabel.homepage_section.homepage_section_id"
+  ],
   "type": "object",
   "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
@@ -1221,7 +1224,10 @@
   }
  },
  "NavigationConfig": {
-  "x-ticvai-persistence": "whitelabel.navigation_item",
+  "x-ticvai-persistence": "whitelabel.navigation_config + whitelabel.navigation_item",
+  "x-ticvai-retired-columns": [
+   "whitelabel.navigation_item.navigation_item_id"
+  ],
   "type": "object",
   "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [

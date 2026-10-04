@@ -243,6 +243,35 @@
   "requestBody": null,
   "responds": "ResourceCalendarRow"
  },
+ "listForecastDefinitions": {
+  "method": "GET",
+  "path": "/forecast-definitions",
+  "contract": "ai",
+  "summary": "What is forecast",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subject",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOperationalRequirements": {
   "method": "GET",
   "path": "/operational-requirements",

@@ -520,7 +520,8 @@
    "orderId": {
     "type": "string",
     "format": "uuid",
-    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
+    "nullable": true,
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). **Null for an entitlement an invitation issued** (`invitationId`; 4 October 2026, CHG-FXC-007)."
    },
    "orderLineId": {
     "type": "string",
@@ -708,6 +709,12 @@
     "x-ticvai-persisted": false,
     "x-ticvai-derived": "onRead",
     "description": "The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`), or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** — the PII split keeps the biometric on its own side, and this carries only its id. It is how a screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.\n"
+   },
+   "invitationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The invitation that issued it** (4 October 2026, CHG-FXC-007): `orders.issueInvitation` issues the entitlement without an order, because an invitation never enters the order path. Exactly one of `orderId` and `invitationId` is set."
    }
   }
  },
@@ -1948,6 +1955,158 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "LoyaltyProgramme": {
+  "x-ticvai-persistence": "marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "earnRules",
+   "tiers"
+  ],
+  "properties": {
+   "tiers": {
+    "type": "array",
+    "description": "**Rows of `marketing.programme_tier`**, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot round-trip. `loyaltyProgrammeId` and `id` are the server's on create.\n",
+    "items": {
+     "$ref": "#/components/schemas/MarketingProgrammeTier"
+    }
+   },
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique per tenant** (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pointsLiabilityAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent.\n"
+   },
+   "earnRules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "trigger",
+      "points"
+     ],
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "enum": [
+        "perCurrencyUnit",
+        "perVisit",
+        "perProduct",
+        "onSignup",
+        "onBirthday",
+        "onReview"
+       ]
+      },
+      "points": {
+       "type": "number"
+      },
+      "productKinds": {
+       "type": "array",
+       "description": "Limits a `perProduct` or `perCurrencyUnit` rule to these kinds. Empty means every kind.",
+       "items": {
+        "$ref": "../spine/catalogue.yaml#/components/schemas/ProductKind"
+       }
+      },
+      "multiplier": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "pointsExpireAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MarketingProgrammeTier": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.programme_tier",
+  "description": "**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at `subscription.plan`.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n",
+  "required": [
+   "loyaltyProgrammeId",
+   "code",
+   "name",
+   "rank"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "loyaltyProgrammeId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "rank": {
+    "type": "integer",
+    "description": "**Order, not threshold.** Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned.\n"
+   },
+   "minLifetimePoints": {
+    "type": "integer",
+    "nullable": true,
+    "description": "What reaching this tier requires. **`pointsToNextTier` on the position is this minus the guest's lifetime points**, and until now it was this minus nothing.\n"
+   },
+   "retainLifetimePoints": {
+    "type": "integer",
+    "nullable": true,
+    "description": "What keeping it requires, per review period. **Usually lower than reaching it**, and a scheme that cannot express the difference either never demotes or demotes on the day a guest stops earning.\n"
+   },
+   "validityMonths": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null means the tier does not lapse on its own."
+   },
+   "benefits": {
+    "type": "array",
+    "description": "What the tier gives, as the guest reads it. Text shown, not rules enforced.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "earnMultiplier": {
+    "type": "number",
+    "nullable": true,
+    "description": "Applied to every earn rule while the guest holds this tier. Null means 1."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
    }
   }
  },

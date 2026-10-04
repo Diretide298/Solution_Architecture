@@ -88,6 +88,19 @@
   "requestBody": null,
   "responds": "Wallet"
  },
+ "getWalletRefundPolicy": {
+  "method": "GET",
+  "path": "/wallet-refund-policy",
+  "contract": "wallet",
+  "summary": "The wallet refund policy in force",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletRefundPolicy"
+ },
  "listApprovalMatrices": {
   "method": "GET",
   "path": "/approval-matrices",

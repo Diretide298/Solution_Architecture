@@ -558,14 +558,15 @@ paths:
       operationId: redeemWaitingGuest
       x-ticvai-audience: [staff]
       summary: Admit a party at the ride
-      description: >
-        Scanned at the attraction. **Offline-capable**, like every other gate operation — a
-        ride entrance loses signal as readily as a turnstile does.
-
-        Where the entry carries a Fast Pass entitlement, redemption decrements its counter
-        through Product & Entitlement. The counter is not maintained here.
-
+      description: |-
+        Scanned at the attraction. **Offline-capable**, like every other gate operation — a ride entrance loses signal as readily as a turnstile does.
+        Where the entry carries a Fast Pass entitlement, redemption decrements its counter through Product & Entitlement. The counter is not maintained here.
         Arriving outside the return window is a denial with a reason, not a silent refusal.
+
+        **A Fast Pass redemption** (4 October 2026, CHG-FXC-004). Where the entry carries an `entitlementId`, redeeming calls
+        `access.validateAccess` for that entitlement at the queue's access point, which decrements its uses in Product &
+        Entitlement; `entitlementRemaining` is the remaining uses that call returns. This operation writes only
+        `queue.entry`.
       tags: [entry]
       x-ticvai-permission: QUEUE_REDEEM
       x-ticvai-scope-level: workstation
@@ -1580,6 +1581,22 @@ components:
         admittedCount: { type: integer, nullable: true }
         joinedAt: { type: string, format: date-time }
         syncedAt: { type: string, format: date-time, nullable: true }
+        overriddenByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Who let the party past the queue** (`overrideWaitingGuest`, 4 October 2026, CHG-FXC-003), with
+            `overrideReason` and `overriddenAt`. Null when the entry was never overridden.'
+        overrideReason:
+          type: string
+          nullable: true
+          readOnly: true
+        overriddenAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
 
     QueueRedemptionResult:
       x-ticvai-persistence: "none — computed, persisted as entry state"

@@ -1193,6 +1193,35 @@
        "operation": "listOperationalRequirements",
        "notes": "\"Configured\" against \"AI recommended\" from the board is the requirement against what the venue has set up; the board labels were not fields.",
        "provenance": "contract ai.yaml GET /operational-requirements"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast",
+       "bindsTo": "AiForecastDefinition.definitionKey",
+       "operation": "listForecastDefinitions",
+       "columns": [
+        "AiForecastDefinition.name",
+        "AiForecastDefinition.grain",
+        "AiForecastDefinition.horizonDays"
+       ],
+       "notes": "Query subject attendance; the first active definition by default.",
+       "provenance": "contract ai.yaml AiForecastDefinition.definitionKey (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Event from",
+       "bindsTo": "AiForecastPoint.targetStart",
+       "operation": "getForecast",
+       "notes": "The event's first day; getForecast `from` and listOperationalRequirements `from`.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetStart (defined 4 October 2026, CHG-FXS-004)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Event to",
+       "bindsTo": "AiForecastPoint.targetEnd",
+       "operation": "getForecast",
+       "notes": "The event's last day; `to` on both reads.",
+       "provenance": "contract ai.yaml AiForecastPoint.targetEnd (defined 4 October 2026, CHG-FXS-004)"
       }
      ]
     },
@@ -1250,7 +1279,7 @@
    "error": "Could not load. Names which read failed and leaves the event resource forecasting untouched.",
    "emptyFirstRun": "No published forecast for this event yet: the baseline forecast fills the requirements as soon as one is published (ADR-0051). Offers Run a what-if once a base version exists.",
    "emptyNoResults": "Nothing of the chosen kinds: names the kinds filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1273,6 +1302,13 @@
     "purpose": "Requirements derived from the forecast",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "The attendance forecast definitions; the picked one's definitionKey is what getForecast reads",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-004)"
    }
   ],
   "entryState": {},
@@ -1303,6 +1339,7 @@
     "provenance": "contract ai.yaml POST /forecast-scenarios"
    }
   ],
+  "notes": "**The forecast definition and the event's dates are picked on the screen 4 October 2026: getForecast reads definitionKey with from and to set to the event's days, and listOperationalRequirements the same window (Event carries no dates, so the window is the event's days as the planner enters them)** (CHG-FXS-004)",
   "_platform": {
    "code": "P08",
    "audience": "staff",

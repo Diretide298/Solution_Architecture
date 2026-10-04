@@ -2029,7 +2029,7 @@
     }
    ]
   },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.\n\n**The single request is read with getApprovalRequest (agreed, ledger) 4 October 2026; listApprovalRequests has no id filter** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "One request opened by `requestId`: its subject, its trail and the decision. The queue is BO-084 (design-note correction, 2 October 2026).",
@@ -2040,7 +2040,21 @@
     {
      "name": "contentBody",
      "slot": "queue",
-     "components": []
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The request",
+       "bindsTo": "ApprovalRequest",
+       "operation": "getApprovalRequest",
+       "columns": [
+        "ApprovalRequest.kind",
+        "ApprovalRequest.status",
+        "ApprovalRequest.requestedByPrincipalId",
+        "ApprovalRequest.requestedAt"
+       ],
+       "provenance": "agreed operation `getApprovalRequest`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
+      }
+     ]
     },
     {
      "name": "contextPanel",
@@ -2180,6 +2194,13 @@
     "invalidates": [
      "listApprovalRequests"
     ]
+   },
+   {
+    "operationId": "getApprovalRequest",
+    "contract": "approvals",
+    "purpose": "The one request the screen opens on (requestId): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -2476,7 +2497,7 @@
     }
    ]
   },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.\n\n**ADM-243 (merged into BO-087 as a section on 2 October) brings its bindings: the approval matrices are read with listApprovalMatrices and saved with setApprovalMatrix (the plan builds them on APP-SETUP-BO-087; ledger, 4 October 2026)** (CHG-FXS-002)",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listApprovalDelegations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -2502,6 +2523,35 @@
        ],
        "operation": "listApprovalDelegations",
        "provenance": "contract approvals.yaml GET /delegations"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Approval limits",
+       "bindsTo": "ApprovalMatrix",
+       "operation": "listApprovalMatrices",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.version",
+        "ApprovalMatrix.isActive"
+       ],
+       "notes": "ADM-243's section: one matrix per approval kind and scope.",
+       "provenance": "contract approvals.yaml ApprovalMatrix (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Rules of the selected matrix",
+       "bindsTo": "ApprovalMatrix.rules",
+       "operation": "listApprovalMatrices",
+       "columns": [
+        "ApprovalRule.order",
+        "ApprovalRule.minAmount",
+        "ApprovalRule.maxAmount",
+        "ApprovalRule.approverRoleIds",
+        "ApprovalRule.mode",
+        "ApprovalRule.requiresMfa"
+       ],
+       "provenance": "contract approvals.yaml ApprovalMatrix.rules (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -2541,6 +2591,13 @@
        "label": "Revoke approval delegation",
        "operation": "revokeApprovalDelegation",
        "provenance": "contract approvals.yaml DELETE /delegations/{delegationId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save approval limits",
+       "operation": "setApprovalMatrix",
+       "permission": "APPROVAL_CONFIGURE",
+       "provenance": "defined 4 October 2026 (CHG-FXS-002)"
       }
      ]
     }
@@ -2578,6 +2635,26 @@
      ]
     },
     "provenance": "contract approvals.yaml POST /delegations"
+   },
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval limits",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules` (each with `order`, `approverRoleIds`, `mode`; optional amount band, risk score, levels, MFA). Optional: `isActive`. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Save approval limits",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices (4 October 2026, CHG-FXS-002)"
    }
   ],
   "states": {
@@ -2585,7 +2662,7 @@
    "error": "Could not load. Names which read failed and leaves the approval delegations untouched.",
    "emptyFirstRun": "No approval delegations yet. Offers Create approval delegation (`createApprovalDelegation`).",
    "emptyNoResults": "Never shown: `listApprovalDelegations` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `createApprovalDelegation`, `revokeApprovalDelegation`."
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires to show this screen, and names that permission (the screen's other reads need `APPROVAL_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `createApprovalDelegation`, `revokeApprovalDelegation`."
   },
   "apis": [
    {
@@ -2611,6 +2688,20 @@
     "invalidates": [
      "listApprovalDelegations"
     ]
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The approval matrices (ADM-243's section, merged here on 2 October): who approves what, up to which amount",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
+   },
+   {
+    "operationId": "setApprovalMatrix",
+    "contract": "approvals",
+    "purpose": "Set role authority and approval limits (ADM-243's section)",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-002)"
    }
   ],
   "entryState": {

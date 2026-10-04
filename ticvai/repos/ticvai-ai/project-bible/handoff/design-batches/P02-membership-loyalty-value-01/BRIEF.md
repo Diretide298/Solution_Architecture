@@ -1,6 +1,6 @@
 # P02-membership-loyalty-value-01 — P02 · Membership, Loyalty & Value
 
-**3 screens · 28 operations · 43 schemas · 13 permissions**
+**3 screens · 29 operations · 44 schemas · 13 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -127,13 +127,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-011` | Wallet Overview | A | 0 | 15 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
+| `GST-011` | Wallet Overview | A | 4 | 15 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
 | `GST-015` | Memberships | A | 10 | 26 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
 | `GST-036` | Loyalty & Rewards | A | 9 | 49 | 6 | 54 | 2 | 2 | guest | notStarted (designed) |
-
-## Thin screens in this batch
-
-**GST-011 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

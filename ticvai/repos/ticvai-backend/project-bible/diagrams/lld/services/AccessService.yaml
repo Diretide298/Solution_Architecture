@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 256 operations, 78 tables
+title: AccessService — 257 operations, 78 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: access
@@ -10,7 +10,7 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 256
+  operations: 257
   inAFlow: 157
   percent: 61%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 256
+  count: 257
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -199,7 +199,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getBleBeaconGeofence
     verb: GET
@@ -207,7 +207,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: getCredentialIssuanceRetryPolicy
     verb: GET
@@ -247,7 +247,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getFacePassEnrolment
     verb: GET
@@ -295,7 +295,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getVirtualTicketIdentity
     verb: GET
@@ -303,7 +303,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: issueOrderEntitlements
     verb: POST
@@ -479,7 +479,7 @@ operationsByContract:
     scope: venue
     permission: SCOPE_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listBiometricValidationGate
     verb: GET
@@ -1240,6 +1240,14 @@ operationsByContract:
     permission: SCOPE_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: listVisualAccessRules
+    verb: GET
+    path: /visual-access-rules
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
     writes: 0
   - operation: lockIdentity
     verb: POST
@@ -2574,7 +2582,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: access.entitlement
-  columns: 29
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -2767,7 +2775,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.parking_facility
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -2874,9 +2882,9 @@ readsFrom:
   operations: 3
 - service: VenueOpsService
   operations: 3
-- service: MarketingService
-  operations: 1
 - service: TenancyService
+  operations: 2
+- service: MarketingService
   operations: 1
 writesOutside:
 - service: IdentityService
@@ -2953,7 +2961,9 @@ screens:
 - P02:GST-013 Ticket Details
 - P02:GST-027 Parking – Reserve & Pay
 - P02:GST-028 Parking – Reservation Confirmed
+- P02:GST-045 Ticket Delivery & Sharing
 - P02:GST-055 Dynamic QR Ticket
+- P02:GST-062 Shop & Drop Collection
 - P02:GST-069 Face Pass
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment

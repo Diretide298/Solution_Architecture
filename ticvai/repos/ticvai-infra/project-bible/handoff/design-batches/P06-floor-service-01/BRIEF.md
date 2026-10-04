@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `EMP-051` | Restaurant Service Command Center | C | 3 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 | `EMP-052` | Floor Plan & Table Map | C | 1 | 3 | 5 | 1 | 6 | 1 | — | notStarted (generated) |
-| `EMP-053` | Table & Seating Configuration | C | 21 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-053` | Table & Seating Configuration | C | 22 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
 | `EMP-054` | Reservation Calendar & Timeline | C | 3 | 36 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-055` | Create / Edit Reservation | C | 33 | 11 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `EMP-056` | Walk-In & Waitlist Management | C | 23 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |

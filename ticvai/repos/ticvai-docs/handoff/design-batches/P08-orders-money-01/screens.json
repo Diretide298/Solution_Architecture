@@ -1283,7 +1283,7 @@
     "BO-025"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Payment exceptions across currencies. **The rate shown is the one stored on the payment, not today's** (CF-37) — an exception opened in March and worked in August is worked at March's rate, or the reconciliation will never close.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Payment exceptions across currencies. **The rate shown is the one stored on the payment, not today's** (CF-37) — an exception opened in March and worked in August is worked at March's rate, or the reconciliation will never close.\n\n**The eight CreatePaymentRequest fields left 4 October 2026: createPayment was removed from this screen on 2 October (CHG-WIR-025). Settle deposit reads OrdersDeposit.ledgerDepositId, the finance Deposit settleDeposit takes (orders.deposit and ledger.deposit are two records)** (CHG-FXS-002)",
   "density": "compact",
   "boardFrames": [
    "Retail Board 3.dc.html#ret-3k"
@@ -1299,54 +1299,6 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "CreatePaymentRequest.id",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "orderId",
-       "bindsTo": "CreatePaymentRequest.orderId",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "tender",
-       "bindsTo": "CreatePaymentRequest.tender",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "amount",
-       "bindsTo": "CreatePaymentRequest.amount",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "tenderedAmount",
-       "bindsTo": "CreatePaymentRequest.tenderAmount",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "walletAuthorisationId",
-       "bindsTo": "CreatePaymentRequest.walletAuthorisationId",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "deviceId",
-       "bindsTo": "CreatePaymentRequest.deviceId",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "recordedAt",
-       "bindsTo": "CreatePaymentRequest.recordedAt",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
        "kind": "dataTable",
        "label": "Unresolved payments",
        "bindsTo": "PaymentReconciliationExceptionManagementView",
@@ -1357,7 +1309,17 @@
        "kind": "dataTable",
        "label": "Deposits",
        "operation": "listDeposits",
-       "provenance": "contract orders.yaml GET /deposits; wiring fix, 2 October 2026"
+       "provenance": "contract orders.yaml OrdersDeposit (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "OrdersDeposit",
+       "columns": [
+        "OrdersDeposit.orderId",
+        "OrdersDeposit.requiredAmount",
+        "OrdersDeposit.authorizedAmount",
+        "OrdersDeposit.capturedAmount",
+        "OrdersDeposit.status",
+        "OrdersDeposit.ledgerDepositId"
+       ],
+       "notes": "Settle deposit acts on the row's ledgerDepositId (the finance Deposit holding the liability; agreed field, ledger). A row without one has nothing to settle yet."
       }
      ]
     },
@@ -1398,8 +1360,20 @@
     "id": "confirmCloseDepositBoxes",
     "component": "confirmDialog",
     "trigger": "Close deposit boxes",
-    "body": "**Names what `closeDepositBoxes` changes and what it leaves alone**, in the consequence rather than the verb. A payment exceptions this affects should be identified in the dialog, not just counted. **Collects what `closeDepositBoxes` sends before it is called.** Nothing in the body is required. Optional: `boxIds`, `allOpenAtVenue`.",
-    "provenance": "contract shift.yaml POST /deposit-boxes/close"
+    "body": "**Names what `closeDepositBoxes` changes and what it leaves alone**, in the consequence rather than the verb. **Collects what `closeDepositBoxes` sends before it is called.** Required: `counts` (each box's counted cash, per denomination). Optional: `boxIds`, `allOpenAtVenue`. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Close deposit boxes",
+     "operation": "closeDepositBoxes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "counts",
+      "boxIds",
+      "allOpenAtVenue"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /deposit-boxes/close (4 October 2026, CHG-FXS-002)"
    },
    {
     "id": "formCapturePayment",

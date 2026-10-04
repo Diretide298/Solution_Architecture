@@ -2497,6 +2497,12 @@
     "type": "boolean",
     "default": false,
     "description": "**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."
+   },
+   "codeGeneration": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "**Which printing of the location's ordering code is current** (4 October 2026, CHG-FXC-009). A code carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code printed before."
    }
   }
  },

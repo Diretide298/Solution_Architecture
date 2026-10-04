@@ -1,6 +1,6 @@
 # P09-overview-health-01 — P09 · Overview & Health
 
-**5 screens · 22 operations · 34 schemas · 8 permissions**
+**5 screens · 23 operations · 34 schemas · 8 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -119,8 +119,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-002` | Platform Dashboard | B | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-002` | Platform Dashboard | A | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-004` | Platform Audit Log | D | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
 | `ADM-013` | Tenant Performance Monitor | B | 0 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-029` | Deployment Monitor | B | 5 | 53 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-002 |
+| Block | Block A · task APP-CONSOLE-ADM-002 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -298,6 +298,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `ADM-412` Payment Method & Settlement Setup: *Opens Payment Method & Settlement Setup*; carries `tenantId`
 - → `ADM-424` Module Activation & Dependency Validation: *Opens Module Activation & Dependency Validation*; carries `tenantId`
 - → `ADM-500` Forecast Configuration & Forecasting Strategy: *Opens Forecast Configuration & Forecasting Strategy*; carries `tenantId`
+- → `ADM-503` Ticket, Product & Timeslot Demand Forecast: *Opens Ticket, Product & Timeslot Demand Forecast*; carries `tenantId`
+- → `ADM-504` Channel & Booking Pace Forecast: *Opens Channel & Booking Pace Forecast*; carries `tenantId`
+- → `ADM-505` Revenue & Commercial Forecast: *Opens Revenue & Commercial Forecast*; carries `tenantId`
 - → `ADM-506` Forecast Drivers, Confidence & Explainability: *Opens Forecast Drivers, Confidence & Explainability*; carries `tenantId`
 - → `ADM-508` Forecast Accuracy, Review & Publication Center: *Opens Forecast Accuracy, Review & Publication Center*; carries `tenantId`
 - → `ADM-523` AI Action & Permission Policy Builder: *Opens AI Action & Permission Policy Builder*; carries `tenantId`
@@ -383,7 +386,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-001`, `ADM-003`, `ADM-004`, `ADM-005`, `ADM-006`, `ADM-007`, `ADM-008`, `ADM-012`, `ADM-369`, `ADM-459`, `ADM-379`, `ADM-389`, `ADM-399`, `ADM-409`, `ADM-419`, `ADM-449`, `ADM-469`, `ADM-479`, `ADM-489`, `ADM-499`, `ADM-509`, `ADM-519`, `ADM-529`, `ADM-539`, `ADM-549`, `ADM-619`, `ADM-009`, `ADM-010`, `ADM-011`, `ADM-013`, `ADM-014`, `ADM-015`, `ADM-016`, `ADM-017`, `ADM-018`, `ADM-019`, `ADM-022`, `ADM-023`, `ADM-026`, `ADM-027`, `ADM-029`, `ADM-030`, `ADM-031`, `ADM-032`, `ADM-033`, `ADM-034`, `ADM-037`, `ADM-318`, `ADM-024`, `ADM-025`, `ADM-028`, `ADM-035`, `ADM-036`, `ADM-068`, `ADM-699`, `ADM-412`, `ADM-424`, `ADM-500`, `ADM-506`, `ADM-508`, `ADM-523`, `ADM-527`, `ADM-528`, `ADM-554`, `ADM-556`, `ADM-020`, `ADM-021`.
+- [ ] Every transition is wired: `ADM-001`, `ADM-003`, `ADM-004`, `ADM-005`, `ADM-006`, `ADM-007`, `ADM-008`, `ADM-012`, `ADM-369`, `ADM-459`, `ADM-379`, `ADM-389`, `ADM-399`, `ADM-409`, `ADM-419`, `ADM-449`, `ADM-469`, `ADM-479`, `ADM-489`, `ADM-499`, `ADM-509`, `ADM-519`, `ADM-529`, `ADM-539`, `ADM-549`, `ADM-619`, `ADM-009`, `ADM-010`, `ADM-011`, `ADM-013`, `ADM-014`, `ADM-015`, `ADM-016`, `ADM-017`, `ADM-018`, `ADM-019`, `ADM-022`, `ADM-023`, `ADM-026`, `ADM-027`, `ADM-029`, `ADM-030`, `ADM-031`, `ADM-032`, `ADM-033`, `ADM-034`, `ADM-037`, `ADM-318`, `ADM-024`, `ADM-025`, `ADM-028`, `ADM-035`, `ADM-036`, `ADM-068`, `ADM-699`, `ADM-412`, `ADM-424`, `ADM-500`, `ADM-503`, `ADM-504`, `ADM-505`, `ADM-506`, `ADM-508`, `ADM-523`, `ADM-527`, `ADM-528`, `ADM-554`, `ADM-556`, `ADM-020`, `ADM-021`.
 - [ ] Every gated control is gated: `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -406,7 +409,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `cellId` (deepLink) · cold entry: **A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the … |
 | Route | `/general/cross-tenant-health-dashboard` |
 
-**What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Drawn 26 August** — `Dashboards Board` frame `adm-003`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.
+**What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Drawn 26 August** — `Dashboards Board` frame `adm-003`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did. **Cross-tenant: the cells are listed with listCells (agreed with contracts in the ledger, 4 October 2026); cellId is optional and comes from the selected row** (CHG-FXS-003)
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-021): propagateCrossRegionEntitlement and reconcileRedemptions are service-audience calls between cells (F19) that no operator makes, and getCrossRegionEntitlement … Removed 2 October 2026 (CHG-WIR-021): propagateCrossRegionEntitlement and reconcileRedemptions are service-audience calls between cells (F19) that no operator makes, and getCrossRegionEntitlement … Removed 2 October 2026 (CHG-WIR-021): propagateCrossRegionEntitlement and reconcileRedemptions are service-audience calls between cells (F19) that no operator makes, and getCrossRegionEntitlement …
 
@@ -421,6 +424,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Window | radio group | Day | Hour · Day · Week · Month | `getCellCapacity` ?window |
+| Region | text field | — | — | `listCells` ?region |
+| Status | text field | — | — | `listCells` ?status |
 
 **Form: Decommission cell** (modal, opened by *Decommission cell*; *Decommission cell* calls `decommissionCell`, *Cancel* sends nothing)
 
@@ -468,6 +473,17 @@ Errors to draw in the form: 400 Target tier is unavailable in this jurisdiction
 | Error | text | — |
 | Scheduled for | 1 Oct 2026, 14:30 | — |
 | Completed at | 1 Oct 2026, 14:30 | — |
+
+**Cells** (data table, from `listCells`): Every cell, unhealthy first; selecting one loads its health, capacity and jobs.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
+| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
+| Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
+| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
+| Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 
 **The selected cell job** (detail panel, from `listCellJobs`)
 
@@ -537,7 +553,7 @@ Errors to draw in the form: 400 Target tier is unavailable in this jurisdiction
 - **Decommission cell**: Confirmation names the tenant, region and what stops ("Marina Leisure Group's Oman cell stops serving AquaCove Muscat"); requires a reason; Cancel decommission halts it while it runs. *(source: contracts/satellite/subscription.yaml#decommissionCell; contracts/satellite/subscription.yaml#cancelDecommission)*
 - **Change tier**: Tier with an optional scheduled time; the change is a job, shown in the jobs list. *(source: contracts/satellite/subscription.yaml#updateCellTier)*
 
-**Data it reads**: `getCellHealth` (onLoad, from page inventory); `getCell` (onLoad, Read a cell); `getCellCapacity` (onLoad, Load against headroom); `listCellJobs` (onLoad, Provisioning, migration and maintenance jobs)
+**Data it reads**: `getCellHealth` (onLoad, from page inventory); `getCell` (onLoad, Read a cell); `getCellCapacity` (onLoad, Load against headroom); `listCellJobs` (onLoad, Provisioning, migration and maintenance jobs); `listCells` (onLoad, Every cell across tenants with its health summary, to pick …)
 
 **Where the user goes next**
 
@@ -605,6 +621,7 @@ cells:
 - `getCellCapacity` → `PLATFORM_CELL_VIEW` (read) · staff
 - `listCellJobs` → `PLATFORM_CELL_VIEW` (read) · staff
 - `updateCellTier` → `PLATFORM_CELL_MANAGE` (configure) · staff
+- `listCells` → `PLATFORM_CELL_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `cancelDecommission`, `decommissionCell`, `updateCellTier`.
 
@@ -635,7 +652,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Cancel decommission, Decommission cell, Save cell tier.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-004`, `SCN-003`.
@@ -1416,6 +1433,7 @@ Method, path, parameters, request and response for every operation these screens
 "listAiInteractions": {"method":"GET","path":"/interactions","contract":"ai","summary":"Every prompt, response and action","permission":"AI_AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"principalId","in":"query","required":null},{"name":"outcome","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAuditRecords": {"method":"GET","path":"/audit-records","contract":"tenancy","summary":"Who did what, where, and when","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orgUnitId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"action","in":"query","required":null},{"name":"subjectRef","in":"query","required":null},{"name":"platformStaffGrantId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCellJobs": {"method":"GET","path":"/cells/{cellId}/jobs","contract":"subscription","summary":"Provisioning, migration and maintenance jobs","permission":"PLATFORM_CELL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listCells": {"method":"GET","path":"/cells","contract":"subscription","summary":"The cells, with their health","permission":"PLATFORM_CELL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"platform","parameters":[{"name":"region","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listOwnPlatformStaffGrants": {"method":"GET","path":"/platform-staff-grants/mine","contract":"identity","summary":"The calling platform operator's own grants into this tenant","permission":"PLATFORM_TENANT_ACCESS","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"activeOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRollouts": {"method":"GET","path":"/rollouts","contract":"platform-ops","summary":"List rollouts","permission":"PLATFORM_RELEASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listTenantCells": {"method":"GET","path":"/tenants/{tenantId}/cells","contract":"subscription","summary":"List a tenant's cells","permission":"PLATFORM_CELL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Cell"},
@@ -1453,7 +1471,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "EntitlementLimit": {"type":"object","required":["metric","limit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"limit":{"type":"integer","nullable":true,"x-ticvai-column":"limit_value","description":"Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."},"overageAllowed":{"type":"boolean","default":false},"overageUnitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
 "EntitlementUsage": {"x-ticvai-persistence":"none — aggregated from usage_record","type":"object","required":["tenantId","metrics"],"properties":{"tenantId":{"type":"string","format":"uuid"},"metrics":{"type":"array","items":{"type":"object","required":["metric","current","isNearLimit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"current":{"type":"integer"},"limit":{"type":"integer","nullable":true},"percentUsed":{"type":"number","nullable":true},"isNearLimit":{"type":"boolean","description":"Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"},"isExceeded":{"type":"boolean"}}}},"asAt":{"type":"string","format":"date-time"}}},
 "EnvironmentKind": {"type":"string","enum":["dev","staging","production"]},
-"LicencePosition": {"x-ticvai-persistence":"none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)","type":"object","required":["tenantId","licensedModules","limits"],"properties":{"poweredByRemovable":{"type":"boolean","readOnly":true,"default":false,"description":"**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."},"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true},"licensedModules":{"type":"array","description":"Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n","items":{"type":"object","required":["moduleKey","source"],"properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"source":{"type":"string","enum":["plan","addOn"]},"validTo":{"type":"string","format":"date","nullable":true}}}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}}}},
+"LicencePosition": {"x-ticvai-persistence":"none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)","type":"object","required":["tenantId","licensedModules","limits"],"properties":{"poweredByRemovable":{"type":"boolean","readOnly":true,"default":false,"description":"**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."},"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true},"licensedModules":{"type":"array","description":"Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.","items":{"type":"object","required":["moduleKey","source"],"properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"source":{"type":"string","enum":["plan","addOn"]},"validTo":{"type":"string","format":"date","nullable":true}}}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},

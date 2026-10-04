@@ -25,7 +25,10 @@ CREATE TABLE IF NOT EXISTS queue.entry (
     redeemed_at                       timestamptz,
     admitted_count                    integer,
     joined_at                         timestamptz NOT NULL,
-    synced_at                         timestamptz
+    synced_at                         timestamptz,
+    overridden_by_principal_id        uuid,
+    override_reason                   text,
+    overridden_at                     timestamptz
 );
 
 -- Where readings come from — an adaptor to a venue’s own system (ADR-0012)

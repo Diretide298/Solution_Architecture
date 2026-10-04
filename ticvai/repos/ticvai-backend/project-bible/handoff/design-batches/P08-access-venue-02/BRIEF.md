@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 46 operations · 69 schemas · 19 permissions**
+**10 screens · 47 operations · 69 schemas · 19 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -138,9 +138,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-071` | Planned Maintenance | D | 21 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
 | `BO-072` | Incident Log | D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
 | `BO-092` | Venue Maps | A | 14 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-093` | Map Import & Labelling | A | 87 | 57 | 6 | 5 | 3 | 0 | — | notStarted (generated) |
+| `BO-093` | Map Import & Labelling | A | 89 | 57 | 6 | 6 | 3 | 0 | — | notStarted (generated) |
 | `BO-094` | Map Editor & Publish | A | 67 | 49 | 5 | 14 | 3 | 0 | — | notStarted (generated) |
-| `BO-095` | Resources | D | 26 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
+| `BO-095` | Resources | D | 27 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

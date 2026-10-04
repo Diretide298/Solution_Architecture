@@ -887,23 +887,6 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain a centralized registry of cookies, SDKs, pixels and other governed tracking technologies used by TICVAI digital channels. This should cover more than traditional browser cookies.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Analytics Tracker, Embedded Service, Other tracking technology. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1144,6 +1127,7 @@
     "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
    }
   ],
+  "notes": "**The generator's 'needs a person' gaps removed 4 October 2026: the registry is defined, and the pack's three kinds (analytics tracker, embedded service, other) are values of the technology type, not separate operations** (CHG-FXS-005)",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1231,7 +1215,10 @@
       {
        "kind": "selectField",
        "label": "Logo",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.logoAssetId (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.logoAssetId",
+       "operation": "setCookieBannerDesign",
+       "notes": "A media asset id from the library."
       },
       {
        "kind": "textField",
@@ -1258,23 +1245,24 @@
       {
        "kind": "selectField",
        "label": "Position",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.position (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.position",
+       "operation": "setCookieBannerDesign"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Theme",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.themeId (defined 4 October 2026, CHG-FXS-002)",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.themeId",
+       "operation": "setCookieBannerDesign"
       },
       {
-       "kind": "selectField",
-       "label": "Branding",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
-      },
-      {
-       "kind": "selectField",
+       "kind": "multiSelect",
        "label": "Language",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
-       "notes": "Languages are tabs of the text fields; English and Arabic are required."
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.languages (defined 4 October 2026, CHG-FXS-002)",
+       "notes": "Languages are tabs of the text fields; English and Arabic are required.",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.languages",
+       "operation": "setCookieBannerDesign"
       },
       {
        "kind": "textField",
@@ -1291,6 +1279,42 @@
        "operation": "setCookieBannerDesign",
        "bindsTo": "CookieBannerPreferenceCenterDesignerView.categories",
        "notes": "The description of each category per language."
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.channel",
+       "operation": "setCookieBannerDesign",
+       "notes": "Required; with the brand, the key the save upserts on.",
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.channel (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "textField",
+       "label": "Brand",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.brandId",
+       "operation": "setCookieBannerDesign",
+       "notes": "The brand the design is for; picking a row of the list fills channel and brand and loads that design.",
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.brandId (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Reject in one click",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.rejectIsOneClick",
+       "operation": "setCookieBannerDesign",
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView.rejectIsOneClick (defined 4 October 2026, CHG-FXS-002)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Designs",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView",
+       "operation": "listCookieBannerPreference",
+       "columns": [
+        "CookieBannerPreferenceCenterDesignerView.channel",
+        "CookieBannerPreferenceCenterDesignerView.brandId",
+        "CookieBannerPreferenceCenterDesignerView.position",
+        "CookieBannerPreferenceCenterDesignerView.languages"
+       ],
+       "provenance": "contract marketing-crm.yaml CookieBannerPreferenceCenterDesignerView (defined 4 October 2026, CHG-FXS-002)"
       }
      ]
     },
@@ -1353,6 +1377,7 @@
     "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    }
   ],
+  "notes": "**Channel and brand, the upsert key, are fields on the form and choosing a row of the list loads that design (4 October 2026); the remaining selects are bound to the design's properties** (CHG-FXS-002)",
   "_platform": {
    "code": "P13",
    "audience": "staff",

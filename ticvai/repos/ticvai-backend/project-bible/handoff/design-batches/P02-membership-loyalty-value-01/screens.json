@@ -44,7 +44,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**The guest's saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up and a stored-card exit settlement have a paymentTokenId to send; the walletId is the wallet's own id (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
@@ -105,6 +105,40 @@
        "operation": "getGameCard",
        "notes": "An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).",
        "provenance": "contract games.yaml GET /game-cards/{cardCode}"
+      },
+      {
+       "kind": "toggle",
+       "label": "Auto top-up",
+       "bindsTo": "WalletAutoReloadSetting.enabled",
+       "operation": "setWalletAutoReloadSetting",
+       "provenance": "contract wallet.yaml WalletAutoReloadSetting.enabled (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "numberField",
+       "label": "When the balance falls below",
+       "bindsTo": "WalletAutoReloadSetting.thresholdAmount",
+       "operation": "setWalletAutoReloadSetting",
+       "provenance": "contract wallet.yaml WalletAutoReloadSetting.thresholdAmount (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Top up by",
+       "bindsTo": "WalletAutoReloadSetting.reloadAmount",
+       "operation": "setWalletAutoReloadSetting",
+       "provenance": "contract wallet.yaml WalletAutoReloadSetting.reloadAmount (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Card",
+       "bindsTo": "WalletAutoReloadSetting.paymentTokenId",
+       "operation": "listPaymentTokens",
+       "columns": [
+        "PaymentToken.maskedIdentifier",
+        "PaymentToken.expiresAt",
+        "PaymentToken.isDefault"
+       ],
+       "notes": "Options from listPaymentTokens; none saved shows Add a card (GST-071).",
+       "provenance": "contract orders.yaml WalletAutoReloadSetting.paymentTokenId (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     }
@@ -115,7 +149,7 @@
    "error": "Could not load. Names which read failed and leaves the wallet overview untouched.",
    "emptyFirstRun": "No wallet overview yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_OPERATE` for `setWalletAutoReloadSetting`, `settleWalletAtExit`.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
@@ -165,21 +199,31 @@
     "purpose": "Balance on a game card",
     "trigger": "onAction",
     "provenance": "flow F18 step 2, 2 October 2026 (CHG-CLN-006)"
+   },
+   {
+    "operationId": "listPaymentTokens",
+    "contract": "orders",
+    "purpose": "The guest's saved cards: the auto top-up card and a stored-card exit settlement pick one (paymentTokenId)",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "cardCode",
-     "from": "deepLink"
-    },
-    {
      "name": "subjectId",
      "from": "session"
     },
     {
+     "name": "cardCode",
+     "from": "deepLink",
+     "optional": true
+    },
+    {
      "name": "walletId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Read from the wallet itself (Wallet.id, agreed field) when not carried."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",

@@ -1,6 +1,6 @@
 # WS36 — Pricing   Revenue Management board 3
 
-**9 screens · 19 operations · 23 schemas · 6 permissions**
+**9 screens · 20 operations · 24 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -136,7 +136,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 15 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 64 | 16 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-070` | Tax Rule & Treatment Builder | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-071` | Fee & Surcharge Library | B | 30 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-072` | Fee Applicability & Charging Rule Builder | B | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -144,11 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-074` | Price Calculation Sequence & Formula Engine | B | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-075` | Currency Precision, Rounding & Monetary Rules | B | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
-
-## Thin screens in this batch
-
-**ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 10 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ---
 
@@ -158,7 +154,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ### `ADM-069` Tax Profile & Jurisdiction Configuration
 
-**Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.**
+**Set this venue's tax profile (one per venue: tax type, jurisdiction, rate, base, legal entity and registration, effective dates) and, for the legal entity it invoices under, the invoice templates and the e-invoicing connection.**
 
 | | |
 |---|---|
@@ -167,14 +163,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Block | Block A · task APP-SETUP-ADM-069 |
 | Who uses it | venue staff holding `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TAX_CONFIGURE` (2 read, 2 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
+| Pattern | configEditor (compact density): The venue's tax profile in one form, with the picked legal entity's invoice templates and e-invoicing beside it (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/tax-profile-jurisdiction-configuration-adm-069` |
 
-**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home. **Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000 limit above which a VAT-registered buyer gets a full tax invoice.
-
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Sales Tax, Entertainment Tax, Tourism Tax, Municipality Tax, Service Tax. Each needs an operation, or needs …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home. **Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000 limit above which a VAT-registered buyer gets a full tax invoice. **Defined 4 October 2026: one tax profile per venue, read and saved as one record (Chinmay's default of 3 October: one tax-profile read, a list only if the design needs it); the legal entities come from listLegalEntities, which fills the invoice-template and e-invoicing calls and tells whether the entity is UAE VAT-registered** (CHG-FXS-001)
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Define reusable tax profiles per legal entity, country and jurisdiction: tax type, rate, where the profile applies, and the taxable base, including the region-configurable rule that tax is charged on the price before discount (Egypt). Also where the invoice templates, number series and e-invoicing connection are set. The one thing to get right: a rate or base change is a new, future-dated version; transactions already made keep the version they were calculated with.
 
@@ -199,27 +193,92 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Tax Profile Name | select field | — | — | — | — | — | — |
-| Tax Profile Code | select field | — | — | — | — | — | — |
-| Tax Type | select field | — | — | — | — | — | — |
-| Country | select field | — | — | — | — | — | — |
-| Region/Jurisdiction | select field | — | — | — | — | — | — |
-| Legal Entity | select field | — | — | — | — | — | — |
-| Tax Registration Number | select field | — | — | — | — | — | — |
-| Currency | select field | — | — | — | — | — | — |
-| Effective From | select field | — | — | — | — | — | — |
-| Effective To | select field | — | — | — | — | — | — |
-| Status | select field | — | — | — | — | — | — |
-| Owner | select field | — | — | — | — | — | — |
-| Taxable base | select field | — | — | — | — | **The one place the taxable base is set** (decided 2 October 2026, Chinmay; CHG-FIN-004): "Price after discount" (default) or "Price before discount" (`TaxProfile.taxBase`). Shown with a worked … | — |
-| Document title | text field | — | — | — | — | Per language. In the UAE fixed by law: "Tax Invoice" for the tax invoice and the simplified tax invoice, "Tax Credit Note" for the credit note (Executive Regulation Art. 59(1)(a), 59(2)(a), 60(1)(a) … | — |
-| Issue a tax invoice on every paid order | toggle | — | — | — | — | `autoIssueOnPayment`. On and locked for a UAE VAT-registered legal entity (Decree-Law Art. 65(1), Executive Regulation Art. 59(13)(1)); CHG-FIN-011. | — |
+| Tax profile name | text field | optional | — | — | — | Tax Profile Name | `TaxProfileJurisdictionConfigurationInput.taxProfileName` |
+| Tax profile code | text field | optional | — | — | — | Tax Profile Code | `TaxProfileJurisdictionConfigurationInput.taxProfileCode` |
+| Tax type | select | optional | — | VAT · Gst · Sales tax · Entertainment tax · Tourism tax · Municipality tax · Service tax · Custom regulatory tax | — | VAT, sales, entertainment, tourism, municipality, service or another regulatory tax. | `TaxProfileJurisdictionConfigurationInput.taxType` |
+| Rate (%) | number field | optional | — | — | — | Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule | `TaxProfileJurisdictionConfigurationInput.ratePercent` |
+| Country | text field | optional | — | pattern `^[A-Z]{2}$` | — | Country: ISO 3166-1 alpha-2 code | `TaxProfileJurisdictionConfigurationInput.country` |
+| Jurisdiction level | segmented control | optional | — | Country · Region · Municipality | — | Jurisdiction Hierarchy (p.41): the level this profile applies at | `TaxProfileJurisdictionConfigurationInput.jurisdictionLevel` |
+| Jurisdiction | text field | optional | — | — | — | Region/Jurisdiction | `TaxProfileJurisdictionConfigurationInput.jurisdiction` |
+| Legal entity | text field | optional | — | — | — | Options from listLegalEntities. | `TaxProfileJurisdictionConfigurationInput.legalEntity` |
+| Tax registration number | text field | optional | — | — | — | Prefilled from the legal entity's TRN. | `TaxProfileJurisdictionConfigurationInput.taxRegistrationNumber` |
+| Taxable base | segmented control | optional | — | Discounted price · Pre discount price | — | Which price the tax is computed on; preDiscountPrice where the jurisdiction taxes the full price before discount (MoM 1 Sep §4.5, e.g. | `TaxProfileJurisdictionConfigurationInput.taxBase` |
+| Effective from | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Effective From; new structures are future-dated and never change historical transactions | `TaxProfileJurisdictionConfigurationInput.effectiveFrom` |
+| Effective to | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Effective To; empty for open-ended | `TaxProfileJurisdictionConfigurationInput.effectiveTo` |
+| Invoicing legal entity | picker: choose an id | optional | — | — | shows names, sends the id | A UAE VAT registrant is a legal entity with countryCode AE and a taxRegistrationNumber. | `LegalEntity.id` |
+| Document title | key and value settings | optional | — | — | — | Per language. In the UAE fixed by law: Tax Invoice, Simplified Tax Invoice. | `FinTaxInvoiceTemplate.title` |
+| Number prefix | text field | optional | — | max length 20 | — | e.g. `INV-`, `SINV-`, `CN-`. | `FinTaxInvoiceTemplate.numberPrefix` |
+| Issue a tax invoice on every paid order | toggle | optional | off | 59(13)(1)); a template for such an entity saved with this false is refused 422 `tax-invoice-required`. | — | On and locked for a UAE VAT-registered legal entity. | `FinTaxInvoiceTemplate.autoIssueOnPayment` |
+| E-invoicing mode | segmented control | optional | — | Disabled · Test · Live | — | — | `FinEInvoicingProvider.mode` |
+| Provider name | text field | optional | — | max length 200 | — | The accredited service provider the client appoints. | `FinEInvoicingProvider.providerName` |
+| Participant id | text field | optional | — | max length 100 | — | The legal entity's Peppol participant identifier. | `FinEInvoicingProvider.participantId` |
+| Credential reference | text area | optional | — | max length 300 | — | A reference to the secret in the vault; the secret is never stored here. | `FinEInvoicingProvider.credentialRef` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Legal entity | picker: choose a legal entity | — | — | `listTaxInvoiceTemplates` ?legalEntityId |
+| Tax profile | picker: choose a tax profile | — | — | `getTaxProfileJurisdiction` ?taxProfileId |
+
+**Sent by *Save tax profile*** (`setTaxProfileJurisdiction`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Tax profile name `taxProfileName` | text field | optional | — | — | — | Tax Profile Name | `setTaxProfileJurisdiction` body |
+| Tax profile code `taxProfileCode` | text field | optional | — | — | — | Tax Profile Code | `setTaxProfileJurisdiction` body |
+| Tax type `taxType` | select | optional | — | VAT · Gst · Sales tax · Entertainment tax · Tourism tax · Municipality tax · Service tax · Custom regulatory tax | — | Tax Type (pp.40-41) | `setTaxProfileJurisdiction` body |
+| Country `country` | text field | optional | — | pattern `^[A-Z]{2}$` | — | Country: ISO 3166-1 alpha-2 code | `setTaxProfileJurisdiction` body |
+| Jurisdiction `jurisdiction` | text field | optional | — | — | — | Region/Jurisdiction | `setTaxProfileJurisdiction` body |
+| Legal entity `legalEntity` | text field | optional | — | — | — | Legal Entity | `setTaxProfileJurisdiction` body |
+| Tax registration number `taxRegistrationNumber` | text field | optional | — | — | — | Tax Registration Number | `setTaxProfileJurisdiction` body |
+| Currency `currency` | text field | optional | — | pattern `^[A-Z]{3}$` | — | Currency: ISO 4217 code | `setTaxProfileJurisdiction` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Effective From; new structures are future-dated and never change historical transactions | `setTaxProfileJurisdiction` body |
+| Effective to `effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Effective To; empty for open-ended | `setTaxProfileJurisdiction` body |
+| Status `status` | text field | optional | — | — | — | Status: draft, active, inactive or expired | `setTaxProfileJurisdiction` body |
+| Owner `owner` | text field | optional | — | — | — | Owner | `setTaxProfileJurisdiction` body |
+| Rate percent `ratePercent` | number field | optional | — | — | — | Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule | `setTaxProfileJurisdiction` body |
+| Tax profile `taxProfileId` | text field | optional | — | — | — | Tax profile ID; empty on create | `setTaxProfileJurisdiction` body |
+| Jurisdiction level `jurisdictionLevel` | segmented control | optional | — | Country · Region · Municipality | — | Jurisdiction Hierarchy (p.41): the level this profile applies at | `setTaxProfileJurisdiction` body |
+| Applicability `applicability` | repeatable rows | optional | — | — | — | Applicability (p.41): where the profile applies; a channel only where legally applicable | `setTaxProfileJurisdiction` body |
+| Level `applicability[].level` | select | optional | — | Legal entity · Country · Market · Venue · Product category · Product · Service · Channel | — | — | `setTaxProfileJurisdiction` body |
+| Ref `applicability[].refId` | text field | optional | — | — | — | — | `setTaxProfileJurisdiction` body |
+| Tax base `taxBase` | segmented control | optional | — | Discounted price · Pre discount price | — | Which price the tax is computed on; preDiscountPrice where the jurisdiction taxes the full price before discount (MoM 1 Sep §4.5, e.g. | `setTaxProfileJurisdiction` body |
+
+**Sent by *Save template*** (`setTaxInvoiceTemplate`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Legal entity `legalEntityId` | picker: choose a legal entity | required | — | — | shows names, sends the id | — | `setTaxInvoiceTemplate` body |
+| Document kind `documentKind` | segmented control | required | — | Tax invoice · Simplified tax invoice · Credit memo | — | — | `setTaxInvoiceTemplate` body |
+| Number prefix `numberPrefix` | text field | required | — | max length 20 | — | e.g. `INV-`, `SINV-`, `CN-`. | `setTaxInvoiceTemplate` body |
+| Resets yearly `resetsYearly` | toggle | optional | on | — | — | A new series per fiscal year of the legal entity. | `setTaxInvoiceTemplate` body |
+| Next number `nextNumber` | number field | optional | — | min 1 | — | May be raised, never lowered below the last number issued. | `setTaxInvoiceTemplate` body |
+| Number padding `numberPadding` | stepper or slider | optional | 6 | min 1; max 12 | — | — | `setTaxInvoiceTemplate` body |
+| Languages `languages` | list of values (chips) | required | — | at least 1 | — | Rendered on one page in this order, e.g. `en`, `ar`. | `setTaxInvoiceTemplate` body |
+| Title `title` | key and value settings | optional | — | — | — | The document title per language. Prescribed wording is law (CF-133, answered by research 2 October 2026, CHG-FIN-011): in the UAE "Tax Invoice" for both `taxInvoice` and … | `setTaxInvoiceTemplate` body |
+| Footer text `footerText` | key and value settings | optional | — | — | — | — | `setTaxInvoiceTemplate` body |
+| Logo `logoAssetId` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | `setTaxInvoiceTemplate` body |
+| Layout key `layoutKey` | text field | optional | — | max length 64 | — | — | `setTaxInvoiceTemplate` body |
+| Auto issue on payment `autoIssueOnPayment` | toggle | optional | off | 59(13)(1)); a template for such an entity saved with this false is refused 422 `tax-invoice-required`. | — | For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt). Always on for a UAE VAT-registered legal entity (research 2 October 2026, CHG-FIN-011): a registrant … | `setTaxInvoiceTemplate` body |
+| Simplified allowed up to `simplifiedAllowedUpTo` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | For a VAT-registered recipient only: the consideration up to which a simplified invoice is still allowed (UAE AED 10,000, Executive Regulation Art. | `setTaxInvoiceTemplate` body |
+| Show legal currency tax `showLegalCurrencyTax` | toggle | optional | on | — | — | Show the tax in the legal entity's currency when the invoice currency differs. | `setTaxInvoiceTemplate` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setTaxInvoiceTemplate` body |
+| Is active `isActive` | toggle | optional | on | — | — | — | `setTaxInvoiceTemplate` body |
+
+**Sent by *Save e-invoicing*** (`setEInvoicingProvider`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Legal entity `legalEntityId` | picker: choose a legal entity | required | — | — | shows names, sends the id | — | `setEInvoicingProvider` body |
+| Provider name `providerName` | text field | required | — | max length 200 | — | The accredited service provider the client appoints. | `setEInvoicingProvider` body |
+| Endpoint URL `endpointUrl` | URL field | optional | — | — | https:// | — | `setEInvoicingProvider` body |
+| Test endpoint URL `testEndpointUrl` | URL field | optional | — | — | https:// | — | `setEInvoicingProvider` body |
+| Credential ref `credentialRef` | text area | optional | — | max length 300 | — | A reference to the secret in the vault; the secret is never stored here. | `setEInvoicingProvider` body |
+| Participant `participantId` | text field | optional | — | max length 100 | — | The legal entity's Peppol participant identifier. | `setEInvoicingProvider` body |
+| Document format `documentFormat` | segmented control | optional | Pint ae | Pint ae | — | — | `setEInvoicingProvider` body |
+| Mode `mode` | segmented control | required | — | Disabled · Test · Live | — | — | `setEInvoicingProvider` body |
+| Transmit within hours `transmitWithinHours` | number field (hours) | optional | — | min 1 | — | — | `setEInvoicingProvider` body |
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -236,28 +295,44 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**Load the tax profile and jurisdiction as saved** (detail panel, from `getTaxProfileJurisdiction`)
+**Tax profile in force** (detail panel, from `getTaxProfileJurisdiction`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Tax profile name | text | Tax Profile Name |
-| Tax profile code | text | Tax Profile Code |
-| Country | text | Country: ISO 3166-1 alpha-2 code |
-| Tax registration number | text | Tax Registration Number |
-| Status | text | Status: draft, active, inactive or expired |
+| Tax type | chip: VAT, Gst, Sales tax, Entertainment tax, Tourism tax, Municipality tax… | Tax Type (pp.40-41) |
 | Rate percent | 1,234.5 | Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule |
+| Jurisdiction | text | Region/Jurisdiction |
+| Effective from | 1 Oct 2026 | Effective From; new structures are future-dated and never change historical transactions |
 | Consuming product count | 1,234 | Dependencies: products using the profile; read-only |
-| Consuming venue count | 1,234 | Dependencies: venues using the profile; read-only |
+
+**Invoice templates** (data table, from `listTaxInvoiceTemplates`): Query legalEntityId the picked one.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Document kind | chip: Tax invoice, Simplified tax invoice, Credit memo | — |
+| Number prefix | text | e.g. `INV-`, `SINV-`, `CN-`. |
+| Next number | 1,234 | May be raised, never lowered below the last number issued. |
+| Languages | list or chips (count when long) | Rendered on one page in this order, e.g. `en`, `ar`. |
+| Auto issue on payment | yes / no (icon or chip) | For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt). Always on for a UAE VAT-registered legal entity (research 2 … |
+| Is active | yes / no (icon or chip) | — |
+
+**E-invoicing** (detail panel, from `listEInvoicingProviders`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Provider name | text | The accredited service provider the client appoints. |
+| Mode | chip: Disabled, Test, Live | — |
+| Participant | text | The legal entity's Peppol participant identifier. |
+| Last accepted test at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Sales Tax (primary button) | navigation or local | — | — | — | — |
-| Entertainment Tax (secondary button) | navigation or local | — | — | — | — |
-| Tourism Tax (secondary button) | navigation or local | — | — | — | — |
-| Municipality Tax (secondary button) | navigation or local | — | — | — | — |
-| Service Tax (secondary button) | navigation or local | — | — | — | — |
+| Save tax profile (primary button) | `setTaxProfileJurisdiction` PUT `/tax-profile-jurisdiction` | TaxProfileJurisdictionConfigurationInput | TaxProfileJurisdictionConfigurationView | — | — |
+| Save template (secondary button) | `setTaxInvoiceTemplate` PUT `/tax-invoice-templates` | FinTaxInvoiceTemplate | FinTaxInvoiceTemplate | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 `nextNumber` below the last number issued in the series, or a language the legal entity's region does not offer. | — |
+| Save e-invoicing (secondary button) | `setEInvoicingProvider` PUT `/e-invoicing/providers` | FinEInvoicingProvider | FinEInvoicingProvider | 409 `live` requested before any `test` transmission from this legal entity was accepted. | — |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -269,7 +344,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - **Save profile**: Saves a new version from its effective date; the previous version stays for history. *(source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction)*
 - **Switch e-invoicing to Live**: Only after a test document was accepted; until then Live is disabled with the reason. *(source: contracts/spine/finance.yaml#/components/schemas/FinEInvoicingProvider)*
 
-**Data it reads**: `listTaxInvoiceTemplates` (onLoad, Show invoice templates and number series); `listEInvoicingProviders` (onLoad, Show the e-invoicing provider connection); `getTaxProfileJurisdiction` (onLoad, Load the tax profile and jurisdiction as saved)
+**Data it reads**: `listTaxInvoiceTemplates` (onLoad, Show invoice templates and number series); `listEInvoicingProviders` (onLoad, Show the e-invoicing provider connection); `getTaxProfileJurisdiction` (onLoad, Load the tax profile and jurisdiction as saved); `listLegalEntities` (onLoad, The legal entities: the tax profile's entity, and the one …)
 
 **Where the user goes next**
 
@@ -280,10 +355,10 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The tax profile jurisdiction configuration as saved. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the tax profile jurisdiction untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No tax profile jurisdiction configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The form with the venue's saved tax profile. |
+| Error (`?state=error`) | Could not load. Names the read that failed; the form stays read-only until it loads. |
+| Empty, first run (`?state=emptyFirstRun`) | No tax profile saved yet: the form is empty and Save creates it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listTaxInvoiceTemplates` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTaxProfileJurisdiction` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `live` requested before any `test` transmission from this legal entity was accepted.; 422 `nextNumber` below the last number issued in the series, or a language the legal entity's region does not offer. |
 
@@ -321,8 +396,9 @@ template: 'SINV- · resets yearly · next 004813 · English + Arabic · VAT rece
 - `listEInvoicingProviders` → `LEDGER_VIEW` (read) · staff
 - `setEInvoicingProvider` → `TAX_CONFIGURE` (configure) · staff
 - `getTaxProfileJurisdiction` → `PRODUCT_VIEW` (read) · staff
+- `listLegalEntities` → `LEDGER_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listTaxInvoiceTemplates` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTaxProfileJurisdiction` …
 
 #### Requirements it meets
 
@@ -349,10 +425,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (64), with its required mark, default, format and its error state (403, 404, 409, 422).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-069?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Sales Tax, Entertainment Tax, Tourism Tax, Municipality Tax, Service Tax.
+- [ ] Every action is wired with its success and its failure: Save tax profile, Save template, Save e-invoicing.
 - [ ] Every transition is wired: `ADM-068`, `BO-100`.
 - [ ] Every gated control is gated: `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TAX_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1377,14 +1453,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · task APP-SETUP-ADM-077 |
 | Who uses it | venue staff holding `LEDGER_POST`, `LEDGER_VIEW`, `PRODUCT_VIEW` (1 operate, 2 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): Validation findings and test results listed and filtered, with the e-invoicing connection and its transmission log beside them (defined 4 October 2026, CHG-FXS-001). |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/calculation-validation-reconciliation-service-interface-adm-077` |
 
-**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.
-
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home. **Defined 4 October 2026 from CalculationValidationReconciliationServiceInterfaceView, FinEInvoicingProvider and FinEInvoiceTransmission, with the legal entity picked from listLegalEntities for the transmission log and a resend** (CHG-FXS-001)
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The last check before pricing and tax changes go live: configuration findings (missing profiles, invalid rates, overlapping rules, rounding problems) and the results of stored test scenarios, each compared against expected totals. It also records which e-invoices were sent, accepted or failed. The one thing to get right: a critical finding blocks progress, so critical items are first and say exactly what to fix.
 
@@ -1394,6 +1468,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - **Nothing runs the test suite or re-validates; the screen only lists results.** Why: The pack's regression run before major changes has no trigger operation on this screen. *(source: contracts/spine/catalogue.yaml#listCalculationValidationReconciliation; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Area | select | optional | — | Tax · Fees · Formula · Currency · Reconciliation · Test suite | — | Filter: tax, fees, formula, currency, reconciliation, test suite. | `CalculationValidationReconciliationServiceInterfaceView.area` |
+| Severity | segmented control | optional | — | Critical · Warning · Information | — | Severity; critical blocks progress | `CalculationValidationReconciliationServiceInterfaceView.severity` |
+| Legal entity | picker: choose an id | optional | — | — | shows names, sends the id | — | `LegalEntity.id` |
+| Status | select | optional | — | Not required · Queued · Sent · Accepted · Rejected · Failed | — | 6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent. | `FinEInvoiceTransmission.status` |
+| Issued from | date picker | — | — | — | — | Body issuedFrom; with Issued to, resends every document of the legal entity in the window. | — |
+| Issued to | date picker | — | — | — | — | Body issuedTo. | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1407,7 +1492,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Status | select | — | Not required · Queued · Sent · Accepted · Rejected · Failed | `listEInvoiceTransmissions` ?status |
 | Document | picker: choose a document | — | — | `listEInvoiceTransmissions` ?documentId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Send to e-invoicing*** (`transmitEInvoices`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Legal entity `legalEntityId` | picker: choose a legal entity | required | — | — | shows names, sends the id | — | `transmitEInvoices` body |
+| Documents `documentIds` | multi-picker: choose documents | optional | — | — | — | Tax invoice or credit memo ids. Omit to send everything issued in the range and not yet `accepted`. | `transmitEInvoices` body |
+| Issued from `issuedFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `transmitEInvoices` body |
+| Issued to `issuedTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `transmitEInvoices` body |
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -1417,14 +1509,55 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Findings and test results** (data table, from `listCalculationValidationReconciliation`): Critical first. A test scenario row shows passed or failed with its reconciliation.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Result kind | chip: Validation finding, Test scenario result | A configuration finding or a test-suite scenario result |
+| Area | chip: Tax, Fees, Formula, Currency, Reconciliation, Test suite | Validation Area (p.52) |
+| Code | chip: Missing profile, Invalid rate, Expired rule, Overlapping rule, Duplicate fee … | What was checked |
+| Severity | chip: Critical, Warning, Information | Severity; critical blocks progress |
+| Message | text | What was found |
+| Scenario name | text | Test scenario name |
+| Passed | yes / no (icon or chip) | Scenario passed; empty for a finding |
+| Calculation version | text | Calculation version the result was produced with (Historical Reproducibility) |
+
+**The selected result** (detail panel, from `listCalculationValidationReconciliation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Message | text | What was found |
+| Subject | text | The profile, rule, fee, formula or currency concerned |
+| Scenario type | chip: Standard B2C sale, POS sale, Member sale, Group booking, B2B sale, Refund… | Test Suite scenario type (pp.52-53) |
+| Reconciliation | grouped details | Reconciliation (p.52): expected against actual totals for a scenario |
+
+**E-invoicing connection** (data table, from `listEInvoicingProviders`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Legal entity | the name it points at, never the id | — |
+| Provider name | text | The accredited service provider the client appoints. |
+| Mode | chip: Disabled, Test, Live | — |
+| Document format | chip: Pint ae | — |
+| Last accepted test at | 1 Oct 2026, 14:30 | — |
+
+**Transmissions** (data table, from `listEInvoiceTransmissions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Document number | text | — |
+| Document kind | chip: Tax invoice, Credit memo | — |
+| Mode | chip: Test, Live | — |
+| Status | chip: Not required, Queued, Sent, Accepted, Rejected, Failed | 6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent. |
+| Attempt | 1,234 | — |
+| Error message | text | — |
+| Sent at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Send to e-invoicing (primary button) | `transmitEInvoices` POST `/e-invoicing/transmissions` | inline | inline | 409 The legal entity has no provider, or its provider is `disabled`. | — |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -1436,7 +1569,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Resend e-invoices**: Queues the selected failed or rejected documents again. *(source: contracts/spine/finance.yaml#transmitEInvoices)*
 
-**Data it reads**: `listCalculationValidationReconciliation` (onLoad, Calculation Validation, Reconciliation & Service Interface); `listEInvoicingProviders` (onLoad, Show the e-invoicing provider connection); `listEInvoiceTransmissions` (onLoad, E-invoicing transmission log and failures)
+**Data it reads**: `listCalculationValidationReconciliation` (onLoad, Calculation Validation, Reconciliation & Service Interface); `listEInvoicingProviders` (onLoad, Show the e-invoicing provider connection); `listEInvoiceTransmissions` (onLoad, E-invoicing transmission log and failures); `listLegalEntities` (onLoad, The legal entities whose documents are transmitted)
 
 **Where the user goes next**
 
@@ -1447,11 +1580,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The calculation validation reconciliation list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the calculation validation reconciliation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No calculation validation reconciliation yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the calculation validation reconciliation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The list skeleton, with the filters already drawn. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves what is on screen untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No findings: every check passed. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filters. Names them and offers to clear them. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listCalculationValidationReconciliation` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `transmitEInvoices`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The legal entity has no provider, or its provider is `disabled`. |
 
@@ -1484,8 +1617,9 @@ scenarios:
 - `listEInvoicingProviders` → `LEDGER_VIEW` (read) · staff
 - `listEInvoiceTransmissions` → `LEDGER_VIEW` (read) · staff
 - `transmitEInvoices` → `LEDGER_POST` (operate) · staff, service
+- `listLegalEntities` → `LEDGER_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listCalculationValidationReconciliation` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `transmitEInvoices`.
 
 #### Requirements it meets
 
@@ -1516,13 +1650,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-077`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 3
 - Flow F145 *Pricing Revenue Management board 3: Tax, Fee & Calculation Command Center*, step 18: Works in Calculation Validation, Reconciliation & Service Interface → Provide final technical and commercial validation of the pricing calculation engine and define how other TICVAI modules consume it. Boards 1–3 established the commercial and calculation engines …
+- ADR-0062 *E-invoicing goes through a provider adapter, and a rejection stops for a person* (`docs/adr/0062-e-invoicing-through-a-provider-adapter.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-077?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Send to e-invoicing.
 - [ ] Every transition is wired: `BO-100`, `ADM-068`.
 - [ ] Every gated control is gated: `LEDGER_POST`, `LEDGER_VIEW`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1624,13 +1759,14 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"getTaxProfileJurisdiction": {"method":"GET","path":"/tax-profile-jurisdiction","contract":"catalogue","summary":"The tax profile and jurisdiction configuration as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"TaxProfileJurisdictionConfigurationView"},
+"getTaxProfileJurisdiction": {"method":"GET","path":"/tax-profile-jurisdiction","contract":"catalogue","summary":"The tax profile and jurisdiction configuration as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"taxProfileId","in":"query","required":false}],"requestBody":null,"responds":"TaxProfileJurisdictionConfigurationView"},
 "listCalculationValidationReconciliation": {"method":"GET","path":"/calculation-validation-reconciliation","contract":"catalogue","summary":"Calculation Validation, Reconciliation & Service Interface","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"resultKind","in":"query","required":false},{"name":"area","in":"query","required":false},{"name":"severity","in":"query","required":false},{"name":"passed","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCurrencyPrecisionRounding": {"method":"GET","path":"/currency-precision-rounding","contract":"catalogue","summary":"Currency Precision, Rounding & Monetary Rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CurrencyPrecisionRoundingMonetaryRulesView"},
 "listEInvoiceTransmissions": {"method":"GET","path":"/e-invoicing/transmissions","contract":"finance","summary":"What was sent to the e-invoicing provider, and what came back","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"legalEntityId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"documentId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listEInvoicingProviders": {"method":"GET","path":"/e-invoicing/providers","contract":"finance","summary":"The e-invoicing service provider connection per legal entity","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listFeeSurcharge": {"method":"GET","path":"/fee-surcharge","contract":"catalogue","summary":"Fee & Surcharge Library","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"feeType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listFeeWaiverTax": {"method":"GET","path":"/fee-waiver-tax","contract":"catalogue","summary":"Fee Waiver, Tax Exemption & Exception Rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"exceptionType","in":"query","required":false},{"name":"eligibilityBasis","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listLegalEntities": {"method":"GET","path":"/legal-entities","contract":"finance","summary":"List legal entities","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPriceCalculationSequence": {"method":"GET","path":"/price-calculation-sequence","contract":"catalogue","summary":"Price Calculation Sequence & Formula Engine","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"calculationProfileId","in":"query","required":false},{"name":"asOf","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listTaxInvoiceTemplates": {"method":"GET","path":"/tax-invoice-templates","contract":"finance","summary":"Invoice and credit memo templates and number series, per legal entity","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"legalEntityId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setCurrencyRoundingRule": {"method":"PUT","path":"/rounding-profiles","contract":"catalogue","summary":"Set precision and rounding for a currency","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RoundingProfile","responds":"RoundingProfile"},
@@ -1665,6 +1801,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "FinEInvoiceTransmissionStatus": {"type":"string","description":"6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.","enum":["notRequired","queued","sent","accepted","rejected","failed"]},
 "FinEInvoicingProvider": {"x-ticvai-persistence":"ledger.einvoicing_provider","type":"object","description":"6.1.1. Also the `setEInvoicingProvider` body. One per legal entity.","required":["legalEntityId","providerName","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"legalEntityId":{"type":"string","format":"uuid"},"providerName":{"type":"string","maxLength":200,"description":"The accredited service provider the client appoints."},"endpointUrl":{"type":"string","format":"uri","nullable":true},"testEndpointUrl":{"type":"string","format":"uri","nullable":true},"credentialRef":{"type":"string","maxLength":300,"nullable":true,"description":"A reference to the secret in the vault; the secret is never stored here."},"participantId":{"type":"string","maxLength":100,"nullable":true,"description":"The legal entity's Peppol participant identifier."},"documentFormat":{"type":"string","enum":["pintAe"],"default":"pintAe"},"mode":{"type":"string","enum":["disabled","test","live"]},"transmitWithinHours":{"type":"integer","minimum":1,"nullable":true},"lastAcceptedTestAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."}}},
 "FinTaxInvoiceTemplate": {"x-ticvai-persistence":"ledger.tax_invoice_template","type":"object","description":"5.7.93, 5.7.94. Also the `setTaxInvoiceTemplate` body. One per legal entity and document kind.","required":["legalEntityId","documentKind","numberPrefix","languages"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"legalEntityId":{"type":"string","format":"uuid"},"documentKind":{"type":"string","enum":["taxInvoice","simplifiedTaxInvoice","creditMemo"]},"numberPrefix":{"type":"string","maxLength":20,"description":"e.g. `INV-`, `SINV-`, `CN-`. The year is added by the series when `resetsYearly`."},"resetsYearly":{"type":"boolean","default":true,"description":"A new series per fiscal year of the legal entity."},"nextNumber":{"type":"integer","minimum":1,"description":"May be raised, never lowered below the last number issued."},"numberPadding":{"type":"integer","minimum":1,"maximum":12,"default":6},"languages":{"type":"array","minItems":1,"description":"Rendered on one page in this order, e.g. `en`, `ar`.","items":{"type":"string","pattern":"^[a-z]{2}(-[A-Z]{2})?$"}},"title":{"type":"object","description":"The document title per language. **Prescribed wording is law** (CF-133, answered by research 2 October 2026, CHG-FIN-011): in the UAE \"Tax Invoice\" for both `taxInvoice` and `simplifiedTaxInvoice` (Executive Regulation Art. 59(1)(a), 59(2)(a)) and \"Tax Credit Note\" for `creditMemo` (Art. 60(1)(a)). Never \"Receipt\" or \"VAT receipt\" as the title; the Arabic title is the client's tax adviser's to confirm.","additionalProperties":{"type":"string"}},"footerText":{"type":"object","additionalProperties":{"type":"string"}},"logoAssetId":{"type":"string","format":"uuid","nullable":true},"layoutKey":{"type":"string","maxLength":64,"nullable":true},"autoIssueOnPayment":{"type":"boolean","default":false,"description":"For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt). **Always on for a UAE VAT-registered legal entity** (research 2 October 2026, CHG-FIN-011): a registrant making a taxable supply issues and delivers a tax invoice (Decree-Law Art. 65(1)), and a simplified one on the date of supply (Executive Regulation Art. 59(13)(1)); a template for such an entity saved with this false is refused 422 `tax-invoice-required`. The till prints it as the receipt (POS-026); the guest web and app show it on the order."},"simplifiedAllowedUpTo":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**For a VAT-registered recipient only**: the consideration up to which a simplified invoice is still allowed (UAE AED 10,000, Executive Regulation Art. 59(5)(b)). A recipient who is not registered may always get a simplified one (Art. 59(5)(a)). Above it, or where the reverse charge applies, the till and the back office offer the full invoice only (CHG-FIN-011)."},"showLegalCurrencyTax":{"type":"boolean","default":true,"description":"Show the tax in the legal entity's currency when the invoice currency differs."},"effectiveFrom":{"type":"string","format":"date"},"isActive":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."}}},
+"LegalEntity": {"x-ticvai-persistence":"ledger.legal_entity","type":"object","description":"Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n","required":["id","code","name","countryCode","currency","currencyScale","fiscalYearStartMonth"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"countryCode":{"type":"string","pattern":"^[A-Z]{2}$"},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"currencyScale":{"type":"integer","minimum":0,"maximum":4},"taxRegistrationNumber":{"type":"string","nullable":true},"fiscalYearStartMonth":{"type":"integer","minimum":1,"maximum":12},"regionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PriceBreakdownCalculationSimulationExplainabilityInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Price Breakdown, Calculation Simulation & Explainability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"customerId":{"type":"string","nullable":true,"description":"Customer"},"productId":{"type":"string","description":"Product"},"quantity":{"type":"integer","description":"Quantity","minimum":1},"venueId":{"type":"string","nullable":true,"description":"Venue"},"eventId":{"type":"string","nullable":true,"description":"Event"},"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel","description":"Channel"},"date":{"type":"string","format":"date","description":"Date of visit"},"timeslotId":{"type":"string","nullable":true,"description":"Timeslot"},"membershipId":{"type":"string","nullable":true,"description":"Membership"},"promotionCode":{"type":"string","nullable":true,"description":"Promotion"},"paymentMethod":{"type":"string","nullable":true,"description":"Payment Method"},"deliveryMethod":{"type":"string","nullable":true,"description":"Delivery Method"},"currency":{"type":"string","description":"Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"compareChannels":{"type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"description":"Channel Comparison (p.51): run the same transaction through these channels too; empty for none"}}},
 "PriceBreakdownCalculationSimulationExplainabilityView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price Breakdown, Calculation Simulation & Explainability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"finalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Final Payable"},"components":{"type":"array","items":{"type":"object","properties":{"sequence":{"type":"integer"},"componentType":{"type":"string","enum":["selectedRate","memberAdjustment","dynamicAdjustment","promotion","packageAdjustment","fee","surcharge","waiver","tax","rounding"]},"label":{"type":"string","description":"e.g. Booking Fee, VAT"},"source":{"type":"string","description":"Source: the price list, rule, fee or tax profile"},"rule":{"type":"string","description":"Rule: id of the rule applied, e.g. FE-021, TAX-UAE-01"},"formula":{"type":"string"},"input":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Input amount"},"output":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Output amount (negative for a reduction)"},"reason":{"type":"string"},"taxTreatment":{"type":"string","nullable":true}}},"description":"Explainability Panel and Rule Trace (p.51), in sequence"},"selectedRate":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Selected Rate x quantity"},"discountTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discounts and adjustments total"},"feeTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fees total"},"subtotal":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Subtotal before tax"},"taxTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Tax total"},"calculationVersion":{"type":"string","description":"Calculation version used"},"channelComparison":{"type":"array","items":{"type":"object","properties":{"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"finalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"difference":{"type":"string","description":"Why it differs, e.g. Call Center Booking Fee"}}},"description":"Channel Comparison results"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"AI observations for this screen; advisory only, never applied automatically"}}},

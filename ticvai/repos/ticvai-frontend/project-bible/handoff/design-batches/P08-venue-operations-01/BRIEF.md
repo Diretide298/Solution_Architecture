@@ -1,6 +1,6 @@
 # P08-venue-operations-01 — P08 · Venue Operations (1 of 2)
 
-**10 screens · 74 operations · 107 schemas · 28 permissions**
+**10 screens · 75 operations · 107 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -179,14 +179,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-036` | Device Registry | B | 32 | 41 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
-| `BO-044` | F&B Outlets | A | 72 | 44 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-044` | F&B Outlets | A | 73 | 47 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-058` | Reporting Home | D | 91 | 26 | 6 | 100 | 2 | 0 | — | notStarted (generated) |
 | `BO-060` | Attendance & Footfall | D | 111 | 38 | 6 | 153 | 1 | 0 | — | notStarted (generated) |
 | `BO-064` | Zones & Areas | A | 32 | 27 | 6 | 27 | 0 | 0 | — | notStarted (generated) |
 | `BO-067` | Integrations | B | 5 | 40 | 6 | 27 | 1 | 0 | — | notStarted (generated) |
 | `BO-070` | Work Orders | D | 61 | 31 | 6 | 17 | 6 | 2 | — | notStarted (generated) |
-| `BO-100` | Venue Home | D | 4 | 29 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
-| `BO-108` | Venue Operations | D | 6 | 32 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `BO-100` | Venue Home | A | 4 | 29 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
+| `BO-108` | Venue Operations | A | 6 | 32 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 | `BO-128` | Live Workstation Health Monitor | B | 3 | 12 | 6 | 0 | 9 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

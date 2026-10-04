@@ -135,16 +135,16 @@
    "status": "notStarted"
   },
   "density": "compact",
-  "notes": "The self-service form of `ADM-380`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "notes": "The self-service form of `ADM-380`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.\n\n**Defined 4 October 2026 from StartProspectSignupRequest, VerifyProspectSignupCodeRequest and OnboardingApplication (companyName, contactEmail, contactPhone, countryCode, billingEntity)** (CHG-FXS-001)",
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-002"
   },
   "purpose": "Create the initial customer account and organization profile.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "wizard",
+  "patternReason": "Three steps on one form: prove the email, then the organisation, then submit (defined 4 October 2026 from OnboardingApplication, CHG-FXS-001).",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
@@ -153,67 +153,109 @@
        "kind": "textField",
        "label": "Work email",
        "bindsTo": "StartProspectSignupRequest.email",
-       "notes": "Step one of the prospect sign-up session (DEC-167, \"Email + one-time code\"): the code goes to this address; \"Continue saved setup\" is the same field (CHG-CLN-019).",
-       "provenance": "contract identity.yaml POST /auth/prospect/signup"
+       "operation": "startProspectSignup",
+       "provenance": "contract identity.yaml StartProspectSignupRequest.email (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Send code",
        "operation": "startProspectSignup",
-       "notes": "Sends the one-time code; the answer is the same whether or not the email has a saved setup.",
-       "provenance": "contract identity.yaml POST /auth/prospect/signup"
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "textField",
        "label": "One-time code",
        "bindsTo": "VerifyProspectSignupCodeRequest.code",
-       "notes": "Six digits from the email; a right code opens the sign-up session (prospectAuth) the rest of the journey runs on and resumes a saved setup (CHG-CLN-019).",
-       "provenance": "contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify"
+       "operation": "verifyProspectSignupCode",
+       "notes": "Six digits; five attempts, then a new code is needed.",
+       "provenance": "contract identity.yaml VerifyProspectSignupCodeRequest.code (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Verify code",
        "operation": "verifyProspectSignupCode",
-       "notes": "A wrong code says so and counts against the challenge; after five, Send code again.",
-       "provenance": "contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify"
+       "notes": "On success the organisation fields unlock; the verified email becomes contactEmail and is not editable.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Company name",
+       "bindsTo": "OnboardingApplication.companyName",
+       "operation": "submitOnboardingApplication",
+       "provenance": "contract subscription.yaml OnboardingApplication.companyName (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Contact email",
+       "bindsTo": "OnboardingApplication.contactEmail",
+       "operation": "submitOnboardingApplication",
+       "notes": "The verified email, read-only.",
+       "provenance": "contract subscription.yaml OnboardingApplication.contactEmail (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Contact phone",
+       "bindsTo": "OnboardingApplication.contactPhone",
+       "operation": "submitOnboardingApplication",
+       "notes": "E.164, +971 by default.",
+       "provenance": "contract subscription.yaml OnboardingApplication.contactPhone (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "bindsTo": "OnboardingApplication.countryCode",
+       "operation": "submitOnboardingApplication",
+       "notes": "ISO 3166-1 alpha-2; AE by default.",
+       "provenance": "contract subscription.yaml OnboardingApplication.countryCode (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Legal name",
+       "bindsTo": "OnboardingApplication.billingEntity.legalName",
+       "operation": "submitOnboardingApplication",
+       "notes": "Optional here; required before the first invoice.",
+       "provenance": "contract subscription.yaml OnboardingApplication.billingEntity.legalName (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Trade licence number",
+       "bindsTo": "OnboardingApplication.billingEntity.tradeLicenceNumber",
+       "operation": "submitOnboardingApplication",
+       "notes": "Optional here.",
+       "provenance": "contract subscription.yaml OnboardingApplication.billingEntity.tradeLicenceNumber (defined 4 October 2026, CHG-FXS-001)"
+      },
+      {
+       "kind": "textField",
+       "label": "Tax registration number (TRN)",
+       "bindsTo": "OnboardingApplication.billingEntity.trn",
+       "operation": "submitOnboardingApplication",
+       "notes": "Optional; 15 digits for a UAE VAT registrant.",
+       "provenance": "contract subscription.yaml OnboardingApplication.billingEntity.trn (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "submitOnboardingApplication",
        "label": "Submit",
-       "notes": "The act the screen exists for."
+       "operation": "submitOnboardingApplication",
+       "notes": "Sends a client UUIDv7 id and status submitted. The venue type and the plan are chosen in the next steps (venueTypeTemplateId and requestedPlanId are optional here).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "submitOnboardingApplication"
+       "notes": "Leaves without submitting; nothing is sent.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The customer organization registration list.",
-   "error": "Could not load. Names which read failed and leaves the customer organization registration untouched.",
+   "loading": "Not used: the form renders at once.",
+   "error": "The call that failed is named beside its button (code, verify or submit); what was typed stays.",
    "emptyFirstRun": "No customer organization registration yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the customer organization registration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `submitOnboardingApplication` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 22"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 22"
-   }
-  ],
   "apis": [
    {
     "operationId": "submitOnboardingApplication",
@@ -237,7 +279,7 @@
     "provenance": "DEC-167, 2 October 2026 (CHG-CLN-019)"
    }
   ],
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "navigation": {
    "entryFrom": [
     "SGN-001",

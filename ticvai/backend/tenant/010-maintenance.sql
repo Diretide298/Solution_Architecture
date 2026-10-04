@@ -1,4 +1,4 @@
--- maintenance — 18 tables
+-- maintenance — 19 tables
 -- **Derived. Do not hand-edit.**
 
 -- A physical thing with a service history — a lift, a chiller, a ride. Distinct from a resource,
@@ -126,6 +126,17 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_authority_notification (
     recorded_at                       timestamptz
 );
 
+CREATE TABLE IF NOT EXISTS maintenance.incident_history (
+    id                                uuid PRIMARY KEY NOT NULL,
+    incident_id                       uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT incident_history_kind_chk CHECK (kind IN ('note', 'statusChange', 'escalation')),
+    from_status                       text,
+    to_status                         text,
+    note                              text,
+    principal_id                      uuid NOT NULL,
+    recorded_at                       timestamptz NOT NULL
+);
+
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.incident_investigation_note (
@@ -152,7 +163,7 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_involved_party (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.incident_media (
     id                                uuid PRIMARY KEY NOT NULL,
     incident_id                       uuid NOT NULL,

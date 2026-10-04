@@ -442,7 +442,7 @@
     "BO-108"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 9 board screen(s): F&B Command Center; Outlet Management; Create / Edit Outlet and 6 more. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.** **This screen owns 18 board frames — the whole of F&B board 1 and the whole of Retail board 1.** No flow could be derived from it because **a chain of nine frames that all resolve to one screen is not a journey**, it is one screen the client drew nine views of. **That is the module system working**: a venue configuring an outlet and a venue configuring a store are the same screen with a different licence, and `requiresModule` is what makes them look different. **Worth stating rather than papering over with a single-step flow.** **Five of the 74 board chains collapse to this one screen and no others do.** The client drew nine F&B views and nine retail views of one outlet configuration surface — **which is what makes it the strongest evidence in the package that the module system is the right shape.** Nine frames per domain, one screen, and `requiresModule` is the only difference a tenant sees.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 9 board screen(s): F&B Command Center; Outlet Management; Create / Edit Outlet and 6 more. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.** **This screen owns 18 board frames — the whole of F&B board 1 and the whole of Retail board 1.** No flow could be derived from it because **a chain of nine frames that all resolve to one screen is not a journey**, it is one screen the client drew nine views of. **That is the module system working**: a venue configuring an outlet and a venue configuring a store are the same screen with a different licence, and `requiresModule` is what makes them look different. **Worth stating rather than papering over with a single-step flow.** **Five of the 74 board chains collapse to this one screen and no others do.** The client drew nine F&B views and nine retail views of one outlet configuration surface — **which is what makes it the strongest evidence in the package that the module system is the right shape.** Nine frames per domain, one screen, and `requiresModule` is the only difference a tenant sees.\n\n**Corrective actions are listed with listCorrectiveActions (agreed with contracts in the ledger, 4 October 2026)** (CHG-FXS-003)",
   "density": "compact",
   "boardFrames": [
    "FnB Board 1.dc.html#fnb-1b",
@@ -554,6 +554,19 @@
        ],
        "operation": "listOutlets",
        "provenance": "contract tenancy.yaml GET /outlets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Corrective actions",
+       "bindsTo": "CorrectiveAction",
+       "operation": "listCorrectiveActions",
+       "columns": [
+        "CorrectiveAction.raisedAt",
+        "CorrectiveAction.source",
+        "CorrectiveAction.status"
+       ],
+       "notes": "Open and overdue first; selecting one gives the actions its actionId.",
+       "provenance": "agreed operation `listCorrectiveActions`, runs/fix-s12/LEDGER.md (defined 4 October 2026, CHG-FXS-003)"
       }
      ]
     },
@@ -682,7 +695,7 @@
    "error": "Could not load. Names which read failed and leaves the outlets untouched.",
    "emptyFirstRun": "No outlets yet. Offers Create outlet (`createOutlet`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind and the outlets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "You don't have access to outlets — ask your venue manager. Permission keys are never shown to the user; the screen names the access in words. **Never an empty table** — that reads as *there is no data*."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `signCorrectiveAction`, `recordCorrectiveAction`, `escalateCorrectiveAction`, `closeCorrectiveAction`; `ORDER_VIEW` for `getReturnPolicy`, `getTableMap`; `PRODUCT_CONFIGURE` for `setFnbDeliveryPolicy`, `setTableLayout`, `setDeliveryLocationOutletMapping`; `REGION_CONFIGURE` for `createOutlet`, `setReturnPolicy`, `updateOutlet`."
   },
   "apis": [
    {
@@ -812,6 +825,13 @@
     "purpose": "Show the delivery locations and the outlets mapped to them",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listCorrectiveActions",
+    "contract": "fnb",
+    "purpose": "The corrective actions, open first, whose id record, sign, escalate and close take: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
+    "trigger": "onLoad",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "entryState": {
@@ -3550,7 +3570,11 @@
     "ADM-243",
     "ADM-342",
     "ADM-354",
-    "BO-1065"
+    "BO-1065",
+    "ADM-340",
+    "ADM-606",
+    "BO-1018",
+    "BO-1034"
    ],
    "entryFrom": [
     "BO-108",
@@ -4538,6 +4562,26 @@
      "to": "BO-1065",
      "trigger": "Opens Currency, Timezone & Channels",
      "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "ADM-340",
+     "trigger": "Opens Segregation of Duties Policy Manager",
+     "provenance": "CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A, CHG-RONEP-007); its command centre is not in Block A"
+    },
+    {
+     "to": "ADM-606",
+     "trigger": "Opens Partial Payment, Failure & Recovery Manager",
+     "provenance": "CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A, CHG-RONEP-007); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-1018",
+     "trigger": "Opens Accessible Seating Master",
+     "provenance": "CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A, CHG-RONEP-007); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-1034",
+     "trigger": "Opens Best Seat Recommendations",
+     "provenance": "CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A, CHG-RONEP-007); its command centre is not in Block A"
     }
    ]
   },

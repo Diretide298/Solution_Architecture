@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-893` | Experience Resource Requirement Builder | D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-894` | Staff-to-Experience Qualification Mapping | D | 19 | 9 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-894` | Staff-to-Experience Qualification Mapping | D | 19 | 11 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-895` | Resource Combination Builder | D | 28 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-896` | Ticket Demand & Resource Capacity Mapping | D | 3 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-897` | Customer Resource Selection Configuration | D | 1 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |

@@ -106,9 +106,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-697` | Event Schedule Command Center | B | 0 | 7 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-698` | Dynamic Performance Duration Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-699` | Schedule Change & Rescheduling Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-697` | Event Schedule Command Center | B | 0 | 9 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-698` | Dynamic Performance Duration Configuration | B | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-699` | Schedule Change & Rescheduling Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -40,6 +40,7 @@
    },
    "schedule": {
     "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
     "description": "**Zone, date and time are three dimensions and all three are needed.**",
     "items": {
      "type": "object",

@@ -252,7 +252,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals was built (CHG-CSA-045) and is bound here (CHG-SGU-022).",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals was built (CHG-CSA-045) and is bound here (CHG-SGU-022).\n\n**proposeTranslations bound again 4 October 2026: it was removed because nothing could follow the 202 job (R288); getTranslationProposals now does, so the screen starts the job and follows it by the translationJobId it returns** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setLanguages`) and no read of a population — it is settings, not a list",
@@ -298,11 +298,27 @@
        "provenance": "contract white-label.yaml GET /tenant-config; wiring fix, 2 October 2026"
       },
       {
-       "kind": "dataTable",
+       "kind": "cardList",
        "label": "Proposed translations",
        "operation": "getTranslationProposals",
-       "notes": "The machine-proposed strings for the missing languages, accepted or edited one by one.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+       "notes": "Each draft is accepted into the language or discarded; nothing is published until accepted.",
+       "provenance": "contract ai.yaml TranslationProposals.drafts (defined 4 October 2026, CHG-FXS-003)",
+       "bindsTo": "TranslationProposals.drafts"
+      },
+      {
+       "kind": "selectField",
+       "label": "Translate into",
+       "bindsTo": "TranslationProposals.targetLocale",
+       "operation": "proposeTranslations",
+       "notes": "An enabled language with gaps.",
+       "provenance": "contract ai.yaml TranslationProposals.targetLocale (defined 4 October 2026, CHG-FXS-003)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Translate missing text",
+       "operation": "proposeTranslations",
+       "notes": "scope allGaps; the job id is kept on the screen (and in the URL as translationJobId so a reload resumes it).",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       }
      ]
     }
@@ -312,7 +328,7 @@
    "loading": "The saved translations.",
    "error": "Could not load. Names which read failed and leaves the translations untouched.",
    "emptyFirstRun": "No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "entryState": {
    "params": [
@@ -341,8 +357,15 @@
    {
     "operationId": "getTranslationProposals",
     "contract": "ai",
-    "purpose": "Follow a translation job and review its proposals (CHG-CSA-045)",
-    "trigger": "onAction"
+    "purpose": "Follow the job started here (every 3 s until completed or failed) and review its drafts",
+    "trigger": "onInterval"
+   },
+   {
+    "operationId": "proposeTranslations",
+    "contract": "ai",
+    "purpose": "Start machine translation of what a language is missing; its translationJobId is what getTranslationProposals follows (R288 is answered by that read, CHG-CSA-045)",
+    "trigger": "onAction",
+    "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
   ],
   "wireframe": {
@@ -351,14 +374,6 @@
    "board": "wireframes/P13 Venue CMS.dc.html#cms-011"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
-  "gaps": [
-   {
-    "operation": "proposeTranslations",
-    "removed": true,
-    "why": "Removed 2 October 2026 (CHG-WIR-015): proposeTranslations answers 202 and nothing on the screen can follow the job (R288); the machine-translation step stays on BO-785 and BO-793 until a status read exists (logged as a contract gap).",
-    "source": "contracts/satellite/ai.yaml#proposeTranslations | R288"
-   }
-  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",

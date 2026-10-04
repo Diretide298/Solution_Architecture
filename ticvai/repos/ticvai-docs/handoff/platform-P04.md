@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 32 |
-| Operations | 152 |
+| Operations | 157 |
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
@@ -46,6 +46,7 @@
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
+| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
@@ -59,7 +60,6 @@
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
-| `setFxProvider` | finance | PUT | Which provider serves which purpose |
 | … | | | 113 more |
 
 ## Modules
@@ -82,7 +82,7 @@
 | `POS-004` | Sell — Seat Map | Sell | 1 | 7 | yes |
 | `POS-005` | Payment | Payment | 1 | 13 | yes |
 | `POS-006` | Held Orders | Sell | 1 | 14 | yes |
-| `POS-007` | Close Shift | Shift | 1 | 8 | yes |
+| `POS-007` | Close Shift | Shift | 1 | 9 | yes |
 | `POS-008` | Reports | Reports | 1 | 4 | yes |
 | `POS-009` | Staff Roster | Shift | 1 | 3 | yes |
 | `POS-010` | Add to Existing Ticket | Sell | 1 | 5 | yes |
@@ -95,16 +95,16 @@
 | `POS-017` | Cash In / Cash Out Operations | Sell | 1 | 2 | yes |
 | `POS-018` | Safe Drop & Cash Transfer Management | Sell | 1 | 3 | yes |
 | `POS-019` | Shift Templates & Policies | Sell | 1 | 3 | yes |
-| `POS-020` | Shift Exceptions & Alerts | Sell | 1 | 5 | yes |
-| `POS-021` | Sell — Food & Drink | Sell | 1 | 4 | yes |
+| `POS-020` | Shift Exceptions & Alerts | Sell | 1 | 6 | yes |
+| `POS-021` | Sell — Food & Drink | Sell | 1 | 5 | yes |
 | `POS-022` | Send to Kitchen | Sell | 1 | 5 | yes |
-| `POS-023` | Sell — Merchandise | Sell | 1 | 4 | yes |
-| `POS-024` | Outlet Setup | Sell | 1 | 5 | yes |
-| `POS-025` | Till Home | Sell | 1 | 7 | yes |
-| `POS-026` | Receipt & Reprint | Sell | 1 | 6 | yes |
+| `POS-023` | Sell — Merchandise | Sell | 1 | 3 | yes |
+| `POS-024` | Outlet Setup | Sell | 1 | 6 | yes |
+| `POS-025` | Till Home | Sell | 1 | 8 | yes |
+| `POS-026` | Receipt & Reprint | Sell | 1 | 8 | yes |
 | `POS-027` | Guest Lookup | Sell | 1 | 5 | yes |
 | `POS-028` | Table Service | Sell | 1 | 13 | yes |
-| `POS-029` | Order Queue | Sell | 1 | 1 | yes |
+| `POS-029` | Order Queue | Sell | 1 | 4 | yes |
 | `POS-030` | Sales Journal | Sell | 1 | 8 | yes |
 | `POS-031` | Reservations & Group Arrivals | Sell | 1 | 9 | yes |
 

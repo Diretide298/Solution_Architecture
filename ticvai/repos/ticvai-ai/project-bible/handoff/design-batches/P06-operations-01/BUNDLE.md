@@ -150,8 +150,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `EMP-001` | Sign in | A | 14 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
-| `EMP-002` | Select venue & role | B | 1 | 5 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
-| `EMP-003` | Home — on duty | D | 35 | 24 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
+| `EMP-002` | Select venue & role | A | 1 | 8 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
+| `EMP-003` | Home — on duty | A | 35 | 24 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
 | `EMP-009` | End shift | C | 17 | 23 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
 | `EMP-010` | Scan — ready | C | 17 | 0 | 6 | 46 | 1 | 0 | — | notStarted (generated) |
 | `EMP-004` | Task list | A | 4 | 14 | 6 | 15 | 6 | 0 | — | notStarted (generated) |
@@ -313,9 +313,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Where the user goes next**
 
-- → `EMP-002` Select venue & role: *Selects venue and role*
 - → `EMP-003` Home — on duty: *Home — on duty*
 - → `EMP-048` Opening checklist: *Opening checklist*
+- → `EMP-002` Select venue & role: *Selects venue and role*
 
 #### States
 
@@ -410,7 +410,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-001?state=<state>`: loading, emptyFirstRun, error, denied, emptyNoAccess, emptyNoResults, sessionHeld, mfaRequired, offline.
 - [ ] Every action is wired with its success and its failure: Sign in, Continue with your organisation, Verify, Email me a code instead, Choose venue and role.
-- [ ] Every transition is wired: `EMP-002`, `EMP-003`, `EMP-048`.
+- [ ] Every transition is wired: `EMP-003`, `EMP-048`, `EMP-002`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
@@ -426,7 +426,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | Block B · task APP-STAFF-EMP-002 |
+| Block | Block A · task APP-STAFF-EMP-002 |
 | Who uses it | venue; in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act |
@@ -434,7 +434,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `sessionId` (session) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
 | Route | `/operations/select-venue-role` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.** ** restored** — a role-select screen must read the roles. Over-stripped and caught by F08.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.** ** restored** — a role-select screen must read the roles. Over-stripped and caught by F08. **Roles come from the login response EMP-001 holds (LoginResponse.availableRoles, preloaded) 4 October 2026; selectRole sends the picked roleId. A role carries its venue scope, so there is no separate venue pick** (CHG-FXS-003)
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-021): Venue-and-role selection listed roles with listRoles (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose … Removed 2 October 2026 (CHG-WIR-021): Venue-and-role selection listed roles with listRoles (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose … Removed 2 October 2026 (CHG-WIR-021): Venue-and-role selection listed roles with listRoles (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose …
 
@@ -461,6 +461,14 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Choose your role for today** (card list): Handed over by EMP-001 from the login response (requiresRoleSelection true); nothing is fetched. The primary role is first. The venue is the role's scope, shown on the session after selectRole.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Code | text | — |
+| Is primary | yes / no (icon or chip) | — |
 
 **The session** (detail panel, from `getCurrentSession`)
 
@@ -556,7 +564,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Select role.
 - [ ] Every transition is wired: `EMP-048`, `EMP-001`, `EMP-003`.
@@ -574,7 +582,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | Block D · task APP-STAFF-EMP-003 |
+| Block | Block A · task APP-STAFF-EMP-003 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`, `REPORT_VIEW_WORKSTATION` (1 configure, 2 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | approvalInbox (comfortable density): `approveShiftOpen` decides items that `listIncidents` queues — every row is waiting for a person, so the empty state is success |

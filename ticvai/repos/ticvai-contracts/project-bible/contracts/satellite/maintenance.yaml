@@ -3418,6 +3418,22 @@ components:
         closedAt: { type: string, format: date-time, nullable: true }
         syncedAt: { type: string, format: date-time, nullable: true }
 
+    IncidentHistoryEntry:
+      x-ticvai-persistence: maintenance.incident_history
+      type: object
+      description: '**One line of an incident''s append-only history** (4 October 2026, CHG-FXC-003). `updateIncident`
+        appends one per note, status change and escalation in the same transaction as the change; rows are never updated
+        or deleted.'
+      required: [id, incidentId, kind, recordedAt, principalId]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        incidentId: { type: string, format: uuid }
+        kind: { type: string, enum: [note, statusChange, escalation] }
+        fromStatus: { type: string, nullable: true }
+        toStatus: { type: string, nullable: true }
+        note: { type: string, nullable: true }
+        principalId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
     IncidentDetail:
       x-ticvai-persistence: "maintenance.incident"
       allOf:

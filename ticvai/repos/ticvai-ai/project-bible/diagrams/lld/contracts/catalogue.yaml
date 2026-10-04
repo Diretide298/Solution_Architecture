@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 248 operations
+title: catalogue — 249 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -730,7 +730,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.tax_profile
   writes: []
 - operation: getWaitingRoomPosition
   verb: GET
@@ -2186,6 +2187,17 @@ operations:
   - catalogue.tax_profile
   - catalogue.tax_rule
   writes: []
+- operation: listTaxProfiles
+  verb: GET
+  path: /tax-profiles
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.tax_profile
+  writes: []
 - operation: listTimeslotPerformanceTime
   verb: GET
   path: /timeslot-performance-time
@@ -2268,7 +2280,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.price
+  - catalogue.price_list
+  - catalogue.product
   - catalogue.published_bundle
+  - catalogue.variant
+  - platform.sale_board
+  - platform.sale_board_tile
   writes:
   - cache:idempotency
   - catalogue.published_bundle
@@ -3522,9 +3540,11 @@ operations:
   - partner
   offline: false
   reads:
+  - access.entitlement
   - cache:idempotency
   - catalogue.product
   - catalogue.product_media
+  - catalogue.published_bundle
   writes:
   - cache:idempotency
   - catalogue.product

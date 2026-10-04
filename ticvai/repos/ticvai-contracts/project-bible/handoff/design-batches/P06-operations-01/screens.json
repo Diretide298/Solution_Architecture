@@ -23,11 +23,6 @@
    "isEntryPoint": true,
    "transitions": [
     {
-     "to": "EMP-002",
-     "trigger": "Selects venue and role",
-     "provenance": "flow F08 step 1→2, F64 step 1→2"
-    },
-    {
      "to": "EMP-003",
      "trigger": "Home — on duty",
      "provenance": "structural — EMP-001 is P06's home screen and its exits are its launcher"
@@ -36,6 +31,11 @@
      "to": "EMP-048",
      "trigger": "Opening checklist",
      "provenance": "structural — EMP-001 is P06's home screen and its exits are its launcher"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Selects venue and role",
+     "provenance": "flow F08 step 1→2, F64 step 1→2"
     }
    ]
   },
@@ -302,7 +302,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.** ** restored** — a role-select screen must read the roles. Over-stripped and caught by F08.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.** ** restored** — a role-select screen must read the roles. Over-stripped and caught by F08.\n\n**Roles come from the login response EMP-001 holds (LoginResponse.availableRoles, preloaded) 4 October 2026; selectRole sends the picked roleId. A role carries its venue scope, so there is no separate venue pick** (CHG-FXS-003)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act",
@@ -313,7 +313,20 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": []
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Choose your role for today",
+       "bindsTo": "LoginResponse.availableRoles",
+       "columns": [
+        "RoleSummary.name",
+        "RoleSummary.code",
+        "RoleSummary.isPrimary"
+       ],
+       "notes": "Handed over by EMP-001 from the login response (requiresRoleSelection true); nothing is fetched. The primary role is first. The venue is the role's scope, shown on the session after selectRole.",
+       "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+      }
+     ]
     },
     {
      "name": "contextPanel",
@@ -380,11 +393,7 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "MfaMethod.id",
-    "MfaMethod.kind",
-    "MfaMethod.label",
-    "MfaMethod.maskedTarget",
-    "MfaMethod.isActive"
+    "LoginResponse.availableRoles"
    ]
   },
   "wireframe": {
@@ -583,7 +592,7 @@
     {
      "to": "EMP-059",
      "trigger": "Table Order, Bill & Payment Management",
-     "provenance": "derived — EMP-059 declares entryState.params visitId and EMP-003 holds none of them, so the edge carries nothing and EMP-059 opens cold"
+     "provenance": "derived — EMP-059 declares entryState.params visitId and EMP-003 holds none of them. The edge carries nothing: EMP-059 finds visitId (createFnbOrder) itself, and EMP-059 opens on its own"
     },
     {
      "to": "EMP-060",
@@ -623,7 +632,7 @@
     {
      "to": "EMP-067",
      "trigger": "Damage, Loss, Shrinkage & Stock Adjustment",
-     "provenance": "derived — EMP-067 declares entryState.params actionId, outletId and EMP-003 holds none of them, so the edge carries nothing and EMP-067 opens cold"
+     "provenance": "derived — EMP-067 declares entryState.params actionId, outletId and EMP-003 holds none of them. The edge carries nothing: actionId only pre-selects (deep link or optional); EMP-067 opens on listCorrectiveActions, and outletId has no source on EMP-067 yet (a gap in EMP-067, not in this edge)"
     },
     {
      "to": "EMP-068",

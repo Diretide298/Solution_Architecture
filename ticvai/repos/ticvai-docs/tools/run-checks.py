@@ -23,12 +23,23 @@ added to `REPORT_ONLY` needs that argument made in writing beside it.**
 
     python3 tools/run-checks.py            # print the table, exit non-zero if a gate failed
     python3 tools/run-checks.py --no-gate  # print the table, always exit 0
+    python3 tools/run-checks.py --jobs 4   # four checkers at a time; the same table, in the same order
+    python3 tools/run-checks.py --out-dir DIR   # also keep each checker's full output in DIR/<name>.txt
+
+**Four at a time, printed in the list's order** (council of 3 October 23:30, CHG-RSPD-001). The
+checkers summed to 33 minutes run one after another; every one of them only reads the package
+(`SERIAL`, below, says how that was established). `--jobs N` runs N at once, keeps each one's
+output apart, and prints each row only when every row above it has printed -- so the table, the
+exit code and every checker's output are the same as `--jobs 1`, which is the original loop and is
+kept. A checker in `SERIAL` runs alone, with nothing before it still running and nothing after it
+started, so whatever it writes is seen exactly as the sequential run saw it.
 """
 import io
 import os
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -106,6 +117,9 @@ CHECKS = [
     # built in Block A, and no artefact the last released plan built leaves the tickets without a reason; a ticket's
     # builds are real ids, a module test names what it tests, a setup ticket links only its own part.
     "check-plan-closure", "check-ticket-builds",
+    # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
+    # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
+    "check-parameter-columns",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
@@ -140,30 +154,106 @@ REPORT_ONLY = {
 }
 
 
+# **Run alone, never beside another checker** (CHG-RSPD-001). A checker belongs here when, run bare as
+# this script runs it, it writes a file in the package or anywhere another checker reads -- then the
+# order the sequential run gave it is the only order that is known to be right. Read on 4 October,
+# every one of the 68 above writes only behind a flag this script never passes: `--write`
+# (check-spec-coverage, check-rfp-coverage, audit-contracts, audit-screen-estate, index-sources),
+# `--csv` (audit-screenless-operations, audit-unwired-tables, audit-duplicate-tables,
+# audit-array-relationships, audit-uncontrolled-values), `--json` (check-screen-redundancy), `--fix`
+# (check-doc-tables), `--bless` (check-authored-inputs), `--freeze` (check-contract-compat) and
+# `--update-baseline` (check-binding-ratchet and the audit_guard checkers). check-contract-compat's
+# one unflagged write is a fresh `tempfile.mkdtemp` per process, removed after. The git calls
+# (check-package, check-changelog, check-cited-sources, check-plan-closure, check-binding-ratchet,
+# audit-contracts, release_baseline's users) only read; git's own index refresh takes its lock
+# without waiting and skips when another holds it. check-parameter-columns, the 69th (CHG-FXC-003, merged into
+# r1-fix-merge on 4 October), only reads. So the set is empty, and a checker that starts
+# writing a shared file must be added here in the same change.
+SERIAL = set()
+
+
+def _run_one(t):
+    """(name, rc, output, seconds) -- the output is stdout then stderr, as the original loop joined them."""
+    path = os.path.join(ROOT, "tools", "%s.py" % t)
+    if not os.path.exists(path):
+        return t, 127, None, 0.0
+    t0 = time.time()
+    p = subprocess.run([sys.executable, path], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", cwd=ROOT,
+                       env=dict(os.environ, PYTHONIOENCODING="utf8"))
+    return t, p.returncode, (p.stdout or "") + (p.stderr or ""), time.time() - t0
+
+
+def _args(argv):
+    gate, jobs, out_dir, only = True, 1, None, []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--no-gate":
+            gate = False
+        elif a in ("--jobs", "-j") or a.startswith("--jobs="):
+            v = a.split("=", 1)[1] if "=" in a else (argv[i + 1] if i + 1 < len(argv) else "")
+            i += 0 if "=" in a else 1
+            if not v.isdigit() or int(v) < 1:
+                raise SystemExit("run-checks: --jobs needs a whole number of at least 1")
+            jobs = int(v)
+        elif a == "--out-dir" or a.startswith("--out-dir="):
+            out_dir = a.split("=", 1)[1] if "=" in a else (argv[i + 1] if i + 1 < len(argv) else "")
+            i += 0 if "=" in a else 1
+            if not out_dir:
+                raise SystemExit("run-checks: --out-dir needs a directory")
+        elif not a.startswith("-"):
+            only.append(a)
+        i += 1
+    return gate, jobs, out_dir, only
+
+
 def main():
-    gate = "--no-gate" not in sys.argv[1:]
-    only = [a for a in sys.argv[1:] if not a.startswith("-")]
+    gate, jobs, out_dir, only = _args(sys.argv[1:])
     checks = [c for c in CHECKS if not only or c in only]
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
 
     results = []
-    for t in checks:
-        path = os.path.join(ROOT, "tools", "%s.py" % t)
-        if not os.path.exists(path):
-            print("  %-26s MISSING" % t)
+
+    def report(r):
+        t, rc, out, secs = r
+        if out is None:
+            print("  %-26s MISSING" % t, flush=True)
             results.append((t, 127, "no such tool"))
-            continue
-        t0 = time.time()
-        p = subprocess.run([sys.executable, path], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", cwd=ROOT,
-                           env=dict(os.environ, PYTHONIOENCODING="utf8"))
-        rc = p.returncode
-        lines = [l for l in ((p.stdout or "") + (p.stderr or "")).split("\n") if l.strip()]
+            return
+        if out_dir:
+            with open(os.path.join(out_dir, t + ".txt"), "w", encoding="utf-8", newline="") as fh:
+                fh.write(out)
+            with open(os.path.join(out_dir, "results.tsv"), "a", encoding="utf-8", newline="\n") as fh:
+                fh.write("%s\t%d\t%.1f\n" % (t, rc, secs))
+        lines = [l for l in out.split("\n") if l.strip()]
         last = lines[-1].strip() if lines else ""
         mark = "ok  " if rc == 0 else "FAIL"
         if t in REPORT_ONLY and rc != 0:
             mark = "rpt "
-        print("  %-26s %s rc=%-3d %5.1fs  %s" % (t, mark, rc, time.time() - t0, last[:96]))
+        print("  %-26s %s rc=%-3d %5.1fs  %s" % (t, mark, rc, secs, last[:96]), flush=True)
         results.append((t, rc, last))
+
+    if out_dir and os.path.exists(os.path.join(out_dir, "results.tsv")):
+        os.remove(os.path.join(out_dir, "results.tsv"))
+    if jobs == 1:
+        # The original loop: one checker at a time, in the list's order.
+        for t in checks:
+            report(_run_one(t))
+    else:
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            pending = []
+            for t in checks:
+                if t in SERIAL:
+                    for f in pending:              # everything before it, finished and printed
+                        report(f.result())
+                    pending = []
+                    report(_run_one(t))            # then it, alone
+                    continue
+                pending.append(pool.submit(_run_one, t))
+            for f in pending:                      # in the list's order, each as soon as it can be
+                report(f.result())
 
     bad = [(t, rc) for t, rc, _ in results if rc != 0 and t not in REPORT_ONLY]
     rpt = [(t, rc) for t, rc, _ in results if rc != 0 and t in REPORT_ONLY]
