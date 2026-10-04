@@ -1,0 +1,45 @@
+id: CHG-RFM-018
+date: '2026-10-04'
+source: audit
+kind: process
+summary: The PM build plan (build-plan.json, both workbooks, the Word plan and the deck) shows the AI engine by phase
+  (Block A, A2, phase 1, phase 2); phase 2 is outside the six-month plan, so no assigned AI work shows past 2 April.
+decision:
+  what: 'tools/build-plan-deck.py reads docs/active/ai-phase-plan.json and tags every AI engine task and AI module test
+    with its phase (A, A2, 1, 2). Phase 2 work (the units that learn from tenant data and the module tests of the phase
+    2 app-modules) is counted apart: never in a person''s load, a sprint, the hours past 2 April, a module''s or build
+    phase''s dates or an app-module''s done date. basis.aiPhases gives hours, people, start and end per phase, with the
+    phase plan''s hours beside them (phase 1 940 h, phase 2 860 h); aiFinish is the in-plan AI finish (3 Mar 2027); a
+    block''s aiEngineLastDay past 2 April is replaced by its in-plan one; Block B to D target overtime leaves out AI
+    phase 1 and 2 (phase 1 runs to 2 April by decision). The Tasks by sprint sheet gains an AI phase column and shows
+    "Phase 2" in the Sprint column. The Summary, risks and presentation text drop "unassigned for the AI developers
+    joining". tools/build-plan-doc.py words section 1 and 7 the same way and adds the AI-by-phase table. The schedule
+    and the phase plan are unchanged.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The PM documents of 4 October (built before CHG-AIPH-001/002 and CHG-RFM-013) said 235 h of assigned AI work
+  (Kalpita 148, second AI engineer 87) ran past 2 April plus about 800 h unassigned, finishing 14 June 2027, while the
+  phase plan ends phase 1 on 3 March and puts what learns from tenant data in phase 2. Measured on the current
+  schedule, the only assigned work past 2 April is the three phase 2 module tests (96 h, July 2027).'
+keys_touched:
+  files:
+  - tools/build-plan-deck.py
+  - tools/build-plan-doc.py
+  - handoff/build-plan.json
+  - handoff/TICVAI - Build Plan.xlsx
+  - docs/active/build-plan-presentation.md
+root_class: 'new: plan-docs-ignore-ai-phases'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-plan-deck.py::main
+status: open
+notes: 'Batch RFM (r1 release), 4 October 2026. Draft, not committed. Open item for Chinmay: the schedule
+  (tools/build-service-docs.py into plan-tasks.csv and block-a-schedule.json) still gives the three phase 2 module
+  tests and app-module leads an owner (second AI engineer 78 h, Kalpita 18 h, July 2027); ai-phase-plan.json gives
+  phase 2 no owner. Close on the commit that ships it.'

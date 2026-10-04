@@ -50,6 +50,7 @@ PREVIOUS = {"date": "30 September 2026", "finish": "2027-04-26", "overtimeHours"
             "blockA": "screens by 20 November, back end wired by 25 December"}
 AI_REVIEW = "docs/active/ai-functions-review-30-september.json"
 AI_PEOPLE = ("Kalpita Mejari", "Second AI engineer")
+AI_PHASES = "docs/active/ai-phase-plan.json"
 OPS_RE = re.compile(r"Operations(?: beyond the first release)?: ([^.]+)\.")
 TABLES_RE = re.compile(r"Tables: (.+?)\. Source")
 SCREEN_RE = re.compile(r"(?:APP-[A-Z]+|VM)-([A-Z]+-\d{3,}[A-Z]?)(?:-REST)?$")
@@ -159,6 +160,21 @@ def main():
                       "points": pts, "days": days, "hours": hours, "s": s0, "e": s0 + dur,
                       "end": float(sched["end"].get(k, s0 + dur)), "module": mod, "tier": int(r["tier"] or 0),
                       "seq": int(r["sequence"] or 0), "ticketed": r.get("ticketed") == "yes"})
+    # **The AI phases** (Chinmay, 4 October, CHG-AIPH-001/002, docs/active/ai-phase-plan.json): AI engine work is
+    # Block A, A2, phase 1 (in the plan, done by 2 April) or phase 2 (after 2 April: it learns from tenant data, has no
+    # owner and is not ticketed). A phase 2 unit and the module test of a phase 2 app-module are outside the six-month
+    # plan: counted apart, never in a person's load, a sprint or the hours past 2 April.
+    aiph = json.load(io.open(AI_PHASES, encoding="utf-8"))
+    unit_phase = {u["key"]: u.get("phase", m["phase"]) for m in aiph["modules"] for u in m["units"]}
+    am_phase = {m["key"]: m["phase"] for m in aiph["modules"]}
+    for it in items:
+        if it["kind"] == "AI engine":
+            it["aiPhase"] = it["block"] if it["block"] in sp.BLOCK_A_FAMILY else str(unit_phase.get(it["key"], 1))
+        elif it["kind"] == "module test" and it["key"].startswith("TEST-AM-AI-ENGINE-"):
+            it["aiPhase"] = it["block"] if it["block"] in sp.BLOCK_A_FAMILY else str(am_phase.get(it["am"], 1))
+        else:
+            it["aiPhase"] = ""
+        it["phase2"] = it["aiPhase"] == "2"
     for it in items:                                      # a test belongs to the module of what it tests
         if it["module"] is None:
             ch = [x for x in items if x["am"] == it["am"] and x["kind"] in ("build", "AI engine")]
@@ -183,7 +199,7 @@ def main():
     after_end = collections.Counter()
     last_day = collections.defaultdict(float)
     for it in items:
-        if not it["who"]:
+        if not it["who"] or it["phase2"]:
             continue
         last_day[it["who"]] = max(last_day[it["who"]], it["e"])
         for i, h in spread(it):
@@ -237,7 +253,9 @@ def main():
              "start": sp.day(s_), "done": sp.day(max(e_ - 1e-6, 0)),
              "sprintFrom": sp.sprint_of_index(s_), "sprintTo": sp.sprint_of_index(max(e_ - 1e-6, 0)),
              "backEndFrom": sp.sprint_of_index(min(bs)) if bs else None,
-             "order": int(f["sequence"] or 0)}
+             "order": int(f["sequence"] or 0), "aiPhase": str(am_phase.get(f["key"], ""))}
+        if a["aiPhase"] == "2":                  # finishes in phase 2, after 2 April (CHG-AIPH-001)
+            a.update(done=None, sprintTo="Phase 2")
         ams.append(a)
         am_of[f["key"]] = a
     ams.sort(key=lambda a: (rank[a["block"]], a["order"]))
@@ -276,7 +294,7 @@ def main():
         for it in items:
             if it["block"] != b or it["kind"] == "block test" or not it["who"] or it["e"] <= cut:
                 continue
-            if it["kind"] == "AI engine" and b != "A":
+            if (it["kind"] == "AI engine" or it["aiPhase"] in ("1", "2")) and b != "A":   # AI phase 1: to 2 April
                 continue
             per[it["who"]] += it["hours"] * (it["e"] - max(it["s"], cut)) / max(it["e"] - it["s"], 1e-6)
         return per
@@ -293,11 +311,15 @@ def main():
         plats = collections.Counter(a["platform"] or "platform" for a in mine)
         n = x.get("endSprint") or settings["targets"][b]
         pair = sp.test_pair(b, tests)
+        ai_last = x.get("aiEngineLastDay")             # the schedule's includes phase 2's notional dates
+        if ai_last and dt.date.fromisoformat(ai_last) > PLAN_END:
+            ends = [i["end"] for i in its if i["aiPhase"] and not i["phase2"]]   # its AI engine and AI module tests
+            ai_last = sp.day(max(max(ends) - 1e-6, 0)).isoformat() if ends else ""
         blocks.append({
             "block": b, "targetSprint": settings["targets"][b], "endSprint": n,
             "endsOn": x.get("endsOn"), "targetEndsOn": x.get("targetEndsOn"), "lastWork": x.get("lastDay"),
             "testFrom": x.get("testFrom"), "testTo": x.get("testTo"), "testers": pair, "testLead": tests["lead"],
-            "aiEngineLastDay": x.get("aiEngineLastDay"),
+            "aiEngineLastDay": ai_last,
             "normalEndSprint": x.get("normalEndSprint") or n, "normalEndsOn": x.get("normalEndsOn") or x.get("endsOn"),
             "fixed": bool(x.get("fixed")),
             "targetOvertimeHours": round(sum(target_ot(b).values())),
@@ -335,8 +357,10 @@ def main():
     for it in items:
         m = mods.get(it["module"]) or mods[FOUNDATION]
         m["hoursByBlock"][it["block"]] += it["hours"]
-        if it["who"]:
+        if it["who"] and not it["phase2"]:
             m["people"][it["who"]] += it["hours"]
+        if it["phase2"]:                          # its hours count; its dates are phase 2's, after 2 April
+            continue
         m["s"] = it["s"] if m["s"] is None else min(m["s"], it["s"])
         m["e"] = it["end"] if m["e"] is None else max(m["e"], it["end"])
     for r in tasks:
@@ -389,7 +413,7 @@ def main():
                             "capacity": {n: round(v) for n, v in cap.items()},
                             "planned": {n: round(load[name][n]) for n in sorted(load[name])},
                             "hours": round(sum(load[name].values())),
-                            "testHours": round(sum(it["hours"] for it in items if it["who"] == name
+                            "testHours": round(sum(it["hours"] for it in items if it["who"] == name and not it["phase2"]
                                                    and it["kind"] in ("module test", "block test"))),
                             "lastDay": sp.day(max(last_day[name] - 1e-6, 0)) if last_day.get(name) else None,
                             "hoursAfterPlanEnd": round(after_end[name]),
@@ -399,7 +423,7 @@ def main():
                                 it["module"] for it in items if it["who"] == name).most_common(8)]})
     sprints = []
     for s in cal:
-        its = [it for it in items if it["who"] and sp.sprint_of_index(it["s"]) == s["n"]]
+        its = [it for it in items if it["who"] and not it["phase2"] and sp.sprint_of_index(it["s"]) == s["n"]]
         ending = [b["block"] for b in blocks if b["endSprint"] == s["n"]]
         active = sorted({it["block"] for it in its}, key=lambda b: rank[b])
         mt = [it for it in its if it["kind"] == "module test"]
@@ -427,24 +451,43 @@ def main():
         side = "back end" if it["track"] in BACK else "front end"
         k = (it["tier"], side)
         r = ph.setdefault(k, {"phase": it["tier"], "name": sp.PHASE_NAME.get(it["tier"], ""), "side": side,
-                              "hours": 0.0, "byBlock": collections.Counter(), "s": it["s"], "e": it["end"],
+                              "hours": 0.0, "byBlock": collections.Counter(), "s": math.inf, "e": -math.inf,
                               "modules": collections.Counter(), "people": collections.Counter()})
         r["hours"] += it["hours"]
         r["byBlock"][it["block"]] += it["hours"]
-        r["s"], r["e"] = min(r["s"], it["s"]), max(r["e"], it["end"])
+        if not it["phase2"]:                      # phase 2 (after 2 April) is not dated in the plan
+            r["s"], r["e"] = min(r["s"], it["s"]), max(r["e"], it["end"])
         r["modules"][it["module"]] += it["hours"]
         if it["who"]:
             r["people"][it["who"]] += it["hours"]
     phases = [{"phase": r["phase"], "name": r["name"], "side": r["side"], "hours": round(r["hours"]),
                "hoursByBlock": {b: round(r["byBlock"][b]) for b in sp.BLOCKS},
-               "start": sp.day(r["s"]).isoformat(), "end": sp.day(max(r["e"] - 1e-6, 0)).isoformat(),
+               "start": sp.day(r["s"]).isoformat() if r["s"] < math.inf else None,
+               "end": sp.day(max(r["e"] - 1e-6, 0)).isoformat() if r["e"] > -math.inf else None,
                "modules": [m for m, _ in r["modules"].most_common(8)],
                "people": [n for n, _ in r["people"].most_common(6)]} for _, r in sorted(ph.items())]
 
     # ---------------------------------------------------------------- totals
     dev = [it for it in items if it["kind"] == "build"]
     devs_finish = max(it["e"] for it in dev if it["who"])
-    ai_finish = max([it["e"] for it in items if it["kind"] == "AI engine"] or [0.0])   # unassigned ones included
+    ai_finish = max([it["e"] for it in items if it["kind"] == "AI engine" and not it["phase2"]] or [0.0])
+
+    def ai_part(sel):
+        its = [it for it in items if sel(it)]
+        by = collections.Counter()
+        for it in its:
+            by[it["who"] or "unassigned"] += it["hours"]
+        return {"hours": round(sum(it["hours"] for it in its)), "byPerson": {k: round(v) for k, v in by.most_common()},
+                "start": sp.day(min(it["s"] for it in its)).isoformat() if its else None,
+                "end": sp.day(max(max(it["e"] for it in its) - 1e-6, 0)).isoformat() if its else None}
+    plan_days = collections.Counter()
+    for m in aiph["modules"]:
+        for u in m["units"]:
+            plan_days[str(u.get("phase", m["phase"]))] += float(u.get("days") or 0)
+    ai_phases = {p: dict(ai_part(lambda it, p=p: it["kind"] == "AI engine" and it["aiPhase"] == p),
+                         moduleTests=ai_part(lambda it, p=p: it["kind"] == "module test" and it["aiPhase"] == p),
+                         **({"phasePlanHours": round(plan_days[p] * HOURS_PER_DAY)} if p in plan_days else {}))
+                 for p in ("A", "A2", "1", "2")}
     test_items = [it for it in items if it["kind"] in ("module test", "block test")]
     counted = [p for p in people_rows if p["name"] not in AI_PEOPLE]
     # Block D against its target, and the developers' spare capacity once their planned work is done (1 October:
@@ -504,6 +547,7 @@ def main():
                   "pace": sched.get("pace") or "", "blockACriticalPathDays": a_critical,
                   "aiUnassignedHours": round(sum(it["hours"] for it in items if it["kind"] == "AI engine"
                                                  and not it["who"])),
+                  "aiPhases": ai_phases, "aiPhase2Source": AI_PHASES,
                   "devIdleHoursToPlanEnd": round(sum(s_["devIdle"] for s_ in sprints if s_["inPlan"])),
                   "blockD": block_d, "spare": spare, "buffer": buffer},
         "calendar": {"start": START.isoformat(), "planEnd": PLAN_END.isoformat(), "sprintDays": sp.SPRINT_DAYS,
@@ -514,9 +558,10 @@ def main():
         "platforms": platforms,
     }
     task_rows = []
-    for it in sorted(items, key=lambda x: (sp.sprint_of_index(x["s"]) if x["who"] else 99, x["seq"])):
+    for it in sorted(items, key=lambda x: (sp.sprint_of_index(x["s"]) if x["who"] and not x["phase2"] else 99, x["seq"])):
         r = by_key[it["key"]]
-        task_rows.append({"sprint": sp.sprint_of_index(it["s"]) if it["who"] else "", "block": it["block"],
+        task_rows.append({"sprint": "Phase 2" if it["phase2"] else sp.sprint_of_index(it["s"]) if it["who"] else "",
+                          "aiPhase": it["aiPhase"], "block": it["block"],
                           "appModule": by_key[r["parent"]]["subject"] if r["parent"] in by_key else "",
                           "platform": am_of[r["parent"]]["platform"] if r["parent"] in am_of else "",
                           "key": it["key"], "title": re.sub(r"^\[[^\]]+\]\s*", "", r["subject"]),
@@ -630,6 +675,26 @@ def _sheet(wb, title, header, rows, widths=None, first=False):
     return ws
 
 
+AI_PHASE_NAME = {"A": "Block A", "A2": "Block A2", "1": "Phase 1", "2": "Phase 2"}
+
+
+def ai_phase_text(b):
+    """The AI engine by phase (CHG-AIPH-001/002): hours, people and end of each, as one sentence."""
+    ph = b.get("aiPhases") or {}
+    if not ph:
+        return ""
+    def who(x):
+        return ", ".join(f"{k} {_pp(v)}" for k, v in x["byPerson"].items())
+    p1, p2 = ph["1"], ph["2"]
+    return (f"Block A {_pp(ph['A']['hours'])} h ({who(ph['A'])}) to {_d(ph['A']['end'])}; Block A2 "
+            f"{_pp(ph['A2']['hours'])} h ({who(ph['A2'])}) to {_d(ph['A2']['end'])}; phase 1 {_pp(p1['hours'])} h "
+            f"({who(p1)}) from {_d(p1['start'])} to {_d(p1['end'])}, its module tests to {_d(p1['moduleTests']['end'])}. "
+            f"Phase 2, {_pp(p2['hours'])} h, is outside the six-month plan: the parts that learn from tenant data "
+            f"(forecasting statistical and learned, fraud classifier, learning-to-rank, training and promotion, anomaly "
+            f"detection, dynamic pricing), after 2 April when the client's data exists, with no owner and not ticketed "
+            f"(Chinmay, 4 October, CHG-AIPH-001; docs/active/ai-phase-plan.json).")
+
+
 def summary_rows(plan):
     b = plan["basis"]
     a = next(x for x in plan["blocks"] if x["block"] == "A")
@@ -646,16 +711,14 @@ def summary_rows(plan):
     rows += [
         ["Forecast finish (developers)", _d(b["forecastFinish"]),
          f"At normal hours. The plan of {PREVIOUS['date']} said {_d(PREVIOUS['finish'])}."],
-        ["AI engine finish", _d(b["aiFinish"]), "Two AI engineers, no third (decided 30 September); the AI review "
-         "found 50 AI-weeks against 35 available in Block B onwards. Decided 1 October: every AI engine task is "
-         "created; those past 2 April are left unassigned for the AI developers joining."],
+        ["AI engine finish (in the plan)", _d(b["aiFinish"]), "Two AI engineers, no third (decided 30 September). "
+         + ai_phase_text(b)],
         ["Total effort", f"{_pp(b['totalHours'])} hours",
          f"Build {_pp(b['buildHours'])} h, testing {_pp(b['testHours'])} h (module tests {_pp(b['moduleTestHours'])}, "
          f"block tests {_pp(b['blockTestHours'])}), AI engine {_pp(b['aiEngineHours'])} h."],
         ["Overtime to finish by 2 April", f"{_pp(b['overtimeHoursDevelopers'])} hours (developers)",
-         f"Decided 1 October: Block D keeps its scope to 2 April. {d_text(b)} The AI engine's "
-         f"{_pp(b.get('aiUnassignedHours', 0))} h past 2 April is not overtime: those tasks are "
-         f"unassigned for the AI developers joining. The plan of {PREVIOUS['date']} needed about "
+         f"Decided 1 October: Block D keeps its scope to 2 April. {d_text(b)} The AI engine's phase 2 "
+         f"({_pp(b.get('aiUnassignedHours', 0))} h) is after 2 April by decision, not overtime. The plan of {PREVIOUS['date']} needed about "
          f"{_pp(PREVIOUS['overtimeHours'])} h without the tests."],
         ["Buffer", f"Sprints {'-'.join(str(n) for n in ((b.get('buffer') or {}).get('sprints') or [])[::max(1, len((b.get('buffer') or {}).get('sprints') or [1]) - 1)])}, "
                    f"{_pp((b.get('buffer') or {}).get('hours', 0))} hours", buffer_text(b)],
@@ -755,8 +818,10 @@ def write_build_xlsx(plan, path):
             ws.cell(row=r, column=1, value="   " + a["name"])
             ws.cell(row=r, column=2, value=a["lead"])
             ws.cell(row=r, column=3, value=a["hours"])
-            ws.cell(row=r, column=4, value=_d(a["done"]))
-            bar(r, dt.date.fromisoformat(_iso(a["start"])), dt.date.fromisoformat(_iso(a["done"])), st["BLOCK"][a["block"]])
+            ws.cell(row=r, column=4, value=_d(a["done"]) or "Phase 2")      # phase 2: after 2 April, not dated
+            if a["done"]:
+                bar(r, dt.date.fromisoformat(_iso(a["start"])), dt.date.fromisoformat(_iso(a["done"])),
+                    st["BLOCK"][a["block"]])
             r += 1
     r += 1
     for b in sp.BLOCKS:
@@ -829,11 +894,12 @@ def write_sprint_xlsx(plan, task_rows, path):
             row[6].fill = st["TEST"]
             row[6].font = st["WHITE"]
     rows = [[t["sprint"], t["block"], t["appModule"], t["platform"], t["key"], t["title"], t["kind"], t["track"],
-             t["owner"], t["points"], t["hours"], t["starts"], t["ends"], t["depends"], t["ticketed"]] for t in task_rows]
+             t["owner"], t["points"], t["hours"], t["starts"], t["ends"], t["depends"], t["ticketed"],
+             AI_PHASE_NAME.get(t.get("aiPhase"), "")] for t in task_rows]
     ws = _sheet(wb, "Tasks by sprint", ["Sprint", "Block", "App-module", "Platform", "Task key", "Title", "Kind", "Track",
                                         "Owner", "Points", "Hours", "Starts", "Ends", "Depends on",
-                                        "Ticketed in OpenProject"],
-                rows, [7, 6, 40, 16, 28, 60, 11, 10, 22, 7, 7, 11, 11, 40, 9])
+                                        "Ticketed in OpenProject", "AI phase"],
+                rows, [7, 6, 40, 16, 28, 60, 11, 10, 22, 7, 7, 11, 11, 40, 9, 9])
     for row in ws.iter_rows(min_row=2):
         if row[6].value in ("module test", "block test"):
             for c in row[:9]:
@@ -854,7 +920,8 @@ def write_sprint_xlsx(plan, task_rows, path):
     write_people(wb, plan)
     rows = [[a["block"], a["name"], a["platform"], a["module"], a["package"], a["screens"], a["ops"], a["tables"],
              a["tasks"], a["ticketedTasks"], a["points"], a["hours"], a["testHours"], a["tester"],
-             f"{a['sprintFrom']}-{a['sprintTo']}", a["backEndFrom"] or "", _d(a["done"]), a["lead"], a["key"]]
+             f"{a['sprintFrom']}-{a['sprintTo']}", a["backEndFrom"] or "",
+             _d(a["done"]) or ("Phase 2, after 2 April" if a.get("aiPhase") == "2" else ""), a["lead"], a["key"]]
             for a in plan["appModules"]]
     _sheet(wb, "App-modules", ["Block", "App-module", "Platform", "Business module", "Package", "Screens", "Operations",
                                "Tables", "Tasks", "Ticketed", "Points", "Hours", "Module test hours", "Module tester",
@@ -921,7 +988,7 @@ RISKS = [
     ("Client inputs late", "Wireframe sign-off over 3 working days; sandbox credentials; stations and fares; cabana numbering; real photos.", "Those tickets wait in 'Waiting on client' and do not count against the team's pace."),
     ("Make-or-break answers", "Tax invoice fields, e-invoicing provider, VAT 201 layout, face capture consent, ID-verification provider.", "Defaults are built; a different answer is a change request."),
     ("Second AI engineer not in place on 5 October", "No start date confirmed this week.", "Kalpita starts the Block A AI alone; the baseline layer moves one sprint and the AI engine work needs more overtime."),
-    ("AI engine past 2 April", "About 50 AI-engineer weeks needed against 35 available.", "Decided 1 October: every AI engine task is created; those past 2 April are unassigned until the AI developers join. Each month they do not join moves the AI engine finish by about a month."),
+    ("AI phase 1 slips past 2 April", "Phase 1 AI work ends 3 March 2027 and its module tests by mid-March; an evaluation gate or the Block A AI overrun eats the margin.", "Decided 4 October (CHG-AIPH-001): a capability enters phase 1 only as a whole unit that finishes by 2 April; one that cannot moves whole to phase 2, never cut across the line. Phase 2 (the parts that learn from tenant data) starts after 2 April when the client's data exists."),
     ("Block test finds severity 1 or 2 defects", "A block test cannot pass in its three days.", "The defects are fixed in the next sprint's first days by the people who built the module; the block's acceptance moves, the next block does not wait."),
 ]
 
@@ -943,7 +1010,8 @@ def write_md(plan, path):
     w(f"We build TICVAI from **{_d(plan['calendar']['start'])} to {_d(plan['calendar']['planEnd'])}** in **13 two-week sprints** "
       f"and **four blocks** (A to D), each a set of complete, tested app-modules: about **{_pp(b['totalHours'])} hours** "
       f"({_pp(b['testHours'])} of them testing) across **{b['appModules']} app-modules**, with a team of {len(plan['people'])}. "
-      f"At normal hours the developers finish on **{_d(b['forecastFinish'])}** and the AI engine on **{_d(b['aiFinish'])}**.")
+      f"At normal hours the developers finish on **{_d(b['forecastFinish'])}** and the AI engine's in-plan work on "
+      f"**{_d(b['aiFinish'])}**; its phase 2 waits on tenant data, after 2 April.")
     w("")
     w("## 2. Blocks")
     w("")
@@ -1006,7 +1074,7 @@ def write_md(plan, path):
     w(f"About **{_pp(b['overtimeHoursDevelopers'])} developer hours** past 2 April at normal hours. Decided 1 October: Block D keeps its scope; "
       f"{d_text(b)} Block A ends Sprint {a['targetSprint']} with {_pp(_opt_a(b, a)['overtimeHours'])} hours of planned overtime ("
       + ", ".join(f"{n} {h}" for n, h in _opt_a(b, a)['byPerson'].items()) + f"). {buffer_text(b)} Ticketing depth: {TICKETING} "
-      f"The AI engine's {_pp(b.get('aiUnassignedHours', 0))} hours past 2 April are not overtime: those tasks are unassigned for the AI developers joining. "
+      f"AI engine by phase: {ai_phase_text(b)} "
       f"The plan of {PREVIOUS['date']} needed about {_pp(PREVIOUS['overtimeHours'])} hours, without the module and block tests.")
     w("")
     w("## 9. Architecture decisions the plan rests on")

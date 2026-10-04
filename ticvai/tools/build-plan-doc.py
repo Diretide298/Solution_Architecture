@@ -147,8 +147,9 @@ def main():
                 f"Display; 40 working days, it was 35) ends Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}, with about "
                 f"{n(opt_a['overtimeHours'])} hours of planned overtime ({ot_names}). {d_line} Developer overtime over the six months: about "
                 f"{n(b['overtimeHoursDevelopers'])} hours. The pace is 5 tasks a developer a day through Block A, rising "
-                f"to 2x by Sprint 11, re-measured after Sprint 2. {spare_line} The AI engine work past "
-                f"{d(b['planEnd'])} is created as tasks and left unassigned for the AI developers joining.",
+                f"to 2x by Sprint 11, re-measured after Sprint 2. {spare_line} The AI engine's phase 1 ends "
+                f"{d(b['aiFinish'])}; its phase 2 (what learns from tenant data) is after {d(b['planEnd'])}, outside "
+                "the plan (decided 4 October).",
            "Decided 1 October:")
     table(doc, ["Block", "Sprints", "Ends (decided)", "At normal hours", "App-modules", "Screens", "Journeys tested end to end"],
           [[k, f"{x['firstSprint']}–{x['targetSprint']}", f"{d(x['targetEndsOn'])} (Sprint {x['targetSprint']})",
@@ -258,10 +259,22 @@ def main():
            ["Block D past 2 April", f"Keep its scope; finish by {d(b['planEnd'])}",
             f"{d_line} Developer overtime over the six months: about {n(b['overtimeHoursDevelopers'])} hours (the "
             f"People table). At normal hours the developers finish {d(b['forecastFinish'])}. {spare_line}"],
-           ["AI engine (about 50 AI-engineer weeks against 35)",
-            "Every AI engine task is created; those past 2 April are unassigned for the AI developers joining",
-            f"About {n(ai_after)} h of AI engine work past 2 April. Two AI engineers alone finish it {d(b['aiFinish'])}."]],
+           ["AI engine (decided 4 October, CHG-AIPH-001/002)",
+            "Phase 1 (works on day one: rules, priors, the LLM over the venue's own data) by 2 April on the two AI "
+            "engineers, benefit first, each capability a whole unit; phase 2 (learns from tenant data) after 2 April, "
+            "no owner, not ticketed",
+            f"Phase 1 ends {d(b['aiFinish'])}; {n(ai_after)} h of phase 2 wait on the client's data."]],
           widths=[3.5, 6, 7.5])
+    ph = b.get("aiPhases") or {}
+    if ph:
+        table(doc, ["AI work", "Hours", "Who (hours)", "From", "To", "Module tests (hours, to)"],
+              [[{"A": "Block A", "A2": "Block A2", "1": "Phase 1 (in the plan)", "2": "Phase 2 (after 2 April)"}[k],
+                n(x["hours"]), ", ".join(f"{w} {n(h)}" for w, h in x["byPerson"].items()),
+                d(x["start"]) if k != "2" else f"after {d(b['planEnd'])}",
+                d(x["end"]) if k != "2" else "waits on client data",
+                (f"{n(x['moduleTests']['hours'])} h, to {d(x['moduleTests']['end'])}" if x["moduleTests"]["hours"] and k != "2"
+                 else f"{n(x['moduleTests']['hours'])} h" if x["moduleTests"]["hours"] else "")]
+               for k, x in ph.items()], widths=[3.2, 1.4, 5.4, 2.2, 2.6, 3.2])
     para(doc, "Other options considered for Block A: " + "; ".join(
         f"Sprint {o['sprint']} ({d(o['endsOn'])}) {n(o['overtimeHours'])} h" for o in b.get("blockAOptions") or []) + ".")
 
