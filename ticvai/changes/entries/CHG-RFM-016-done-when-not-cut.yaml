@@ -12,7 +12,7 @@ decision:
   date: '2026-10-04'
 why: 'The sample re-judge of 4 October on f4e2e489 (42 formerly unbuildable tickets; 40 now buildable) found
   PLATFORM-KERNEL still not buildable: its pointer ended at "`ticvai.sc", the two session settings the row-level
-  policies read. The plan text is whole; the pointer builder cut it. Fixed before the r1 push under Chinmay's instruction of 4 October to fix all the Sprint 1-2 findings in one round.'
+  policies read. The plan text is whole; the pointer builder cut it. Fixed before the r1 push under Chinmay''s instruction of 4 October to fix all the Sprint 1-2 findings in one round.'
 keys_touched: {}
 root_class: 'new: pointer-text-cut'
 tickets:
