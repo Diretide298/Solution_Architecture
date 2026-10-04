@@ -24,4 +24,4 @@ prevention:
   type: check
   ref: tools/op-release.py
 status: open
-notes: Batch RFM (r1 release), 4 October 2026. Closes on its commit.
+notes: Batch RFM (r1 release), 4 October 2026. Fix in acca4d22. Its guard is op-release itself (it refuses on the server), not a run-checks checker, so it stays open for Chinmay to approve as prevention none or keep.
