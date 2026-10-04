@@ -1,0 +1,39 @@
+id: CHG-RFM-005
+date: '2026-10-04'
+source: audit
+kind: process
+summary: A forward migration planned for the first time takes a file number below every kept migration that depends on it;
+  VM-MIG-WALLET is V1081, before MIG-WALLET-2..6.
+decision:
+  what: 'build-service-docs.py: a forward migration with no kept number takes the next free number only if every kept migration
+    depending on it is numbered after that; otherwise the lowest free number between its own dependencies and its first
+    dependent. Kept numbers never move. VM-MIG-WALLET (new: a Venue Management screen now reaches a new wallet table) goes
+    from V1196 to V1081.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The check-migration-tickets finding M-FILE-ORDER on the merged branch (e13d7ad5): MIG-WALLET-2..6 (V1128-V1194) depend
+  on VM-MIG-WALLET, which took V1196 and would run after them. Present on the contracts branch alone (52401fca) with the
+  plan generator of 857986c1.'
+keys_touched:
+  tickets:
+  - VM-MIG-WALLET
+  - MIG-WALLET-2
+  - MIG-WALLET-3
+  - MIG-WALLET-4
+  - MIG-WALLET-5
+  - MIG-WALLET-6
+  files:
+  - tools/build-service-docs.py
+root_class: 'new: migration-number-order'
+tickets:
+  started: []
+  unstarted:
+  - VM-MIG-WALLET
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.

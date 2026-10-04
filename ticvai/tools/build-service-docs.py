@@ -3247,10 +3247,39 @@ def main() -> int:
             taken.add(int(m.group(2)))
             fname_of[t_["key"]] = m.group(1)
     nxt = max(taken | {FORWARD_TICKET_FIRST - 1}) + 1
+    # **A new migration runs before the kept ones that wait on it** (4 October, CHG-RFM-005). VM-MIG-WALLET first
+    # appeared after the fix round's contracts (a Venue Management screen reached a new wallet table) and took V1196,
+    # after MIG-WALLET-2..6 (V1128-V1194), which depend on it: they would have run first (M-FILE-ORDER). A migration
+    # with no kept number takes the next one only if every kept migration depending on it is numbered after that;
+    # otherwise the lowest free number between its own dependencies and its first dependent (the numbers retired
+    # tickets left). Kept numbers never move.
+    num_of_ = {}
+    for t_ in tasks:
+        m_ = MIG_FILE.search(t_["subject"])
+        if m_:
+            num_of_[t_["key"]] = int(m_.group(2))
+    for k_, f_ in fname_of.items():
+        num_of_[k_] = int(MIG_FILE.search(f_).group(2))
+    dependents_ = defaultdict(set)
+    for t_ in tasks:
+        for d_ in (t_.get("dependsOn") or "").split():
+            dependents_[d_].add(t_["key"])
     for t_ in fwd_tasks:
-        if t_["key"] not in fname_of:
-            fname_of[t_["key"]] = f"V{nxt:04d}__{fwd_head.match(t_['subject']).group(2)}.sql"
+        if t_["key"] in fname_of:
+            continue
+        upper = min((num_of_[x] for x in dependents_[t_["key"]] if x in fname_of), default=None)
+        n_ = nxt
+        if upper is not None and nxt >= upper:
+            lower = max([num_of_[d_] for d_ in (t_.get("dependsOn") or "").split() if d_ in num_of_]
+                        + [FORWARD_TICKET_FIRST - 1])
+            free = [x for x in range(lower + 1, upper) if x not in taken]
+            if free:
+                n_ = free[0]
+        if n_ == nxt:
             nxt += 1
+        taken.add(n_)
+        num_of_[t_["key"]] = n_
+        fname_of[t_["key"]] = f"V{n_:04d}__{fwd_head.match(t_['subject']).group(2)}.sql"
     fwd_rows = []
     for t_ in fwd_tasks:
         f_ = fname_of[t_["key"]]
