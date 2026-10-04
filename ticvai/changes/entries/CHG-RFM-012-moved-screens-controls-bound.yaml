@@ -8,7 +8,7 @@ decision:
   what: 'Search and scan controls bind what they send: EMP-015 and EMP-017 (scan target ValidateRequest.mediaCode; search
     ?mediaCode= to lookupTicket), SCN-009 (scan and search, ?mediaCode= to lookupTicket), EMP-075 (?assetTag= to lookupAsset);
     EMP-083''s Additional duration sends ?to= to getRentalAvailability; the Filter by of EMP-071 and EMP-081 sends ?status=
-    to listRentalBookings and ADM-198''s ?guestType= to listTargetingEligibility. Each is what the control already did in
+    to listRentalBookings and ADM-198''s ?guestType= to listTargetingEligibility. The rental staff-app screens are copies of BO-544, BO-548, BO-554 and BO-556 (tools/applied/apply-rental-staff-app.py), which carry the same bindings. Each is what the control already did in
     its notes or the screen''s operations; no operation or field is added.'
   by: Chinmay
   date: '2026-10-04'
@@ -37,5 +37,5 @@ prevention:
   type: check
   ref: tools/check-binding-ratchet.py
 status: closed
-closed_by_commit: b220c672
+closed_by_commit: eddcd295
 notes: Batch RFM (r1-fix-merge), 4 October 2026.
