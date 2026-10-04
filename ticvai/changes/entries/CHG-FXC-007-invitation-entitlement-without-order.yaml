@@ -1,0 +1,31 @@
+id: CHG-FXC-007
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: An invitation issues its entitlement with orderId null and invitationId set.
+decision:
+  what: Entitlement.orderId nullable, Entitlement.invitationId added; exactly one is set.
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; NO ticket SVC-ORDER-ORDERS-12: access.entitlement.order_id was NOT
+  NULL with a key to orders.sales_order, and the contract says an invitation never enters the order path.'
+keys_touched:
+  operations:
+  - issueInvitation
+  schemas:
+  - Entitlement
+  tables:
+  - access.entitlement
+root_class: none
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: none
+  reason: A one-off contradiction between a rule and a key. A required response field made nullable is for Chinmay to confirm
+    (no contract is frozen yet, so check-contract-compat passes).
+status: open

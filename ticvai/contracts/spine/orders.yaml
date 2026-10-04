@@ -2370,21 +2370,16 @@ paths:
     post:
       operationId: issueInvitation
       summary: Issue a complimentary entitlement, with no payment expected
-      description: '8.1.3 to 8.1.5. **A complimentary ticket is not a 100% discount** — a discount runs
-        through the order path and produces a zero-value sale; an invitation never enters it. **No payment
-        is expected, so nothing waits for one.**
+      description: |-
+        8.1.3 to 8.1.5. **A complimentary ticket is not a 100% discount** — a discount runs through the order path and produces a zero-value sale; an invitation never enters it. **No payment is expected, so nothing waits for one.**
+        Three requirements and one operation, because they are one act: **issue it, record who offered it, and refuse where the issuer's profile does not allow it.**
+        `x-ticvai-permission-escalated` gates issuance above the configured value. **8.1.5 asks for restriction by profile, and an unbounded comp is how a venue gives away a season** — a host with a ten-ticket allowance and a general manager with none are different people.
+        **Recognised at issue, not at admission.** An invitation has no revenue to defer, so the entitlement is issued and the accounting is a marketing cost rather than a deferral.
 
-        Three requirements and one operation, because they are one act: **issue it, record who offered
-        it, and refuse where the issuer''s profile does not allow it.**
-
-        `x-ticvai-permission-escalated` gates issuance above the configured value. **8.1.5 asks for restriction
-        by profile, and an unbounded comp is how a venue gives away a season** — a host with a ten-ticket
-        allowance and a general manager with none are different people.
-
-        **Recognised at issue, not at admission.** An invitation has no revenue to defer, so the entitlement
-        is issued and the accounting is a marketing cost rather than a deferral.
-
-        '
+        **The entitlement it issues has no order** (4 October 2026, CHG-FXC-007; `access.entitlement.order_id` was NOT NULL
+        with a key to `orders.sales_order`, so the row could not be inserted). The entitlement is written with `orderId` null
+        and `invitationId` set to this invitation; exactly one of the two is set on every entitlement. Nothing is written to
+        `orders.sales_order`.
       tags:
       - orders
       x-ticvai-permission: ORDER_CREATE
@@ -16530,6 +16525,13 @@ components:
           type: string
           format: date-time
           nullable: true
+        ledgerDepositId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The finance Deposit that holds this deposit''s liability** (4 October 2026, CHG-FXC-010; VM-BO-024):
+            the `depositId` `finance.settleDeposit` takes. Null until the liability is posted.'
     OrdersDiscount:
       type: object
       x-ticvai-persistence: orders.discount

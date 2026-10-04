@@ -357,12 +357,19 @@ def derive(stored: dict) -> dict:
                 if verb != "get" and not body_writes:
                     response_writes = sorted(tables_in({c: r for c, r in (op.get("responses") or {}).items()
                                                         if str(c).startswith("2")}, persist, defs))
+                # **A 201 creates what it returns** (4 October 2026, CHG-FXC-002). `recordWriteOff` answers 201 with
+                # the JournalEntry it posted and its lineage wrote only `ledger.posting`; `createPlan` returns the plan
+                # with its modules and never wrote `subscription.plan_module`; `topUpWallet` creates a credit lot it did
+                # not list. A 201 response is a created row by definition, so the tables its schema persists to
+                # (directly, not through refs into neighbours) are writes, for new and existing entries alike.
+                created = (set(tables_in({c: r for c, r in (op.get("responses") or {}).items() if str(c) == "201"},
+                                         persist)) if verb != "get" else set())
                 out[op["operationId"]] = {
                     "contract": contract,
                     "verb": verb.upper(),
                     "path": path,
                     "reads": tables_in(op.get("responses"), persist, defs),
-                    "writes": sorted(body_writes
+                    "writes": sorted(body_writes | created
                                      | ({"platform.outbox"} if (op["operationId"] in emitting
                                         or op.get("x-ticvai-emits")) and contract != "ai" else set())),
                     # Kept only long enough for the repair below to tell which tables are new
@@ -518,12 +525,36 @@ def main() -> int:
     for o in retired:
         del stored[o]
         print("     retired %-26s (approved breaking change)" % o)
-    if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired:
+    # **Which `cache:resolution` entry an operation fills or evicts is recorded on the entry** (4 October 2026,
+    # CHG-FXC-001, root class R141). The lineage named the store and not the key, and the service documents said a
+    # writer could not be built from the package; 18 Sprint 1-2 tickets stopped on it. The key and the bump are a
+    # rule (tools/resolution_cache.py), so they are a derivation: filled where missing or out of date with the
+    # entry's tables, on new and existing entries alike, after the new entries are added below.
+    import importlib.util as _ilu
+    _spec = _ilu.spec_from_file_location("resolution_cache", ROOT / "tools" / "resolution_cache.py")
+    _rc = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_rc)
+    keyed = 0
+    _view = dict(stored)
+    _view.update({o: fresh[o] for o in missing})
+    for o, e in _view.items():
+        want = _rc.resolution_cache(o, e, _view)
+        if want and stored.get(o, {}).get("cache") != want:
+            keyed += 1
+    if keyed:
+        print("  %d entry(s) given the cache:resolution key they fill or evict" % keyed)
+    if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired             and not keyed:
         print("  nothing to add")
         return 0
     for o in missing:
         stored[o] = {k: v for k, v in fresh[o].items() if not k.startswith("_")}
         stored[o]["writes"] = sorted(set(stored[o]["writes"]) | set(fresh[o].get("_response_writes") or []))
+    for o in stored:
+        want = _rc.resolution_cache(o, stored[o], stored)
+        if want:
+            stored[o]["cache"] = want
+        else:
+            stored[o].pop("cache", None)
     # **A name that is not `<schema>.<table>` is not a table, and is removed** (SD-007, 29
     # September). The one exception to "never removed": authored entries carried the prose after
     # `none —` (`embedded as attributes (jsonb) on orders.cart_line ...`) and table names with a

@@ -1,0 +1,36 @@
+id: CHG-FXC-002
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: 'A 201 response''s persisted tables are writes: derive-lineage adds them to new and existing entries and check-write-lineage
+  (W-CREATED) holds it; 14 operations gained 18 writes.'
+decision:
+  what: recordWriteOff ledger.journal_entry and journal_line, createPlan and createPlanVersion subscription.plan_module,
+    topUpWallet wallet.credit_lot, openShift, reverseJournalEntry, startStockCount, createShopAndDrop, withdrawFromDepositBox,
+    replyToMyCase, allocateResources, createTicketTemplate, createCommercialCampaign, recordChargeback.
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; SVC-LEDGER-FINANCE-3 (recordWriteOff answers 201 with the JournalEntry
+  it posted and wrote only ledger.posting) and SVC-PLATFORM-PLAN-1 (the licensed modules were never written).'
+keys_touched:
+  operations:
+  - recordWriteOff
+  - createPlan
+  - createPlanVersion
+  - topUpWallet
+  files:
+  - tools/derive-lineage.py
+  - tools/check-write-lineage.py
+  - handoff/api-data-lineage.json
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open

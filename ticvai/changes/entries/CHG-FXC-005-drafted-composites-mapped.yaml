@@ -1,0 +1,44 @@
+id: CHG-FXC-005
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: 'Where five drafted workspace writes land, field by field: approveMatrixMultiLevel, approveRoleAuthorityDelegation,
+  setCodeDistributionManager, setPdfPrintablePos (with getPdfPrintablePos?templateId=) and setDeveloperMembers.'
+decision:
+  what: 'Mapping tables in the descriptions. ApprovalRule gains code, minimumApprovals, requiredApproverRoleId, rejectionBehavior,
+    allowRequestChanges, allowDelegate, allowReassign, minPercentage, matchAttributes and compositeMode, and approvalMode
+    maps onto mode, levels and minimumApprovals; ApprovalDelegation gains delegationType, maxPercentage, requiredRoleId;
+    CouponCodeAssignment (promotions.code_assignment) and CouponCode distributionStatus; the printable design is access.media_template.design;
+    DeveloperMember (control.developer_member): portal members are not tenant principals.'
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; NO tickets SVC-TENANCY-APPROVALS-1 (five rows), SVC-CATALOGUE-DRAFTED-1,
+  APP-SETUP-BO-346, SVC-PLATFORM-PUBLICAPI-3.'
+keys_touched:
+  operations:
+  - approveMatrixMultiLevel
+  - approveRoleAuthorityDelegation
+  - setCodeDistributionManager
+  - setPdfPrintablePos
+  - getPdfPrintablePos
+  - setDeveloperMembers
+  schemas:
+  - ApprovalRule
+  - ApprovalDelegation
+  - CouponCodeAssignment
+  - CouponCode
+  - DeveloperMember
+root_class: A-STORAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: P-DRAFTED-UNMAPPED fails a new drafted write that says no table stores it while it writes one; the 65 known are the
+  drafted-storage backlog, listed for Chinmay.

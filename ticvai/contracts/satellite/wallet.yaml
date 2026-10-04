@@ -1204,6 +1204,38 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-refund-policy:
+    get:
+      operationId: getWalletRefundPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-1146 Wallet Refund Policy"
+      summary: The wallet refund policy in force
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; BO-1146): `setWalletRefundPolicy` was a PUT nothing read.** Returns the policy
+        at the venue, or the defaults it would get before the first save (`defaultDestination` the original payment method,
+        `restoreToOriginalLots` true, `restoreOriginalExpiry` true, no bonus). The `ETag` header carries the version the PUT
+        takes as `If-Match`.
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          headers:
+            ETag:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletRefundPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletRefundPolicy
       x-ticvai-consumed-by:
@@ -2455,17 +2487,23 @@ paths:
       - guest
       x-ticvai-guest-callable: true
       summary: Load credits onto a card
-      description: 'Creates a liability, not revenue. Recognition happens as credits are played, or as
-        breakage when the card expires.
+      description: |-
+        Creates a liability, not revenue. Recognition happens as credits are played, or as breakage when the card expires.
+        **Posts a `gameCreditLoaded` ledger entry** (decided 28 September, audit R191): the amount paid to the liability account `finance.setAccountMappings` holds for that event type, in the fiscal period open for the load date. Until this date the load wrote no ledger row.
+        Bonus credits from a promotion are tracked separately because they are typically non-refundable and are spent first.
 
-        **Posts a `gameCreditLoaded` ledger entry** (decided 28 September, audit R191): the amount paid
-        to the liability account `finance.setAccountMappings` holds for that event type, in the fiscal
-        period open for the load date. Until this date the load wrote no ledger row.
-
-        Bonus credits from a promotion are tracked separately because they are typically non-refundable
-        and are spent first.
-
-        '
+        **Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; the Sprint 1-2 judging found a Wallet
+        response and a wallet lock for a card that has no wallet). The card is found by `cardCode` (`games.card.card_code`).
+        * **A card with a `walletId`** (registered to a guest with a wallet): the movement is a wallet movement under the
+          one-balance-writer rule: `wallet.balance` locked for one guarded statement, a `wallet.wallet_transaction` (kind
+          `topUp`, `reason` `gameCard:{cardCode}`), and a `wallet.credit_lot` per kind of credit (`source_kind` `topUp` for
+          paid credits, `promotion` for bonus credits, `source_reference` `gameCard:{cardCode}`). Returns that Wallet.
+        * **An anonymous card** (`walletId` null): the card row is the balance. `games.card.credits` and `bonus_credits`
+          change in one guarded update on the locked row. Returns the card as a Wallet view: `id` the card's `id`,
+          `subjectId` the nil UUID `00000000-0000-0000-0000-000000000000` (no guest), `balance` the paid credits,
+          `bonusBalance` the bonus credits, `currency` the venue's, `status` the card's status.
+        Either way the movement emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
+        through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it.
       tags:
       - card
       x-ticvai-permission: WALLET_OPERATE
@@ -2537,11 +2575,21 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Manually adjust credits or points
-      description: 'A machine that swallowed a play, a goodwill gesture, a correction. Requires a reason
-        and is reported separately — manual adjustments to stored value get the same scrutiny here as
-        they do on a wallet.
+      description: |-
+        A machine that swallowed a play, a goodwill gesture, a correction. Requires a reason and is reported separately — manual adjustments to stored value get the same scrutiny here as they do on a wallet.
 
-        '
+        **Where an adjustment goes and what comes back** (4 October 2026, CHG-FXC-006; the Sprint 1-2 judging found a Wallet
+        response and a wallet lock for a card that has no wallet). The card is found by `cardCode` (`games.card.card_code`).
+        * **A card with a `walletId`** (registered to a guest with a wallet): the movement is a wallet movement under the
+          one-balance-writer rule: `wallet.balance` locked for one guarded statement, a `wallet.wallet_transaction` (kind
+          `adjustment`, `reason` `gameCard:{cardCode}`), and a `wallet.credit_lot` per kind of credit (`source_kind` `topUp` for
+          paid credits, `promotion` for bonus credits, `source_reference` `gameCard:{cardCode}`). Returns that Wallet.
+        * **An anonymous card** (`walletId` null): the card row is the balance. `games.card.credits` and `bonus_credits`
+          change in one guarded update on the locked row. Returns the card as a Wallet view: `id` the card's `id`,
+          `subjectId` the nil UUID `00000000-0000-0000-0000-000000000000` (no guest), `balance` the paid credits,
+          `bonusBalance` the bonus credits, `currency` the venue's, `status` the card's status.
+        Either way the movement emits `wallet.credited` (`kind` `adjustment`, `walletId` the wallet or the card's id)
+        through `platform.outbox` in the same transaction, and the ledger posts it as a stored-value adjustment.
       tags:
       - card
       x-ticvai-permission: WALLET_OPERATE
@@ -3963,6 +4011,7 @@ components:
           description: The `public-api` ApiClient the integration authenticates as.
         fieldMappings:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             type: object
             required:
@@ -3978,6 +4027,7 @@ components:
                 nullable: true
         currencyMappings:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             type: object
             required:
@@ -3991,6 +4041,7 @@ components:
                 pattern: ^[A-Z]{3}$
         statusMappings:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             type: object
             required:
@@ -4003,6 +4054,7 @@ components:
                 type: string
         creditTypeMappings:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             type: object
             required:
@@ -5168,7 +5220,7 @@ components:
           type: string
     WalletRiskRules:
       type: object
-      x-ticvai-persistence: wallet.risk_rules
+      x-ticvai-persistence: wallet.risk_rules + wallet.risk_rule
       description: 'Boards 8.2 to 8.7. **A risk rule with no action is a report.**'
       properties:
         rules:
@@ -5221,6 +5273,7 @@ components:
                   '
               alertOnAction:
                 type: boolean
+                x-ticvai-column: does_alert_on_action
                 default: true
               status:
                 type: string

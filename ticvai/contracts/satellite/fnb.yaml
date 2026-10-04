@@ -4512,18 +4512,18 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Tell the platform where the guest is
-      description: 'Scanning the code on a table, a cabana, a sunbed, or entering a seat number. One operation
-        for all of them — a guest at a poolside and a guest in an auditorium are doing the same thing,
-        and a separate endpoint per furniture type would be four ways to say the same sentence.
+      description: |-
+        Scanning the code on a table, a cabana, a sunbed, or entering a seat number. One operation for all of them — a guest at a poolside and a guest in an auditorium are doing the same thing, and a separate endpoint per furniture type would be four ways to say the same sentence.
+        **A claim is not a booking.** It attaches the guest to a location so an order can be routed there. Where a table visit is already open the guest joins it rather than starting a second, and both order onto one bill.
+        Codes rotate. A static code photographed once lets someone order to a cabana they are not at, from outside the venue.
 
-        **A claim is not a booking.** It attaches the guest to a location so an order can be routed there.
-        Where a table visit is already open the guest joins it rather than starting a second, and both
-        order onto one bill.
-
-        Codes rotate. A static code photographed once lets someone order to a cabana they are not at,
-        from outside the venue.
-
-        '
+        **What the rotating code is** (4 October 2026, CHG-FXC-009; the Sprint 1-2 judging found no store for it). Not a row:
+        a signed token, `{locationRef}.{generation}.{expiresAt}.{signature}`, where `locationRef` is the delivery location's
+        or table's id, `generation` the location's `codeGeneration`, `expiresAt` a Unix time (0 for a printed code that does
+        not expire by time), and `signature` an HMAC-SHA256 over the other three with the tenant's location-code key from the
+        secrets store. **Unknown** (`codeUnknown`): the signature does not verify or the location does not exist. **Expired**
+        (`codeExpired`): it verifies, and its `generation` is behind the location's or `expiresAt` has passed. Reprinting a
+        location's codes bumps its `codeGeneration`, which retires every code printed before.
       tags:
       - guestOrdering
       x-ticvai-permission: null
@@ -4724,23 +4724,19 @@ paths:
       - guest
       summary: Identify which table a guest is sitting at
       deprecated: true
-      description: '**Superseded by `claimLocationSession`, 26 September.** That operation is *one operation
-        for all of them* — a table is a `DeliveryLocation` of kind `table` with its `tableId` — and it is the
-        one `CreateGuestOrderRequest.locationSessionId`, flow F11 and flow F48 use. A `TableSession` id has
-        nowhere to go on a guest order. Kept, with its path and id, for callers already built on it; new
-        screens claim with `claimLocationSession`.
+      description: |-
+        **Superseded by `claimLocationSession`, 26 September.** That operation is *one operation for all of them* — a table is a `DeliveryLocation` of kind `table` with its `tableId` — and it is the one `CreateGuestOrderRequest.locationSessionId`, flow F11 and flow F48 use. A `TableSession` id has nowhere to go on a guest order. Kept, with its path and id, for callers already built on it; new screens claim with `claimLocationSession`.
+        Scanning the QR code on a table. This is the step that makes ordering to a table possible without a server — the guest tells the platform where they are.
+        **A claim is not a booking.** It attaches the guest to a table so an order can be routed there. Where a visit is already open — a server seated them — the guest joins it rather than starting a second one, and both order onto the same bill.
+        The code is short-lived and rotates. A static table code photographed once lets someone order to a table they are not at, from outside the venue.
 
-        Scanning the QR code on a table. This is the step that makes ordering to a table possible
-        without a server — the guest tells the platform where they are.
-
-        **A claim is not a booking.** It attaches the guest to a table so an order can be routed there.
-        Where a visit is already open — a server seated them — the guest joins it rather than starting
-        a second one, and both order onto the same bill.
-
-        The code is short-lived and rotates. A static table code photographed once lets someone order
-        to a table they are not at, from outside the venue.
-
-        '
+        **What the rotating code is** (4 October 2026, CHG-FXC-009; the Sprint 1-2 judging found no store for it). Not a row:
+        a signed token, `{locationRef}.{generation}.{expiresAt}.{signature}`, where `locationRef` is the delivery location's
+        or table's id, `generation` the location's `codeGeneration`, `expiresAt` a Unix time (0 for a printed code that does
+        not expire by time), and `signature` an HMAC-SHA256 over the other three with the tenant's location-code key from the
+        secrets store. **Unknown** (`codeUnknown`): the signature does not verify or the location does not exist. **Expired**
+        (`codeExpired`): it verifies, and its `generation` is behind the location's or `expiresAt` has passed. Reprinting a
+        location's codes bumps its `codeGeneration`, which retires every code printed before.
       tags:
       - guestOrdering
       x-ticvai-permission: null
@@ -6139,15 +6135,12 @@ paths:
       - staff
       x-ticvai-config-scope: outlet
       summary: Configure the table layout
-      description: 'The outlet''s whole layout in one call — the outlet is the one in the path. Each table
-        is matched on `TableDefinition.id`: an id already on the outlet updates that table, a new id adds
-        one. A table whose capacity changes is refused while a visit is open on it, as `updateTable` is.
+      description: |-
+        The outlet's whole layout in one call — the outlet is the one in the path. Each table is matched on `TableDefinition.id`: an id already on the outlet updates that table, a new id adds one. A table whose capacity changes is refused while a visit is open on it, as `updateTable` is.
+        **Nothing is ever deleted** (Chinmay, 2 October, workbook Q67; CHG-CSA-012). "Remove table" on the layout editor marks the table out of service (`TableStatus` `outOfService`), so its history, its visits and its bookings keep their table; a table left out of the body is unchanged, not removed.
 
-        **Nothing is ever deleted** (Chinmay, 2 October, workbook Q67; CHG-CSA-012). "Remove table" on the
-        layout editor marks the table out of service (`TableStatus` `outOfService`), so its history, its visits
-        and its bookings keep their table; a table left out of the body is unchanged, not removed.
-
-        '
+        **A table with an open visit** (4 October 2026, CHG-FXC-004): removing it, or lowering its capacity below the visit's
+        covers, is refused with 409 `tableHasOpenVisit` (an `FnbProblem` reason), read from `fnb.table_visit`.
       tags:
       - table
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -8490,6 +8483,7 @@ components:
             type: string
         undeclared:
           type: array
+          x-ticvai-persistence-column: jsonb
           description: '**Present in the dish and absent from the label.** The dangerous direction,
             and the response leads with it.
 
@@ -8778,6 +8772,13 @@ components:
         createdAt:
           type: string
           format: date-time
+        recipeId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The recipe this substitute belongs to** (4 October 2026, CHG-FXC-003): the `{recipeId}` of
+            `listIngredientSubstitutes` and `setIngredientSubstitutes`, stored on every row so the list filters by it and the
+            set replaces exactly that recipe''s rows. Taken from the path, never from the body.'
     FnbMenuItemModifier:
       type: object
       x-ticvai-persistence: fnb.menu_item_modifier
@@ -9091,7 +9092,7 @@ components:
           default: true
     ComboSlot:
       type: object
-      x-ticvai-persistence: fnb.combo_slot
+      x-ticvai-persistence: fnb.combo_slot + fnb.combo_slot_option
       description: 'One choice within a combo. **`minSelect` and `maxSelect` are what make it a slot rather
         than a line** — a main is exactly one, a side is one of four, and a sauce might be none or two.
 
@@ -10178,6 +10179,13 @@ components:
             away is not the same promise as a table by the kitchen.
 
             '
+        codeGeneration:
+          type: integer
+          minimum: 1
+          default: 1
+          description: '**Which printing of the location''s ordering code is current** (4 October 2026, CHG-FXC-009). A code
+            carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code
+            printed before.'
     LocationSession:
       type: object
       x-ticvai-persistence: fnb.location_session
@@ -11170,6 +11178,13 @@ components:
           default: false
           description: '**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a
             claim on it is refused with `tableOutOfService`.'
+        codeGeneration:
+          type: integer
+          minimum: 1
+          default: 1
+          description: '**Which printing of the location''s ordering code is current** (4 October 2026, CHG-FXC-009). A code
+            carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code
+            printed before.'
     TableState:
       x-ticvai-persistence: none — projection over table and visit
       allOf:
@@ -11313,6 +11328,18 @@ components:
           type: string
           format: date-time
           nullable: true
+        serviceStage:
+          type: string
+          nullable: true
+          readOnly: true
+          description: '**Where the table is in its service** (4 October 2026, CHG-FXC-003): the last stage `setServiceStage`
+            recorded (its `stage` value), null before the first. Kept with `serviceStageRecordedAt` so the last-writer-wins rule
+            compares the incoming `recordedAt` with the stored one and ignores an older write.'
+        serviceStageRecordedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
     Bill:
       x-ticvai-persistence: none — computed from visit orders
       type: object
@@ -11923,6 +11950,13 @@ components:
             or an ingredient cost changes.
 
             '
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The recipe''s own id** (4 October 2026, CHG-FXC-003; the Sprint 1-2 judging found no operation
+            returned one, so `listIngredientSubstitutes`, `setIngredientSubstitutes` and `SubstitutionRule.recipeId` had
+            nothing to send). One recipe per menu item: `setRecipe` upserts on `menuItemId` and returns the id it kept.'
     FnbProblem:
       x-ticvai-persistence: none — error shape
       description: '**Every operation-specific error in this contract except a guest order''s.** One

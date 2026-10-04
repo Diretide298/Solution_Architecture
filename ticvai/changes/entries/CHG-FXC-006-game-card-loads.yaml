@@ -1,0 +1,34 @@
+id: CHG-FXC-006
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: 'loadGameCredits and adjustGameCard: a registered card''s credits are wallet movements; an anonymous card''s are
+  held on the card row and returned as a Wallet view with the nil subject; both emit wallet.credited.'
+decision:
+  what: GameCard gains id and walletId; the response stays Wallet (no breaking change); events/wallet-credited.yaml names
+    both operations.
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; NO ticket SVC-WALLET-CARD-1 (three rows): the x-ticvai-note (SD-027)
+  locked a wallet balance the card does not have, and an anonymous card had no wallet to return.'
+keys_touched:
+  operations:
+  - loadGameCredits
+  - adjustGameCard
+  schemas:
+  - GameCard
+  files:
+  - events/wallet-credited.yaml
+root_class: none
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: none
+  reason: A product decision with a default, not a class of mistake; the re-judge of the ticket is the check. Open until
+    Chinmay confirms the default.
+status: open

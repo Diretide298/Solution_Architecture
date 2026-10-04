@@ -1266,13 +1266,14 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Begin termination
-      description: 'Deliberately harder to reach than suspension. Starts a retention window during which
-        data is exportable and the decision remains reversible by a platform administrator. Cells are
-        destroyed only when the window closes.
-
+      description: |-
+        Deliberately harder to reach than suspension. Starts a retention window during which data is exportable and the decision remains reversible by a platform administrator. Cells are destroyed only when the window closes.
         A tenant with unsettled ledger balances cannot be terminated — the money has to be resolved first.
 
-        '
+        **The unsettled-balance refusal** (4 October 2026, CHG-FXC-004). The tenant's ledger lives in its own cell database,
+        which the control plane does not read. Before terminating, the Control Plane asks the tenant's cell (`serviceAuth`) for
+        `finance.getTrialBalance` at today's date for every legal entity; any non-zero receivable, payable or inter-entity
+        balance refuses the termination with 409 `unsettledBalances`, naming the legal entities.
       tags:
       - tenant
       x-ticvai-permission: PLATFORM_TENANT_TERMINATE
@@ -4003,6 +4004,46 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /membership-product-validation:
+    get:
+      operationId: getMembershipProductValidation
+      x-ticvai-consumed-by:
+        - "P09 BO-293 Membership Product Validation, Approval & Publication"
+      summary: A membership product's validation, as the approver sees it
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; VM-BO-293): `approveMembershipProductValidation` was the only operation, and the
+        screen must show the checks, the impact and the stage before anyone decides.** Returns the view the PUT returns for
+        one membership product version; without `version`, the latest.
+      tags:
+      - subscription
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: membershipCode
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipProductValidationApprovalPublicationVersioView'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: approveMembershipProductValidation
       x-ticvai-consumed-by:
@@ -10805,6 +10846,9 @@ components:
       properties:
         moduleCode:
           type: string
+          description: |-
+            **Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of
+            `white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.
         name:
           type: string
         description:
@@ -10815,10 +10859,16 @@ components:
           nullable: true
         requiresModules:
           type: array
+          description: |-
+            **Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of
+            `white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.
           items:
             type: string
         incompatibleWithModules:
           type: array
+          description: |-
+            **Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of
+            `white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.
           items:
             type: string
         includedInTiers:
@@ -15379,10 +15429,11 @@ components:
           nullable: true
         licensedModules:
           type: array
-          description: 'Union of plan modules and add-ons. The White Label Builder reads this and cannot
-            enable anything absent from it.
+          description: |-
+            Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.
 
-            '
+            **`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of
+            `white-label.ModuleEnablement.moduleKey`.
           items:
             type: object
             required:
@@ -16257,6 +16308,17 @@ components:
         recordedAt:
           type: string
           format: date-time
+        tenantId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**Whose usage it is** (4 October 2026, CHG-FXC-003). The control database is read across tenants by the
+            operator; `getUsageMetering` (`/tenants/{tenantId}/usage`) selects one tenant''s rows by this column.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: The tenant's root scope path, so the row sits under the scope row-level security of the control
+            database (`platform.apply_scope_rls`) like every other tenant-owned control row.
     UsageReport:
       x-ticvai-persistence: none — aggregated
       type: object

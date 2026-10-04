@@ -1,0 +1,41 @@
+id: CHG-FXC-010
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: The operations and fields the screens and plan agents asked for in the fix-round ledger.
+decision:
+  what: 'Additive. New operations: updateMessageTemplate, updateLoyaltyProgramme, getWalletRefundPolicy, listVisualAccessRules,
+    getMembershipProductValidation, listTaxProfiles (with getTaxProfileJurisdiction?taxProfileId=); updateCampaign takes
+    variants and abTest; fields PaymentProviderConnection.credentialRef, OrdersDeposit.ledgerDepositId, ParkingFacility.productVariantId,
+    PublishedTenantConfig.paymentTokenisation; ModuleKey vocabulary documented on ModuleListing and LicencePosition; experienceId
+    is Product.id; receivePaymentProviderWebhook?connectionId=; listTenantCells reads control.cell_tenant. Each new operation
+    follows the gates (existing permission values, config scope on writes, Page with PageSize and PageCursor on lists, a
+    problem type on the new 409).'
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; the ledger requests (audit/ticvai/runs/fix-s12/LEDGER.md) for APP-SETUP-BO-772,
+  BO-785, BO-827, ADM-424, ADM-570, VM-BO-024, BO-1146, BO-155, VM-BO-293, BO-877, GST-027, WEB-041, GST-071, ADM-069 and
+  the plan agent''s PLATFORM-PAYMENTS and SVC-PLATFORM-CELL-4 rows.'
+keys_touched:
+  operations:
+  - updateMessageTemplate
+  - updateLoyaltyProgramme
+  - getWalletRefundPolicy
+  - listVisualAccessRules
+  - getMembershipProductValidation
+  - listTaxProfiles
+  - updateCampaign
+  - receivePaymentProviderWebhook
+  - listTenantCells
+root_class: none
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open

@@ -3633,14 +3633,28 @@ paths:
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The printable ticket design as saved
-      description: >
-        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
-        BO-346 saves the design with `setPdfPrintablePos` and read nothing back. Returns what the write
-        stores, in the write's own shape.
+      description: |-
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** BO-346 saves the design with `setPdfPrintablePos` and read nothing back. Returns what the write stores, in the write's own shape.
+
+        **Where the design is stored** (4 October 2026, CHG-FXC-005; the Sprint 1-2 judging found the schemas saying nothing
+        is stored while the lineage wrote `access.media_template`). The body is the template's working design document:
+        `access.media_template.design` (jsonb) on the row `templateId` names, with `designer` `pdfPrintablePos` and
+        `media_type` from `outputFormat`; a save appends an `access.configuration_change` with the before and after. The GET
+        reads that row and returns `design` in the write's shape.
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: templateId
+        in: query
+        required: false
+        description: '**The template to open** (4 October 2026, CHG-FXC-005): `access.media_template.id` of a template whose
+          `designer` is `pdfPrintablePos`, as BO-346 opened it. Absent: the most recently updated such template at the
+          caller''s venue; 404 when there is none.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: The printable ticket design as saved
@@ -3661,26 +3675,20 @@ paths:
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.26 (15.2.3); MoM 15
         Sep 2026 (printers, configuration templates)'
       summary: PDF, Printable & POS Ticket Designer
-      description: '**Drafted from the workshop pack and checked against it on 29 September.** Ticket Media
-        & Credential Management, page 26. The screen says: Design tickets intended for printing, PDF generation,
-        POS, box office and other physical/document outputs.
+      description: |-
+        **Drafted from the workshop pack and checked against it on 29 September.** Ticket Media & Credential Management, page 26. The screen says: Design tickets intended for printing, PDF generation, POS, box office and other physical/document outputs.
 
+        **Every property carries the sentence it came from.** 28 were read from the screen's own bulleted directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
 
-        **Every property carries the sentence it came from.** 28 were read from the screen''s own bulleted
-        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
-        into fields. Names and types are this package''s reading of those sentences, checked against the pack
-        on 29 September.
+        **Agreed (decided 29 September, readiness close-out).** The supported outputs were separate fields and are one outputFormat enum; images and dynamic fields are lists and DPI an integer. The write names its template. On-screen print preview and sample-data fill are screen actions.
 
+        **The screen's actions are behaviour, not fields:** Virtual on-screen print preview (no operation yet); Populate with sample data (no operation yet).
 
-        **Agreed (decided 29 September, readiness close-out).** The supported outputs were separate fields
-        and are one outputFormat enum; images and dynamic fields are lists and DPI an integer. The write names
-        its template. On-screen print preview and sample-data fill are screen actions.
-
-
-        **The screen''s actions are behaviour, not fields:** Virtual on-screen print preview (no operation
-        yet); Populate with sample data (no operation yet).
-
-        '
+        **Where the design is stored** (4 October 2026, CHG-FXC-005; the Sprint 1-2 judging found the schemas saying nothing
+        is stored while the lineage wrote `access.media_template`). The body is the template's working design document:
+        `access.media_template.design` (jsonb) on the row `templateId` names, with `designer` `pdfPrintablePos` and
+        `media_type` from `outputFormat`; a save appends an `access.configuration_change` with the before and after. The GET
+        reads that row and returns `design` in the write's shape.
       tags:
       - access
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -16165,6 +16173,43 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /visual-access-rules:
+    get:
+      operationId: listVisualAccessRules
+      x-ticvai-consumed-by:
+        - "P08 BO-155 Visual Access Rule Builder"
+      summary: The visual access rules at a venue
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; BO-155): `setVisualAccessRule` upserts rules by `ruleId` and nothing read
+        them.** One item per rule, in the shape the PUT returns, ordered by `ruleId`.
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/VisualAccessRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     AccessDynamicPolicyEffectiveness:
@@ -24331,7 +24376,9 @@ components:
         orderId:
           type: string
           format: uuid
-          description: The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`).
+          nullable: true
+          description: The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). **Null for an
+            entitlement an invitation issued** (`invitationId`; 4 October 2026, CHG-FXC-007).
         orderLineId:
           type: string
           format: uuid
@@ -24557,6 +24604,13 @@ components:
             screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.
 
             '
+        invitationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The invitation that issued it** (4 October 2026, CHG-FXC-007): `orders.issueInvitation` issues the
+            entitlement without an order, because an invitation never enters the order path. Exactly one of `orderId` and
+            `invitationId` is set.'
     BiometricKind:
       type: string
       description: >
@@ -24879,6 +24933,13 @@ components:
             format: uuid
         isActive:
           type: boolean
+        productVariantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The catalogue variant sold for parking here** (4 October 2026, CHG-FXC-010; GST-027, WEB-041): what
+            `addCartLine` sells when a guest buys parking at this car park. Set by staff; readable by guests. Null where the
+            car park does not sell parking through the platform.'
     ParkingEntitlementStatus:
       type: string
       enum:
@@ -27493,8 +27554,7 @@ components:
     PdfPrintablePosTicketDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; the whole body is stored as the design document (access.media_template.design, jsonb) of the template named by templateId, designer pdfPrintablePos (CHG-FXC-005)'
       description: '**What PDF, Printable & POS Ticket Designer submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -35692,6 +35752,14 @@ components:
           type: string
           format: date-time
           description: effective time
+        pendingChangeId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The scheduled mode change on this lane, if any** (4 October 2026, CHG-FXC-003; BO-230): the
+            `access.gate_mode_change` id `cancelGateModeChange` takes as `{changeId}`, set while `targetMode` differs from
+            `currentMode` and the change has not taken effect. Null otherwise.'
       required:
       - accessPointId
     QueueThroughputLaneOptimizationView:

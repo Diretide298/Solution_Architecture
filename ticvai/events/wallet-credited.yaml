@@ -6,11 +6,13 @@ version: 1
 publisher: wallet
 description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
 aggregate: wallet
-emittedWhen: topUpWallet, adjustWallet, releaseWalletHold or a refund to wallet moves the balance up
+emittedWhen: topUpWallet, adjustWallet, releaseWalletHold or a refund to wallet moves the balance up; loadGameCredits and adjustGameCard move a game card's credits (kind gameCreditLoad or adjustment; walletId is the card's id for an anonymous card; 4 October 2026, CHG-FXC-006)
 emittedBy:
 - wallet.topUpWallet
 - wallet.adjustWallet
 - wallet.releaseWalletHold
+- wallet.loadGameCredits
+- wallet.adjustGameCard
 payload:
 - field: walletId
   type: uuid
