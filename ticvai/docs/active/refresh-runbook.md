@@ -103,9 +103,14 @@ HEAD is still that commit; if anything was committed meanwhile it prints `STALE 
 ## 5. The checks in parallel
 
 `run-checks.py --jobs 4` runs four checkers at a time and prints each row only after every row above it, so
-the table, the exit code and each checker's output are the same as `--jobs 1`. Proven on 4 October on one
-derived tree: the per-check outputs of both runs are identical, and the tables differ only in the seconds
-column. check-package and check-authored-inputs still run alongside, as before.
+the table, the exit code and each checker's output are the same as `--jobs 1`. Proven on 4 October on the
+tree the end-to-end run derived, all 68 checkers each way (808 s at `--jobs 1`, 251 s at `--jobs 4`): with
+Python's string hashing fixed (`PYTHONHASHSEED=0`) the 68 outputs are byte-identical, the exit codes are the
+same and the tables differ only in the seconds column; the tree hashed the same before and after both runs, so
+no checker wrote anything. Without a fixed seed one output moves on every run, sequential or not:
+audit-pack-citations lists the packs nothing cites by page count alone, from a set, so packs with equal page
+counts come out in a different order each time. That is not the parallel run, and it changes no verdict.
+check-package and check-authored-inputs still run alongside, as before.
 
 **Checkers that must run alone (`SERIAL` in `run-checks.py`): none today.** All 68 were read on 4 October.
 Every file write is behind a flag `run-checks.py` never passes: `--write`, `--csv`, `--json`, `--fix`,
@@ -118,9 +123,9 @@ it to finish and runs before anything after it starts.
 
 | | Before (3 October, last PASS) | After |
 |---|---|---|
-| Derive (65 steps) | 47.9 min | @@DERIVE@@ |
-| Checks | 33.4 min (sequential) | @@CHECKS@@ |
-| Whole run | 84.4 min | @@TOTAL@@ |
+| Derive (65 steps) | 47.9 min | 35.8 min (the steps are unchanged: the gap is the machine's load, not the code) |
+| Checks | 33.4 min (sequential) | 3.7 min (4 at a time) |
+| Whole run | 84.4 min | 41.8 min (setup 2.2, derive 35.8, checks 3.7, merge 0.1) |
 | check-screens alone | 681 s | 36 s |
 | check-package alone (runs alongside) | 638 s | about 121 s |
 | check-wireframes alone | 279 s | 33 s |
@@ -133,7 +138,21 @@ PyYAML accepts), and the gate's results must not move.
 
 The slowest derive steps of the run on 4 October:
 
-@@SLOWEST@@
+| Step | Tool | Seconds |
+|---|---|---|
+| 26 | `derive-wireframes.py` | 245.6 |
+| 35 | `link-screens-contracts.py` | 240.2 |
+| 14 | `derive-diagrams.py` | 131.7 |
+| 31 | `export-design-batch.py --all` | 120.6 |
+| 22 | `derive-carries-from-entrystate.py --apply` | 78.8 |
+| 1 | `derive-lineage.py --apply` | 73.3 |
+| 27 | `index-boards.py` | 62.4 |
+| 37 | `build-service-docs.py` | 62.0 |
+| 23 | `derive-entrystate-params.py --apply` | 54.0 |
+| 20 | `derive-transitions-from-flows.py --apply --adopt` | 52.4 |
+
+These ten are 18.7 of the 35.8 minutes. They were not changed: the council left the derive steps for later, and
+the per-step log now says where to look first.
 
 ## 7. Defender exclusions (Chinmay, as administrator)
 

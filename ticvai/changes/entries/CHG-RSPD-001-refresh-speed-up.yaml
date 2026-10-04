@@ -94,4 +94,25 @@ notes: 'Decisions, each with its reason (4 October 2026, branch refresh-speedup)
   cached runs byte for byte.
   (13) The task named the file CHG-RSPD-001.yaml; it is CHG-RSPD-001-refresh-speed-up.yaml because
   check-changelog requires <id>-<slug>.yaml.
+  (14) Proof, 4 October. Unit level, in a throwaway repository with three fake steps and three fake checks
+  (no hook left in the package): a forced failure in step 2 stops the run with "FAILED at step 2 ... exit 3",
+  exit 1, the worktree kept; --resume then skips step 1 and passes without merging; --resume after step 3''s
+  script changed (uncommitted) is refused ("the script of step(s) 3 changed") and a fresh run starts; after a
+  commit, both reasons are given; a step that exits 0 leaving truncated JSON fails on its expected output; the
+  refresh shell SIGKILLed mid-step ends "no FAILED line: the refresh process itself was killed", exit 1, no
+  checks; an exit 0 inside a step is still FAILED; the judge alone refuses a log with no marker; a second run
+  while the first holds the lock exits 6 naming the holder; a lock left by a SIGKILLed run is removed as stale;
+  a commit during a run ends in STALE BASE, exit 5, nothing merged; a traced run still builds its manifest,
+  the output check''s reads unrecorded. Equality: on the tree the end-to-end run derived, run-checks --jobs 1
+  (808 s) and --jobs 4 (251 s), all 68 checkers, PYTHONHASHSEED=0: 68 outputs byte-identical, exit codes and
+  the table identical apart from the seconds, the tree unchanged by either. Without the seed,
+  audit-pack-citations orders tied packs differently on every run, sequential runs included (it sorts a set by
+  page count alone): pre-existing, verdict unchanged, left for its owner (a tie-break by name). End to end:
+  refresh-safe on e9a6661e, --no-merge --keep-worktree, started detached from PowerShell with Git Bash: PASS,
+  the same verdict as the last PASS of 3 October (on 94179670, merged as 857986c1) against the same
+  baseline -- every run-checks checker the same mark and exit code, check-package''s 2 and
+  check-authored-inputs'' 7 known failures the same lines, the same 4 report-only non-zero. Times: setup 2m14s,
+  derive 35m46s, checks 3m40s, merge (report only) 7s, total 41m47s, against 2.4, 47.9, 33.4 and 0.6 min (84.4)
+  on 3 October. The derive steps are unchanged, so their gap is the machine''s load; the checks went from 33.4
+  to 3.7 minutes.
   Closes when the branch is merged and a full gate has passed on it: closed_by_commit is that merge.'
