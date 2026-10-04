@@ -22,6 +22,5 @@ triage: fix-forward
 prevention:
   type: none
   reason: 'the refresh''s own tools coverage rule already catches an unexcused helper; this entry records the excuse it asked for.'
-status: closed
-closed_by_commit: a9296266
-notes: Batch RFM (r1-fix-merge), 4 October 2026. Closes on its commit.
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026. Fix in a9296266; stays open until Chinmay approves prevention none (the coverage rule itself is the guard).
