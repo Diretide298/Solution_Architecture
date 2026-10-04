@@ -1,0 +1,26 @@
+id: CHG-RFM-015
+date: '2026-10-04'
+source: audit
+kind: process
+summary: tools/resolution_cache.py is listed in refresh.sh's tools coverage as an imported helper with no main.
+decision:
+  what: refresh.sh's excused-tools list gains resolution_cache (imported by derive-lineage, derive-diagrams and
+    check-write-lineage). No step or check changes.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The release refresh of 4 October on b76bfb77 passed every checker and all 65 steps, and failed only the tools
+  coverage rule: resolution_cache (added by CHG-FXC-001) was neither run nor excused. It is a library, like ticket_done
+  and screen_patterns, so it is excused the same way.'
+keys_touched: {}
+root_class: 'known: helper-not-excused'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/refresh.sh
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026. Closes on its commit.
