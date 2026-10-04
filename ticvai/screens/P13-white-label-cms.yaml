@@ -1574,6 +1574,27 @@ screens:
     dismiss:
       label: Cancel
     provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
+  - id: formUpdateContentBlock
+    component: modal
+    trigger: Save block
+    body: '**Collects what `updateContentBlock` sends before it is called**, for the block selected in Blocks on this
+      page. At least one of: `body` (the block''s content, typed by its kind, in the block editor''s fields), `localeVariants`
+      (the per-language bodies), `position` (its order on the page; a drag sets it), `publishAt`, `expireAt` and
+      `audienceSegmentId` (who sees it). Only what changed is sent. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ContentBlock
+    confirm:
+      label: Save block
+      operation: updateContentBlock
+    dismiss:
+      label: Cancel
+      discards:
+      - body
+      - localeVariants
+      - position
+      - publishAt
+      - expireAt
+      - audienceSegmentId
+    provenance: contract white-label.yaml PATCH /content-blocks/{blockId} (4 October 2026, CHG-RFM-010)
 - id: CMS-008
   name: Content Blocks
   module: White Label

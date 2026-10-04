@@ -1,0 +1,31 @@
+id: CHG-RFM-010
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: CMS-007's Save block opens a form that collects what updateContentBlock sends (body, localeVariants, position,
+  publishAt, expireAt, audienceSegmentId; at least one).
+decision:
+  what: CMS-007 gains the overlay formUpdateContentBlock (a modal triggered by Save block, confirm updateContentBlock),
+    as Save content page has formUpdateContentPage; only the changed fields are sent.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'check-screen-wiring finding S-BUTTON-FORM on the merged branch (e13d7ad5): Save block calls updateContentBlock, whose
+  body is required (minProperties 1, added in 8d68998d, CHG-FXC-011), and nothing on the screen collected it; the screens
+  agent bound the button in CHG-FXS-003 before the body was known.'
+keys_touched:
+  screens:
+  - CMS-007
+  operations:
+  - updateContentBlock
+root_class: 'new: button-without-form'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.
