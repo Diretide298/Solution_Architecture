@@ -747,6 +747,9 @@ paths:
                   default: json
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Export started, as a data-subject request (`platform.dsar_request`). The same
             shape `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests
             read alike.
@@ -7118,6 +7121,7 @@ components:
             '
         conditions:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             $ref: '#/components/schemas/AccessCondition'
         combining:
@@ -7188,6 +7192,20 @@ components:
             tenant''s.
 
             '
+    GuestCredential:
+      x-ticvai-persistence: identity.guest_credential
+      type: object
+      description: '**A guest''s password, as stored** (4 October 2026, CHG-FXC-003; `registerGuest` took a password and
+        no table held it, so `guestPasswordLogin` had nothing to check). Never returned by any operation: this schema exists
+        to say where the hash lives. One row per guest subject; `registerGuest` and `changeOwnCredential` write it,
+        `guestPasswordLogin` reads it, counts failures against `identity.password_policy` and locks until `lockedUntil`.'
+      required: [subjectId, passwordHash, failedAttempts]
+      properties:
+        subjectId: { type: string, format: uuid }
+        passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password.' }
+        failedAttempts: { type: integer, minimum: 0 }
+        lockedUntil: { type: string, format: date-time, nullable: true }
+        passwordSetAt: { type: string, format: date-time }
     AccessCondition:
       type: object
       description: '**One attribute, one operator, one value** — and the attribute names are an enum

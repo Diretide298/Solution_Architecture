@@ -1,0 +1,45 @@
+id: CHG-FXC-001
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: Every operation that fills or evicts cache:resolution records its key, resolvers and bump; derive-lineage derives
+  it, check-write-lineage (W-CACHEKEY) holds it, derive-diagrams prints it instead of the gap.
+decision:
+  what: 'Key res:{tenantId}:{resolver}:{scopePath}; a writer INCRs resver:{tenantId}:{resolver} after commit for each resolver
+    whose tables it wrote, so every scope in the tenant re-resolves (readers serve stale while revalidating, ADR-0032).
+    Resolvers: permissions, tenant-config, price-list, venue-map, menu, table-layout, else the configuration table. tools/resolution_cache.py
+    is the rule; 69 lineage entries carry `cache`.'
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; 18 tickets stopped on the service document''s own sentence that
+  which resolution entry a writer evicts is not recorded (setRefundPolicy, setNavigation, restoreConfigVersion, setApiLicensing,
+  setTaxInvoiceTemplate, setPrices, publishVenueMap). Root class R141, open since the 26 September audit.'
+keys_touched:
+  operations:
+  - setRefundPolicy
+  - setNavigation
+  - restoreConfigVersion
+  - setApiLicensing
+  - setTaxInvoiceTemplate
+  - setPrices
+  - publishVenueMap
+  - setSuggestionProvider
+  files:
+  - tools/resolution_cache.py
+  - tools/derive-lineage.py
+  - tools/check-write-lineage.py
+  - tools/derive-diagrams.py
+  - handoff/api-data-lineage.json
+root_class: R141
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: closed
+closed_by_commit: 68736bcb

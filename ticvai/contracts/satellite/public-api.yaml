@@ -140,6 +140,42 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /developers/{developerId}/members:
+    get:
+      operationId: listDeveloperMembers
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      summary: Who is in a developer organisation
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; DEV-002: setDeveloperMembers wrote members nothing read).** The organisation's `control.developer_member` rows (DeveloperMember), owner first, then by email; removed members are left out.
+      tags:
+      - publicApi
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: developerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Who is in a developer organisation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeveloperMember'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
       - name: developerId
         in: path
@@ -150,9 +186,13 @@ paths:
       x-ticvai-consumed-by:
         - "P14 DEV-002 Register & Organisation"
       summary: Who at this organisation may do what
-      description: >
-        13.1.10. **The organisation administers its own people**, because TICVAI maintaining every
-        integrator's staff list is TICVAI doing their HR — the same reasoning as `PartnerUser`.
+      description: |-
+        13.1.10. **The organisation administers its own people**, because TICVAI maintaining every integrator's staff list is TICVAI doing their HR — the same reasoning as `PartnerUser`.
+
+        **What the PUT does** (4 October 2026, CHG-FXC-005). Replaces the organisation's member list in
+        `control.developer_member` (DeveloperMember): an email not on the list is invited, a listed email's role is
+        updated, a member left off is `removed`. Exactly one `owner` must remain, or 409. Nothing is written to the tenant's
+        identity tables; the portal signs a member in by the email.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [partner]
@@ -187,8 +227,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  additionalProperties: true
+                  $ref: '#/components/schemas/DeveloperMember'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1844,7 +1883,38 @@ components:
         windowMinutes: { type: integer, minimum: 1, default: 5 }
         action: { type: string, enum: [flag, throttle, suspend], default: flag }
         isActive: { type: boolean, default: true }
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which
+            every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant''s own rules.'
+        scopePath:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default.
 
+    DeveloperMember:
+      type: object
+      x-ticvai-persistence: control.developer_member
+      description: '**One person at a developer organisation** (`setDeveloperMembers`, 4 October 2026, CHG-FXC-005).
+        Developer-portal people are not tenant staff: they are kept here in the control database beside
+        `control.developer_account`, keyed by email, and never become `identity.principal` or `identity.delegated_access`
+        rows (the Sprint 1-2 judging found no email column on a principal and no permission a portal role could map to).
+        A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it.
+        What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the
+        owner, `developer` its own clients and credentials, `readOnly` view.'
+      required: [email, role, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        developerAccountId: { type: string, format: uuid, readOnly: true }
+        email: { type: string, format: email }
+        role: { type: string, enum: [owner, admin, developer, readOnly] }
+        status: { type: string, enum: [invited, active, removed], readOnly: true }
+        invitedAt: { type: string, format: date-time, readOnly: true }
+        activatedAt: { type: string, format: date-time, nullable: true, readOnly: true }
     ApiAnomaly:
       type: object
       x-ticvai-persistence: "control.api_anomaly"

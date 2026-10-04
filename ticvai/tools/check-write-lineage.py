@@ -17,6 +17,9 @@ operations writing nothing. Rules:
     W-EMITS     an operation on a state transition that emits an event is in that event's `emittedBy`,
                 and every `emittedBy` names an operation that exists
     W-OWNER     every schema with a table belongs to a service in `handoff/service-decomposition.json`
+    W-CACHEKEY  an operation that reads or writes `cache:resolution` records the key it fills or evicts and the
+                resolvers it bumps, as `tools/resolution_cache.py` derives them (CHG-FXC-001, root class R141)
+    W-CREATED   a 201 response's persisted tables are among the operation's writes (CHG-FXC-002)
 
     python tools/check-write-lineage.py [--list]
 """
@@ -100,6 +103,46 @@ def main() -> int:
                     bad.append(("W-EMITS", ev, f"{os.path.basename(f)}: {t.get('from')} -> {t.get('to')} by {op} "
                                                f"emits it, and its emittedBy does not name {op}"))
 
+    # W-CACHEKEY (4 October 2026, CHG-FXC-001): 18 Sprint 1-2 tickets stopped on "which resolution entry each
+    # writer evicts is not recorded". The rule is in tools/resolution_cache.py; the entry must carry what it says.
+    import importlib.util as _ilu
+    _spec = _ilu.spec_from_file_location("resolution_cache", os.path.join(ROOT, "tools", "resolution_cache.py"))
+    _rc = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_rc)
+    for o, e in sorted(lin.items()):
+        want = _rc.resolution_cache(o, e, lin)
+        if want is None:
+            continue
+        if not want.get("resolvers"):
+            bad.append(("W-CACHEKEY", o, "touches cache:resolution and no resolver can be named for it"))
+        elif e.get("cache") != want:
+            bad.append(("W-CACHEKEY", o, "touches cache:resolution and its lineage does not record the key it "
+                                         "fills or evicts (run derive-lineage --apply)"))
+    # W-CREATED (CHG-FXC-002): recordWriteOff answered 201 with the JournalEntry it posted and wrote only
+    # ledger.posting. A 201 is a created row; its schema's persisted tables are writes.
+    # A schema name is per file (`Invitation` is an orders invitation and a marketing one), and a 201 refers to its
+    # own file's schema, so the persistence map is kept per contract file.
+    _persist, _file_of = {}, {}
+    for f in sorted(glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml"))):
+        d = yl(f)
+        for p_, item in (d.get("paths") or {}).items():
+            for v_, op_ in (item or {}).items():
+                if isinstance(op_, dict) and op_.get("operationId"):
+                    _file_of[op_["operationId"]] = f
+        for n, sc in ((d.get("components") or {}).get("schemas") or {}).items():
+            t = str((sc or {}).get("x-ticvai-persistence") or "").strip()
+            if t and not t.lower().startswith("none"):
+                _persist[(f, n)] = [x.strip() for x in t.split("+") if "." in x.strip()]
+    for o, (v, op) in sorted(ops.items()):
+        r201 = (op.get("responses") or {}).get("201") or (op.get("responses") or {}).get(201)
+        if v == "get" or not r201:
+            continue
+        names = set(__import__("re").findall(r"(?<![./a-z])#/components/schemas/([A-Za-z0-9_]+)", json.dumps(r201)))
+        made = {t.split(" ")[0] for n in names for t in _persist.get((_file_of.get(o), n), [])}
+        miss = sorted(t for t in made if t not in ((lin.get(o) or {}).get("writes") or []))
+        if miss:
+            bad.append(("W-CREATED", o, "answers 201 with %s and does not write it" % ", ".join(miss)))
+
     sref = json.load(io.open(os.path.join(ROOT, "handoff", "schema-reference.json"), encoding="utf-8"))
     dec = json.load(io.open(os.path.join(ROOT, "handoff", "service-decomposition.json"), encoding="utf-8"))
     owned = {s for v in (dec.get("services") or {}).values() for s in v.get("schemas") or []}
@@ -130,7 +173,8 @@ def main() -> int:
         return 1
     print(f"ok: every emitter writes the outbox, every write writes a table or says why not "
           f"({kinds.get('pure', 0)} pure, {kinds.get('storageUndecided', 0)} storage undecided), every emitted "
-          f"event names its operations, every schema has an owner")
+          f"event names its operations, every schema has an owner, every resolution-cache user names its key, "
+          f"every 201 writes what it creates")
     return 0
 
 

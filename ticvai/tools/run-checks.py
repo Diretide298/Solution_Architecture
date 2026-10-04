@@ -117,6 +117,9 @@ CHECKS = [
     # built in Block A, and no artefact the last released plan built leaves the tickets without a reason; a ticket's
     # builds are real ids, a module test names what it tests, a setup ticket links only its own part.
     "check-plan-closure", "check-ticket-builds",
+    # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
+    # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
+    "check-parameter-columns",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

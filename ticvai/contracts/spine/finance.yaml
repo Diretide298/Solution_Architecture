@@ -4360,15 +4360,22 @@ paths:
         FinTaxInvoice and FinCreditMemo to PINT AE is defined by the Ministry of Finance and the FTA, not by us
         (CF-133).'
       summary: Send issued tax documents to the e-invoicing provider
-      description: >
-        6.1.1. **Shares issued tax invoices and credit memos with the external e-invoicing solution.** The
-        platform calls this itself (`service`) within the provider's `transmitWithinHours` of issue; staff
-        call it to resend a `failed` document or a range. Each document is converted to the provider's
-        format (`pintAe`), hashed, sent, and recorded as a transmission in `queued`, then `sent`; the
-        provider's answer arrives through `recordEInvoiceTransmissionStatus`.
+      description: |-
+        6.1.1. **Shares issued tax invoices and credit memos with the external e-invoicing solution.** The platform calls this itself (`service`) within the provider's `transmitWithinHours` of issue; staff call it to resend a `failed` document or a range. Each document is converted to the provider's format (`pintAe`), hashed, sent, and recorded as a transmission in `queued`, then `sent`; the provider's answer arrives through `recordEInvoiceTransmissionStatus`.
+        A document already `accepted` is never sent again. Nothing is sent for a legal entity whose provider is `disabled`; `test` sends to the provider's test endpoint only.
 
-        A document already `accepted` is never sent again. Nothing is sent for a legal entity whose provider
-        is `disabled`; `test` sends to the provider's test endpoint only.
+        **The PINT AE mapping this build uses until the regulator's list is in hand** (4 October 2026, CHG-FXC-009; a client
+        question, CF-133, stays open). From FinTaxInvoice: `invoiceNumber` the invoice ID, `issuedAt` the issue date,
+        `supplyDate` the supply date, `invoiceType` the type code (380 a tax invoice, simplified invoices flagged as
+        simplified), `currency` the document currency, `supplierName`, `supplierAddress` and
+        `supplierTaxRegistrationNumber` the seller party and its TRN, `buyerName`, `buyerAddress`, `buyerCountryCode` and
+        `buyerTaxRegistrationNumber` the buyer party, each line its quantity, net amount, tax category and rate, and the
+        totals `netAmount`, `discountAmount`, `taxAmount`, `grossAmount` (with `taxAmountInLegalCurrency` where the document
+        currency is not AED). From FinCreditMemo: type code 381, `creditMemoNumber`, the billing reference to
+        `taxInvoiceNumber`, `reason`, its lines and totals. A document missing a field the provider rejects as mandatory is
+        not sent: its `eInvoiceStatus` becomes `rejected` with the provider's reason, and the rest of the batch goes on. The
+        mapping lives in the provider adapter (ADR-0062), so the regulator's final list changes the adapter, not this
+        contract.
       tags:
       - tax
       x-ticvai-permission: LEDGER_POST
@@ -6975,6 +6982,20 @@ components:
             entity, which carried the balance.
 
             '
+        agreedAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          description: '**The figure a dispute was resolved at** (4 October 2026, CHG-FXC-003): written by
+            `resolveObligationDispute`, which returns the obligation to `outstanding`. `arisingAmount` keeps the original, so
+            the difference stays auditable; settlement settles `agreedAmount` where it is set and `arisingAmount` otherwise.
+            Null until a dispute is resolved.'
+        disputeNote:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The `note` of the last `disputeObligation` or `resolveObligationDispute`.
     FxRevaluationResult:
       type: object
       x-ticvai-persistence: none — computed, posts a journal
@@ -7434,6 +7455,23 @@ components:
             properties:
               check:
                 type: string
+                description: |-
+                  **What each check is, and what fails it** (4 October 2026, CHG-FXC-009; the Sprint 1-2 judging found the values and
+                  no definition). Each runs over the period's legal entity and dates; `blockingCount` is what fails it.
+                  - `trialBalanceBalances`: posted `ledger.journal_line` debits equal credits for the period, per currency. Blocking:
+                    currencies out of balance.
+                  - `noUnapprovedJournals`: no `ledger.journal_entry` dated in the period is `draft` or awaiting approval. Blocking: those
+                    entries.
+                  - `noOpenShifts`: no POS shift with a business date in the period is still open, suspended or awaiting close approval,
+                    asked of `orders.listShifts`. Blocking: those shifts.
+                  - `settlementsReconciled`: every `ledger.settlement` in the period is reconciled and no `ledger.settlement_exception`
+                    on it is open. Blocking: unreconciled settlements plus open exceptions.
+                  - `recognitionRunComplete`: no `ledger.recognition_schedule` line due on or before the period end is unrecognised.
+                    Blocking: those lines.
+                  - `priorPeriodClosed`: the legal entity's previous `ledger.fiscal_period` is `closed`. Blocking: 1 or 0.
+                  - `varianceExceptionsReviewed`: no `ledger.price_variance` in the period is unreviewed. Blocking: those variances.
+                  The close fails (409, `PeriodCloseProblem.failedChecks`) when any check or wallet check fails; a dry run reports the
+                  same list and locks nothing. Each run, dry or not, appends one `ledger.fiscal_period_event` with the results.
                 enum:
                 - trialBalanceBalances
                 - noUnapprovedJournals

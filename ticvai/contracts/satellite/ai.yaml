@@ -126,19 +126,17 @@ paths:
         - "P08 BO-785 Template Library"
         - "P08 BO-793 AI Content, Translation & Audit"
       summary: Fill translation gaps with a first pass, for a human to edit
-      description: 'BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports
-        content missing a version. What was absent is filling it.
+      description: |-
+        BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports content missing a version. What was absent is filling it.
+        **A first pass, never a publish.** Every proposal lands as a draft on the block it translates, and **a tenant's own words in a language nobody at the venue reads is exactly the content that must not go live unreviewed.**
+        **Lives here rather than in `white-label` because it calls a model.** ADR-0020: only the AI contract writes AI tables — and the boundary caught this on the day it was written, for the third time in one session. **A rule I had just described in the description above and then broke in the lineage below it.**
 
-        **A first pass, never a publish.** Every proposal lands as a draft on the block it translates,
-        and **a tenant''s own words in a language nobody at the venue reads is exactly the content that
-        must not go live unreviewed.**
-
-        **Lives here rather than in `white-label` because it calls a model.** ADR-0020: only the AI contract
-        writes AI tables — and the boundary caught this on the day it was written, for the third time
-        in one session. **A rule I had just described in the description above and then broke in the lineage
-        below it.**
-
-        '
+        **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
+        lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
+        the block or template it is for (`control.content_block`, `marketing.message_template`), the language, the proposed
+        text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+        operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
+        content; `getTranslationProposals` reads the rows back by job.
       tags:
       - ai
       x-ticvai-permission: TENANT_CONFIGURE
@@ -206,11 +204,15 @@ paths:
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-017 (CMS-011: no read follows a proposeTranslations job, which
         answers 202); shape follows proposeTranslations'
       summary: Follow a translation job
-      description: 'The drafts a `proposeTranslations` job has written so far, and whether it has finished (contract gap
-        logged in CHG-WIR-017 for CMS-011; built in CHG-CSA-045). The CMS polls it after the 202 to offer machine
-        translation as a first pass for review (DI-081, DI-083); nothing is published from here.
+      description: |-
+        The drafts a `proposeTranslations` job has written so far, and whether it has finished (contract gap logged in CHG-WIR-017 for CMS-011; built in CHG-CSA-045). The CMS polls it after the 202 to offer machine translation as a first pass for review (DI-081, DI-083); nothing is published from here.
 
-        '
+        **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
+        lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
+        the block or template it is for (`control.content_block`, `marketing.message_template`), the language, the proposed
+        text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+        operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
+        content; `getTranslationProposals` reads the rows back by job.
       tags:
       - ai
       x-ticvai-permission: TENANT_CONFIGURE
@@ -18616,7 +18618,7 @@ components:
         $ref: '#/components/schemas/SuggestionProviderAssignment'
     TranslationProposals:
       type: object
-      x-ticvai-persistence: none — each draft is written on the block it translates
+      x-ticvai-persistence: 'none — each draft is an ai.proposed_action row (one per block and language), applied to the block only when an operator saves it through the block''s own write (ADR-0020); CHG-FXC-004'
       description: 'What `proposeTranslations` drafted. **Every entry is a draft, never a publish** —
         a person edits and publishes it through the contract that owns the block.
 

@@ -1,0 +1,43 @@
+id: CHG-FXC-004
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: The judged operations' lineage lists the tables their own descriptions say they read and write (about 80 entries),
+  cross-service steps are named as calls, and inventory.stock_level is replaced by the movement ledger it is derived from.
+decision:
+  what: 'tools/applied/contracts-s12-4-october.py LINEAGE, each entry with a fixNote: rollbackMenu fnb.menu_version, scheduleMenuPublish
+    fnb.menu_schedule, publishVenueMap venuemap.map_version, closeFiscalPeriod and the close steps ledger.fiscal_period_event,
+    settleDeposit the journal, acceptFnbOrder the kitchen ticket, listSegmentMembers the segment, previewSegmentDraft pure;
+    calls for respondToInvitation (orders.issueInvitation), updateTransportDeparture (catalogue.updateChannelCapacity),
+    createTransportRoute (catalogue.createEvent, createProduct), redeemWaitingGuest (access.validateAccess), terminateTenant
+    (finance.getTrialBalance).'
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; the 58 lineage blockers, e.g. SVC-FNB-FNB-8, VM-LEDGER-LEDGER-1,
+  VM-INVENTORY-STOCK-1, SVC-MARKETING-SEGMENT-2, SVC-WALLET-CARD-1, VM-FNB-SERVICE-1.'
+keys_touched:
+  operations:
+  - rollbackMenu
+  - scheduleMenuPublish
+  - publishVenueMap
+  - closeFiscalPeriod
+  - listSegmentMembers
+  - getStockPositions
+  - respondToInvitation
+  files:
+  - handoff/api-data-lineage.json
+  - tools/applied/contracts-s12-4-october.py
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: closed
+closed_by_commit: 68736bcb
+notes: P-NAMED-TABLE fails a new operation whose description names a table its lineage does not list.

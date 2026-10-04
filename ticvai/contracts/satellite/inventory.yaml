@@ -365,26 +365,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                - itemIds
-                - postsAdjustment
-                properties:
-                  itemIds:
-                    type: array
-                    items:
-                      type: string
-                      format: uuid
-                  locationId:
-                    type: string
-                    format: uuid
-                    nullable: true
-                  dueBy:
-                    type: string
-                    nullable: true
-                    description: Local time, e.g. 10:00
-                  postsAdjustment:
-                    type: boolean
+                $ref: '#/components/schemas/DailyCountList'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/bulk:
@@ -1254,6 +1235,50 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/lines:
+    get:
+      operationId: listStockCountLines
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+      summary: The lines of a stock count
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; EMP-066: the count screen needs its pre-filled lines).** The count's `inventory.count_line` rows (CountLine), ordered by item. **A blind count hides what is expected**: while an `isBlind` count is open, `theoreticalQuantity`, `variance` and `variancePercent` are null; they appear once the count is submitted.
+      tags:
+      - count
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: countId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The lines of a stock count
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CountLine'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
     - name: countId
       in: path
@@ -3982,6 +4007,39 @@ components:
             description: True locks costing method and base unit.
           isActive:
             type: boolean
+    DailyCountList:
+      x-ticvai-persistence: inventory.daily_count_list
+      type: object
+      description: '**The items counted every day at one location** (`setDailyCount`, 4 October 2026, CHG-FXC-003: the
+        write had only `inventory.item` to land in, which has no column for any of it). One row per venue and location
+        (`locationId` null is the venue-wide list); `setDailyCount` replaces it.'
+      required:
+      - itemIds
+      - postsAdjustment
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        itemIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        dueBy:
+          type: string
+          nullable: true
+          description: Local time, e.g. 10:00
+        postsAdjustment:
+          type: boolean
+          x-ticvai-column: does_post_adjustment
+        scopePath:
+          type: string
+          readOnly: true
     StockLocation:
       x-ticvai-persistence: inventory.location
       type: object

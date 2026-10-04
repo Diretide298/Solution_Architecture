@@ -1870,6 +1870,33 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}:
+    get:
+      operationId: getResourceBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-097 Rental Desk"
+      summary: One resource booking
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; VM-BO-097: no read of a ResourceBooking).** One `resources.booking` row: status, `conditionOut`, `conditionIn`, `depositAuthorisationId`. A rental booking (`rental.getRentalBooking`) names the resource bookings it holds; this reads one of them.
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: One resource booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBooking'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
     - name: bookingId
       in: path
@@ -2489,6 +2516,7 @@ paths:
     - name: experienceId
       in: path
       required: true
+      description: The experience's catalogue `Product.id` (4 October 2026, CHG-FXC-010; BO-877).
       schema:
         type: string
         format: uuid
@@ -4311,6 +4339,21 @@ components:
             format: uuid
         scopePath:
           type: string
+        packageId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The package this requirement is a component of** (4 October 2026, CHG-FXC-003). Written by
+            `updateResourcePackage`, which replaces the package''s `components` as these rows; `listResourcePackages` reads
+            them back by it. Null for an experience''s own requirement (`productId`).'
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The experience product this requirement belongs to (`setExperienceResourceRequirements`). Exactly one
+            of `packageId` and `productId` is set.
     ResourceVenueAssignment:
       type: object
       x-ticvai-persistence: resources.venue_assignment
@@ -4716,6 +4759,13 @@ components:
         isActive:
           type: boolean
           default: true
+        resourceTypeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003).
+            `kind` is the fixed family a type belongs to; this is the tenant''s own type within it, and the
+            `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it.'
     ResourceCleaningPolicy:
       x-ticvai-persistence: none — columns on resources.resource
       type: object

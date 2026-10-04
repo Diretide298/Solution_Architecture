@@ -1,0 +1,81 @@
+id: CHG-FXC-003
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: A column or child table for every field the judged operations store or are addressed by, and a new ratchet check
+  (check-parameter-columns) for an id with no column, a named table the lineage misses and a drafted write with no field
+  mapping.
+decision:
+  what: 'Contract properties and persistence tags that derive-schema reads (no hand DDL): Event lifecycleState, Recipe.id,
+    FnbIngredientSubstitute.recipeId, ComboSlot options (child table), AllergenVerdict.undeclared, AuthorisationPolicy.conditions,
+    WalletIntegrationMapping mappings and AccessProfile.schedule, HolderAccess.exceptions (jsonb), WalletRiskRules rules
+    (child table), NavigationConfig and HomepageLayout as container plus item table with the old self-pointers retired (derive-schema
+    now reads a qualified retired column), UsageRecord and ApiAnomalyRule tenant and scope, FavouriteRoute.subjectId, Resource.resourceTypeId,
+    ResourceRequirement packageId and productId, InterEntityObligation.agreedAmount, TableVisit serviceStage, WaitingGuest
+    override, LiveGateModeLaneControlView.pendingChangeId, GameCard.id; new stores DailyCountList, IncidentHistoryEntry,
+    GuestCredential.'
+  by: Chinmay (fix round of 4 October, default taken by the contracts agent)
+  date: '2026-10-04'
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+  tickets, 38 not buildable) under the fix-round brief; NO tickets SVC-CATALOGUE-EVENTS-1, APP-SETUP-BO-111-REST, SVC-FNB-FNB-11,
+  -17, -18, -19, SVC-IDENTITY-ADMINISTRATION-7, SVC-PLATFORM-METERING-2, SVC-VENUEOPS-FAVOURITE-1, SVC-VENUEOPS-RESOURCES-5
+  and -7, SVC-LEDGER-FINANCE-3, SVC-WALLET-WALLET-6, SVC-WHITELABEL-HOMEPAGE-1, SVC-WHITELABEL-NAVIGATION-1 and -2, SVC-INVENTORY-INVENTORY-1;
+  check-contract-storage already listed most in its baseline.'
+keys_touched:
+  schemas:
+  - Event
+  - Recipe
+  - FnbIngredientSubstitute
+  - ComboSlot
+  - AllergenVerdict
+  - AuthorisationPolicy
+  - WalletIntegrationMapping
+  - WalletRiskRules
+  - NavigationConfig
+  - HomepageLayout
+  - UsageRecord
+  - ApiAnomalyRule
+  - FavouriteRoute
+  - Resource
+  - ResourceRequirement
+  - InterEntityObligation
+  - TableVisit
+  - WaitingGuest
+  - IncidentHistoryEntry
+  - GuestCredential
+  - DailyCountList
+  - LiveGateModeLaneControlView
+  - AccessProfile
+  - HolderAccess
+  - GameCard
+  tables:
+  - catalogue.event
+  - fnb.combo_slot_option
+  - wallet.risk_rule
+  - whitelabel.navigation_config
+  - whitelabel.homepage_layout
+  - control.usage_record
+  - inventory.daily_count_list
+  - maintenance.incident_history
+  - identity.guest_credential
+  files:
+  - tools/derive-schema.py
+  - tools/check-parameter-columns.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+  - tools/applied/contracts-s12-4-october.py
+  - tools/applied/yamltext.py
+root_class: A-STORAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: closed
+closed_by_commit: 68736bcb
+notes: 'check-parameter-columns is a ratchet: 226 known findings baselined (104 P-PARAM-NO-COLUMN, 57 P-NAMED-TABLE, 65
+  P-DRAFTED-UNMAPPED); a new operation must not add one.'

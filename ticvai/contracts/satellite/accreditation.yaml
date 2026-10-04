@@ -1221,6 +1221,44 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-validity:
+    get:
+      operationId: getAccreditationValidity
+      x-ticvai-consumed-by:
+        - "P08 BO-669 Accreditation Validity & Renewal"
+        - "P08 BO-666 Accreditation Programme Setup"
+      summary: The validity and renewal rules of a programme
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-010; VM-BO-669, BO-666): `setAccreditationValidity` is a whole-record PUT that
+        nothing read.** Returns the programme's `accreditation.validity` row at the caller's venue, or the default before the
+        first save (`validityKind` eventDuration, `renewalRequiresReverification` true, `onExpiry` revokeAccess, the schema's
+        own defaults; no months, renewal window or grace period).
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: programmeId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The validity rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationValidity'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccreditationValidity
       x-ticvai-consumed-by:
@@ -3705,6 +3743,7 @@ components:
             type: string
         schedule:
           type: array
+          x-ticvai-persistence-column: jsonb
           description: '**Zone, date and time are three dimensions and all three are needed.**'
           items:
             type: object
@@ -3794,6 +3833,7 @@ components:
             format: uuid
         exceptions:
           type: array
+          x-ticvai-persistence-column: jsonb
           items:
             type: object
             properties:
