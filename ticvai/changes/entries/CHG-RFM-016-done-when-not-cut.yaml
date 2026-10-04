@@ -1,0 +1,29 @@
+id: CHG-RFM-016
+date: '2026-10-04'
+source: audit
+kind: plan
+summary: A ticket's Done when is carried whole into its OpenProject pointer; the 700-character cut is removed.
+decision:
+  what: tools/ticket_done.py done_when() returns the plan's whole Done-when text. Before, it kept the first 700
+    characters, so 11 r1 tickets (DB-READ-VIEWS, DB-ROLES, PLATFORM-OBSERVE, PLATFORM-KERNEL, PLATFORM-RLS,
+    PLATFORM-SAGA-PAID, OFFLINE-JOURNAL, AI-ENGINE-SCRUB-GUARD, TEST-AM-FOUNDATION-PLATFORM,
+    TEST-AM-ORDERS-RESERVATIONS-P04 and one more) reached developers with their acceptance cut mid-word.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The sample re-judge of 4 October on f4e2e489 (42 formerly unbuildable tickets; 40 now buildable) found
+  PLATFORM-KERNEL still not buildable: its pointer ended at "`ticvai.sc", the two session settings the row-level
+  policies read. The plan text is whole; the pointer builder cut it. Fixed before the r1 push under Chinmay's instruction of 4 October to fix all the Sprint 1-2 findings in one round.'
+keys_touched: {}
+root_class: 'new: pointer-text-cut'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'the cut was the only length limit on the pointer body; the subject (255) and summary (200) limits are
+    OpenProject field limits and stay.'
+status: open
+notes: Batch RFM (r1 release), 4 October 2026. Open until Chinmay approves prevention none.
