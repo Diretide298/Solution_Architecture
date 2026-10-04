@@ -1,0 +1,44 @@
+id: CHG-FXS-004
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: The forecast screens pick the forecast definition getForecast requires (listForecastDefinitions by subject)
+  and show AiForecastPoint's interval columns.
+decision:
+  what: Bind listForecastDefinitions with the screen's subject, a definition picker and date window, and AiForecastPoint
+    columns (p10, p50, p90); pack labels with no contract field leave the screen.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+  CHG-FXC-010; plan CHG-FXP-004).'
+keys_touched:
+  screens:
+  - ADM-503
+  - ADM-504
+  - ADM-505
+  - ADM-506
+  - BO-919
+  files:
+  - tools/applied/s12-screens-4-october.py
+  - tools/applied/s12-screens-4-october-specs.py
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-CONSOLE-ADM-503
+  - APP-CONSOLE-ADM-504
+  - APP-CONSOLE-ADM-505
+  - APP-SETUP-ADM-506
+  - APP-SETUP-ADM-506-REST
+  - APP-SETUP-BO-919
+  - APP-SETUP-BO-919-REST
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'

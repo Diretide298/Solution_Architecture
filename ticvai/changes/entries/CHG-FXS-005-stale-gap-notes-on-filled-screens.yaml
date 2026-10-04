@@ -1,0 +1,73 @@
+id: CHG-FXS-005
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: Filled screens whose generator gap still said a person must define them, or that an operation was missing
+  when it is bound, have the stale gap removed; the POS drawer steps take the plan's default.
+decision:
+  what: Remove the stale gaps, and record on POS-003 and POS-004 that they are steps two and three of the POS-002
+    sale drawer (the plan's default, Chinmay to confirm).
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+  CHG-FXC-010; plan CHG-FXP-004).'
+keys_touched:
+  screens:
+  - ADM-342
+  - ADM-527
+  - ADM-528
+  - ADM-554
+  - ANL-047
+  - BO-1065
+  - BO-151
+  - BO-166
+  - BO-230
+  - BO-877
+  - CMS-025
+  - CMS-086
+  - KIT-008
+  - POS-003
+  - POS-004
+  files:
+  - tools/applied/s12-screens-4-october.py
+  - tools/applied/s12-screens-4-october-specs.py
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-ANALYTICS-ANL-047
+  - APP-CMS-CMS-086
+  - APP-POS-KIT-008
+  - APP-POS-POS-003
+  - APP-POS-POS-004
+  - APP-SETUP-ADM-342
+  - APP-SETUP-ADM-342-REST
+  - APP-SETUP-ADM-527
+  - APP-SETUP-ADM-527-REST
+  - APP-SETUP-ADM-528
+  - APP-SETUP-ADM-554
+  - APP-SETUP-ADM-554-REST
+  - APP-SETUP-BO-1065
+  - APP-SETUP-BO-1065-REST
+  - APP-SETUP-BO-151
+  - APP-SETUP-BO-151-REST
+  - APP-SETUP-BO-166
+  - APP-SETUP-BO-166-REST
+  - APP-SETUP-BO-230
+  - APP-SETUP-BO-230-REST
+  - APP-SETUP-BO-877
+  - APP-SETUP-BO-877-REST
+  - APP-SETUP-CMS-025
+  - APP-SETUP-CMS-025-REST
+  - TEST-AM-SETUP-CUSTOMER-MARKETING-P13
+  - TEST-AM-SETUP-PLATFORM-FOUNDATION-P08
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'

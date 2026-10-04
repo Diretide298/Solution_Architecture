@@ -1,0 +1,131 @@
+id: CHG-FXS-001
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: 'The screens planned in Sprints 1-2 whose spec said a person must define them before they are built are
+  defined from what the package holds: the bound operations'' schemas, the design notes and the decisions.'
+decision:
+  what: Define each screen's regions, fields, columns, actions and states from its operations' request and response
+    schemas, the process design notes and the binding decisions; narrow a purpose to what the contract carries and
+    say what left; where an operation or field is missing, bind the name agreed with the contracts agent in the
+    fix-round ledger.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+  CHG-FXC-010; plan CHG-FXP-004).'
+keys_touched:
+  screens:
+  - ADM-069
+  - ADM-077
+  - ADM-164
+  - ADM-380
+  - ADM-460
+  - ADM-541
+  - ADM-542
+  - ADM-545
+  - ADM-570
+  - BO-1045
+  - BO-1062
+  - BO-1063
+  - BO-1066
+  - BO-155
+  - BO-669
+  - BO-674
+  - BO-696
+  - BO-716
+  - BO-755
+  - BO-766
+  - BO-772
+  - BO-785
+  - BO-798
+  - BO-799
+  - BO-825
+  - BO-826
+  - BO-827
+  - BO-828
+  - SGN-002
+  files:
+  - tools/applied/s12-screens-4-october.py
+  - tools/applied/s12-screens-4-october-specs.py
+  operations:
+  - updateMessageTemplate
+  - updateLoyaltyProgramme
+  - getWalletRefundPolicy
+  - listVisualAccessRules
+  - getMembershipProductValidation
+  - getAccreditationValidity
+  - listCells
+  - listCorrectiveActions
+  - listProductionPlans
+  - getWalletRiskRules
+  - listContentBlocks
+  - updateContentBlock
+  - getApprovalRequest
+  - listStockCountLines
+  - listDeveloperMembers
+  - getResourceBooking
+  - listTableCombinations
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-CONSOLE-ADM-380
+  - APP-CONSOLE-ADM-460
+  - APP-CONSOLE-ADM-541
+  - APP-CONSOLE-ADM-542
+  - APP-CONSOLE-ADM-545
+  - APP-SETUP-ADM-069
+  - APP-SETUP-ADM-069-REST
+  - APP-SETUP-ADM-077
+  - APP-SETUP-ADM-077-REST
+  - APP-SETUP-ADM-164
+  - APP-SETUP-ADM-164-REST
+  - APP-SETUP-ADM-570
+  - APP-SETUP-ADM-570-REST
+  - APP-SETUP-BO-1045
+  - APP-SETUP-BO-1045-REST
+  - APP-SETUP-BO-1062
+  - APP-SETUP-BO-1062-REST
+  - APP-SETUP-BO-155
+  - APP-SETUP-BO-155-REST
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-696-REST
+  - APP-SETUP-BO-716
+  - APP-SETUP-BO-716-REST
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-755-REST
+  - APP-SETUP-BO-766
+  - APP-SETUP-BO-766-REST
+  - APP-SETUP-BO-772
+  - APP-SETUP-BO-772-REST
+  - APP-SETUP-BO-785
+  - APP-SETUP-BO-785-REST
+  - APP-SETUP-BO-798
+  - APP-SETUP-BO-798-REST
+  - APP-SETUP-BO-799
+  - APP-SETUP-BO-799-REST
+  - APP-SETUP-BO-825
+  - APP-SETUP-BO-825-REST
+  - APP-SETUP-BO-826
+  - APP-SETUP-BO-826-REST
+  - APP-SETUP-BO-827
+  - APP-SETUP-BO-827-REST
+  - APP-SETUP-BO-828
+  - APP-SETUP-BO-828-REST
+  - APP-SIGNUP-SGN-002
+  - TEST-AM-SETUP-PLATFORM-FOUNDATION-P08
+  - TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08
+  - VM-BO-1063
+  - VM-BO-1066
+  - VM-BO-669
+  - VM-BO-674
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'
