@@ -9,9 +9,9 @@ decision:
     sale drawer (the plan's default, Chinmay to confirm).
   by: Chinmay
   date: '2026-10-04'
-why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
-  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
-  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+why: 'Sprint 1-2 judging of 4 October 2026 (sources/audit-4-october/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief sources/audit-4-october/fix-s12/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in sources/audit-4-october/fix-s12/LEDGER.md (contracts CHG-FXC-003,
   CHG-FXC-010; plan CHG-FXP-004).'
 keys_touched:
   screens:

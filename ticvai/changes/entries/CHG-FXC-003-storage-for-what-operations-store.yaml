@@ -16,7 +16,7 @@ decision:
     GuestCredential.'
   by: Chinmay (fix round of 4 October, default taken by the contracts agent)
   date: '2026-10-04'
-why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (sources/audit-4-october/fix-s12/contracts.tsv, contracts area: 141
   tickets, 38 not buildable) under the fix-round brief; NO tickets SVC-CATALOGUE-EVENTS-1, APP-SETUP-BO-111-REST, SVC-FNB-FNB-11,
   -17, -18, -19, SVC-IDENTITY-ADMINISTRATION-7, SVC-PLATFORM-METERING-2, SVC-VENUEOPS-FAVOURITE-1, SVC-VENUEOPS-RESOURCES-5
   and -7, SVC-LEDGER-FINANCE-3, SVC-WALLET-WALLET-6, SVC-WHITELABEL-HOMEPAGE-1, SVC-WHITELABEL-NAVIGATION-1 and -2, SVC-INVENTORY-INVENTORY-1;

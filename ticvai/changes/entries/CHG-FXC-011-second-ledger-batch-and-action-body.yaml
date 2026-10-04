@@ -12,9 +12,9 @@ decision:
     PassOffer.variants, Product.eventId, recordLostItem''s guest caller.'
   by: Chinmay (fix round of 4 October, default taken by the contracts agent)
   date: '2026-10-04'
-why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (sources/audit-4-october/fix-s12/contracts.tsv, contracts area: 141
   tickets, 38 not buildable) under the fix-round brief; NO tickets SVC-FNB-FNB-17 (recordCorrectiveAction had no body) and
-  APP-SETUP-BO-167-REST (the release action''s bindingId), and the ledger requests (audit/ticvai/runs/fix-s12/LEDGER.md)
+  APP-SETUP-BO-167-REST (the release action''s bindingId), and the ledger requests (sources/audit-4-october/fix-s12/LEDGER.md)
   for ADM-003, BO-044, EMP-067, BO-112, BO-1162, CMS-007, VM-BO-085, BO-1111, EMP-066, DEV-002-REST, BO-167, VM-BO-097,
   POS-024, KIT-002, POS-031, GST-050, GST-056, WEB-002, WEB-004 and WEB-034.'
 keys_touched:

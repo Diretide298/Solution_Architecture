@@ -42,5 +42,5 @@ prevention:
 status: closed
 closed_by_commit: 611e02c9
 notes: 'check-ticket-builds B-BARE-TASK fails a hand-written task that links only ADRs or nothing, unless it says why
-  (printed on every run; seven infrastructure and tooling tasks do). The judge''s packer (audit/kit/pack-local.py, outside
-  the repo) also opened schemas only one or two levels and did not follow nested $refs; fixed there.'
+  (printed on every run; seven infrastructure and tooling tasks do). The judge''s packer (kept outside
+  the repository) also opened schemas only one or two levels and did not follow nested $refs; fixed there.'

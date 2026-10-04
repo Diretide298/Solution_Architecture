@@ -11,7 +11,7 @@ decision:
     operations; the other 4 (...) are APP-SETUP-BO-772-REST"); ticket_done.done_when says "calls only the operations its
     scope names" for such a task; op-release.py carries the sentence into the pointer (**Scope:**). The links were
     already scoped by adam-links.py (CHG-RONEP-003); the judge''s local packer was not, and is fixed outside the repo
-    (audit/kit/pack-local.py now links through tools/adam-links.py).'
+    (the judge''s local packer, kept outside the repository, now links through tools/adam-links.py).'
   by: Chinmay
   date: '2026-10-04'
 why: 'Sprint 1-2 judging of 4 October (finding kind rest-scope, plan.tsv): APP-SETUP-BO-857-REST, BO-772, BO-772-REST

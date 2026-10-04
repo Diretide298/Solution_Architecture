@@ -11,7 +11,7 @@ decision:
     is the rule; 69 lineage entries carry `cache`.'
   by: Chinmay (fix round of 4 October, default taken by the contracts agent)
   date: '2026-10-04'
-why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (sources/audit-4-october/fix-s12/contracts.tsv, contracts area: 141
   tickets, 38 not buildable) under the fix-round brief; 18 tickets stopped on the service document''s own sentence that
   which resolution entry a writer evicts is not recorded (setRefundPolicy, setNavigation, restoreConfigVersion, setApiLicensing,
   setTaxInvoiceTemplate, setPrices, publishVenueMap). Root class R141, open since the 26 September audit.'

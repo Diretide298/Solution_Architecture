@@ -8,7 +8,7 @@ decision:
     a matrix routes it by subjectTypes.
   by: Chinmay (fix round of 4 October, default taken by the contracts agent)
   date: '2026-10-04'
-why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (sources/audit-4-october/fix-s12/contracts.tsv, contracts area: 141
   tickets, 38 not buildable) under the fix-round brief; NO ticket SVC-TENANCY-ROTA-2: the approvals.request kind CHECK had
   no value for a swap; CHG-CSP-036 decided an optional review step narrows an existing kind rather than adding one.'
 keys_touched:

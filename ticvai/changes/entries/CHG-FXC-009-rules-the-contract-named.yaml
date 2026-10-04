@@ -9,7 +9,7 @@ decision:
     and claimTableSession; DeliveryLocation and TableDefinition gain codeGeneration.
   by: Chinmay (fix round of 4 October, default taken by the contracts agent)
   date: '2026-10-04'
-why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (audit/ticvai/runs/fix-s12/contracts.tsv, contracts area: 141
+why: 'the Sprint 1-2 judging finding rows of 4 October 2026 (sources/audit-4-october/fix-s12/contracts.tsv, contracts area: 141
   tickets, 38 not buildable) under the fix-round brief; NO tickets VM-LEDGER-FISCAL-1, SVC-WHITELABEL-NAVIGATION-1, SVC-LEDGER-TAX-3
   (CF-133) and SVC-FNB-GUESTORDERING-5.'
 keys_touched:

@@ -1,0 +1,34 @@
+id: CHG-RFM-003
+date: '2026-10-04'
+source: audit
+kind: process
+summary: The fix round's judging files and brief are copied into git (sources/audit-4-october/fix-s12/) and the FXC, FXP
+  and FXS entries cite them there.
+decision:
+  what: 'Copy LEDGER.md, contracts.tsv, screens.tsv and plan.tsv of the Sprint 1-2 judging run and FIX-S12-BRIEF.md (checked:
+    no credentials) to sources/audit-4-october/fix-s12/, and repoint the 20 entries that cited audit/ (outside git). The
+    two mentions of the judge''s local packer name no path.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The check-cited-sources finding CS-OUTSIDE-GIT: 22 citations of audit/ in CHG-FXC, CHG-FXP and CHG-FXS entries on
+  the merged branch (e13d7ad5, 4 October); ticvai/CLAUDE.md rule 12: every source cited is inside git. Chinmay, 4 October:
+  the gate passes on fixes, not on baseline exceptions.'
+keys_touched:
+  files:
+  - sources/audit-4-october/fix-s12/LEDGER.md
+  - sources/audit-4-october/fix-s12/contracts.tsv
+  - sources/audit-4-october/fix-s12/screens.tsv
+  - sources/audit-4-october/fix-s12/plan.tsv
+  - sources/audit-4-october/fix-s12/FIX-S12-BRIEF.md
+root_class: 'new: citation-outside-git'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.
