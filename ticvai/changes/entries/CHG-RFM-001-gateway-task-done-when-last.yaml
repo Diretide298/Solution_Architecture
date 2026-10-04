@@ -1,0 +1,37 @@
+id: CHG-RFM-001
+date: '2026-10-04'
+source: audit
+kind: plan
+summary: AI-ENGINE-GATEWAY's text ends with its Done-when again; the routing sentences appended after it are moved
+  before it, word for word.
+decision:
+  what: Reorder only. The fragment that 7abd44b3 appended after "Done when" (from "half-open after 30 s) and the
+    class's fallback chain" to "store=false, no uploads or fine-tuning);") now stands before "Done when:". No scope,
+    date, owner, size, dependency, operation or build changed; no word added or removed.
+  by: Chinmay
+  date: '2026-10-04'
+proposed: '2026-10-04T12:00'
+why: 'The fix round list of 4 October (r1-fix-merge brief: "the AI-ENGINE-GATEWAY task text is garbled: routing
+  sentences were appended after Done when"). The garble came in with commit 7abd44b3 (CHG-R1S-002, CHG-R1S-016), whose
+  replacement of step (4) was appended at the end instead.'
+keys_touched:
+  tickets:
+  - AI-ENGINE-GATEWAY
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'new: task-text-order'
+tickets:
+  started: []
+  unstarted:
+  - AI-ENGINE-GATEWAY
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'A one-off repair of a mis-applied text replacement. Open for the lead: the moved fragment still restates
+    step (4) with a different uaeOnly fallback chain (OpenAI UAE only, CHG-R1S-002) from the one step (4) and the
+    Done-when keep (Core42 Compass, then OpenAI UAE). Which chain stands is a content decision this reorder does not
+    make; once made, step (4) is rewritten once and the fragment removed.'
+status: open
+notes: 'Batch RFM (r1-fix-merge), 4 October 2026. Ticket not started (Sprint 1 starts Monday 5 October).'
