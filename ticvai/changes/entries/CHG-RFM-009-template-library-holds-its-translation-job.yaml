@@ -1,0 +1,33 @@
+id: CHG-RFM-009
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: BO-785 holds the translation job it starts (translationJobId from its own proposeTranslations call, optional),
+  as CMS-011 does, so no inbound edge has to carry it.
+decision:
+  what: 'BO-785 Template Library gets entryState.params translationJobId, from BO-785, optional: the id comes back from
+    the screen''s own proposeTranslations call and getTranslationProposals reads the drafts by it; opened from the library
+    or the section home it needs none.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'check-screen-patterns finding P5 on the merged branch (e13d7ad5): BO-785 requires translationJobId (from navigation)
+  and none of its 2 inbound edges carries it; the screens agent bound getTranslationProposals on it (CHG-FXS-003) and the
+  derive made the job id a required navigation parameter. CMS-011 settled the same case on 2 October (CHG-CLN-016).'
+keys_touched:
+  screens:
+  - BO-785
+  operations:
+  - getTranslationProposals
+  - proposeTranslations
+root_class: 'new: entry-param-not-carried'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.

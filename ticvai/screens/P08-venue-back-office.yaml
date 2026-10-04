@@ -110736,6 +110736,13 @@ screens:
       sends somebody to support with the wrong question. A caller who can see the screen but lacks what
       an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`;
       `MARKETING_MANAGE` for `createMessageTemplate`.'
+  entryState:
+    params:
+    - name: translationJobId
+      from: BO-785
+      optional: true
+      notes: The translation job this screen started with proposeTranslations; getTranslationProposals reads its
+        drafts back by it (CHG-RFM-009, as CMS-011).
   apis:
   - operationId: listMessageTemplates
     contract: marketing-crm
