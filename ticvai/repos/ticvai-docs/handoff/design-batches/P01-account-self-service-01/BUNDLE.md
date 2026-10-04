@@ -195,7 +195,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WEB-WEB-016 |
+| Block | Block A · ticket #27739 (APP-WEB-WEB-016) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | form (compact density): **A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or Google, UAE Pass) and a way to register; `getGuestSession` is the one piece of context. Rebuilt 28 September: the … |
@@ -533,7 +533,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-017 |
+| Block | Block A · ticket #28810 (APP-WEB-WEB-017) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
@@ -835,7 +835,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `access` module |
-| Block | Block A · task APP-WEB-WEB-018 |
+| Block | Block A · ticket #28347 (APP-WEB-WEB-018) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act |
@@ -1150,7 +1150,7 @@ Also set there, as content the tenant writes: social links: platform.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-019 |
+| Block | Block A · ticket #28395 (APP-WEB-WEB-019) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMyOrders` reads the population and `getOrder` reads one of them — list, select, act |
@@ -1475,7 +1475,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-020 |
+| Block | Block A · ticket #28811 (APP-WEB-WEB-020) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act |

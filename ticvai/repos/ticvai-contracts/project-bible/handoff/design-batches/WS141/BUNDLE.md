@@ -507,7 +507,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | Block B · task VM-BO-797 |
+| Block | Block B · ticket #29139 (VM-BO-797) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -602,7 +602,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-SETUP-BO-798 |
+| Block | Block A · ticket #28942 (APP-SETUP-BO-798) |
 | Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE`, `ASSET_LIBRARY_MANAGE` (2 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): The copilot's knowledge settings edited in one form beside the collections it answers from and the questions it could not answer (defined 4 October 2026, CHG-FXS-001). |
@@ -821,7 +821,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-SETUP-BO-799 |
+| Block | Block A · ticket #28880 (APP-SETUP-BO-799) |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW`, `GUEST_VIEW` (1 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): The agent's queue with the open conversation, its transcript and the guest beside it (defined 4 October 2026, CHG-FXS-001). |

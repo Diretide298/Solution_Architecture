@@ -1180,7 +1180,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block B · task APP-ANALYTICS-ANL-047 |
+| Block | Block B · ticket #29062 (APP-ANALYTICS-ANL-047) |
 | Who uses it | venue staff holding `PERMISSION_MANAGE`, `PERMISSION_VIEW`, `REPORT_VIEW_TENANT` (1 configure, 1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAuthorisationPolicies` reads the population and the selected policy is edited in place — list, select, act. Chosen 2 October 2026 (CHG-SOT-013); the pack gave no directory. |
@@ -1761,7 +1761,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block B · task APP-ANALYTICS-ANL-050 |
+| Block | Block B · ticket #29177 (APP-ANALYTICS-ANL-050) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure retention separately for; Define) and no display directory — it is settings, not a population |

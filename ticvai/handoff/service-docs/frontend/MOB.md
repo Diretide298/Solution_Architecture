@@ -659,7 +659,7 @@
 |---|---|---|---|---|
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Reprint or resend tickets | `ORDER_REPRINT` |
-| `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Set a password: turn the guest-checkout order into an account | `None` |
+| `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Create an account: once verifyGuestEmail proves the code, move the guest-checkout order to the new account (CHG-R11-002) | `None` |
 | `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create an account for the order's email: sends a code | `None` |
 | `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Prove the code; then linkGuestCheckout moves the order to the account | `GUEST_VIEW` |
 

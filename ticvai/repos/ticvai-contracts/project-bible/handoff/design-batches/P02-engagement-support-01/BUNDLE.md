@@ -232,7 +232,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-MOB-GST-030 |
+| Block | Block A · ticket #28816 (APP-MOB-GST-030) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (comfortable density): `listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn |
@@ -390,7 +390,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ai` module |
-| Block | Block A · task APP-MOB-GST-031 |
+| Block | Block A · ticket #28864 (APP-MOB-GST-031) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): The conversation and its state (thinking, answered, handed to a person) are the content; the menu is only a shortcut (design-notes correction ai, CHG-SGU-016) |
@@ -649,7 +649,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-032 |
+| Block | Block A · ticket #28554 (APP-MOB-GST-032) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -952,7 +952,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ai` module |
-| Block | Block A · task APP-MOB-GST-033 |
+| Block | Block A · ticket #28863 (APP-MOB-GST-033) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): A conversation sheet: the question, the answer and its state are the content; nothing is configured or saved here (CHG-SGU-016) |
@@ -1179,7 +1179,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-MOB-GST-035 |
+| Block | Block A · ticket #28819 (APP-MOB-GST-035) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`submitReview`, `raiseMyCase`) and no read of a population — it is settings, not a list |
@@ -1408,7 +1408,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-MOB-GST-040 |
+| Block | Block A · ticket #27891 (APP-MOB-GST-040) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | commandCentre (comfortable density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -1650,7 +1650,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-051 |
+| Block | Block A · ticket #28701 (APP-MOB-GST-051) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | multiStepForm (comfortable density): The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food) and ends on *Make my plan* |
@@ -1897,7 +1897,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-052 |
+| Block | Block A · ticket #28160 (APP-MOB-GST-052) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2140,7 +2140,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-053 |
+| Block | Block A · ticket #28693 (APP-MOB-GST-053) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getCart` reads one of them — list, select, act |
@@ -2487,7 +2487,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Engagement & Support · wave 1 · needs the `ai` module |
-| Block | Block A · task APP-MOB-GST-054 |
+| Block | Block A · ticket #28862 (APP-MOB-GST-054) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act |

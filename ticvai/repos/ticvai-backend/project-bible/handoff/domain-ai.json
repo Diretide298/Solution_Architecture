@@ -4894,6 +4894,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\build-plan-presentation.md",
+   "title": "TICVAI complete build plan: presentation source",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\change-log-validation-18-september.md",
    "title": "Validating the developer team's Change Log",
    "status": "",
@@ -5439,7 +5445,7 @@
   "tables": 138,
   "screens": 194,
   "flows": 11,
-  "documents": 67,
+  "documents": 68,
   "openConflicts": 1
  }
 }

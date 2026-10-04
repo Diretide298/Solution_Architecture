@@ -143,7 +143,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Branding & Localisation · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-ADM-016 |
+| Block | Block A · ticket #27928 (APP-WL-ADM-016) |
 | Who uses it | ticvai staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (3 configure, 2 read, 1 operate) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listConfigVersions` reads the population and `getAppIcons` reads one of them — list, select, act |
@@ -601,7 +601,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Branding & Localisation · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-ADM-017 |
+| Block | Block A · ticket #27929 (APP-WL-ADM-017) |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `TENANT_CONFIGURE` (1 operate, 1 read, 1 configure) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCustomDomains` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -838,7 +838,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Branding & Localisation · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-ADM-018 |
+| Block | Block A · ticket #27886 (APP-WL-ADM-018) |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `TENANT_CONFIGURE` (1 operate, 1 read, 1 configure) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1093,7 +1093,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Branding & Localisation · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-019 |
+| Block | Block B · ticket #29181 (APP-CONSOLE-ADM-019) |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (1 operate, 2 read, 1 configure) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPlans` reads the population and `getPlan` reads one of them — list, select, act |

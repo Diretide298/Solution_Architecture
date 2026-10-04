@@ -167,6 +167,10 @@ if missing.any? || foreign.any?
   abort("REFUSED: #{missing.size} plan tickets in pms-map.json are not in OpenProject, #{foreign.size} are in " \
         "another project. Take them out of pms-map.json (the bundle then makes them again) and rebuild")
 end
+if ids.empty? && (left = WorkPackage.where(project_id: PROJECT_ID).count) > 0
+  abort("REFUSED: a fresh push (pms-map.json holds no pushed ticket) into project #{PROJECT_ID}, which still holds " \
+        "#{left} work packages; empty it first or name a new project (CHG-RFM-017)")
+end
 rel_say "ok: #{ids.size} keys, #{ids.values.uniq.size} distinct ids; all #{plan_ids.size} pushed plan tickets are in the project"
 
 created = {}      # key -> id made or taken in this run; :pending in a dry run for one still to make

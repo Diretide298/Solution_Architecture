@@ -602,7 +602,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 1 · needs the `analytics` module |
-| Block | Block A · task APP-SETUP-ANL-023 |
+| Block | Block A · ticket #28744 (APP-SETUP-ANL-023) |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): A canvas edited and saved as a whole (`updateDashboard` replaces the tiles), drawn 2 October 2026 from the client's dashboard specification (MATRIX 8.7.12: grid, gallery, data pane, field wells … |
@@ -1076,7 +1076,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 1 · needs the `analytics` module |
-| Block | Block A · task APP-SETUP-ANL-025 |
+| Block | Block A · ticket #28745 (APP-SETUP-ANL-025) |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Define whether) and no display directory — it is settings, not a population |

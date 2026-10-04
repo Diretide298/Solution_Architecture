@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 1 · needs the `core` module |
-| Block | Block A · task APP-CONSOLE-ADM-002 |
+| Block | Block A · ticket #28384 (APP-CONSOLE-ADM-002) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -401,7 +401,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 1 · needs the `core` module |
-| Block | Block A · task APP-CONSOLE-ADM-003 |
+| Block | Block A · ticket #28003 (APP-CONSOLE-ADM-003) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -888,7 +888,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-013 |
+| Block | Block B · ticket #29282 (APP-CONSOLE-ADM-013) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -1079,7 +1079,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-029 |
+| Block | Block B · ticket #29221 (APP-CONSOLE-ADM-029) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getRollout` reads one of them — list, select, act |

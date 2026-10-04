@@ -1252,7 +1252,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-534 |
+| Block | Block B · ticket #29548 (APP-CONSOLE-ADM-534) |
 | Who uses it | ticvai staff holding `AI_USE`, `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW`, `PLATFORM_TENANT_ACCESS`… (4 operate, 1 configure, 2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

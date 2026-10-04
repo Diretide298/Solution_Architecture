@@ -400,9 +400,12 @@ def main() -> int:
     # ticket a second time in the archived project, so the new project's id must be named.
     if a.project:
         bundle["project"] = a.project
-    if not pushed(mp) and bundle["project"] == ARCHIVED_PROJECT:
-        errors.append(f"pms-map.json holds no pushed ticket and the project is still #{ARCHIVED_PROJECT}, archived "
-                      "on 3 October: name the new project with --project <id>")
+    # Chinmay, 4 October (CHG-RFM-017): no new project after all; the old work packages of 153 are deleted in place and
+    # r1 goes into 153. So 153 is allowed when named with --project; op-release.rb refuses a fresh push into a
+    # project that still holds work packages, the check that sees the real state on the server.
+    if not pushed(mp) and bundle["project"] == ARCHIVED_PROJECT and not a.project:
+        errors.append(f"pms-map.json holds no pushed ticket and the project is #{ARCHIVED_PROJECT}: name it with "
+                      "--project to confirm a fresh push into it (op-release.rb refuses while it holds tickets)")
     errors += op10_problems()
     # CHG-REL-003: every task a developer pulls says what finishes it
     errors += [f"{t['key']}: its pointer has no done-when" for t in bundle["tickets"]

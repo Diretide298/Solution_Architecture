@@ -911,7 +911,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `ticketing` module |
-| Block | Block B · task APP-STAFF-EMP-018 |
+| Block | Block B · ticket #29662 (APP-STAFF-EMP-018) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act |

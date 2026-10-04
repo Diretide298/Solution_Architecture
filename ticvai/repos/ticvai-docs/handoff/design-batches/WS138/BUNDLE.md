@@ -507,7 +507,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-SETUP-BO-766 |
+| Block | Block A · ticket #28877 (APP-SETUP-BO-766) |
 | Who uses it | venue staff holding `AI_USE`, `MARKETING_MANAGE`, `MARKETING_SEND`, `MARKETING_VIEW` (2 operate, 1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): The campaign library beside a builder for the selected or new campaign (defined 4 October 2026 from CreateCampaignRequest, CHG-FXS-001). |
@@ -1308,7 +1308,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | Block B · task VM-BO-771 |
+| Block | Block B · ticket #29445 (VM-BO-771) |
 | Who uses it | venue staff holding `APPROVAL_REQUEST`, `MARKETING_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1437,7 +1437,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-SETUP-BO-772 |
+| Block | Block A · ticket #28878 (APP-SETUP-BO-772) |
 | Who uses it | venue staff holding `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW` (1 operate, 1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): One campaign's A/B test edited in place beside its results and the AI's recommendations on it (defined 4 October 2026 from Campaign.variants and Campaign.abTest, CHG-FXS-001). |

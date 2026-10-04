@@ -13,7 +13,7 @@
 | **Tables** | 138 |
 | **Screens** | 194 |
 | **Flows** | 11 |
-| **Documents** | 67 |
+| **Documents** | 68 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -590,6 +590,7 @@
 | [BL-073 — cookie consent: what to buy, what to build, what is ours either way](..\docs\active\bl-073-cookie-consent-20-september.md) |  | 1 |
 | [The event broker: RabbitMQ or Kafka](..\docs\active\broker-decision-pack.md) |  | 2 |
 | [Build plan — 20 September 2026](..\docs\active\build-plan-20-september.md) |  | 1 |
+| [TICVAI complete build plan: presentation source](..\docs\active\build-plan-presentation.md) |  | 1 |
 | [Validating the developer team's Change Log](..\docs\active\change-log-validation-18-september.md) |  | 2 |
 | [Configured limits: proposed values](..\docs\active\configured-limits-proposal.md) |  | 1 |
 | [Contract audit — every contract against the four things that must agree with it](..\docs\active\contract-audit-19-september.md) |  | 7 |

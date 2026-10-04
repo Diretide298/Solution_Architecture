@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1183 |
+| Block | Block A · ticket #28067 (APP-SETUP-BO-1183) |
 | Who uses it | venue staff holding `TRANSPORT_MANAGE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportStations` reads the population and the panel acts on one of them — list, select, act |
@@ -322,7 +322,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1184 |
+| Block | Block A · ticket #28068 (APP-SETUP-BO-1184) |
 | Who uses it | venue staff holding `TRANSPORT_MANAGE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportRoutes` reads the population and `getTransportRoute` reads one of them — list, select, act |
@@ -588,7 +588,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1185 |
+| Block | Block A · ticket #28069 (APP-SETUP-BO-1185) |
 | Who uses it | venue staff holding `TRANSPORT_PRICE` (1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): one fare table per route, replaced as a whole — settings that take effect on sales from a date, not a list |
@@ -830,7 +830,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1186 |
+| Block | Block A · ticket #28070 (APP-SETUP-BO-1186) |
 | Who uses it | venue staff holding `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportTimetables` reads the route's timetables and the panel acts on one of them — list, select, act |
@@ -1072,7 +1072,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 2 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1187 |
+| Block | Block A · ticket #28071 (APP-SETUP-BO-1187) |
 | Who uses it | venue staff holding `PERFORMANCE_CONFIGURE`, `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportRouteDepartures` reads the population and the panel acts on one departure — list, select, act |
@@ -1273,7 +1273,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1188 |
+| Block | Block A · ticket #28072 (APP-SETUP-BO-1188) |
 | Who uses it | venue staff holding `TRANSPORT_PRICE`, `TRANSPORT_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportPassTypes` reads the population and the panel acts on one of them — list, select, act |
@@ -1465,7 +1465,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-SETUP-BO-1189 |
+| Block | Block A · ticket #28073 (APP-SETUP-BO-1189) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): an upload, a preview and one apply — a staged change to the network, not a list |

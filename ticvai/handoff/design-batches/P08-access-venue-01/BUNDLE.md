@@ -157,7 +157,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `queue` module |
-| Block | Block A · task APP-SETUP-BO-001 |
+| Block | Block A · ticket #28442 (APP-SETUP-BO-001) |
 | Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueues` reads the population and `getEvent` reads one of them — list, select, act |
@@ -1363,7 +1363,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `marketing` module |
-| Block | Block A · task VM-BO-005 |
+| Block | Block A · ticket #28791 (VM-BO-005) |
 | Who uses it | venue staff holding `AI_USE`, `QUEUE_MANAGE`, `QUEUE_VIEW`, `REPORT_VIEW_VENUE` (2 operate, 1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -1712,7 +1712,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
-| Block | Block A · task APP-SETUP-BO-006 |
+| Block | Block A · ticket #28419 (APP-SETUP-BO-006) |
 | Who uses it | venue staff holding `PARKING_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAccessPoints` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1893,7 +1893,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `maintenance` module |
-| Block | Block A · task VM-BO-030 |
+| Block | Block A · ticket #28669 (VM-BO-030) |
 | Who uses it | venue staff holding `WORK_ORDER_VERIFY`, `WORK_ORDER_VIEW` (1 operate, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
@@ -2213,7 +2213,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
-| Block | Block A · task APP-SETUP-BO-032 |
+| Block | Block A · ticket #28420 (APP-SETUP-BO-032) |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAdmissionRules` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2538,7 +2538,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
-| Block | Block A · task APP-SETUP-BO-033 |
+| Block | Block A · ticket #28421 (APP-SETUP-BO-033) |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listBlacklist` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

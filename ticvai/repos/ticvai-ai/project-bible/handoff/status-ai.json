@@ -48,7 +48,7 @@
   "tables": 138,
   "screens": 194,
   "flows": 11,
-  "documents": 67,
+  "documents": 68,
   "openConflicts": 1
  },
  "metrics": {
@@ -344,6 +344,11 @@
   {
    "file": "docs\\active\\build-plan-20-september.md",
    "title": "Build plan \u2014 20 September 2026",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\build-plan-presentation.md",
+   "title": "TICVAI complete build plan: presentation source",
    "status": ""
   },
   {

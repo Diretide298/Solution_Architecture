@@ -120,7 +120,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-005 |
+| Block | Block A · ticket #27964 (APP-SETUP-ADM-005) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_TERMINATE`, `PLATFORM_TENANT_VIEW`… (3 configure, 2 read, 2 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -546,7 +546,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-006 |
+| Block | Block B · ticket #29279 (APP-CONSOLE-ADM-006) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW`, `SCOPE_MANAGE`, `SCOPE_VIEW` (3 read, 1 operate, 2 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getSsoConfig` reads one of them — list, select, act |
@@ -849,7 +849,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-007 |
+| Block | Block B · ticket #29280 (APP-CONSOLE-ADM-007) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (2 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act |
@@ -1128,7 +1128,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-008 |
+| Block | Block A · ticket #27965 (APP-SETUP-ADM-008) |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_VIEW`, `PLATFORM_PLAN_MANAGE`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (3 configure, 3 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPlans` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -1561,7 +1561,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-009 |
+| Block | Block B · ticket #29337 (APP-CONSOLE-ADM-009) |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSubscriptionInvoices` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -1811,7 +1811,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-010 |
+| Block | Block B · ticket #29283 (APP-CONSOLE-ADM-010) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (2 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getUsageMetering` reads one of them — list, select, act |
@@ -2018,7 +2018,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-011 |
+| Block | Block B · ticket #29284 (APP-CONSOLE-ADM-011) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (2 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -2312,7 +2312,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-012 |
+| Block | Block B · ticket #29281 (APP-CONSOLE-ADM-012) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -2569,7 +2569,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-015 |
+| Block | Block B · ticket #29577 (APP-CONSOLE-ADM-015) |
 | Who uses it | ticvai staff holding `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act |

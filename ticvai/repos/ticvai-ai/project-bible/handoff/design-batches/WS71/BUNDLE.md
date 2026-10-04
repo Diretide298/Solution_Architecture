@@ -1093,7 +1093,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 1 · needs the `analytics` module |
-| Block | Block A · task APP-SETUP-ANL-066 |
+| Block | Block A · ticket #28509 (APP-SETUP-ANL-066) |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `getSemanticModel` reads the model as a tree; the selection is a domain, dataset or field (CHG-SOT-012). |

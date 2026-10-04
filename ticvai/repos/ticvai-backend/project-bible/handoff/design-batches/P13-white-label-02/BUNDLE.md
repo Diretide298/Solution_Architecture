@@ -184,7 +184,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-013 |
+| Block | Block A · ticket #28845 (APP-WL-CMS-013) |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setSeoMetadata`) and no read of a population — it is settings, not a list |
@@ -411,7 +411,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-011 |
+| Block | Block A · ticket #27926 (APP-WL-CMS-011) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setLanguages`) and no read of a population — it is settings, not a list |
@@ -664,7 +664,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-012 |
+| Block | Block A · ticket #27900 (APP-WL-CMS-012) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing |
@@ -806,7 +806,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-014 |
+| Block | Block A · ticket #27906 (APP-WL-CMS-014) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_PUBLISH` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1072,7 +1072,7 @@ Also apply: 9 for P13 · White Label, 8 for all of P13, 29 for every app (sectio
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-015 |
+| Block | Block A · ticket #27901 (APP-WL-CMS-015) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_PUBLISH` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listConfigVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1249,7 +1249,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-016 |
+| Block | Block A · ticket #27907 (APP-WL-CMS-016) |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TENANT_CONFIGURE` (1 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1642,7 +1642,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-017 |
+| Block | Block A · ticket #27902 (APP-WL-CMS-017) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listCustomDomains` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1877,7 +1877,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-018 |
+| Block | Block A · ticket #28846 (APP-WL-CMS-018) |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW`, `TENANT_CONFIGURE` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPolicies` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2187,7 +2187,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-019 |
+| Block | Block A · ticket #27769 (APP-WL-CMS-019) |
 | Who uses it | venue staff holding `ROLE_MANAGE`, `USER_MANAGE` (2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2366,7 +2366,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-101 |
+| Block | Block A · ticket #27916 (APP-WL-CMS-101) |
 | Who uses it | venue staff holding `AI_USE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (1 operate, 1 read, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listGuidedChoices` reads the venue's set-ups and the editor acts on one of them — list, select, act |

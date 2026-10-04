@@ -51,5 +51,11 @@ stays mandatory in every residency class.
 - **Cost (Azure, a month):** the 1 October base of $5,553.50 without high availability and $8,047.50 with it, less
   the $700 AI CPU pool, plus the GPU nodes ($473.77 / $947.54): **$5,327.27 without high availability, $8,295.04
   with it.**
+- **The cost basis is staged** ("Staged: start ~$1.9k"; CHG-R11-003): launch on Stage 1 (two D8s v5 nodes with every
+  deployable, Redis, Qdrant and the broker in-cluster, a load balancer, PostgreSQL with its zone-redundant standby, the
+  GPU node, and a launch-sized entry, storage and logs) and grow to the full cell (Stage 2) later. ADR-0061's replica
+  floors apply from Stage 2; at Stage 1 one replica per deployable across the two nodes. Shape from the 25 September
+  AWS hosting-cost board (Stage 0 one m6i.4xlarge $716; Stage 1 two servers + LB + Postgres Multi-AZ about $1,053
+  + GPU; Stage 2 the shared cell).
 - The Presidio link given was github.com/data-privacy-stack/presidio: confirm it is the Microsoft Presidio project
   before pinning a release.

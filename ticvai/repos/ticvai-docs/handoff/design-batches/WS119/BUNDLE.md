@@ -357,7 +357,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-500 |
+| Block | Block A · ticket #28971 (APP-SETUP-ADM-500) |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields; Options conceptually) and no display directory — it is settings, not a population |
@@ -960,7 +960,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-503 |
+| Block | Block B · ticket #29073 (APP-CONSOLE-ADM-503) |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): Forecast values of one product and timeslot demand definition, picked on the screen (4 October 2026, CHG-FXS-004). |
@@ -1189,7 +1189,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-504 |
+| Block | Block B · ticket #29074 (APP-CONSOLE-ADM-504) |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): Forecast values of one channel booking pace definition, picked on the screen (4 October 2026, CHG-FXS-004). |
@@ -1408,7 +1408,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-505 |
+| Block | Block B · ticket #29075 (APP-CONSOLE-ADM-505) |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): Forecast values of one revenue definition, picked on the screen (4 October 2026, CHG-FXS-004). |
@@ -1640,7 +1640,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-506 |
+| Block | Block A · ticket #28972 (APP-SETUP-ADM-506) |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): Forecast values of one any definition, picked on the screen (4 October 2026, CHG-FXS-004). |
@@ -2120,7 +2120,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | AI · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-508 |
+| Block | Block A · ticket #28973 (APP-SETUP-ADM-508) |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |

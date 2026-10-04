@@ -902,7 +902,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | Block B · task APP-STAFF-EMP-046 |
+| Block | Block B · ticket #29039 (APP-STAFF-EMP-046) |
 | Who uses it | venue |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`logout`) and no read of a population — it is settings, not a list |

@@ -20312,7 +20312,8 @@
    "applied_by": [
     "CHG-R1S-001",
     "CHG-R1S-002"
-   ]
+   ],
+   "superseded": "4 October (Chinmay, CHG-R11-001): we host the embedding model (BGE-M3), its reranker, Presidio and the Arabic NER on one AI GPU node pool in our cell in UAE North, which also carries the ticvai-ai pods (no AI CPU pool, no Presidio pool); never an LLM unless a client asks. The provider-embeddings line of 3 October (CHG-R1S-026) was a mis-recording (docs/active/decisions/answers-3-october-gate-and-hosting.md, correction of 4 October)."
   }
  ]
 }

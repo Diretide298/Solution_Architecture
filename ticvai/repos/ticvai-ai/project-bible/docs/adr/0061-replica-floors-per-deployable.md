@@ -8,6 +8,25 @@
 
 ---
 
+## Amended 4 October 2026: the floors apply from Stage 2; Stage 1 runs one replica per deployable
+
+**Decided by Chinmay, 4 October 2026** (change entry CHG-R11-003: *"Staged: start ~$1.9k"*). The platform launches on
+**Stage 1** and grows to the full cell (**Stage 2**) later; the staged cost is the Stages sheet of
+`handoff/hld-lld/TICVAI - Azure Cloud Specs & Cost.xlsx`.
+
+- **Stage 1 (launch):** two D8s v5 nodes, one per zone, run every deployable, Redis, Qdrant and the broker
+  in-cluster, from the same images and Helm chart as the cell, plus the AI GPU node (CHG-R11-001). The floors
+  below are **relaxed to one replica per deployable** across the two nodes; `ticvai-ai` runs one real-time and
+  one interactive replica, batch from zero. A node or zone loss is an outage until the pods reschedule.
+  PostgreSQL keeps its zone-redundant standby (ADR-0060 holds at every stage).
+- **Stage 2 (the full cell):** the floors below apply unchanged.
+- **The move to Stage 2** happens when any of these holds: a paying venue needs ADR-0060's availability targets
+  (99.95% for cloud commerce); traffic beyond Stage 1's capacity is sustained (CPU above about 70% on both nodes
+  at the daily peak for a week, or the GPU node at its CPU or memory limit); a large on-sale is booked; or a
+  client needs the Premium WAF or a private origin.
+
+---
+
 ## Context
 
 **The floors were computed per service.**
@@ -42,6 +61,13 @@ deployable.**
 | `ticvai-ai` interactive | 1 | Assistants tolerate a short outage |
 | `ticvai-ai` batch | 0 | Scales from zero on queue depth |
 | **Total, small cell** | **12** | Down from 34 per service; up from the 10 in `sizing.json` today |
+
+**Where the `ticvai-ai` floors run (4 October 2026, Chinmay, CHG-R11-001):** on the AI GPU node pool, the only AI
+pool ("Naaa dont keep AI CPU node at all"): Azure NV6ads A10 v5 (6 vCPU, 55 GB, 4 GB of GPU memory), one node
+without high availability and two with it, one per zone. Each AI pod requests about 1 vCPU (they mostly wait on
+the provider's streamed answer), beside Presidio, the Arabic NER, BGE-M3 and its reranker on the same node; a
+large cell's third real-time replica fits on the two nodes. The floors themselves are unchanged. The pod size is
+an assumption until the Sprint 2 benchmark; the step up is NV12ads A10 v5.
 
 - Above the floor, each deployable autoscales on RPS (not CPU), as ADR-0032 says.
 - **Peak, from the package's own arithmetic** (`sizing.json`, large cell, 7,036 rps): `commerce` 17, `operations` 12, `access` 3, `ticvai-ai` 2, `workers` 2 = 36, against 50 per service. It rests on the `rpsPerReplica` hypotheses until the benchmark replaces them.

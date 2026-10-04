@@ -719,7 +719,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `maintenance` module |
-| Block | Block A · task VM-BO-069 |
+| Block | Block A · ticket #28667 (VM-BO-069) |
 | Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW` (1 configure, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAssets` reads the population and `getAsset` reads one of them — list, select, act |
@@ -1548,7 +1548,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `seating` module |
-| Block | Block A · task APP-SETUP-BO-092 |
+| Block | Block A · ticket #28077 (APP-SETUP-BO-092) |
 | Who uses it | venue staff holding `VENUE_MAP_MANAGE`, `VENUE_MAP_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listVenueMaps` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1733,7 +1733,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `seating` module |
-| Block | Block A · task APP-SETUP-BO-093 |
+| Block | Block A · ticket #28078 (APP-SETUP-BO-093) |
 | Who uses it | venue staff holding `AI_USE`, `ASSET_LIBRARY_MANAGE`, `VENUE_MAP_MANAGE`, `VENUE_MAP_VIEW` (1 operate, 2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`importVenueGeometry`, `proposeVenueLabels`, `acceptVenueLabelProposals`) and no read of a population — it is settings, not a list |
@@ -2098,7 +2098,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `seating` module |
-| Block | Block A · task APP-SETUP-BO-094 |
+| Block | Block A · ticket #28079 (APP-SETUP-BO-094) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `PRODUCT_VIEW`, `VENUE_MAP_MANAGE`, `VENUE_MAP_PUBLISH`, `VENUE_MAP_VIEW` (3 configure, 3 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getVenueMap` reads one record and nothing reads a population — the screen is about that one thing |

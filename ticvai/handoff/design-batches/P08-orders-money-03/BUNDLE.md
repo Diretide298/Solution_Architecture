@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-BO-075 |
+| Block | Block A · ticket #28487 (APP-SETUP-BO-075) |
 | Who uses it | venue staff holding `ACCOUNT_CONFIGURE`, `LEDGER_VIEW`, `TAX_CONFIGURE` (2 configure, 1 read); in the flows as finance controller, platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -704,7 +704,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-BO-077 |
+| Block | Block A · ticket #28485 (APP-SETUP-BO-077) |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `LEDGER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `reviewPriceVariance` decides items that `listFxRates` queues — every row is waiting for a person, so the empty state is success |
@@ -1466,7 +1466,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-101 |
+| Block | Block A · ticket #28283 (VM-BO-101) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `SETTLEMENT_VIEW` (2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listOrders` reads the population and `getVenueSettings` reads one of them — list, select, act |

@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-032 |
+| Block | Block B · ticket #29555 (APP-PARTNER-PTR-032) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each agreement should show) — counts over a population, then the population |
@@ -338,7 +338,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-033 |
+| Block | Block B · ticket #29403 (APP-PARTNER-PTR-033) |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |
@@ -481,7 +481,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-034 |
+| Block | Block B · ticket #29409 (APP-PARTNER-PTR-034) |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population |
@@ -604,7 +604,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-038 |
+| Block | Block B · ticket #29410 (APP-PARTNER-PTR-038) |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -736,7 +736,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-040 |
+| Block | Block B · ticket #29100 (APP-PARTNER-PTR-040) |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Capture) and no display directory — it is settings, not a population |
@@ -894,7 +894,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-041 |
+| Block | Block B · ticket #29556 (APP-PARTNER-PTR-041) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

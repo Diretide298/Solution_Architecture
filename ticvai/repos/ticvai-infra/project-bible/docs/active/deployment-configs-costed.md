@@ -284,8 +284,50 @@ one node and three, and it costs recall — **a decision, not a default.**
 | Qdrant self-hosted, 3 nodes HA (4 vCPU / 16 GB each) | $694 | $596 |
 | Qdrant self-hosted, 1 node | $231 | $199 |
 | AI cache tier — `cache:answer` + `cache:embedding`, 8 GB | $274 | $286 |
-| Index and embedding workers, 2 × 2 vCPU / 4 GB batch | $180 | $152 |
-| **AI tier total, HA** | **$1,148** | **$1,034** |
+| AI GPU node, two with HA (one per zone): the `ticvai-ai` pods, Presidio, the Arabic NER, BGE-M3 and its reranker (4 October, CHG-R11-001); AWS me-central-1 g6.2xlarge class (1 × L4 24 GB, 8 vCPU) | to confirm | not priced |
+| **AI tier total, HA** | **$968 + the GPU nodes** | **$882 + the GPU nodes** |
+
+**Staged, 4 October 2026 (Chinmay, CHG-R11-003: "Staged: start ~$1.9k").** The platform launches on **Stage 1**
+and grows to the full cell (**Stage 2**) later, on Azure UAE North (the Stages sheet of the cost workbook,
+`tools/build-hld-lld.py`, priced line by line from the workbook's unit prices or the Azure Retail Prices API of
+4 October). Shape from the 25 September AWS hosting-cost board (Stage 0 one m6i.4xlarge, $716; Stage 1 two servers,
+a load balancer, PostgreSQL Multi-AZ, about $1,053 plus the GPU; Stage 2 the shared cell).
+
+| Stage 1 line (Azure UAE North, a month) | USD | Price from |
+|---|---:|---|
+| AKS control plane, Free tier | 0.00 | workbook |
+| 2 x D8s v5 nodes (one per zone): every deployable, Redis, Qdrant and the broker in-cluster, one replica each | 700.00 | workbook |
+| Qdrant P15 256 GB, broker P10 128 GB, Redis P10 128 GB disks | 81.00 | workbook |
+| Standard load balancer (5 rules, about 1 TB processed) | 23.25 | Retail API |
+| Static egress IP (Standard IPv4) on the load balancer's outbound rule | 3.65 | Retail API |
+| PostgreSQL Flexible D4ds v5, primary + zone-redundant standby | 640.00 | workbook |
+| PostgreSQL storage, 2 x 256 GB | 72.00 | workbook |
+| AI GPU node NV6ads A10 v5 (ticvai-ai, Presidio, Arabic NER, BGE-M3, reranker) | 473.77 | Retail API |
+| Blob Hot LRS 2 TB | 45.00 | workbook |
+| Container Registry Standard | 20.00 | workbook |
+| Key Vault Standard | 5.00 | workbook |
+| Front Door Standard (base $35, 500 GB, about 10 million requests; custom WAF rules) | 100.80 | Retail API |
+| Bandwidth to providers | 20.00 | workbook |
+| Log Analytics, about 20 GB | 70.00 | workbook |
+| **Stage 1 production** | **2,254.47** | |
+| Minimal pre-production (1 x D8s v5, PostgreSQL D2ds v5 no standby, Blob 500 GB, Key Vault; the rest shared) | 566.00 | workbook |
+| **Stage 1 in all** | **2,820.47** | |
+| Stage 2, the full cell (production) | 5,327.27 without zone HA, 8,295.04 with it | workbook |
+| Stage 0, reference only: 1 x D16s v5 + the GPU node | 1,161.43 | Retail API |
+
+Chinmay's ~$1.9k was the servers, PostgreSQL and the GPU node alone ($1,885.77 above). ADR-0061's floors apply from
+Stage 2 (one replica per deployable at Stage 1); PostgreSQL stays zone-redundant at every stage (ADR-0060). The move
+to Stage 2: a paying venue needing ADR-0060's targets, traffic beyond Stage 1 sustained, a large on-sale booked, or
+a client needing the Premium WAF or a private origin. On AWS (me-central-1) the stages keep the same shape; the GPU
+node is a g6.2xlarge-class instance whose price and availability are to confirm.
+
+**Corrected 4 October 2026 (Chinmay, CHG-R11-001).** We host the embedding model (BGE-M3), its reranker, Presidio
+and the Arabic NER on a GPU node pool in our cell in the UAE, on Azure (UAE North) and on AWS (me-central-1),
+and never an LLM. The CPU "index and embedding workers" line ($180 / $152) is gone. On AWS the node is a
+g6.2xlarge-class instance (g6.xlarge's 4 vCPU is too few for the AI pods); its price and its availability in
+me-central-1 are to confirm, so no figure is given. Azure, the priced platform: NV6ads A10 v5 at $473.77 a month a
+node, totals $5,327.27 a month without high availability and $8,295.04 with it (`handoff/hld-lld/`, the cost
+workbook built by `tools/build-hld-lld.py`).
 
 **Neither provider offers managed Qdrant.** Both mean self-hosting on the compute tier or buying
 Qdrant Cloud, and **the 12 August minute made this conditional**: Qdrant was proposed over Postgres

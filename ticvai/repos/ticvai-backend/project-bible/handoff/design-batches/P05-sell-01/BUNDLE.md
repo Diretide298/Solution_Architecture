@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · task APP-KIOSK-KSK-001 |
+| Block | Block A · ticket #28168 (APP-KIOSK-KSK-001) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): **the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision |
@@ -309,7 +309,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | Block B · task APP-KIOSK-KSK-002 |
+| Block | Block B · ticket #29643 (APP-KIOSK-KSK-002) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -483,7 +483,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | Block B · task APP-KIOSK-KSK-003 |
+| Block | Block B · ticket #29657 (APP-KIOSK-KSK-003) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): `listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -640,7 +640,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | Block B · task APP-KIOSK-KSK-004 |
+| Block | Block B · ticket #29658 (APP-KIOSK-KSK-004) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): `listProductVariants` reads the population and `getAvailability` reads one of them — list, select, act |

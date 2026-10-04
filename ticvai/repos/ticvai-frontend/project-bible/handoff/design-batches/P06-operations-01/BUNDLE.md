@@ -178,7 +178,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | Block A · task APP-STAFF-EMP-001 |
+| Block | Block A · ticket #27758 (APP-STAFF-EMP-001) |
 | Who uses it | venue; in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | form (comfortable density): A sign-in on a shared handheld: number and PIN, the venue's SSO where it has one, the code only when a permission demands it - a form, not a list. |
@@ -426,7 +426,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | Block A · task APP-STAFF-EMP-002 |
+| Block | Block A · ticket #27755 (APP-STAFF-EMP-002) |
 | Who uses it | venue; in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act |
@@ -582,7 +582,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | Block A · task APP-STAFF-EMP-003 |
+| Block | Block A · ticket #28652 (APP-STAFF-EMP-003) |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`, `REPORT_VIEW_WORKSTATION` (1 configure, 2 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | approvalInbox (comfortable density): `approveShiftOpen` decides items that `listIncidents` queues — every row is waiting for a person, so the empty state is success |
@@ -1389,7 +1389,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | Block A · task APP-STAFF-EMP-004 |
+| Block | Block A · ticket #28659 (APP-STAFF-EMP-004) |
 | Who uses it | venue staff holding `MAINTENANCE_EXECUTE`, `WORK_ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor, technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
@@ -1645,7 +1645,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | Block A · task APP-STAFF-EMP-005 |
+| Block | Block A · ticket #28662 (APP-STAFF-EMP-005) |
 | Who uses it | venue staff holding `MAINTENANCE_EXECUTE`, `PROCUREMENT_REQUEST`, `PRODUCT_VIEW`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW` (2 operate, 2 read, 1 configure); in the flows as supervisor, technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |

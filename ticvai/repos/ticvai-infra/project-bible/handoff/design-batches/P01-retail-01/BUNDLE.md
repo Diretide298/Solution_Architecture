@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Retail · wave 1 · needs the `retail` module |
-| Block | Block A · task APP-WEB-WEB-033 |
+| Block | Block A · ticket #28225 (APP-WEB-WEB-033) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -397,7 +397,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Retail · wave 1 · needs the `retail` module |
-| Block | Block A · task APP-WEB-WEB-042 |
+| Block | Block A · ticket #28609 (APP-WEB-WEB-042) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -640,7 +640,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `ticketing` module |
-| Block | Block A · task VM-BO-023 |
+| Block | Block A · ticket #28727 (VM-BO-023) |
 | Who uses it | venue staff holding `LEDGER_POST`, `LEDGER_VIEW`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE`, `ORDER_MODIFY`, `ORDER_REFUND`… (9 operate, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listOrderRefunds` reads the population and `getOrder` reads one of them — list, select, act |
@@ -1105,7 +1105,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `ticketing` module |
-| Block | Block A · task VM-BO-024 |
+| Block | Block A · ticket #28582 (VM-BO-024) |
 | Who uses it | venue staff holding `LEDGER_POST`, `ORDER_CREATE`, `ORDER_VIEW`, `SHIFT_CLOSE` (3 operate, 1 read); in the flows as cashier, finance controller |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`createPayment`, `addTip`, `capturePayment`) and no read of a population — it is settings, not a list |
@@ -2406,7 +2406,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `analytics` module |
-| Block | Block A · task APP-SETUP-BO-029 |
+| Block | Block A · ticket #28737 (APP-SETUP-BO-029) |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReports` reads the population and `getFinancialReport` reads one of them — list, select, act |

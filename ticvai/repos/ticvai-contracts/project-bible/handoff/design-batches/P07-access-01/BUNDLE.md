@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SCANNER-SCN-001 |
+| Block | Block A · ticket #27761 (APP-SCANNER-SCN-001) |
 | Who uses it | venue; in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | form (comfortable density): PIN or badge on a gate scanner, then the role - a form, not a list. |
@@ -547,7 +547,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | Block A · task APP-SCANNER-SCN-003 |
+| Block | Block A · ticket #28891 (APP-SCANNER-SCN-003) |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `TICKET_LOOKUP` (3 operate); in the flows as contractor, gate operator, guest, partner |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -1388,7 +1388,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `core` module |
-| Block | Block B · task APP-SCANNER-SCN-011 |
+| Block | Block B · ticket #29193 (APP-SCANNER-SCN-011) |
 | Who uses it | venue staff holding `ACCESS_VALIDATE`, `TICKET_LOOKUP` (2 operate) |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getCrossRegionEntitlement` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1771,7 +1771,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | Block A · task APP-SCANNER-SCN-014 |
+| Block | Block A · ticket #28373 (APP-SCANNER-SCN-014) |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `ORDER_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (4 operate, 1 read); in the flows as gate operator, guest |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listSyncRejections` reads the population and `getOfflinePackage` reads one of them — list, select, act |

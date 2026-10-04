@@ -118,7 +118,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-102 |
+| Block | Block A · ticket #27908 (APP-WL-CMS-102) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | multiStepForm (compact density): `getSiteSetupProgress` holds the seven steps and their state, and `setSiteSetupProgress` saves each one — progress, fields per step, review, submit |
@@ -416,7 +416,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-103 |
+| Block | Block A · ticket #28337 (APP-WL-CMS-103) |
 | Who uses it | venue staff holding `GUEST_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (2 read, 3 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listBookingFlows` reads the venue's flows and `getBookingFlow` reads one of them to compose — list, select, act |
@@ -852,7 +852,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WL-CMS-104 |
+| Block | Block A · ticket #27914 (APP-WL-CMS-104) |
 | Who uses it | venue staff holding `AI_USE`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (1 operate, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listAppBuilds` reads the builds and `getAppBuild` reads one — list, select, act; the checklist sits above the list |

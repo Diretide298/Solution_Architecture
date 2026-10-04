@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | Block A · task APP-CONSOLE-ADM-001 |
+| Block | Block A · ticket #27783 (APP-CONSOLE-ADM-001) |
 | Who uses it | ticvai; in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | form (compact density): A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse. |
@@ -400,7 +400,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-020 |
+| Block | Block B · ticket #29066 (APP-CONSOLE-ADM-020) |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `USER_MANAGE` (1 operate, 1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -624,7 +624,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-021 |
+| Block | Block B · ticket #29068 (APP-CONSOLE-ADM-021) |
 | Who uses it | ticvai staff holding `PERMISSION_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `ROLE_MANAGE` (2 read, 1 operate, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -842,7 +842,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-699 |
+| Block | Block B · ticket #29070 (APP-CONSOLE-ADM-699) |
 | Who uses it | ticvai |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): Two short lists the operator acts on, their own methods and their own sessions, with the account they are signed in as above them. |

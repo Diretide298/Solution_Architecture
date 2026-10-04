@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 3 · needs the `core` module |
-| Block | Block B · task VM-BO-088 |
+| Block | Block B · ticket #29434 (VM-BO-088) |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listIndexJobs` reads the population and `getApprovalAnalytics` reads one of them — list, select, act |
@@ -282,7 +282,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-106 |
+| Block | Block A · ticket #29003 (VM-BO-106) |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE`, `ROLE_MANAGE`, `TENANT_VIEW` (1 operate, 1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act |

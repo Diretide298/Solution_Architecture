@@ -174,7 +174,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
-| Block | Block B · task APP-SIGNUP-SGN-018 |
+| Block | Block B · ticket #29376 (APP-SIGNUP-SGN-018) |
 | Who uses it | public |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -276,7 +276,7 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
-| Block | Block B · task APP-SIGNUP-SGN-019 |
+| Block | Block B · ticket #29391 (APP-SIGNUP-SGN-019) |
 | Who uses it | public staff holding `PLATFORM_TENANT_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -392,7 +392,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
-| Block | Block B · task APP-SIGNUP-SGN-020 |
+| Block | Block B · ticket #29392 (APP-SIGNUP-SGN-020) |
 | Who uses it | public staff holding `TENANT_CONFIGURE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): One record (the billing entity) entered and saved on the application; no population to list (CHG-SOT-017). |
@@ -732,7 +732,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
-| Block | Block B · task APP-SIGNUP-SGN-022 |
+| Block | Block B · ticket #29395 (APP-SIGNUP-SGN-022) |
 | Who uses it | public staff holding `PLATFORM_TENANT_VIEW` (1 read) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -879,7 +879,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
-| Block | Block B · task APP-SIGNUP-SGN-023 |
+| Block | Block B · ticket #29393 (APP-SIGNUP-SGN-023) |
 | Who uses it | public staff holding `PLATFORM_CELL_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1028,7 +1028,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
-| Block | Block B · task APP-SIGNUP-SGN-024 |
+| Block | Block B · ticket #29398 (APP-SIGNUP-SGN-024) |
 | Who uses it | public staff holding `PLATFORM_TENANT_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

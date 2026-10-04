@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform Ops · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-318 |
+| Block | Block B · ticket #29214 (APP-CONSOLE-ADM-318) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listDeadLetters` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

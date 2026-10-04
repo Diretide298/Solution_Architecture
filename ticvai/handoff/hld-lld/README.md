@@ -12,6 +12,8 @@
 
 Monthly totals (USD, prices of 30 September 2026): with high availability $8,295.04; without zone-level
 HA $5,327.27 (PostgreSQL stays zone-redundant; recomputed 1 and 4 October, see the sheet's notes; the AI pool is one GPU node pool since 4 October, CHG-R11-001);
-pre-production $1,535.50.
+pre-production $1,535.50. **Staged (CHG-R11-003):** the platform launches on Stage 1, $2,254.47
+a month in production plus $566.00 of pre-production (the workbook's Stages sheet); the totals above
+are Stage 2, the full cell.
 
 The polished drawings are made in Claude Design from [`../design-batches/HLD-LLD/`](../design-batches/HLD-LLD/BRIEF.md).

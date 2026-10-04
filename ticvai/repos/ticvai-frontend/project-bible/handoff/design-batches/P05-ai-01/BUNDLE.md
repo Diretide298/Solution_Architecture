@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | AI · wave 1 · needs the `ai` module |
-| Block | Block A · task APP-KIOSK-KSK-015 |
+| Block | Block A · ticket #28867 (APP-KIOSK-KSK-015) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): A conversation: the question, the answer and its product cards are the content (CHG-SGU-016) |

@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-284 |
+| Block | Block B · ticket #29857 (VM-BO-284) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Identify) and no metric row |
@@ -638,7 +638,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-285 |
+| Block | Block B · ticket #29249 (VM-BO-285) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PRODUCT_CONFIGURE` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Define; Configure) and no display directory — it is settings, not a population |
@@ -826,7 +826,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-286 |
+| Block | Block B · ticket #29240 (VM-BO-286) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether qualification requires) and no display directory — it is settings, not a population |
@@ -947,7 +947,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-287 |
+| Block | Block B · ticket #29241 (VM-BO-287) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1053,7 +1053,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-288 |
+| Block | Block B · ticket #29880 (VM-BO-288) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1215,7 +1215,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-289 |
+| Block | Block B · ticket #29788 (VM-BO-289) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_TENANT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Maintain counters such as) and no metric row |
@@ -1421,7 +1421,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-290 |
+| Block | Block B · ticket #29242 (VM-BO-290) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Possible configured action) and no display directory — it is settings, not a population |
@@ -1559,7 +1559,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-291 |
+| Block | Block B · ticket #29883 (VM-BO-291) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_TENANT_VIEW`, `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE` (3 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure sale through; Configure) and no display directory — it is settings, not a population |
@@ -1745,7 +1745,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-292 |
+| Block | Block B · ticket #29265 (VM-BO-292) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; At renewal, configure whether) and no display directory — it is settings, not a population |
@@ -1875,7 +1875,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | Block B · task VM-BO-293 |
+| Block | Block B · ticket #29864 (VM-BO-293) |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population |

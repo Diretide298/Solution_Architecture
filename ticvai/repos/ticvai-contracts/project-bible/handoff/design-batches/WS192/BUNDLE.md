@@ -598,7 +598,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-BO-1146 |
+| Block | Block A · ticket #28037 (APP-SETUP-BO-1146) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `REGION_CONFIGURE`, `WALLET_CONFIGURE`, `WALLET_VIEW` (2 read, 2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Refund policy can define) and no display directory — it is settings, not a population |

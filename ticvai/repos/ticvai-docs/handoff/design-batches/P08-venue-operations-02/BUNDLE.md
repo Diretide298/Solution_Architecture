@@ -180,7 +180,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 2 · needs the `core` module |
-| Block | Block B · task VM-BO-129 |
+| Block | Block B · ticket #29117 (VM-BO-129) |
 | Who uses it | venue staff holding `DEVICE_MANAGE`, `DEVICE_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE` (2 configure, 2 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listWorkstations` reads the population and `getWorkstationHealth` reads one of them — list, select, act |
@@ -404,7 +404,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-130 |
+| Block | Block A · ticket #28139 (VM-BO-130) |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (1 operate, 2 read, 1 configure); in the flows as cashier, technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -624,7 +624,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 2 · needs the `core` module |
-| Block | Block B · task VM-BO-131 |
+| Block | Block B · ticket #29115 (VM-BO-131) |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setConnectivityThresholds`) and no read of a population — it is settings, not a list |
@@ -958,7 +958,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-SETUP-BO-133 |
+| Block | Block A · ticket #28738 (APP-SETUP-BO-133) |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `ORDER_MODIFY`, `ORDER_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` (3 read, 2 operate, 1 configure); in the flows as cashier |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `decideApprovalRequest` decides items that `listSyncRejections` queues — every row is waiting for a person, so the empty state is success |

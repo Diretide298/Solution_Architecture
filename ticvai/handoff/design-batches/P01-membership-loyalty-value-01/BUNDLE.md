@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `retail` module |
-| Block | Block A · task APP-WEB-WEB-021 |
+| Block | Block A · ticket #28310 (APP-WEB-WEB-021) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act |
@@ -416,7 +416,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-022 |
+| Block | Block A · ticket #28147 (APP-WEB-WEB-022) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getProduct` reads one of them — list, select, act |
@@ -613,7 +613,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-023 |
+| Block | Block A · ticket #28295 (APP-WEB-WEB-023) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestMemberships` reads the population and `getMyMemberships` reads one of them — list, select, act |
@@ -835,7 +835,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-024 |
+| Block | Block A · ticket #28812 (APP-WEB-WEB-024) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
@@ -1232,7 +1232,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-043 |
+| Block | Block A · ticket #28804 (APP-WEB-WEB-043) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |

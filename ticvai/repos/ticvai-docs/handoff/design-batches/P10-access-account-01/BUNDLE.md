@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 1 · needs the `partner` module |
-| Block | Block A · task APP-PARTNER-PTR-001 |
+| Block | Block A · ticket #27785 (APP-PARTNER-PTR-001) |
 | Who uses it | partner; in the flows as platform admin |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | form (compact density): A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse. |
@@ -442,7 +442,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 2 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-003 |
+| Block | Block B · ticket #29094 (APP-PARTNER-PTR-003) |
 | Who uses it | partner staff holding `USER_MANAGE` (1 configure) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -771,7 +771,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 3 · needs the `developerApi` module |
-| Block | Block B · task APP-PARTNER-PTR-019 |
+| Block | Block B · ticket #29580 (APP-PARTNER-PTR-019) |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listApiClients` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1027,7 +1027,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-020 |
+| Block | Block B · ticket #29097 (APP-PARTNER-PTR-020) |
 | Who uses it | partner staff holding `PERMISSION_GRANT`, `PERMISSION_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listDelegatedAccess` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -656,6 +656,92 @@ PREPROD = [
     ("Network", "Front Door, NAT, Bastion, Registry", "Shared with production", "Separate routes and WAF policy", 1, 0, None),
     ("Operations", "Azure Monitor / Log Analytics", "Logs and metrics", "About 20 GB ingested a month", 1, 70, None),
 ]
+
+# **Staged cost (Chinmay, 4 October 2026, CHG-R11-003: "Staged: start ~$1.9k").** Launch on Stage 1 and grow to the
+# full cell (Stage 2 = the two sheets above) later; Stage 0 is a reference line only. Each line says where its price
+# comes from: "workbook" is this file's own unit price (Azure Retail Prices API, 30 September); "Retail API, 4 Oct"
+# is the Azure Retail Prices API (prices.azure.com, uaenorth or the service's billing zone) read on 4 October 2026.
+# Shape from the 25 September AWS hosting-cost board (Stage 0 one server, Stage 1 two servers + LB + PostgreSQL
+# Multi-AZ + GPU, Stage 2 the shared cell), priced here on Azure UAE North.
+STAGE_1 = [
+    ("Compute (AKS)", "Azure Kubernetes Service", "Control plane, Free tier",
+     "No uptime SLA at launch; Standard tier ($73) from Stage 2. Workbook (pre-production line)", 1, 0, None),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)",
+     "Two nodes running every deployable, Redis, Qdrant and the broker in-cluster",
+     "D8s v5 (8 vCPU, 32 GB), Linux, one per zone. The same images and Helm chart as the cell; one replica per "
+     "deployable across the two nodes (ADR-0061 as amended 4 October: the floors apply from Stage 2). Workbook",
+     2, 350, None),
+    ("Vector store", "Managed Disks", "Qdrant storage (single in-cluster node)", "Premium SSD P15 256 GB. Workbook",
+     1, 38, None),
+    ("Event broker", "Managed Disks", "Broker storage (RabbitMQ single in-cluster node)",
+     "Premium SSD P10 128 GB. Workbook", 1, 21.5, None),
+    ("Cache", "Managed Disks", "Redis persistence (single in-cluster node, append-only file)",
+     "Premium SSD P10 128 GB. Workbook (the broker disk's price)", 1, 21.5, None),
+    ("Network", "Load Balancer", "Standard load balancer in front of the ingress; its outbound rule carries the "
+     "static egress IP", "First 5 rules $0.025/h ($18.25) + about 1 TB processed at $0.005/GB ($5). Retail API, 4 Oct",
+     1, 23.25, None),
+    ("Network", "Public IP", "One static egress IP for the payment, e-invoicing and messaging allow-lists",
+     "Standard IPv4 static, $0.005/h, on the load balancer's outbound rule (the NAT Gateway, $80, from Stage 2). "
+     "Retail API, 4 Oct", 1, 3.65, None),
+    ("Database", "Azure Database for PostgreSQL", "Primary with zone-redundant standby: control DB + DB per tenant",
+     "Flexible Server 16, General Purpose D4ds v5 (4 vCore, 16 GB) x2 (primary + standby in another zone): "
+     "ADR-0060 holds at every stage. No read or reporting replica at launch. Workbook", 2, 320, None),
+    ("Database", "Azure Database for PostgreSQL", "Storage, primary and standby",
+     "256 GB Premium SSD each; PITR backup 35 days. Workbook", 2, 36, None),
+    ("AI", "Virtual Machines (AKS nodes)",
+     "AI GPU node: ticvai-ai, Presidio, the Arabic NER, BGE-M3 and its reranker (CHG-R11-001)",
+     "NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB), tainted, one node; the AI log tables live in the main "
+     "PostgreSQL server at launch. $0.649/h. Retail API, 4 Oct", 1, 473.77, None),
+    ("Storage", "Storage account (Blob, LRS)", "Media (including venue 3D models), exports, snapshots, dumps",
+     "Hot tier, 2 TB, UAE North only. Workbook", 1, 45, None),
+    ("Storage", "Container Registry", "Images for the five deployables", "Standard. Workbook", 1, 20, None),
+    ("Security", "Key Vault", "Secrets and per-tenant keys", "Standard. Workbook", 1, 5, None),
+    ("Network", "Azure Front Door", "TLS and WAF entry for web, apps and APIs, sized for launch",
+     "Standard (not Premium): base $35 + 500 GB edge-to-client in zone 7 at $0.11/GB ($55) + about 10 million "
+     "requests at $0.0108 per 10,000 ($10.80). Custom WAF and rate rules only; the managed OWASP and bot rule "
+     "sets and the Private Link origin need Premium (Stage 2). Retail API, 4 Oct", 1, 100.80, None),
+    ("Network", "Bandwidth", "Egress to the providers", "First 100 GB free, then $0.181/GB. Workbook", 1, 20, None),
+    ("Operations", "Azure Monitor / Log Analytics", "Logs, metrics, alerts at launch volume",
+     "About 20 GB ingested a month. Workbook (the pre-production rate)", 1, 70, None),
+    ("AI (usage)", "LLM providers", "Language model calls (re-billed per token, AI-D02)", "Usage-based", 1, 0, None),
+]
+STAGE_1_PREPROD = [
+    ("Compute (AKS)", "Azure Kubernetes Service", "Control plane", "Free tier. Workbook", 1, 0, None),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)", "One node: every deployable, Redis, Qdrant and the broker",
+     "D8s v5 (8 vCPU, 32 GB), Linux, one replica each. No GPU node: the models run on its CPU at test volume (an "
+     "assumption to confirm in Sprint 2). Workbook", 1, 350, None),
+    ("Database", "Azure Database for PostgreSQL", "Control DB + test tenant DBs",
+     "General Purpose D2ds v5 + 256 GB, no standby (pre-production only). Workbook", 1, 196, None),
+    ("Storage", "Storage account (Blob, LRS)", "Test media and snapshots", "Hot tier, 500 GB. Workbook", 1, 15, None),
+    ("Security", "Key Vault", "Test secrets", "Standard. Workbook", 1, 5, None),
+    ("Network", "Front Door, load balancer, registry, Log Analytics", "Shared with Stage 1 production",
+     "Separate routes and WAF policy", 1, 0, None),
+]
+STAGE_0 = [
+    ("Compute", "Virtual Machines", "One server running everything (reference only, not the plan)",
+     "D16s v5 (16 vCPU, 64 GB), Linux, $0.942/h. No zone redundancy anywhere. Retail API, 4 Oct", 1, 687.66, None),
+    ("AI", "Virtual Machines", "AI GPU node", "NV6ads A10 v5, $0.649/h. Retail API, 4 Oct", 1, 473.77, None),
+]
+NOTES_STAGES = [
+    "Staged (Chinmay, 4 October 2026, CHG-R11-003: \"Staged: start ~$1.9k\"): launch on Stage 1, move to Stage 2 "
+    "(the full cell on the other two sheets: $5,327.27 a month without zone-level HA, $8,295.04 with it) when the "
+    "first trigger below fires. His ~$1.9k was the servers, PostgreSQL and the GPU node alone ($1,885.77 here); the "
+    "rest of the launch platform brings Stage 1 production to the total above.",
+    "Move to Stage 2 when any of these holds: a paying venue needs the availability targets of ADR-0060 (99.95% "
+    "for cloud commerce; Stage 1 runs one replica per deployable, so a node or zone loss is an outage until it "
+    "reschedules); traffic beyond Stage 1 capacity is sustained (CPU above about 70% on both nodes at the daily "
+    "peak for a week, or the GPU node at its CPU or memory limit); a large on-sale is booked; or a client needs "
+    "Premium WAF (managed OWASP and bot rules) or a private origin.",
+    "ADR-0061's replica floors apply from Stage 2; at Stage 1 they are relaxed to one replica per deployable "
+    "across the two nodes (ADR-0061, amended 4 October). PostgreSQL keeps its zone-redundant standby at every "
+    "stage (ADR-0060).",
+    "Not included at Stage 1: Defender for Cloud (about $150-200 at this size if taken), Azure Bastion, Private "
+    "Link, a NAT Gateway, Azure Managed Redis, the AI log server, read and reporting replicas: each comes with "
+    "Stage 2. LLM tokens, SMS, email, payment and e-invoicing fees are usage, not hosting.",
+    "Stage 0 is a reference line only (one server and the GPU node, no PostgreSQL service, no redundancy): it is "
+    "not the plan.",
+]
+
 NOTES_PROD = [
     "Prices: " + PRICE_SOURCE + " Confirm each line in the Azure pricing calculator for UAE North before "
     "quoting; reserved instances (1 or 3 years) lower compute by roughly 30-55%.",
@@ -803,9 +889,30 @@ def cost_sheet(wb, title, prod_rows, prod_notes):
     return ws
 
 
+def stages_sheet(wb):
+    """Stage 1 (launch), its pre-production, and Stage 0 for reference (CHG-R11-003)."""
+    ws = wb.create_sheet("Stages")
+    ws["A1"] = "TICVAI - Azure cloud specs and cost, staged (Stage 1 launch; Stage 2 = the full cell sheets)"
+    ws["A1"].font = Font(bold=True, size=14)
+    ws["B3"], ws["C3"] = "AED per USD", AED
+    ws["B4"], ws["C4"] = "Margin", MARGIN
+    ws["C4"].number_format = "0%"
+    ws["D3"] = "Edit the rate, the margin and any unit price; every total is a formula."
+    ws["D4"] = "Prices: per line, the workbook's own unit price or the Azure Retail Prices API read on 4 October 2026."
+    r = cost_block(ws, 6, "Stage 1 production (launch)", STAGE_1, NOTES_STAGES, scaled_col=False)
+    r = cost_block(ws, r, "Stage 1 pre-production", STAGE_1_PREPROD, [], scaled_col=False)
+    cost_block(ws, r, "Stage 0 (reference only)", STAGE_0, [], scaled_col=False)
+    widths = [16, 16, 26, 38, 11, 46, 6, 14, 16]
+    for i, w in enumerate(widths, 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    ws.freeze_panes = "A7"
+    return ws
+
+
 def build_workbook(path):
     wb = Workbook()
     wb.remove(wb.active)
+    stages_sheet(wb)
     cost_sheet(wb, "Infra without HA", PROD_NO_HA, NOTES_NO_HA)
     cost_sheet(wb, "Infra with High Availability", PROD_HA, [
         "Zones 1-3 in UAE North: PostgreSQL zone-redundant standby (on every production tier, ADR-0060), Qdrant "
@@ -1001,7 +1108,9 @@ def lld_md():
 
 > **Date:** {DATE} · **Generated by** `tools/build-hld-lld.py` · **Diagram:** [`TICVAI-LLD.svg`](TICVAI-LLD.svg)
 > **Costs:** [`TICVAI - Azure Cloud Specs & Cost.xlsx`](TICVAI%20-%20Azure%20Cloud%20Specs%20%26%20Cost.xlsx): production with high availability
-> **${ha:,.2f}** a month, without zone-level HA **${noha:,.2f}**, pre-production **${pre:,.2f}** (prices of 30 September)
+> **${ha:,.2f}** a month, without zone-level HA **${noha:,.2f}**, pre-production **${pre:,.2f}** (prices of 30 September);
+> **staged** (CHG-R11-003): launch on Stage 1 at **${month(STAGE_1):,.2f}** a month in production plus **${month(STAGE_1_PREPROD):,.2f}** of
+> pre-production; the figures before it are Stage 2, the full cell
 > **Source of sizes:** the Terraform cell module (`repos/ticvai-infra/terraform/modules/cell`), `handoff/sizing.json`,
 > the decisions of 30 September and the ADRs of 1 October. The generator checks the Terraform before it writes.
 
@@ -1197,7 +1306,9 @@ def readme():
 
 Monthly totals (USD, prices of 30 September 2026): with high availability ${month(PROD_HA):,.2f}; without zone-level
 HA ${month(PROD_NO_HA):,.2f} (PostgreSQL stays zone-redundant; recomputed 1 and 4 October, see the sheet's notes; the AI pool is one GPU node pool since 4 October, CHG-R11-001);
-pre-production ${month(PREPROD):,.2f}.
+pre-production ${month(PREPROD):,.2f}. **Staged (CHG-R11-003):** the platform launches on Stage 1, ${month(STAGE_1):,.2f}
+a month in production plus ${month(STAGE_1_PREPROD):,.2f} of pre-production (the workbook's Stages sheet); the totals above
+are Stage 2, the full cell.
 
 The polished drawings are made in Claude Design from [`../design-batches/HLD-LLD/`](../design-batches/HLD-LLD/BRIEF.md).
 """
@@ -1291,7 +1402,8 @@ def main():
         write(keep, "")
     print("hld-lld: 2 diagrams, 2 documents, 1 workbook; Claude Design brief and architecture.json; "
           f"Terraform agrees; no line crosses a box. Monthly USD: HA {month(PROD_HA):,.2f}, "
-          f"without zone HA {month(PROD_NO_HA):,.2f}, pre-production {month(PREPROD):,.2f}")
+          f"without zone HA {month(PROD_NO_HA):,.2f}, pre-production {month(PREPROD):,.2f}; Stage 1 "
+          f"{month(STAGE_1):,.2f} + pre-production {month(STAGE_1_PREPROD):,.2f}; Stage 0 {month(STAGE_0):,.2f}")
 
 
 if __name__ == "__main__":

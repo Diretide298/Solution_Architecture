@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-001 |
+| Block | Block A · ticket #28567 (APP-POS-KIT-001) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | commandCentre (touchLarge density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -409,7 +409,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-002 |
+| Block | Block A · ticket #28568 (APP-POS-KIT-002) |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as cashier, supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -673,7 +673,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-003 |
+| Block | Block A · ticket #28569 (APP-POS-KIT-003) |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`setKitchenTicketStatus`, `prioritiseKitchenTicket`, `fireCourse`) and no read of a population — it is settings, not a list |
@@ -897,7 +897,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-004 |
+| Block | Block A · ticket #28570 (APP-POS-KIT-004) |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads the population and `getFnbOrder` reads one of them — list, select, act |
@@ -1084,7 +1084,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-005 |
+| Block | Block A · ticket #28571 (APP-POS-KIT-005) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenStations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1293,7 +1293,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-006 |
+| Block | Block A · ticket #28572 (APP-POS-KIT-006) |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1521,7 +1521,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-007 |
+| Block | Block A · ticket #28573 (APP-POS-KIT-007) |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1703,7 +1703,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-008 |
+| Block | Block A · ticket #28574 (APP-POS-KIT-008) |
 | Who uses it | venue staff holding `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 3 read, 1 configure); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `list86Events` reads the population and `getHaccpStatus` reads one of them — list, select, act |
@@ -1916,7 +1916,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-009 |
+| Block | Block A · ticket #28575 (APP-POS-KIT-009) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`prioritiseKitchenTicket`, `setVenueSettings`) and no read of a population — it is settings, not a list |
@@ -2072,7 +2072,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-KIT-010 |
+| Block | Block A · ticket #29000 (APP-POS-KIT-010) |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | statusTracker (touchLarge density): `getDashboard` reads one record and nothing reads a population — the screen is about that one thing |

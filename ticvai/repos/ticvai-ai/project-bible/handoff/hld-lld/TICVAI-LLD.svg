@@ -57,10 +57,10 @@
 <text x="785.0" y="286" text-anchor="middle" font-size="11.5" fill="#333">floors: commerce 3, access 2,</text>
 <text x="785.0" y="303" text-anchor="middle" font-size="11.5" fill="#333">operations 2, workers 2</text>
 <rect x="690" y="329" width="190" height="90" rx="8" fill="#EEF4FF" stroke="#2F6DB5" stroke-width="1.4"/>
-<text x="785.0" y="351" text-anchor="middle" font-size="13.5" font-weight="700">AKS AI pool</text>
-<text x="785.0" y="371" text-anchor="middle" font-size="11.5" fill="#333">D8s v5, 2-4 nodes, tainted</text>
-<text x="785.0" y="388" text-anchor="middle" font-size="11.5" fill="#333">ticvai-ai: real-time 2,</text>
-<text x="785.0" y="405" text-anchor="middle" font-size="11.5" fill="#333">interactive 1, batch 0; models</text>
+<text x="785.0" y="351" text-anchor="middle" font-size="13.5" font-weight="700">AKS AI GPU pool</text>
+<text x="785.0" y="371" text-anchor="middle" font-size="11.5" fill="#333">NV6ads A10 v5 x2, 1 a zone</text>
+<text x="785.0" y="388" text-anchor="middle" font-size="11.5" fill="#333">tainted; ticvai-ai 2/1/0,</text>
+<text x="785.0" y="405" text-anchor="middle" font-size="11.5" fill="#333">BGE-M3, reranker, NER</text>
 <rect x="690" y="431" width="190" height="72" rx="8" fill="#EEF4FF" stroke="#2F6DB5" stroke-width="1.4"/>
 <text x="785.0" y="453" text-anchor="middle" font-size="13.5" font-weight="700">AKS qdrant pool</text>
 <text x="785.0" y="473" text-anchor="middle" font-size="11.5" fill="#333">E4s v5 x3, one per zone</text>

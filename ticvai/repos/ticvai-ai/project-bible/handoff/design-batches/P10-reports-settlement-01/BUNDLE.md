@@ -358,7 +358,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-017 |
+| Block | Block B · ticket #29415 (APP-PARTNER-PTR-017) |
 | Who uses it | partner staff holding `PARTNER_MANAGE`, `PARTNER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act |

@@ -172,7 +172,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | In-venue Services · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-WEB-WEB-036 |
+| Block | Block A · ticket #28556 (APP-WEB-WEB-036) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): Location, menu, basket, pay: the guest picks an outlet, then orders from its menu (CHG-SGU-018) |
@@ -689,7 +689,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | In-venue Services · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-WEB-WEB-037 |
+| Block | Block A · ticket #28557 (APP-WEB-WEB-037) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018) |
@@ -874,7 +874,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | In-venue Services · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-WEB-WEB-038 |
+| Block | Block A · ticket #28558 (APP-WEB-WEB-038) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1054,7 +1054,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | In-venue Services · wave 1 · needs the `queue` module |
-| Block | Block A · task APP-WEB-WEB-039 |
+| Block | Block A · ticket #28690 (APP-WEB-WEB-039) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listQueues` reads the population and `getVenueMap` reads one of them — list, select, act |
@@ -1262,7 +1262,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | In-venue Services · wave 1 · needs the `queue` module |
-| Block | Block A · task APP-WEB-WEB-040 |
+| Block | Block A · ticket #28696 (APP-WEB-WEB-040) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1496,7 +1496,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | In-venue Services · wave 1 · needs the `access` module |
-| Block | Block A · task APP-WEB-WEB-041 |
+| Block | Block A · ticket #28348 (APP-WEB-WEB-041) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

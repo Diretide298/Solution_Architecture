@@ -146,7 +146,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block B · task VM-BO-053 |
+| Block | Block B · ticket #29045 (VM-BO-053) |
 | Who uses it | venue staff holding `PERMISSION_VIEW`, `SESSION_FORCE_LOGOUT`, `USER_MANAGE`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 operate, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -451,7 +451,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-BO-054 |
+| Block | Block A · ticket #27938 (APP-SETUP-BO-054) |
 | Who uses it | venue staff holding `PERMISSION_VIEW`, `ROLE_MANAGE`, `USER_MANAGE` (1 read, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -693,7 +693,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-BO-055 |
+| Block | Block A · ticket #28417 (APP-SETUP-BO-055) |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1476,7 +1476,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-084 |
+| Block | Block A · ticket #28028 (VM-BO-084) |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW` (2 operate, 1 read); in the flows as cashier, technician, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success |
@@ -1716,7 +1716,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-085 |
+| Block | Block A · ticket #27830 (VM-BO-085) |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW` (2 operate, 1 read); in the flows as cashier |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): One request opened by `requestId`: its subject, its trail and the decision. The queue is BO-084 (design-note correction, 2 October 2026). |
@@ -1951,7 +1951,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | Block B · task VM-BO-086 |
+| Block | Block B · ticket #29421 (VM-BO-086) |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listApprovalMatrices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2172,7 +2172,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | Block A · task APP-SETUP-BO-087 |
+| Block | Block A · ticket #27939 (APP-SETUP-BO-087) |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 configure, 1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listApprovalDelegations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

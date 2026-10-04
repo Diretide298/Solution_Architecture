@@ -379,7 +379,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Inventory & Pricing · wave 2 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-006 |
+| Block | Block B · ticket #29935 (APP-PARTNER-PTR-006) |
 | Who uses it | partner staff holding `PRICE_VIEW`, `PRODUCT_VIEW` (2 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getPriceList` reads one of them — list, select, act |
@@ -611,7 +611,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Inventory & Pricing · wave 2 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-007 |
+| Block | Block B · ticket #29936 (APP-PARTNER-PTR-007) |
 | Who uses it | partner staff holding `PRODUCT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getAvailability` reads one record and nothing reads a population — the screen is about that one thing |

@@ -43,6 +43,28 @@ whatever they typed. Putting it beside `pii.subject` is defensible; putting it t
 
 ---
 
+## Amended 4 October 2026: the embedding model, its reranker and the scrubber run on our GPU node pool; no LLM
+
+**Decided by Chinmay, 4 October 2026** (change entry CHG-R11-001, reversing CHG-R1S-026): *"we have to host for
+embeddings only not for LLM"*; *"its a sdk we can host it wihtin our embeddings server cant we ? also the arabic
+NER"*; *"Naaa dont keep AI CPU node at all"*.
+
+- **The AI pool is a GPU node pool:** one AI GPU node pool: Azure NV6ads A10 v5 in UAE North (6 vCPU, 55 GB, a sixth of an A10 with 4 GB), one node without high availability and two with it, one per zone; on AWS (me-central-1, UAE) a g6.2xlarge-class node (one L4, 8 vCPU), its price and regional availability to confirm. It is still tainted and isolated as this ADR says; it
+  runs the `ticvai-ai` pods (floors as ADR-0061: real-time 2, interactive 1, batch 0, about 1 vCPU a pod, since
+  they mostly wait on the provider's streamed answer), Presidio's recognisers on its CPU, and on its GPU at fp16
+  BGE-M3, its reranker and the Arabic NER. There is no separate AI CPU pool and no separate Presidio pool.
+- **Sizing is an assumption** until the Sprint 2 benchmark; the step up is NV12ads A10 v5 (12 vCPU, 8 GB of GPU
+  memory), taken on CPU saturation or GPU memory pressure.
+- **Scrubbing stays mandatory and fails closed:** with the GPU node down the scrubber is down, and the LLM call is
+  refused `503 scrubber-unavailable`, never sent raw.
+- **Embeddings never leave the cell:** hybrid retrieval is our BGE-M3 dense vectors with Qdrant's BM25 sparse
+  index, reranked by our reranker; the vectors stay in our Qdrant (ADR-0049).
+- **Still no LLM of ours:** LLM calls stay with the providers and the guard stays the provider's content-safety
+  service. In the 3 October amendment below, the scrubber "inside our own worker", "No GPU pool" and "Embeddings
+  too" are superseded.
+
+---
+
 ## Amended 3 October 2026: the guard is the provider's content-safety service; we host no model
 
 **Decided by Chinmay, 3 October 2026** (`docs/active/decisions/answers-3-october-gate-and-hosting.md`; change
@@ -54,13 +76,13 @@ needs a GPU host, so item 3 of the amendment above changes; items 1, 2, 4 and 5 
   `globalAllowed`. Qwen3Guard is not hosted; a self-hosted guard comes back only if a client asks for
   self-hosting (Chinmay may drop the guard altogether). The Arabic gap the 2 October text names is covered by
   the golden set: Arabic harmful prompts run against the safety service before each release.
-- **The scrubber stays, unchanged:** Microsoft Presidio and the Arabic NER model are **a CPU library inside our
+- **[Where it runs superseded 4 October, CHG-R11-001: on the AI GPU node pool.]** **The scrubber stays, unchanged:** Microsoft Presidio and the Arabic NER model are **a CPU library inside our
   own worker**, not a hosted model, and scrubbing is mandatory in every residency class.
 - **Still fails closed:** with the scrubber or the safety service down the call is refused
   (`503 scrubber-unavailable`), never sent raw; a blocked message or reply is `422 guard-refused`.
-- **No GPU pool, no in-cell model.** The cell runs no LLM; the AI goes through providers (Core42 Compass by
+- **[Superseded 4 October, CHG-R11-001: the AI pool is a GPU node pool, still with no LLM.]** **No GPU pool, no in-cell model.** The cell runs no LLM; the AI goes through providers (Core42 Compass by
   default, OpenAI UAE as fallback, BYOK), ADR-0009 as amended the same day.
-- **Embeddings too** (later the same evening, CHG-R1S-026): the provider's embedding model on the UAE route
+- **[Superseded 4 October, CHG-R11-001: BGE-M3 and its reranker are ours, in the cell.]** **Embeddings too** (later the same evening, CHG-R1S-026): the provider's embedding model on the UAE route
   (OpenAI UAE `text-embedding-3-large` or Core42), through the scrubber and the residency class like any call;
   no embedding model and no CPU embeddings in the cell. The vectors stay in our Qdrant (ADR-0049).
 

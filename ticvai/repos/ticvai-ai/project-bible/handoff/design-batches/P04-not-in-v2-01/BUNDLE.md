@@ -172,7 +172,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Shift · wave 1 · needs the `core` module |
-| Block | Block A · task APP-POS-POS-009 |
+| Block | Block A · ticket #28646 (APP-POS-POS-009) |
 | Who uses it | venue staff holding `ATTENDANCE_RECORD`, `REPORT_VIEW_WORKSTATION`, `WORKFORCE_VIEW` (2 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (touchLarge density): `approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success |
@@ -395,7 +395,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-POS-POS-010 |
+| Block | Block A · ticket #28257 (APP-POS-POS-010) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `ORDER_CREATE`, `ORDER_EXCHANGE`, `ORDER_VIEW` (2 read, 2 operate); in the flows as cashier |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (touchLarge density): `getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing |
@@ -647,7 +647,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · task APP-POS-POS-015 |
+| Block | Block A · ticket #28533 (APP-POS-POS-015) |
 | Who uses it | venue staff holding `REPORT_VIEW_WORKSTATION`, `SHIFT_OPEN` (2 operate); in the flows as venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listCashMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -856,7 +856,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · task APP-POS-POS-017 |
+| Block | Block A · ticket #28534 (APP-POS-POS-017) |
 | Who uses it | venue staff holding `CASH_LIFT`, `REPORT_VIEW_WORKSTATION` (2 operate) |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`createCashMovement`) and no read of a population — it is settings, not a list |
@@ -1027,7 +1027,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · task APP-POS-POS-018 |
+| Block | Block A · ticket #28535 (APP-POS-POS-018) |
 | Who uses it | venue staff holding `CASH_LIFT`, `SHIFT_OPEN` (2 operate); in the flows as cashier, venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1241,7 +1241,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · task APP-POS-POS-019 |
+| Block | Block A · ticket #28538 (APP-POS-POS-019) |
 | Who uses it | venue staff holding `REPORT_VIEW_WORKSTATION`, `SCOPE_VIEW`, `WORKSTATION_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listShifts` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1468,7 +1468,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-POS-POS-024 |
+| Block | Block A · ticket #28566 (APP-POS-POS-024) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -745,11 +745,11 @@
    },
    {
     "id": "aip",
-    "label": "AKS AI pool",
+    "label": "AKS AI GPU pool",
     "lines": [
-     "D8s v5, 2-4 nodes, tainted",
-     "ticvai-ai: real-time 2,",
-     "interactive 1, batch 0; models"
+     "NV6ads A10 v5 x2, 1 a zone",
+     "tainted; ticvai-ai 2/1/0,",
+     "BGE-M3, reranker, NER"
     ],
     "x": 690,
     "y": 329,
@@ -1142,7 +1142,7 @@
    {
     "name": "snet-aks-ai",
     "cidr": "10.20.16.0/22",
-    "holds": "AI pool: ticvai-ai, embeddings, reranker",
+    "holds": "AI GPU pool (the only AI pool): ticvai-ai, BGE-M3 and its reranker, Presidio and the Arabic NER",
     "rule": "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on transactional schemas (ADR-0020, amended by ADR-0049)"
    },
    {

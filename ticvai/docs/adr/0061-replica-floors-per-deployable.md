@@ -8,6 +8,25 @@
 
 ---
 
+## Amended 4 October 2026: the floors apply from Stage 2; Stage 1 runs one replica per deployable
+
+**Decided by Chinmay, 4 October 2026** (change entry CHG-R11-003: *"Staged: start ~$1.9k"*). The platform launches on
+**Stage 1** and grows to the full cell (**Stage 2**) later; the staged cost is the Stages sheet of
+`handoff/hld-lld/TICVAI - Azure Cloud Specs & Cost.xlsx`.
+
+- **Stage 1 (launch):** two D8s v5 nodes, one per zone, run every deployable, Redis, Qdrant and the broker
+  in-cluster, from the same images and Helm chart as the cell, plus the AI GPU node (CHG-R11-001). The floors
+  below are **relaxed to one replica per deployable** across the two nodes; `ticvai-ai` runs one real-time and
+  one interactive replica, batch from zero. A node or zone loss is an outage until the pods reschedule.
+  PostgreSQL keeps its zone-redundant standby (ADR-0060 holds at every stage).
+- **Stage 2 (the full cell):** the floors below apply unchanged.
+- **The move to Stage 2** happens when any of these holds: a paying venue needs ADR-0060's availability targets
+  (99.95% for cloud commerce); traffic beyond Stage 1's capacity is sustained (CPU above about 70% on both nodes
+  at the daily peak for a week, or the GPU node at its CPU or memory limit); a large on-sale is booked; or a
+  client needs the Premium WAF or a private origin.
+
+---
+
 ## Context
 
 **The floors were computed per service.**

@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-MOB-GST-076 |
+| Block | Block A · ticket #28515 (APP-MOB-GST-076) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `searchTransportDepartures` reads the population of departures; one is chosen and opens GST-077 |
@@ -290,7 +290,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-MOB-GST-077 |
+| Block | Block A · ticket #28519 (APP-MOB-GST-077) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getTransportRoute` reads the one route of the chosen departure; the screen is about that one trip |
@@ -561,7 +561,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-MOB-GST-078 |
+| Block | Block A · ticket #28517 (APP-MOB-GST-078) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listTransportPassOffers` reads the population of passes for the station pair |
@@ -743,7 +743,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-MOB-GST-079 |
+| Block | Block A · ticket #28516 (APP-MOB-GST-079) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listMyFavouriteRoutes` reads the guest's saved routes |

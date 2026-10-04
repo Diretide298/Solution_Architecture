@@ -166,7 +166,7 @@ LLD_NODES = {
     "sys":     ("AKS system pool", ["D4s v5, 2-4 nodes, zones 1-3", "+ ingress gateway pods"], 690, 145, 190, 70, "#EEF4FF"),
     "wl":      ("AKS workload pool", ["D8s v5, 3-20 nodes, 3 zones", "floors: commerce 3, access 2,", "operations 2, workers 2"],
                 690, 227, 190, 90, "#EEF4FF"),
-    "aip":     ("AKS AI pool", ["D8s v5, 2-4 nodes, tainted", "ticvai-ai: real-time 2,", "interactive 1, batch 0; models"],
+    "aip":     ("AKS AI GPU pool", ["NV6ads A10 v5 x2, 1 a zone", "tainted; ticvai-ai 2/1/0,", "BGE-M3, reranker, NER"],
                 690, 329, 190, 90, "#EEF4FF"),
     "qdrant":  ("AKS qdrant pool", ["E4s v5 x3, one per zone", "Qdrant, replication 2, TLS"], 690, 431, 190, 72, "#EEF4FF"),
     "broker":  ("AKS broker pool", ["D2s v5 x3, while self-run;", "recommended: CloudAMQP", "UAE North, Private Link"],
@@ -215,7 +215,8 @@ SUBNETS = [
      "No NSG; egress through the NAT Gateway"),
     ("snet-aks-workload", "10.20.8.0/21", "Workload pool: commerce, access, operations, workers",
      "No NSG; Cilium policy: inbound from the ingress gateway; egress through the NAT Gateway"),
-    ("snet-aks-ai", "10.20.16.0/22", "AI pool: ticvai-ai, embeddings, reranker",
+    ("snet-aks-ai", "10.20.16.0/22", "AI GPU pool (the only AI pool): ticvai-ai, BGE-M3 and its reranker, Presidio and "
+     "the Arabic NER",
      "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on "
      "transactional schemas (ADR-0020, amended by ADR-0049)"),
     ("snet-aks-data", "10.20.20.0/23", "The qdrant pool (Qdrant cluster) and, while the broker is self-run, the broker "
@@ -492,8 +493,10 @@ AED = 3.6725
 MARGIN = 0.20
 # (group, service type, description, specs, qty, unit USD, scaled qty or None = same)
 # Node counts carry ADR-0061's floors. Pod sizes are assumptions until tools/bench.py measures them: a .NET
-# replica requests about 1 vCPU and 2 GB; an AI pod 2 vCPU (AI design 4.3); the embedding model and reranker
-# about 8 vCPU together (AI design 4.3, "2 x 4 vCPU"). A D8s v5 node leaves about 7 vCPU to pods.
+# replica requests about 1 vCPU and 2 GB; an AI pod about 1 vCPU (4 October, CHG-R11-001: it mostly waits on the
+# provider's streamed answer). A D8s v5 node leaves about 7 vCPU to pods. The AI pool is a GPU node pool and the only
+# AI pool (Chinmay, 4 October: "Naaa dont keep AI CPU node at all"): NV6ads A10 v5, $0.649/h = $473.77 a month,
+# carrying the ticvai-ai pods, Presidio, and on the GPU at fp16 BGE-M3, its reranker and the Arabic NER.
 PROD_HA = [
     ("Compute (AKS)", "Azure Kubernetes Service", "Control plane, Standard tier",
      "Uptime SLA, zone-redundant control plane", 1, 73, None),
@@ -505,10 +508,14 @@ PROD_HA = [
      "commerce 3 (one per zone), access 2, operations 2, workers 2 = 9 replicas, three to a node at about 1 vCPU "
      "each. Scaled up, 6 nodes hold a large cell's peak of 34 (commerce 17, operations 12, access 3, workers 2)",
      3, 350, 6),
-    ("Compute (AKS)", "Virtual Machines (AKS nodes)", "AI pool: ticvai-ai, embedding model, reranker (CPU)",
-     "D8s v5 (8 vCPU, 32 GB), Linux, autoscale 2-4, tainted. Carries the floors: real-time 2, interactive 1, "
-     "batch 0 (2 vCPU a pod) beside the embedding model and reranker (about 8 vCPU). A large cell's third "
-     "real-time replica takes a third node", 2, 350, 4),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)",
+     "AI GPU pool: ticvai-ai, BGE-M3 and its reranker, Presidio and the Arabic NER (CHG-R11-001)",
+     "NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB), Linux, tainted, one node per zone. Carries the floors: real-time 2, "
+     "interactive 1, batch 0 (about 1 vCPU a pod), Presidio on the CPU, and on the GPU at fp16 BGE-M3 (about "
+     "1.1 GB), its reranker (about 1.1 GB) and the Arabic NER (about 0.3 GB); a large cell's third real-time "
+     "replica fits. No AI CPU pool and no Presidio pool. Sizing to confirm by the Sprint 2 benchmark; step up to "
+     "NV12ads A10 v5 ($947.54) on CPU saturation or GPU memory pressure. AWS me-central-1: a g6.2xlarge-class "
+     "node, price to confirm", 2, 473.77, 4),
     ("Vector store", "Virtual Machines (AKS nodes)", "Qdrant cluster, one collection per tenant (ADR-0049)",
      "qdrant node pool: E4s v5 (4 vCPU, 32 GB) x3, one per zone, replication factor 2. Open-source Qdrant 1.16 or "
      "later from the official Helm chart; TLS; collection-scoped JWT per tenant", 3, 225, None),
@@ -581,10 +588,12 @@ PROD_NO_HA = [
     ("Compute (AKS)", "Virtual Machines (AKS nodes)", "Workload pool: commerce, access, operations, workers",
      "D8s v5 (8 vCPU, 32 GB), Linux, autoscale 2-10. Carries the floors (ADR-0061): 9 replicas on 2 nodes; in "
      "one zone commerce's three replicas cannot be one per zone", 2, 350, 4),
-    ("Compute (AKS)", "Virtual Machines (AKS nodes)", "AI pool: ticvai-ai, embedding model, reranker (CPU)",
-     "D8s v5 (8 vCPU, 32 GB), Linux, autoscale 2-3. Two nodes are the least that carries the floors "
-     "(real-time 2, interactive 1, 2 vCPU a pod) beside the embedding model and reranker (about 8 vCPU)",
-     2, 350, 3),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)",
+     "AI GPU pool: ticvai-ai, BGE-M3 and its reranker, Presidio and the Arabic NER (CHG-R11-001)",
+     "NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB), Linux, tainted, one node. Carries the floors (real-time 2, interactive 1, "
+     "about 1 vCPU a pod) beside Presidio and, on the GPU, BGE-M3, its reranker and the Arabic NER. With the node "
+     "down the scrubber is down and LLM calls are refused (503 scrubber-unavailable), never sent raw",
+     1, 473.77, 2),
     ("Vector store", "Virtual Machines (AKS nodes)", "Qdrant, one collection per tenant (ADR-0049)",
      "E4s v5 (4 vCPU, 32 GB), single node", 1, 225, None),
     ("Vector store", "Managed Disks", "Qdrant storage", "Premium SSD P15 256 GB", 1, 38, None),
@@ -647,6 +656,92 @@ PREPROD = [
     ("Network", "Front Door, NAT, Bastion, Registry", "Shared with production", "Separate routes and WAF policy", 1, 0, None),
     ("Operations", "Azure Monitor / Log Analytics", "Logs and metrics", "About 20 GB ingested a month", 1, 70, None),
 ]
+
+# **Staged cost (Chinmay, 4 October 2026, CHG-R11-003: "Staged: start ~$1.9k").** Launch on Stage 1 and grow to the
+# full cell (Stage 2 = the two sheets above) later; Stage 0 is a reference line only. Each line says where its price
+# comes from: "workbook" is this file's own unit price (Azure Retail Prices API, 30 September); "Retail API, 4 Oct"
+# is the Azure Retail Prices API (prices.azure.com, uaenorth or the service's billing zone) read on 4 October 2026.
+# Shape from the 25 September AWS hosting-cost board (Stage 0 one server, Stage 1 two servers + LB + PostgreSQL
+# Multi-AZ + GPU, Stage 2 the shared cell), priced here on Azure UAE North.
+STAGE_1 = [
+    ("Compute (AKS)", "Azure Kubernetes Service", "Control plane, Free tier",
+     "No uptime SLA at launch; Standard tier ($73) from Stage 2. Workbook (pre-production line)", 1, 0, None),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)",
+     "Two nodes running every deployable, Redis, Qdrant and the broker in-cluster",
+     "D8s v5 (8 vCPU, 32 GB), Linux, one per zone. The same images and Helm chart as the cell; one replica per "
+     "deployable across the two nodes (ADR-0061 as amended 4 October: the floors apply from Stage 2). Workbook",
+     2, 350, None),
+    ("Vector store", "Managed Disks", "Qdrant storage (single in-cluster node)", "Premium SSD P15 256 GB. Workbook",
+     1, 38, None),
+    ("Event broker", "Managed Disks", "Broker storage (RabbitMQ single in-cluster node)",
+     "Premium SSD P10 128 GB. Workbook", 1, 21.5, None),
+    ("Cache", "Managed Disks", "Redis persistence (single in-cluster node, append-only file)",
+     "Premium SSD P10 128 GB. Workbook (the broker disk's price)", 1, 21.5, None),
+    ("Network", "Load Balancer", "Standard load balancer in front of the ingress; its outbound rule carries the "
+     "static egress IP", "First 5 rules $0.025/h ($18.25) + about 1 TB processed at $0.005/GB ($5). Retail API, 4 Oct",
+     1, 23.25, None),
+    ("Network", "Public IP", "One static egress IP for the payment, e-invoicing and messaging allow-lists",
+     "Standard IPv4 static, $0.005/h, on the load balancer's outbound rule (the NAT Gateway, $80, from Stage 2). "
+     "Retail API, 4 Oct", 1, 3.65, None),
+    ("Database", "Azure Database for PostgreSQL", "Primary with zone-redundant standby: control DB + DB per tenant",
+     "Flexible Server 16, General Purpose D4ds v5 (4 vCore, 16 GB) x2 (primary + standby in another zone): "
+     "ADR-0060 holds at every stage. No read or reporting replica at launch. Workbook", 2, 320, None),
+    ("Database", "Azure Database for PostgreSQL", "Storage, primary and standby",
+     "256 GB Premium SSD each; PITR backup 35 days. Workbook", 2, 36, None),
+    ("AI", "Virtual Machines (AKS nodes)",
+     "AI GPU node: ticvai-ai, Presidio, the Arabic NER, BGE-M3 and its reranker (CHG-R11-001)",
+     "NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB), tainted, one node; the AI log tables live in the main "
+     "PostgreSQL server at launch. $0.649/h. Retail API, 4 Oct", 1, 473.77, None),
+    ("Storage", "Storage account (Blob, LRS)", "Media (including venue 3D models), exports, snapshots, dumps",
+     "Hot tier, 2 TB, UAE North only. Workbook", 1, 45, None),
+    ("Storage", "Container Registry", "Images for the five deployables", "Standard. Workbook", 1, 20, None),
+    ("Security", "Key Vault", "Secrets and per-tenant keys", "Standard. Workbook", 1, 5, None),
+    ("Network", "Azure Front Door", "TLS and WAF entry for web, apps and APIs, sized for launch",
+     "Standard (not Premium): base $35 + 500 GB edge-to-client in zone 7 at $0.11/GB ($55) + about 10 million "
+     "requests at $0.0108 per 10,000 ($10.80). Custom WAF and rate rules only; the managed OWASP and bot rule "
+     "sets and the Private Link origin need Premium (Stage 2). Retail API, 4 Oct", 1, 100.80, None),
+    ("Network", "Bandwidth", "Egress to the providers", "First 100 GB free, then $0.181/GB. Workbook", 1, 20, None),
+    ("Operations", "Azure Monitor / Log Analytics", "Logs, metrics, alerts at launch volume",
+     "About 20 GB ingested a month. Workbook (the pre-production rate)", 1, 70, None),
+    ("AI (usage)", "LLM providers", "Language model calls (re-billed per token, AI-D02)", "Usage-based", 1, 0, None),
+]
+STAGE_1_PREPROD = [
+    ("Compute (AKS)", "Azure Kubernetes Service", "Control plane", "Free tier. Workbook", 1, 0, None),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)", "One node: every deployable, Redis, Qdrant and the broker",
+     "D8s v5 (8 vCPU, 32 GB), Linux, one replica each. No GPU node: the models run on its CPU at test volume (an "
+     "assumption to confirm in Sprint 2). Workbook", 1, 350, None),
+    ("Database", "Azure Database for PostgreSQL", "Control DB + test tenant DBs",
+     "General Purpose D2ds v5 + 256 GB, no standby (pre-production only). Workbook", 1, 196, None),
+    ("Storage", "Storage account (Blob, LRS)", "Test media and snapshots", "Hot tier, 500 GB. Workbook", 1, 15, None),
+    ("Security", "Key Vault", "Test secrets", "Standard. Workbook", 1, 5, None),
+    ("Network", "Front Door, load balancer, registry, Log Analytics", "Shared with Stage 1 production",
+     "Separate routes and WAF policy", 1, 0, None),
+]
+STAGE_0 = [
+    ("Compute", "Virtual Machines", "One server running everything (reference only, not the plan)",
+     "D16s v5 (16 vCPU, 64 GB), Linux, $0.942/h. No zone redundancy anywhere. Retail API, 4 Oct", 1, 687.66, None),
+    ("AI", "Virtual Machines", "AI GPU node", "NV6ads A10 v5, $0.649/h. Retail API, 4 Oct", 1, 473.77, None),
+]
+NOTES_STAGES = [
+    "Staged (Chinmay, 4 October 2026, CHG-R11-003: \"Staged: start ~$1.9k\"): launch on Stage 1, move to Stage 2 "
+    "(the full cell on the other two sheets: $5,327.27 a month without zone-level HA, $8,295.04 with it) when the "
+    "first trigger below fires. His ~$1.9k was the servers, PostgreSQL and the GPU node alone ($1,885.77 here); the "
+    "rest of the launch platform brings Stage 1 production to the total above.",
+    "Move to Stage 2 when any of these holds: a paying venue needs the availability targets of ADR-0060 (99.95% "
+    "for cloud commerce; Stage 1 runs one replica per deployable, so a node or zone loss is an outage until it "
+    "reschedules); traffic beyond Stage 1 capacity is sustained (CPU above about 70% on both nodes at the daily "
+    "peak for a week, or the GPU node at its CPU or memory limit); a large on-sale is booked; or a client needs "
+    "Premium WAF (managed OWASP and bot rules) or a private origin.",
+    "ADR-0061's replica floors apply from Stage 2; at Stage 1 they are relaxed to one replica per deployable "
+    "across the two nodes (ADR-0061, amended 4 October). PostgreSQL keeps its zone-redundant standby at every "
+    "stage (ADR-0060).",
+    "Not included at Stage 1: Defender for Cloud (about $150-200 at this size if taken), Azure Bastion, Private "
+    "Link, a NAT Gateway, Azure Managed Redis, the AI log server, read and reporting replicas: each comes with "
+    "Stage 2. LLM tokens, SMS, email, payment and e-invoicing fees are usage, not hosting.",
+    "Stage 0 is a reference line only (one server and the GPU node, no PostgreSQL service, no redundancy): it is "
+    "not the plan.",
+]
+
 NOTES_PROD = [
     "Prices: " + PRICE_SOURCE + " Confirm each line in the Azure pricing calculator for UAE North before "
     "quoting; reserved instances (1 or 3 years) lower compute by roughly 30-55%.",
@@ -658,9 +753,16 @@ NOTES_PROD = [
     "collection with a collection-scoped key.",
     "Node counts carry the replica floors of ADR-0061 (accepted 1 October): commerce 3, access 2, operations 2, "
     "workers 2, ticvai-ai real-time 2 (3 in a large cell), interactive 1, batch 0: 12 a cell, 13 in a large one. "
-    "Pod sizes are assumptions until tools/bench.py measures them: about 1 vCPU for a .NET replica, 2 vCPU for "
-    "an AI pod, about 8 vCPU for the embedding model and reranker together (AI design 4.3).",
-    "\"When scaled up\" doubles the autoscaled lines (workload and AI pools, Front Door traffic, bandwidth) for "
+    "Pod sizes are assumptions until tools/bench.py measures them: about 1 vCPU for a .NET replica and about "
+    "1 vCPU for an AI pod, which mostly waits on the provider's streamed answer (AI design 4.3).",
+    "AI hosting (Chinmay, 4 October, CHG-R11-001): we host the embedding model (BGE-M3), its reranker, Presidio "
+    "and the Arabic NER, together with the ticvai-ai pods, on one AI GPU node pool (NV6ads A10 v5, $473.77 a "
+    "month a node; one node without HA, two with HA, one per zone); never an LLM, which stays with the providers "
+    "(Core42 Compass, OpenAI UAE, BYOK). The 2 x D8s v5 AI CPU pool ($700) is gone: $8,047.50 became $8,295.04 "
+    "with HA, $5,553.50 became $5,327.27 without. Defender for Containers is not re-priced for the GPU nodes' "
+    "vCores (6 a node against the D8s v5's 8, so slightly lower). On AWS (me-central-1) the node is a "
+    "g6.2xlarge-class instance (one L4, 8 vCPU), price and regional availability to confirm.",
+    "\"When scaled up\" doubles the autoscaled lines (workload and AI GPU pools, Front Door traffic, bandwidth) for "
     "busy periods such as a holiday peak. A large on-sale runs in its own burst environment (ADR-0035, amended "
     "3 September; deploy/c-flash-sale.yml), not priced here.",
     "Not included: Azure OpenAI tokens (billed per use), SMS, email and WhatsApp fees, payment provider fees, "
@@ -693,6 +795,9 @@ NOTES_NO_HA = [
     "+$196. A second AI node, because one node cannot hold the AI floors beside the embedding model and "
     "reranker (ADR-0061): +$350. The Private Link line the sheet lacked: +$50. Defender for the extra 8 vCores "
     "and the fourth PostgreSQL server: +$70.",
+    "Recomputed 4 October 2026 (Chinmay, CHG-R11-001): the AI pool is one GPU node, NV6ads A10 v5 at $473.77, "
+    "carrying the ticvai-ai pods, Presidio, the Arabic NER, BGE-M3 and its reranker, in place of the two D8s v5 "
+    "AI nodes ($700): $5,553.50 became $5,327.27.",
 ]
 NOTES_PREPROD = [
     "One pre-production environment for acceptance testing and client demos; development runs locally on "
@@ -784,9 +889,30 @@ def cost_sheet(wb, title, prod_rows, prod_notes):
     return ws
 
 
+def stages_sheet(wb):
+    """Stage 1 (launch), its pre-production, and Stage 0 for reference (CHG-R11-003)."""
+    ws = wb.create_sheet("Stages")
+    ws["A1"] = "TICVAI - Azure cloud specs and cost, staged (Stage 1 launch; Stage 2 = the full cell sheets)"
+    ws["A1"].font = Font(bold=True, size=14)
+    ws["B3"], ws["C3"] = "AED per USD", AED
+    ws["B4"], ws["C4"] = "Margin", MARGIN
+    ws["C4"].number_format = "0%"
+    ws["D3"] = "Edit the rate, the margin and any unit price; every total is a formula."
+    ws["D4"] = "Prices: per line, the workbook's own unit price or the Azure Retail Prices API read on 4 October 2026."
+    r = cost_block(ws, 6, "Stage 1 production (launch)", STAGE_1, NOTES_STAGES, scaled_col=False)
+    r = cost_block(ws, r, "Stage 1 pre-production", STAGE_1_PREPROD, [], scaled_col=False)
+    cost_block(ws, r, "Stage 0 (reference only)", STAGE_0, [], scaled_col=False)
+    widths = [16, 16, 26, 38, 11, 46, 6, 14, 16]
+    for i, w in enumerate(widths, 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    ws.freeze_panes = "A7"
+    return ws
+
+
 def build_workbook(path):
     wb = Workbook()
     wb.remove(wb.active)
+    stages_sheet(wb)
     cost_sheet(wb, "Infra without HA", PROD_NO_HA, NOTES_NO_HA)
     cost_sheet(wb, "Infra with High Availability", PROD_HA, [
         "Zones 1-3 in UAE North: PostgreSQL zone-redundant standby (on every production tier, ADR-0060), Qdrant "
@@ -799,7 +925,7 @@ def build_workbook(path):
     ws = wb.create_sheet("Deployables")
     ws.append(["Deployable", "What it is", "Modules", "Runs on", "Replica floor (ADR-0061)"])
     runs = {"commerce": "Workload pool", "access": "Workload pool (and the venue edge node)",
-            "operations": "Workload pool", "ticvai-ai": "AI pool (tainted)", "workers": "Workload pool"}
+            "operations": "Workload pool", "ticvai-ai": "AI GPU pool (tainted)", "workers": "Workload pool"}
     floor_text = {}
     for unit, dep, f, why in FLOORS:
         floor_text.setdefault(dep, []).append((unit, f, why))
@@ -982,7 +1108,9 @@ def lld_md():
 
 > **Date:** {DATE} · **Generated by** `tools/build-hld-lld.py` · **Diagram:** [`TICVAI-LLD.svg`](TICVAI-LLD.svg)
 > **Costs:** [`TICVAI - Azure Cloud Specs & Cost.xlsx`](TICVAI%20-%20Azure%20Cloud%20Specs%20%26%20Cost.xlsx): production with high availability
-> **${ha:,.2f}** a month, without zone-level HA **${noha:,.2f}**, pre-production **${pre:,.2f}** (prices of 30 September)
+> **${ha:,.2f}** a month, without zone-level HA **${noha:,.2f}**, pre-production **${pre:,.2f}** (prices of 30 September);
+> **staged** (CHG-R11-003): launch on Stage 1 at **${month(STAGE_1):,.2f}** a month in production plus **${month(STAGE_1_PREPROD):,.2f}** of
+> pre-production; the figures before it are Stage 2, the full cell
 > **Source of sizes:** the Terraform cell module (`repos/ticvai-infra/terraform/modules/cell`), `handoff/sizing.json`,
 > the decisions of 30 September and the ADRs of 1 October. The generator checks the Terraform before it writes.
 
@@ -1008,7 +1136,7 @@ def lld_md():
 | AKS cluster | Azure CNI Overlay (pods from `{POD_CIDR}`, outside the VNet), Cilium network policy and data plane, egress through the NAT Gateway (`userAssignedNATGateway`), five node pools, a subnet per pool (the qdrant and broker pools share `snet-aks-data`) | Standard tier |
 | AKS system pool | Kubernetes system services, the ingress gateway | D4s v5, autoscale 2-4 nodes, zones 1-3 |
 | AKS workload pool | `commerce`, `access`, `operations`, `workers`: floors 3, 2, 2 and 2 | D8s v5, autoscale 3-20 nodes, zones 1-3 |
-| AKS AI pool | `ticvai-ai` (real-time 2, 3 in a large cell; interactive 1; batch 0), the embedding model and the reranker (CPU); tainted `ticvai.io/pool=ai` | D8s v5, autoscale 2-4 nodes |
+| AKS AI GPU pool | The only AI pool (CHG-R11-001): `ticvai-ai` (real-time 2, 3 in a large cell; interactive 1; batch 0; about 1 vCPU a pod), Presidio, and on the GPU BGE-M3, its reranker and the Arabic NER; never an LLM; tainted `ticvai.io/pool=ai` | NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB): 2 nodes, one per zone (1 without HA); step up to NV12ads A10 v5 on CPU or GPU memory pressure |
 | AKS qdrant pool | Qdrant 1.16 or later, open source, official Helm chart: 3 nodes, one per zone, replication factor 2, TLS on the service; tainted `ticvai.io/pool=data` | E4s v5 x3, Premium SSD P15 256 GB each |
 | AKS broker pool | The broker while it is self-run: RabbitMQ on the Cluster Operator, 3 nodes, quorum queues on persistent disks; tainted `ticvai.io/pool=data`. Not built (`broker_self_hosted = false`) if the client takes the recommended CloudAMQP | D2s v5 x3, Premium SSD P10 128 GB each |
 | Database | PostgreSQL Flexible Server 16: primary with a zone-redundant standby on every production tier, the shared cell included (ADR-0060, decided 1 October); 2 read replicas; a reporting replica; the AI log database (a server of its own, ADR-0020 as amended by ADR-0049; not yet in the Terraform cell module) | General Purpose D4ds v5, 256 GB each; reporting D2ds v5; AI log D4ds v5 with 1 TB |
@@ -1024,9 +1152,10 @@ def lld_md():
 A floor is survivability, not load: enough replicas to lose one zone and keep serving. It is each Deployment's
 `minReplicas`, from the Terraform output `replica_floors`; above it each unit autoscales on requests per second
 (ADR-0032, amended by ADR-0038 and ADR-0064), with no maximum. **The node counts carry the floors:** three workload nodes hold the nine .NET floor
-replicas, one `commerce` replica per zone; two AI nodes hold the three AI floor pods beside the embedding model
-and reranker, and a large cell's third real-time pod takes a third. Pod sizes are assumptions (about 1 vCPU for a
-.NET replica, 2 vCPU for an AI pod) until `tools/bench.py` measures them in sprint 2.
+replicas, one `commerce` replica per zone; two AI GPU nodes hold the three AI floor pods beside Presidio,
+BGE-M3, its reranker and the Arabic NER, and a large cell's third real-time pod fits on them. Pod sizes are
+assumptions (about 1 vCPU for a .NET replica, about 1 vCPU for an AI pod) until `tools/bench.py` measures them in
+sprint 2.
 
 ## Network
 
@@ -1176,8 +1305,10 @@ def readme():
 | `TICVAI - Azure Cloud Specs & Cost.xlsx` | Specs and monthly cost, without and with high availability, for production and pre-production; editable rate, margin and prices |
 
 Monthly totals (USD, prices of 30 September 2026): with high availability ${month(PROD_HA):,.2f}; without zone-level
-HA ${month(PROD_NO_HA):,.2f} (PostgreSQL stays zone-redundant; recomputed 1 October, see the sheet's notes);
-pre-production ${month(PREPROD):,.2f}.
+HA ${month(PROD_NO_HA):,.2f} (PostgreSQL stays zone-redundant; recomputed 1 and 4 October, see the sheet's notes; the AI pool is one GPU node pool since 4 October, CHG-R11-001);
+pre-production ${month(PREPROD):,.2f}. **Staged (CHG-R11-003):** the platform launches on Stage 1, ${month(STAGE_1):,.2f}
+a month in production plus ${month(STAGE_1_PREPROD):,.2f} of pre-production (the workbook's Stages sheet); the totals above
+are Stage 2, the full cell.
 
 The polished drawings are made in Claude Design from [`../design-batches/HLD-LLD/`](../design-batches/HLD-LLD/BRIEF.md).
 """
@@ -1271,7 +1402,8 @@ def main():
         write(keep, "")
     print("hld-lld: 2 diagrams, 2 documents, 1 workbook; Claude Design brief and architecture.json; "
           f"Terraform agrees; no line crosses a box. Monthly USD: HA {month(PROD_HA):,.2f}, "
-          f"without zone HA {month(PROD_NO_HA):,.2f}, pre-production {month(PREPROD):,.2f}")
+          f"without zone HA {month(PROD_NO_HA):,.2f}, pre-production {month(PREPROD):,.2f}; Stage 1 "
+          f"{month(STAGE_1):,.2f} + pre-production {month(STAGE_1_PREPROD):,.2f}; Stage 0 {month(STAGE_0):,.2f}")
 
 
 if __name__ == "__main__":

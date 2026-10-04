@@ -180,7 +180,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Engagement & Support · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WEB-WEB-025 |
+| Block | Block A · ticket #28806 (APP-WEB-WEB-025) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -425,7 +425,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-026 |
+| Block | Block A · ticket #28807 (APP-WEB-WEB-026) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`submitReview`) and no read of a population — it is settings, not a list |
@@ -855,7 +855,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Engagement & Support · wave 1 · needs the `core` module |
-| Block | Block A · task APP-WEB-WEB-028 |
+| Block | Block A · ticket #27888 (APP-WEB-WEB-028) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1021,7 +1021,7 @@ Also set there, as content the tenant writes: contact.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Engagement & Support · wave 1 · needs the `ai` module |
-| Block | Block A · task APP-WEB-WEB-044 |
+| Block | Block A · ticket #28859 (APP-WEB-WEB-044) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): The conversation and its state (thinking, answered, handed to a person) are the content; the menu is only a shortcut (design-notes correction ai, CHG-SGU-016) |
@@ -1292,7 +1292,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-046 |
+| Block | Block A · ticket #28805 (APP-WEB-WEB-046) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (compact density): `listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn |

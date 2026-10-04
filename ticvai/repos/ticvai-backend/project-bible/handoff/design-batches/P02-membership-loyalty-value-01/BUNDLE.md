@@ -145,7 +145,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `retail` module |
-| Block | Block A · task APP-MOB-GST-011 |
+| Block | Block A · ticket #28313 (APP-MOB-GST-011) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act |
@@ -354,7 +354,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-015 |
+| Block | Block A · ticket #28298 (APP-MOB-GST-015) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listDelegations` reads the population and `getMyMemberships` reads one of them — list, select, act |
@@ -627,7 +627,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Membership, Loyalty & Value · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-MOB-GST-036 |
+| Block | Block A · ticket #28817 (APP-MOB-GST-036) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |

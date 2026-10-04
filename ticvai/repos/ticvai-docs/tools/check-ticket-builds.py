@@ -16,8 +16,10 @@ handoff/service-decomposition.json and docs/adr/):
   B-UNRESOLVED    an id in a ticket's builds is no operation, screen, table, service or ADR of the package
   B-AI-EMPTY      a Block A AI engine task (AI-ENGINE-*, docs/active/block-a-extra-tasks.json) builds nothing: the
                   operations it serves or implements, its tables and ADRs go in the task's `operations` and `builds`
-  B-HOSTED-MODEL  a task's text plans a model we host or a GPU pool (gpt-oss in the cell, a Qwen3Guard host, vLLM, a GPU
-                  node pool, an embedding or reranking model of our own: CHG-RONEP-008): "We are not hosting anything unless the client asks" (Chinmay, 3 October, CHG-RONEP-004)
+  B-HOSTED-MODEL  a task's text plans an LLM we host (gpt-oss in the cell, a Qwen3Guard host, vLLM, a self-hosted LLM or
+                  guard, an LLM on our GPU): "We are not hosting anything unless the client asks" (Chinmay, 3 October,
+                  CHG-RONEP-004). The embedding model, its reranker, Presidio and the Arabic NER on the AI GPU node
+                  pool in the cell are ours and allowed (Chinmay, 4 October, CHG-R11-001, reversing CHG-RONEP-008)
   B-MODULE-TEST   a module test builds nothing although its app-module's tasks build something, or its done-when
                   names none of what it builds
   B-SETUP-LINKS   a setup ticket links an operation outside its slice, or a rest-of-the-screen ticket links one of
@@ -55,7 +57,7 @@ import ticket_done as td  # noqa: E402
 RULES = {
     "B-UNRESOLVED": "a ticket builds an id that is no operation, screen, table, service or ADR (r1 gate G2, CHG-RONEP-003)",
     "B-AI-EMPTY": "a Block A AI engine task names no operation, table or ADR it builds (r1 gate G2, CHG-RONEP-003)",
-    "B-HOSTED-MODEL": "a task plans a model or GPU pool we host, against Chinmay's 3 October decision (CHG-RONEP-004)",
+    "B-HOSTED-MODEL": "a task plans an LLM we host, against Chinmay's 3 October decision (CHG-RONEP-004; embeddings are ours, CHG-R11-001)",
     "B-MODULE-TEST": "a module test names nothing it tests, in its builds or its done-when (r1 gate G1, CHG-RONEP-003)",
     "B-SETUP-LINKS": "a setup or rest-of-the-screen ticket links operations outside its part (r1 gate G4, CHG-RONEP-003)",
     "B-SCOPE-NAMED": "a split screen's ticket does not name exactly its operations and the ticket with the rest (CHG-FXP-001)",
@@ -106,7 +108,10 @@ def main() -> int:
             guard.add("B-AI-EMPTY", t["key"], f"{t['key']} builds nothing: name its operations, tables and ADRs in "
                                               "block-a-extra-tasks.json `operations` / `builds`")
 
-    hosted = re.compile(r"gpt-oss|Qwen3Guard|vLLM|GPU (?:node )?pool|in-cell (?:open )?model|self-hosted (?:guard|LLM|model)|BGE-M3|Qwen3-(?:Embedding|Reranker)|(?:embeddings?|reranking)[^.;]{0,30}self-hosted", re.I)
+    # 4 October (CHG-R11-001): the embedding model (BGE-M3), its reranker, Presidio and the Arabic NER are ours, on the
+    # AI GPU node pool in the cell, so BGE-M3, a GPU pool and a self-hosted embedder are no longer refused; an LLM still is.
+    hosted = re.compile(r"gpt-oss|Qwen3Guard|vLLM|in-cell (?:open model|LLM)|self-hosted (?:guard|LLM|open model|chat model)"
+                        r"|(?:LLM|language model|chat model)[^.;]{0,30}\bon (?:our|the) GPU", re.I)
     # A negated mention is the decision itself, not a plan: "no in-cell model: we host none" (CHG-R1S-002 in
     # AI-ENGINE-GATEWAY) failed the r1 merge refresh until this (CHG-GTRB-003).
     negated = re.compile(r"\b(?:no|not|never|without|nor)\s+(?:an?\s+|any\s+)?$", re.I)

@@ -16,6 +16,8 @@ The rules live in `tools/screen_patterns.py`, shared with the generators and the
     P8   a Block A screen that says it is not in the first release, or is
          not wave 1                                                           (CHG-SPF-006)
     DEC  a screen Chinmay's 3 October answers changed drifts back             (CHG-SPF-007..013)
+         or a guest account overlay asks for a password again (passwordless,
+         CHG-FXS-003)                                                         (CHG-R11-002)
     READ a screen shows data and binds no read, or edits saved data (PUT or
          PATCH) and binds no read that returns it: the r1 gate's G3           (CHG-R1S-004)
          Block A fails on any; outside Block A the count may only fall
@@ -140,6 +142,10 @@ DECIDED = [
     ("CHG-SPF-013", "GST-070", "with", "listBookableOutlets"),
     ("CHG-SPF-013", "EMP-026", "with", "uploadIncidentMedia"),
     ("CHG-SPF-013", "EMP-026", "with", "addIncidentPerson"),
+    # Guest accounts are passwordless (CHG-FXS-003): the overlay that links a guest checkout to an account is
+    # "Create an account" (email, code, verify), never "Set a password" (4 October 2026, CHG-R11-002).
+    ("CHG-R11-002", "WEB-013", "passwordless", "linkGuestCheckout"),
+    ("CHG-R11-002", "GST-010", "passwordless", "linkGuestCheckout"),
 ]
 # READ outside Block A: 545 on 3 October (430 screens with no read, 115 edits with no read back), found
 # by the rule that fixed the 47 in Block A (CHG-R1S-004); 574 once the same day's lineage fix (CHG-R1S-005)
@@ -173,6 +179,15 @@ def decided(S) -> list:
             out.append(("DEC", sid, f"{chg}: {op} is read on load again"))
         elif rule == "no-buttons" and any(c.get("kind") in BUTTONS for _, c in sp.components(s)):
             out.append(("DEC", sid, f"{chg}: a read-only display has a button again"))
+        elif rule == "passwordless":
+            for o in s.get("overlays") or []:
+                if (o.get("confirm") or {}).get("operation") != op:
+                    continue
+                words = " ".join(str(x or "") for x in (o.get("trigger"), (o.get("confirm") or {}).get("label"),
+                                                         o.get("body"))).lower().replace("no password", "").replace("passwordless", "")
+                if "password" in words:
+                    out.append(("DEC", sid, f"{chg}: overlay {o.get('id')} asks for a password; guest accounts "
+                                            f"are passwordless (Create an account: email, code, verify)"))
     return out
 
 

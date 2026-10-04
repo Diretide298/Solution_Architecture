@@ -123,7 +123,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-042 |
+| Block | Block B · ticket #29557 (APP-PARTNER-PTR-042) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner should show) — counts over a population, then the population |
@@ -337,7 +337,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-043 |
+| Block | Block B · ticket #29730 (APP-PARTNER-PTR-043) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -518,7 +518,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-044 |
+| Block | Block B · ticket #29733 (APP-PARTNER-PTR-044) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -831,7 +831,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-045 |
+| Block | Block B · ticket #29519 (APP-PARTNER-PTR-045) |
 | Who uses it | partner staff holding `ORDER_MODIFY`, `PLATFORM_TENANT_VIEW` (1 operate, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -976,7 +976,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-046 |
+| Block | Block B · ticket #29734 (APP-PARTNER-PTR-046) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each line should show) — counts over a population, then the population |
@@ -1150,7 +1150,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-049 |
+| Block | Block B · ticket #29520 (APP-PARTNER-PTR-049) |
 | Who uses it | partner staff holding `CASE_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
@@ -1340,7 +1340,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-050 |
+| Block | Block B · ticket #29521 (APP-PARTNER-PTR-050) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1468,7 +1468,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-051 |
+| Block | Block B · ticket #29522 (APP-PARTNER-PTR-051) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |

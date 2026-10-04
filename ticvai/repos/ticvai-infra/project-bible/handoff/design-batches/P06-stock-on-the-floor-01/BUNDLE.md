@@ -1068,7 +1068,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 1 · needs the `inventory` module |
-| Block | Block A · task APP-SETUP-EMP-065 |
+| Block | Block A · ticket #28719 (APP-SETUP-EMP-065) |
 | Who uses it | venue staff holding `INCIDENT_REPORT`, `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 2 read, 1 configure); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getStockTransfer` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1615,7 +1615,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-SETUP-EMP-067-REST |
+| Block | Block A · ticket #28583 (APP-SETUP-EMP-067-REST) |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE` (2 configure, 2 operate, 1 read); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`) and no read of a population — it is settings, not a list |

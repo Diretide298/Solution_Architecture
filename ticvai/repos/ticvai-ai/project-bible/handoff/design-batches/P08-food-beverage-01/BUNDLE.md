@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | Block A · task VM-BO-020 |
+| Block | Block A · ticket #28598 (VM-BO-020) |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `SCOPE_VIEW` (1 operate, 2 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listFnbOrders` reads the population and `getFnbOrder` reads one of them — list, select, act |
@@ -466,7 +466,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | Block A · task VM-BO-021 |
+| Block | Block A · ticket #28596 (VM-BO-021) |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -692,7 +692,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-SETUP-BO-045-REST |
+| Block | Block A · ticket #28760 (APP-SETUP-BO-045-REST) |
 | Who uses it | venue staff holding `APPROVAL_REQUEST`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (1 operate, 1 configure, 2 read); in the flows as supervisor, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads the population and `getMenu` reads one of them — list, select, act |
@@ -1447,7 +1447,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-104 |
+| Block | Block A · ticket #29009 (VM-BO-104) |
 | Who uses it | venue staff holding `REPORT_VIEW_OWN`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -2096,7 +2096,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-SETUP-BO-136 |
+| Block | Block A · ticket #27944 (APP-SETUP-BO-136) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 configure, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProductionRuns` reads the population and `getVenueSettings` reads one of them — list, select, act |

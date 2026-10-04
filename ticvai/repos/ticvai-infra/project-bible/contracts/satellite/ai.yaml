@@ -1525,7 +1525,8 @@ paths:
         applies whatever the tenant''s residency class. **The guard is the provider''s content-safety service,
         not a model we host** (Chinmay, 3 October: "We are not hosting anything unless client asks it";
         CHG-R1S-002): Azure AI Content Safety in UAE North for `uaeOnly`, the provider''s own moderation for
-        BYOK and `globalAllowed`. The Presidio scrubber stays a CPU library inside our worker. With the scrubber
+        BYOK and `globalAllowed`. The Presidio scrubber and the Arabic NER run on the AI GPU node pool in our cell,
+        beside the embedding model (4 October, CHG-R11-001). With the scrubber
         or the safety service down the call is refused `503 scrubber-unavailable`, never sent raw; a message or
         reply the guard blocks is refused `422 guard-refused`.
 
@@ -17022,9 +17023,13 @@ components:
             residency decision; CHG-CSA-002). The gateway routes a call for a tenant only to a provider whose list
             holds the tenant''s class (tenancy, common `AiResidencyClass`, default `uaeOnly`); `setAiProvider`
             refuses a provider that cannot serve the tenant''s class (`409 residency-class-refused`). A `uaeOnly`
-            call can only resolve to an in-UAE endpoint: Core42 Compass or OpenAI UAE (no in-cell model since 3 October,
-            CHG-R1S-002). **Embedding calls route the same way** (CHG-R1S-026): the provider''s embedding model on the UAE
-            route (OpenAI UAE `text-embedding-3-large` or Core42), scrubbed like any call; no embedding model is hosted.
+            LLM call can only resolve to an in-UAE endpoint: Core42 Compass or OpenAI UAE (we host no LLM unless a
+            client asks, 3 October, CHG-R1S-002). **Embeddings and reranking are ours, not a provider''s** (Chinmay,
+            4 October, CHG-R11-001): BGE-M3 and its reranker run on the AI GPU node pool in our own cell in UAE North,
+            beside Presidio and the Arabic NER, so tenant content is embedded in the cell and never leaves it to be
+            embedded; the vectors stay in the cell''s Qdrant. Retrieval is hybrid: our BGE-M3 dense vectors with
+            Qdrant''s BM25 sparse index, reranked by our reranker. Embeddings and reranking are platform-owned, so no
+            provider row serves them in any residency class.
 
             '
         maxTokens:
@@ -17195,8 +17200,9 @@ components:
             input and output guard checks both directions: **the provider''s content-safety service, not a model we
             host** (Chinmay, 3 October: we host no LLM unless a client asks, and a guard model is an LLM;
             CHG-R1S-002): Azure AI Content Safety in UAE North for `uaeOnly`, the provider''s own moderation for BYOK
-            and `globalAllowed`. The scrubber stays a CPU library in our own worker and is mandatory in every
-            residency class. **Fails closed**: with the scrubber or the safety service down, the call is refused
+            and `globalAllowed`. Presidio and the Arabic NER run on the AI GPU node pool in our own cell, beside the
+            embedding model (Chinmay, 4 October, CHG-R11-001), and scrubbing is mandatory in every residency class.
+            **Fails closed**: with the scrubber, its GPU node or the safety service down, the call is refused
             (`503 scrubber-unavailable`), never sent raw. This object reports what is in force.
 
 

@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Ticketing · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-030 |
+| Block | Block A · ticket #28224 (APP-WEB-WEB-030) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listOrders` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -348,7 +348,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Ticketing · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-031 |
+| Block | Block A · ticket #28228 (APP-WEB-WEB-031) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listReservations` reads the population and `getReservation` reads one of them — list, select, act |
@@ -674,7 +674,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Ticketing · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-035 |
+| Block | Block A · ticket #28396 (APP-WEB-WEB-035) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

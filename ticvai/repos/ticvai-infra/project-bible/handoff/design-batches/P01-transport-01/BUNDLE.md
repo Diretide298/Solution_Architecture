@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Transport · wave 1 · needs the `transport` module |
-| Block | Block A · task APP-WEB-WEB-049 |
+| Block | Block A · ticket #28512 (APP-WEB-WEB-049) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `searchTransportDepartures` reads the population of departures and one is chosen for a price card and a route — list, select, act; the prototype draws one-way, multi-trip and favourites as tabs of … |

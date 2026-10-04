@@ -1,0 +1,56 @@
+id: CHG-R11-003
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: The cost basis is staged. The platform launches on Stage 1 (two D8s v5 nodes with everything in-cluster, a load
+  balancer, zone-redundant PostgreSQL, the AI GPU node), $2,254.47 a month in production plus $566.00 of pre-production
+  on Azure UAE North, and grows to the full cell (Stage 2, $5,327.27 / $8,295.04) later; ADR-0061's floors apply from
+  Stage 2.
+decision:
+  what: 'A Stages view in the cost workbook (tools/build-hld-lld.py STAGE_1, STAGE_1_PREPROD, STAGE_0; the Stages sheet
+    of handoff/hld-lld/TICVAI - Azure Cloud Specs & Cost.xlsx) and in docs/active/deployment-configs-costed.md, priced
+    line by line from the workbook''s unit prices or the Azure Retail Prices API of 4 October (said per line). Stage 1
+    production: AKS Free control plane $0; 2 x D8s v5 $700 (every deployable, Redis, Qdrant and the broker in-cluster,
+    one replica each, same images and Helm chart as the cell); Qdrant, broker and Redis disks $81; Standard load
+    balancer $23.25; static egress IP $3.65; PostgreSQL Flexible D4ds v5 with zone-redundant standby $640 and storage
+    $72 (ADR-0060 holds); NV6ads A10 v5 GPU node $473.77 (CHG-R11-001); Blob $45; Container Registry $20; Key Vault
+    $5; Front Door Standard $100.80; bandwidth $20; Log Analytics $70: $2,254.47. Minimal pre-production $566.00
+    (Stage 1 in all $2,820.47). Stage 2 is the full cell already in the workbook. Stage 0 (one D16s v5 + the GPU
+    node, $1,161.43) is a reference line only. ADR-0061 amended: the floors apply from Stage 2; at Stage 1 one
+    replica per deployable across the two nodes. The move to Stage 2: a paying venue needing ADR-0060''s availability
+    targets, traffic beyond Stage 1 sustained (CPU above about 70% on both nodes at the daily peak for a week, or the
+    GPU node at its limit), a large on-sale booked, or a client needing the Premium WAF or a private origin.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Chinmay, 4 October 2026 (the correction note of 4 October in
+  docs/active/decisions/answers-3-october-gate-and-hosting.md): "Staged: start ~$1.9k", from the 25 September AWS
+  hosting-cost board (Stage 0 one m6i.4xlarge $716; Stage 1 two servers + LB + Postgres Multi-AZ about $1,053 + GPU;
+  Stage 2 the shared cell). His ~$1.9k covers the servers, PostgreSQL and the GPU node ($1,885.77 here); the rest of a
+  launch platform (entry, storage, logs, egress IP, load balancer, disks) brings Stage 1 production to $2,254.47.
+  Follows CHG-R11-001 (the GPU node) and amends ADR-0061.'
+keys_touched:
+  files:
+  - tools/build-hld-lld.py
+  - handoff/hld-lld/TICVAI - Azure Cloud Specs & Cost.xlsx
+  - handoff/hld-lld/TICVAI-LLD.md
+  - handoff/hld-lld/README.md
+  - docs/active/deployment-configs-costed.md
+  - docs/adr/0061-replica-floors-per-deployable.md
+  - docs/active/decisions/answers-3-october-gate-and-hosting.md
+  other:
+  - ADR-0061
+  - ADR-0060
+root_class: 'new: cost-basis-not-staged'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-hld-lld.py::STAGE_1
+status: open
+notes: 'Batch R11 (r1.1, branch r11-ai-hosting), 4 October 2026. Not in the AWS figures: the g6.2xlarge price and
+  me-central-1 availability are still to confirm. No Block A task provisions the Stage 1 shape in the Terraform cell
+  module yet (a plan change if one is added). Close on the commit that merges it.'

@@ -154,7 +154,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-105 |
+| Block | Block A · ticket #29005 (VM-BO-105) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listInventoryItems` reads the population and `getVenueSettings` reads one of them — list, select, act |

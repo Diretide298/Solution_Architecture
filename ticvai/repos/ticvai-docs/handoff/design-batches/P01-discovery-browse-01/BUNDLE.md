@@ -143,7 +143,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Discovery & Browse · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-001 |
+| Block | Block A · ticket #28333 (APP-WEB-WEB-001) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act |
@@ -560,7 +560,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Discovery & Browse · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-002 |
+| Block | Block A · ticket #28684 (APP-WEB-WEB-002) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -939,7 +939,7 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Discovery & Browse · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-003 |
+| Block | Block A · ticket #28145 (APP-WEB-WEB-003) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `searchCatalogue` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1145,7 +1145,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Discovery & Browse · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-004 |
+| Block | Block A · ticket #28685 (APP-WEB-WEB-004) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listPerformances` reads the population and `getProduct` reads one of them — list, select, act |
@@ -1485,7 +1485,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Discovery & Browse · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-WEB-WEB-050 |
+| Block | Block A · ticket #28200 (APP-WEB-WEB-050) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | multiStepForm (compact density): The Visit Planner prototype: six questions, then the plan with Book this plan |

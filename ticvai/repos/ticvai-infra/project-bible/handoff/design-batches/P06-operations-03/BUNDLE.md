@@ -462,7 +462,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `queue` module |
-| Block | Block A · task APP-STAFF-EMP-032 |
+| Block | Block A · ticket #28706 (APP-STAFF-EMP-032) |
 | Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read); in the flows as guest, supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -633,7 +633,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
-| Block | Block B · task APP-STAFF-EMP-033 |
+| Block | Block B · ticket #29663 (APP-STAFF-EMP-033) |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
@@ -1467,7 +1467,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | Block A · task APP-STAFF-EMP-026 |
+| Block | Block A · ticket #28657 (APP-STAFF-EMP-026) |
 | Who uses it | venue staff holding `GUEST_VIEW`, `INCIDENT_REPORT`, `INCIDENT_VIEW` (2 read, 1 operate); in the flows as supervisor, technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listIncidents` reads the population and `getIncident` reads one of them — list, select, act |

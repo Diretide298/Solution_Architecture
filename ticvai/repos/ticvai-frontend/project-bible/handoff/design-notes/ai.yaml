@@ -1446,8 +1446,8 @@ screens:
         priority: 1
         managedBy: TICVAI
         fitness: OK
-      - kind: Azure OpenAI
-        model: text-embedding-3-large
+      - kind: TICVAI AI GPU node pool (in the cell, platform-owned; CHG-R11-001)
+        model: BGE-M3
         tasks:
         - embeddings
         priority: 1

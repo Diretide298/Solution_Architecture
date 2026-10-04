@@ -464,7 +464,7 @@
    {
     "operationId": "linkGuestCheckout",
     "contract": "identity",
-    "purpose": "Set a password: turn the guest-checkout order into an account",
+    "purpose": "Create an account: once verifyGuestEmail proves the code, move the guest-checkout order to the new account (CHG-R11-002)",
     "trigger": "onAction"
    },
    {
@@ -530,16 +530,20 @@
    {
     "id": "formLinkGuestCheckout",
     "component": "modal",
-    "trigger": "Set a password",
-    "body": "A password for the account; the order and the verified contact come from the checkout just made.",
+    "trigger": "Create an account",
+    "body": "**Create an account, with no password** (guest accounts are passwordless, CHG-FXS-003): the email for the account, the order's email prefilled; **Send me a code** (`registerGuest`, channel email); the six-digit code sent to it; **Verify the code** (`verifyGuestEmail`, mode code); then the order moves to the new account (`linkGuestCheckout`). There is no password field. Dismissing before the code is verified links nothing.",
     "confirm": {
-     "label": "Set a password",
+     "label": "Create an account",
      "operation": "linkGuestCheckout"
     },
     "dismiss": {
-     "label": "Cancel"
+     "label": "Cancel",
+     "discards": [
+      "identifier",
+      "code"
+     ]
     },
-    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
+    "provenance": "corrected 4 October 2026 (CHG-R11-002; passwordless, CHG-FXS-003)"
    },
    {
     "id": "formVerifyGuestEmail",

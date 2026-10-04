@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-009 |
+| Block | Block A · ticket #28236 (APP-MOB-GST-009) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |
@@ -514,7 +514,7 @@ Also set there, as content the tenant writes: settings.
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-010 |
+| Block | Block A · ticket #27742 (APP-MOB-GST-010) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
@@ -556,9 +556,9 @@ Also set there, as content the tenant writes: settings.
 
 Errors to draw in the form: 400 Validation failed
 
-**Form: Set a password** (modal, opened by *Set a password*; *Set a password* calls `linkGuestCheckout`, *Cancel* sends nothing)
+**Form: Create an account** (modal, opened by *Create an account*; *Create an account* calls `linkGuestCheckout`, *Cancel* sends nothing)
 
-A password for the account; the order and the verified contact come from the checkout just made.
+**Create an account, with no password** (guest accounts are passwordless, CHG-FXS-003): the email for the account, the order's email prefilled; **Send me a code** (`registerGuest`, channel email); the six-digit code sent to it; **Verify the code** (`verifyGuestEmail`, mode code); then the order moves to the new account (`linkGuestCheckout`). There is no password field. Dismissing before the code is verified links nothing.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -742,7 +742,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · task APP-MOB-GST-041 |
+| Block | Block A · ticket #28238 (APP-MOB-GST-041) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |

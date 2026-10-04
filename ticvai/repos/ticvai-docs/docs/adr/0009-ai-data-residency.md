@@ -7,6 +7,23 @@
 
 ---
 
+## Amended 4 October 2026: we host the embedding model, never an LLM
+
+**Decided by Chinmay, 4 October 2026** (change entry CHG-R11-001, which reverses CHG-R1S-026; the correction note
+of 4 October in `docs/active/decisions/answers-3-october-gate-and-hosting.md`): *"we have to host for embeddings
+only not for LLM"*. The 3 October record turned his "We have a GPU server" into provider embeddings; that was a
+mis-recording.
+
+- **Ours, in the cell:** the embedding model (BGE-M3), its reranker, Presidio and the Arabic NER run with the
+  `ticvai-ai` pods on one AI GPU node pool: Azure NV6ads A10 v5 in UAE North (6 vCPU, 55 GB, a sixth of an A10 with 4 GB), one node without high availability and two with it, one per zone; on AWS (me-central-1, UAE) a g6.2xlarge-class node (one L4, 8 vCPU), its price and regional availability to confirm. Tenant content is embedded in the cell and never sent to a provider to be
+  embedded; the vectors stay in Qdrant (ADR-0049), so the table below holds for embeddings end to end.
+- **Never ours unless a client asks: an LLM.** LLM calls stay with the providers (Core42 Compass by default,
+  OpenAI UAE as fallback, BYOK); the guard stays the provider's content-safety service.
+- In the 3 October amendment below, "the cell has no GPU node pool", "Presidio, a CPU library in our worker" and "Embeddings are the provider's too" no
+  longer hold.
+
+---
+
 ## Amended 3 October 2026: no in-cell model
 
 **Decided by Chinmay, 3 October 2026** (`docs/active/decisions/answers-3-october-gate-and-hosting.md`; change
@@ -14,7 +31,7 @@ entry CHG-R1S-002): *"We are not hosting anything unless client asks it."* The U
 UAE region only**: the in-cell open model (gpt-oss-120b) is dropped, and the cell has no GPU node pool. Item 4
 of the 2 October amendment changes: **the guard is the provider's content-safety service** (ADR-0020 as amended
 the same day), not a model in the cell; PII detection (Presidio, a CPU library in our worker) stays in the cell.
-**Embeddings are the provider's too** (Chinmay, later the same evening; CHG-R1S-026): OpenAI UAE
+**[Superseded 4 October, CHG-R11-001: the embeddings are ours, in the cell.]** **Embeddings are the provider's too** (Chinmay, later the same evening; CHG-R1S-026): OpenAI UAE
 `text-embedding-3-large` or Core42 on the UAE route, chosen by the residency class and scrubbed like any call;
 no embedding model is hosted by us. The vectors stay in the cell, in Qdrant (ADR-0049), so the table below
 still holds for embeddings as stored data. The on-premise class runs models only on a client's own estate,

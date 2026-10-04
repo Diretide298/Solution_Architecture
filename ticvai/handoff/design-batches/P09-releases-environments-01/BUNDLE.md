@@ -123,7 +123,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-022 |
+| Block | Block B · ticket #29217 (APP-CONSOLE-ADM-022) |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReleases` reads the population and `getRelease` reads one of them — list, select, act |
@@ -373,7 +373,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-023 |
+| Block | Block B · ticket #29218 (APP-CONSOLE-ADM-023) |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReleases` reads the population and `getReleaseReadiness` reads one of them — list, select, act |
@@ -600,7 +600,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-024 |
+| Block | Block B · ticket #29222 (APP-CONSOLE-ADM-024) |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -786,7 +786,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-025 |
+| Block | Block B · ticket #29211 (APP-CONSOLE-ADM-025) |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listUpgradeSchedules` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -944,7 +944,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-026 |
+| Block | Block B · ticket #29225 (APP-CONSOLE-ADM-026) |
 | Who uses it | ticvai staff holding `DEVELOPER_ADMIN`, `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 configure, 2 read, 1 operate) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1157,7 +1157,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 1 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-027 |
+| Block | Block B · ticket #29209 (APP-CONSOLE-ADM-027) |
 | Who uses it | ticvai staff holding `PLATFORM_MIGRATION_APPLY`, `PLATFORM_MIGRATION_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMigrations` reads the population and `getVersionSkew` reads one of them — list, select, act |
@@ -1382,7 +1382,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-028 |
+| Block | Block B · ticket #29204 (APP-CONSOLE-ADM-028) |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listEnvironments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1536,7 +1536,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-700 |
+| Block | Block B · ticket #29206 (APP-CONSOLE-ADM-700) |
 | Who uses it | ticvai staff holding `PLATFORM_MIGRATION_APPLY`, `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 operate, 1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): One package moving through export, diff, approval and apply; each step shows its result before the next. |

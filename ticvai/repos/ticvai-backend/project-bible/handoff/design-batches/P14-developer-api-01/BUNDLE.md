@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 1 · needs the `developerApi` module |
-| Block | Block A · task APP-DEVPORTAL-DEV-001 |
+| Block | Block A · ticket #27982 (APP-DEVPORTAL-DEV-001) |
 | Who uses it | partner staff holding `DEVELOPER_VIEW` (1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listApiVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -318,7 +318,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 1 · needs the `developerApi` module |
-| Block | Block A · task APP-SETUP-DEV-002 |
+| Block | Block A · ticket #27978 (APP-SETUP-DEV-002) |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`registerDeveloper`, `setDeveloperMembers`) and no read of a population — it is settings, not a list |
@@ -518,7 +518,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 1 · needs the `developerApi` module |
-| Block | Block A · task APP-SETUP-DEV-003 |
+| Block | Block A · ticket #27984 (APP-SETUP-DEV-003) |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listApiClients` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -777,7 +777,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | Block B · task APP-DEVPORTAL-DEV-004 |
+| Block | Block B · ticket #29587 (APP-DEVPORTAL-DEV-004) |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listSandboxes` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1015,7 +1015,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | Block B · task APP-DEVPORTAL-DEV-005 |
+| Block | Block B · ticket #29584 (APP-DEVPORTAL-DEV-005) |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listWebhookSubscriptions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1230,7 +1230,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | Block B · task APP-DEVPORTAL-DEV-006 |
+| Block | Block B · ticket #29585 (APP-DEVPORTAL-DEV-006) |
 | Who uses it | partner staff holding `DEVELOPER_VIEW` (1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | statusTracker (compact density): `getApiUsage` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1389,7 +1389,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 3 · needs the `developerApi` module |
-| Block | Block B · task APP-DEVPORTAL-DEV-007 |
+| Block | Block B · ticket #29588 (APP-DEVPORTAL-DEV-007) |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listIntegrationListings` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1560,7 +1560,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 1 · needs the `developerApi` module |
-| Block | Block A · task APP-SETUP-DEV-008 |
+| Block | Block A · ticket #27985 (APP-SETUP-DEV-008) |
 | Who uses it | partner staff holding `DEVELOPER_ADMIN`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setApiQuota`, `certifyIntegration`, `setApiLicensing`) and no read of a population — it is settings, not a list |

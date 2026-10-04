@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `resources` module |
-| Block | Block A · task VM-BO-096 |
+| Block | Block A · ticket #28640 (VM-BO-096) |
 | Who uses it | venue staff holding `RESOURCE_BOOK`, `RESOURCE_VIEW` (1 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getResourceAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -354,7 +354,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `resources` module |
-| Block | Block A · task VM-BO-097 |
+| Block | Block A · ticket #28642 (VM-BO-097) |
 | Who uses it | venue staff holding `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK`, `RESOURCE_VIEW` (2 operate, 2 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`checkOutResource`, `checkInResource`, `authoriseStoredValue`) and no read of a population — it is settings, not a list |
@@ -961,7 +961,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `core` module |
-| Block | Block A · task VM-BO-103 |
+| Block | Block A · ticket #28787 (VM-BO-103) |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE`, `SCOPE_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAccessPoints` reads the population and `getVenueSettings` reads one of them — list, select, act |

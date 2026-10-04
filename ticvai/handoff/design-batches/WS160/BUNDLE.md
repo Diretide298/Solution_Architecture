@@ -1356,7 +1356,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 1 · needs the `resources` module |
-| Block | Block A · task APP-SETUP-BO-911 |
+| Block | Block A · ticket #28440 (APP-SETUP-BO-911) |
 | Who uses it | venue staff holding `INSPECTION_MANAGE`, `INSPECTION_SUBMIT`, `INSPECTION_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Track) and no metric row |
