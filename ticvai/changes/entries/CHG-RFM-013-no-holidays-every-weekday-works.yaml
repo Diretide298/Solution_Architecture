@@ -29,5 +29,6 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/sprint_plan.py::HOLIDAYS
-status: open
+status: closed
+closed_by_commit: df51db98
 notes: Batch RFM (r1-fix-merge), 4 October 2026.

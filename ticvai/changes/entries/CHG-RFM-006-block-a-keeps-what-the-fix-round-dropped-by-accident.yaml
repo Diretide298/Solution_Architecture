@@ -56,5 +56,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 97961c1c
 notes: Batch RFM (r1-fix-merge), 4 October 2026.
