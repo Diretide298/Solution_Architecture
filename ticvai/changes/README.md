@@ -54,6 +54,7 @@ changes/
 | `closed_by_commit` | when closed | the commit that merged the fix |
 | `proposed` | plan changes, from 5 Oct | when the plan change was proposed, `YYYY-MM-DD[THH:MM]`; the decision comes at least 24 hours later |
 | `reverses` | when it does | the id of the change this one reverses; that one must have been decided at least 48 hours before |
+| `waivers` | when the lead waives | `cooling_off: {by, date, quote}`: the lead (`waivable_by` in the schema) waived a plan change's 24-hour cooling-off for its release, in their words; printed on every run (CHG-R4-004) |
 | `notes` | no | anything else a reader needs |
 
 ### The closing rule

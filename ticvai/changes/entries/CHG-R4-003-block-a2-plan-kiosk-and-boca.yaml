@@ -1,0 +1,54 @@
+id: CHG-R4-003
+date: '2026-10-05'
+source: cr
+kind: plan
+summary: The kiosk customisation is one new app-module in Block A2, "White Label · Kiosk customisation"
+  (AM-WHITE-LABEL-KIOSK), with its forward migration, back-end, front-end and wiring tasks and its module test; no
+  existing ticket's owner, sprint, key, points or waits change.
+proposed: '2026-10-05'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json gains `appModules`, a decided app-module built as written: AM-WHITE-LABEL-KIOSK
+    in Block A2 (ends Friday 11 December 2026, Sprint 5) with the thirteen kiosk operations of CHG-R4-001, the whole
+    screens CMS-105 and BO-485 (BO-485 leaves "Games & Rides · Venue Management 4 of 4", Block D, under its key
+    VM-BO-485), and two wiring tasks: APP-KIOSK-CONFIG wires getPublishedKioskConfig into KSK-001, -002, -008, -010,
+    -013 and -014, and VM-FE-ADM-582-KIOSK wires listKioskAssignments, listKioskConfigs and assignKiosk into ADM-582. The
+    wired operations are taken off those screens in the plan (tools/ticket_done.py strip_wiring), so their own tickets
+    keep their scope, points and waits and say in a Scope sentence which operations the wiring task wires.
+    tools/build-service-docs.py builds a decided app-module as written and never moves it in the block filling;
+    tools/check-plan-closure.py reads an operation a wiring task wires into a screen as wired in that task''s drop.'
+  by: Chinmay
+  date: '2026-10-05'
+why: 'Chinmay, 5 October 2026, recorded in docs/active/decisions/answers-5-october.md: Block "A2"; "run the agent now. we
+  add it as release now to make sure that it goes out"; "it is a addition so it shouldnt break existing". The plan
+  formed app-modules only by a screen''s module and app, so the kiosk work would have been spread over five app-modules
+  in three blocks (the kiosk screens in A1, B and C, BO-485 in D) and KSK-001''s A1 ticket would have grown an A2 wait
+  (CHG-R4-001).'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+  - tools/ticket_done.py
+  - tools/check-plan-closure.py
+  other:
+  - CHG-R4-001
+  - AM-WHITE-LABEL-KIOSK
+root_class: 'new: decided-app-module'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the decision is recorded in docs/active/decisions/answers-5-october.md)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-05'
+    quote: we add it as release now to make sure that it goes out
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::decided_ams
+status: open
+notes: 'Batch R4, 5 October 2026. Proposed and decided the same day: Chinmay waived the 24-hour cooling-off of rule 9
+  and the Tuesday and Friday cadence of rule 8 for r4 on 5 October ("we add it as release now to make sure that it goes
+  out"); check-changelog prints the waiver (CHG-R4-004). Not announced before it is committed.'

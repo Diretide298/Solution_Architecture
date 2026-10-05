@@ -116,18 +116,50 @@ screens:
         - Product.media
         notes: Published products only, primary media first; a touch opens the language choice (CHG-R1S-022).
         provenance: design cross-check, 3 October 2026 (CHG-R1S-022)
+      - kind: canvas
+        label: 'Attract loop'
+        bindsTo: PublishedKioskConfig
+        columns:
+        - PublishedKioskConfig.attractSlides
+        - PublishedKioskConfig.attractLoop
+        - PublishedKioskConfig.isOpenNow
+        operation: getPublishedKioskConfig
+        notes: '**The screen saver the venue set up** in the white-label builder''s kiosk tab (CMS-105): the kiosk group''s video, photo and text slides in order, each for its seconds, with the group''s transition and sound; the open slides inside the play windows and opening hours, the closed slides outside the opening hours, when nothing is sold; and the "Download our app" QR slide every n-th slide. With no slide configured the products above fill the loop.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
+      - kind: primaryButton
+        label: 'Touch to start'
+        bindsTo: KioskAttractLoop.touchToStart
+        operation: getPublishedKioskConfig
+        notes: 'The kiosk group''s "Touch to start" text in the current language, at its position and with its animation; a touch opens the language choice (KSK-002) and starts the session.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
+      - kind: banner
+        label: 'Still there?'
+        bindsTo: PublishedKioskConfig.session
+        columns:
+        - KioskSessionSettings.idleTimeoutSeconds
+        - KioskSessionSettings.stillTherePromptSeconds
+        operation: getPublishedKioskConfig
+        notes: '**The kiosk shell''s idle rule, read here at every return to the loop**: after `idleTimeoutSeconds` without a touch on any kiosk screen the shell asks "Still there?" (the group''s `idleWarning` message) with a countdown of `stillTherePromptSeconds`; with no touch it clears the cart, signs the guest out, returns here and switches to the default language. A payment in progress is never interrupted.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: Not applicable — the attract loop is the idle state
     error: Falls through to KSK-014 if the kiosk cannot reach the server
     emptyFirstRun: Not applicable
-    offline: '**Not available.** An unattended terminal selling from a stale catalogue oversells with
-      nobody watching'
+    offline: '**The last cached attract loop plays, with the group''s offline message** (decided 5 October
+      2026, CHG-R4-001: `getPublishedKioskConfig` and the loop''s media are served from the kiosk''s cache).
+      **Nothing is sold**: an unattended terminal selling from a stale catalogue oversells with nobody
+      watching'
   apis:
   - operationId: listProducts
     contract: catalogue
     purpose: Fill the loop with the venue's products and their media
     trigger: onLoad
     provenance: design cross-check, 3 October 2026 (CHG-R1S-022)
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: 'The kiosk group''s published configuration: the attract loop, Touch to start, the session rule and the opening hours; cached for offline (CHG-R4-001)'
+    trigger: onLoad
+    provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   wireframe:
     status: notStarted
     provenance: generated
@@ -194,6 +226,15 @@ screens:
         notes: 'Only when `isInMaintenance`: the tenant''s message and expected-back time, and nothing
           can be bought.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
+      - kind: banner
+        label: 'This kiosk''s languages'
+        bindsTo: PublishedKioskConfig.languages
+        columns:
+        - KioskLanguages.languageCodes
+        - KioskLanguages.defaultLanguageCode
+        operation: getPublishedKioskConfig
+        notes: 'The kiosk group''s `languageCodes` narrow the published languages to the ones this kiosk offers (all of them when empty); `defaultLanguageCode` is preselected and is the language the idle reset returns to.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: The language select, read by `getTenantAppStatus`.
     error: Could not load. Names which read failed and leaves the language select untouched.
@@ -215,6 +256,11 @@ screens:
     purpose: The published languages and branding the kiosk renders in, cached for offline (GFIX-1)
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: 'The languages this kiosk group offers and its default (CHG-R4-001)'
+    trigger: onLoad
+    provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   wireframe:
     status: notStarted
     provenance: generated
@@ -829,6 +875,14 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: inquirePaymentStatus
+      - kind: banner
+        label: 'Payment unresolved message'
+        bindsTo: PublishedKioskConfig.messages
+        columns:
+        - KioskMessages.paymentUnresolved
+        operation: getPublishedKioskConfig
+        notes: 'The kiosk group''s own words for this moment in the guest''s language (`messages.paymentUnresolved`); the platform''s standard words when the group set none.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: The saved payment unresolved.
     error: Could not load. Names which read failed and leaves the payment unresolved untouched.
@@ -844,6 +898,11 @@ screens:
     contract: orders
     purpose: Ask the provider what actually happened
     trigger: onAction
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: 'The kiosk group''s payment unresolved message, in the guest''s language (CHG-R4-001)'
+    trigger: onLoad
+    provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   entryState:
     params:
     - name: paymentId
@@ -1046,6 +1105,14 @@ screens:
           the sale stands and the tickets go to the guest''s phone.'
         operation: reprintOrder
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+      - kind: banner
+        label: 'Printer failure message'
+        bindsTo: PublishedKioskConfig.messages
+        columns:
+        - KioskMessages.printerFailure
+        operation: getPublishedKioskConfig
+        notes: 'The kiosk group''s own words for this moment in the guest''s language (`messages.printerFailure`); the platform''s standard words when the group set none.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: Sending by email and rendering the QR
     error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself
@@ -1059,6 +1126,11 @@ screens:
       (GFIX-3)
     trigger: onAction
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: 'The kiosk group''s printer failure message, in the guest''s language (CHG-R4-001)'
+    trigger: onLoad
+    provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   entryState:
     params:
     - name: orderId
@@ -1322,6 +1394,14 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: endKioskAssist
+      - kind: banner
+        label: 'Call staff message'
+        bindsTo: PublishedKioskConfig.messages
+        columns:
+        - KioskMessages.callStaff
+        operation: getPublishedKioskConfig
+        notes: 'The kiosk group''s own words for this moment in the guest''s language (`messages.callStaff`); the platform''s standard words when the group set none.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: Alerting staff
     error: '**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner'
@@ -1338,6 +1418,11 @@ screens:
       join with startKioskAssist'
     trigger: onAction
     provenance: design cross-check, 3 October 2026 (CHG-R1S-022)
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: 'The kiosk group''s call staff message, in the guest''s language (CHG-R4-001)'
+    trigger: onLoad
+    provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   entryState:
     params:
     - name: sessionId
@@ -1414,6 +1499,16 @@ screens:
         notes: Shown while the tenant's app status or this kiosk's own health (its heartbeat, recordDeviceHeartbeat)
           says it cannot sell; polled, and the attract loop returns when both clear (CHG-R1S-022).
         provenance: design cross-check, 3 October 2026 (CHG-R1S-022)
+      - kind: banner
+        label: 'Out of service, back at'
+        bindsTo: PublishedKioskConfig.outOfService
+        columns:
+        - KioskOutOfService.active
+        - KioskOutOfService.expectedBackAt
+        - KioskMessages.outOfService
+        operation: getPublishedKioskConfig
+        notes: '**A kiosk group taken out of service on BO-485** (`setKioskOutOfService`): the group''s `messageOverride` or `messages.outOfService` in the guest''s language, with `expectedBackAt` in the venue''s time zone; the attract loop returns when it is put back in service. Also shown outside the opening hours is the closed loop on KSK-001, not this screen.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: Not applicable
     error: This is the error state
@@ -1425,6 +1520,11 @@ screens:
     purpose: Read whether the app is in service; the screen leaves when it is back
     trigger: onLoad
     provenance: design cross-check, 3 October 2026 (CHG-R1S-022)
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: 'Whether this kiosk''s group is out of service, its message and expected-back time (CHG-R4-001)'
+    trigger: onLoad
+    provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   wireframe:
     status: notStarted
     provenance: generated

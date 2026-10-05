@@ -76614,5 +76614,362 @@
    "postgres-analytical",
    "redis"
   ]
+ },
+ "assignKiosk": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/kiosk-assignments/{workstationId}",
+  "reads": [
+   "platform.workstation",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_assignment"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Put a kiosk in a kiosk group, or back on the venue's default",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Reads platform.workstation (tenancy) to refuse a workstation that is not a kiosk."
+ },
+ "createKioskConfig": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/venues/{venueId}/kiosk-configs",
+  "reads": [
+   "whitelabel.kiosk_config"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Add a kiosk group to a venue, with its kiosk configuration",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "deleteKioskConfig": {
+  "contract": "white-label",
+  "verb": "DELETE",
+  "path": "/kiosk-configs/{kioskConfigId}",
+  "reads": [
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Remove a kiosk group's configuration",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getKioskConfig": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/kiosk-configs/{kioskConfigId}",
+  "reads": [
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Read one kiosk configuration from the working draft, every part included",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getKioskConfigValidation": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/kiosk-configs/{kioskConfigId}/validation",
+  "reads": [
+   "catalogue.product",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
+   "whitelabel.config_version",
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Whether a kiosk configuration can be published, and why not",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Reads the published tenant configuration (fonts, languages), the venue's booking flows and its products on sale. Writes nothing."
+ },
+ "getPublishedKioskConfig": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/kiosk-config",
+  "reads": [
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "The published kiosk configuration a kiosk renders, before anyone touches it",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "anonymous",
+   "guest",
+   "device",
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "The current KioskConfigVersion snapshot of the kiosk's group (kiosk_assignment, else the venue default) and the live out-of-service state on kiosk_config."
+ },
+ "listKioskAssignments": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/kiosk-assignments",
+  "reads": [
+   "whitelabel.kiosk_assignment"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Which kiosk group each kiosk of the venue is in",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listKioskConfigVersions": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/kiosk-configs/{kioskConfigId}/versions",
+  "reads": [
+   "whitelabel.kiosk_config_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "A kiosk configuration's published versions",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listKioskConfigs": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/kiosk-configs",
+  "reads": [
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "A venue's kiosk configurations, in the working draft",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "publishKioskConfigs": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/venues/{venueId}/kiosk-configs/publish",
+  "reads": [
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_version",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_version"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Publish the venue's kiosk configurations, to every kiosk or to one group",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Snapshots the draft (config, slides, tiles) into a new kiosk_config_version and marks the config published, in one transaction."
+ },
+ "restoreKioskConfigVersion": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore",
+  "reads": [
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_version"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Restore a kiosk configuration's previous version into the draft",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setKioskOutOfService": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/kiosk-configs/{kioskConfigId}/out-of-service",
+  "reads": [
+   "whitelabel.kiosk_config"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_config"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Take a kiosk group out of service, or put it back, at once",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateKioskConfig": {
+  "contract": "white-label",
+  "verb": "PATCH",
+  "path": "/kiosk-configs/{kioskConfigId}",
+  "reads": [
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Change a kiosk configuration in the working draft",
+  "source": "CHG-R4-001, 5 October 2026 (the kiosk customisation; derived, then read against each description)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

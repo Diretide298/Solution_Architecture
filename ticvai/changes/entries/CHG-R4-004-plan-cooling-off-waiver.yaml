@@ -1,0 +1,39 @@
+id: CHG-R4-004
+date: '2026-10-05'
+source: cr
+kind: process
+summary: A plan change may carry the lead's written waiver of the 24-hour cooling-off for its release; check-changelog
+  accepts it only from a name in waivable_by, with the date and the lead's words, and prints it on every run.
+decision:
+  what: 'changes/schema.yaml gains `waivable_by: [Chinmay]`; an entry may carry `waivers: {cooling_off: {by, date,
+    quote}}` (changes/README.md); tools/check-changelog.py accepts a plan change decided within 24 hours of its
+    proposal only with such a waiver, prints it as a warning, and has three new self-tests (a valid waiver passes, a
+    waiver by someone else fails, a waiver without the lead''s words fails). The 48-hour reversal rule and the
+    release rule stay unwaivable. The Tuesday and Friday cadence (rule 8) has no gate and is waived in the entries''
+    notes.'
+  by: Chinmay
+  date: '2026-10-05'
+why: 'Chinmay waived the cooling-off and the release cadence for r4 on 5 October 2026 ("we add it as release now to make
+  sure that it goes out", docs/active/decisions/answers-5-october.md); the plan-change rule of the council of 2
+  October had no way to record a waiver, so the release could not pass check-changelog without a false `proposed`
+  time (CHG-R4-003).'
+keys_touched:
+  files:
+  - tools/check-changelog.py
+  - changes/schema.yaml
+  - changes/README.md
+  other:
+  - CHG-R4-003
+root_class: 'new: waiver-without-record'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-changelog.py
+status: open
+notes: Batch R4, 5 October 2026. The waiver is printed by every check-changelog run, so it is never silent.

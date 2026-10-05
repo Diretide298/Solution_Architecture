@@ -1,0 +1,68 @@
+id: CHG-R4-002
+date: '2026-10-05'
+source: cr
+kind: spec
+summary: BOCA is confirmed as the ticket and wristband printer and its documents are filed. ADR-0015 is amended (the
+  FGL driver is built now on an emulator, hardware validation on arrival, RFID encoding on the Lemur behind a flag until
+  its scope is confirmed), the integration and dependency registers carry the status, six client questions are added
+  to the Decisions Register (pending, not sent), the hardware workbook gains the client documents and the next step,
+  and a Block A2 task builds the driver (DEVICE-BOCA-FGL, planned by CHG-R4-003).
+decision:
+  what: 'sources/client/2026-10-05-allam-boca-printer.md files Muhamed Allam''s email of 5 October 2026 verbatim (link
+    titles only; the URLs are added when Chinmay forwards them), registered in sources/README.md. ADR-0015 gains an
+    amendment: the client confirmed BOCA and sent the specifications, SDK samples, operator manuals and FGL programming
+    guide, RFID encoding on the BOCA Lemur and the Windows driver; the unit ships to the India office; the Tier A
+    decision stands (FGL now on an emulator, the lab validates on arrival); RFID encoding is new scope to confirm.
+    handoff/integration-register.md (BOCA -> ticketPrinter) and docs/registers/external-dependencies.md (H-D) record:
+    documentation received 5 Oct 2026, hardware shipping to India, the owner and the next step. The Decisions Register
+    generator (tools/build-decisions-workbook.py) gains six BOCA questions marked pending, not sent: the model(s) and
+    count per kiosk, POS and box office; the connection and host OS (the Windows driver or raw FGL from the device
+    app); the ticket and wristband stock; RFID scope, chip and data and whether the gates read it; the arrival date and
+    the BOCA technical contact; any mandated firmware or settings. tools/annotate-hardware-sheet.py: the Boca row is
+    Settled with the decision extended and the email quoted, and two columns are appended to every row, "Client
+    documents" and "Next step / task". docs/registers/actors.md already names Boca and is unchanged (the model is a
+    question). The prevention, tools/check-device-tiers.py (registered in run-checks.py), fails when a Tier A device
+    class of ADR-0015 is built by no planned task and no deferral says why.'
+  by: Chinmay
+  date: '2026-10-05'
+why: 'Muhamed Allam (client), 5 October 2026, filed in sources/client/2026-10-05-allam-boca-printer.md: "Please see all
+  the links for the Boca printer integration ... Please note that we will be shipping the Boca printer to India once
+  it''s ready." Chinmay, the same day: "hardware documents can you update the excel". ADR-0015 put the ticket printer
+  (BOCA FGL) in Tier A, build now, and no task built it.'
+keys_touched:
+  tickets:
+  - DEVICE-BOCA-FGL
+  files:
+  - sources/client/2026-10-05-allam-boca-printer.md
+  - sources/README.md
+  - docs/adr/0015-standards-first-device-drivers.md
+  - handoff/integration-register.md
+  - docs/registers/external-dependencies.md
+  - tools/build-decisions-workbook.py
+  - handoff/TICVAI - Decisions Register.xlsx
+  - tools/annotate-hardware-sheet.py
+  - handoff/TICVAI_Hardware_Integration_annotated_v1_1.xlsx
+  - tools/check-device-tiers.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+  other:
+  - ADR-0015
+  - CHG-R4-003
+root_class: 'new: accepted-decision-without-task'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the source is sources/client/2026-10-05-allam-boca-printer.md)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-device-tiers.py
+status: open
+notes: 'Batch R4, 5 October 2026. check-device-tiers starts with a baseline (handoff/audit-baseline.json) of the eight
+  ADR-0015 Tier A classes no task builds yet: receipt printer, cash drawer, customer / line display, barcode scanner,
+  magnetic stripe reader, POS peripheral abstraction, mobile printer, access reader to controller. Each leaves the
+  baseline when a task names it (`deviceClasses`) or the lead records a deferral (`deviceClassesDeferred`); a new
+  Tier A class with neither fails. Run on the commit before this change it fails on the ticket printer too. The
+  BOCA questions are not sent: the lead sends them with the next weekly batch.'

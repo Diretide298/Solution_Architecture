@@ -271,8 +271,17 @@ def validate(entries: list[tuple[str, dict]], schema: dict, ctx) -> tuple[list[s
         if not prop:
             errs.append(f"{where}: a plan change records when it was proposed (proposed: YYYY-MM-DD[THH:MM])")
         elif dec and (dec - prop).total_seconds() < 24 * 3600:
-            errs.append(f"{where}: decided {dec:%Y-%m-%d %H:%M}, less than 24 hours after it was proposed "
-                        f"({prop:%Y-%m-%d %H:%M}): plan changes cool off for a day")
+            # **The lead may waive the cooling-off for one release, in writing** (CHG-R4-004, 5 October 2026: Chinmay
+            # waived it for r4, "we add it as release now to make sure that it goes out"). The waiver names who (one of
+            # `waivable_by`), when and their words; it is printed on every run like an exemption, never silent.
+            w = (e.get("waivers") or {}).get("cooling_off") if isinstance(e.get("waivers"), dict) else None
+            if isinstance(w, dict) and w.get("by") in (schema.get("waivable_by") or []) and _date(w.get("date")) \
+                    and str(w.get("quote") or "").strip():
+                warns.append(f"{where}: cooling-off waived by {w['by']} on {w['date']}: \"{w['quote']}\"")
+            else:
+                errs.append(f"{where}: decided {dec:%Y-%m-%d %H:%M}, less than 24 hours after it was proposed "
+                            f"({prop:%Y-%m-%d %H:%M}): plan changes cool off for a day"
+                            + (" (a waiver needs by: one of waivable_by, date and quote)" if w else ""))
         rev = e.get("reverses")
         if rev:
             old = by_id.get(rev)
@@ -449,6 +458,14 @@ def self_test(schema: dict) -> list[tuple[str, bool, str]]:
     case("a plan change decided within 24 hours fails",
          [(pf, dict(plan, proposed="2026-10-06T08:00"))], False, "cool off")
     case("a closed plan change without its release fails", [(pf, dict(plan, release_tag="pending"))], False, "release")
+    waived = dict(plan, proposed="2026-10-06T08:00", waivers={"cooling_off": {
+        "by": "Chinmay", "date": "2026-10-06", "quote": "ship it in this release"}})
+    case("a plan change within 24 hours with the lead's written waiver passes", [(pf, waived)], True)
+    case("a waiver by someone not in waivable_by fails",
+         [(pf, dict(waived, waivers={"cooling_off": {"by": "Somebody", "date": "2026-10-06", "quote": "q"}}))],
+         False, "cool off")
+    case("a waiver without the lead's words fails",
+         [(pf, dict(waived, waivers={"cooling_off": {"by": "Chinmay", "date": "2026-10-06"}}))], False, "cool off")
     plan2 = dict(plan, id="CHG-TST-002", proposed="2026-10-06T11:00", reverses="CHG-TST-001",
                  decision={"what": "back", "by": "Chinmay", "date": "2026-10-07T12:00"})
     case("a reversal within 48 hours fails", [(pf, plan), ("CHG-TST-002-back.yaml", plan2)], False, "48 hours")

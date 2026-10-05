@@ -1,0 +1,140 @@
+id: CHG-R4-001
+date: '2026-10-05'
+source: cr
+kind: spec
+summary: The kiosk becomes the third channel of the white-label builder. A kiosk configuration per kiosk group (device
+  profile, attract loop, start tiles, header and footer, journey, session, payment and output, languages, messages,
+  opening hours), published per group with versions and roll back, read by the kiosk shell with no session; a builder
+  kiosk tab (CMS-105), BO-485 rebuilt as the kiosk groups, ADM-582 assigning a kiosk to a group, KSK-001, -002, -008,
+  -010, -013 and -014 reading it, flow F304. Additive only.
+decision:
+  what: 'contracts/satellite/white-label.yaml gains the tag `kiosk`, thirteen operations and twenty-four schemas, nothing
+    existing changed: staff configuration listKioskConfigs (paged), createKioskConfig, getKioskConfig, updateKioskConfig,
+    deleteKioskConfig (refused for the default and while kiosks are in the group), getKioskConfigValidation (the publish
+    checks: attractLoopEmpty, mediaDoesNotFit, tileWithoutProducts, arabicFontMissing, journeyInvalid,
+    languageNotPublished, paymentMethodUnavailable, ticketTemplateMissing), publishKioskConfigs (one group or every kiosk
+    of the venue; TENANT_PUBLISH), listKioskConfigVersions (paged) and restoreKioskConfigVersion (into the draft, not
+    published), setKioskOutOfService (live, like setMaintenanceMode); listKioskAssignments (paged) and assignKiosk (a
+    kiosk workstation into a group, DEVICE_VIEW / DEVICE_MANAGE); and getPublishedKioskConfig, the public read served
+    like getPublishedTenantConfig (tenant from the host, no session, cacheable, offline from the kiosk''s cache,
+    serverWins), keyed by the kiosk''s workstation or a group. Config scope venue/venue. The kiosk inherits the
+    published brand, theme, fonts, content pages, products, waivers and consents and the tenant''s AccessibilitySettings
+    (BL-065) from getPublishedTenantConfig; nothing of them is repeated. Publishing reuses the white-label mechanism (a
+    draft, checks, an immutable snapshot version made current, restore into the draft then publish) on its own version
+    rows (KioskConfigVersion), because publishTenantConfig publishes the whole tenant at once and an additive release
+    may not change its behaviour; the brand still reaches kiosks through publishTenantConfig. Five new tables, written
+    by derive-ddl as the next forward migration after r1: whitelabel.kiosk_config, kiosk_attract_slide,
+    kiosk_start_tile, kiosk_config_version and kiosk_assignment. Screens: CMS-105 Kiosk Builder (P13, module Kiosk, the
+    builder''s kiosk tab, reached from CMS-102); BO-485 rebuilt as the venue''s kiosk groups and the functions each
+    offers (id kept, requiresModule core instead of games, wave 1, reached from BO-102; it no longer binds the games-only
+    setGameKioskConfiguration, which BO-493 still binds); ADM-582 lists the kiosks with their group and assigns one;
+    KSK-001 draws the attract loop, Touch to start and the idle reset and plays the cached loop offline; KSK-002 offers
+    the group''s languages; KSK-008, -010, -013 and -014 show the group''s messages (KSK-014 its out-of-service state
+    and expected-back time). Flow F304 walks the kiosk channel. Not carried over from the app, deliberately: app icons,
+    the store listing, push, dark mode and saved sign-in.'
+  by: Chinmay
+  date: '2026-10-05'
+why: 'Chinmay, 5 October 2026, recorded in docs/active/decisions/answers-5-october.md: "kiosk customisation option? of
+  course it won''t be like mobile app but screen saver video or photo, click to start, head footer content, size of the
+  card etc. think of all things we can get from mobile to here", then "update the rest" and "it is a addition so it
+  shouldnt break existing". The package had no kiosk configuration: KSK-001 Attract Loop "declares no operation; nothing
+  fills the loop" (CHG-R1S-022); the white-label app-module on the kiosk built only KSK-002 and KSK-014; BO-485 was an
+  empty Save and Cancel form on the games-only setGameKioskConfiguration whose gaps said it "needs a person before it is
+  built" (contract gap CHG-WIR-004).'
+keys_touched:
+  operations:
+  - listKioskConfigs
+  - createKioskConfig
+  - getKioskConfig
+  - updateKioskConfig
+  - deleteKioskConfig
+  - getKioskConfigValidation
+  - publishKioskConfigs
+  - listKioskConfigVersions
+  - restoreKioskConfigVersion
+  - setKioskOutOfService
+  - getPublishedKioskConfig
+  - listKioskAssignments
+  - assignKiosk
+  - setGameKioskConfiguration
+  schemas:
+  - KioskPlacementKind
+  - KioskFunction
+  - KioskTileSize
+  - KioskDisplaySettings
+  - KioskAttractSlide
+  - KioskAttractLoop
+  - KioskStartTile
+  - KioskStartScreen
+  - KioskHeaderFooter
+  - KioskJourneySettings
+  - KioskSessionSettings
+  - KioskPaymentOutput
+  - KioskLanguages
+  - KioskMessages
+  - KioskOpeningHours
+  - KioskOutOfService
+  - KioskConfig
+  - KioskConfigVersion
+  - KioskAssignment
+  - KioskConfigFindingKind
+  - KioskConfigFinding
+  - KioskConfigValidation
+  - KioskConfigValidationProblem
+  - PublishedKioskConfig
+  tables:
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_attract_slide
+  - whitelabel.kiosk_start_tile
+  - whitelabel.kiosk_config_version
+  - whitelabel.kiosk_assignment
+  screens:
+  - CMS-105
+  - CMS-102
+  - BO-485
+  - BO-102
+  - ADM-582
+  - KSK-001
+  - KSK-002
+  - KSK-008
+  - KSK-010
+  - KSK-013
+  - KSK-014
+  flows:
+  - F304
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/games.yaml
+  - screens/P13-white-label-cms.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P05-guest-kiosk.yaml
+  - flows/F304-a-kiosk-group-is-customised-published-assigned-and-.yaml
+  - docs/active/decisions/answers-5-october.md
+  - tools/check-channel-config.py
+  - tools/run-checks.py
+  other:
+  - CHG-R4-003
+  - CHG-R4-004
+  - CHG-R1S-022
+  - CHG-WIR-004
+root_class: 'new: channel-without-configuration'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the decision is recorded in docs/active/decisions/answers-5-october.md)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-channel-config.py
+status: open
+notes: 'Batch R4 (branch r4-kiosk-config, from main e875d996; last release r3 = a67ca498), 5 October 2026. Contract
+  compatibility against r1: additive (check-contract-compat: no breaking change, nothing added to
+  docs/active/breaking-changes.yaml); the only edit to an existing operation is setGameKioskConfiguration''s
+  x-ticvai-consumed-by losing BO-485, which no longer binds it. The prevention, tools/check-channel-config.py
+  (registered in run-checks.py), fails on the commit before this change (e875d996: "P05 Guest Kiosk: no entry screen
+  (KSK-001) binds a published configuration read") and passes after it. Chinmay waived the Tuesday and Friday release
+  cadence for r4 on 5 October 2026 ("we add it as release now to make sure that it goes out"); the plan side and its
+  24-hour cooling-off waiver are CHG-R4-003. Open for Chinmay and the client: the reachable-height threshold
+  (kioskReachableHeightThresholdCm, default 100 cm, client to confirm).'

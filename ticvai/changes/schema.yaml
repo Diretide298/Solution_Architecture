@@ -78,6 +78,10 @@ authored_files:
 # later (cooling off); one that reverses an earlier change names it in `reverses`, and that change was decided
 # at least 48 hours before; a closed plan change names its release (r<N>). Plan changes ship only in a Tue/Fri
 # release and are never announced before they are committed (ticvai/CLAUDE.md).
+# **The lead may waive a plan change's cooling-off for one release** (CHG-R4-004, 5 October 2026), in the entry:
+#   waivers: {cooling_off: {by: <one of waivable_by>, date: YYYY-MM-DD, quote: "<the lead's words>"}}
+# check-changelog prints every waiver. The 48-hour reversal rule and the release rule are not waivable.
+waivable_by: [Chinmay]
 plan_files:
   - docs/active/team.json
   - docs/active/block-a-extra-tasks.json

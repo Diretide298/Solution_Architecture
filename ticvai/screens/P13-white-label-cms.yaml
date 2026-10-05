@@ -22,7 +22,7 @@ platform:
     deviceOwnership: tenant workstation
     networkAssumption: public internet
     releaseCadence: weekly
-  screenCount: 103
+  screenCount: 104
   designReferences:
   - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
@@ -15061,11 +15061,15 @@ screens:
     - CMS-014
     - CMS-015
     - CMS-104
+    - CMS-105
     inferred: false
     notes: '**The step-based CMS (decided 29 September, W12 and M24-05).** Each of the seven steps opens
       the full screen for its details and comes back here; progress is saved on every return, so the builder
       reopens where the operator left it.'
     transitions:
+    - to: CMS-105
+      trigger: Kiosks
+      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk tab of the builder beside the web and the app
     - to: CMS-001
       trigger: 1 Venue and modules
       provenance: authored 29 September, W12 (step 1 reuses CMS-001 for modules, feature toggles and guest
@@ -15932,3 +15936,372 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract white-label.yaml POST /tenant-config/app-builds
+- id: CMS-105
+  name: Kiosk Builder
+  module: Kiosk
+  permission: TENANT_CONFIGURE
+  requiresModule: core
+  wave: 1
+  capability: C00
+  implementation:
+    app: venue-management-web
+    route: /white-label/kiosk
+    component: apps/venue-management-web/src/routes/white-label/KioskBuilder.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - CMS-102
+    exitTo:
+    - CMS-102
+    - CMS-010
+    - CMS-103
+    inferred: false
+    notes: '**The kiosk tab of the white-label builder** (decided 5 October 2026 by Chinmay, CHG-R4-001): the Site
+      Builder (CMS-102) is the web channel, App Build & Store Publishing (CMS-104) the app channel, and this the
+      kiosk channel. Reached from the Site Builder; the kiosk groups and their kiosks are also listed on BO-485, and
+      a kiosk is put in a group on ADM-582.'
+    transitions:
+    - to: CMS-102
+      trigger: Back to the Site Builder
+      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
+      back: true
+    - to: CMS-010
+      trigger: Add photos and videos to the media library
+      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); the attract loop's slides are media library assets
+    - to: CMS-103
+      trigger: The venue's booking flows
+      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); a kiosk journey uses the venue's booking flows
+  notes: '**Added 5 October 2026 (decided by Chinmay, CHG-R4-001; docs/active/decisions/answers-5-october.md).** "Kiosk
+    customisation option? of course it won''t be like mobile app but screen saver video or photo, click to start, head
+    footer content, size of the card etc." The kiosk inherits the published brand, theme, fonts (the Arabic pair),
+    content pages, products, waivers and consents; this screen sets only what differs on a kiosk, per kiosk group (by
+    access point, operating area or outlet) with a venue default for every kiosk in no group. **Not carried over from
+    the app, deliberately:** app icons, the store listing, push notifications, dark mode and saved sign-in. Accessibility
+    is the tenant''s settings (BL-065), shown read-only with a link to where they are set.'
+  density: compact
+  pattern: listDetail
+  patternReason: '`listKioskConfigs` reads the venue''s kiosk groups and `getKioskConfig` reads one to edit — list,
+    select, act; the preview and the publish gate sit beside the selected group'
+  purpose: Customise what a venue's kiosks show, group by group — the device profile, the attract loop (the screen
+    saver), the start tiles, the header and footer, the journey, the session, payment and output, the languages, the
+    messages and the opening hours — preview it on the kiosk's own frame, check it, publish it to one group or to
+    every kiosk, and roll it back.
+  layout:
+    template: split
+    regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: selectField
+        label: Venue
+        operation: listKioskConfigs
+        notes: The venue whose kiosk groups are shown (path `venueId`); defaults to the session venue.
+        provenance: contract white-label.yaml GET /venues/{venueId}/kiosk-configs
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Kiosk groups
+        bindsTo: KioskConfig
+        columns:
+        - KioskConfig.name
+        - KioskConfig.placementKind
+        - KioskConfig.enabledFunctions
+        - KioskConfig.assignedKioskCount
+        - KioskConfig.hasUnpublishedChanges
+        operation: listKioskConfigs
+        notes: The venue's default first (every kiosk in no group), then the groups by name; a group with unpublished
+          changes is marked.
+        provenance: contract white-label.yaml GET /venues/{venueId}/kiosk-configs
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Device profile
+        bindsTo: KioskDisplaySettings
+        columns:
+        - KioskDisplaySettings.orientation
+        - KioskDisplaySettings.resolutionWidthPx
+        - KioskDisplaySettings.resolutionHeightPx
+        - KioskDisplaySettings.mountingHeightCm
+        - KioskDisplaySettings.productTileSize
+        operation: getKioskConfig
+        notes: Orientation, screen size and resolution, mounting height (it sets whether the kiosk opens in the
+          reachable-height mode), touch scale, product tile size (small, medium, large) and tiles per row. The
+          preview redraws at the kiosk's resolution.
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}
+      - kind: dataTable
+        label: Attract loop
+        bindsTo: KioskAttractSlide
+        columns:
+        - KioskAttractSlide.kind
+        - KioskAttractSlide.mediaAssetRef
+        - KioskAttractSlide.durationSeconds
+        - KioskAttractSlide.playsWhen
+        - KioskAttractSlide.sortOrder
+        operation: getKioskConfig
+        notes: '**The screen saver.** Video, photo and text slides from the media library, dragged into order, each with
+          its seconds; the transition and sound, the play windows by time of day and weekday, the "Touch to start" text
+          in each language with its position and animation, and the "Download our app" QR slide. `closed` slides make
+          the loop shown outside the opening hours. Offline, kiosks play the last loop they cached.'
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId} (KioskConfig.attractSlides, attractLoop)
+      - kind: dataTable
+        label: Start screen tiles
+        bindsTo: KioskStartTile
+        columns:
+        - KioskStartTile.function
+        - KioskStartTile.isEnabled
+        - KioskStartTile.tileSize
+        - KioskStartTile.imageAssetRef
+        - KioskStartTile.sortOrder
+        operation: getKioskConfig
+        notes: Which functions this kiosk offers (sell tickets, collect a booking, order food, shop, membership, wallet
+          top-up, map, assistant), in order, each with its size and image; and one hero banner.
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId} (KioskConfig.startTiles, startScreen)
+      - kind: detailPanel
+        label: Header and footer
+        bindsTo: KioskHeaderFooter
+        columns:
+        - KioskHeaderFooter.logoPosition
+        - KioskHeaderFooter.languageSwitchVisible
+        - KioskHeaderFooter.callStaffVisible
+        - KioskHeaderFooter.accessibilityButtonVisible
+        - KioskHeaderFooter.legalLinksAsQr
+        operation: getKioskConfig
+        notes: Logo position, language switch, the order summary, Call staff, the accessibility button and the clock;
+          the footer's payment logos, help text and the legal links as QR codes.
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}
+      - kind: detailPanel
+        label: Journey, session and output
+        bindsTo: KioskConfig
+        columns:
+        - KioskConfig.journey
+        - KioskConfig.session
+        - KioskConfig.paymentOutput
+        - KioskConfig.languages
+        - KioskConfig.openingHours
+        operation: getKioskConfig
+        notes: 'The venue''s booking flows the kiosk uses (custom flows allowed; payment and legal steps stay locked as
+          on the web and app), the most steps, upsell and cross-sell; the idle timeout and the "Still there?" countdown,
+          after which the cart is cleared and the kiosk returns to the loop and the default language; sign-in by the
+          app''s QR or a one-time code only; the accepted payment methods, the receipt (print, email, SMS, QR), the
+          ticket stock and its print layout from the ticket designer, "Send to my phone"; the languages KSK-002 offers
+          and the default; the opening hours.'
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}
+      - kind: detailPanel
+        label: Messages
+        bindsTo: KioskMessages
+        columns:
+        - KioskMessages.idleWarning
+        - KioskMessages.outOfService
+        - KioskMessages.offline
+        - KioskMessages.printerFailure
+        - KioskMessages.paymentUnresolved
+        operation: getKioskConfig
+        notes: In every kiosk language; also Call staff and Closed. Empty shows the platform's standard words.
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}
+      - kind: livePreview
+        label: Preview on the kiosk
+        operation: getPublishedKioskConfig
+        notes: '**The kiosk as a guest meets it**, in the group''s orientation and resolution and in each language
+          (right to left for Arabic): the attract loop playing, "Touch to start", the start tiles, the header and
+          footer. Drawn from the draft in hand; the published configuration (`getPublishedKioskConfig` with the
+          group''s `kioskConfigId`) is shown beside it for comparison. Calls nothing that writes.'
+        provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
+      - kind: banner
+        label: Why this cannot publish
+        bindsTo: KioskConfigValidation
+        columns:
+        - KioskConfigValidation.valid
+        - KioskConfigValidation.findings
+        operation: getKioskConfigValidation
+        notes: 'Each finding names what to fix: the loop has no slide, a slide''s media does not fit the screen, an
+          enabled tile has nothing behind it, Arabic is on with no Arabic font, a journey is invalid, a language is not
+          published, a payment method is not configured, no ticket layout for the stock.'
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}/validation
+      - kind: dataTable
+        label: Versions
+        bindsTo: KioskConfigVersion
+        columns:
+        - KioskConfigVersion.versionNumber
+        - KioskConfigVersion.publishedAt
+        - KioskConfigVersion.note
+        - KioskConfigVersion.isCurrent
+        operation: listKioskConfigVersions
+        notes: Newest first. Restore copies a version into the draft; it goes live only when published again.
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}/versions
+      - kind: publishGate
+        label: What publishing changes
+        impliedBy: publishKioskConfigs
+        notes: '**Publish to one group or to every kiosk of the venue.** Names the groups that change and how many
+          kiosks show each, and says kiosks pick it up when their attract loop next restarts (a guest mid-session
+          finishes first). Refused while any group has an error (`409`, `kiosk-config-invalid`). Needs
+          `TENANT_PUBLISH`.'
+        provenance: contract white-label.yaml POST /venues/{venueId}/kiosk-configs/publish
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Add a kiosk group
+        operation: createKioskConfig
+        provenance: contract white-label.yaml POST /venues/{venueId}/kiosk-configs
+      - kind: secondaryButton
+        label: Save
+        operation: updateKioskConfig
+        provenance: contract white-label.yaml PATCH /kiosk-configs/{kioskConfigId}
+      - kind: secondaryButton
+        label: Check
+        operation: getKioskConfigValidation
+        provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}/validation
+      - kind: secondaryButton
+        label: Publish to this group
+        operation: publishKioskConfigs
+        permission: TENANT_PUBLISH
+        provenance: contract white-label.yaml POST /venues/{venueId}/kiosk-configs/publish
+      - kind: secondaryButton
+        label: Publish to every kiosk
+        operation: publishKioskConfigs
+        permission: TENANT_PUBLISH
+        provenance: contract white-label.yaml POST /venues/{venueId}/kiosk-configs/publish
+      - kind: secondaryButton
+        label: Restore this version
+        operation: restoreKioskConfigVersion
+        permission: TENANT_PUBLISH
+        provenance: contract white-label.yaml POST /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore
+      - kind: destructiveButton
+        label: Remove group
+        operation: deleteKioskConfig
+        notes: Refused `409` for the venue's default and while kiosks are in the group; the refusal names them and
+          links to ADM-582 to move them.
+        provenance: contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}
+  states:
+    loading: The venue's kiosk groups, read by `listKioskConfigs`, then the selected group by `getKioskConfig`.
+    error: Could not load. Names which read failed and leaves the draft untouched.
+    emptyFirstRun: '**No kiosk configuration at this venue yet.** Kiosks show the platform''s neutral holding screen
+      until one is published. Offers "Set up the kiosks", which creates the venue''s default from the published brand
+      with the standard settings (portrait, medium tiles, a 60-second idle timeout).'
+    emptyNoResults: Not applicable — the list is not filtered beyond the venue.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `TENANT_PUBLISH` for `publishKioskConfigs` and
+      `restoreKioskConfigVersion`.'
+  apis:
+  - operationId: listKioskConfigs
+    contract: white-label
+    purpose: The venue's kiosk groups and their default, in the draft
+    trigger: onLoad
+  - operationId: getKioskConfig
+    contract: white-label
+    purpose: One kiosk group's configuration, every part, to edit
+    trigger: onAction
+  - operationId: createKioskConfig
+    contract: white-label
+    purpose: Add a kiosk group (the first is the venue's default)
+    trigger: onAction
+    invalidates:
+    - listKioskConfigs
+  - operationId: updateKioskConfig
+    contract: white-label
+    purpose: Save a part of the group's configuration
+    trigger: onAction
+    invalidates:
+    - listKioskConfigs
+    - getKioskConfig
+  - operationId: deleteKioskConfig
+    contract: white-label
+    purpose: Remove a group no kiosk is in
+    trigger: onAction
+    invalidates:
+    - listKioskConfigs
+  - operationId: getKioskConfigValidation
+    contract: white-label
+    purpose: The publish checks on the saved draft
+    trigger: onAction
+  - operationId: getPublishedKioskConfig
+    contract: white-label
+    purpose: What the group's kiosks show now, beside the draft in the preview
+    trigger: onAction
+  - operationId: publishKioskConfigs
+    contract: white-label
+    purpose: Publish to one group or to every kiosk of the venue
+    trigger: onAction
+    invalidates:
+    - listKioskConfigs
+    - listKioskConfigVersions
+  - operationId: listKioskConfigVersions
+    contract: white-label
+    purpose: The group's published versions
+    trigger: onAction
+  - operationId: restoreKioskConfigVersion
+    contract: white-label
+    purpose: Copy a version back into the draft (roll back, then publish)
+    trigger: onAction
+    invalidates:
+    - getKioskConfig
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: kioskConfigId
+      from: navigation
+      optional: true
+      notes: Opened without it, the screen lists the venue's kiosk groups and opens the default.
+    coldEntry: Resolves the venue from the session and opens on the venue's default kiosk configuration.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-105
+  apisNote: Authored 5 October 2026 (CHG-R4-001) from Chinmay's kiosk customisation decision.
+  overlays:
+  - id: formCreateKioskConfig
+    component: modal
+    trigger: Add a kiosk group
+    body: '**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` (an access point, an
+      operating area or an outlet) and `placementId`; every other part starts from the venue default''s values and is
+      edited in the panels. Dismissing sends nothing.'
+    bindsTo: KioskConfig
+    confirm:
+      label: Add group
+      operation: createKioskConfig
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - placementKind
+      - placementId
+    provenance: contract white-label.yaml POST /venues/{venueId}/kiosk-configs
+  - id: confirmPublishKioskConfigs
+    component: confirmDialog
+    trigger: Publish to this group
+    body: '**Names what goes live**: the groups that change and how many kiosks show each. Asks for the publish note
+      `publishKioskConfigs` requires. "Publish to every kiosk" sends no `kioskConfigIds`; "Publish to this group" sends
+      the selected one.'
+    confirm:
+      label: Publish
+      operation: publishKioskConfigs
+    dismiss:
+      label: Cancel
+    provenance: contract white-label.yaml POST /venues/{venueId}/kiosk-configs/publish
+  - id: confirmRestoreKioskConfigVersion
+    component: confirmDialog
+    trigger: Restore this version
+    body: Names the version and says it replaces the draft without publishing. When the draft has unpublished changes
+      the refusal (`409`, `unpublished-changes`) offers to discard them (`discardDraftChanges`).
+    confirm:
+      label: Restore
+      operation: restoreKioskConfigVersion
+    dismiss:
+      label: Keep the draft
+    provenance: contract white-label.yaml POST /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore
+  - id: confirmDeleteKioskConfig
+    component: confirmDialog
+    trigger: Remove group
+    body: Names the group and says its published versions stay in the history. Refused `409` for the default and while
+      kiosks are in the group, and names them.
+    confirm:
+      label: Remove
+      operation: deleteKioskConfig
+    dismiss:
+      label: Keep it
+    provenance: contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}

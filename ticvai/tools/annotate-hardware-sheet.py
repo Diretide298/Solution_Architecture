@@ -100,15 +100,42 @@ DECISIONS = {
     'Kiosk Integration': (
         SETTLED, 'BlueRhine Kiosk.', 'No MoM reference - hardware sheet only.'),
     'Boca Printer Integration': (
-        NOTE,
+        SETTLED,
         'Boca wristband and ticket printer. One unified QR code / wristband per customer across '
-        'ticketing, F&B and retail - not one per product line.',
+        'ticketing, F&B and retail - not one per product line. The client confirmed BOCA on 5 October 2026 '
+        'and sent the specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding '
+        'for the BOCA Lemur, and the Windows driver; the unit ships to the India office when ready. We build '
+        'to FGL now on an emulator (ADR-0015 Tier A), hardware validation on arrival. RFID encoding scope to '
+        'confirm.',
         'MoM 14 Aug: "Ticketing, F&B, and retail share one cart, one receipt, and one unified QR '
-        'code/wristband per customer."'),
+        'code/wristband per customer." Client email, Muhamed Allam, 5 Oct 2026 '
+        '(sources/client/2026-10-05-allam-boca-printer.md): "Please note that we will be shipping the Boca '
+        'printer to India once it\'s ready."'),
     'Zebra Bluetooth Printer Integration': (
         SETTLED, 'Zebra. Bluetooth, for mobile/flying POS.',
         'No MoM names Zebra directly; the RFP requires Flying POS on mobile devices.'),
 }
+
+# **What the client has supplied for each device, and what happens next** (5 October 2026, CHG-R4-002; Chinmay:
+# "hardware documents can you update the excel"). Two columns appended after the MoM columns, for every row; blank
+# where the package records no document or task for the device.
+DOCUMENTS = {
+    'Boca Printer Integration': (
+        '5 Oct 2026, Muhamed Allam: printer specifications; SDK sample codes; operator manuals and FGL programming '
+        'guide; RFID encoding on the BOCA Lemur; Windows driver (link titles only, URLs pending; '
+        'sources/client/2026-10-05-allam-boca-printer.md).'),
+    'Turnstile Reader Integration': 'Turnstile SDK: outstanding since 5 Aug 2026 (ADR-0015).',
+    'RFID Reader Integration': ('RFID reader specifications and reference data: asked for on 19 Aug 2026 (MoM 19 Aug), '
+                                'still pending.'),
+}
+NEXT = {
+    'Boca Printer Integration': (
+        'DEVICE-BOCA-FGL (Block A2): the FGL driver behind the ticketPrinter port, on an emulator now; hardware test '
+        'when the unit reaches India. Open client questions (Decisions Register, pending): model(s) and count, '
+        'connection and host OS, ticket and wristband stock, RFID scope, arrival date and BOCA contact, mandated '
+        'firmware or settings.'),
+}
+EXTRA_HEADERS = ('Client documents', 'Next step / task')
 
 FILL = {
     SETTLED: PatternFill('solid', fgColor='DDF0DD'),
@@ -125,7 +152,8 @@ def main():
     ws.cell(header, 4).value = 'Status'
     ws.cell(header, 5).value = 'Decision / standard'
     ws.cell(header, 6).value = 'Source (quoted from MoM)'
-    for c in range(1, 7):
+    ws.cell(header, 7).value, ws.cell(header, 8).value = EXTRA_HEADERS
+    for c in range(1, 9):
         ws.cell(header, c).font = Font(bold=True)
 
     unseen = set(DECISIONS)
@@ -143,7 +171,9 @@ def main():
         ws.cell(r, 4).value = status
         ws.cell(r, 5).value = decision
         ws.cell(r, 6).value = source
-        for c in range(1, 7):
+        ws.cell(r, 7).value = DOCUMENTS.get(name) or None
+        ws.cell(r, 8).value = NEXT.get(name) or None
+        for c in range(1, 9):
             ws.cell(r, c).fill = FILL[status]
             ws.cell(r, c).alignment = Alignment(vertical='top', wrap_text=(c >= 5))
 
@@ -152,6 +182,8 @@ def main():
     ws.column_dimensions['D'].width = 10
     ws.column_dimensions['E'].width = 62
     ws.column_dimensions['F'].width = 78
+    ws.column_dimensions['G'].width = 60
+    ws.column_dimensions['H'].width = 60
 
     counts = {}
     for r in range(2, ws.max_row + 1):

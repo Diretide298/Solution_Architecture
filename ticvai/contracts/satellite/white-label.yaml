@@ -88,6 +88,7 @@ tags:
 - name: publishing
 - name: bookingFlows
 - name: appPublishing
+- name: kiosk
 paths:
   /tenant-domains:
     get:
@@ -5021,6 +5022,893 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/kiosk-configs:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listKioskConfigs
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, the kiosk is the builder''s third channel
+        (docs/active/decisions/answers-5-october.md, CHG-R4-001); shape follows listBookingFlows'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: A venue's kiosk configurations, in the working draft
+      description: '**The kiosk channel of the white-label builder (decided 5 October 2026 by Chinmay, CHG-R4-001).**
+        One kiosk configuration per kiosk group of the venue (kiosks grouped by an access point, an operating area or
+        an outlet), plus the venue''s default, which every kiosk in no group takes. Draft rows: a kiosk reads the
+        published copy through `getPublishedKioskConfig`.
+
+
+        **Ordered by** the default first, then `name` (case-insensitive), then `id`. An unknown venue is an empty
+        page, not 404. Each item carries `enabledFunctions` and `assignedKioskCount` (worked out on read), which the
+        group list (BO-485) shows, and `publishedVersion` with `hasUnpublishedChanges`.
+
+
+        **A venue with no kiosk configuration yet** returns an empty page; the first `createKioskConfig` of a venue
+        makes the default.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The venue's kiosk configurations, the default first, then by name
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/KioskConfig'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: createKioskConfig
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
+        shape follows createBookingFlowDefinition'
+      x-ticvai-audience:
+      - staff
+      summary: Add a kiosk group to a venue, with its kiosk configuration
+      description: '**A kiosk group and what its kiosks show (decided 5 October 2026 by Chinmay, CHG-R4-001).** The
+        kiosk inherits the tenant''s published brand, theme, fonts (the Arabic pair), content pages, products,
+        waivers and consents from the current `ConfigVersion` (read by `getPublishedTenantConfig`); this holds only
+        what differs on a kiosk: the display, the attract loop, the start tiles, the header and footer, the journey,
+        the session, payment and output, the languages, the messages and the opening hours. Accessibility is the
+        tenant''s `AccessibilitySettings` (BL-065) and is not repeated here.
+
+
+        **The first kiosk configuration of a venue is its default** (`isDefault` true, whatever the body says); a
+        later one with `isDefault` true is refused 409 `default-kiosk-config-exists`. A group names where its kiosks
+        stand (`placementKind` and `placementId`); the default names none (`placementKind` `venue`). **Saved even
+        when it would not publish**, so an operator works part by part; `getKioskConfigValidation` says what still
+        blocks a publish. Unset parts take the defaults the schemas give (an idle timeout of 60 seconds, a
+        15-second "Still there?" countdown, medium tiles, three per row, portrait).
+
+
+        **Refused:** 400 for a malformed body, a `placementId` without a `placementKind` other than `venue`, or a
+        slide or tile given twice (`sortOrder` repeated); 409 `default-kiosk-config-exists` as above, and 409
+        `kiosk-config-name-taken` when the venue already has a configuration of that `name`.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KioskConfig'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created in the working draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskConfig'
+        '400':
+          description: A malformed body, a placement id with no placement kind, or a repeated slide or tile order
+          x-ticvai-problem-types:
+          - validation-failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: The venue already has a default kiosk configuration, or one of this name
+          x-ticvai-problem-types:
+          - default-kiosk-config-exists
+          - kiosk-config-name-taken
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/kiosk-configs/publish:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: publishKioskConfigs
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, publish to all kiosks or to one group, with versions and
+        roll back (docs/active/decisions/answers-5-october.md, CHG-R4-001); shape follows publishTenantConfig'
+      x-ticvai-audience:
+      - staff
+      summary: Publish the venue's kiosk configurations, to every kiosk or to one group
+      description: '**Validates, snapshots, versions and activates, per kiosk configuration** (decided 5 October 2026
+        by Chinmay, CHG-R4-001). With `kioskConfigIds` it publishes those configurations only (one group); without, every
+        configuration of the venue that has unpublished changes (all kiosks). Each is checked as `getKioskConfigValidation`
+        does; **one failure publishes nothing** and the 409 lists every finding. Each published configuration gets a new
+        `KioskConfigVersion` whose `snapshot` is the draft exactly as published, and that version becomes the one its
+        kiosks read; its previous version stays in the history for `restoreKioskConfigVersion`.
+
+
+        **The same publishing mechanism as the web and app, scoped to the kiosk.** Like `publishTenantConfig` this is
+        draft, check, snapshot, version and activate, and a roll back is a restore into the draft followed by a
+        publish. It does not change `publishTenantConfig` or the tenant''s `ConfigVersion` history: the brand, theme,
+        fonts and content a kiosk inherits still reach it through `publishTenantConfig`, and a kiosk configuration
+        is published here. Kiosks pick the new version up on their next read of `getPublishedKioskConfig` (the edge
+        cache for the venue is invalidated in the same transaction), at the latest when the attract loop next
+        restarts; a kiosk in a guest''s session finishes that session first.
+
+
+        **Permission:** `TENANT_PUBLISH` at the venue, the permission `publishTenantConfig` uses for the guest
+        channels, held here at venue level because a kiosk configuration belongs to one venue.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - note
+              properties:
+                note:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                  description: What changed, shown in the version history.
+                kioskConfigIds:
+                  type: array
+                  minItems: 1
+                  maxItems: 50
+                  items:
+                    type: string
+                    format: uuid
+                  description: Publish these configurations only (one kiosk group, or a few). Omitted, every
+                    configuration of the venue with unpublished changes is published.
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published; one new version per configuration published
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - versions
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/KioskConfigVersion'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: A configuration fails its checks (every finding listed, nothing published), or there is
+            nothing to publish (no configuration named or found has unpublished changes)
+          x-ticvai-problem-types:
+          - kiosk-config-invalid
+          - nothing-to-publish
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/KioskConfigValidationProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/kiosk-config:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPublishedKioskConfig
+      x-ticvai-consumed-by:
+        - "P05 KSK-001 Attract Loop"
+        - "P05 KSK-002 Language Select"
+        - "P05 KSK-008 Payment unresolved"
+        - "P05 KSK-010 Print failure"
+        - "P05 KSK-013 Call Staff"
+        - "P05 KSK-014 Out of service"
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
+        the kiosk''s counterpart of getPublishedTenantConfig, served the same way'
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      - staff
+      x-ticvai-read-routing: replica
+      summary: The published kiosk configuration a kiosk renders, before anyone touches it
+      description: '**What the kiosk shell reads at start, at every return to the attract loop and offline from its
+        cache** (decided 5 October 2026 by Chinmay, CHG-R4-001). The counterpart of `getPublishedTenantConfig`,
+        which the kiosk still reads for the brand, theme, fonts, policies, accessibility and the published language
+        list; this adds what differs on a kiosk.
+
+
+        **The tenant comes from the host, never from the caller**, exactly as for `getPublishedTenantConfig`: the edge
+        resolves the host to a tenant with `tenancy.resolveTenantHost`; an unknown host is 404. **Keyed by the kiosk or
+        by the group:** `workstationId` (the kiosk''s workstation, from its enrolment) resolves through the kiosk''s
+        assignment (`assignKiosk`) to its group''s configuration, and a kiosk in no group gets the venue''s default;
+        `kioskConfigId` reads one group''s configuration directly (the builder''s preview, CMS-105). One of the two is
+        required (400 otherwise); a workstation that is not in this venue is 404.
+
+
+        **Published, non-sensitive fields only.** Read from the configuration''s current `KioskConfigVersion` (never
+        the draft), plus the live `outOfService` state `setKioskOutOfService` writes and `isOpenNow` worked out from
+        the opening hours in the venue''s time zone. Left out: the draft markers, `assignedKioskCount`, who published,
+        and every principal id.
+
+
+        **Cacheable.** No session is needed, so the answer is the same for every caller of a host, venue and kiosk and
+        is cached at the edge, invalidated by `publishKioskConfigs`, `restoreKioskConfigVersion` (only once published),
+        `assignKiosk` and `setKioskOutOfService`. A staff token is accepted too, for the builder''s preview.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '5 October 2026: **servable from the kiosk''s local cache.** A published configuration changes
+        only on a publish, so the kiosk keeps the last answer (and the media of its attract loop) and renders from it
+        offline: the last cached loop plays, with the `offline` message, and nothing is sold that needs the server.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: workstationId
+        in: query
+        required: false
+        description: The kiosk's workstation (tenancy `Workstation.id`, from the kiosk's enrolment). Resolves to its
+          group's configuration, or to the venue's default when it is in no group.
+        schema:
+          type: string
+          format: uuid
+      - name: kioskConfigId
+        in: query
+        required: false
+        description: One kiosk configuration, read directly (the builder's preview). Ignored when `workstationId` is
+          given.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The published kiosk configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishedKioskConfig'
+        '400':
+          description: Neither `workstationId` nor `kioskConfigId` was given
+          x-ticvai-problem-types:
+          - kiosk-key-missing
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          description: The host belongs to no tenant (`not-found`), the workstation or configuration is not in this
+            venue (`not-found`), or nothing is published for it yet (`not-configured`); the kiosk then shows KSK-014
+            Out of service with the platform's neutral text.
+          x-ticvai-problem-types:
+          - not-found
+          - not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/kiosk-assignments:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listKioskAssignments
+      x-ticvai-consumed-by:
+        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, a kiosk is assigned to a kiosk group
+        (docs/active/decisions/answers-5-october.md, CHG-R4-001)'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Which kiosk group each kiosk of the venue is in
+      description: '**One row per kiosk of the venue that has been assigned** (decided 5 October 2026 by Chinmay,
+        CHG-R4-001). A kiosk with no row takes the venue''s default configuration. **Ordered by** `kioskConfigId`
+        (the default''s kiosks first), then `workstationId`. With `kioskConfigId` only that group''s kiosks. An unknown
+        venue or configuration is an empty page.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: kioskConfigId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The venue's kiosk assignments, by group then kiosk
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/KioskAssignment'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/kiosk-assignments/{workstationId}:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: workstationId
+      in: path
+      required: true
+      description: The kiosk's workstation (tenancy `Workstation.id`).
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: assignKiosk
+      x-ticvai-consumed-by:
+        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, ADM-582 assigns a kiosk to a kiosk group
+        (docs/active/decisions/answers-5-october.md, CHG-R4-001)'
+      x-ticvai-audience:
+      - staff
+      summary: Put a kiosk in a kiosk group, or back on the venue's default
+      description: '**Assigns a kiosk, not a configuration** (decided 5 October 2026 by Chinmay, CHG-R4-001): the
+        kiosk shows its group''s published configuration from its next read of `getPublishedKioskConfig`.
+        `kioskConfigId` null puts it back on the venue''s default. **PUT semantics:** the kiosk in the path has one
+        assignment; the first call creates it and later calls replace it, answered 200 either way.
+
+
+        **Separate from tenancy''s `setDeviceAssignment`**, which records who owns, holds and placed a device and is
+        unchanged: this records only which kiosk configuration a kiosk workstation shows. **Refused:** 404 when the
+        workstation or the configuration is not in this venue; 409 `not-a-kiosk` when the workstation''s sale board
+        is not a self-service kiosk (it has no kiosk enrolment), and 409 `kiosk-config-deleted` when the
+        configuration has been deleted.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KioskAssignment'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskAssignment'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The workstation is not a kiosk, or the configuration was deleted
+          x-ticvai-problem-types:
+          - not-a-kiosk
+          - kiosk-config-deleted
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /kiosk-configs/{kioskConfigId}:
+    parameters:
+    - name: kioskConfigId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getKioskConfig
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
+        shape follows getBookingFlow'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Read one kiosk configuration from the working draft, every part included
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The kiosk configuration, slides and tiles included
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskConfig'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    patch:
+      operationId: updateKioskConfig
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
+        shape follows updateBookingFlowDefinition'
+      x-ticvai-audience:
+      - staff
+      summary: Change a kiosk configuration in the working draft
+      description: 'A partial update of the working draft; kiosks see it after `publishKioskConfigs`. Each part given
+        replaces that part whole (`display`, `attractLoop` with its `slides`, `startScreen` with its `tiles`,
+        `headerFooter`, `journey`, `session`, `paymentOutput`, `languages`, `messages`, `openingHours`); a part left
+        out is unchanged. **Saved even when it would not publish**; `hasUnpublishedChanges` turns true. `isDefault`
+        cannot be changed (400): the default stays the default. **Refused:** 400 as on create; 409
+        `kiosk-config-name-taken` for a name another configuration of the venue has.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 80
+                placementKind:
+                  $ref: '#/components/schemas/KioskPlacementKind'
+                placementId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                display:
+                  $ref: '#/components/schemas/KioskDisplaySettings'
+                attractLoop:
+                  $ref: '#/components/schemas/KioskAttractLoop'
+                startScreen:
+                  $ref: '#/components/schemas/KioskStartScreen'
+                headerFooter:
+                  $ref: '#/components/schemas/KioskHeaderFooter'
+                journey:
+                  $ref: '#/components/schemas/KioskJourneySettings'
+                session:
+                  $ref: '#/components/schemas/KioskSessionSettings'
+                paymentOutput:
+                  $ref: '#/components/schemas/KioskPaymentOutput'
+                languages:
+                  $ref: '#/components/schemas/KioskLanguages'
+                messages:
+                  $ref: '#/components/schemas/KioskMessages'
+                openingHours:
+                  $ref: '#/components/schemas/KioskOpeningHours'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated in the working draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskConfig'
+        '400':
+          description: A malformed part, a repeated slide or tile order, or an attempt to change `isDefault`
+          x-ticvai-problem-types:
+          - validation-failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Another configuration of the venue has this name
+          x-ticvai-problem-types:
+          - kiosk-config-name-taken
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    delete:
+      operationId: deleteKioskConfig
+      x-ticvai-consumed-by:
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
+        shape follows deleteBookingFlow'
+      x-ticvai-audience:
+      - staff
+      summary: Remove a kiosk group's configuration
+      description: 'Removes a kiosk group''s configuration from the working draft; its published versions stay in the
+        history, read-only. **Refused with 409** `default-kiosk-config` for the venue''s default (every kiosk in no
+        group needs it) and `kiosk-config-in-use` while any kiosk is assigned to it (`assignKiosk` them elsewhere
+        first, so no kiosk is left showing a configuration that no longer exists).
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Removed from the draft
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: It is the venue's default, or kiosks are still assigned to it; the problem names them
+          x-ticvai-problem-types:
+          - default-kiosk-config
+          - kiosk-config-in-use
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /kiosk-configs/{kioskConfigId}/validation:
+    parameters:
+    - name: kioskConfigId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getKioskConfigValidation
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, the publish checks (docs/active/decisions/answers-5-october.md,
+        CHG-R4-001); shape follows validateBookingFlow'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: primary
+      summary: Whether a kiosk configuration can be published, and why not
+      description: '**The publish checks, run on the saved draft without writing anything** (decided 5 October 2026 by
+        Chinmay, CHG-R4-001). Each is a finding with its `kind`: the attract loop has no slide that plays while the
+        kiosk is open (`attractLoopEmpty`); a slide''s media is not a video or image the media library holds, or does
+        not fit the display''s resolution and orientation (`mediaDoesNotFit`); an enabled start tile offers a function
+        with nothing published behind it, such as Sell tickets with no product on sale at the venue or Order food with
+        no outlet menu (`tileWithoutProducts`); Arabic is among the kiosk''s languages and the tenant''s published
+        fonts have no Arabic pair (`arabicFontMissing`); a journey names a booking flow that fails `validateBookingFlow`
+        or is not enabled (`journeyInvalid`); a kiosk language or the default is not one the tenant has published
+        (`languageNotPublished`); an accepted payment method is not configured for the venue
+        (`paymentMethodUnavailable`); ticket printing is on and no ticket template is named (`ticketTemplateMissing`).
+        `publishKioskConfigs` refuses a configuration with any `error`; a `warning` does not block.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The findings; `valid` false lists every error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskConfigValidation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /kiosk-configs/{kioskConfigId}/out-of-service:
+    parameters:
+    - name: kioskConfigId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setKioskOutOfService
+      x-ticvai-consumed-by:
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, out of service by group with an expected-back time
+        (docs/active/decisions/answers-5-october.md, CHG-R4-001); live like setMaintenanceMode'
+      x-ticvai-audience:
+      - staff
+      summary: Take a kiosk group out of service, or put it back, at once
+      description: '**Live at once, neither drafted nor published nor restored**, like `setMaintenanceMode` (decided
+        5 October 2026 by Chinmay, CHG-R4-001). With `active` true every kiosk of the group shows KSK-014 Out of
+        service, with the group''s `outOfService` message (or `messageOverride`) and `expectedBackAt`, from its next
+        read; a guest mid-session finishes first. `active` false returns them to the attract loop. **PUT semantics:**
+        the state is replaced whole. Refused 400 when `expectedBackAt` is in the past.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KioskOutOfService'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskOutOfService'
+        '400':
+          description: '`expectedBackAt` is in the past'
+          x-ticvai-problem-types:
+          - validation-failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /kiosk-configs/{kioskConfigId}/versions:
+    parameters:
+    - name: kioskConfigId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listKioskConfigVersions
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, versions and roll back (docs/active/decisions/answers-5-october.md,
+        CHG-R4-001); shape follows listConfigVersions'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: A kiosk configuration's published versions
+      description: '**Order:** newest first (`versionNumber` descending). Each version''s `snapshot` is left out of the
+        items. An unknown configuration is an empty page.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Versions, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/KioskConfigVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore:
+    parameters:
+    - name: kioskConfigId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: versionNumber
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    post:
+      operationId: restoreKioskConfigVersion
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, roll back (docs/active/decisions/answers-5-october.md,
+        CHG-R4-001); shape follows restoreConfigVersion'
+      x-ticvai-audience:
+      - staff
+      summary: Restore a kiosk configuration's previous version into the draft
+      description: 'Copies the chosen version''s `snapshot` into this configuration''s working draft (its slides and
+        tiles included). **It does not publish**, as `restoreConfigVersion` does not: restore, check, then
+        `publishKioskConfigs`, so a roll back is as deliberate as the change that caused it. **Refused 409**
+        `unpublished-changes` when the draft holds changes not yet published and `discardDraftChanges` is not true,
+        so nobody overwrites a colleague''s unpublished work by accident.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discardDraftChanges:
+                  type: boolean
+                  default: false
+                  description: True overwrites unpublished changes in the draft.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Restored into the working draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KioskConfig'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The draft has unpublished changes and `discardDraftChanges` is not true
+          x-ticvai-problem-types:
+          - unpublished-changes
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     WhiteLabelStorefrontSessionBatch:
@@ -9354,6 +10242,907 @@ components:
           nullable: true
         sortOrder:
           type: integer
+    KioskPlacementKind:
+      type: string
+      description: '**Where a kiosk group''s kiosks stand** (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk
+        groups by gate, zone or outlet). `accessPoint` is a gate (access `AccessPoint`), `operatingArea` a zone of the
+        venue (tenancy), `outlet` an outlet (tenancy `Outlet`); `venue` is the venue''s default configuration, which
+        every kiosk in no group takes, and names no place.'
+      enum:
+      - venue
+      - accessPoint
+      - operatingArea
+      - outlet
+    KioskFunction:
+      type: string
+      description: '**What a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay, CHG-R4-001). Each
+        opens an existing kiosk screen: `sellTickets` KSK-003, `collectReservation` KSK-011 (collect a booking),
+        `orderFood` KSK-016, `shop` KSK-017, `membership` and `walletTopUp` the guest app''s membership and wallet
+        screens drawn for the kiosk, `map` the venue map, `assistant` KSK-015. A function whose module the tenant has not
+        enabled cannot be switched on (the tile is refused at publish, `tileWithoutProducts`).'
+      enum:
+      - sellTickets
+      - collectReservation
+      - orderFood
+      - shop
+      - membership
+      - walletTopUp
+      - map
+      - assistant
+    KioskTileSize:
+      type: string
+      description: The size of a tile or of a product tile on the kiosk ("the size of the card", decided 5 October 2026
+        by Chinmay, CHG-R4-001).
+      enum:
+      - small
+      - medium
+      - large
+    KioskDisplaySettings:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**The device profile of a kiosk group** (decided 5 October 2026 by Chinmay, CHG-R4-001): what the
+        kiosk''s screen is, so the attract loop''s media is checked against it and the start screen is laid out for it.'
+      properties:
+        orientation:
+          type: string
+          enum:
+          - portrait
+          - landscape
+          default: portrait
+        screenSizeInches:
+          type: number
+          minimum: 7
+          maximum: 100
+          nullable: true
+          description: The diagonal, for the layout's touch targets. Null until the hardware is known.
+        resolutionWidthPx:
+          type: integer
+          minimum: 320
+          maximum: 7680
+          default: 1080
+        resolutionHeightPx:
+          type: integer
+          minimum: 320
+          maximum: 7680
+          default: 1920
+        mountingHeightCm:
+          type: integer
+          minimum: 50
+          maximum: 250
+          nullable: true
+          description: The height of the screen's lower edge from the floor. Sets `reachableHeightByDefault` when that is
+            not given.
+        reachableHeightByDefault:
+          type: boolean
+          description: '**Whether the kiosk opens in the reachable-height mode** of the tenant''s `AccessibilitySettings`
+            (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). When not given it is
+            set from `mountingHeightCm`: true at or above 100 cm (the setting `kioskReachableHeightThresholdCm`,
+            default 100; client to confirm), false below it or with no height.'
+        touchScale:
+          type: number
+          minimum: 1
+          maximum: 2
+          default: 1.25
+          description: Multiplies every touch target and text size on the kiosk (1 is the guest app's size).
+        productTileSize:
+          $ref: '#/components/schemas/KioskTileSize'
+        tilesPerRow:
+          type: integer
+          minimum: 1
+          maximum: 6
+          default: 3
+          description: Product tiles per row on the selling screens (KSK-003, KSK-016, KSK-017).
+    KioskAttractSlide:
+      x-ticvai-persistence: whitelabel.kiosk_attract_slide
+      type: object
+      description: '**One slide of the attract loop**, the kiosk''s screen saver (decided 5 October 2026 by Chinmay,
+        CHG-R4-001). A video or photo from the media library, or a text slide in the brand''s fonts. Slides play in
+        `sortOrder`; `playsWhen` `closed` slides make the "Closed" loop shown outside the group''s opening hours.'
+      required:
+      - kind
+      - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        kioskConfigId:
+          type: string
+          format: uuid
+          readOnly: true
+        kind:
+          type: string
+          enum:
+          - video
+          - photo
+          - text
+        mediaAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `MediaAsset` (a video for `video`, an image for `photo`); required for both, null for `text`.
+            Refused at publish when it does not fit the display (`mediaDoesNotFit`).
+        text:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The slide's words in every kiosk language; required for `text`, a caption otherwise.
+        sortOrder:
+          type: integer
+          minimum: 0
+        durationSeconds:
+          type: integer
+          minimum: 3
+          maximum: 120
+          default: 8
+          description: How long a photo or text slide shows. A video plays to its end and ignores it.
+        playsWhen:
+          type: string
+          enum:
+          - open
+          - closed
+          default: open
+          description: '`closed` slides play only outside the opening hours (the "Closed" loop); `open` slides only
+            inside them.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `venue` scope.
+    KioskAttractLoop:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**How the attract loop plays** (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides
+        themselves are `KioskConfig.attractSlides`. Offline, the kiosk plays the last loop it cached.'
+      properties:
+        transition:
+          type: string
+          enum:
+          - cut
+          - fade
+          - slide
+          default: fade
+        soundOn:
+          type: boolean
+          default: false
+          description: Whether a video slide plays its sound. Off by default (a kiosk in a queue hall).
+        playWindows:
+          type: array
+          maxItems: 21
+          description: '**When the open loop plays, by time of day and weekday**, in the venue''s time zone. A slide
+            plays only inside a window; with no window the loop plays all day. Outside the opening hours the
+            `closed` slides play regardless.'
+          items:
+            type: object
+            required:
+            - weekdays
+            - from
+            - to
+            properties:
+              weekdays:
+                type: array
+                minItems: 1
+                maxItems: 7
+                items:
+                  type: string
+                  enum:
+                  - mon
+                  - tue
+                  - wed
+                  - thu
+                  - fri
+                  - sat
+                  - sun
+              from:
+                type: string
+                format: time
+                description: Local time, inclusive.
+              to:
+                type: string
+                format: time
+                description: Local time, exclusive; earlier than `from` runs past midnight.
+        touchToStart:
+          type: object
+          description: The "Touch to start" call to action over the loop.
+          properties:
+            text:
+              $ref: '#/components/schemas/LocalisedText'
+            position:
+              type: string
+              enum:
+              - top
+              - middle
+              - bottom
+              default: bottom
+            animation:
+              type: string
+              enum:
+              - none
+              - pulse
+              - bounce
+              default: pulse
+        appDownloadSlide:
+          type: object
+          description: '**A "Download our app" slide with a QR code**, added to the loop when on. The QR points at the
+            tenant''s store listings (the published app''s deep-link scheme, `getDeepLinkScheme`).'
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            caption:
+              $ref: '#/components/schemas/LocalisedText'
+            everyNthSlide:
+              type: integer
+              minimum: 1
+              maximum: 20
+              default: 4
+              description: Shown after every n-th slide of the loop.
+    KioskStartTile:
+      x-ticvai-persistence: whitelabel.kiosk_start_tile
+      type: object
+      description: '**One function a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay,
+        CHG-R4-001), in `sortOrder`. A function appears at most once per kiosk configuration.'
+      required:
+      - function
+      - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        kioskConfigId:
+          type: string
+          format: uuid
+          readOnly: true
+        function:
+          $ref: '#/components/schemas/KioskFunction'
+        isEnabled:
+          type: boolean
+          default: true
+        sortOrder:
+          type: integer
+          minimum: 0
+        tileSize:
+          $ref: '#/components/schemas/KioskTileSize'
+        imageAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+          description: The tile's image from the media library; null shows the function's icon.
+        label:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Null shows the function's standard label in each language.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `venue` scope.
+    KioskStartScreen:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: The start screen around the tiles (`KioskConfig.startTiles`); one hero banner.
+      properties:
+        heroBanner:
+          type: object
+          nullable: true
+          properties:
+            imageAssetRef:
+              type: string
+              format: uuid
+            title:
+              $ref: '#/components/schemas/LocalisedText'
+            linkTarget:
+              $ref: '#/components/schemas/LinkTarget'
+    KioskHeaderFooter:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**The kiosk''s header and footer** (decided 5 October 2026 by Chinmay, CHG-R4-001). The logo and
+        colours are the published brand''s; this says what the kiosk''s bars hold.'
+      properties:
+        logoPosition:
+          type: string
+          enum:
+          - start
+          - centre
+          - end
+          default: start
+          description: '`start` and `end` follow the reading direction, so Arabic mirrors them.'
+        languageSwitchVisible:
+          type: boolean
+          default: true
+        cartVisible:
+          type: boolean
+          default: true
+          description: The order summary button with its count.
+        callStaffVisible:
+          type: boolean
+          default: true
+          description: Opens KSK-013 Call Staff.
+        accessibilityButtonVisible:
+          type: boolean
+          default: true
+          description: Opens the tenant's `AccessibilitySettings` modes (BL-065).
+        clockVisible:
+          type: boolean
+          default: false
+        footerPaymentLogos:
+          type: boolean
+          default: true
+          description: Shows the logos of `paymentOutput.paymentMethodIds` in the footer.
+        footerHelpText:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        legalLinksAsQr:
+          type: boolean
+          default: true
+          description: '**The legal links shown as QR codes**, because a kiosk cannot open a policy page in a browser:
+            each published policy (`listPublishedPolicies`) gets a code that opens it on the guest''s phone.'
+    KioskJourneySettings:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**The kiosk channel''s journeys** (decided 5 October 2026 by Chinmay, CHG-R4-001). The kiosk books
+        through the venue''s booking flows like the web and app; custom flows are allowed, and the payment and legal
+        steps stay locked exactly as `validateBookingFlow` holds them on the web and app.'
+      properties:
+        bookingFlowIds:
+          type: array
+          maxItems: 30
+          description: The venue's booking flows the kiosk uses, by id (`listBookingFlows`). Empty uses the venue's
+            default flow for each type, as the web does.
+          items:
+            type: string
+            format: uuid
+        maxSteps:
+          type: integer
+          minimum: 2
+          maximum: 12
+          default: 6
+          description: The most steps a kiosk journey may take; a flow with more enabled steps is refused at publish
+            (`journeyInvalid`).
+        upsellEnabled:
+          type: boolean
+          default: true
+          description: Add-ons and cross-sell offers (KSK-004, KSK-006).
+        upsellOfferCount:
+          type: integer
+          minimum: 0
+          maximum: 6
+          default: 2
+          description: How many offers a step shows at most.
+    KioskSessionSettings:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**When a kiosk forgets its guest** (decided 5 October 2026 by Chinmay, CHG-R4-001). After
+        `idleTimeoutSeconds` without a touch the kiosk asks "Still there?" with a countdown of
+        `stillTherePromptSeconds`; with no touch by its end it clears the cart, signs the guest out, returns to the
+        attract loop and switches to the default language. The tenant''s `AccessibilitySettings.sessionTimeoutMultiplier`
+        multiplies both while an accessibility mode is on. A payment in progress is never interrupted.'
+      properties:
+        idleTimeoutSeconds:
+          type: integer
+          minimum: 15
+          maximum: 600
+          default: 60
+        stillTherePromptSeconds:
+          type: integer
+          minimum: 5
+          maximum: 60
+          default: 15
+        signInMethods:
+          type: array
+          description: '**How a guest signs in at a kiosk: never with a password.** By scanning a QR code from the
+            guest app (`appQr`) or with a one-time code sent to their phone or email (`oneTimeCode`). Empty: no sign-in
+            at this kiosk. Saved sign-in is never offered (decided 5 October 2026).'
+          maxItems: 2
+          items:
+            type: string
+            enum:
+            - appQr
+            - oneTimeCode
+    KioskPaymentOutput:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**What a kiosk takes and what it gives back** (decided 5 October 2026 by Chinmay, CHG-R4-001).'
+      properties:
+        paymentMethodIds:
+          type: array
+          maxItems: 20
+          description: The venue's configured payment methods this kiosk accepts (payments `listPaymentMethods`). One
+            not configured for the venue is refused at publish (`paymentMethodUnavailable`).
+          items:
+            type: string
+            format: uuid
+        receiptChannels:
+          type: array
+          description: How the guest may take the receipt; the kiosk offers these on KSK-009.
+          maxItems: 4
+          items:
+            type: string
+            enum:
+            - print
+            - email
+            - sms
+            - qr
+        ticketStock:
+          type: string
+          nullable: true
+          enum:
+          - thermal80mm
+          - wristband
+          - plasticTicket
+          description: What the kiosk's printer issues; null when it issues nothing printed (QR only).
+        ticketTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The print layout from the ticket designer (orders `updateTicketTemplate`) for `ticketStock`;
+            required when `ticketStock` is set (`ticketTemplateMissing` at publish).
+        sendToPhoneQr:
+          type: boolean
+          default: true
+          description: Offers a "Send to my phone" QR on KSK-009 that opens the order in the guest app or web.
+    KioskLanguages:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**The languages KSK-002 offers and the one the kiosk returns to** (decided 5 October 2026 by
+        Chinmay, CHG-R4-001). Each must be one the tenant has published (`LanguageConfig`); empty offers them all.'
+      properties:
+        languageCodes:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            pattern: ^[a-z]{2}$
+        defaultLanguageCode:
+          type: string
+          pattern: ^[a-z]{2}$
+          nullable: true
+          description: Null takes the tenant's published default.
+    KioskMessages:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**The kiosk''s own messages, in every kiosk language** (decided 5 October 2026 by Chinmay,
+        CHG-R4-001). Null shows the platform''s standard words.'
+      properties:
+        idleWarning:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The "Still there?" prompt.
+        outOfService:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: KSK-014, with the expected-back time when `setKioskOutOfService` gives one.
+        offline:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Over the cached loop while the kiosk cannot reach the server.
+        printerFailure:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: KSK-010 Print failure.
+        paymentUnresolved:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: KSK-008 Payment unresolved.
+        callStaff:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: KSK-013 Call Staff, while help is on its way.
+        closed:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Over the "Closed" loop outside the opening hours.
+    KioskOpeningHours:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**When a kiosk group sells** (decided 5 October 2026 by Chinmay, CHG-R4-001), in the venue''s time
+        zone. Outside them the kiosk plays its `closed` slides with the `closed` message and sells nothing. With no
+        hours set the kiosk follows the venue''s own opening hours.'
+      properties:
+        weekly:
+          type: array
+          maxItems: 14
+          items:
+            type: object
+            required:
+            - weekday
+            - opensAt
+            - closesAt
+            properties:
+              weekday:
+                type: string
+                enum:
+                - mon
+                - tue
+                - wed
+                - thu
+                - fri
+                - sat
+                - sun
+              opensAt:
+                type: string
+                format: time
+              closesAt:
+                type: string
+                format: time
+                description: Earlier than `opensAt` runs past midnight.
+    KioskOutOfService:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**A kiosk group taken out of service** (`setKioskOutOfService`; decided 5 October 2026 by Chinmay,
+        CHG-R4-001). Live state, never drafted or published.'
+      required:
+      - active
+      properties:
+        active:
+          type: boolean
+        expectedBackAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Shown on KSK-014. Must be in the future.
+        messageOverride:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Replaces the group's `messages.outOfService` until it is put back in service.
+    KioskConfig:
+      x-ticvai-persistence: whitelabel.kiosk_config
+      type: object
+      description: '**A kiosk group''s configuration, in the working draft: the kiosk channel of the white-label
+        builder** (decided 5 October 2026 by Chinmay, CHG-R4-001; `docs/active/decisions/answers-5-october.md`). The
+        kiosk is the third channel beside the web and the app. It inherits what the tenant has published for them (the
+        brand, theme, fonts with the Arabic pair, content pages, products, waivers and consents, read through
+        `getPublishedTenantConfig`) and holds here only what differs on a kiosk. **Not carried over from the app,
+        deliberately:** app icons, the store listing, push notifications, dark mode and saved sign-in.
+
+
+        **One per kiosk group of a venue, plus the venue''s default** (`isDefault`), which every kiosk in no group
+        takes (`assignKiosk` puts a kiosk in a group). Published copies are `KioskConfigVersion` rows; kiosks read the
+        current one through `getPublishedKioskConfig`.
+
+        '
+      required:
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of `createKioskConfig`.
+        name:
+          type: string
+          maxLength: 80
+          description: Staff-facing, e.g. "North gate kiosks". Unique in the venue. Not shown to guests.
+        isDefault:
+          type: boolean
+          default: false
+          description: The venue's default configuration, for every kiosk in no group. The first configuration of a
+            venue is the default; it cannot be deleted or stop being the default.
+        placementKind:
+          $ref: '#/components/schemas/KioskPlacementKind'
+        placementId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The access point, operating area or outlet `placementKind` names; null for `venue`.
+        display:
+          $ref: '#/components/schemas/KioskDisplaySettings'
+        attractLoop:
+          $ref: '#/components/schemas/KioskAttractLoop'
+        attractSlides:
+          type: array
+          maxItems: 40
+          description: The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_attract_slide`). Given
+            on a write, it replaces the whole list.
+          items:
+            $ref: '#/components/schemas/KioskAttractSlide'
+        startScreen:
+          $ref: '#/components/schemas/KioskStartScreen'
+        startTiles:
+          type: array
+          maxItems: 8
+          description: The functions this kiosk offers, in `sortOrder` (child rows, `whitelabel.kiosk_start_tile`).
+            Given on a write, it replaces the whole list. A function given twice is refused 400.
+          items:
+            $ref: '#/components/schemas/KioskStartTile'
+        headerFooter:
+          $ref: '#/components/schemas/KioskHeaderFooter'
+        journey:
+          $ref: '#/components/schemas/KioskJourneySettings'
+        session:
+          $ref: '#/components/schemas/KioskSessionSettings'
+        paymentOutput:
+          $ref: '#/components/schemas/KioskPaymentOutput'
+        languages:
+          $ref: '#/components/schemas/KioskLanguages'
+        messages:
+          $ref: '#/components/schemas/KioskMessages'
+        openingHours:
+          $ref: '#/components/schemas/KioskOpeningHours'
+        outOfService:
+          allOf:
+          - $ref: '#/components/schemas/KioskOutOfService'
+          readOnly: true
+          description: Live state, written only by `setKioskOutOfService`.
+        enabledFunctions:
+          type: array
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: The functions of the enabled start tiles, in order, for the group list (BO-485).
+          items:
+            $ref: '#/components/schemas/KioskFunction'
+        assignedKioskCount:
+          type: integer
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: How many kiosks `assignKiosk` put in this group; for the default, the venue's kiosks in no group.
+        publishedVersion:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: The `versionNumber` of the current `KioskConfigVersion`; null until first published. Set by
+            `publishKioskConfigs` in the same transaction.
+        hasUnpublishedChanges:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: True after any write to the draft since the last publish or restore; false once published.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `venue` scope.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    KioskConfigVersion:
+      x-ticvai-persistence: whitelabel.kiosk_config_version
+      type: object
+      description: '**A published kiosk configuration: immutable**, like a `ConfigVersion` (decided 5 October 2026 by
+        Chinmay, CHG-R4-001). Written once by `publishKioskConfigs` and never changed; the newest published one is
+        `isCurrent`. `restoreKioskConfigVersion` copies its `snapshot` back into the draft.'
+      required:
+      - kioskConfigId
+      - versionNumber
+      - publishedAt
+      - note
+      - isCurrent
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        kioskConfigId:
+          type: string
+          format: uuid
+          readOnly: true
+        versionNumber:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: 1, 2, 3 ... per kiosk configuration, given by the publish.
+        publishedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        publishedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        note:
+          type: string
+          maxLength: 500
+        isCurrent:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: Moved by `publishKioskConfigs` in the same transaction; one current version per configuration.
+        contentHash:
+          type: string
+          readOnly: true
+          description: A hash of the snapshot, so a kiosk holding the same version keeps its cache.
+        snapshot:
+          type: object
+          additionalProperties: true
+          readOnly: true
+          description: '**What this version contained:** the kiosk configuration exactly as published, in the shape
+            `getKioskConfig` returns (`KioskConfig`, its slides and tiles included). Deliberately an open object, as
+            `ConfigVersion.snapshot` is: a `$ref` would make it a key to a row rather than a copy. Left out of
+            `listKioskConfigVersions` items.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `venue` scope.
+    KioskAssignment:
+      x-ticvai-persistence: whitelabel.kiosk_assignment
+      x-ticvai-primary-key:
+      - workstationId
+      type: object
+      description: '**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001).
+        One row per assigned kiosk; a kiosk with no row takes the venue''s default configuration.'
+      properties:
+        workstationId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The kiosk's workstation (tenancy `Workstation.id`), from the path. The row's key.
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+        kioskConfigId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The group's configuration; null puts the kiosk on the venue's default.
+        assignedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        assignedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `venue` scope.
+    KioskConfigFindingKind:
+      type: string
+      description: The publish checks of a kiosk configuration (`getKioskConfigValidation`, decided 5 October 2026 by
+        Chinmay, CHG-R4-001).
+      enum:
+      - attractLoopEmpty
+      - mediaDoesNotFit
+      - tileWithoutProducts
+      - arabicFontMissing
+      - journeyInvalid
+      - languageNotPublished
+      - paymentMethodUnavailable
+      - ticketTemplateMissing
+    KioskConfigFinding:
+      x-ticvai-persistence: none — computed
+      type: object
+      required:
+      - kind
+      - severity
+      - message
+      properties:
+        kind:
+          $ref: '#/components/schemas/KioskConfigFindingKind'
+        severity:
+          type: string
+          enum:
+          - error
+          - warning
+        message:
+          type: string
+        reference:
+          type: string
+          nullable: true
+          description: The slide, tile, flow, language or payment method the finding is about.
+    KioskConfigValidation:
+      x-ticvai-persistence: none — computed
+      type: object
+      required:
+      - kioskConfigId
+      - valid
+      - findings
+      properties:
+        kioskConfigId:
+          type: string
+          format: uuid
+        valid:
+          type: boolean
+          description: True when no finding is an `error`.
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/KioskConfigFinding'
+    KioskConfigValidationProblem:
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          findings:
+            type: array
+            items:
+              type: object
+              properties:
+                kioskConfigId:
+                  type: string
+                  format: uuid
+                kind:
+                  $ref: '#/components/schemas/KioskConfigFindingKind'
+                message:
+                  type: string
+    PublishedKioskConfig:
+      x-ticvai-persistence: none — computed from the current KioskConfigVersion snapshot and the live state on
+        whitelabel.kiosk_config and whitelabel.kiosk_assignment
+      type: object
+      description: '**The public view of a kiosk configuration** (`getPublishedKioskConfig`, decided 5 October 2026 by
+        Chinmay, CHG-R4-001): the published parts a kiosk renders with, beside the tenant''s published brand, theme,
+        fonts, policies, accessibility and languages from `getPublishedTenantConfig`. No draft marker, no counts, no
+        person.'
+      required:
+      - kioskConfigId
+      - venueId
+      - publishedVersion
+      - publishedAt
+      - isOpenNow
+      properties:
+        kioskConfigId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        isDefault:
+          type: boolean
+          description: True when the kiosk is in no group and shows the venue's default.
+        publishedVersion:
+          type: integer
+          description: The `KioskConfigVersion.versionNumber` this answer was read from; a kiosk holding the same version
+            and `contentHash` keeps its cache.
+        contentHash:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+        display:
+          $ref: '#/components/schemas/KioskDisplaySettings'
+        attractLoop:
+          $ref: '#/components/schemas/KioskAttractLoop'
+        attractSlides:
+          type: array
+          description: Every slide, `open` and `closed`, in order; the kiosk plays the set `isOpenNow` selects.
+          items:
+            $ref: '#/components/schemas/KioskAttractSlide'
+        startScreen:
+          $ref: '#/components/schemas/KioskStartScreen'
+        startTiles:
+          type: array
+          description: The enabled tiles only, in order.
+          items:
+            $ref: '#/components/schemas/KioskStartTile'
+        headerFooter:
+          $ref: '#/components/schemas/KioskHeaderFooter'
+        journey:
+          $ref: '#/components/schemas/KioskJourneySettings'
+        session:
+          $ref: '#/components/schemas/KioskSessionSettings'
+        paymentOutput:
+          $ref: '#/components/schemas/KioskPaymentOutput'
+        languages:
+          $ref: '#/components/schemas/KioskLanguages'
+        messages:
+          $ref: '#/components/schemas/KioskMessages'
+        openingHours:
+          $ref: '#/components/schemas/KioskOpeningHours'
+        isOpenNow:
+          type: boolean
+          x-ticvai-derived: onRead
+          description: Whether the group is inside its opening hours now, in the venue's time zone. Outside them the
+            kiosk sells nothing.
+        outOfService:
+          allOf:
+          - $ref: '#/components/schemas/KioskOutOfService'
+          nullable: true
+          description: Live state (`setKioskOutOfService`); null when in service. While `active`, the kiosk shows KSK-014.
   responses:
     NotConfigured:
       description: 'This part of the working draft has never been saved. **Not the same as a missing

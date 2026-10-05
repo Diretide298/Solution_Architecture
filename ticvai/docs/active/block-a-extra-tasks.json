@@ -725,6 +725,29 @@
    "subject": "Same numbers test: till, back-office and Analytics reports agree",
    "detail": "2 October (Chinmay, DEC-559, prevention of CHG-FIN-006): an automated comparison of the same measure (takings, gross sales, net revenue, refunds) for the same period and scope on the till report (POS-008), the back-office report and the Analytics (P16) dashboard; fails when they differ. Done when: the test runs in CI against the seeded demo tenant.",
    "builds": ["screen POS-008"]
+  },
+  {
+   "key": "DEVICE-BOCA-FGL",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "block": "A2",
+   "appModule": "AM-DEVICES-BOCA",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SVC-ORDER-ORDERS-5",
+    "SVC-ORDER-ORDERS-8",
+    "SVC-ORDER-ORDER-4"
+   ],
+   "subject": "BOCA ticket and wristband printing: FGL driver behind the ticketPrinter port",
+   "detail": "In the device app (ADR-0015 Tier A; the client confirmed BOCA and sent its documents on 5 October 2026, sources/client/2026-10-05-allam-boca-printer.md; CHG-R4-002). Implement the ticketPrinter port of handoff/integration-register.md for BOCA in FGL: render a ticket or wristband from the ticket designer's layout (updateTicketTemplate, listTicketTemplates; the same layout printTicketProof previews) to FGL: text, fonts including Arabic (as a bitmap where FGL needs it), barcode and QR, the logo bitmap and the cut; printer status and errors (paper out, jam, offline) reported so the kiosk shows KSK-010 Print failure and the POS its reprint path (reprintOrder, POS-026); reprint; and a virtual (emulated) BOCA printer for the tests and CI. RFID encoding on the BOCA Lemur is built behind a flag, off, until the client confirms its scope (Decisions Register, pending). The hardware validation runs on the real unit when it reaches the India office. Done when: a kiosk sale and a POS sale print a ticket and a wristband from the designer layout on the emulator with the same output as the designer's print preview, print failures reach KSK-010 and POS-026, and the hardware check is listed as pending the device.",
+   "builds": [
+    "adr ADR-0015"
+   ],
+   "deviceClasses": [
+    "Ticket printer"
+   ],
+   "linksNothingBecause": "a device driver in the device app behind the ticketPrinter port: it builds no operation, table or screen of the package; its spec is ADR-0015 and the integration register"
   }
  ],
  "blockA1Operations": {
@@ -1043,5 +1066,84 @@
   "BO-1072": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no staff read of the published API definitions for the seat API catalogue (contract gap CHG-WIR-027) (the screens agent, 4 October; CHG-FXP-004)"},
   "BO-1179": {"kind": "undefined", "part": "rest", "into": "", "why": "the rest cannot be defined yet: its setup operation setApiClientStatus stays on APP-SETUP-BO-1179, but the rest is an integration-exception console (endpoint, error code, attempts, owner) with no operation or table holding wallet integration exceptions; WalletDispute is a guest dispute record (the contracts agent, 4 October; CHG-FXP-004)"},
   "ADM-408": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no operation approves a prospect's commercial package and hands it to purchase and contract activation (contract gap CHG-WIR-024); a commercial process the lead has not specified (the screens agent, 4 October; CHG-FXP-004)"}
- }
+ },
+ "appModulesNote": "A decided app-module (Chinmay, 5 October 2026, CHG-R4-003; docs/active/decisions/answers-5-october.md): work the lead places in a named block as one app-module, which no screen-module rule would form. tools/build-service-docs.py builds it as written: `operations` are built by its back-end tasks (grouped by service and tag as usual) and the tables they need by its forward migration; `screens` are built whole by its front-end tasks under their usual keys; each `wiring` entry is one front-end task (`key`) that wires `operations` into `screens` another ticket builds, so that ticket's scope, points and waits stay as they were and its text names the wiring task; `tasks` names hand-written tasks of this file (with `block` and `appModule`) built in it. `block` is kept: the block-filling and pass-2 moves never move a decided app-module. tools/check-plan-closure.py reads the wiring (an operation a screen binds through a wiring task is wired in that task's drop).",
+ "appModules": [
+  {
+   "key": "AM-WHITE-LABEL-KIOSK",
+   "name": "White Label \u00b7 Kiosk customisation",
+   "module": "White Label & CMS",
+   "platform": "P05",
+   "block": "A2",
+   "decided": "Chinmay, 5 October 2026 (docs/active/decisions/answers-5-october.md): Block \"A2\"; \"we add it as release now to make sure that it goes out\"; \"it is a addition so it shouldnt break existing\" (CHG-R4-001, CHG-R4-003)",
+   "why": "The kiosk becomes the third channel of the white-label builder: a kiosk configuration per kiosk group (device profile, attract loop, start tiles, header and footer, journey, session, payment and output, languages, messages, hours), published per group with versions and roll back, assigned to kiosks on ADM-582 and read by the kiosk shell. Block A2 (ends Friday 11 December 2026, Sprint 5), not A1: no A1 ticket's scope, points or waits change.",
+   "operations": [
+    "listKioskConfigs",
+    "createKioskConfig",
+    "getKioskConfig",
+    "updateKioskConfig",
+    "deleteKioskConfig",
+    "getKioskConfigValidation",
+    "publishKioskConfigs",
+    "listKioskConfigVersions",
+    "restoreKioskConfigVersion",
+    "setKioskOutOfService",
+    "getPublishedKioskConfig",
+    "listKioskAssignments",
+    "assignKiosk"
+   ],
+   "screens": [
+    "CMS-105",
+    "BO-485"
+   ],
+   "wiring": [
+    {
+     "key": "APP-KIOSK-CONFIG",
+     "platform": "P05",
+     "subject": "Kiosk shell: the published kiosk configuration on KSK-001, KSK-002, KSK-008, KSK-010, KSK-013 and KSK-014",
+     "screens": [
+      "KSK-001",
+      "KSK-002",
+      "KSK-008",
+      "KSK-010",
+      "KSK-013",
+      "KSK-014"
+     ],
+     "operations": [
+      "getPublishedKioskConfig"
+     ],
+     "detail": "The kiosk shell reads its group's published kiosk configuration (getPublishedKioskConfig, keyed by the kiosk's workstation) at start and at every return to the attract loop, caches it with the loop's media for offline, and applies it: KSK-001 plays the attract loop (the group's slides, transition, sound, play windows, the closed loop outside the opening hours, the Download our app QR slide) under Touch to start, and runs the idle rule on every kiosk screen (Still there? with its countdown, then the cart cleared, the guest signed out, back to the loop in the default language); KSK-002 offers the group's languages with its default; KSK-008, KSK-010 and KSK-013 show the group's payment unresolved, printer failure and call staff messages; KSK-014 shows the group's out of service message and expected-back time. Offline the last cached loop plays and nothing is sold."
+    },
+    {
+     "key": "VM-FE-ADM-582-KIOSK",
+     "platform": "P08",
+     "subject": "ADM-582 POS, Kiosk & Terminal Assignment Manager: put a kiosk in a kiosk group",
+     "screens": [
+      "ADM-582"
+     ],
+     "operations": [
+      "listKioskAssignments",
+      "listKioskConfigs",
+      "assignKiosk"
+     ],
+     "detail": "ADM-582 gains the kiosks and their groups: the list of the venue's kiosks with the kiosk group each is in (listKioskAssignments), the venue's kiosk groups to choose from (listKioskConfigs, the default first) and Put in kiosk group (assignKiosk; null puts the kiosk back on the venue's default, 409 when the workstation is not a kiosk)."
+    }
+   ]
+  },
+  {
+   "key": "AM-DEVICES-BOCA",
+   "name": "Devices \u00b7 BOCA ticket and wristband printing",
+   "module": "Tenancy, Venues & Devices",
+   "platform": "API",
+   "block": "A2",
+   "decided": "Chinmay, 5 October 2026 (the BOCA documents of Muhamed Allam's email, sources/client/2026-10-05-allam-boca-printer.md; Block A2 like the kiosk customisation; CHG-R4-002, CHG-R4-003)",
+   "why": "The client confirmed BOCA as the ticket and wristband printer and sent its documents; ADR-0015 puts the ticket printer in Tier A (build to FGL now), and no task built it.",
+   "operations": [],
+   "screens": [],
+   "wiring": [],
+   "tasks": [
+    "DEVICE-BOCA-FGL"
+   ]
+  }
+ ]
 }

@@ -1,0 +1,121 @@
+# F304 — A kiosk group is customised, published, assigned and rolled back
+#
+# Added 5 October 2026 (decided by Chinmay, CHG-R4-001; docs/active/decisions/answers-5-october.md): the kiosk is
+# the third channel of the white-label builder, beside the web (F102, F22) and the app. This flow walks the kiosk
+# channel from the builder's kiosk tab to the kiosk itself and back through a roll back.
+#
+# Validated by tools/check-flows.py.
+
+id: F304
+name: A kiosk group is customised, published, assigned and rolled back
+actor: venueManager
+capability: A kiosk group is customised, published, assigned and rolled back
+wave: 3
+frequency: As needed.
+criticality: operational
+primaryContract: white-label
+contracts:
+- white-label
+platforms:
+- P13
+- P08
+- P05
+trigger:
+  description: A venue wants its kiosks to show its own screen saver, start tiles, header and footer, messages and
+    hours, group by group, without touching the web or the app.
+  entryScreen: CMS-105
+  entryPoints:
+  - A new kiosk group (a gate, a zone or an outlet)
+  - A seasonal attract loop
+  - A kiosk showing the wrong configuration
+offlineBehaviour: '**Configuring is online only; the kiosk is not.** A kiosk keeps the last published configuration
+  and its attract loop in its cache and plays it offline, selling nothing that needs the server.'
+steps:
+- step: 1
+  screen: CMS-105
+  action: Kiosk Builder. Adds a kiosk group and customises it part by part.
+  operations:
+  - listKioskConfigs
+  - createKioskConfig
+  - updateKioskConfig
+  outcome: The group's device profile, attract loop, start tiles, header and footer, journey, session, payment and
+    output, languages, messages and hours are saved in the draft; nothing a kiosk shows has changed yet.
+- step: 2
+  screen: CMS-105
+  action: Checks it and previews it on the kiosk's own frame.
+  operations:
+  - getKioskConfigValidation
+  - getPublishedKioskConfig
+  outcome: '**Every publish check passes** (the loop has a slide, its media fits, every enabled tile has products,
+    an Arabic font when Arabic is on, the journeys are valid), and the draft is compared with what kiosks show now.'
+- step: 3
+  screen: CMS-105
+  action: Publishes to the group.
+  operations:
+  - publishKioskConfigs
+  outcome: A new kiosk configuration version is current for the group; its kiosks pick it up at their next return to
+    the attract loop.
+- step: 4
+  screen: ADM-582
+  action: Puts the gate's kiosks in the group.
+  operations:
+  - listKioskAssignments
+  - assignKiosk
+  crossesDevice: true
+  outcome: Each kiosk shows its group's configuration; a kiosk in no group keeps the venue's default.
+- step: 5
+  screen: KSK-001
+  action: The kiosk plays the group's attract loop until a guest touches it.
+  operations:
+  - getPublishedKioskConfig
+  outcome: The screen saver, "Touch to start", the start tiles and the idle reset are the group's; the brand, theme
+    and fonts are the tenant's published ones.
+  crossesDevice: true
+- step: 6
+  screen: CMS-105
+  action: Rolls back when something is wrong.
+  crossesDevice: true
+  operations:
+  - listKioskConfigVersions
+  - restoreKioskConfigVersion
+  outcome: '**Restore, then check, then publish — not one click**, as on the web: the earlier version is copied into
+    the draft without reaching any kiosk.'
+- step: 7
+  screen: CMS-105
+  action: Publishes the restored draft.
+  operations:
+  - publishKioskConfigs
+  outcome: The group's kiosks show the earlier configuration again from their next return to the loop.
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** `TENANT_CONFIGURE` customises; publishing and restoring
+    need `TENANT_PUBLISH`, and assigning a kiosk `DEVICE_MANAGE`.'
+  severity: medium
+  resolvedBy: resolvePermissions
+- at: 3
+  condition: A publish check fails.
+  behaviour: '**Nothing is published**: the refusal (409, `kiosk-config-invalid`) lists every finding, and the
+    builder shows each beside the part to fix.'
+  severity: medium
+  resolvedBy: getKioskConfigValidation
+- at: 5
+  condition: The kiosk cannot reach the server.
+  behaviour: '**The last cached attract loop plays with the offline message**; nothing that needs the server is sold.'
+  severity: low
+  resolvedBy: Automatic
+- at: 5
+  condition: The group has been taken out of service.
+  behaviour: The kiosk shows KSK-014 with the group's message and expected-back time until it is put back in service
+    on BO-485.
+  severity: medium
+  resolvedBy: setKioskOutOfService
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a publish check**, with the reason named.'
+notes: '**Added 5 October 2026 (CHG-R4-001).** The kiosk inherits the tenant''s published brand, theme, fonts,
+  content pages, products, waivers and consents (`getPublishedTenantConfig`, F102); this flow changes only the
+  kiosk configuration, which is published on its own and never with the web and app.'
+openQuestions: null
