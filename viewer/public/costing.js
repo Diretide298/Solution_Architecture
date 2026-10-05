@@ -200,6 +200,12 @@ async function load() {
       $('unconnected-why').textContent = error.message;
       return;
     }
+    if (error.status === 503) {
+      // The first read of a big project, still running on the server.
+      say('ct-error', `${error.message} Checking again in 30 seconds…`);
+      setTimeout(() => load(), 30_000);
+      return;
+    }
     say('ct-error', error.message);
     return;
   }

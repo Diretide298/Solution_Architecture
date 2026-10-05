@@ -50,6 +50,7 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Optional
 
 # Named, so an edge does not refuse us for looking like a script. See above.
@@ -489,7 +490,11 @@ def projects(endpoint: str, token: str) -> list:
     return sorted(found.values(), key=lambda p: (p["name"] or "").lower())
 
 
-def everything(endpoint: str, token: str, project_id: int, limit: int = 2000) -> list:
+EVERYTHING_PAGE = 200
+EVERYTHING_WORKERS = 3
+
+
+def everything(endpoint: str, token: str, project_id: int, limit: int = 20000) -> list:
     """
     Every work package in one OpenProject project, in every state.
 
@@ -498,33 +503,47 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 2000) ->
     rejected are the whole point of an overview, and leaving them out would make
     every count a count of unfinished work wearing the name of the total.
 
-    Paged the way `projects` is, and for the same reasons: nothing promises a
-    page holds them all, and an instance that ignores paging must not spin. The
-    `limit` is a ceiling on rows, not on pages — a project bigger than it is cut
-    off oldest-first, because the walk is newest first.
+    **Paged by id, and the pages read side by side.** OpenProject 10 takes about
+    six seconds for a page of 200, and a release project holds thousands (TICVAI:
+    7,967), so one page after another is minutes — past the proxy's two. The
+    first page says the total; the rest are asked for three at a time, which is
+    a load the instance carries and a minute instead of four. Sorted by id rather
+    than by last change, because pages read at different moments must not shift
+    under each other when somebody edits a ticket mid-read.
+
+    Page 200, not bigger: a page of 1,000 takes longer than `TIMEOUT`. The
+    `limit` is a ceiling on rows; past it the newest-created are kept.
     """
-    found, offset, size = {}, 1, 200
     filters = json.dumps([
         {"project": {"operator": "=", "values": [str(project_id)]}},
         {"status": {"operator": "*", "values": []}},
     ])
-    for _ in range(50):
+
+    def page_at(offset: int) -> tuple:
         page = call(endpoint, token, "work_packages", {
             "filters": filters,
-            "pageSize": size,
+            "pageSize": EVERYTHING_PAGE,
             "offset": offset,
-            "sortBy": json.dumps([["updatedAt", "desc"]]),
+            "sortBy": json.dumps([["id", "desc"]]),
         })
-        elements = page.get("_embedded", {}).get("elements", [])
-        before = len(found)
+        return page.get("_embedded", {}).get("elements", []), page.get("total")
+
+    first, total = page_at(1)
+    pages = [first]
+    if isinstance(total, int) and len(first) >= EVERYTHING_PAGE:
+        wanted = min(total, limit)
+        last = -(-wanted // EVERYTHING_PAGE)  # ceiling
+        # An instance that ignores paging would hand back page 1 forty times;
+        # the dedupe below makes that harmless, and the page count is bounded
+        # by the total it reported rather than by what keeps arriving.
+        with ThreadPoolExecutor(max_workers=EVERYTHING_WORKERS) as pool:
+            pages.extend(pool.map(lambda n: page_at(n)[0], range(2, last + 1)))
+
+    found: dict = {}
+    for elements in pages:
         for raw in elements:
             summary = summarise(raw, endpoint, token)
             found[summary["key"]] = summary
-        total = page.get("total")
-        if (len(elements) < size or len(found) == before or len(found) >= limit
-                or (isinstance(total, int) and len(found) >= total)):
-            break
-        offset += 1
     return list(found.values())[:limit]
 
 

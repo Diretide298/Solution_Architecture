@@ -100,6 +100,13 @@ async function load({ refresh = false } = {}) {
     // that says which of the two and where to fix it, not a red line.
     if (error.status === 428) return needsSetup(error.message);
     if (error.status === 403) return denied();
+    // 503 is the first read of a big project still running on the server. It
+    // carries on without us; asking again shortly is the whole of the fix.
+    if (error.status === 503) {
+      $('tk-asof').textContent = `${error.message} Checking again in 30 seconds…`;
+      setTimeout(() => load(), 30_000);
+      return;
+    }
     $('tk-asof').textContent = '';
     showError(`Could not read the tickets: ${error.message}`);
   }

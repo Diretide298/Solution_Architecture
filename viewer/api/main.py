@@ -18,6 +18,7 @@ import base64
 import json
 import os
 import re
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -2296,9 +2297,83 @@ def my_board(
 # workload, which is the one PMS shape that is nobody's business but the team's.
 
 OVERVIEW_TTL_SECONDS = 300
-OVERVIEW_LIMIT = 2000
-# {(adam project, openproject id): {"at": monotonic, "payload": {...}}}
+# A ceiling, not a working size: a release project is thousands of tickets
+# (TICVAI's r1 is 7,967), and a cut at 2,000 newest-first handed every page the
+# sub-tasks and none of the tasks above them.
+OVERVIEW_LIMIT = 20000
+# {(adam project, openproject id): {"at": monotonic, "asOf": stamp, "payload": {...}}}
 _overview_cache: dict = {}
+# **Read behind, never in the request.** A whole release project is minutes
+# against OpenProject 10 (TICVAI r1: 7,967 tickets, 171 s with three pages at a
+# time), past the proxy's 120 s. So the read always runs on its own thread, one
+# per project however many pages ask for it, and a request waits for it only so
+# long. The board, the overview, costing and the plan all share it.
+OVERVIEW_WAIT_SECONDS = 90
+# {(adam project, openproject id): {"done": Event, "error": HTTPException | None}}
+_overview_reading: dict = {}
+_overview_guard = threading.Lock()
+
+
+def _read_behind(account: dict, scope: dict, key: tuple) -> dict:
+    """Start the project read unless one is running; return the running one.
+
+    A failure is kept on the read so the callers waiting on it can say what went
+    wrong; the cache keeps whatever it held, because a five-minute-old overview
+    is still the overview.
+    """
+    with _overview_guard:
+        running = _overview_reading.get(key)
+        if running:
+            return running
+        running = {"done": threading.Event(), "error": None}
+        _overview_reading[key] = running
+
+    def run() -> None:
+        try:
+            payload = _overview_payload(account, scope)
+            _overview_cache[key] = {"at": time.monotonic(), "asOf": security.stamp(),
+                                    "payload": payload}
+        except HTTPException as exc:
+            running["error"] = exc
+        except Exception as exc:  # noqa: BLE001 — told to the waiting callers
+            running["error"] = HTTPException(502, f"Could not read OpenProject: {exc}")
+        finally:
+            with _overview_guard:
+                _overview_reading.pop(key, None)
+            running["done"].set()
+
+    threading.Thread(target=run, daemon=True).start()
+    return running
+
+
+def _project_read(account: dict, scope: dict, refresh: bool = False) -> dict:
+    """The shared read of a whole project: {"at", "asOf", "payload"}.
+
+    A read older than the TTL is answered at once while a fresh one starts
+    behind it, so nobody waits because five minutes went by. The first read of a
+    project, and an explicit Refresh, wait up to OVERVIEW_WAIT_SECONDS for the
+    read; a Refresh that runs longer answers with what is held, and a first read
+    that runs longer is a 503 saying to come back — the read carries on, and the
+    page that asks again a minute later gets it.
+    """
+    key = (scope["project"], scope["pmsId"])
+    held = _overview_cache.get(key)
+    if held and not refresh:
+        if time.monotonic() - held["at"] >= OVERVIEW_TTL_SECONDS:
+            _read_behind(account, scope, key)
+        return held
+    running = _read_behind(account, scope, key)
+    finished = running["done"].wait(OVERVIEW_WAIT_SECONDS)
+    if finished and running["error"] and not held:
+        raise running["error"]
+    fresh = _overview_cache.get(key)
+    if fresh:
+        return fresh
+    raise HTTPException(
+        503,
+        "Still reading every ticket from OpenProject — a project this size takes "
+        "two or three minutes. Try again in a minute.",
+        headers={"Retry-After": "30"})
 
 
 def _overview_payload(account: dict, scope: dict) -> dict:
@@ -2360,15 +2435,7 @@ def _overview_payload(account: dict, scope: dict) -> dict:
 
 def _project_tree(account: dict, scope: dict) -> tuple:
     """Every ticket in the project, keyed, with its children gathered."""
-    key = (scope["project"], scope["pmsId"])
-    now = time.monotonic()
-    held = _overview_cache.get(key)
-    if held and now - held["at"] < OVERVIEW_TTL_SECONDS:
-        payload = held["payload"]
-    else:
-        payload = _overview_payload(account, scope)
-        _overview_cache[key] = {"at": now, "asOf": security.stamp(), "payload": payload}
-    items = payload["items"]
+    items = _project_read(account, scope)["payload"]["items"]
     by_key = {item["key"]: item for item in items}
     kids: dict = {}
     for item in items:
@@ -2442,19 +2509,10 @@ def delivery_overview(
     account can see — ADAM widens who may ask, and does not widen the answer.
     """
     scope = _pms_scope(account, project_id)
-    key = (scope["project"], scope["pmsId"])
-    now = time.monotonic()
-    held = _overview_cache.get(key)
-    if held and not refresh and now - held["at"] < OVERVIEW_TTL_SECONDS:
-        age = int(now - held["at"])
-        return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,
-                "fromCache": True, "cacheSeconds": OVERVIEW_TTL_SECONDS}
-
-    payload = _overview_payload(account, scope)
-    asOf = security.stamp()
-    _overview_cache[key] = {"at": now, "asOf": asOf, "payload": payload}
-    return {**payload, "asOf": asOf, "ageSeconds": 0, "fromCache": False,
-            "cacheSeconds": OVERVIEW_TTL_SECONDS}
+    held = _project_read(account, scope, refresh=bool(refresh))
+    age = int(time.monotonic() - held["at"])
+    return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,
+            "fromCache": age > 0, "cacheSeconds": OVERVIEW_TTL_SECONDS}
 
 
 # ── changing a work package: proposed, shown, then applied ───────────
@@ -3408,14 +3466,7 @@ def costing(project_id: str = Query(default=""), refresh: int = Query(default=0)
     the cost of a page somebody leaves open.
     """
     scope = _pms_scope(reader, project_id)
-    key = (scope["project"], scope["pmsId"])
-    now = time.monotonic()
-    held = _overview_cache.get(key)
-    if held and not refresh and now - held["at"] < OVERVIEW_TTL_SECONDS:
-        payload = held["payload"]
-    else:
-        payload = _overview_payload(reader, scope)
-        _overview_cache[key] = {"at": now, "payload": payload}
+    payload = _project_read(reader, scope, refresh=bool(refresh))["payload"]
 
     rates = {r["person"].lower(): r for r in db.all_rows(
         "SELECT * FROM rate WHERE project_id = ?", (scope["project"],))}
@@ -5303,15 +5354,9 @@ def read_plan(project_id: str = Query(default=""),
     five minutes for no reason anybody could see.
     """
     scope = _pms_scope(account, project_id)
-    key = (scope["project"], scope["pmsId"])
-    now = time.monotonic()
-    held = _overview_cache.get(key)
-    if held and not refresh and now - held["at"] < OVERVIEW_TTL_SECONDS:
-        payload, as_of, age = held["payload"], held["asOf"], int(now - held["at"])
-    else:
-        payload = _overview_payload(account, scope)
-        as_of, age = security.stamp(), 0
-        _overview_cache[key] = {"at": now, "asOf": as_of, "payload": payload}
+    held = _project_read(account, scope, refresh=bool(refresh))
+    payload, as_of = held["payload"], held["asOf"]
+    age = int(time.monotonic() - held["at"])
 
     modules = _modules(payload["items"])
     held_draft = _drafts(account["id"], scope["project"])
@@ -5359,11 +5404,7 @@ def save_plan_draft(body: PlanDraftIn, account: dict = Depends(require_owner)):
     if len(body.bars) > PLAN_LIMIT:
         raise HTTPException(400, f"That is more than {PLAN_LIMIT} bars.")
 
-    payload = _overview_cache.get((scope["project"], scope["pmsId"]), {}).get("payload")
-    if not payload:
-        payload = _overview_payload(account, scope)
-        _overview_cache[(scope["project"], scope["pmsId"])] = {
-            "at": time.monotonic(), "asOf": security.stamp(), "payload": payload}
+    payload = _project_read(account, scope)["payload"]
     live = {m["key"]: m for m in _modules(payload["items"])}
 
     saved, dropped = 0, 0

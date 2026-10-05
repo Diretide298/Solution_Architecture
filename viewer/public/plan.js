@@ -467,6 +467,12 @@ async function load(refresh = false) {
       $('unconnected-why').textContent = error.message;
       return;
     }
+    if (error.status === 503) {
+      // The first read of a big project, still running on the server.
+      say('pl-error', `${error.message} Checking again in 30 seconds…`);
+      setTimeout(() => load(refresh), 30_000);
+      return;
+    }
     say('pl-error', error.message);
     return;
   }

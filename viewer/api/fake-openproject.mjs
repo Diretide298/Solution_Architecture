@@ -221,9 +221,12 @@ createServer(async (req, res) => {
     }
     rows.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
     const size = Number(url.searchParams.get('pageSize') ?? 100);
+    // `offset` is OpenProject's page number, from 1.
+    const from = (Math.max(1, Number(url.searchParams.get('offset') ?? 1)) - 1) * size;
+    const page = rows.slice(from, from + size);
     return json(res, 200, {
-      total: rows.length, count: Math.min(rows.length, size),
-      _embedded: { elements: rows.slice(0, size) },
+      total: rows.length, count: page.length, pageSize: size,
+      _embedded: { elements: page },
     });
   }
 
