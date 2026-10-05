@@ -246,7 +246,7 @@
   ],
   "fePointsPerAppModule": 45,
   "stableOwners": {
-   "since": "r2"
+   "since": "r1"
   },
   "blockAApps": [
    "P01",

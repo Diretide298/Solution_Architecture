@@ -76649,7 +76649,9 @@
   "verb": "POST",
   "path": "/venues/{venueId}/kiosk-configs",
   "reads": [
-   "whitelabel.kiosk_config"
+   "whitelabel.kiosk_attract_slide",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_start_tile"
   ],
   "writes": [
    "cache:idempotency",
@@ -76762,8 +76764,10 @@
   "path": "/venues/{venueId}/kiosk-config",
   "reads": [
    "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_config_version"
+   "whitelabel.kiosk_config_version",
+   "whitelabel.kiosk_start_tile"
   ],
   "writes": [],
   "routing": "replica",
@@ -76837,6 +76841,7 @@
   "path": "/venues/{venueId}/kiosk-configs",
   "reads": [
    "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
    "whitelabel.kiosk_start_tile"
   ],
@@ -76892,8 +76897,10 @@
   "verb": "POST",
   "path": "/kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore",
   "reads": [
+   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_config_version"
+   "whitelabel.kiosk_config_version",
+   "whitelabel.kiosk_start_tile"
   ],
   "writes": [
    "cache:idempotency",
