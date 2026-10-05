@@ -2341,6 +2341,22 @@
   },
   "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
  },
+ "check-device-tiers": {
+  "updated": "2026-10-05",
+  "commit": "7f132ef2",
+  "rules": {
+   "D-TIER-A-UNPLANNED": [
+    "Access reader ↔ controller",
+    "Barcode venue-scanner",
+    "Cash drawer",
+    "Customer / line display",
+    "Magnetic stripe reader",
+    "Mobile printer",
+    "POS peripheral abstraction",
+    "Receipt printer"
+   ]
+  }
+ },
  "check-glossary-terms": {
   "updated": "2026-10-01",
   "commit": "278cc437",

@@ -1067,10 +1067,11 @@
   "BO-1179": {"kind": "undefined", "part": "rest", "into": "", "why": "the rest cannot be defined yet: its setup operation setApiClientStatus stays on APP-SETUP-BO-1179, but the rest is an integration-exception console (endpoint, error code, attempts, owner) with no operation or table holding wallet integration exceptions; WalletDispute is a guest dispute record (the contracts agent, 4 October; CHG-FXP-004)"},
   "ADM-408": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no operation approves a prospect's commercial package and hands it to purchase and contract activation (contract gap CHG-WIR-024); a commercial process the lead has not specified (the screens agent, 4 October; CHG-FXP-004)"}
  },
- "appModulesNote": "A decided app-module (Chinmay, 5 October 2026, CHG-R4-003; docs/active/decisions/answers-5-october.md): work the lead places in a named block as one app-module, which no screen-module rule would form. tools/build-service-docs.py builds it as written: `operations` are built by its back-end tasks (grouped by service and tag as usual) and the tables they need by its forward migration; `screens` are built whole by its front-end tasks under their usual keys; each `wiring` entry is one front-end task (`key`) that wires `operations` into `screens` another ticket builds, so that ticket's scope, points and waits stay as they were and its text names the wiring task; `tasks` names hand-written tasks of this file (with `block` and `appModule`) built in it. `block` is kept: the block-filling and pass-2 moves never move a decided app-module. tools/check-plan-closure.py reads the wiring (an operation a screen binds through a wiring task is wired in that task's drop).",
+ "appModulesNote": "A decided app-module (Chinmay, 5 October 2026, CHG-R4-003; docs/active/decisions/answers-5-october.md): work the lead places in a named block as one app-module, which no screen-module rule would form. tools/build-service-docs.py builds it as written: `operations` are built by its back-end tasks (grouped by service and tag as usual) and the tables they need by its forward migration; `screens` are built whole by its front-end tasks under their usual keys; each `wiring` entry is one front-end task (`key`) that wires `operations` into `screens` another ticket builds, so that ticket's scope, points and waits stay as they were and its text names the wiring task; `tasks` names hand-written tasks of this file (with `block` and `appModule`) built in it; `scheduleAfter` (a block) puts its tasks behind that block's in the build order, so a module added after the block's tickets were pushed moves none of their owners or sprints and takes the capacity left. `block` is kept: the block-filling and pass-2 moves never move a decided app-module. tools/check-plan-closure.py reads the wiring (an operation a screen binds through a wiring task is wired in that task's drop).",
  "appModules": [
   {
    "key": "AM-WHITE-LABEL-KIOSK",
+   "scheduleAfter": "B",
    "name": "White Label \u00b7 Kiosk customisation",
    "module": "White Label & CMS",
    "platform": "P05",
@@ -1132,6 +1133,7 @@
   },
   {
    "key": "AM-DEVICES-BOCA",
+   "scheduleAfter": "B",
    "name": "Devices \u00b7 BOCA ticket and wristband printing",
    "module": "Tenancy, Venues & Devices",
    "platform": "API",

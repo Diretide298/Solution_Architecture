@@ -86,7 +86,10 @@ def main():
         if r["key"].startswith("TEST-BLOCK-") and r.get("notBefore"):
             w0 = float(r["notBefore"])
             freeze[r["block"]] = (w0, w0 + float(r.get("days") or sp.BLOCK_TEST_DAYS))
+    # the tasks of a decided app-module scheduled after a block do not re-pace the pushed work (CHG-R4-003)
+    late_ams = {a["key"] for a in extra.get("appModules") or [] if a.get("scheduleAfter")}
     items = [{"key": r["key"], "who": pins.get(r["key"]) or r["assignee"] or None, "pool": pool_of(r),
+              "paceExclude": r.get("parent") in late_ams,
               "track": r["track"], "service": r["service"], "points": int(r["points"] or 0),
               "days": float(r.get("days") or 0) or days_of.get(r["key"]),
               "notBefore": float(r.get("notBefore") or 0), "deps": (r["dependsOn"] or "").split(),

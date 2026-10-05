@@ -2,36 +2,55 @@ id: CHG-R4-003
 date: '2026-10-05'
 source: cr
 kind: plan
-summary: The kiosk customisation is one new app-module in Block A2, "White Label · Kiosk customisation"
-  (AM-WHITE-LABEL-KIOSK), with its forward migration, back-end, front-end and wiring tasks and its module test; no
-  existing ticket's owner, sprint, key, points or waits change.
+summary: Two new app-modules in Block A2, "White Label · Kiosk customisation" (AM-WHITE-LABEL-KIOSK) and "Devices · BOCA
+  ticket and wristband printing" (AM-DEVICES-BOCA, the task DEVICE-BOCA-FGL), planned so that no pushed ticket's owner,
+  sprint, key, points or waits change; Block A2 is held at Sprint 5.
 proposed: '2026-10-05'
 decision:
-  what: 'docs/active/block-a-extra-tasks.json gains `appModules`, a decided app-module built as written: AM-WHITE-LABEL-KIOSK
-    in Block A2 (ends Friday 11 December 2026, Sprint 5) with the thirteen kiosk operations of CHG-R4-001, the whole
-    screens CMS-105 and BO-485 (BO-485 leaves "Games & Rides · Venue Management 4 of 4", Block D, under its key
-    VM-BO-485), and two wiring tasks: APP-KIOSK-CONFIG wires getPublishedKioskConfig into KSK-001, -002, -008, -010,
-    -013 and -014, and VM-FE-ADM-582-KIOSK wires listKioskAssignments, listKioskConfigs and assignKiosk into ADM-582. The
-    wired operations are taken off those screens in the plan (tools/ticket_done.py strip_wiring), so their own tickets
-    keep their scope, points and waits and say in a Scope sentence which operations the wiring task wires.
-    tools/build-service-docs.py builds a decided app-module as written and never moves it in the block filling;
-    tools/check-plan-closure.py reads an operation a wiring task wires into a screen as wired in that task''s drop.'
+  what: 'docs/active/block-a-extra-tasks.json gains `appModules`, decided app-modules built as written. AM-WHITE-LABEL-KIOSK
+    (Block A2) holds the thirteen kiosk operations of CHG-R4-001 (SVC-WHITELABEL-KIOSK-1..4), their forward migration
+    (MIG-WHITELABEL-2), the whole screens CMS-105 and BO-485 (BO-485 leaves "Games & Rides · Venue Management 4 of 4",
+    Block D, under its key VM-BO-485), and two wiring tasks: APP-KIOSK-CONFIG wires getPublishedKioskConfig into KSK-001,
+    -002, -008, -010, -013 and -014, and VM-FE-ADM-582-KIOSK wires listKioskAssignments, listKioskConfigs and assignKiosk
+    into ADM-582. The wired operations are taken off those screens in the plan (tools/ticket_done.py strip_wiring), so their
+    own tickets keep scope, points and waits and name the wiring task in a Scope sentence. AM-DEVICES-BOCA (Block A2)
+    holds the hand-written task DEVICE-BOCA-FGL (8 points, after PLATFORM-KERNEL, SVC-ORDER-ORDERS-5 and -8 and
+    SVC-ORDER-ORDER-4; CHG-R4-002). Both carry `scheduleAfter: B`: their tasks follow Block B''s in the build order, do
+    not re-pace the plan (sprint_plan.pace_model `paceExclude`) and are not waited on by the A2 block test, so the work
+    already pushed keeps its owners and sprints and the new work takes the capacity left (it ends in Sprint 5, before the
+    A2 window). team.json: Block A2 is `fixed` at Sprint 5 (A2 ends Friday 11 December) and `stableOwners.since` is r1;
+    sprint_plan.pinned_owners reads the pushed keys from pms-map.json, because the r1 bundle was built before its own
+    push and named none. tools/build-service-docs.py builds a decided app-module as written and never moves it in the
+    block filling; tools/check-plan-closure.py reads an operation a wiring task wires as wired in that task''s drop.'
   by: Chinmay
   date: '2026-10-05'
 why: 'Chinmay, 5 October 2026, recorded in docs/active/decisions/answers-5-october.md: Block "A2"; "run the agent now. we
-  add it as release now to make sure that it goes out"; "it is a addition so it shouldnt break existing". The plan
-  formed app-modules only by a screen''s module and app, so the kiosk work would have been spread over five app-modules
-  in three blocks (the kiosk screens in A1, B and C, BO-485 in D) and KSK-001''s A1 ticket would have grown an A2 wait
-  (CHG-R4-001).'
+  add it as release now to make sure that it goes out"; "it is a addition so it shouldnt break existing"; and the BOCA
+  documents of the client''s email (sources/client/2026-10-05-allam-boca-printer.md, CHG-R4-002). The plan formed
+  app-modules only by a screen''s module and app, so the kiosk work would have spread over five app-modules in three blocks
+  and KSK-001''s A1 ticket would have grown an A2 wait (CHG-R4-001). A regeneration of the plan placed owners afresh (the
+  r1 bundle pinned nothing) and re-paced every task, so any addition moved hundreds of pushed tickets; measured on 5
+  October: with the pins and the late scheduling, 0 of the 2,196 pushed tasks change owner or sprint.'
 keys_touched:
   files:
   - docs/active/block-a-extra-tasks.json
+  - docs/active/team.json
   - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/sprint_plan.py
   - tools/ticket_done.py
   - tools/check-plan-closure.py
+  tickets:
+  - AM-WHITE-LABEL-KIOSK
+  - AM-DEVICES-BOCA
+  - DEVICE-BOCA-FGL
+  - APP-KIOSK-CONFIG
+  - VM-FE-ADM-582-KIOSK
+  - APP-CMS-CMS-105
+  - VM-BO-485
   other:
   - CHG-R4-001
-  - AM-WHITE-LABEL-KIOSK
+  - CHG-R4-002
 root_class: 'new: decided-app-module'
 tickets:
   started: []
@@ -51,4 +70,5 @@ prevention:
 status: open
 notes: 'Batch R4, 5 October 2026. Proposed and decided the same day: Chinmay waived the 24-hour cooling-off of rule 9
   and the Tuesday and Friday cadence of rule 8 for r4 on 5 October ("we add it as release now to make sure that it goes
-  out"); check-changelog prints the waiver (CHG-R4-004). Not announced before it is committed.'
+  out"); check-changelog prints the waiver (CHG-R4-004). Not announced before it is committed. Unpushed Block C and D
+  tasks still move when anything is added (their owners are placed afresh by design).'

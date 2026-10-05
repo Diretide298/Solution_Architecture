@@ -2116,6 +2116,8 @@ def main() -> int:
         k = add_am(am["module"], am["platform"], None, 1, key=am["key"], name=am["name"], block=am["block"],
                    order=sp.am_order(am["module"], am["platform"], 9, "decided"))
         am_info[k]["decided"] = True
+        if am.get("scheduleAfter"):
+            am_info[k]["scheduleAfter"] = am["scheduleAfter"]
         for sid in am.get("screens") or []:
             if sid not in screens:
                 raise SystemExit(f"block-a-extra-tasks.json appModules {k}: no screen {sid}")
@@ -2779,6 +2781,7 @@ def main() -> int:
                  "days": t_.get("days") or days_ex.get(t_["key"]), "notBefore": t_.get("notBefore") or 0,
                  "deps": t_["dependsOn"].split(), "client": t_["area"] == "client",
                  "block": block_of_task(t_["key"]), "peerOf": t_.get("peerOf"),
+                 "paceExclude": bool(am_of.get(t_["key"]) and (am_info.get(am_of[t_["key"]]) or {}).get("scheduleAfter")),
                  "fallback": {"pos": ("mob", "web"), "mob": ("web",)}.get(t_.get("pool")) if t_.get("peerOf") else None}
                 for t_ in order]
 
@@ -2858,7 +2861,9 @@ def main() -> int:
 
     # **Pass 1: where each later app-module finishes**, with Block A first and the rest in build order. B, C and D
     # are then the app-modules that finish by each block's target sprint (team.json sprintPlan.blocks).
-    first_run = run_schedule(topo(lambda t_: (BRANK[am_info[am_of[t_["key"]]]["block"]]
+    # a decided app-module scheduled after a block (CHG-R4-003) goes last here, so it moves no other app-module's finish
+    first_run = run_schedule(topo(lambda t_: (3 if am_info[am_of[t_["key"]]].get("scheduleAfter")
+                                              else BRANK[am_info[am_of[t_["key"]]]["block"]]
                                               if am_info[am_of[t_["key"]]]["block"] in sp.BLOCK_A_FAMILY else 2,
                                               am_info[am_of[t_["key"]]]["order"],
                                               t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
@@ -3176,7 +3181,11 @@ def main() -> int:
             late_ = am_of[t_["key"]] in ai_needs and a_["block"] not in settings["ticketBlocks"]
             return (len(sp.BLOCKS) if late_ else BRANK[a_["block"]], (8, 99, 99, 9, 99), (9, 0), 9, step[t_["key"]], 6,
                     t_["key"])
-        return (BRANK[a_["block"]], a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
+        # **A decided app-module added after its block's tickets were pushed is scheduled after them** (CHG-R4-003,
+        # 5 October): `scheduleAfter: B` places its tasks behind every Block B task in the build order, so the work
+        # already pushed keeps its owners and sprints, and the new work takes the capacity left (its block is unchanged)
+        rank_ = BRANK[a_["block"]] if not a_.get("scheduleAfter") else BRANK[a_["scheduleAfter"]] + 0.5
+        return (rank_, a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
                 step[t_["key"]], TRACK_ORDER[t_["track"]], t_["key"])
 
     # **Pass 2: each block on a sprint boundary, its test in the last three days.** Scheduled block first, with each
@@ -3190,8 +3199,10 @@ def main() -> int:
     for _round in range(10):
         for tk, b in block_tests.items():
             # the AI engine's module tests may overlap the block test (Chinmay, 1 October): they do not gate it
+            # a decided app-module scheduled after a block (CHG-R4-003) is tested in its block test, and does not hold the
+            # block test's window: its module test ending before the window is checked below, not waited on
             mods = [f"TEST-{k}" for k, a in am_info.items() if a["block"] == b and k in am_tasks
-                    and a["platform"] != "AI"]
+                    and a["platform"] != "AI" and not a.get("scheduleAfter")]
             by_key[tk]["dependsOn"] = " ".join(sorted(mods))
             w0, w1 = sp.window_of(final[b], tests["days"])
             by_key[tk]["notBefore"] = w0
@@ -3238,6 +3249,10 @@ def main() -> int:
         w0, w1 = sp.window_of(block_final[b], tests["days"])
         by_key[tk]["notBefore"] = w0
         windows[b] = (w0, w1)
+    for k, a in am_info.items():                          # CHG-R4-003: a late-added module must still end before its window
+        if a and a.get("scheduleAfter") and k in fin and a["block"] in windows and fin[k] > windows[a["block"]][0] + 1e-6:
+            print(f"WARNING: {k} (scheduled after Block {a['scheduleAfter']}) ends on day {fin[k]:.1f}, after Block "
+                  f"{a['block']}'s test window opens (day {windows[a['block']][0]:g}); its block test will not cover it")
 
     # **The hierarchy** (1 October): Epic = Block, Feature = app-module, Task = the work under its pushed key. The
     # service and app epics and their group features of 23-30 September leave the plan; op-release.py closes them

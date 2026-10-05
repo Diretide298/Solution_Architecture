@@ -303,7 +303,9 @@ def pace_model(team, items):
     tpd = cfg.get("tasksPerDevDay")
     if not tpd:
         return (lambda i: PLAN_PACE), f"{PLAN_PACE:.2f} points per developer per day (Block A's plan of record)", PLAN_PACE
-    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI"]
+    # a task of a decided app-module scheduled after a block (`paceExclude`, CHG-R4-003) does not re-pace the work already
+    # pushed: the average a developer-day is measured on the plan without it
+    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI" and not it.get("paceExclude")]
     avg = sum(pts) / max(len(pts), 1)
     base = float(tpd) * avg
     to, a, b = float(cfg.get("rampTo") or 1.0), int(cfg.get("rampFromSprint") or 5), int(cfg.get("rampFullSprint") or 11)
