@@ -19,6 +19,12 @@
     "^handoff/schema-viewer-notes\\.md\\s",
     "^handoff/rag-index-sources\\.md\\s"
    ]
+  },
+  "check-screen-patterns": {
+   "why": "known on main at e875d996 and named by the lead's brief of 5 October 2026 as not to be chased in r4 (CHG-R4-004): P8 and READ on ADM-340, the NP ceiling (284 later-sprint findings above 191), and the P8/READ findings the r1 bundle (handoff/service-docs/op-release.json) still gives BO-087, BO-344, BO-1018, BO-1034, BO-1179, BO-1187 and ADM-606. The count is pinned: one more finding is a new failure",
+   "known": [
+    "^12 finding\\(s\\): NP 1, P8 8, READ 3$"
+   ]
   }
  },
  "refresh_tools_coverage": {

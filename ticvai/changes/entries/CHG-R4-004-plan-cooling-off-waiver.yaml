@@ -22,6 +22,7 @@ keys_touched:
   - tools/check-changelog.py
   - changes/schema.yaml
   - changes/README.md
+  - tools/refresh-safe-baseline.json
   other:
   - CHG-R4-003
 root_class: 'new: waiver-without-record'
@@ -36,4 +37,7 @@ prevention:
   type: check
   ref: tools/check-changelog.py
 status: open
-notes: Batch R4, 5 October 2026. The waiver is printed by every check-changelog run, so it is never silent.
+notes: 'Batch R4, 5 October 2026. The waiver is printed by every check-changelog run, so it is never silent. Also in this
+  entry: tools/refresh-safe-baseline.json records check-screen-patterns'' failure on main at e875d996 (the lead''s brief
+  names it as not to be chased in r4), pinned to its count (12 findings: NP 1, P8 8, READ 3), so the full gate judges
+  only new failures.'
