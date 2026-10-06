@@ -428,36 +428,6 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /platform-subdomain:
-    get:
-      operationId: getPlatformSubdomain
-      x-ticvai-consumed-by:
-        - "P09 ADM-017 Domain & Certificate Management"
-        - "P13 CMS-017 Domain & Certificate"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-read-routing: replica
-      x-ticvai-agreed: '2 October: Chinmay, batch 5 ("subdomain plus CNAME"); DI-283; shape follows listCustomDomains'
-      summary: The tenant's platform subdomain
-      description: 'The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-CSA-043). CMS-017
-        shows it as the default address above any custom domains.
-
-        '
-      tags:
-      - white-label
-      x-ticvai-permission: TENANT_CONFIGURE
-      x-ticvai-scope-level: tenant
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      responses:
-        '200':
-          description: The platform subdomain
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlatformSubdomain'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/kiosk-configs:
     parameters:
     - name: venueId
@@ -595,6 +565,36 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /platform-subdomain:
+    get:
+      operationId: getPlatformSubdomain
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, batch 5 ("subdomain plus CNAME"); DI-283; shape follows listCustomDomains'
+      summary: The tenant's platform subdomain
+      description: 'The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-CSA-043). CMS-017
+        shows it as the default address above any custom domains.
+
+        '
+      tags:
+      - white-label
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The platform subdomain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformSubdomain'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /landing-page-templates:
@@ -4858,53 +4858,6 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /kiosk-configs/{kioskConfigId}/versions:
-    parameters:
-    - name: kioskConfigId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    get:
-      operationId: listKioskConfigVersions
-      x-ticvai-consumed-by:
-        - "P13 CMS-105 Kiosk Builder"
-      x-ticvai-agreed: '5 October 2026: decided by Chinmay, versions and roll back (docs/active/decisions/answers-5-october.md,
-        CHG-R4-001); shape follows listConfigVersions'
-      x-ticvai-audience:
-      - staff
-      x-ticvai-read-routing: replica
-      summary: A kiosk configuration's published versions
-      description: '**Order:** newest first (`versionNumber` descending). Each version''s `snapshot` is left out of the
-        items. An unknown configuration is an empty page.
-
-        '
-      tags:
-      - kiosk
-      x-ticvai-permission: TENANT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/PageSize
-      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
-      responses:
-        '200':
-          description: Versions, newest first
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: ../shared/common.yaml#/components/schemas/Page
-                - type: object
-                  properties:
-                    items:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/KioskConfigVersion'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /storefront/pages:
     get:
       operationId: listPublishedContentPages
@@ -5444,6 +5397,53 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /kiosk-configs/{kioskConfigId}/versions:
+    parameters:
+    - name: kioskConfigId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listKioskConfigVersions
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-agreed: '5 October 2026: decided by Chinmay, versions and roll back (docs/active/decisions/answers-5-october.md,
+        CHG-R4-001); shape follows listConfigVersions'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: A kiosk configuration's published versions
+      description: '**Order:** newest first (`versionNumber` descending). Each version''s `snapshot` is left out of the
+        items. An unknown configuration is an empty page.
+
+        '
+      tags:
+      - kiosk
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Versions, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/KioskConfigVersion'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /booking-flows/{bookingFlowId}/validate:
@@ -8528,36 +8528,6 @@ components:
           type: string
           nullable: true
           pattern: ^\d+\.\d+\.\d+$
-    KioskSessionSettings:
-      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
-      type: object
-      description: '**When a kiosk forgets its guest** (decided 5 October 2026 by Chinmay, CHG-R4-001). After
-        `idleTimeoutSeconds` without a touch the kiosk asks "Still there?" with a countdown of
-        `stillTherePromptSeconds`; with no touch by its end it clears the cart, signs the guest out, returns to the
-        attract loop and switches to the default language. The tenant''s `AccessibilitySettings.sessionTimeoutMultiplier`
-        multiplies both while an accessibility mode is on. A payment in progress is never interrupted.'
-      properties:
-        idleTimeoutSeconds:
-          type: integer
-          minimum: 15
-          maximum: 600
-          default: 60
-        stillTherePromptSeconds:
-          type: integer
-          minimum: 5
-          maximum: 60
-          default: 15
-        signInMethods:
-          type: array
-          description: '**How a guest signs in at a kiosk: never with a password.** By scanning a QR code from the
-            guest app (`appQr`) or with a one-time code sent to their phone or email (`oneTimeCode`). Empty: no sign-in
-            at this kiosk. Saved sign-in is never offered (decided 5 October 2026).'
-          maxItems: 2
-          items:
-            type: string
-            enum:
-            - appQr
-            - oneTimeCode
     VenueContact:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -9202,6 +9172,36 @@ components:
               $ref: '#/components/schemas/ThemeComponentColour'
             badge:
               $ref: '#/components/schemas/ThemeComponentColour'
+    KioskSessionSettings:
+      x-ticvai-persistence: none — jsonb column of whitelabel.kiosk_config
+      type: object
+      description: '**When a kiosk forgets its guest** (decided 5 October 2026 by Chinmay, CHG-R4-001). After
+        `idleTimeoutSeconds` without a touch the kiosk asks "Still there?" with a countdown of
+        `stillTherePromptSeconds`; with no touch by its end it clears the cart, signs the guest out, returns to the
+        attract loop and switches to the default language. The tenant''s `AccessibilitySettings.sessionTimeoutMultiplier`
+        multiplies both while an accessibility mode is on. A payment in progress is never interrupted.'
+      properties:
+        idleTimeoutSeconds:
+          type: integer
+          minimum: 15
+          maximum: 600
+          default: 60
+        stillTherePromptSeconds:
+          type: integer
+          minimum: 5
+          maximum: 60
+          default: 15
+        signInMethods:
+          type: array
+          description: '**How a guest signs in at a kiosk: never with a password.** By scanning a QR code from the
+            guest app (`appQr`) or with a one-time code sent to their phone or email (`oneTimeCode`). Empty: no sign-in
+            at this kiosk. Saved sign-in is never offered (decided 5 October 2026).'
+          maxItems: 2
+          items:
+            type: string
+            enum:
+            - appQr
+            - oneTimeCode
     ThemeComponentColour:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -10935,79 +10935,6 @@ components:
             publishableKey:
               type: string
               nullable: true
-    PublishedAnalyticsProvider:
-      x-ticvai-persistence: none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only
-      description: '**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no
-        credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.'
-      type: object
-      required:
-      - provider
-      - measurementId
-      - surfaces
-      - consentCategory
-      properties:
-        provider:
-          type: string
-          enum:
-          - googleAnalytics4
-          - googleTagManager
-          - adobeAnalytics
-          - metaPixel
-          - matomo
-          - other
-        otherProviderName:
-          type: string
-          maxLength: 100
-          nullable: true
-          description: The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`).
-        measurementId:
-          type: string
-          maxLength: 100
-          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
-        surfaces:
-          type: array
-          minItems: 1
-          items:
-            type: string
-            enum:
-            - guestWeb
-            - guestApp
-        consentCategory:
-          type: string
-          enum:
-          - functional
-          - analytics
-          - personalisation
-          - marketing
-          description: The cookie category the visitor must grant before this provider loads (marketing-crm
-            `CookieCategory`).
-    PublishedPolicy:
-      x-ticvai-persistence: none — a public projection of whitelabel.policy
-      type: object
-      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
-      description: The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published
-        it and the partition key stay on `Policy`.
-      required:
-      - kind
-      - version
-      - body
-      - effectiveFrom
-      properties:
-        kind:
-          $ref: '#/components/schemas/PolicyKind'
-        title:
-          type: string
-        version:
-          type: string
-          description: The version a consent records (a guest who consented to version 3 consented to version 3).
-        body:
-          $ref: '#/components/schemas/LocalisedRichText'
-        effectiveFrom:
-          type: string
-          format: date
-        requiresReconsent:
-          type: boolean
-          description: True when guests who consented to an earlier version are asked again on next launch.
     PublishedKioskConfig:
       x-ticvai-persistence: none — computed from the current KioskConfigVersion snapshot and the live state on
         whitelabel.kiosk_config and whitelabel.kiosk_assignment
@@ -11081,6 +11008,79 @@ components:
           - $ref: '#/components/schemas/KioskOutOfService'
           nullable: true
           description: Live state (`setKioskOutOfService`); null when in service. While `active`, the kiosk shows KSK-014.
+    PublishedAnalyticsProvider:
+      x-ticvai-persistence: none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only
+      description: '**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no
+        credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.'
+      type: object
+      required:
+      - provider
+      - measurementId
+      - surfaces
+      - consentCategory
+      properties:
+        provider:
+          type: string
+          enum:
+          - googleAnalytics4
+          - googleTagManager
+          - adobeAnalytics
+          - metaPixel
+          - matomo
+          - other
+        otherProviderName:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`).
+        measurementId:
+          type: string
+          maxLength: 100
+          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
+        surfaces:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+            - guestWeb
+            - guestApp
+        consentCategory:
+          type: string
+          enum:
+          - functional
+          - analytics
+          - personalisation
+          - marketing
+          description: The cookie category the visitor must grant before this provider loads (marketing-crm
+            `CookieCategory`).
+    PublishedPolicy:
+      x-ticvai-persistence: none — a public projection of whitelabel.policy
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published
+        it and the partition key stay on `Policy`.
+      required:
+      - kind
+      - version
+      - body
+      - effectiveFrom
+      properties:
+        kind:
+          $ref: '#/components/schemas/PolicyKind'
+        title:
+          type: string
+        version:
+          type: string
+          description: The version a consent records (a guest who consented to version 3 consented to version 3).
+        body:
+          $ref: '#/components/schemas/LocalisedRichText'
+        effectiveFrom:
+          type: string
+          format: date
+        requiresReconsent:
+          type: boolean
+          description: True when guests who consented to an earlier version are asked again on next launch.
     PublishedFaqCategory:
       x-ticvai-persistence: none — a public projection of whitelabel.faq_category + whitelabel.faq_entry
       type: object
