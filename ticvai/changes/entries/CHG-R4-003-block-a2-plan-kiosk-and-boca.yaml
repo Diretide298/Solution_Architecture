@@ -69,6 +69,6 @@ prevention:
   ref: tools/build-service-docs.py::decided_ams
 status: open
 notes: 'Batch R4, 5 October 2026. Proposed and decided the same day: Chinmay waived the 24-hour cooling-off of rule 9
-  and the Tuesday and Friday cadence of rule 8 for r4 on 5 October ("we add it as release now to make sure that it goes
-  out"); check-changelog prints the waiver (CHG-R4-004). Not announced before it is committed. Unpushed Block C and D
+  for r4 on 5 October ("we add it as release now to make sure that it goes out"); check-changelog prints the waiver
+  (CHG-R4-004). Released in r4 on Tuesday 6 October 2026 on the normal cadence; only the cooling-off is waived. Not announced before it is committed. Unpushed Block C and D
   tasks still move when anything is added (their owners are placed afresh by design).'

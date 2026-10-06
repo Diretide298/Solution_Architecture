@@ -78867,6 +78867,7 @@ screens:
       components:
       - kind: selectField
         label: Venue
+        bindsTo: KioskConfig.venueId
         operation: listKioskConfigs
         notes: The venue whose kiosk groups are shown (path `venueId`); defaults to the session venue.
         provenance: contract white-label.yaml GET /venues/{venueId}/kiosk-configs

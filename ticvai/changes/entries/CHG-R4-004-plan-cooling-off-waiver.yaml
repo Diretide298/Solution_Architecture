@@ -9,12 +9,12 @@ decision:
     quote}}` (changes/README.md); tools/check-changelog.py accepts a plan change decided within 24 hours of its
     proposal only with such a waiver, prints it as a warning, and has three new self-tests (a valid waiver passes, a
     waiver by someone else fails, a waiver without the lead''s words fails). The 48-hour reversal rule and the
-    release rule stay unwaivable. The Tuesday and Friday cadence (rule 8) has no gate and is waived in the entries''
-    notes.'
+    release rule stay unwaivable. r4 is released on Tuesday 6 October 2026 on the normal Tuesday and Friday cadence
+    (rule 8 is not waived); only the 24-hour cooling-off of the plan change is.'
   by: Chinmay
   date: '2026-10-05'
-why: 'Chinmay waived the cooling-off and the release cadence for r4 on 5 October 2026 ("we add it as release now to make
-  sure that it goes out", docs/active/decisions/answers-5-october.md); the plan-change rule of the council of 2
+why: 'Chinmay waived the plan cooling-off for r4 on 5 October 2026 ("we add it as release now to make sure that it goes
+  out", docs/active/decisions/answers-5-october.md; r4 itself is cut on Tuesday 6 October on the normal cadence); the plan-change rule of the council of 2
   October had no way to record a waiver, so the release could not pass check-changelog without a false `proposed`
   time (CHG-R4-003).'
 keys_touched:

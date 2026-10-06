@@ -15994,6 +15994,7 @@ screens:
       components:
       - kind: selectField
         label: Venue
+        bindsTo: KioskConfig.venueId
         operation: listKioskConfigs
         notes: The venue whose kiosk groups are shown (path `venueId`); defaults to the session venue.
         provenance: contract white-label.yaml GET /venues/{venueId}/kiosk-configs
@@ -16252,6 +16253,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-105
+    derivedFrom: wireframes/P13 Venue CMS.dc.html#cms-103
+    note: Laid out as CMS-103 Booking Flows (the list, the composing panels, the live preview and the publish gate), the
+      builder screen nearest to it; the kiosk preview frame follows KSK-001 (wireframes/reference/Kiosk Board 1.dc.html).
   apisNote: Authored 5 October 2026 (CHG-R4-001) from Chinmay's kiosk customisation decision.
   overlays:
   - id: formCreateKioskConfig

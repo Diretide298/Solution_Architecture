@@ -33842,8 +33842,8 @@
   "verb": "GET",
   "path": "/device-gate",
   "reads": [
-   "access.device_placement",
    "access.access_point",
+   "access.device_placement",
    "access.hardware_deployment"
   ],
   "writes": [],
@@ -36685,10 +36685,10 @@
   "verb": "GET",
   "path": "/offline-edge",
   "reads": [
-   "access.device_placement",
    "access.access_point",
    "access.admission_rules",
    "access.blacklist",
+   "access.device_placement",
    "access.edge_node",
    "access.edge_package",
    "access.scan_event",
@@ -37603,8 +37603,8 @@
   "path": "/physical-device-registration",
   "reads": [
    "access.access_area",
-   "access.device_placement",
    "access.access_point",
+   "access.device_placement",
    "access.gate_lane",
    "access.hardware_model"
   ],
@@ -41658,10 +41658,10 @@
   "path": "/topology-validation",
   "reads": [
    "access.access_area",
-   "access.device_placement",
    "access.access_point",
    "access.admission_rules",
    "access.configuration_version",
+   "access.device_placement",
    "access.entry_rule_point",
    "access.hardware_deployment",
    "access.offline_policy",
@@ -41940,14 +41940,14 @@
   "verb": "PUT",
   "path": "/ble-beacon-geofence",
   "reads": [
-   "access.device_placement",
    "access.access_point",
+   "access.device_placement",
    "cache:idempotency"
   ],
   "writes": [
-   "access.device_placement",
    "access.access_point",
    "access.configuration_change",
+   "access.device_placement",
    "cache:idempotency"
   ],
   "routing": "primary",
@@ -43940,9 +43940,9 @@
   "verb": "PUT",
   "path": "/reader-scanner-peripheral",
   "reads": [
-   "access.device_placement",
    "access.access_point",
    "access.access_point_configuration",
+   "access.device_placement",
    "access.hardware_model",
    "cache:idempotency"
   ],
@@ -63874,14 +63874,14 @@
   "path": "/device-placements",
   "reads": [
    "access.access_area",
-   "access.device_placement",
    "access.access_point",
+   "access.device_placement",
    "access.hardware_model",
    "cache:idempotency"
   ],
   "writes": [
-   "access.device_placement",
    "access.configuration_change",
+   "access.device_placement",
    "cache:idempotency"
   ],
   "routing": "primary",
@@ -65766,8 +65766,8 @@
    "cache:idempotency"
   ],
   "writes": [
-   "access.device_placement",
    "access.configuration_change",
+   "access.device_placement",
    "cache:idempotency"
   ],
   "routing": "primary",
@@ -76649,15 +76649,15 @@
   "verb": "POST",
   "path": "/venues/{venueId}/kiosk-configs",
   "reads": [
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "routing": null,
   "scope": "venue",
@@ -76684,9 +76684,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "routing": null,
   "scope": "venue",
@@ -76708,9 +76708,9 @@
   "verb": "GET",
   "path": "/kiosk-configs/{kioskConfigId}",
   "reads": [
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [],
   "routing": "replica",
@@ -76737,9 +76737,9 @@
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [],
   "routing": "primary",
@@ -76764,10 +76764,10 @@
   "path": "/venues/{venueId}/kiosk-config",
   "reads": [
    "whitelabel.kiosk_assignment",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_config_version",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [],
   "routing": "replica",
@@ -76841,9 +76841,9 @@
   "path": "/venues/{venueId}/kiosk-configs",
   "reads": [
    "whitelabel.kiosk_assignment",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [],
   "routing": "replica",
@@ -76866,10 +76866,10 @@
   "verb": "POST",
   "path": "/venues/{venueId}/kiosk-configs/publish",
   "reads": [
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_config_version",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [
    "cache:idempotency",
@@ -76897,16 +76897,16 @@
   "verb": "POST",
   "path": "/kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore",
   "reads": [
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_config_version",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "routing": null,
   "scope": "venue",
@@ -76954,15 +76954,15 @@
   "verb": "PATCH",
   "path": "/kiosk-configs/{kioskConfigId}",
   "reads": [
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.kiosk_attract_slide",
    "whitelabel.kiosk_config",
-   "whitelabel.kiosk_start_tile"
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "routing": null,
   "scope": "venue",

@@ -23,8 +23,8 @@ decision:
     draft, checks, an immutable snapshot version made current, restore into the draft then publish) on its own version
     rows (KioskConfigVersion), because publishTenantConfig publishes the whole tenant at once and an additive release
     may not change its behaviour; the brand still reaches kiosks through publishTenantConfig. Five new tables, written
-    by derive-ddl as the next forward migration after r1: whitelabel.kiosk_config, kiosk_attract_slide,
-    kiosk_start_tile, kiosk_config_version and kiosk_assignment. Screens: CMS-105 Kiosk Builder (P13, module Kiosk, the
+    by derive-ddl as the next forward migration after r1: whitelabel.kiosk_config, kiosk_config_attract_slide,
+    kiosk_config_start_tile, kiosk_config_version and kiosk_assignment. Screens: CMS-105 Kiosk Builder (P13, module Kiosk, the
     builder''s kiosk tab, reached from CMS-102); BO-485 rebuilt as the venue''s kiosk groups and the functions each
     offers (id kept, requiresModule core instead of games, wave 1, reached from BO-102; it no longer binds the games-only
     setGameKioskConfiguration, which BO-493 still binds); ADM-582 lists the kiosks with their group and assigns one;
@@ -84,8 +84,8 @@ keys_touched:
   - PublishedKioskConfig
   tables:
   - whitelabel.kiosk_config
-  - whitelabel.kiosk_attract_slide
-  - whitelabel.kiosk_start_tile
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
   - whitelabel.kiosk_config_version
   - whitelabel.kiosk_assignment
   screens:
@@ -134,7 +134,7 @@ notes: 'Batch R4 (branch r4-kiosk-config, from main e875d996; last release r3 = 
   docs/active/breaking-changes.yaml); the only edit to an existing operation is setGameKioskConfiguration''s
   x-ticvai-consumed-by losing BO-485, which no longer binds it. The prevention, tools/check-channel-config.py
   (registered in run-checks.py), fails on the commit before this change (e875d996: "P05 Guest Kiosk: no entry screen
-  (KSK-001) binds a published configuration read") and passes after it. Chinmay waived the Tuesday and Friday release
-  cadence for r4 on 5 October 2026 ("we add it as release now to make sure that it goes out"); the plan side and its
-  24-hour cooling-off waiver are CHG-R4-003. Open for Chinmay and the client: the reachable-height threshold
+  (KSK-001) binds a published configuration read") and passes after it. Released in r4 on Tuesday 6 October 2026, on
+  the normal Tuesday and Friday cadence (Chinmay, 5 October, evening: not tagged on the Monday); only the 24-hour
+  cooling-off of the plan change is waived (CHG-R4-003). Open for Chinmay and the client: the reachable-height threshold
   (kioskReachableHeightThresholdCm, default 100 cm, client to confirm).'

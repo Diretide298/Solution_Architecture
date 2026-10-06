@@ -55,9 +55,11 @@ column, screen id or ticket key is removed or renamed; no required field is adde
 operation's behaviour changes. New operations, schemas, optional fields, tables (as a new forward migration) and
 screens only.
 
-**The release.** It ships now as release r4 ("we add it as release now to make sure that it goes out"). Chinmay
-waived, for this release only, the Tuesday and Friday release cadence (`ticvai/CLAUDE.md` rule 8) and the 24-hour
-cooling-off of a plan change (rule 9) on 5 October 2026.
+**The release.** It ships as release r4 ("we add it as release now to make sure that it goes out"). Chinmay waived,
+for this release only, the 24-hour cooling-off of a plan change (`ticvai/CLAUDE.md` rule 9) on 5 October 2026.
+**Updated the same evening (Chinmay, relayed by the lead):** r4 is not tagged on Monday 5 October; it is cut on
+Tuesday 6 October, a regular release day, together with the other changes going in, so the Tuesday and Friday cadence
+(rule 8) is kept. Only the cooling-off is waived.
 
 ## Why (the gap it closes)
 

@@ -7370,7 +7370,7 @@ components:
           format: date-time
           readOnly: true
     KioskAttractSlide:
-      x-ticvai-persistence: whitelabel.kiosk_attract_slide
+      x-ticvai-persistence: whitelabel.kiosk_config_attract_slide
       type: object
       description: '**One slide of the attract loop**, the kiosk''s screen saver (decided 5 October 2026 by Chinmay,
         CHG-R4-001). A video or photo from the media library, or a text slide in the brand''s fonts. Slides play in
@@ -7878,7 +7878,7 @@ components:
         layout:
           $ref: '#/components/schemas/HomepageLayout'
     KioskStartTile:
-      x-ticvai-persistence: whitelabel.kiosk_start_tile
+      x-ticvai-persistence: whitelabel.kiosk_config_start_tile
       type: object
       description: '**One function a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay,
         CHG-R4-001), in `sortOrder`. A function appears at most once per kiosk configuration.'
@@ -9795,7 +9795,7 @@ components:
         attractSlides:
           type: array
           maxItems: 40
-          description: The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_attract_slide`). Given
+          description: The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). Given
             on a write, it replaces the whole list.
           items:
             $ref: '#/components/schemas/KioskAttractSlide'
@@ -9804,7 +9804,7 @@ components:
         startTiles:
           type: array
           maxItems: 8
-          description: The functions this kiosk offers, in `sortOrder` (child rows, `whitelabel.kiosk_start_tile`).
+          description: The functions this kiosk offers, in `sortOrder` (child rows, `whitelabel.kiosk_config_start_tile`).
             Given on a write, it replaces the whole list. A function given twice is refused 400.
           items:
             $ref: '#/components/schemas/KioskStartTile'
@@ -10147,17 +10147,20 @@ components:
         and WEB-050; off, the tab and the page are not shown.'
     KioskAssignment:
       x-ticvai-persistence: whitelabel.kiosk_assignment
-      x-ticvai-primary-key:
-      - workstationId
       type: object
       description: '**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001).
         One row per assigned kiosk; a kiosk with no row takes the venue''s default configuration.'
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
         workstationId:
           type: string
           format: uuid
           readOnly: true
-          description: The kiosk's workstation (tenancy `Workstation.id`), from the path. The row's key.
+          x-ticvai-unique: tenant
+          description: The kiosk's workstation (tenancy `Workstation.id`), from the path. One assignment per kiosk.
         venueId:
           type: string
           format: uuid
