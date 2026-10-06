@@ -1,0 +1,68 @@
+id: CHG-R4-011
+date: '2026-10-06'
+source: audit
+kind: contract
+summary: A product gets its name and description per language (nameLocalised, descriptionLocalised, LocalisedText)
+  beside the plain name and description, and the product edit screens (BO-007 create and save forms, BO-008)
+  bind them.
+decision:
+  what: 'Additive. contracts/spine/catalogue.yaml Product, CreateProductRequest and UpdateProductRequest gain the
+    optional, nullable nameLocalised and descriptionLocalised (allOf LocalisedText), the pattern fnb ComboDeal,
+    venue-map VenuePoint and catalogue ProductCategory already use; name and description keep their type and stay
+    the fallback a guest surface shows when a language is missing. screens/P08-venue-back-office.yaml: BO-007
+    formCreateProduct and formUpdateProduct collect the two maps; BO-008 shows them in "The product" panel and edits
+    them with two per-language text fields saved by updateProduct. ADM-119 (a section of BO-007 since CHG-MOV-002)
+    has no form of its own and is unchanged. check-contract-shapes gains C-NAME-LOCALISED.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Comparison audit finding (defect 1 of the r2 fix list the lead handed over on 6 October 2026): catalogue.yaml
+  Product carried name and description as plain strings while the same schema already localised notBookableLabel
+  (LocalisedText), so a bilingual UAE venue had nowhere to keep an Arabic product name. The type of the existing
+  fields is not changed, so the change is additive against r1 (check-contract-compat).'
+keys_touched:
+  screens:
+  - BO-007
+  - BO-008
+  operations:
+  - createProduct
+  - updateProduct
+  - getProduct
+  schemas:
+  - Product
+  - CreateProductRequest
+  - UpdateProductRequest
+  tables:
+  - catalogue.product
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P08-venue-back-office.yaml
+  - tools/check-contract-shapes.py
+  - handoff/audit-baseline.json
+root_class: 'new: name-not-localised'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-007
+  - APP-SETUP-BO-007-REST
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-008-REST
+  - SVC-CATALOGUE-PRODUCT-1
+  - SVC-CATALOGUE-PRODUCT-4
+  - SVC-CATALOGUE-PRODUCT-5
+  - MIG-CATALOGUE
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+notes: 'Batch R4, 6 October 2026. C-NAME-LOCALISED (a persisted schema that localises other text with LocalisedText
+  but keeps its name as one plain string) fails on the commit before this fix with catalogue.Product and passes
+  after it. It also finds four older members, recorded in handoff/audit-baseline.json for the lead to judge:
+  catalogue.PriceCategory, catalogue.ProductVariant, subscription.Tenant, white-label.GuidedChoice. Ticket state:
+  no status snapshot is in git, so "started" is read from handoff/service-docs/block-a-schedule.json (working days
+  from Mon 5 October; anything scheduled to start by the end of Tue 6 October counts as started). None of these
+  starts before Wed 7 October (APP-SETUP-BO-008 at day 4.38 is the earliest). The lead confirms against ADAM before
+  the release.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

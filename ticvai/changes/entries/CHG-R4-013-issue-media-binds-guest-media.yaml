@@ -1,0 +1,55 @@
+id: CHG-R4-013
+date: '2026-10-06'
+source: audit
+kind: spec
+summary: EMP-036 Issue media binds the wristband or card a guest wears (access setMediaBindingActivation) instead of
+  reading a digital-library asset (assets getMediaAsset); POS-010 loses the same stray asset read.
+decision:
+  what: 'screens/P06-staff-app.yaml EMP-036: the "media asset" panel, getMediaAsset and the mediaId deep-link
+    parameter are removed (gaps, removed: true); setMediaBindingActivation (access PUT /media-binding-activation:
+    virtual ticket, media kind, UID, capture and activation) is the primary action "Bind media to the ticket" with
+    its form overlay; appendEntitlementToMedia stays as the secondary action. screens/P04-point-of-sale.yaml POS-010:
+    the asset panel, getMediaAsset and mediaId are removed the same way, as BO-027 was on 2 October (CHG-WIR-025).
+    flows/F66 step 3 (EMP-036) names setMediaBindingActivation. x-ticvai-consumed-by follows (link-screens-contracts).
+    check-screen-wiring gains S-MEDIA-LIBRARY.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Comparison audit finding (defect 3 of the lead''s r2 fix list, 6 October 2026): "Issue media" called
+  getMediaAsset, the digital-asset lookup in assets.yaml, which shares the /media prefix with the guest''s media and
+  nothing else (orders.yaml getMediaEntitlements says so). A leftover of CF-114 (docs/registers/conflicts.md), which
+  took the rest of the assets contract off POS-010 and EMP-036 on 18 August; CHG-WIR-025 removed the same read from
+  BO-027.'
+keys_touched:
+  screens:
+  - EMP-036
+  - POS-010
+  operations:
+  - getMediaAsset
+  - setMediaBindingActivation
+  flows:
+  - F66
+  files:
+  - screens/P06-staff-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - flows/F66-a-walk-up-sale-is-taken-on-a-handheld.yaml
+  - tools/check-screen-wiring.py
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-010
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+notes: 'Batch R4, 6 October 2026. S-MEDIA-LIBRARY (a screen calling getMediaEntitlements, appendEntitlementToMedia,
+  setMediaBindingActivation, replaceCredential or getEntitlementCredential also calls an assets.yaml operation) fails
+  on the commit before this fix with EMP-036 and POS-010 and passes after it. EMP-036 is Block C
+  (AM-ORDERS-RESERVATIONS-P06, no task ticket yet); APP-POS-POS-010 starts at day 3.44. setMediaBindingActivation
+  needs ACCESS_POINT_CONFIGURE, which the staff app''s roles will have to grant to whoever issues wristbands; the
+  screen names the permission on the disabled action. The POS-010 frame accepted in Claude Design on 29 September
+  goes back to Claude Design to drop any asset panel it drew.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

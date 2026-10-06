@@ -125,6 +125,72 @@ def findings(coverage: str | None = None) -> tuple[list[tuple], dict]:
 
 
 # ------------------------------------------------------------------------------------- allowlist
+def crossed_refs(ds=None) -> list[str]:
+    """Fields the generator draws from another contract's schema of the same name (CHG-R4-012).
+
+    **A gate operator was asked to pick "Model3d".** `access.yaml` and `assets.yaml` both define a schema
+    called `MediaKind` (the media a guest wears; the kinds of digital asset), and the generator pooled
+    schemas by name, first file read wins, so `ValidateRequest.mediaKind` on SCN-003, SCN-008 and SCN-013
+    was drawn with the asset kinds. Not a count that can ratchet: a crossed field is wrong however few
+    there are, so every one fails. For each schema field whose `$ref` names a schema its own contract
+    defines and another contract defines differently, the field as the generator resolves it must carry
+    its own contract's enum values and properties."""
+    ds = ds or _spec()
+    pkg = ds.PKG
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    docs = []
+    for f in sorted((ROOT / "contracts").rglob("*.yaml")):
+        text = f.read_text(encoding="utf-8")
+        try:
+            doc = yaml.load(text, Loader=loader) or {}
+        except Exception:
+            doc = yaml.load(text, Loader=yaml.SafeLoader) or {}
+        docs.append((f.stem, doc))
+    by_name = collections.defaultdict(dict)
+    for stem, doc in docs:
+        for n, s in ((doc.get("components") or {}).get("schemas") or {}).items():
+            by_name[n][stem] = s
+
+    def shape(node) -> tuple:
+        s, _ = ds.resolve(node)
+        return tuple(str(v) for v in (s.get("enum") or [])), tuple(sorted((s.get("properties") or {}).keys()))
+
+    def canon(x):
+        if isinstance(x, dict):
+            return {str(k): canon(v) for k, v in x.items()}
+        return [canon(v) for v in x] if isinstance(x, list) else x
+
+    def bodies(n):
+        return {json.dumps(canon(v), sort_keys=True, default=str) for v in by_name[n].values()}
+
+    out = []
+    for stem, doc in docs:
+        local = (doc.get("components") or {}).get("schemas") or {}
+        for sname, sch in local.items():
+            if not isinstance(sch, dict):
+                continue
+            mine = pkg.schemas.get(f"{stem}::{sname}") or (pkg.schemas.get(sname)
+                                                             if len(by_name[sname]) == 1 else None)
+            if not isinstance(mine, dict):
+                continue
+            for p, v in (sch.get("properties") or {}).items():
+                ref = str((v or {}).get("$ref") or "") if isinstance(v, dict) else ""
+                if not ref.startswith("#/components/schemas/"):
+                    continue
+                target = ref.rsplit("/", 1)[-1]
+                if len(by_name.get(target) or {}) < 2 or stem not in by_name[target]:
+                    continue
+                if len(bodies(target)) < 2:
+                    continue
+                want = shape(by_name[target][stem])
+                got = shape(((mine.get("properties") or {}).get(p)) or {})
+                if want != got:
+                    out.append(f"{stem}.{sname}.{p}: drawn with another contract's {target} "
+                               f"({', '.join(got[0][:4]) or ', '.join(got[1][:4])} ...), not {stem}'s "
+                               f"({', '.join(want[0][:4]) or ', '.join(want[1][:4])} ...)")
+    return out
+
+
 def load_allowlist(path=ALLOWLIST) -> list[dict]:
     if not pathlib.Path(path).exists():
         return []
@@ -292,9 +358,13 @@ def main() -> int:
         print(f"  ... and {len(down) - 20} more fallen")
     for e in errs:
         print(f"  FAIL {e}")
+    crossed = crossed_refs()
+    for c in crossed:
+        print(f"  FAIL crossed schema: {c}")
     bad = [t for t in tests if not t[1]]
-    if up or errs or bad:
-        print(f"FAIL - {len(up)} count(s) rose, {len(errs)} allowlist problem(s), {len(bad)} self-test(s) failed "
+    if up or errs or bad or crossed:
+        print(f"FAIL - {len(up)} count(s) rose, {len(errs)} allowlist problem(s), {len(bad)} self-test(s) failed, "
+              f"{len(crossed)} field(s) drawn from another contract's schema "
               f"(baseline {base.get('recorded')} at {base.get('commit')})")
         return 1
     print(f"PASS - no count rose against the baseline of {base.get('recorded')} ({base.get('commit')})"

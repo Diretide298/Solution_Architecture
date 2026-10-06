@@ -49,7 +49,15 @@ RULES = {
     "S-PANEL-ENTITY": "a list and its detail panel bound to different entities (R256)",
     "S-STAFF-AUDIENCE": "a staff screen calls an operation whose audience has no staff: guest-, device-, service- or partner-only (R254, CHG-WIR-001)",
     "S-PURPOSE-BOILERPLATE": "a screen purpose that is a generator template or a pasted board placeholder (CHG-WIR-003)",
+    "S-MEDIA-LIBRARY": "a screen about the media a guest carries calls the digital-asset library (CF-114, CHG-WIR-025, CHG-R4-013)",
 }
+# **Two things are called media** (glossary; orders.yaml `getMediaEntitlements`): the QR, wristband or card a
+# guest carries, which orders and access read and write, and the images, video and documents of the asset
+# library (`assets.yaml`), which shares the `/media` prefix and nothing else. A screen that reads or writes the
+# first has no use for the second: BO-027 (2 October, CHG-WIR-025), POS-010 and EMP-036 "Issue media" (6 October,
+# CHG-R4-013) each read an image-library asset where the guest's wristband was meant.
+GUEST_MEDIA_OPS = {"getMediaEntitlements", "appendEntitlementToMedia", "setMediaBindingActivation",
+                   "replaceCredential", "getEntitlementCredential"}
 # **The staff surfaces.** A screen on one of these is operated by venue or platform staff, so every operation
 # it calls must accept a staff caller. Added 2 October 2026 with the wiring fixes (CHG-WIR-001): guest-only
 # reads (listMyCases, getLoyaltyPosition), device heartbeats and service-only writes had been bulk-attached to
@@ -128,6 +136,14 @@ def main() -> int:
         sid = s["id"]
         apis = [a for a in (s.get("apis") or []) if isinstance(a, dict) and a.get("operationId")]
         op_ids = {a["operationId"] for a in apis}
+        # --- CHG-R4-013 guest media is not the asset library ------------------------------------
+        if op_ids & GUEST_MEDIA_OPS:
+            for o in sorted(op_ids):
+                f = ops.get(o)
+                if f and f.get("contract") == "assets":
+                    guard.add("S-MEDIA-LIBRARY", f"{sid}:{o}",
+                              f"{sid} ({plat}): {o} is the digital-asset library; this screen is about the media "
+                              f"a guest carries ({', '.join(sorted(op_ids & GUEST_MEDIA_OPS))})")
         # --- R100 workstation operations off the till ------------------------------------------
         for o in sorted(op_ids):
             f = ops.get(o)

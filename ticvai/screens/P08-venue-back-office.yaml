@@ -2302,7 +2302,9 @@ screens:
       (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3:
       who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking
       flow the product is sold through; empty means the category''s flow, then the venue''s flow for its
-      kind), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.'
+      kind), decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description
+      per language with English and Arabic side by side, Arabic right to left, `name` and `description`
+      the fallback (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreateProductRequest
     confirm:
       label: Create product
@@ -2315,6 +2317,8 @@ screens:
       - kind
       - venueId
       - description
+      - nameLocalised
+      - descriptionLocalised
       - channels
       - entitlementTemplateId
       - dataMaskValues
@@ -2377,7 +2381,8 @@ screens:
       Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`,
       `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3
       REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12),
-      decided 29 September. Dismissing sends nothing; the screen behind is unchanged.'
+      decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per
+      language (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: UpdateProductRequest
     confirm:
       label: Save product
@@ -2387,6 +2392,8 @@ screens:
       discards:
       - name
       - description
+      - nameLocalised
+      - descriptionLocalised
       - channels
       - dataMaskValues
       - guestListing
@@ -2531,7 +2538,9 @@ screens:
         columns:
         - Product.code
         - Product.name
+        - Product.nameLocalised
         - Product.description
+        - Product.descriptionLocalised
         - Product.kind
         - Product.onSaleFrom
         - Product.onSaleTo
@@ -2638,6 +2647,21 @@ screens:
         operation: updateProduct
         notes: At most 200 characters per language, e.g. *Group courses are booked by phone*.
         provenance: contract catalogue.yaml Product.salesContact
+      - kind: textField
+        label: Name per language
+        bindsTo: Product.nameLocalised
+        operation: updateProduct
+        notes: '**The product name a guest reads, in each language the venue sells in** (CHG-R4-011). English
+          and Arabic side by side; Arabic right to left; at most 200 characters per language. A language
+          left empty shows `name`. Saved with `updateProduct`.'
+        provenance: contract catalogue.yaml Product.nameLocalised (6 October 2026, CHG-R4-011)
+      - kind: textField
+        label: Description per language
+        bindsTo: Product.descriptionLocalised
+        operation: updateProduct
+        notes: English and Arabic side by side; Arabic right to left. A language left empty shows `description`.
+          Saved with `updateProduct` (CHG-R4-011).
+        provenance: contract catalogue.yaml Product.descriptionLocalised (6 October 2026, CHG-R4-011)
   states:
     loading: The product variants list.
     error: Could not load. Names which read failed and leaves the product variants untouched.
@@ -3475,8 +3499,9 @@ screens:
     trigger: Create promotion
     body: '**Collects what `createPromotion` sends before it is called.** Required: `code`, `name`, `venueId`,
       `discount`, `validFrom`. Optional: `description`, `conditions`, `stackingMode`, `stackingGroup`,
-      `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+      `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. **A code another
+      promotion of the tenant already uses is refused `409 duplicate-code`** (CHG-R4-015); the form keeps
+      what was typed and says so beside the code. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreatePromotionRequest
     confirm:
       label: Create promotion
@@ -5430,6 +5455,7 @@ screens:
         - Performance.status
         - Performance.language
         - Performance.format
+        - Performance.minutesOnScreen
         operation: listPerformances
         provenance: contract catalogue.yaml GET /events/{eventId}/performances
       - kind: dataTable
@@ -5467,6 +5493,7 @@ screens:
         - Performance.status
         - Performance.language
         - Performance.format
+        - Performance.minutesOnScreen
         operation: getPerformance
         provenance: contract catalogue.yaml GET /performances/{performanceId}
       - kind: detailPanel
@@ -5501,13 +5528,17 @@ screens:
       - kind: primaryButton
         label: Create time slots
         operation: createPerformances
-        notes: '**Time-slot creation, as the 24 September review asked (M24-01)**: start date and end
-          date (`startsAt`, `recurrence.until`), first and last start time of the day, the interval between
-          starts (`recurrence.intervalMinutes`, e.g. every 30 minutes), the slot length (`endsAt`), the
-          days of the week (`recurrence.daysOfWeek`), language and format. A preview lists the slots it
-          will create (`Prefer: validate-only`) before one is written; one performance per slot.'
+        notes: '**Time-slot creation, as the 24 September review asked (M24-01, DI-995)**: start date and
+          end date (`startsAt`, `recurrence.until`), first and last start time of the day (`recurrence.firstStartTime`,
+          `recurrence.lastStartTime`), the interval between starts (`recurrence.intervalMinutes`, e.g. every
+          30 minutes), the slot length (`slotLengthMinutes`; the first slot''s `endsAt` follows from it),
+          the minutes on screen (`minutesOnScreen`: how long after its start a slot is still sold, e.g. 10
+          keeps a 10:00 slot on sale until 10:10; DI-167, DI-169), the days of the week (`recurrence.daysOfWeek`),
+          language and format. A preview lists the slots it will create (`Prefer: validate-only`) before
+          one is written; one performance per slot. A last start before the first is refused `422 slot-window-invalid`
+          and the form says so beside the two times (CHG-R4-014).'
         provenance: contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September
-          2026, M24-01 (applied 30 September)
+          2026, M24-01 (applied 30 September); minutes on screen and the daily window 6 October 2026 (CHG-R4-014)
       - kind: destructiveButton
         label: Cancel performance
         operation: cancelPerformance
@@ -5544,8 +5575,9 @@ screens:
     trigger: Create performances
     body: '**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`.
       Optional: `admissionRulesId`, `seatMapId`, `language` (BCP 47, e.g. `ar`, `fr`) and `format` (e.g.
-      2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `recurrence`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+      2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `minutesOnScreen`
+      and `slotLengthMinutes` (DI-167, DI-169, DI-995), `recurrence` with `firstStartTime` and `lastStartTime`
+      for the daily window (CHG-R4-014). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreatePerformancesRequest
     confirm:
       label: Create performances
@@ -5559,6 +5591,8 @@ screens:
       - seatMapId
       - language
       - format
+      - minutesOnScreen
+      - slotLengthMinutes
       - recurrence
     provenance: contract catalogue.yaml POST /events/{eventId}/performances
   - id: formCreateEvent
@@ -100896,24 +100930,35 @@ screens:
         provenance: contract catalogue.yaml Event (defined 4 October 2026, CHG-FXS-001)
       - kind: textField
         label: New event name
+        bindsTo: CloneEventRequest.newName
         operation: cloneEvent
         notes: Body newName; the source name with ' (copy)' by default.
-        provenance: defined 4 October 2026 (CHG-FXS-001)
+        provenance: defined 4 October 2026 (CHG-FXS-001); bound 6 October 2026 (CHG-R4-016)
+      - kind: textField
+        label: New event code
+        bindsTo: CloneEventRequest.newCode
+        operation: cloneEvent
+        notes: '**Event codes are unique per tenant** (audit R108), so the copy needs its own. Prefilled with
+          the source''s code and the first free suffix (`-2`, `-3`, ...); a code already in use is refused
+          `409 duplicate-code` and the form says so beside the field, keeping everything else (CHG-R4-016).'
+        provenance: contract catalogue.yaml CloneEventRequest.newCode (6 October 2026, CHG-R4-016)
       - kind: multiSelect
         label: Copy
+        bindsTo: CloneEventRequest.include
         operation: cloneEvent
         notes: 'Body include[]: the parts to copy (performances, prices, capacities, resources, content);
           all ticked by default.'
-        provenance: defined 4 October 2026 (CHG-FXS-001)
+        provenance: defined 4 October 2026 (CHG-FXS-001); bound 6 October 2026 (CHG-R4-016)
       - kind: numberField
         label: Move dates by (days)
+        bindsTo: CloneEventRequest.shiftDatesByDays
         operation: cloneEvent
         notes: Body shiftDatesByDays; 0 keeps the dates, 7 moves every performance a week on.
-        provenance: defined 4 October 2026 (CHG-FXS-001)
+        provenance: defined 4 October 2026 (CHG-FXS-001); bound 6 October 2026 (CHG-R4-016)
       - kind: primaryButton
         label: Copy event
         operation: cloneEvent
-        notes: On 201 opens the new event (the eventId returned) as a draft.
+        notes: On 201 opens the new event (the eventId and code returned) as a draft.
         provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Cancel
@@ -100953,7 +100998,8 @@ screens:
     - name: eventId
       from: navigation
   notes: '**Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent**
-    (CHG-FXS-001)'
+    (CHG-FXS-001). **The copy takes its own event code** (`newCode`, 6 October 2026, CHG-R4-016): event
+    codes are unique per tenant, and a duplicate is refused `409 duplicate-code`.'
 - id: BO-697
   name: Event Schedule Command Center
   module: Sell
