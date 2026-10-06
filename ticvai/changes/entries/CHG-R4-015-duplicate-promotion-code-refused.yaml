@@ -1,0 +1,56 @@
+id: CHG-R4-015
+date: '2026-10-06'
+source: audit
+kind: contract
+summary: createPromotion refuses a promotion code another promotion of the tenant already uses (409 duplicate-code),
+  and the promotion code is unique per tenant.
+decision:
+  what: 'Additive. contracts/satellite/promotions.yaml: CreatePromotionRequest.code gains x-ticvai-unique tenant (and so
+    Promotion.code, which composes it), and createPromotion gains 409 $ref common DuplicateCode (problem type
+    duplicate-code, the package convention since audit R108). updatePromotion cannot change a code, so it needs no
+    409. The operation''s partner audience is not touched: that question goes to the client on 7 October.
+    screens/P08-venue-back-office.yaml BO-010''s create form says what a duplicate gets. check-contract-shapes gains
+    C-CODE-409.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Comparison audit finding (defect 7 of the lead''s r2 fix list, 6 October 2026): createPromotion declared no 409,
+  so a second promotion with the same code was not refused. Audit decision R108 (docs/registers/audit-decisions.md,
+  28 September) makes configuration codes unique per tenant and adds the shared duplicate-code response; promotions
+  were not on its list.'
+keys_touched:
+  screens:
+  - BO-010
+  operations:
+  - createPromotion
+  schemas:
+  - CreatePromotionRequest
+  - Promotion
+  tables:
+  - promotions.promotion
+  files:
+  - contracts/satellite/promotions.yaml
+  - screens/P08-venue-back-office.yaml
+  - tools/check-contract-shapes.py
+  - handoff/audit-baseline.json
+root_class: 'new: duplicate-code-unrefused'
+tickets:
+  started: []
+  unstarted:
+  - SVC-CATALOGUE-PROMOTION-1
+  - APP-SETUP-BO-010
+  - APP-SETUP-BO-010-REST
+  - MIG-PROMOTIONS
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+notes: 'Batch R4, 6 October 2026. C-CODE-409 (a create/add/register/import POST whose body takes a `code` and that
+  declares no 409) fails on the commit before this fix with createPromotion and passes after it. It also finds 40
+  older creates with the same gap (createAccessPoint, createBundle, createEntitlementTemplate, createGame ...),
+  recorded in handoff/audit-baseline.json for the lead to schedule; each is a business-rule decision (is the code
+  unique, and where), not a mechanical fix. SVC-CATALOGUE-PROMOTION-1 starts at day 5.06, APP-SETUP-BO-010 at 4.05,
+  MIG-PROMOTIONS at 4.55 (block-a-schedule.json): none started.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

@@ -913,8 +913,8 @@ screens:
       trigger: Add to Existing Ticket
       carries:
       - orderId
-      provenance: derived — POS-010 declares entryState.params mediaCode, mediaId, orderId and POS-002
-        holds orderId, so an edge into it carries them
+      provenance: derived — POS-010 declares entryState.params mediaCode, orderId and POS-002 holds orderId,
+        so an edge into it carries them
     - to: POS-020
       trigger: Shift Exceptions & Alerts
       carries:
@@ -5032,20 +5032,6 @@ screens:
         operation: getMediaEntitlements
         provenance: contract orders.yaml GET /media/{mediaCode}/entitlements
       - kind: detailPanel
-        label: The media asset
-        bindsTo: MediaAssetDetail
-        columns:
-        - MediaAssetDetail.kind
-        - MediaAssetDetail.status
-        - MediaAssetDetail.filename
-        - MediaAssetDetail.contentType
-        - MediaAssetDetail.sizeBytes
-        - MediaAssetDetail.title
-        - MediaAssetDetail.description
-        - MediaAssetDetail.durationSeconds
-        operation: getMediaAsset
-        provenance: contract assets.yaml GET /media/{mediaId}
-      - kind: detailPanel
         label: The cart
         bindsTo: Cart
         columns:
@@ -5092,11 +5078,11 @@ screens:
     error: Could not load. Names which read failed and leaves the add existing ticket untouched.
     emptyFirstRun: No add existing ticket yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: 'Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to
       show this screen, and names that permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question. A caller who can see the screen
       but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE`
-      for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`.'
+      for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`.'
     offline: '**Not available.** The entitlement set must be read live; appending to a stale picture double-sells
       a locker'
   apis:
@@ -5108,10 +5094,6 @@ screens:
     contract: orders
     purpose: Attach the new purchase to the same media
     trigger: onAction
-  - operationId: getMediaAsset
-    contract: assets
-    purpose: Read an asset with derivatives and usage
-    trigger: onLoad
   - operationId: getCart
     contract: orders
     purpose: The cart, priced and checked, right now
@@ -5128,8 +5110,6 @@ screens:
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getMediaEntitlements`,
         `appendEntitlementToMedia` take the id from the record the user acts on, and an edge or link that
         holds one only pre-selects it.'
-    - name: mediaId
-      from: deepLink
     - name: cartId
       from: session
     - name: orderId
@@ -5138,7 +5118,7 @@ screens:
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
       session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
-      with `mediaCode`, `mediaId`, `orderId`.'
+      with `mediaCode`, `orderId`.'
   wireframe:
     status: notStarted
     provenance: designed
@@ -5193,6 +5173,14 @@ screens:
       - waiveFee
       - reason
     provenance: designed
+  gaps:
+  - operation: getMediaAsset
+    removed: true
+    why: 'Removed 6 October 2026 (CHG-R4-013): getMediaAsset reads the digital-asset library (images,
+      video, documents); the media here is the QR, wristband or card the guest already carries, read by
+      getMediaEntitlements (orders). Left over from CF-114, which removed the rest of the assets contract
+      from this screen on 18 August; BO-027 lost the same operation for the same reason on 2 October (CHG-WIR-025).'
+    source: contracts/satellite/assets.yaml#getMediaAsset | contracts/spine/orders.yaml#getMediaEntitlements
 - id: POS-011
   name: Returns, Refunds & Exchanges
   module: Sell

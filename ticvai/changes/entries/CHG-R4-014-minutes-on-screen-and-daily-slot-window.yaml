@@ -1,0 +1,65 @@
+id: CHG-R4-014
+date: '2026-10-06'
+source: design-input
+kind: contract
+summary: A performance carries its "minutes on screen" (how long after its start it is still sold), and time-slot
+  creation takes the slot length and the first and last start time of each day, as agreed in DI-167, DI-169 and
+  DI-995; BO-015 binds them.
+decision:
+  what: 'Additive. contracts/spine/catalogue.yaml: Performance and CreatePerformancesRequest gain minutesOnScreen
+    (integer 0-1440, default 0); updatePerformance''s body gains it too (not a timing change, so a sold performance
+    accepts it). CreatePerformancesRequest gains slotLengthMinutes (optional; must agree with endsAt minus startsAt)
+    and recurrence.firstStartTime and recurrence.lastStartTime (HH:MM on the region''s clock; omitted, the series
+    behaves as before). createPerformances gains a 422 slot-window-invalid. The entry window stays with the admission
+    rules (admissionRulesId). screens/P08-venue-back-office.yaml BO-015 shows minutesOnScreen in the calendar table and
+    the performance panel, and its Create time slots notes and form name the new fields. check-contract-shapes gains
+    C-SERIES-WINDOW.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Agreed with the client on 7 August (DI-167, DI-169: sources/mom/TICVAI_BackendDeepDive_MoM_07Aug2026.docx
+  section 14) and 24 September (DI-995, M24-01), and promised by BO-015''s Create time slots notes and its design notes
+  (handoff/design-notes/ticketing-backoffice.yaml BO-015 inputs), but the contract had no field for the minutes on
+  screen and no way to stop a series at a last start time: a series every 30 minutes ran through the night. Defect 4 of
+  the lead''s r2 fix list, 6 October 2026.'
+keys_touched:
+  screens:
+  - BO-015
+  operations:
+  - createPerformances
+  - updatePerformance
+  - listPerformances
+  - getPerformance
+  schemas:
+  - Performance
+  - CreatePerformancesRequest
+  tables:
+  - catalogue.performance
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P08-venue-back-office.yaml
+  - tools/check-contract-shapes.py
+root_class: 'new: decision-applied-in-part'
+tickets:
+  started:
+  - APP-SETUP-BO-015
+  - APP-SETUP-BO-015-REST
+  unstarted:
+  - SVC-CATALOGUE-EVENT-1
+  - SVC-CATALOGUE-EVENT-3
+  - MIG-CATALOGUE
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+notes: 'Batch R4, 6 October 2026. C-SERIES-WINDOW (a schema whose series repeats every intervalMinutes and has no last
+  start time of the day) fails on the commit before this fix with catalogue.CreatePerformancesRequest.recurrence and
+  passes after it. No check can see that an agreed design input names a field the contract lacks ("minutes on
+  screen"); that part rests on the design notes the process agents write. **Started tickets:** APP-SETUP-BO-015
+  (Pallavi Sawant) is scheduled from day 0.51 and APP-SETUP-BO-015-REST (Pradnya Yeram) from day 1.87 of Block A
+  (handoff/service-docs/block-a-schedule.json; no status snapshot is in git), so both are taken as started: they are
+  not rewritten, and the release gives each a comment and a linked delta ticket for the new fields. The lead confirms
+  their state in ADAM. The additive fields leave what they started on valid.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

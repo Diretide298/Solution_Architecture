@@ -43,6 +43,7 @@ steps:
   operations:
   - appendEntitlementToMedia
   - getMediaEntitlements
+  - setMediaBindingActivation
   outcome: '**Issued to a wristband or a phone, not printed.** A roaming seller has no printer, which
     is why this path exists at all.'
   crossesDevice: true

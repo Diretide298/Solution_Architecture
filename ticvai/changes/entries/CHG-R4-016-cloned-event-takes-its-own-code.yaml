@@ -1,0 +1,51 @@
+id: CHG-R4-016
+date: '2026-10-06'
+source: audit
+kind: contract
+summary: cloneEvent takes the copy's own event code (newCode, optional, unique per tenant, 409 duplicate-code), names its
+  body CloneEventRequest, returns the code, and BO-696 asks for it.
+decision:
+  what: 'Additive. contracts/spine/catalogue.yaml: cloneEvent''s inline body becomes the named schema CloneEventRequest
+    with the same include, shiftDatesByDays and newName, plus newCode (optional, nullable, maxLength 64, x-ticvai-unique
+    tenant); omitted, the server gives the copy the source''s code with the first free suffix -2, -3, ... The 201 gains
+    `code`; the operation gains 409 $ref common DuplicateCode. screens/P08-venue-back-office.yaml BO-696 adds a New event
+    code field and binds its four fields to CloneEventRequest. check-contract-shapes gains C-CLONE-CODE.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Comparison audit finding (defect 8 of the lead''s r2 fix list, 6 October 2026): event codes are unique per tenant
+  (CreateEventRequest.code, audit R108), and cloneEvent''s body had only newName, shiftDatesByDays and include, so a
+  copy had no code of its own and the rule could not hold.'
+keys_touched:
+  screens:
+  - BO-696
+  operations:
+  - cloneEvent
+  schemas:
+  - CloneEventRequest
+  - Event
+  tables:
+  - catalogue.event
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P08-venue-back-office.yaml
+  - tools/check-contract-shapes.py
+root_class: 'new: duplicate-code-unrefused'
+tickets:
+  started: []
+  unstarted:
+  - SVC-CATALOGUE-EVENTS-1
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-696-REST
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+notes: 'Batch R4, 6 October 2026. C-CLONE-CODE (a cloneX whose CreateXRequest.code is x-ticvai-unique and whose body
+  takes no code) fails on the commit before this fix with cloneEvent and passes after it; the older C-ACTION-409
+  finding on cloneEvent goes too. Naming the inline body is additive: check-contract-compat compares the resolved
+  fields, which only gained newCode. APP-SETUP-BO-696 starts at day 3.96, -REST at 2.93, SVC-CATALOGUE-EVENTS-1 at 9.71
+  (block-a-schedule.json): none started.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

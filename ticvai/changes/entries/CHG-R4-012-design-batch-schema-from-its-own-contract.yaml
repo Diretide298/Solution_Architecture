@@ -1,0 +1,53 @@
+id: CHG-R4-012
+date: '2026-10-06'
+source: audit
+kind: spec
+summary: The design-handoff generator resolves a schema name two contracts define differently in the contract that
+  refers to it, so the scanner screens SCN-003, SCN-008 and SCN-013 offer the gate media kinds (QR, barcode, RFID,
+  NFC ...) instead of the asset library's (Image, Video ... Model3d).
+decision:
+  what: 'tools/design_spec.py pooled every component schema by name, first contract read wins; assets.yaml is read
+    before access.yaml, so access ValidateRequest.mediaKind ($ref MediaKind) was drawn with the asset MediaKind. The
+    loader now finds the names defined differently in two or more contracts (MediaKind, ModuleKey, ScopeLevel,
+    LocalisedText, Invitation, OutletPaymentTiming), files each contract''s definition under <contract>::<Name>, and
+    points every reference at its own contract''s (common::Name for ../shared/common.yaml). Display names are
+    unchanged. No contract or screen changes: access.yaml ValidateRequest already names the right MediaKind, and the
+    screens bind ValidateRequest. check-binding-ratchet fails on any field drawn from another contract''s schema.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Comparison audit finding (defect 2 of the lead''s r2 fix list, 6 October 2026): the validateAccess and syncScans
+  forms on SCN-003, SCN-008 and SCN-013 (handoff/design-batches/P07-access-01/BUNDLE.md) listed Image, Video, Audio,
+  Document, Vector, Font, Archive, Model3d as the media kind a gate reads. The contract was right; the generator crossed
+  the two MediaKind schemas. The same fault drew white-label LinkTarget.moduleKey and ModuleEnablement.moduleKey and
+  tenancy OrgUnit.level and CreateScopeNodeRequest.level from another contract''s ModuleKey and ScopeLevel.'
+keys_touched:
+  screens:
+  - SCN-003
+  - SCN-008
+  - SCN-013
+  schemas:
+  - MediaKind
+  - ValidateRequest
+  files:
+  - tools/design_spec.py
+  - tools/check-binding-ratchet.py
+  - handoff/design-batches
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted:
+  - APP-SCANNER-SCN-003
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+notes: 'Batch R4, 6 October 2026. check-binding-ratchet''s new crossed-schema rule (crossed_refs) run with the
+  design_spec.py of the commit before this fix reports 5 fields (access ValidateRequest.mediaKind, white-label
+  LinkTarget.moduleKey and ModuleEnablement.moduleKey, tenancy OrgUnit.level and CreateScopeNodeRequest.level) and
+  with the fixed one 0. Every design-batch folder is rebuilt (export-design-batch --all). SCN-008 and SCN-013 are
+  Block C (AM-ADMISSION-ACCESS-P07, no task ticket yet); APP-SCANNER-SCN-003 is scheduled from day 14.77. The
+  wireframe boards (wireframes/P07) never drew the media kind; Claude Design reads the rebuilt batch.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open
