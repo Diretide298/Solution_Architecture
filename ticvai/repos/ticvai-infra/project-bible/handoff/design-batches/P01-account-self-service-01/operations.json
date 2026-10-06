@@ -776,7 +776,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Invitation"
+  "responds": "marketing-crm::Invitation"
  },
  "shareEntitlement": {
   "method": "POST",

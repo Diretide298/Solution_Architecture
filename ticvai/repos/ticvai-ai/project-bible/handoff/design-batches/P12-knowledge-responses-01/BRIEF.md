@@ -1,6 +1,6 @@
 # P12-knowledge-responses-01 — P12 · Knowledge & Responses
 
-**2 screens · 5 operations · 8 schemas · 4 permissions**
+**2 screens · 5 operations · 7 schemas · 4 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·

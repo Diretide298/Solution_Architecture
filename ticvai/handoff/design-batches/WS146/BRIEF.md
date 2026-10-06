@@ -1,6 +1,6 @@
 # WS146 — Marketing CRM Configuration Reference v1.0 board 12
 
-**10 screens · 12 operations · 16 schemas · 3 permissions**
+**10 screens · 12 operations · 15 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

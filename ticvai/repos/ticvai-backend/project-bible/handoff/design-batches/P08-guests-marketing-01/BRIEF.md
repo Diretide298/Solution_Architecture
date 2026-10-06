@@ -1,6 +1,6 @@
 # P08-guests-marketing-01 — P08 · Guests & Marketing
 
-**4 screens · 23 operations · 39 schemas · 11 permissions**
+**4 screens · 23 operations · 38 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

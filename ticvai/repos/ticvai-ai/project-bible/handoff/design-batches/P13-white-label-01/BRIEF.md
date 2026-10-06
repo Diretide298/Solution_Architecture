@@ -1,6 +1,6 @@
 # P13-white-label-01 — P13 · White Label (1 of 3)
 
-**10 screens · 57 operations · 55 schemas · 6 permissions**
+**10 screens · 57 operations · 52 schemas · 6 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·

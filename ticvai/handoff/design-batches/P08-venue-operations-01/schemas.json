@@ -1330,7 +1330,7 @@
   ],
   "properties": {
    "level": {
-    "$ref": "#/components/schemas/ScopeLevel"
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
    },
    "parentId": {
     "type": "string",
@@ -2266,20 +2266,6 @@
    }
   }
  },
- "MediaKind": {
-  "type": "string",
-  "enum": [
-   "image",
-   "video",
-   "audio",
-   "document",
-   "vector",
-   "font",
-   "archive",
-   "model3d"
-  ],
-  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
- },
  "MetricSource": {
   "type": "string",
   "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
@@ -2790,7 +2776,7 @@
     "format": "uuid"
    },
    "level": {
-    "$ref": "#/components/schemas/ScopeLevel"
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
    },
    "parentId": {
     "type": "string",
@@ -2889,7 +2875,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/tenancy::OutletPaymentTiming"
      }
     ],
     "default": "sendFirst",
@@ -2960,15 +2946,6 @@
    "type": "string",
    "maxLength": 200
   }
- },
- "OutletPaymentTiming": {
-  "type": "string",
-  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
-  "enum": [
-   "sendFirst",
-   "payFirst"
-  ],
-  "default": "sendFirst"
  },
  "OutletType": {
   "type": "string",
@@ -4207,21 +4184,6 @@
    }
   }
  },
- "ScopeLevel": {
-  "type": "string",
-  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
-  "enum": [
-   "tenant",
-   "brand",
-   "region",
-   "venue",
-   "department",
-   "subDepartment",
-   "workstation",
-   "outlet",
-   "subject"
-  ]
- },
  "Shift": {
   "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
   "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
@@ -4389,6 +4351,12 @@
     "readOnly": true,
     "maxLength": 1000,
     "description": "The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."
+   },
+   "varianceReasonRequired": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed, not stored** (CHG-R4-019): true while the shift is `pendingClosure` because its count differs from the expected figure within the threshold and no `cashierReason` is recorded. The till shows \"Give a reason to close\" (POS-007, EMP-009), BO-040 and BO-043 list it as waiting for a reason; `giveShiftVarianceReason` or `approveShiftClose` clears it. Shown to the shift's own cashier, since it carries no figure (CHG-FIN-003).\n"
    },
    "heldLeaseCount": {
     "type": "integer",
@@ -4741,7 +4709,7 @@
     "description": "What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"
    },
    "mediaKind": {
-    "$ref": "#/components/schemas/MediaKind"
+    "$ref": "#/components/schemas/access::MediaKind"
    },
    "direction": {
     "$ref": "#/components/schemas/Direction"
@@ -5333,7 +5301,7 @@
      }
     ],
     "nullable": true,
-    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).** The client's policy of 6 October 2026 (tracker answer T10.1, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-019): the tolerance is configurable, a difference within it closes only with a reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager approval (OVERSHORT_ACCEPT).\n"
    },
    "cashDrawerLimit": {
     "oneOf": [

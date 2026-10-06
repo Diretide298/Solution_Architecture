@@ -684,7 +684,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/common::OutletPaymentTiming"
      }
     ],
     "readOnly": true,
@@ -1952,7 +1952,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/tenancy::OutletPaymentTiming"
      }
     ],
     "default": "sendFirst",
@@ -2023,15 +2023,6 @@
    "type": "string",
    "maxLength": 200
   }
- },
- "OutletPaymentTiming": {
-  "type": "string",
-  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
-  "enum": [
-   "sendFirst",
-   "payFirst"
-  ],
-  "default": "sendFirst"
  },
  "OutletType": {
   "type": "string",
@@ -2716,7 +2707,7 @@
      }
     ],
     "nullable": true,
-    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).** The client's policy of 6 October 2026 (tracker answer T10.1, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-019): the tolerance is configurable, a difference within it closes only with a reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager approval (OVERSHORT_ACCEPT).\n"
    },
    "cashDrawerLimit": {
     "oneOf": [

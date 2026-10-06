@@ -1,5 +1,5 @@
 id: LLD-shift
-title: shift — 27 operations
+title: shift — 28 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -215,6 +215,18 @@ operations:
   - orders.pos_shift_approval
   - orders.pos_shift_incident
   writes: []
+- operation: giveShiftVarianceReason
+  verb: POST
+  path: /shifts/{shiftId}/variance-reason
+  scope: venue
+  permission: SHIFT_CLOSE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes:
+  - orders.pos_shift
+  - platform.outbox
 - operation: listCashMovements
   verb: GET
   path: /shifts/{shiftId}/cash-movements

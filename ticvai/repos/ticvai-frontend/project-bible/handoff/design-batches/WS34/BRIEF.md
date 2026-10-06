@@ -1,6 +1,6 @@
 # WS34 — Pricing   Revenue Management board 1
 
-**10 screens · 15 operations · 23 schemas · 4 permissions**
+**10 screens · 15 operations · 22 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

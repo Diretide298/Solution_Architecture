@@ -1,6 +1,6 @@
 # P07-access-01 — P07 · Access (1 of 2)
 
-**10 screens · 21 operations · 32 schemas · 7 permissions**
+**10 screens · 21 operations · 31 schemas · 7 permissions**
 
 Platform P07 Venue Scanner · ships as **venue-staff-mobile** ·
 staff audience · handheld ·

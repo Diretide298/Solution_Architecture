@@ -1,6 +1,6 @@
 # P02-system-states-01 — P02 · System States
 
-**2 screens · 2 operations · 19 schemas · 0 permissions**
+**2 screens · 2 operations · 17 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

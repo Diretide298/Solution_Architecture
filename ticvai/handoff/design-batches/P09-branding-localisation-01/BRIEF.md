@@ -1,6 +1,6 @@
 # P09-branding-localisation-01 — P09 · Branding & Localisation
 
-**4 screens · 30 operations · 39 schemas · 7 permissions**
+**4 screens · 30 operations · 37 schemas · 7 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

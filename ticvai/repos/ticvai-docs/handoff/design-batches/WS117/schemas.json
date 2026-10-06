@@ -464,13 +464,6 @@
   ],
   "description": "**Where a configuration value came from** (design 2.2 D, AIC-111): said by the administrator, recommended by the assistant, inferred from other answers, or not known yet. Shown beside every value; no confidence number is shown for configuration (design 5.6)."
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "Page": {
   "type": "object",
   "required": [
@@ -802,7 +795,7 @@
     "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
    },
    "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/subscription::LocalisedText",
     "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
    },
    "terminationScheduledAt": {

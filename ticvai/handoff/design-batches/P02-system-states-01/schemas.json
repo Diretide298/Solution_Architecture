@@ -430,7 +430,7 @@
        "$ref": "#/components/schemas/HomepageSectionKind"
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "sortOrder": {
        "type": "integer"
@@ -557,13 +557,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -581,9 +574,6 @@
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_config + whitelabel.navigation_item",
@@ -630,7 +620,7 @@
        "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "icon": {
        "type": "string"
@@ -665,7 +655,7 @@
       "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
      },
      "label": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     }
    }
@@ -793,7 +783,7 @@
     "type": "array",
     "description": "The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.",
     "items": {
-     "$ref": "#/components/schemas/ModuleKey"
+     "$ref": "#/components/schemas/white-label::ModuleKey"
     }
    },
    "enabledFeatures": {
@@ -810,7 +800,7 @@
    "maintenanceMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -829,7 +819,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -924,7 +914,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -943,7 +933,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -1018,7 +1008,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -1214,7 +1204,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -1222,7 +1212,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,

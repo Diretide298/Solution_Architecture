@@ -317,20 +317,6 @@
        ],
        "operation": "getMediaEntitlements",
        "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The media asset",
-       "bindsTo": "MediaAssetDetail",
-       "columns": [
-        "MediaAssetDetail.status",
-        "MediaAssetDetail.filename",
-        "MediaAssetDetail.title",
-        "MediaAssetDetail.description",
-        "MediaAssetDetail.durationSeconds"
-       ],
-       "operation": "getMediaAsset",
-       "provenance": "contract assets.yaml GET /media/{mediaId}"
       }
      ]
     },
@@ -340,6 +326,13 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Bind media to the ticket",
+       "operation": "setMediaBindingActivation",
+       "notes": "**Issuing media is binding it** (6 October 2026, CHG-R4-013): the wristband, RFID or NFC card the guest will wear is tapped or scanned, its UID is bound to the guest's virtual ticket and activated, and from then on the gate reads it. A medium already bound to another ticket is refused and needs authorised resolution (access `setMediaBindingActivation`).",
+       "provenance": "contract access.yaml PUT /media-binding-activation (CHG-R4-013)"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Append entitlement to media",
        "operation": "appendEntitlementToMedia",
        "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
@@ -351,8 +344,8 @@
   "states": {
    "loading": "The issue media, read by `getMediaEntitlements`.",
    "error": "Could not load. Names which read failed and leaves the issue media untouched.",
-   "emptyFirstRun": "No issue media yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`.",
+   "emptyFirstRun": "Nothing is on this media yet. Offers Bind media to the ticket (`setMediaBindingActivation`) rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ACCESS_POINT_CONFIGURE` for `setMediaBindingActivation`.",
    "offline": "Issues from the local range allocated at shift start"
   },
   "apis": [
@@ -369,10 +362,14 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getMediaAsset",
-    "contract": "assets",
-    "purpose": "Read an asset with derivatives and usage",
-    "trigger": "onLoad"
+    "operationId": "setMediaBindingActivation",
+    "contract": "access",
+    "purpose": "Bind the wristband, RFID or NFC card the guest will wear to their ticket and activate it",
+    "trigger": "onAction",
+    "provenance": "6 October 2026 (CHG-R4-013)",
+    "invalidates": [
+     "getMediaEntitlements"
+    ]
    }
   ],
   "entryState": {
@@ -380,13 +377,9 @@
     {
      "name": "mediaCode",
      "from": "deepLink"
-    },
-    {
-     "name": "mediaId",
-     "from": "deepLink"
     }
    ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `mediaId`."
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`."
   },
   "wireframe": {
    "status": "notStarted",
@@ -416,6 +409,38 @@
      ]
     },
     "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+   },
+   {
+    "id": "formSetMediaBindingActivation",
+    "component": "modal",
+    "trigger": "Bind media to the ticket",
+    "body": "**Collects what `setMediaBindingActivation` sends before it is called.** Required: `virtualTicketId` (the guest's ticket), `mediaKind` (wristband, RFID, NFC, physical card, temporary credential) and `credentialIdUid` (read by tapping or scanning the medium, typed only as a fallback). Optional: `captureMethod`, `activationMode` (activate now by default), `provider`, `scheduledAt`. Dismissing sends nothing; the screen behind is unchanged (CHG-R4-013).",
+    "bindsTo": "MediaBindingActivationAssignmentOperationsInput",
+    "confirm": {
+     "label": "Bind media to the ticket",
+     "operation": "setMediaBindingActivation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "virtualTicketId",
+      "mediaKind",
+      "credentialIdUid",
+      "captureMethod",
+      "activationMode",
+      "provider",
+      "scheduledAt"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /media-binding-activation (CHG-R4-013)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getMediaAsset",
+    "removed": true,
+    "why": "Removed 6 October 2026 (CHG-R4-013): getMediaAsset reads the digital-asset library (images, video, documents); the media this screen issues is what the guest wears (QR, wristband, RFID or NFC card). Issuing it is setMediaBindingActivation (access); what is already on it is getMediaEntitlements (orders). Left over from CF-114, which removed the rest of the assets contract from this screen on 18 August.",
+    "source": "contracts/satellite/assets.yaml#getMediaAsset | contracts/spine/access.yaml#setMediaBindingActivation"
    }
   ],
   "_platform": {

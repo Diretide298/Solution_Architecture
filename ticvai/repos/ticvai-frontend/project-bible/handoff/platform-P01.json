@@ -150,7 +150,7 @@
    "operations": 10
   },
   {
-   "contract": "white-label",
+   "contract": "venue-map",
    "operations": 8
   },
   {
@@ -158,7 +158,7 @@
    "operations": 8
   },
   {
-   "contract": "venue-map",
+   "contract": "white-label",
    "operations": 8
   },
   {
@@ -174,15 +174,15 @@
    "operations": 6
   },
   {
-   "contract": "queue",
-   "operations": 5
-  },
-  {
    "contract": "seating",
    "operations": 5
   },
   {
    "contract": "promotions",
+   "operations": 5
+  },
+  {
+   "contract": "queue",
    "operations": 5
   },
   {

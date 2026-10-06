@@ -12,7 +12,7 @@
  "counts": {
   "screens": 32,
   "operations": 157,
-  "contracts": 19,
+  "contracts": 18,
   "modules": 4,
   "undrawn": 0,
   "operationsWithNoScreen": 153
@@ -61,7 +61,7 @@
   },
   {
    "contract": "shift",
-   "operations": 22
+   "operations": 23
   },
   {
    "contract": "retail",
@@ -80,7 +80,7 @@
    "operations": 7
   },
   {
-   "contract": "promotions",
+   "contract": "marketing-crm",
    "operations": 5
   },
   {
@@ -92,15 +92,15 @@
    "operations": 5
   },
   {
-   "contract": "marketing-crm",
+   "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "seating",
+   "contract": "approvals",
    "operations": 4
   },
   {
-   "contract": "approvals",
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -116,15 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
-   "operations": 1
-  },
-  {
    "contract": "inventory",
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "games",
    "operations": 1
   }
  ],
@@ -198,7 +194,7 @@
    "module": "Shift",
    "wave": 1,
    "route": "/shift/close-shift",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -225,7 +221,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/add-to-existing-ticket",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {

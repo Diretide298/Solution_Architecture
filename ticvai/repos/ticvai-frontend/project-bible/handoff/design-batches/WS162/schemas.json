@@ -21,7 +21,7 @@
     "type": "string"
    },
    "module": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "locale": {
     "type": "string"
@@ -224,7 +224,7 @@
    "module": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+      "$ref": "#/components/schemas/common::ModuleKey"
      }
     ],
     "readOnly": true,
@@ -761,9 +761,6 @@
     "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Page": {
   "type": "object",

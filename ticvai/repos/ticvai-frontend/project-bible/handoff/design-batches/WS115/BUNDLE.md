@@ -215,7 +215,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -426,7 +426,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -963,7 +963,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 #### Outputs: what the screen shows and produces
 

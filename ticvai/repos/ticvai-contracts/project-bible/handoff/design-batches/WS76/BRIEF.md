@@ -1,6 +1,6 @@
 # WS76 — Digital Asset Management DAM board 3
 
-**10 screens · 11 operations · 16 schemas · 7 permissions**
+**10 screens · 11 operations · 14 schemas · 7 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·

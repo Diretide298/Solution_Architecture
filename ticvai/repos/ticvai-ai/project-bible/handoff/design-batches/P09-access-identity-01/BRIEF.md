@@ -1,6 +1,6 @@
 # P09-access-identity-01 — P09 · Access & Identity
 
-**4 screens · 26 operations · 26 schemas · 5 permissions**
+**4 screens · 26 operations · 25 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

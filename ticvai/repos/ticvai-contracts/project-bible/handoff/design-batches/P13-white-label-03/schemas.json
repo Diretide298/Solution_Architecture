@@ -21,7 +21,7 @@
     "type": "string"
    },
    "module": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "locale": {
     "type": "string"
@@ -217,7 +217,7 @@
     "description": "The signed .ipa or .aab in the `assets` library, for the client to download and upload."
    },
    "releaseNotes": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "submitToStore": {
     "type": "boolean",
@@ -1655,10 +1655,10 @@
     "$ref": "#/components/schemas/BookingFlowTypeKey"
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "description": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "productKinds": {
     "type": "array",
@@ -1692,7 +1692,7 @@
       "condition": {
        "allOf": [
         {
-         "$ref": "#/components/schemas/LocalisedText"
+         "$ref": "#/components/schemas/white-label::LocalisedText"
         }
        ],
        "nullable": true,
@@ -2148,7 +2148,7 @@
    "text": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/marketing-crm::LocalisedText"
      }
     ],
     "description": "The question as the guest reads it, per locale."
@@ -2156,7 +2156,7 @@
    "helpText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/marketing-crm::LocalisedText"
      }
     ],
     "nullable": true
@@ -2231,13 +2231,6 @@
   "default": "bookable",
   "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -2255,9 +2248,6 @@
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Page": {
   "type": "object",
@@ -2314,6 +2304,24 @@
    },
    "description": {
     "type": "string"
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
    },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
@@ -2419,7 +2427,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2596,7 +2604,7 @@
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2662,7 +2670,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -2738,7 +2746,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -2765,7 +2773,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3056,16 +3064,16 @@
     "description": "The store listing.",
     "properties": {
      "appName": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      },
      "subtitle": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      },
      "description": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      },
      "keywords": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      },
      "category": {
       "type": "string"
@@ -3205,7 +3213,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -3224,7 +3232,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3299,7 +3307,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -3348,6 +3356,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "See `Product.nameLocalised` (CHG-R4-011). Replaces the whole map; null clears it."
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "See `Product.descriptionLocalised` (CHG-R4-011). Replaces the whole map; null clears it."
+   },
    "channels": {
     "type": "array",
     "items": {
@@ -3364,7 +3390,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -3434,7 +3460,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -3442,7 +3468,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,

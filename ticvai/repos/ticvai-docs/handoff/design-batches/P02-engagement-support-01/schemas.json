@@ -165,7 +165,7 @@
     "type": "string"
    },
    "module": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "locale": {
     "type": "string"
@@ -2004,10 +2004,10 @@
     ]
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "body": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "venueId": {
     "type": "string",
@@ -2234,13 +2234,6 @@
    "type": "string"
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -2344,9 +2337,6 @@
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Order": {
   "x-ticvai-persistence": "orders.sales_order + orders.order_line",
@@ -2887,6 +2877,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
+   },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
    },
@@ -2991,7 +2999,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3128,7 +3136,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -3204,7 +3212,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -3231,7 +3239,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3387,7 +3395,7 @@
     "pattern": "^[a-z0-9-]+$"
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "body": {
     "$ref": "#/components/schemas/LocalisedRichText"
@@ -3421,7 +3429,7 @@
     "type": "string"
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "sortOrder": {
     "type": "integer"
@@ -3441,7 +3449,7 @@
        "format": "uuid"
       },
       "question": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "answer": {
        "$ref": "#/components/schemas/LocalisedRichText"
@@ -3755,7 +3763,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -3774,7 +3782,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3849,7 +3857,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -3901,7 +3909,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -3909,7 +3917,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -4651,7 +4659,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "attractionProductId": {
     "type": "string",

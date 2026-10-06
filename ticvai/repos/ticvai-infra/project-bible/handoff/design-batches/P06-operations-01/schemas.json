@@ -267,7 +267,7 @@
      "miscount",
      "other"
     ],
-    "description": "Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the supervisor reads it beside the variance on BO-040.\n"
+    "description": "Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the supervisor reads it beside the variance on BO-040. **Optional here, never skipped where it matters** (CHG-R4-019): if the count differs within the threshold and this is empty, the shift waits for `giveShiftVarianceReason` before it closes.\n"
    },
    "releaseHeldLeases": {
     "type": "boolean",
@@ -1016,20 +1016,6 @@
    }
   ]
  },
- "MediaKind": {
-  "type": "string",
-  "enum": [
-   "image",
-   "video",
-   "audio",
-   "document",
-   "vector",
-   "font",
-   "archive",
-   "model3d"
-  ],
-  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
- },
  "MfaMethod": {
   "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
@@ -1490,6 +1476,12 @@
     "maxLength": 1000,
     "description": "The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."
    },
+   "varianceReasonRequired": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed, not stored** (CHG-R4-019): true while the shift is `pendingClosure` because its count differs from the expected figure within the threshold and no `cashierReason` is recorded. The till shows \"Give a reason to close\" (POS-007, EMP-009), BO-040 and BO-043 list it as waiting for a reason; `giveShiftVarianceReason` or `approveShiftClose` clears it. Shown to the shift's own cashier, since it carries no figure (CHG-FIN-003).\n"
+   },
    "heldLeaseCount": {
     "type": "integer",
     "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
@@ -1618,7 +1610,7 @@
      "referredToSupervisor",
      "awaitingCloseApproval"
     ],
-    "description": "`closed`: within the venue's threshold, the shift is closed. `referredToSupervisor`: a supervisor reviews the count (`pendingVariance`); the till says \"Your count is with your supervisor\" and nothing about the amount. `awaitingCloseApproval`: the venue supervises every close (`pendingClosure`).\n"
+    "description": "`closed`: within the venue's threshold, the shift is closed. `referredToSupervisor`: a supervisor reviews the count (`pendingVariance`); the till says \"Your count is with your supervisor\" and nothing about the amount. `awaitingCloseApproval`: the venue supervises every close (`pendingClosure`), or, with `varianceReasonRequired` true, the shift waits for the cashier's reason for a difference within the threshold (CHG-R4-019).\n"
    },
    "countedAt": {
     "type": "string",
@@ -1628,6 +1620,11 @@
     "type": "integer",
     "minimum": 1,
     "description": "1 for the first count of the close, 2 for a recount the supervisor asked for, and so on."
+   },
+   "varianceReasonRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The count found a difference within the threshold and no reason came with it** (the client's policy of 6 October 2026, T10.1; CHG-R4-019). The shift is held in `pendingClosure` (outcome `awaitingCloseApproval`) and the till asks for a reason (`giveShiftVarianceReason`), which closes it. Says only that a difference exists: never its amount or direction, and the count is already locked (CHG-FIN-003). False when the count matched, when a `cashierReason` came with it, and beyond the threshold (`referredToSupervisor`).\n"
    }
   }
  },
@@ -1642,6 +1639,33 @@
    "closed",
    "autoClosed"
   ]
+ },
+ "ShiftVarianceReasonRequest": {
+  "x-ticvai-persistence": "orders.pos_shift",
+  "type": "object",
+  "description": "The reason for a difference within the threshold, given after the blind count is locked (`giveShiftVarianceReason`; the client's policy of 6 October 2026, T10.1; CHG-R4-019).\n",
+  "required": [
+   "reason"
+  ],
+  "properties": {
+   "reason": {
+    "type": "string",
+    "enum": [
+     "tillError",
+     "unrecordedRefund",
+     "miscount",
+     "other"
+    ],
+    "x-ticvai-column": "cashier_reason",
+    "description": "The same reasons as `CloseShiftRequest.cashierReason` (DI-803), recorded as the shift's `cashierReason`.\n"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "x-ticvai-column": "cashier_note",
+    "description": "What happened, in the cashier's words; recorded as the shift's `cashierNote` (appended to a note given with the count). Required when `reason` is `other` (422 `reason-note-required`).\n"
+   }
+  }
  },
  "SsoProtocol": {
   "type": "string",
@@ -1837,7 +1861,7 @@
     "description": "What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"
    },
    "mediaKind": {
-    "$ref": "#/components/schemas/MediaKind"
+    "$ref": "#/components/schemas/access::MediaKind"
    },
    "direction": {
     "$ref": "#/components/schemas/Direction"

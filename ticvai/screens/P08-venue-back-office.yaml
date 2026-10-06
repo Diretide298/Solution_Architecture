@@ -2381,8 +2381,8 @@ screens:
       Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`,
       `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3
       REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12),
-      decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per
-      language (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.'
+      decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per language
+      (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: UpdateProductRequest
     confirm:
       label: Save product
@@ -2651,9 +2651,9 @@ screens:
         label: Name per language
         bindsTo: Product.nameLocalised
         operation: updateProduct
-        notes: '**The product name a guest reads, in each language the venue sells in** (CHG-R4-011). English
-          and Arabic side by side; Arabic right to left; at most 200 characters per language. A language
-          left empty shows `name`. Saved with `updateProduct`.'
+        notes: '**The product name a guest reads, in each language the venue sells in** (CHG-R4-011).
+          English and Arabic side by side; Arabic right to left; at most 200 characters per language.
+          A language left empty shows `name`. Saved with `updateProduct`.'
         provenance: contract catalogue.yaml Product.nameLocalised (6 October 2026, CHG-R4-011)
       - kind: textField
         label: Description per language
@@ -5528,15 +5528,15 @@ screens:
       - kind: primaryButton
         label: Create time slots
         operation: createPerformances
-        notes: '**Time-slot creation, as the 24 September review asked (M24-01, DI-995)**: start date and
-          end date (`startsAt`, `recurrence.until`), first and last start time of the day (`recurrence.firstStartTime`,
-          `recurrence.lastStartTime`), the interval between starts (`recurrence.intervalMinutes`, e.g. every
-          30 minutes), the slot length (`slotLengthMinutes`; the first slot''s `endsAt` follows from it),
-          the minutes on screen (`minutesOnScreen`: how long after its start a slot is still sold, e.g. 10
-          keeps a 10:00 slot on sale until 10:10; DI-167, DI-169), the days of the week (`recurrence.daysOfWeek`),
-          language and format. A preview lists the slots it will create (`Prefer: validate-only`) before
-          one is written; one performance per slot. A last start before the first is refused `422 slot-window-invalid`
-          and the form says so beside the two times (CHG-R4-014).'
+        notes: '**Time-slot creation, as the 24 September review asked (M24-01, DI-995)**: start date
+          and end date (`startsAt`, `recurrence.until`), first and last start time of the day (`recurrence.firstStartTime`,
+          `recurrence.lastStartTime`), the interval between starts (`recurrence.intervalMinutes`, e.g.
+          every 30 minutes), the slot length (`slotLengthMinutes`; the first slot''s `endsAt` follows
+          from it), the minutes on screen (`minutesOnScreen`: how long after its start a slot is still
+          sold, e.g. 10 keeps a 10:00 slot on sale until 10:10; DI-167, DI-169), the days of the week
+          (`recurrence.daysOfWeek`), language and format. A preview lists the slots it will create (`Prefer:
+          validate-only`) before one is written; one performance per slot. A last start before the first
+          is refused `422 slot-window-invalid` and the form says so beside the two times (CHG-R4-014).'
         provenance: contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September
           2026, M24-01 (applied 30 September); minutes on screen and the daily window 6 October 2026 (CHG-R4-014)
       - kind: destructiveButton
@@ -12055,8 +12055,8 @@ screens:
         - Shift.variance
         - Shift.varianceReasonRequired
         operation: listShifts
-        notes: 'Waiting for a decision: beyond the threshold (pendingVariance, accept or reject), or within it
-          with no reason yet (`varianceReasonRequired`, the client''s policy of 6 October 2026, T10.1;
+        notes: 'Waiting for a decision: beyond the threshold (pendingVariance, accept or reject), or within
+          it with no reason yet (`varianceReasonRequired`, the client''s policy of 6 October 2026, T10.1;
           CHG-R4-019).'
         provenance: contract shift.yaml GET /shifts
       - kind: dataTable
@@ -12126,8 +12126,8 @@ screens:
         permission: SHIFT_CLOSE
         notes: 'For a shift waiting for a reason (`varianceReasonRequired`): a difference within the threshold
           with no reason from the cashier. The supervisor records the reason and the shift closes (the
-          client''s policy of 6 October 2026, T10.1; CHG-R4-019). Beyond the threshold the shift needs Accept
-          variance (OVERSHORT_ACCEPT: the Supervisor and Venue Manager presets).'
+          client''s policy of 6 October 2026, T10.1; CHG-R4-019). Beyond the threshold the shift needs
+          Accept variance (OVERSHORT_ACCEPT: the Supervisor and Venue Manager presets).'
         provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
   states:
     loading: The variance approval list.
@@ -12141,11 +12141,12 @@ screens:
       say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question. A caller who can see the screen but lacks what an action
       needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`,
-      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift` and `giveShiftVarianceReason` (for another person''s shift the contract asks more, and says so on each).'
-    reasonRequired: '**Waiting for a reason.** The selected shift''s count differed within the threshold and
-      no reason came with it (`Shift.varianceReasonRequired`); it stays `pendingClosure` until the cashier gives
-      one at the till or a supervisor gives it here (`giveShiftVarianceReason`). The client''s policy of 6
-      October 2026, T10.1 (CHG-R4-019).'
+      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift` and `giveShiftVarianceReason` (for another
+      person''s shift the contract asks more, and says so on each).'
+    reasonRequired: '**Waiting for a reason.** The selected shift''s count differed within the threshold
+      and no reason came with it (`Shift.varianceReasonRequired`); it stays `pendingClosure` until the
+      cashier gives one at the till or a supervisor gives it here (`giveShiftVarianceReason`). The client''s
+      policy of 6 October 2026, T10.1 (CHG-R4-019).'
   apis:
   - operationId: listShifts
     contract: shift
@@ -12298,8 +12299,8 @@ screens:
     component: modal
     trigger: Give the variance reason
     body: '**Collects what `giveShiftVarianceReason` sends before it is called.** Required: `reason` (till
-      error, unrecorded refund, miscount, other); `note`, required with other. Dismissing sends nothing; the
-      shift keeps waiting for a reason (CHG-R4-019).'
+      error, unrecorded refund, miscount, other); `note`, required with other. Dismissing sends nothing;
+      the shift keeps waiting for a reason (CHG-R4-019).'
     confirm:
       label: Close shift
       operation: giveShiftVarianceReason
@@ -100981,9 +100982,10 @@ screens:
         label: New event code
         bindsTo: CloneEventRequest.newCode
         operation: cloneEvent
-        notes: '**Event codes are unique per tenant** (audit R108), so the copy needs its own. Prefilled with
-          the source''s code and the first free suffix (`-2`, `-3`, ...); a code already in use is refused
-          `409 duplicate-code` and the form says so beside the field, keeping everything else (CHG-R4-016).'
+        notes: '**Event codes are unique per tenant** (audit R108), so the copy needs its own. Prefilled
+          with the source''s code and the first free suffix (`-2`, `-3`, ...); a code already in use is
+          refused `409 duplicate-code` and the form says so beside the field, keeping everything else
+          (CHG-R4-016).'
         provenance: contract catalogue.yaml CloneEventRequest.newCode (6 October 2026, CHG-R4-016)
       - kind: multiSelect
         label: Copy

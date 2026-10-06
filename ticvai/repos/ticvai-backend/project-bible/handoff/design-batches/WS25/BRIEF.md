@@ -1,6 +1,6 @@
 # WS25 — Customer Service board 1
 
-**10 screens · 20 operations · 36 schemas · 7 permissions**
+**10 screens · 20 operations · 34 schemas · 7 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·

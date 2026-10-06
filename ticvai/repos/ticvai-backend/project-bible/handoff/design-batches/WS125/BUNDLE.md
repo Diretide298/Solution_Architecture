@@ -1,6 +1,6 @@
 # WS125 — Event Management Configuration Backend Structure v1.0 board 1
 
-**3 screens · 5 operations · 3 schemas · 2 permissions**
+**3 screens · 5 operations · 4 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-694` | Event Catalogue Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-696` | Event Duplication & Clone Configuration | A | 6 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-696` | Event Duplication & Clone Configuration | A | 8 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -399,7 +399,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/event-duplication-clone-configuration-bo-696` |
 
-**What the spec says about it.** **Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent** (CHG-FXS-001)
+**What the spec says about it.** **Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent** (CHG-FXS-001). **The copy takes its own event code** (`newCode`, 6 October 2026, CHG-R4-016): event codes are unique per tenant, and a duplicate is refused `409 duplicate-code`.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Clone an event for next season choosing exactly what comes with it: schedule, prices, seat map, resource plan, staff roster; never the sales. Most events are last year's event, so this is a frequent act and must be a short checklist, not a wizard.
 
@@ -415,9 +415,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| New event name | text field | — | — | — | — | Body newName; the source name with ' (copy)' by default. | — |
-| Copy | multi select | — | — | — | — | Body include[]: the parts to copy (performances, prices, capacities, resources, content); all ticked by default. | — |
-| Move dates by (days) | number field | — | — | — | — | Body shiftDatesByDays; 0 keeps the dates, 7 moves every performance a week on. | — |
+| New event name | text field | optional | — | — | — | Body newName; the source name with ' (copy)' by default. | `CloneEventRequest.newName` |
+| New event code | text field | optional | — | max length 64; A code any event in the tenant already uses is refused `409 duplicate-code`. | — | **Event codes are unique per tenant** (audit R108), so the copy needs its own. Prefilled with the source's code and the first free suffix (`-2`, `-3`, ...); a code already in use is refused `409 … | `CloneEventRequest.newCode` |
+| Copy | multi-select chips | optional | — | Schedule · Pricing · Seat map · Capacity profile · Resource requirements · Staff plan · Registration form · Access rules | — | Body include[]: the parts to copy (performances, prices, capacities, resources, content); all ticked by default. | `CloneEventRequest.include` |
+| Move dates by (days) | number field (days) | optional | — | — | — | Body shiftDatesByDays; 0 keeps the dates, 7 moves every performance a week on. | `CloneEventRequest.shiftDatesByDays` |
 
 **Sent by *Copy event*** (`cloneEvent`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -426,6 +427,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Include `include` | multi-select chips | optional | — | Schedule · Pricing · Seat map · Capacity profile · Resource requirements · Staff plan · Registration form · Access rules | — | — | `cloneEvent` body |
 | Shift dates by days `shiftDatesByDays` | number field (days) | optional | — | — | — | — | `cloneEvent` body |
 | New name `newName` | text field | optional | — | — | — | — | `cloneEvent` body |
+| New code `newCode` | text field | optional | — | max length 64; A code any event in the tenant already uses is refused `409 duplicate-code`. | — | The copy's event code (6 October 2026, CHG-R4-016). Event codes are unique per tenant (`CreateEventRequest.code`, audit R108), so a copy cannot keep its source's. | `cloneEvent` body |
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -447,7 +449,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Copy event (primary button) | `cloneEvent` POST `/events/{eventId}/clone` | inline | inline | — | — |
+| Copy event (primary button) | `cloneEvent` POST `/events/{eventId}/clone` | CloneEventRequest | inline | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -470,6 +472,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event duplication clone are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `cloneEvent`. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -516,7 +519,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (3 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-696?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Copy event, Cancel.
@@ -626,7 +629,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"cloneEvent": {"method":"POST","path":"/events/{eventId}/clone","contract":"catalogue","summary":"Copy an event, choosing what comes with it","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"cloneEvent": {"method":"POST","path":"/events/{eventId}/clone","contract":"catalogue","summary":"Copy an event, choosing what comes with it","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloneEventRequest","responds":null},
 "getEvent": {"method":"GET","path":"/events/{eventId}","contract":"catalogue","summary":"Read an event","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Event"},
 "listEventTypes": {"method":"GET","path":"/event-types","contract":"catalogue","summary":"The kinds of event, and how each behaves","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"EventType"},
 "listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -640,6 +643,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"CloneEventRequest": {"x-ticvai-persistence":"none — request only","type":"object","description":"The body of `cloneEvent`. Named on 6 October 2026 (CHG-R4-016) so the clone screen (BO-696) can bind its fields; the first three properties are unchanged from the inline body.\n","properties":{"include":{"type":"array","items":{"type":"string","enum":["schedule","pricing","seatMap","capacityProfile","resourceRequirements","staffPlan","registrationForm","accessRules"]}},"shiftDatesByDays":{"type":"integer","nullable":true},"newName":{"type":"string","nullable":true},"newCode":{"type":"string","maxLength":64,"nullable":true,"x-ticvai-unique":"tenant","description":"**The copy's event code** (6 October 2026, CHG-R4-016). Event codes are unique per tenant (`CreateEventRequest.code`, audit R108), so a copy cannot keep its source's. A code any event in the tenant already uses is refused `409 duplicate-code`. Omitted or null: the server gives the copy the source's code with the first free suffix `-2`, `-3`, ..., and returns it.\n"}}},
 "Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
 "EventType": {"type":"object","x-ticvai-persistence":"catalogue.event_type","description":"Event board 1.2. **The type decides behaviour, not just a label.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"hasPerformances":{"type":"boolean","default":true,"description":"**An open-run exhibition has none**, and modelling it as 400 daily performances is how a schedule becomes unmanageable.\n"},"capacityBasis":{"type":"string","enum":["perPerformance","perDay","unlimited"],"description":"`perSession` was removed: a session is a Performance (decided 28 September, audit R165), so `perPerformance` covers it.\n"},"ticketNamesDate":{"type":"boolean","default":true},"multiDay":{"type":"boolean","default":false},"requiresRegistration":{"type":"boolean","default":false},"requiresAccreditation":{"type":"boolean","default":false},"seatingModesAllowed":{"type":"array","items":{"type":"string"}},"defaultLifecycle":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}

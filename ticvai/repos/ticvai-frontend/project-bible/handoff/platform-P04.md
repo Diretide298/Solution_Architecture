@@ -6,7 +6,7 @@
 |---|---|
 | Screens | 32 |
 | Operations | 157 |
-| Contracts | 19 |
+| Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
 | Operations with no screen | 153 |
@@ -82,10 +82,10 @@
 | `POS-004` | Sell — Seat Map | Sell | 1 | 7 | yes |
 | `POS-005` | Payment | Payment | 1 | 13 | yes |
 | `POS-006` | Held Orders | Sell | 1 | 14 | yes |
-| `POS-007` | Close Shift | Shift | 1 | 9 | yes |
+| `POS-007` | Close Shift | Shift | 1 | 10 | yes |
 | `POS-008` | Reports | Reports | 1 | 4 | yes |
 | `POS-009` | Staff Roster | Shift | 1 | 3 | yes |
-| `POS-010` | Add to Existing Ticket | Sell | 1 | 5 | yes |
+| `POS-010` | Add to Existing Ticket | Sell | 1 | 4 | yes |
 | `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 7 | yes |
 | `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 | yes |
 | `POS-013` | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 | yes |

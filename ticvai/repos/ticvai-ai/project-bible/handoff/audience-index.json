@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2789,
+  "operations": 2790,
   "screens": 2451,
   "flows": 291
  },
@@ -2701,6 +2701,7 @@
     "getWorkstation",
     "getWorkstationHealth",
     "getWorkstationShift",
+    "giveShiftVarianceReason",
     "grantDelegation",
     "holdCourse",
     "holdOrder",
@@ -7972,7 +7973,7 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2602,
+    "operations": 2603,
     "screens": 2156,
     "flows": 138,
     "contracts": 33,

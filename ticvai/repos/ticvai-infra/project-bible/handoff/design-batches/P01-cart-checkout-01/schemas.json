@@ -2204,6 +2204,13 @@
     "nullable": true,
     "maxLength": 40,
     "description": "How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. A cinema screening shows language and format together. Null when it does not apply (decided 29 September, rev 3 REV3-17).\n"
+   },
+   "minutesOnScreen": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1440,
+    "default": 0,
+    "description": "**\"Minutes on screen\": how long after `startsAt` the slot is still sold** (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). A 10:00 slot with 10 stays on the till and the guest apps until 10:10 and then drops off; 0, the default, stops selling at the start time. Applies to every channel that sells the slot; the entry window is the admission rules' (`admissionRulesId`), not this.\n"
    }
   }
  },

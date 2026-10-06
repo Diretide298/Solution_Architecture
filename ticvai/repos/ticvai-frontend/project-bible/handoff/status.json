@@ -3,14 +3,14 @@
  "generated": "2026-10-06",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2789,
+  "operations": 2790,
   "contracts": 33,
   "tables": 1129,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3191,
+  "relationships": 3192,
   "states": 207,
   "events": 77,
   "flows": 98,
@@ -27,14 +27,14 @@
    {
     "name": "API data lineage resolved",
     "done": 2756,
-    "total": 2789,
+    "total": 2790,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2789,
-    "total": 2789,
+    "done": 2790,
+    "total": 2790,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -103,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2551,
-    "total": 2789,
+    "done": 2552,
+    "total": 2790,
     "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },

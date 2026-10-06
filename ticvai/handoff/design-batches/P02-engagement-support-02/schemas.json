@@ -21,7 +21,7 @@
     "type": "string"
    },
    "module": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "locale": {
     "type": "string"
@@ -294,13 +294,6 @@
    "resolved",
    "closed"
   ]
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
  },
  "MessageChannel": {
   "type": "string",
@@ -1012,7 +1005,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "attractionProductId": {
     "type": "string",

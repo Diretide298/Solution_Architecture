@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | Contracts | 33 |
-| Operations | 2789 |
+| Operations | 2790 |
 | Screens | 2451 |
 | Platforms | 16 |
 | Apps | 5 |
@@ -15,7 +15,7 @@
 | Stores | 10 |
 | Foreign Keys | 815 |
 | Indexes | 2924 |
-| Relationships | 3191 |
+| Relationships | 3192 |
 | Flows | 98 |
 | Boards | 218 |
 | Adrs | 70 |
@@ -29,19 +29,19 @@
 |---|---:|---:|---|
 | Requirements in scope | 3165 / 3184 | 99% | matrix rows, less the ones deliberately parked |
 | Requirements contracted | 3153 / 3165 | 100% | an operation or schema field demonstrably serves it |
-| Operations declaring a service | 2789 / 2789 | 100% | the operation is owned by one of the seventeen deployables |
-| Operations declaring a permission | 2625 / 2789 | 94% | the checklist a grant screen renders is built from these |
-| Operations with resolved lineage | 2762 / 2789 | 99% | names the tables it reads and writes -- the join the DDL cannot make itself |
-| Operations reaching a screen | 2551 / 2789 | 91% | sync, webhook and job operations legitimately have none |
+| Operations declaring a service | 2790 / 2790 | 100% | the operation is owned by one of the seventeen deployables |
+| Operations declaring a permission | 2626 / 2790 | 94% | the checklist a grant screen renders is built from these |
+| Operations with resolved lineage | 2763 / 2790 | 99% | names the tables it reads and writes -- the join the DDL cannot make itself |
+| Operations reaching a screen | 2552 / 2790 | 91% | sync, webhook and job operations legitimately have none |
 | Screens naming an operation | 2387 / 2451 | 97% | the rest are static, navigation shells or workshop-blocked |
 | Tables reached by an operation | 1124 / 1129 | 100% | a table nothing reaches is a missing operation or a table that should not exist |
 | Tables carrying a relationship | 1040 / 1129 | 92% | either end of a declared reference |
 
 ## What crosses a service boundary
 
-**3191 declared references. 1941 stay inside one service; 1250 cross two.**
+**3192 declared references. 1941 stay inside one service; 1251 cross two.**
 
-**631 of the 1250 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
+**631 of the 1251 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
 
 | From | To | Edges |
 |---|---|---:|
@@ -63,7 +63,7 @@
 | `identity.principal` | 352 |
 | `platform.scope` | 185 |
 | `pii.subject` | 94 |
-| `platform.outbox` | 49 |
+| `platform.outbox` | 50 |
 | `orders.sales_order` | 39 |
 | `approvals.request` | 37 |
 | `catalogue.product` | 33 |
@@ -76,12 +76,12 @@
 | Service | Tier | Ops | On a screen | Tables | Screens | Out | In |
 |---|---|---:|---:|---:|---:|---:|---:|
 | CatalogueService | commerce | 447 | 420 | 138 | 73 | 161 | 120 |
-| OrderService | commerce | 298 | 281 | 115 | 101 | 149 | 93 |
+| OrderService | commerce | 299 | 282 | 115 | 101 | 150 | 93 |
 | VenueOpsService | operations | 291 | 277 | 125 | 53 | 110 | 43 |
 | MarketingService | engagement | 277 | 234 | 132 | 40 | 155 | 15 |
 | AccessService | commerce | 257 | 247 | 77 | 29 | 141 | 20 |
 | PlatformService | platform | 228 | 204 | 109 | 42 | 85 | 36 |
-| TenancyService | foundation | 212 | 188 | 109 | 71 | 116 | 366 |
+| TenancyService | foundation | 212 | 188 | 109 | 71 | 116 | 367 |
 | AiService | engagement | 144 | 131 | 75 | 21 | 69 | 4 |
 | FnbService | operations | 138 | 130 | 53 | 57 | 61 | 6 |
 | WhiteLabelService | platform | 108 | 106 | 34 | 25 | 18 | 5 |
@@ -122,7 +122,7 @@
 | resources | 62 | 62 | 62 | 62 |
 | retail | 25 | 22 | 25 | 25 |
 | seating | 55 | 55 | 55 | 55 |
-| shift | 27 | 25 | 27 | 27 |
+| shift | 28 | 26 | 28 | 28 |
 | subscription | 152 | 130 | 152 | 150 |
 | tenancy | 57 | 47 | 57 | 54 |
 | transport | 32 | 32 | 32 | 19 |
@@ -139,9 +139,9 @@
 | P02 | Guest App | guest-app | 77 | 77 | 218 |
 | P04 | Venue POS | venue-pos | 32 | 32 | 157 |
 | P05 | Guest Kiosk | guest-app | 17 | 17 | 23 |
-| P06 | Venue Staff App | venue-staff-app | 96 | 94 | 222 |
+| P06 | Venue Staff App | venue-staff-app | 96 | 94 | 223 |
 | P07 | Venue Scanner | venue-scanner | 11 | 11 | 24 |
-| P08 | Venue Management | venue-management-web | 1661 | 1608 | 1880 |
+| P08 | Venue Management | venue-management-web | 1661 | 1608 | 1881 |
 | P09 | TICVAI Web | ticvai-web | 211 | 205 | 276 |
 | P10 | Partner Web | partner-web | 43 | 43 | 118 |
 | P11 | Accreditation Web | accreditation-web | 8 | 7 | 17 |

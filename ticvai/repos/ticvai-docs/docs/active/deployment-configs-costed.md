@@ -62,6 +62,13 @@ about 14** — admission and in-venue spend.
 | **Medium** | Theme park, concert day | 18,500 | 55% | **482,850** | 11.2 | ~124 | peak 3h before gates |
 | **Large** | Stadium sell-out | 60,000 | 95% | **2,094,000** | 48.5 | ~1,045 | 2h sale window |
 
+**The Small tier is the client's smallest site** (tracker answer T9, 6 October 2026,
+`sources/client/2026-10-06-tracker-answers.md`; CHG-R4-017): *"small sites with only 1–2 POS/access points and low
+B2C traffic"*. The Large tier is their *"major football matches, concerts and events with 30,000–50,000+ attendees"*;
+for those the client gives 1,000-2,000 concurrent B2C users as the expected peak, 3,000 as the acceptance benchmark
+(not a limit) and 50,000+ on-sale arrivals at the edge waiting room (ADR-0066). The tiers above stay the capacity
+model; the acceptance runs are in `block-test-strategy.md` ("Load scenarios").
+
 **18,500 is the client's own figure** — *"TICVAI knows that 18,500 guests are attending Saturday's
 concert, 2,100 are VIP ticket holders."* **1,200 is a corporate gala in the Grand Hall.** Neither is
 invented.

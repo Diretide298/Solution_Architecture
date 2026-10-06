@@ -268,13 +268,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "LoginRequest": {
   "type": "object",
   "description": "**`workstationId` is required for a device door and absent from a browser door** (CHG-DOOR-001, 2 October 2026). It was required on every login, so no browser could sign in: the TICVAI Console (ADM-001), Venue Management (SUP-001) and the partner portal (PTR-001) have no workstation. Optional in the schema is additive against r1; the rule moved to where it belongs, the device-bound methods: `pin`, `card` and `rfid` without a `workstationId` are refused 400 (`workstation-required`). A `password` sign-in from a till, handheld or scanner still sends it, because the workstation decides the Sale Board, the hardware and the till identity (never a permission, ADR-0002).\n",
@@ -1037,7 +1030,7 @@
     "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
    },
    "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/subscription::LocalisedText",
     "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
    },
    "terminationScheduledAt": {

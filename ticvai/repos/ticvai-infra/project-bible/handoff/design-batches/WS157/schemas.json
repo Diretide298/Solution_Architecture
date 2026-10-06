@@ -95,13 +95,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "Page": {
   "type": "object",
   "required": [
@@ -211,6 +204,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
+   },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
    },
@@ -315,7 +326,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -452,7 +463,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -528,7 +539,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -555,7 +566,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,

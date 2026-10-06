@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,789 operations and 1,133 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,790 operations and 1,133 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -68,7 +68,7 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 298
+    operations: 299
     tables: 116
     schemas:
     - orders
@@ -298,7 +298,7 @@ deployables:
 crossServiceWrites:
 - from: OrderService
   to: TenancyService
-  writes: 32
+  writes: 33
   reads: 11
   kind: strong
 - from: CatalogueService

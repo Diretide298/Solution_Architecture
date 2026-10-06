@@ -329,7 +329,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/tenancy::OutletPaymentTiming"
      }
     ],
     "default": "sendFirst",
@@ -400,15 +400,6 @@
    "type": "string",
    "maxLength": 200
   }
- },
- "OutletPaymentTiming": {
-  "type": "string",
-  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
-  "enum": [
-   "sendFirst",
-   "payFirst"
-  ],
-  "default": "sendFirst"
  },
  "OutletTemplate": {
   "type": "object",

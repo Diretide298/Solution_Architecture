@@ -1,6 +1,6 @@
 # P09-ai-01 — P09 · AI
 
-**1 screens · 14 operations · 16 schemas · 8 permissions**
+**1 screens · 14 operations · 15 schemas · 8 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

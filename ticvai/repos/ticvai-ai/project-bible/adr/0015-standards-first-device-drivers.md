@@ -195,7 +195,7 @@ need to prove each driver against real hardware before acceptance.
 The client confirmed BOCA as the ticket and wristband printer and sent, on 5 October 2026, the printer
 specifications, the SDK sample code, the operator manuals and the FGL programming guide, RFID encoding on the BOCA
 Lemur, and the Windows driver (Muhamed Allam's email, filed verbatim in
-`sources/client/2026-10-05-allam-boca-printer.md`; link titles only, the URLs to follow). The printer ships to the
+`sources/client/2026-10-05-allam-boca-printer.md`, with the five addresses forwarded on 6 October 2026). The printer ships to the
 India office when it is ready.
 
 **The Tier A decision stands.** The ticket printer is built to BOCA FGL now, behind the `ticketPrinter` port of

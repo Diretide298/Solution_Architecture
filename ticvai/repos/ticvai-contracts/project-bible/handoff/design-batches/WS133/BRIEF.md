@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-725` | Performance Operations Command Center | B | 0 | 14 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-726` | Participant Photo & Video Assignment | B | 0 | 11 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-725` | Performance Operations Command Center | B | 0 | 15 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-726` | Participant Photo & Video Assignment | B | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

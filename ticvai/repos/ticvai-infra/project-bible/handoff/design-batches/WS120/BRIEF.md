@@ -1,6 +1,6 @@
 # WS120 — AI Forecasting and Predictive Intelligence board 2
 
-**10 screens · 12 operations · 20 schemas · 5 permissions**
+**10 screens · 12 operations · 19 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

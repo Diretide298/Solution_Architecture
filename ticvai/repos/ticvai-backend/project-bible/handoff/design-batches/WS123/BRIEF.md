@@ -1,6 +1,6 @@
 # WS123 — AI Governance board 3
 
-**10 screens · 10 operations · 21 schemas · 4 permissions**
+**10 screens · 10 operations · 20 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

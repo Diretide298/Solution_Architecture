@@ -324,7 +324,7 @@
      "miscount",
      "other"
     ],
-    "description": "Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the supervisor reads it beside the variance on BO-040.\n"
+    "description": "Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the supervisor reads it beside the variance on BO-040. **Optional here, never skipped where it matters** (CHG-R4-019): if the count differs within the threshold and this is empty, the shift waits for `giveShiftVarianceReason` before it closes.\n"
    },
    "releaseHeldLeases": {
     "type": "boolean",
@@ -1697,13 +1697,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "ManualDiscountRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -2718,7 +2711,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/tenancy::OutletPaymentTiming"
      }
     ],
     "default": "sendFirst",
@@ -2789,15 +2782,6 @@
    "type": "string",
    "maxLength": 200
   }
- },
- "OutletPaymentTiming": {
-  "type": "string",
-  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
-  "enum": [
-   "sendFirst",
-   "payFirst"
-  ],
-  "default": "sendFirst"
  },
  "OutletType": {
   "type": "string",
@@ -3069,6 +3053,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
+   },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
    },
@@ -3173,7 +3175,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3350,7 +3352,7 @@
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3416,7 +3418,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -3492,7 +3494,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -3519,7 +3521,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3579,7 +3581,7 @@
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -4772,6 +4774,12 @@
     "maxLength": 1000,
     "description": "The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."
    },
+   "varianceReasonRequired": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed, not stored** (CHG-R4-019): true while the shift is `pendingClosure` because its count differs from the expected figure within the threshold and no `cashierReason` is recorded. The till shows \"Give a reason to close\" (POS-007, EMP-009), BO-040 and BO-043 list it as waiting for a reason; `giveShiftVarianceReason` or `approveShiftClose` clears it. Shown to the shift's own cashier, since it carries no figure (CHG-FIN-003).\n"
+   },
    "heldLeaseCount": {
     "type": "integer",
     "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
@@ -4906,6 +4914,11 @@
    "requiresAcceptance": {
     "type": "boolean",
     "description": "True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit R080 (e)).\n"
+   },
+   "varianceReasonRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the variance is non-zero and within the threshold and the body gave no `cashierReason`: the shift is held in `pendingClosure` until `giveShiftVarianceReason` or `approveShiftClose` records a reason (the client's policy of 6 October 2026, T10.1; CHG-R4-019).\n"
    },
    "nonCashVariances": {
     "type": "array",
@@ -5493,7 +5506,7 @@
      }
     ],
     "nullable": true,
-    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).** The client's policy of 6 October 2026 (tracker answer T10.1, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-019): the tolerance is configurable, a difference within it closes only with a reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager approval (OVERSHORT_ACCEPT).\n"
    },
    "cashDrawerLimit": {
     "oneOf": [

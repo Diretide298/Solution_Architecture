@@ -1,6 +1,6 @@
 # P06-operations-01 — P06 · Operations (1 of 5)
 
-**10 screens · 47 operations · 49 schemas · 19 permissions**
+**10 screens · 48 operations · 49 schemas · 19 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -152,7 +152,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-001` | Sign in | A | 14 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
 | `EMP-002` | Select venue & role | A | 1 | 8 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
 | `EMP-003` | Home — on duty | A | 35 | 24 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
-| `EMP-009` | End shift | C | 17 | 23 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-009` | End shift | C | 19 | 23 | 7 | 1 | 1 | 6 | — | notStarted (generated) |
 | `EMP-010` | Scan — ready | C | 17 | 0 | 6 | 46 | 1 | 0 | — | notStarted (generated) |
 | `EMP-004` | Task list | A | 4 | 14 | 6 | 15 | 6 | 0 | — | notStarted (generated) |
 | `EMP-005` | Task detail | A | 40 | 17 | 6 | 22 | 4 | 0 | — | notStarted (generated) |

@@ -1,6 +1,6 @@
 # WS74 — Digital Asset Management DAM board 1
 
-**10 screens · 15 operations · 16 schemas · 3 permissions**
+**10 screens · 15 operations · 14 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·

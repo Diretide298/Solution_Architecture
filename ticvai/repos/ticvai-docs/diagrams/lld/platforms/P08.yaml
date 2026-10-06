@@ -63,7 +63,7 @@ servicesCalled:
 - service: TenancyService
   operationCalls: 492
 - service: OrderService
-  operationCalls: 422
+  operationCalls: 423
 - service: AccessService
   operationCalls: 297
 - service: MarketingService
@@ -1371,6 +1371,7 @@ screens:
   - closeShift
   - getShift
   - getShiftCountLines
+  - giveShiftVarianceReason
   - listCashMovements
   - listShifts
   - listWorkstations
@@ -1381,6 +1382,7 @@ screens:
   - emptyNoResults
   - error
   - loading
+  - reasonRequired
   offlineState: false
   entryParams:
   - shiftId<-session
@@ -37022,6 +37024,8 @@ screens:
   offlineState: false
   entryParams:
   - deviceId<-session
+  - venueId<-session
+  - workstationId<-session
   goesTo:
   - ADM-579
   boardFrames: null

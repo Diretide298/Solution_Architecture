@@ -30,7 +30,7 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
-| asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
+| asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082 |
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076, CMS-095 |
 | asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075, CMS-082 |
@@ -162,7 +162,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | Offline note | 24 August: The asset is on the device before the shift; a media issue with no artwork is a blank card. |
 | Reads | `assets.media_asset`, `assets.media_usage` |
 | Writes | - |
-| Called by | CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
+| Called by | CMS-010, CMS-068, CMS-082 |
 
 **Parameters**
 

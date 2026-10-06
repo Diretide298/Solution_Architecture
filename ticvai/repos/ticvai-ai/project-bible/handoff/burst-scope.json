@@ -6,7 +6,7 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2789,
+  "ofTotalOperations": 2790,
   "tables": 62,
   "ofTotalTables": 1129
  },
@@ -17,7 +17,7 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2757,
+    "operations": 2758,
     "tables": 1129,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
@@ -249,7 +249,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 42,
+   "columns": 44,
    "burstOperations": 5,
    "written": false,
    "contention": null,
@@ -299,7 +299,7 @@
   {
    "table": "catalogue.performance",
    "schema": "catalogue",
-   "columns": 11,
+   "columns": 12,
    "burstOperations": 4,
    "written": false,
    "contention": null,

@@ -1,6 +1,6 @@
 # P09-releases-environments-01 — P09 · Releases & Environments
 
-**8 screens · 28 operations · 29 schemas · 8 permissions**
+**8 screens · 28 operations · 28 schemas · 8 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

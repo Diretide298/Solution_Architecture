@@ -305,6 +305,25 @@
   "requestBody": null,
   "responds": "Shift"
  },
+ "giveShiftVarianceReason": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/variance-reason",
+  "contract": "shift",
+  "summary": "Give the reason for a difference within the threshold, and close the shift",
+  "permission": "SHIFT_CLOSE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ShiftVarianceReasonRequest",
+  "responds": "ShiftCountReceipt"
+ },
  "listCashMovements": {
   "method": "GET",
   "path": "/shifts/{shiftId}/cash-movements",

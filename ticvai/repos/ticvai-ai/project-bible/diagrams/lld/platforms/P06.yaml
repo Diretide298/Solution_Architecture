@@ -45,17 +45,17 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 104
+  operationCalls: 103
+- service: OrderService
+  operationCalls: 44
 - service: FnbService
   operationCalls: 44
-- service: OrderService
-  operationCalls: 43
 - service: TenancyService
   operationCalls: 30
 - service: InventoryService
   operationCalls: 28
 - service: AccessService
-  operationCalls: 20
+  operationCalls: 21
 - service: MarketingService
   operationCalls: 20
 - service: IdentityService
@@ -263,6 +263,7 @@ screens:
   - acceptShiftVariance
   - getCurrentShift
   - getShift
+  - giveShiftVarianceReason
   - listCashMovements
   - listShifts
   - submitShiftCount
@@ -274,6 +275,7 @@ screens:
   - error
   - loading
   - offline
+  - reasonRequired
   offlineState: true
   entryParams:
   - shiftId<-session
@@ -849,8 +851,8 @@ screens:
   density: comfortable
   operations:
   - appendEntitlementToMedia
-  - getMediaAsset
   - getMediaEntitlements
+  - setMediaBindingActivation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -860,7 +862,6 @@ screens:
   offlineState: true
   entryParams:
   - mediaCode<-deepLink
-  - mediaId<-deepLink
   goesTo:
   - EMP-001
   - EMP-002

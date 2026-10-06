@@ -38,7 +38,7 @@
   "counts": {
    "screens": 32,
    "operations": 157,
-   "contracts": 19,
+   "contracts": 18,
    "modules": 4,
    "undrawn": 0,
    "operationsWithNoScreen": 153
@@ -70,8 +70,8 @@
   "operator": "venue",
   "counts": {
    "screens": 96,
-   "operations": 222,
-   "contracts": 21,
+   "operations": 223,
+   "contracts": 20,
    "modules": 4,
    "undrawn": 0,
    "operationsWithNoScreen": 139
@@ -104,7 +104,7 @@
   "operator": "venue",
   "counts": {
    "screens": 1661,
-   "operations": 1880,
+   "operations": 1881,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,

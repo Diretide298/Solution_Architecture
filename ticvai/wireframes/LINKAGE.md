@@ -20,7 +20,7 @@
 | Screen -> board | `wireframe.board` on every screen: `wireframes/<file>#<id>` |
 | Platform -> board | `platform.wireframeBoard` |
 | Board -> screen | The anchor `id` on each frame, matched by id |
-| Screen -> operations | `apis[].operationId`, validated against 2,789 |
+| Screen -> operations | `apis[].operationId`, validated against 2,790 |
 | Operation -> tables | `handoff/api-data-lineage.json` |
 | Screen -> everything | **`handoff/screen-index.json`** - the join, pre-computed |
 

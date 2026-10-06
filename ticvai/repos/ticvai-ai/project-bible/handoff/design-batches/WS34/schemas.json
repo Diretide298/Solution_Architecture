@@ -428,13 +428,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MarketVenueCurrencyPricingStructureView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -876,7 +869,7 @@
    "localizedDisplayNames": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true

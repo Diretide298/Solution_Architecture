@@ -1,6 +1,6 @@
 # WS01 — Access Control board 1
 
-**10 screens · 20 operations · 29 schemas · 3 permissions**
+**10 screens · 20 operations · 28 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

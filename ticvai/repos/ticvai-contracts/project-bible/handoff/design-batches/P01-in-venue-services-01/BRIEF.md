@@ -1,6 +1,6 @@
 # P01-in-venue-services-01 — P01 · In-venue Services
 
-**6 screens · 26 operations · 56 schemas · 5 permissions**
+**6 screens · 26 operations · 55 schemas · 5 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

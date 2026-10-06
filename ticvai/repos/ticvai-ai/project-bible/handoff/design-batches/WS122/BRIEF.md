@@ -1,6 +1,6 @@
 # WS122 — AI Governance board 2
 
-**10 screens · 29 operations · 40 schemas · 10 permissions**
+**10 screens · 29 operations · 39 schemas · 10 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

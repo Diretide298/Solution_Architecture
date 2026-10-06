@@ -41,10 +41,10 @@
 | [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 7 |
 | [POS-005](#pos-005-payment) | Payment | Payment | 1 | 13 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
-| [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 9 |
+| [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 10 |
 | [POS-008](#pos-008-reports) | Reports | Reports | 1 | 4 |
 | [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 1 | 3 |
-| [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 5 |
+| [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 4 |
 | [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 7 |
 | [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 |
 | [POS-013](#pos-013-mobile-pos-event-sales-offline-operations) | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 |
@@ -1023,6 +1023,7 @@
 | `listCashMovements` | [OrderService](../backend/OrderService.md#listcashmovements) | onLoad | Lifts, adds and the opening float | `REPORT_VIEW_WORKSTATION` |
 | `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | listDenominations | `SHIFT_OPEN` |
 | `rejectShiftVariance` | [OrderService](../backend/OrderService.md#rejectshiftvariance) | onAction | A supervisor sends a counted shift back for a recount, with a reason and their PIN; the shift stays pendingVariance (DEC-175; CHG-CSP-013) | `OVERSHORT_ACCEPT` |
+| `giveShiftVarianceReason` | [OrderService](../backend/OrderService.md#giveshiftvariancereason) | onAction | The cashier's reason for a difference within the threshold, given after the blind count is locked; closes the shift (the client's policy of 6 October 2026, T10.1; CHG-R4-019) | `SHIFT_CLOSE` |
 | `getShiftCountLines` | [OrderService](../backend/OrderService.md#getshiftcountlines) | onAction | The denominations the cashier counted, line by line, for the supervisor reviewing the shift; counted values only, never the expected figure (CHG-CSP-014) | `REPORT_VIEW_WORKSTATION` |
 | `closeShift` | [OrderService](../backend/OrderService.md#closeshift) | onAction | A supervisor closes a cashier's shift on this till or any till of the venue, with their own PIN; counted, expected and variance go to the supervisor only (decided 2 October 2026, Chinmay, pre-apply round; DEC-059; CHG-CSP-012, CHG-SPO-021) | `SHIFT_CLOSE` |
 | `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | Shifts of the venue waiting for a supervisor (status pendingVariance) or a recount, on any till: F32's 'from whichever till they are at' | `REPORT_VIEW_WORKSTATION` |
@@ -1040,6 +1041,7 @@
 | denied | `acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor accepts it on this till (audit R080 (e)). |
 | pendingVariance | Counted; "Under review". `submitShiftCount` answered `referredToSupervisor`. The cashier sees "Under review" and no amount, and may sign out: the shift waits, and the next cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves it with their PIN on this till or any till of the venue (accept the variance, ask for a recount, or close it with `closeShift`), or in the daily cash reconciliation, which lists every shift of the day and resolves them one by one (decided 2 October 2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit R080 (e)). |
 | recountRequested | "Recount requested". A supervisor rejected the variance (`rejectShiftVariance`) with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set. The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`; a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013). |
+| reasonRequired | "Give a reason to close". `submitShiftCount` answered `awaitingCloseApproval` with `varianceReasonRequired`: the count differed from the expected figure within the venue's threshold and no reason came with it. The count is locked; the till asks for a reason (till error, unrecorded refund, miscount, other, with a note) and `giveShiftVarianceReason` closes the shift. No amount, no over or short (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). A reason given with the count skips this step. |
 
 **Goes to**
 
@@ -1161,7 +1163,6 @@
 | Parameter | From |
 |---|---|
 | mediaCode | deepLink |
-| mediaId | deepLink |
 | cartId | session |
 | orderId | deepLink |
 
@@ -1171,7 +1172,6 @@
 |---|---|---|---|---|
 | `getMediaEntitlements` | [OrderService](../backend/OrderService.md#getmediaentitlements) | onScan | What the scanned QR already carries | `ORDER_VIEW` |
 | `appendEntitlementToMedia` | [OrderService](../backend/OrderService.md#appendentitlementtomedia) | onAction | Attach the new purchase to the same media | `ORDER_CREATE` |
-| `getMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#getmediaasset) | onLoad | Read an asset with derivatives and usage | `ASSET_LIBRARY_VIEW` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
 | `exchangeOrderLines` | [OrderService](../backend/OrderService.md#exchangeorderlines) | onAction | Exchange lines for different products or dates | `ORDER_EXCHANGE` |
 
@@ -1182,7 +1182,7 @@
 | loading | The add existing ticket, read by `getMediaEntitlements`. |
 | error | Could not load. Names which read failed and leaves the add existing ticket untouched. |
 | emptyFirstRun | No add existing ticket yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`. |
 | offline | Not available. The entitlement set must be read live; appending to a stale picture double-sells a locker |
 
 **Goes to**

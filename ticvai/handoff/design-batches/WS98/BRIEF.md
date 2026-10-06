@@ -1,6 +1,6 @@
 # WS98 — Subscription Licensing AI Self Service board 1
 
-**10 screens · 8 operations · 16 schemas · 3 permissions**
+**10 screens · 8 operations · 15 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

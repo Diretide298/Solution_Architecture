@@ -1,7 +1,8 @@
 # ADR-0035: A flash sale gets its own environment, and it cannot be deleted until it has been reconciled
 
 **Status:** Accepted · **amended 3 September 2026** — `synchronous_commit` moves from the server to
-the statement ([below](#amendment--synchronous_commit-3-september-2026))
+the statement ([below](#amendment--synchronous_commit-3-september-2026)) · **amended 6 October 2026** — the client's
+sizing figures: 50,000+ arrivals stop at the edge, the sale is accepted at 3,000 concurrent ([below](#amendment--the-clients-sizing-figures-6-october-2026-chg-r4-017))
 **Date:** 31 August 2026
 **Related:** [ADR-0038](0038-cell-is-a-region-database-per-tenant.md), which supersedes [ADR-0014](0014-cell-per-region.md) and amends [ADR-0017](0017-deployment-models.md) · [ADR-0013](0013-local-first-point-of-sale.md) · [ADR-0031](0031-contention-and-locking.md) · [ADR-0033](0033-outbox-and-dead-letters.md) · CF-162
 
@@ -176,6 +177,21 @@ tell what they had bought.
 
 **Let the CDN absorb it.** Handles the browse and does nothing for the buy — **`acquireInventoryHold`
 cannot be cached**, and it is the operation that fails.
+
+---
+
+## Amendment — the client's sizing figures, 6 October 2026 (CHG-R4-017)
+
+**The thirty thousand in the Context was the Bahrain failure, not a target. The client has now given the targets**
+(tracker answer T9, `sources/client/2026-10-06-tracker-answers.md`): an on-sale may bring **50,000+ simultaneous
+visitors**, absorbed by the edge waiting room ([ADR-0066](0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md),
+amended the same day), which admits them progressively; behind it, **1,000-2,000 active concurrent B2C users** is the
+expected peak and **3,000 the initial performance acceptance benchmark**, *"not ... a hard architectural limit"*.
+
+**What it means here.** A burst environment is sized for the admitted sale, not for the arrivals: it is accepted at
+3,000 concurrent buyers and must keep scaling past them (its pools autoscale; nothing in it is capped at 3,000). The
+arrivals stop at the edge. The reconciliation numbers above (order 18,000 of 30,000) are an example, not a bound. The
+load runs are in `docs/active/block-test-strategy.md` ("Load scenarios").
 
 ---
 

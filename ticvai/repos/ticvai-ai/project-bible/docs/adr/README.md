@@ -47,7 +47,7 @@ and usually enough to predict what an ADR says.
 | [0032](0032-load-shedding-and-pooling.md) | A service refuses early or fails late — pooling, backpressure and breakers | Accepted — pooling amended by 0038; the per-tenant rate limit it deferred is decided by **0064** | — |
 | [0033](0033-outbox-and-dead-letters.md) | Every asynchronous handoff has an outbox and a place to fail | Accepted — **amended by 0058** (relay per region, inbox); broker per 0057 | — |
 | [0034](0034-ai-retrieval-and-cost.md) | The cheapest AI call is the one that never reaches a provider | Accepted | — |
-| [0035](0035-burst-environments.md) | A flash sale gets its own environment, and it cannot be deleted until it has been reconciled | Accepted — amended 3 September | — |
+| [0035](0035-burst-environments.md) | A flash sale gets its own environment, and it cannot be deleted until it has been reconciled | Accepted — amended 3 September and 6 October (the client's sizing figures) | — |
 | [0036](0036-burst-cell-database-segregation.md) | The burst cell shares one Postgres instance with a database per service | **Superseded** by 0038 | — |
 | [0037](0037-what-may-be-inside-a-lock.md) | A lock holds one statement, not a transaction | Accepted | — |
 | [0038](0038-cell-is-a-region-database-per-tenant.md) | **A cell is a region, and a database per tenant inside it** | Accepted | **CF-161** |
@@ -78,7 +78,7 @@ and usually enough to predict what an ADR says.
 | [0063](0063-encryption-keys-and-biometric-templates.md) | Encryption and keys; biometric templates stay with the biometric vendor | **Accepted in part** — the biometric consent, enrolment-channel, minors, image-viewing and face-matching rules decided 2 October; the rest waits on the client's DPO (template location, retention floor) and the facial-reader vendor | SD-058, CF-35 |
 | [0064](0064-per-tenant-limits.md) | Every tenant has a request budget, and a busy tenant cannot starve the others | Accepted 1 October | SD-042, SD-043 — amends 0032 |
 | [0065](0065-on-sale-availability-is-read-from-a-short-cache.md) | Browse availability is read from a one-second cache; the hold decides | **Proposed** — waiting on Chinmay: it reverses F01/F07's "never cached" | **SD-038** |
-| [0066](0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md) | The on-sale waiting room sits at the edge, apart from the ride queue | Accepted 1 October | **SD-039** — amends 0012 |
+| [0066](0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md) | The on-sale waiting room sits at the edge, apart from the ride queue | Accepted 1 October — amended 6 October (sized and load-tested at 50,000+ arrivals; the sale behind it accepted at 3,000 concurrent) | **SD-039** — amends 0012 |
 | [0067](0067-one-device-register.md) | One device register; Access keeps only where a device is placed | Accepted 1 October | SD-004 — amends 0015 |
 | [0068](0068-guest-admission-policy-lives-in-access-only.md) | Guest admission policy lives in Access only, and the offline package carries it | Accepted 1 October | SD-005, SD-052 |
 | [0069](0069-in-park-3d-navigation-is-built-natively.md) | **In-park 3D navigation is built natively**, from a venue GLB model, a pathway and location file, and GPS | Accepted 30 September (client meeting, MoM 4.8) | — builds on the venue-map contract (19.2.55–19.2.60) |

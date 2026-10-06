@@ -338,7 +338,7 @@
    "module": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+      "$ref": "#/components/schemas/common::ModuleKey"
      }
     ],
     "description": "**Whose AI this forecast is, and so who publishes it** (Chinmay, 2 October, workbook Q3: \"the permission holder for that module's AI\"; CHG-FUP-004). `publishForecastVersion` requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module. Absent on a write, the server takes it from `subject`: ticketing for `attendance`, `arrivalPattern`, `productDemand`, `timeslotDemand`, `channelPace`, `occupancy` and `refunds`; access for `entryFlow` and `attractionUtilisation`; queue for `queue`; fnb for `fnbDemand`; retail for `retailDemand`; inventory for `stockDemand`; resources for `resourceDemand`; membership for `membershipRenewals` and `churn`; core for `revenue`, `staffing`, `posDemand` and `cashCollection`. Proposed, client to correct; a venue may name the module itself. Always present on a read."
@@ -659,7 +659,7 @@
    "module": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+      "$ref": "#/components/schemas/common::ModuleKey"
      }
     ],
     "readOnly": true,
@@ -1152,13 +1152,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "Page": {
   "type": "object",
   "required": [
@@ -1501,7 +1494,7 @@
     "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
    },
    "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/subscription::LocalisedText",
     "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
    },
    "terminationScheduledAt": {

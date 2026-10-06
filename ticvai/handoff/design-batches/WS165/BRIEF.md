@@ -1,6 +1,6 @@
 # WS165 — Seat Management Venue Mapping Reference v1.0 board 1
 
-**10 screens · 14 operations · 22 schemas · 3 permissions**
+**10 screens · 14 operations · 20 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

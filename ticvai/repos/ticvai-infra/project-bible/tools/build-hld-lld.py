@@ -1305,9 +1305,9 @@ AWS_DR_OPEN = ("OPEN, not decided (CHG-R3-001). AWS has one region in the UAE (m
 
 # Azure component -> AWS component, service for service (the HLD and the AWS LLD print this table).
 AWS_MAP = [
-    ("Azure Front Door Premium + WAF (waiting-room page from cache)",
+    ("Azure Front Door Premium + WAF (waiting-room page from cache; built-in DDoS protection)",
      "Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from "
-     "CloudFront's cache"),
+     "CloudFront's cache; AWS Shield Standard for DDoS"),
     ("Internal load balancer + Private Link service; AKS App Routing (Gateway API)",
      "Internal Application Load Balancer (AWS Load Balancer Controller, Gateway API or Ingress), CloudFront VPC origin"),
     ("AKS, Standard tier: system, workload, AI GPU, qdrant and broker pools",
@@ -1856,10 +1856,15 @@ in `deploy/a-independent-tenant.yml` and `deploy/b-shared-platform.yml`, and `DE
 ## On the request path
 
 - **One entry.** Front Door Premium with WAF: OWASP and bot rules, and rate rules per client IP against abuse.
+  **DDoS protection** (the client's T9, 6 October, CHG-R4-018): Front Door's built-in infrastructure DDoS protection
+  absorbs network-layer floods at the edge, at no extra charge, and the WAF's rate and bot rules take the
+  application-layer ones; the origin has no public address (Private Link). On AWS, AWS Shield Standard on CloudFront.
 - **The on-sale waiting room sits at the edge, apart from the ride queue** (ADR-0066, amended ADR-0012's Q2). The
   waiting page is static and served from Front Door's cache; a guest's position comes from a Redis counter (no
   database write); a release controller admits guests per second from the health of `commerce` (latency and 429
-  rate). An admitted guest gets a short-lived signed admission token (the signing key is a Key Vault secret).
+  rate). It is sized and load-tested for **50,000+ simultaneous arrivals**, the client's figure (6 October), with the
+  sale behind it accepted at 3,000 concurrent B2C users, a benchmark and not a limit (ADR-0066, amended 6 October).
+  An admitted guest gets a short-lived signed admission token (the signing key is a Key Vault secret).
   **Only online cart holds need it**: `addCartLine` forwards it and `acquireInventoryHold` checks the signature in
   middleware, with no database read, for a `cart` hold on a performance whose room is on. A `workstation` hold (a
   till, a kiosk, an edge node) is not behind the room. The endpoints (`enterWaitingRoom`,
@@ -1964,7 +1969,7 @@ def lld_md():
 
 | Tier | What runs there | Size (production, with HA) |
 |---|---|---|
-| Edge | Azure Front Door Premium with WAF (OWASP and bot rules, rate rules per client IP), TLS 1.2+, Private Link to the origin. Serves the on-sale waiting-room page from its cache (ADR-0066) | One profile |
+| Edge | Azure Front Door Premium with WAF (OWASP and bot rules, rate rules per client IP), TLS 1.2+, Private Link to the origin. **DDoS protection:** Front Door's built-in infrastructure DDoS protection (network layer, no extra charge) at the edge, the WAF's rate and bot rules for the application layer; the origin has no public address, so no Azure DDoS Protection plan sits in front of it (one can be added for a tenant that requires it). Serves the on-sale waiting-room page from its cache (ADR-0066) | One profile |
 | Ingress | A Gateway API ingress: the AKS App Routing add-on's Gateway API implementation behind an internal load balancer, published to Front Door by Private Link. Not NGINX (ingress-nginx is out of maintenance; the add-on's NGINX is supported only through November 2026). Application Gateway for Containers is the alternative, with `snet-agc` reserved. Installed at bootstrap, not by the Terraform | In the system pool; the gateway pods tolerate its `CriticalAddonsOnly` taint |
 | AKS cluster | Azure CNI Overlay (pods from `{POD_CIDR}`, outside the VNet), Cilium network policy and data plane, egress through the NAT Gateway (`userAssignedNATGateway`), five node pools, a subnet per pool (the qdrant and broker pools share `snet-aks-data`) | Standard tier |
 | AKS system pool | Kubernetes system services, the ingress gateway | D4s v5, autoscale 2-4 nodes, zones 1-3 |
@@ -2047,6 +2052,10 @@ ranges (`snet-agc`, `snet-jump`) are not created until they are needed.
 
 ## Security
 
+- **DDoS and bot protection** (the client's T9, 6 October, CHG-R4-018): Front Door's built-in infrastructure DDoS
+  protection at the edge (network layer, included); the WAF's rate rules per client IP and bot rules for the
+  application layer; the on-sale waiting room (ADR-0066) absorbs legitimate floods. The origin is reachable only
+  through Private Link, so no public address behind the edge needs an Azure DDoS Protection plan.
 - **Identity:** Entra ID for administrators; the platform's own identity for staff, guests and partners.
   Workloads use managed identities (workload identity) to reach Key Vault, storage, Redis and the registry.
 - **Tenant isolation:** each tenant's database (with row-level security for venue scope) and each tenant's
@@ -2186,7 +2195,7 @@ box dashed, as open.
 
 | Tier | What runs there | Size (production, with HA) |
 |---|---|---|
-| Edge | CloudFront with AWS WAF (AWS managed core rule set for OWASP, Bot Control, rate-based rules per client IP), TLS 1.2+, a VPC origin to the internal ALB. Serves the on-sale waiting-room page from its cache (ADR-0066) | One distribution, one web ACL |
+| Edge | CloudFront with AWS WAF (AWS managed core rule set for OWASP, Bot Control, rate-based rules per client IP), TLS 1.2+, a VPC origin to the internal ALB. **DDoS protection:** AWS Shield Standard, automatic on CloudFront at no extra charge (network and transport layers), the WAF's rate-based and Bot Control rules for the application layer; Shield Advanced (a subscription) is an option for a major event, not in the costed cell. Serves the on-sale waiting-room page from its cache (ADR-0066) | One distribution, one web ACL |
 | Ingress | An internal Application Load Balancer run by the AWS Load Balancer Controller (Gateway API or Ingress), reachable only as CloudFront's VPC origin | In the system node group |
 | EKS cluster | Amazon EKS, VPC CNI with custom networking (pods from the secondary range `100.64.0.0/16`, outside the node subnets), Cilium (or the VPC CNI's own) network policy, egress through the NAT Gateways, five managed node groups, a subnet per group and AZ | Standard support |
 | EKS system node group | Kubernetes system services, the ingress controller | m6i.xlarge, autoscale 2-4, AZs a-c |
@@ -2228,6 +2237,10 @@ are ever peered.
 - **Secrets:** Secrets Manager only; the Qdrant API key and the waiting-room token key are read only by their issuers.
 - **Detection:** GuardDuty (EKS Runtime Monitoring, RDS Protection, VPC flow, DNS and CloudTrail analysis),
   Inspector (node and image scanning) and Security Hub: the Defender for Cloud line.
+- **DDoS and bot protection** (the client's T9, 6 October, CHG-R4-018): AWS Shield Standard on CloudFront
+  (network and transport layers, automatic, no charge); AWS WAF rate-based rules and Bot Control for the application
+  layer; the waiting room (ADR-0066) absorbs legitimate floods. Shield Advanced is an option for a major event, not
+  costed here. The ALB is internal, reachable only as CloudFront's VPC origin.
 - Tenant isolation, least privilege between deployables and encryption in transit are the Azure LLD's, unchanged.
 
 ## Availability and backup
@@ -2368,6 +2381,29 @@ def architecture_json():
     }, indent=1, ensure_ascii=False) + "\n"
 
 
+EDGE_PROTECTION = ("WAF", "DDoS", "bot")  # the client's T9 (6 October): "CDN/WAF/DDoS/bot protection"
+
+
+def edge_protection_named():
+    """CHG-R4-018: the client asked for CDN, WAF, DDoS and bot protection (sources/client/2026-10-06-tracker-answers.md,
+    T9), and both LLDs named WAF and bot rules but never DDoS. Every LLD's Edge tier row and Security section, and the
+    HLD's request path, must name each of EDGE_PROTECTION. Returns the omissions (must be empty)."""
+    bad = []
+    for name, text in (("TICVAI-LLD.md", lld_md()), ("TICVAI-LLD-AWS.md", aws_lld_md())):
+        edge = next((ln for ln in text.splitlines() if ln.startswith("| Edge |")), "")
+        sec = text.split("## Security", 1)[1].split("\n## ", 1)[0] if "## Security" in text else ""
+        for word in EDGE_PROTECTION:
+            if word.lower() not in edge.lower():
+                bad.append(f"{name}: the Edge tier row does not name {word} protection")
+            if word.lower() not in sec.lower() and word != "WAF":
+                bad.append(f"{name}: the Security section does not name {word} protection")
+    path = hld_md().split("## On the request path", 1)[-1].split("\n## ", 1)[0]
+    for word in EDGE_PROTECTION:
+        if word.lower() not in path.lower():
+            bad.append(f"TICVAI-HLD.md: 'On the request path' does not name {word} protection")
+    return bad
+
+
 def main():
     bad = terraform_agrees()
     for b in bad:
@@ -2375,7 +2411,10 @@ def main():
     clouds = clouds_agree()
     for b in clouds:
         print(f"ERROR clouds: {b}")
-    bad = bad + clouds
+    edge = edge_protection_named()
+    for b in edge:
+        print(f"ERROR edge: {b}")
+    bad = bad + clouds + edge
     hld, lld, lld_aws = hld_svg(), lld_svg(), aws_lld_svg()
     for k, v in CROSS.items():
         for c in v:

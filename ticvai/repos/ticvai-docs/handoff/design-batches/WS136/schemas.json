@@ -1660,7 +1660,7 @@
     "description": "The role the actor held at the time."
    },
    "source": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "channel": {
     "type": "string",

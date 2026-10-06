@@ -513,7 +513,7 @@
     "maxLength": 64
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "venueId": {
     "type": "string",
@@ -798,13 +798,6 @@
     "type": "boolean",
     "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
    }
-  }
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
   }
  },
  "MetricValue": {
@@ -1469,7 +1462,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "attractionProductId": {
     "type": "string",
@@ -1544,7 +1537,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "subjectId": {
     "type": "string",

@@ -2705,6 +2705,7 @@ screens:
   entryParams:
   - venueId<-session
   - kioskConfigId<-navigation
+  - versionNumber<-navigation
   goesTo:
   - CMS-010
   - CMS-102

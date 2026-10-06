@@ -243,7 +243,7 @@
    "guestReleaseNotes": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/platform-ops::LocalisedText"
      }
     ],
     "nullable": true,
@@ -306,13 +306,6 @@
    "staging",
    "production"
   ]
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
  },
  "Migration": {
   "type": "object",
@@ -1302,7 +1295,7 @@
     "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
    },
    "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/subscription::LocalisedText",
     "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
    },
    "terminationScheduledAt": {

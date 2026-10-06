@@ -211,7 +211,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 | Status | radio group | — | Raised · Acknowledged · Resolved · Expired | `listAlerts` ?status |
 | Severity | segmented control | — | Info · Warning · Critical | `listAlerts` ?severity |
 | Workstation | picker: choose a workstation | — | — | `listAlerts` ?workstationId |
@@ -408,7 +408,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -647,7 +647,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -832,7 +832,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -998,7 +998,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -1184,7 +1184,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 | Refresh | toggle | off | — | `getDashboard` ?refresh |
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)

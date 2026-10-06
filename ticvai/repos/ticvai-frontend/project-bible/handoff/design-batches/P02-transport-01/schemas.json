@@ -397,10 +397,10 @@
     "description": "Short operator code, e.g. `SHJ-JUB`. Unique in the venue."
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/transport::LocalisedText"
    },
    "shortName": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/transport::LocalisedText",
     "description": "The label on the route diagram and the map pin (`Union Sq`, `MoE`)."
    },
    "latitude": {
@@ -443,7 +443,7 @@
     "description": "The public line number shared by both directions, e.g. `E101`."
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/transport::LocalisedText"
    },
    "colour": {
     "type": "string",

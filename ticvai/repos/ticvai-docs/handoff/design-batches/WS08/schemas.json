@@ -563,7 +563,7 @@
     "maxLength": 64
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "venueId": {
     "type": "string",
@@ -1382,13 +1382,6 @@
      }
     }
    }
-  }
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
   }
  },
  "MultiParkCrossoverJourneyOrchestratorView": {

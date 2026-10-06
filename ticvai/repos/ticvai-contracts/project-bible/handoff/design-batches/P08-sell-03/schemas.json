@@ -1446,13 +1446,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MarketingCampaignVariant": {
   "type": "object",
   "x-ticvai-persistence": "marketing.campaign_variant",
@@ -1764,7 +1757,7 @@
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,

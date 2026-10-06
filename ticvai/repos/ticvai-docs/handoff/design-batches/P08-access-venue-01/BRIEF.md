@@ -1,6 +1,6 @@
 # P08-access-venue-01 — P08 · Access & Venue (1 of 3)
 
-**10 screens · 28 operations · 36 schemas · 9 permissions**
+**10 screens · 28 operations · 35 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

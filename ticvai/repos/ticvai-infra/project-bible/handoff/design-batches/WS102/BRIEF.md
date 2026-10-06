@@ -1,6 +1,6 @@
 # WS102 — Subscription Licensing AI Self Service board 5
 
-**10 screens · 15 operations · 26 schemas · 11 permissions**
+**10 screens · 15 operations · 24 schemas · 11 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

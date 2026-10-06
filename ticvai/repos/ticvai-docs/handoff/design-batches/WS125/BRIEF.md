@@ -1,6 +1,6 @@
 # WS125 — Event Management Configuration Backend Structure v1.0 board 1
 
-**3 screens · 5 operations · 3 schemas · 2 permissions**
+**3 screens · 5 operations · 4 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-694` | Event Catalogue Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-696` | Event Duplication & Clone Configuration | A | 6 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-696` | Event Duplication & Clone Configuration | A | 8 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

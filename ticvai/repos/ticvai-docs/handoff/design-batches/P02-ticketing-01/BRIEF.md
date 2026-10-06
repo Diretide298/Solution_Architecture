@@ -1,6 +1,6 @@
 # P02-ticketing-01 — P02 · Ticketing
 
-**4 screens · 8 operations · 23 schemas · 4 permissions**
+**4 screens · 8 operations · 22 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

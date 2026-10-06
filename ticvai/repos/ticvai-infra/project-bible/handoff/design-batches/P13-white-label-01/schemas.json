@@ -119,10 +119,10 @@
     "readOnly": true
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "subtitle": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "imageAssetRef": {
     "type": "string",
@@ -775,7 +775,7 @@
     "pattern": "^[a-z0-9-]+$"
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "body": {
     "$ref": "#/components/schemas/LocalisedRichText"
@@ -1183,7 +1183,7 @@
        "$ref": "#/components/schemas/HomepageSectionKind"
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "sortOrder": {
        "type": "integer"
@@ -1380,7 +1380,7 @@
     "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."
    },
    "moduleKey": {
-    "$ref": "#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/white-label::ModuleKey"
    },
    "appSection": {
     "type": "string",
@@ -1420,13 +1420,6 @@
    "type": "string"
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MediaAsset": {
   "x-ticvai-persistence": "assets.media_asset",
   "type": "object",
@@ -1446,7 +1439,7 @@
     "format": "uuid"
    },
    "kind": {
-    "$ref": "#/components/schemas/MediaKind"
+    "$ref": "#/components/schemas/assets::MediaKind"
    },
    "status": {
     "$ref": "#/components/schemas/MediaStatus"
@@ -1461,12 +1454,12 @@
     "type": "integer"
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/assets::LocalisedText"
    },
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/assets::LocalisedText"
      }
     ],
     "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
@@ -1474,7 +1467,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/assets::LocalisedText"
      }
     ],
     "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
@@ -1630,20 +1623,6 @@
     }
    }
   ]
- },
- "MediaKind": {
-  "type": "string",
-  "enum": [
-   "image",
-   "video",
-   "audio",
-   "document",
-   "vector",
-   "font",
-   "archive",
-   "model3d"
-  ],
-  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
  },
  "MediaReplaceResult": {
   "x-ticvai-persistence": "none — computed",
@@ -1836,7 +1815,7 @@
   ],
   "properties": {
    "moduleKey": {
-    "$ref": "#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/white-label::ModuleKey"
    },
    "displayName": {
     "type": "string"
@@ -1858,9 +1837,6 @@
     }
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_config + whitelabel.navigation_item",
@@ -1907,7 +1883,7 @@
        "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "icon": {
        "type": "string"
@@ -1942,7 +1918,7 @@
       "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
      },
      "label": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     }
    }
@@ -2051,10 +2027,10 @@
     "readOnly": true
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "description": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "iconAssetRef": {
     "type": "string",
@@ -2444,7 +2420,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -2463,7 +2439,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2538,7 +2514,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -2691,7 +2667,7 @@
    "maintenanceMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2729,7 +2705,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2751,7 +2727,7 @@
        "format": "uuid"
       },
       "name": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "city": {
        "type": "string",
@@ -2760,7 +2736,7 @@
       "openingHours": {
        "allOf": [
         {
-         "$ref": "#/components/schemas/LocalisedText"
+         "$ref": "#/components/schemas/white-label::LocalisedText"
         }
        ],
        "nullable": true,
@@ -2990,7 +2966,7 @@
     "pattern": "^[a-z0-9-]+$"
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "body": {
     "$ref": "#/components/schemas/LocalisedRichText"
@@ -3110,7 +3086,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -3118,7 +3094,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,

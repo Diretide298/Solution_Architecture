@@ -766,7 +766,7 @@
     "maxLength": 64
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "venueId": {
     "type": "string",
@@ -1848,13 +1848,6 @@
    "cancelled"
   ]
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "LocationSession": {
   "type": "object",
   "x-ticvai-persistence": "fnb.location_session",
@@ -2857,6 +2850,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
+   },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
    },
@@ -2961,7 +2972,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3098,7 +3109,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -3174,7 +3185,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -3201,7 +3212,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3609,7 +3620,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -3628,7 +3639,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3703,7 +3714,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -3778,7 +3789,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -3786,7 +3797,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -4441,7 +4452,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "attractionProductId": {
     "type": "string",
@@ -4516,7 +4527,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "subjectId": {
     "type": "string",

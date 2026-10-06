@@ -866,6 +866,8 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -2117,10 +2119,14 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | seatMapId | string (uuid) |  |  |
 | language | string |  | As Performance.language; every performance of a generated series takes it (decided 29 September, rev 3 REV3-17). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
 | format | string |  | As Performance.format (decided 29 September, rev 3 REV3-17). (max length 40; nullable) |
+| minutesOnScreen | integer |  | As Performance.minutesOnScreen; every performance of a generated series takes it (DI-167, DI-169; CHG-R4-014). (min 0; max 1440) |
+| slotLengthMinutes | integer |  | The slot length the form asks for (DI-167, DI-995; CHG-R4-014): every generated performance ends this many minutes after it starts. (min 1; max 1440) |
 | recurrence | object |  | Generate a series rather than a single performance. |
 | recurrence.intervalMinutes | integer |  | (min 1) |
 | recurrence.until | string (date-time) |  |  |
 | recurrence.daysOfWeek | array of integer |  |  |
+| recurrence.firstStartTime | string |  | The first start of each day, HH:MM on the region's clock (DI-995, 24 September minutes M24-01; CHG-R4-014). (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| recurrence.lastStartTime | string |  | The last start of each day, HH:MM on the region's clock (DI-995; CHG-R4-014): no slot of the day starts after it, so a series every 30 minutes from 10:00 with a last start of 17:30 makes 16 slots a d… (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 
 **Response**: `object`
 
@@ -2139,6 +2145,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | performances[].seatMapId | string (uuid) |  | (nullable) |
 | performances[].language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
 | performances[].format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
+| performances[].minutesOnScreen | integer |  | "Minutes on screen": how long after startsAt the slot is still sold (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). (min 0; max 1440; default 0) |
 
 **Responses**
 
@@ -2146,6 +2153,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 |---|---|---|
 | 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
+| 422 |  | The daily window cannot produce a slot (CHG-R4-014): recurrence.lastStartTime before recurrence.firstStartTime, a slotLengthMinutes that disagrees with endsAt minus startsAt, or firstStartTime or las… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### enterWaitingRoom
@@ -2244,6 +2252,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | seatMapId | string (uuid) |  | (nullable) |
 | language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
 | format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
+| minutesOnScreen | integer |  | "Minutes on screen": how long after startsAt the slot is still sold (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). (min 0; max 1440; default 0) |
 
 **Responses**
 
@@ -2403,6 +2412,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | items[].seatMapId | string (uuid) |  | (nullable) |
 | items[].language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
 | items[].format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
+| items[].minutesOnScreen | integer |  | "Minutes on screen": how long after startsAt the slot is still sold (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). (min 0; max 1440; default 0) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2502,6 +2512,7 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | admissionRulesId | string (uuid) |  |  |
 | language | string |  | As Performance.language (decided 29 September, rev 3 REV3-17). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
 | format | string |  | As Performance.format (decided 29 September, rev 3 REV3-17). (max length 40; nullable) |
+| minutesOnScreen | integer |  | As Performance.minutesOnScreen (DI-167, DI-169; CHG-R4-014). (min 0; max 1440) |
 
 **Response**: `Performance`
 
@@ -2518,6 +2529,7 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | seatMapId | string (uuid) |  | (nullable) |
 | language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
 | format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
+| minutesOnScreen | integer |  | "Minutes on screen": how long after startsAt the slot is still sold (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). (min 0; max 1440; default 0) |
 
 **Responses**
 
@@ -2554,25 +2566,28 @@ Event board 1.3. **Most events are last year's event**, and the question is neve
 | eventId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**
+**Request body**: `CloneEventRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | include | array of enum (schedule, pricing, seatMap, capacityProfile, resourceRequirements, staffPlan, registrationForm, accessRules) |  |  |
 | shiftDatesByDays | integer |  | (nullable) |
 | newName | string |  | (nullable) |
+| newCode | string |  | The copy's event code (6 October 2026, CHG-R4-016). (max length 64; nullable) |
 
 **Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | eventId | string (uuid) |  |  |
+| code | string |  | The copy's event code, as sent in newCode or as the server chose it (CHG-R4-016). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Cloned as a draft |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEventLifecycleState
@@ -3513,6 +3528,8 @@ Checks a party's declared ages and heights against every product in the booking 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -3812,6 +3829,8 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | items[].name | string | yes | (max length 200) |
 | items[].description | string |  |  |
+| items[].nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| items[].descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | items[].kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | items[].venueId | string (uuid) | yes |  |
 | items[].scopePath | string | yes |  |
@@ -4146,6 +4165,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | familyKey | string |  | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see Product.familyKey. (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string |  | (max length 200) |
 | description | string |  |  |
+| nameLocalised | object |  | See Product.nameLocalised (CHG-R4-011). (nullable) |
+| descriptionLocalised | object |  | See Product.descriptionLocalised (CHG-R4-011). (nullable) |
 | channels | array of Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
 | dataMaskValues | object |  |  |
 | guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
@@ -4177,6 +4198,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -4381,7 +4404,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes | (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | venueId | string (uuid) | yes |  |
@@ -4451,7 +4474,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes | (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | venueId | string (uuid) | yes |  |
@@ -4533,6 +4556,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 |---|---|---|
 | 201 |  | Created in draft |
 | 400 |  | Conditions are unsatisfiable, or the discount exceeds the configured cap. |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPromotion
@@ -4709,7 +4733,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes | (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | venueId | string (uuid) | yes |  |
@@ -4879,7 +4903,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes | (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | venueId | string (uuid) | yes |  |
@@ -5461,6 +5485,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | seat_map_id | uuid | no |  |
 | language | text | no | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). |
 | format | text | no | How it is presented, free text the venue chooses, e.g. |
+| minutes_on_screen | integer | no | "Minutes on screen": how long after startsAt the slot is still sold (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). |
 
 ### `catalogue.price`
 
@@ -5514,6 +5539,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | family_key | text | no | The same product at another location (decided 29 September, rev 3 REV3-18). |
 | name | text | yes |  |
 | description | text | no |  |
+| name_localised | jsonb | no | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. |
+| description_localised | jsonb | no | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). |
 | kind | text | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | yes |  |
@@ -5796,7 +5823,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| code | text | yes |  |
+| code | text | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). |
 | name | text | yes |  |
 | description | text | no |  |
 | venue_id | uuid | yes |  |

@@ -28,6 +28,7 @@ Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/a
 
     python3 tools/check-contract-shapes.py [--all] [--update-baseline]
 """
+import json
 import re
 import sys
 from pathlib import Path
@@ -56,7 +57,13 @@ RULES = {
     "C-ID-FORMAT": "an id field typed other than uuid (ADR-0056) (R074)",
     "C-APPEND-ONLY": "an append-only schema written by PUT/PATCH/DELETE (R185)",
     "C-GUEST-INTERNAL": "a guest-callable read returns principal ids or internal fields (R164)",
+    "C-CODE-409": "a create that takes a business code declares no 409 for a duplicate (R108, CHG-R4-015)",
+    "C-CLONE-CODE": "a clone of an entity with a unique code takes no new code (R108, CHG-R4-016)",
+    "C-NAME-LOCALISED": "an entity localises other text but not its name (CHG-R4-011)",
+    "C-SERIES-WINDOW": "a series repeating every N minutes has no last start time of the day (DI-995, CHG-R4-014)",
 }
+CREATES = re.compile(r"^(create|add|register|import)[A-Z]")
+LOCALISED = re.compile(r"schemas/(LocalisedText|LocalisedRichText)['\"]")
 INTERNAL = re.compile(r"^(createdByPrincipalId|updatedByPrincipalId|principalId|approvedByPrincipalId|"
                       r"internalNote|internalNotes|budgetCap|costPrice|marginPercent)$")
 
@@ -142,6 +149,19 @@ def main() -> int:
                         and not node.get("oneOf") and not node.get("anyOf") \
                         and not isinstance(node.get("additionalProperties"), dict):
                     guard.add("C-UNTYPED-BODY", f"{oid}:request", f"{oid}: request body is a bare object")
+                # R108, CHG-R4-015: a create that takes a business code must say what a duplicate gets.
+                codes_ = {str(c) for c in (op.get("responses") or {})}
+                if m == "post" and CREATES.match(oid) and "code" in props and "409" not in codes_:
+                    guard.add("C-CODE-409", oid, f"{oid}: creates with a `code` and declares no 409 for a duplicate")
+                # R108, CHG-R4-016: a copy of an entity whose code is unique must be given a code of its own.
+                cm = re.match(r"^clone([A-Z]\w*)$", oid)
+                if m == "post" and cm:
+                    create, _ = deref({"$ref": f"#/components/schemas/Create{cm.group(1)}Request"}, doc)
+                    ccode = ((create or {}).get("properties") or {}).get("code") if isinstance(create, dict) else None
+                    if isinstance(ccode, dict) and ccode.get("x-ticvai-unique") \
+                            and not [p for p in props if p == "code" or p.endswith("Code")]:
+                        guard.add("C-CLONE-CODE", oid, f"{oid}: copies a {cm.group(1)} whose code is unique "
+                                                       f"({ccode.get('x-ticvai-unique')}) and takes no new code")
         # --- responses -------------------------------------------------------------------------
         codes = {str(c) for c in (op.get("responses") or {})}
         for code, r in (op.get("responses") or {}).items():
@@ -183,6 +203,20 @@ def main() -> int:
     for (stem, name), s in sorted(g.schemas()[0].items()):
         if "parameters" in s:
             guard.add("C-SCHEMA-PARAMETERS", f"{stem}.{name}", f"{stem}.{name}: carries a parameters key")
+        # CHG-R4-014 (DI-995): a series repeating every N minutes needs the day's last start, or it runs all night.
+        sp = s.get("properties") or {}
+        for p, ps in sp.items():
+            rp = (ps.get("properties") or {}) if isinstance(ps, dict) else {}
+            if "intervalMinutes" in rp and not ({"lastStartTime", "dailyEndTime", "lastStart"} & set(rp)):
+                guard.add("C-SERIES-WINDOW", f"{stem}.{name}.{p}",
+                          f"{stem}.{name}.{p}: repeats every intervalMinutes with no last start time of the day")
+        # CHG-R4-011: an entity that localises some of what a guest reads localises its name too.
+        persisted_ = not str(s.get("x-ticvai-persistence") or "none").strip().startswith("none")
+        if persisted_ and isinstance(sp.get("name"), dict) and sp["name"].get("type") == "string" \
+                and not ({"nameLocalised", "nameTranslations", "localisedName"} & set(sp)) \
+                and [p for p, v in sp.items() if p != "name" and LOCALISED.search(json.dumps(v, default=str))]:
+            guard.add("C-NAME-LOCALISED", f"{stem}.{name}",
+                      f"{stem}.{name}: localises other text (LocalisedText) but its name is one plain string")
         enums = []
         walk_enums(s, f"{stem}.{name}", enums)
         siblings = set((s.get("properties") or {}).keys())

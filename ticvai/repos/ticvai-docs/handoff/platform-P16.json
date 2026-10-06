@@ -41,15 +41,15 @@
    "operations": 30
   },
   {
+   "contract": "tenancy",
+   "operations": 4
+  },
+  {
    "contract": "finance",
    "operations": 4
   },
   {
    "contract": "identity",
-   "operations": 4
-  },
-  {
-   "contract": "tenancy",
    "operations": 4
   },
   {
@@ -65,11 +65,11 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "promotions",
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "orders",
    "operations": 1
   }
  ],

@@ -1,6 +1,6 @@
 # P05-ai-01 — P05 · AI
 
-**1 screens · 7 operations · 30 schemas · 2 permissions**
+**1 screens · 7 operations · 28 schemas · 2 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·

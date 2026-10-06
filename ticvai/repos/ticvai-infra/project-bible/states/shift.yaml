@@ -47,6 +47,17 @@ transitions:
     `shift.closed` when it lands here (CHG-R1S-009)
   emits:
   - shift.closed
+- from: pendingClosure
+  to: closed
+  operation: giveShiftVarianceReason
+  trigger: operation
+  guard: The count differed within the venue's threshold and came with no reason (`Shift.varianceReasonRequired`);
+    the reason is recorded after the count is locked, so the close stays blind. The client's policy of 6 October
+    2026, T10.1 (sources/client/2026-10-06-tracker-answers.md; CHG-R4-019). Where the venue supervises every close
+    the shift stays `pendingClosure` for `approveShiftClose`, which is no move. `approveShiftClose` also releases a
+    shift held for a reason (the job transition above), recording its approver's `reason` as the variance reason
+  emits:
+  - shift.closed
 - from: pendingVariance
   to: closed
   operation: acceptShiftVariance

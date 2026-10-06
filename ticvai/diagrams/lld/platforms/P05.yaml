@@ -68,7 +68,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - venueId<-session
   goesTo:
   - KSK-002
   - KSK-003
@@ -99,7 +100,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - venueId<-session
   goesTo:
   - KSK-001
   - KSK-003
@@ -275,6 +277,7 @@ screens:
   offlineState: true
   entryParams:
   - paymentId<-deepLink
+  - venueId<-session
   goesTo:
   - KSK-001
   - KSK-002
@@ -332,6 +335,7 @@ screens:
   offlineState: true
   entryParams:
   - orderId<-deepLink
+  - venueId<-session
   goesTo:
   - KSK-001
   - KSK-002
@@ -411,6 +415,7 @@ screens:
   entryParams:
   - sessionId<-session
   - conversationId<-navigation
+  - venueId<-session
   goesTo:
   - KSK-001
   - KSK-002
@@ -436,7 +441,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - venueId<-session
   goesTo:
   - KSK-001
   - KSK-002

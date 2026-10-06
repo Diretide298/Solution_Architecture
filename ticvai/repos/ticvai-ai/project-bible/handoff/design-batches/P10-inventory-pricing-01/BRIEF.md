@@ -1,6 +1,6 @@
 # P10-inventory-pricing-01 — P10 · Inventory & Pricing
 
-**3 screens · 17 operations · 29 schemas · 5 permissions**
+**3 screens · 17 operations · 28 schemas · 5 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·

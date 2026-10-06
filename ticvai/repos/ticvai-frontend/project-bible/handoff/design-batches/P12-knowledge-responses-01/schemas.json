@@ -99,7 +99,7 @@
     "type": "string"
    },
    "name": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "sortOrder": {
     "type": "integer"
@@ -119,7 +119,7 @@
        "format": "uuid"
       },
       "question": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "answer": {
        "$ref": "#/components/schemas/LocalisedRichText"
@@ -144,13 +144,6 @@
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
   "description": "Keyed by language code. Values are sanitised HTML.",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
   "additionalProperties": {
    "type": "string"
   }

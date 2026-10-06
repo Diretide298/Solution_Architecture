@@ -176,8 +176,6 @@ paths:
     get:
       operationId: getMediaAsset
       x-ticvai-consumed-by:
-        - "P04 POS-010 Add to Existing Ticket"
-        - "P06 EMP-036 Issue media"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-068 Digital Asset 360° Profile"
         - "P13 CMS-082 Asset Ownership & Responsibility Management"

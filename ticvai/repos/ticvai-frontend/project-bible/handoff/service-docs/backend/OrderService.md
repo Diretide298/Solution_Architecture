@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 97 of 298 |
+| Operations in the slice | 98 of 299 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -119,6 +119,7 @@
 | shift | [`getShiftCountLines`](#getshiftcountlines) | GET | `/shifts/{shiftId}/count-lines` | core | 1 | BO-040, BO-043, POS-007 |
 | shift | [`getTillShiftPolicy`](#gettillshiftpolicy) | GET | `/venues/{venueId}/till-shift-policy` | core | 1 | BO-065, POS-019 |
 | shift | [`getWorkstationShift`](#getworkstationshift) | GET | `/shifts/current/overview` | core | 1 | EMP-003, POS-025 |
+| shift | [`giveShiftVarianceReason`](#giveshiftvariancereason) | POST | `/shifts/{shiftId}/variance-reason` | core | 1 | BO-040, EMP-009, POS-007 |
 | shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007 |
 | shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | BO-042, POS-015, POS-018 |
 | shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008 … |
@@ -7011,6 +7012,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7267,6 +7269,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7301,6 +7304,7 @@ The operator submits a counted denomination breakdown. The expected figure is no
 The response carries the variance. Where it exceeds the configured threshold, the shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
 **The threshold is the venue setting `shiftVarianceThreshold`, with a tenant default**, an absolute amount either way, over or short (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 20.00 per shift.**
 **`acceptShiftVariance` is the one way past that threshold** (decided 28 September, audit R080 (e)): a supervisor accepts the variance on the till. The close is not held for a PIN before this call, and no approval request is raised for it.
+**Within the threshold, a difference closes only with a reason** (the client's policy of 6 October 2026, T10.1; CHG-R4-019): a non-zero variance within the threshold with no `cashierReason` in the body holds the shift in `pendingClosure` with `ShiftCloseResult.varianceReasonRequired` true, until `giveShiftVarianceReason` (the supervisor, who sees the variance here, may give it at once) or `approveShiftClose` records one.
 Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
 Where the venue requires approval on close, the shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE).
 **The cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003). This response carries `expectedCash` and `variance`, so it is the **supervisor and back-office close** (BO-039, BO-040: closing a shift on a cashier's behalf). A cashier counting their own drawer at the till or on the staff app submits the count with `submitShiftCount`, which returns neither figure. A caller closing a shift they opened themselves, without OVERSHORT_ACCEPT, is refused 403 `blind-count-required`. Retail practice and the client's reason are in docs/active/research-uae-vat-and-blind-close-2-october.md (MoM 9 Sep 2026 4.18, DI-271, DI-806).
@@ -7405,6 +7409,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | shift.variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | shift.cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | shift.cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| shift.varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | shift.heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | shift.openedAt | string (date-time) | yes |  |
 | shift.recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7435,6 +7440,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | requiresAcceptance | boolean | yes | True when the variance exceeds the venue's shiftVarianceThreshold (audit R094). |
+| varianceReasonRequired | boolean |  | True when the variance is non-zero and within the threshold and the body gave no cashierReason: the shift is held in pendingClosure until giveShiftVarianceReason or approveShiftClose records a reason… (default False) |
 | nonCashVariances | array of object |  |  |
 | nonCashVariances[].tender | string | yes |  |
 | nonCashVariances[].declared | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -7528,6 +7534,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7735,6 +7742,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7760,6 +7768,65 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | 200 |  | The open or suspended shift on this workstation |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 |  | No shift open or suspended on this workstation, or the session has no workstation (problem type no-current-shift). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### giveShiftVarianceReason
+
+**`POST /shifts/{shiftId}/variance-reason`**: Give the reason for a difference within the threshold, and close the shift
+
+**The client's policy for a variance within tolerance** (tracker answer T10.1, 6 October 2026, `sources/client/2026-10-06-tracker-answers.md`: "The system should support configurable cash variance tolerance. Variances within the permitted threshold may be closed with mandatory reason capture. Variances exceeding the threshold should require supervisor/manager approval. All variances and approvals must be fully audited and reported."; CHG-R4-019). Until 6 October a difference within `shiftVarianceThreshold` closed the shift with no reason at all (`CloseShiftRequest.cashierReason` was optional).
+**From `pendingClosure` with `Shift.varianceReasonRequired` true only**: the count found a difference within the threshold and no `cashierReason` came with it (`submitShiftCount`, `closeShift`). Records `reason` and `note` as the shift's `cashierReason` and `cashierNote`, writes the audit record (who, when, which shift) and closes the shift (`closed`, emitting `shift.closed`), or, where the venue supervises every close (`TillShiftPolicy.requireCloseApproval`), leaves it in `pendingClosure` for `approveShiftClose`.
+**Still blind** (CHG-FIN-003). The count was locked when it was submitted; this call cannot change it, and its receipt, like `submitShiftCount`'s, carries no expected figure, no variance and no over or short. The cashier gives the reason for their own shift (SHIFT_CLOSE); a supervisor may give it for somebody else's (SHIFT_CLOSE_OTHER), as on `closeShift`.
+**Above the threshold nothing changes**: the shift is `pendingVariance` and only `acceptShiftVariance` (OVERSHORT_ACCEPT, which the Supervisor and Venue Manager presets both hold: the client's "supervisor/manager approval") finalises it; this operation refuses it with 409. One threshold: a second tier for the manager is a question to the client, not decided here.
+
+|  |  |
+|---|---|
+| Permission | `SHIFT_CLOSE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | - |
+| Writes | `orders.pos_shift`, `platform.outbox` |
+| Called by | BO-040, EMP-009, POS-007 |
+| State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingClosure` -> `closed` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ShiftVarianceReasonRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | enum (tillError, unrecordedRefund, miscount, other) | yes | The same reasons as CloseShiftRequest.cashierReason (DI-803), recorded as the shift's cashierReason. |
+| note | string |  | What happened, in the cashier's words; recorded as the shift's cashierNote (appended to a note given with the count). (max length 1000) |
+
+**Response**: `ShiftCountReceipt`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| shiftId | string (uuid) | yes |  |
+| status | ShiftStatus: enum (pendingApproval, open, suspended, pendingVariance, pendingClosure, closed, autoClosed) | yes |  |
+| outcome | enum (closed, referredToSupervisor, awaitingCloseApproval) | yes | closed: within the venue's threshold, the shift is closed. |
+| countedAt | string (date-time) | yes |  |
+| countNumber | integer |  | 1 for the first count of the close, 2 for a recount the supervisor asked for, and so on. (min 1) |
+| varianceReasonRequired | boolean |  | The count found a difference within the threshold and no reason came with it (the client's policy of 6 October 2026, T10.1; CHG-R4-019). (default False) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Reason recorded; the receipt says what happens next and nothing about the variance |
+| 400 | BadRequest | Validation failed |
+| 403 |  | The shift is not the caller's own and the caller lacks SHIFT_CLOSE_OTHER at this venue (problem type not-shift-operator). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The shift is not waiting for a variance reason (problem type variance-reason-not-required): not yet counted, closed, beyond the threshold (pendingVariance), or a reason is already recorded. |
+| 422 |  | reason is other and no note says what happened (problem type reason-note-required). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDenominations
@@ -7958,6 +8025,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | items[].cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| items[].varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | items[].heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | items[].openedAt | string (date-time) | yes |  |
 | items[].recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -8087,6 +8155,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -8258,6 +8327,7 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -8373,6 +8443,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -8482,6 +8553,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -8647,6 +8719,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 **The variance goes to the supervisor, not the cashier.** Beyond the threshold an alert is raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest is the one measured.
 **The recount after a rejection** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013): once `rejectShiftVariance` has set `Shift.recountRequestedAt`, the cashier submits the recount here, at any till of the venue, because the till the shift was counted on may be the next cashier's by then (DEC-059). The receipt's `countNumber` rises and the request flags clear.
 `Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read; they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
+**A difference within the threshold closes only with a reason** (the client's policy, tracker answer T10.1 of 6 October 2026, `sources/client/2026-10-06-tracker-answers.md`: "Variances within the permitted threshold may be closed with mandatory reason capture"; CHG-R4-019). Where the count differs from the expected figure at all, by no more than `shiftVarianceThreshold`, and no `cashierReason` came with the count, the shift does not close: it is held in `pendingClosure`, the receipt's outcome is `awaitingCloseApproval` with `varianceReasonRequired: true`, and the till asks for a reason, which `giveShiftVarianceReason` records and which closes the shift. **The count is locked before the reason is asked**, so the close stays blind: the cashier learns only that a difference was found, never its amount or whether the drawer is over or short. A count that matches exactly closes with no reason; one beyond the threshold goes to the supervisor as before.
 Online only, as `closeShift`: the expected figure is the server's.
 
 |  |  |
@@ -8700,6 +8773,7 @@ Online only, as `closeShift`: the expected figure is the server's.
 | outcome | enum (closed, referredToSupervisor, awaitingCloseApproval) | yes | closed: within the venue's threshold, the shift is closed. |
 | countedAt | string (date-time) | yes |  |
 | countNumber | integer |  | 1 for the first count of the close, 2 for a recount the supervisor asked for, and so on. (min 1) |
+| varianceReasonRequired | boolean |  | The count found a difference within the threshold and no reason came with it (the client's policy of 6 October 2026, T10.1; CHG-R4-019). (default False) |
 
 **Responses**
 
@@ -8794,6 +8868,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
 | cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -9467,8 +9542,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expected_cash_amount | numeric(18,4) | no | 26 September, pull audit R207. |
 | counted_cash_amount | numeric(18,4) | no | What the close count found. |
 | variance_amount | numeric(18,4) | no | Counted minus expected, as ShiftCloseResult.variance. |
-| cashier_reason | text | no | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). |
-| cashier_note | text | no | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). |
 | held_lease_count | integer | no | Inventory leases currently held by this workstation. |
 | opened_at | timestamptz | yes |  |
 | recorded_at | timestamptz | no | When the device recorded the open. |
@@ -9481,6 +9554,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recount_reason | text | no | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). |
 | count_number | integer | no | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). |
 | synced_at | timestamptz | no | Null while the shift has unsynced operations. |
+| cashier_reason | text | yes | The same reasons as CloseShiftRequest.cashierReason (DI-803), recorded as the shift's cashierReason. |
+| cashier_note | text | no | What happened, in the cashier's words; recorded as the shift's cashierNote (appended to a note given with the count). |
 
 ### `orders.pos_shift_approval`
 

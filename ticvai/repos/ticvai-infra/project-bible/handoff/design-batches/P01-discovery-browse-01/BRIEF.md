@@ -1,6 +1,6 @@
 # P01-discovery-browse-01 — P01 · Discovery & Browse
 
-**5 screens · 22 operations · 59 schemas · 3 permissions**
+**5 screens · 22 operations · 57 schemas · 3 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

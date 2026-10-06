@@ -298,6 +298,7 @@ Everyone now has some work past 2 April, from Surendra's 55 hours to Pranay's 12
 | CMS | A flow builder | Agreed |
 | E-invoicing | A provider adapter; four questions to the client | Client |
 | Availability, biometrics | 99.99% at gate and POS; face templates stay with the vendor | Client |
+| Sizing and load acceptance | Elastic from a 1-2 POS site to a 30,000-50,000+ attendee event. Major event: 1,000-2,000 concurrent B2C users expected peak, 3,000 the initial acceptance benchmark (not a limit); 50,000+ on-sale arrivals absorbed by the edge waiting room (ADR-0066, amended 6 Oct); UAE residency first (`sources/client/2026-10-06-tracker-answers.md`, T9) | Client, 6 Oct |
 
 The client's open questions (30, with hardware and suppliers added on 30 September) are in `handoff/TICVAI - Decisions Register.xlsx`. The architecture decisions are in `docs/adr/` (index: `docs/adr/README.md`). On 1 October ADR-0052, 0053, 0054, 0061 (replica floors), 0064 (per-tenant limits), 0066 (the on-sale waiting room), 0067 (one device register) and 0068 (admission policy in Access) were accepted there; four are still **Proposed** in the same folder and wait on a decision: ADR-0060 (availability and HA), ADR-0062 (e-invoicing), ADR-0063 (encryption and biometric templates) and ADR-0065 (the on-sale availability cache).
 
@@ -317,7 +318,7 @@ The client's open questions (30, with hardware and suppliers added on 30 Septemb
 - [ ] Payment sandbox: a sale, a refund and a settlement pass.
 - [ ] The POS sells and the scanner admits with the network cut, and both reconcile when it returns.
 - [ ] Tax invoice, credit note and VAT fields match the client's answers.
-- [ ] Load test at the on-sale burst and at the venue-day mix.
+- [ ] Load test at the on-sale burst and at the venue-day mix: the client's small-site and major-event scenarios (6 October, CHG-R4-017), including 3,000 concurrent B2C users (the initial acceptance benchmark, then stepped above it: not a limit) and 50,000 simultaneous waiting-room arrivals (`block-test-strategy.md`, "Load scenarios").
 - [ ] Backups restore into a clean environment, and the restore time is written down.
 - [ ] Role grants reviewed per module; secrets in the vault; no test credentials in production.
 - [ ] Canary tenant first, then the pilot venue; the rollback rehearsed.

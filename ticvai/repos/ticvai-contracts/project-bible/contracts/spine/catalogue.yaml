@@ -2981,6 +2981,17 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Performance'
+        '422':
+          description: 'The daily window cannot produce a slot (CHG-R4-014): `recurrence.lastStartTime`
+            before `recurrence.firstStartTime`, a `slotLengthMinutes` that disagrees with `endsAt` minus
+            `startsAt`, or `firstStartTime` or `lastStartTime` given without `intervalMinutes`
+            (`slot-window-invalid`).'
+          x-ticvai-problem-types:
+          - slot-window-invalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities:
@@ -4768,6 +4779,12 @@ paths:
                   nullable: true
                   maxLength: 40
                   description: As `Performance.format` (decided 29 September, rev 3 REV3-17).
+                minutesOnScreen:
+                  type: integer
+                  minimum: 0
+                  maximum: 1440
+                  description: As `Performance.minutesOnScreen` (DI-167, DI-169; CHG-R4-014). Not a timing
+                    change, so a performance with sold tickets accepts it.
       responses:
         '200':
           headers:
@@ -14335,27 +14352,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                include:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                    - schedule
-                    - pricing
-                    - seatMap
-                    - capacityProfile
-                    - resourceRequirements
-                    - staffPlan
-                    - registrationForm
-                    - accessRules
-                shiftDatesByDays:
-                  type: integer
-                  nullable: true
-                newName:
-                  type: string
-                  nullable: true
+              $ref: '#/components/schemas/CloneEventRequest'
       responses:
         '201':
           headers:
@@ -14370,6 +14367,12 @@ paths:
                   eventId:
                     type: string
                     format: uuid
+                  code:
+                    type: string
+                    description: The copy's event code, as sent in `newCode` or as the server chose it
+                      (CHG-R4-016).
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/schedule:
@@ -20393,6 +20396,25 @@ components:
           maxLength: 200
         description:
           type: string
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: '**The product''s name in each language the venue sells in** (6 October 2026,
+            CHG-R4-011), keyed by ISO 639-1 code, e.g. `{"en": "Aquarium entry", "ar": "دخول الأكواريوم"}`.
+            Every guest surface shows the entry for the guest''s language and falls back to `name`, which
+            stays the name staff search and reports print. Null, or a language missing from it, means
+            `name` is shown. At most 200 characters per language, as `name`.
+
+            '
+        descriptionLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: 'The product''s description in each language, as `nameLocalised`; falls back to
+            `description` (6 October 2026, CHG-R4-011).
+
+            '
         kind:
           $ref: '#/components/schemas/ProductKind'
         venueId:
@@ -20703,6 +20725,16 @@ components:
           maxLength: 200
         description:
           type: string
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: See `Product.nameLocalised` (CHG-R4-011). Optional; `name` is the fallback.
+        descriptionLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: See `Product.descriptionLocalised` (CHG-R4-011). Optional; `description` is the fallback.
         kind:
           $ref: '#/components/schemas/ProductKind'
         venueId:
@@ -20770,6 +20802,17 @@ components:
           maxLength: 200
         description:
           type: string
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: See `Product.nameLocalised` (CHG-R4-011). Replaces the whole map; null clears it.
+        descriptionLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: See `Product.descriptionLocalised` (CHG-R4-011). Replaces the whole map; null clears
+            it.
         channels:
           type: array
           items:
@@ -21397,6 +21440,44 @@ components:
         parentEventId:
           type: string
           format: uuid
+    CloneEventRequest:
+      x-ticvai-persistence: none — request only
+      type: object
+      description: 'The body of `cloneEvent`. Named on 6 October 2026 (CHG-R4-016) so the clone screen
+        (BO-696) can bind its fields; the first three properties are unchanged from the inline body.
+
+        '
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+            enum:
+            - schedule
+            - pricing
+            - seatMap
+            - capacityProfile
+            - resourceRequirements
+            - staffPlan
+            - registrationForm
+            - accessRules
+        shiftDatesByDays:
+          type: integer
+          nullable: true
+        newName:
+          type: string
+          nullable: true
+        newCode:
+          type: string
+          maxLength: 64
+          nullable: true
+          x-ticvai-unique: tenant
+          description: '**The copy''s event code** (6 October 2026, CHG-R4-016). Event codes are unique per
+            tenant (`CreateEventRequest.code`, audit R108), so a copy cannot keep its source''s. A code any
+            event in the tenant already uses is refused `409 duplicate-code`. Omitted or null: the server
+            gives the copy the source''s code with the first free suffix `-2`, `-3`, ..., and returns it.
+
+            '
     Performance:
       x-ticvai-persistence: catalogue.performance
       type: object
@@ -21479,6 +21560,18 @@ components:
             apply (decided 29 September, rev 3 REV3-17).
 
             '
+        minutesOnScreen:
+          type: integer
+          minimum: 0
+          maximum: 1440
+          default: 0
+          description: '**"Minutes on screen": how long after `startsAt` the slot is still sold** (agreed
+            7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). A 10:00 slot with 10 stays on
+            the till and the guest apps until 10:10 and then drops off; 0, the default, stops selling at
+            the start time. Applies to every channel that sells the slot; the entry window is the
+            admission rules'' (`admissionRulesId`), not this.
+
+            '
     CreatePerformancesRequest:
       type: object
       required:
@@ -21509,6 +21602,22 @@ components:
           nullable: true
           maxLength: 40
           description: As `Performance.format` (decided 29 September, rev 3 REV3-17).
+        minutesOnScreen:
+          type: integer
+          minimum: 0
+          maximum: 1440
+          description: As `Performance.minutesOnScreen`; every performance of a generated series takes it
+            (DI-167, DI-169; CHG-R4-014). Omitted means 0.
+        slotLengthMinutes:
+          type: integer
+          minimum: 1
+          maximum: 1440
+          description: '**The slot length the form asks for** (DI-167, DI-995; CHG-R4-014): every generated
+            performance ends this many minutes after it starts. Optional, because `endsAt` minus `startsAt`
+            already says it for the first slot; when both are given they must agree, else `422
+            slot-window-invalid`.
+
+            '
         recurrence:
           type: object
           description: 'Generate a series rather than a single performance. **Read in the region''s time
@@ -21529,6 +21638,24 @@ components:
                 type: integer
                 minimum: 0
                 maximum: 6
+            firstStartTime:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              description: '**The first start of each day**, `HH:MM` on the region''s clock (DI-995, 24
+                September minutes M24-01; CHG-R4-014). Omitted means the time of day of `startsAt`. Each
+                day''s slots start here and repeat every `intervalMinutes`.
+
+                '
+            lastStartTime:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              description: '**The last start of each day**, `HH:MM` on the region''s clock (DI-995; CHG-R4-014):
+                no slot of the day starts after it, so a series every 30 minutes from 10:00 with a last start
+                of 17:30 makes 16 slots a day rather than running through the night. Omitted means the
+                series runs every `intervalMinutes` until `until`, as before. Before `firstStartTime` is
+                `422 slot-window-invalid`.
+
+                '
     ChannelCapacity:
       x-ticvai-persistence: catalogue.channel_capacity
       type: object

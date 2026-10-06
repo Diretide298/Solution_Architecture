@@ -1,6 +1,6 @@
 # P04-not-in-v2-01 — P04 · Screens the v2 build does not draw
 
-**7 screens · 20 operations · 41 schemas · 13 permissions**
+**7 screens · 19 operations · 38 schemas · 12 permissions**
 
 Platform P04 Venue POS · ships as **venue-pos** ·
 staff audience · posTerminal ·
@@ -52,10 +52,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 13 permissions apply here:
-  `ASSET_LIBRARY_VIEW, ATTENDANCE_RECORD, CASH_LIFT, ORDER_CREATE, ORDER_EXCHANGE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_WORKSTATION, SCOPE_VIEW, SHIFT_OPEN, WORKFORCE_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `ATTENDANCE_RECORD, CASH_LIFT, ORDER_CREATE, ORDER_EXCHANGE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_WORKSTATION, SCOPE_VIEW, SHIFT_OPEN, WORKFORCE_VIEW, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: createCashMovement, getMediaAsset, getMediaEntitlements, getTableMap, getTillShiftPolicy, listCashMovements, listDepositBoxes, listRotaAssignments
+- **10 of these operations work offline**: createCashMovement, getMediaEntitlements, getTableMap, getTillShiftPolicy, listCashMovements, listDepositBoxes, listRotaAssignments, recordAttendance
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `POS-009` | Staff Roster | A | 8 | 12 | 6 | 18 | 1 | 0 | — | notStarted (designed) |
-| `POS-010` | Add to Existing Ticket | A | 37 | 23 | 5 | 44 | 3 | 0 | — | notStarted (designed) |
+| `POS-010` | Add to Existing Ticket | A | 37 | 15 | 5 | 43 | 3 | 0 | — | notStarted (designed) |
 | `POS-015` | Cash Operations Dashboard | A | 0 | 41 | 6 | 0 | 2 | 6 | — | notStarted (designed) |
 | `POS-017` | Cash In / Cash Out Operations | A | 21 | 6 | 5 | 0 | 2 | 6 | — | notStarted (designed) |
 | `POS-018` | Safe Drop & Cash Transfer Management | A | 27 | 20 | 6 | 1 | 1 | 6 | — | notStarted (designed) |

@@ -25,6 +25,14 @@ Muhamed Allam
 
 ---
 
-**Note (filed 5 October 2026).** The email as received gave the link titles only, not the addresses. The documents
-are on the BOCA Systems support site; their URLs are to be added here when Chinmay forwards them. No URL is
-written here until then.
+**Note (filed 5 October 2026).** The email as received gave the link titles only, not the addresses.
+
+**The addresses (forwarded by Chinmay, 6 October 2026, CHG-R4-002).** The five links of the email, in its order:
+
+| Link in the email | Address |
+|---|---|
+| Printer specifications | https://tls-bocasystems.com/en/857/specifications/ |
+| SDKs: sample codes to communicate with your Boca printer | https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000051763-sample-code-and-sdk |
+| Operator manuals and programming guide | https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000068126-operator-s-manuals-and-programming-guide |
+| RFID encoding on BOCA Lemur | https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000201858 |
+| Windows drivers | https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000222844-windows-driver |

@@ -1,6 +1,6 @@
 # P02-engagement-support-02 — P02 · Engagement & Support (2 of 2)
 
-**2 screens · 8 operations · 18 schemas · 1 permissions**
+**2 screens · 8 operations · 17 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

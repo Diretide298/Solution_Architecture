@@ -220,9 +220,9 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 517,
+  "core": 518,
   "setup": 239,
-  "allOperations": 2789
+  "allOperations": 2790
  },
  "services": {
   "AccessService": {
@@ -266,9 +266,9 @@
    "total": 277
   },
   "OrderService": {
-   "core": 87,
+   "core": 88,
    "setup": 10,
-   "total": 298
+   "total": 299
   },
   "PlatformService": {
    "core": 3,
@@ -4506,15 +4506,12 @@
    "path": "/media/{mediaId}",
    "perm": "ASSET_LIBRARY_VIEW",
    "platforms": [
-    "POS",
     "WL"
    ],
    "screens": [
     "CMS-010",
     "CMS-068",
-    "CMS-082",
-    "EMP-036",
-    "POS-010"
+    "CMS-082"
    ],
    "enables": []
   },
@@ -5819,6 +5816,23 @@
    "screens": [
     "EMP-003",
     "POS-025"
+   ],
+   "enables": []
+  },
+  "giveShiftVarianceReason": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/variance-reason",
+   "perm": "SHIFT_CLOSE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-040",
+    "EMP-009",
+    "POS-007"
    ],
    "enables": []
   },

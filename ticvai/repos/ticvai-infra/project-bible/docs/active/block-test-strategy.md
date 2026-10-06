@@ -20,7 +20,7 @@
 | Module | The app-module's screens with the real back end: every state the screen YAML lists (loading, empty, error and the named ones), its navigation, its permissions | Component and interaction tests in the app; API tests for the module's operations | Integration environment, when the module completes |
 | Flow (end to end) | A journey from `flows/F*.yaml` across apps and services, step by step | Scripted journeys (web and mobile); the flow's steps are the test case | Integration environment, at the block test |
 | Offline | POS, scanner and staff app: the flow's `offlineBehaviour`: sell offline, queue, reconcile on reconnect, refuse configuration offline | Network-cut runs of the flow on a device | Integration environment, at the module test and the block test |
-| Load | Purchase and admission paths (99.99% target), on-sale waiting room, the event relay | k6 | Pre-production, once per block that adds a purchase or admission path |
+| Load | Purchase and admission paths (99.99% target), on-sale waiting room, the event relay; the small-site and major-event scenarios below ("Load scenarios"), including a 3,000-concurrent B2C run and a 50,000-arrival waiting-room run | k6 | Pre-production, once per block that adds a purchase or admission path |
 
 ## Done, for each unit
 
@@ -59,6 +59,27 @@ back-office reports and Analytics are windows onto one reporting area, so they m
 one period and one as-of time on the till (POS-008), the back office (BO-058, BO-059) and Analytics (P16), and
 fails on any difference. It is a real ticket in the block that first ships all three, run in the module test and
 again in the block test.
+
+## Load scenarios (the client's benchmarks, 6 October)
+
+The client's tracker answer T9 (6 October 2026, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-017):
+*"Load testing should cover both small-site and major-event scenarios."* For a major event, 1,000-2,000 active
+concurrent B2C users is the expected peak and **3,000 the initial performance acceptance benchmark**, not a hard
+limit; an on-sale may bring **50,000+ simultaneous visitors**, absorbed by the edge waiting room (ADR-0066, amended
+6 October). The RPS sizing in `deployment-configs-costed.md` (Part 2) stays the capacity model; these runs are the
+acceptance. All in k6, on pre-production at production size, with generated data.
+
+| Scenario | Shape | Passes when |
+|---|---|---|
+| **Small site** | One tenant with 1-2 POS and 1-2 access points and low B2C traffic (the Small tier: about 2,000 guests a day, peak about 2 RPS), on the shared platform, while a neighbouring tenant runs the major-event mix | The site runs on its starting floor with no scale-out; its POS and gate latencies do not move when the neighbour peaks (per-tenant limits, ADR-0064) |
+| **Major event, venue day** | 30,000-50,000 attendees: admission at the gates across the gate window, POS and F&B sales, and 1,000-2,000 concurrent B2C users | Admission and POS hold the go-live thresholds (development plan §11: a POS sale under 2 seconds at p95, payment failures under 2%) |
+| **Major event, 3,000 concurrent B2C** | 3,000 active concurrent B2C users browsing, holding seats and paying, held for the sale window | The purchase path holds its latency and error targets; no seat sold twice and no hold lost (ADR-0031) |
+| **Above the benchmark** | The same, stepped past 3,000 concurrent until a target slips | The platform scales out (pods, then nodes) rather than failing; the point where it slips is written down. 3,000 is not a limit |
+| **On-sale, 50,000 arrivals** | 50,000 simultaneous arrivals at the waiting room in the burst environment, admitted progressively into the sale | Arrivals cost no `commerce` request or database write; the release controller keeps the sale within its targets; nobody reaches the cart without an admission token (ADR-0066) |
+
+The small-site and venue-day runs go into the block test of the first block that adds an admission or purchase path;
+the 3,000-concurrent, above-benchmark and 50,000-arrival runs into the block that ships the on-sale path, and before
+the first large sale whichever comes first.
 
 ## Environments
 

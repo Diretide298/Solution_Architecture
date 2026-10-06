@@ -1,6 +1,6 @@
 # WS119 — AI Forecasting and Predictive Intelligence board 1
 
-**10 screens · 18 operations · 21 schemas · 4 permissions**
+**10 screens · 18 operations · 20 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 1661 |
-| Operations | 1880 |
+| Operations | 1881 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
@@ -615,7 +615,7 @@
 | `BO-037` | Offline Package Status | Sell | 1 | 8 | yes |
 | `BO-038` | Reconciliation Queue | Access & Venue | 1 | 2 | yes |
 | `BO-039` | Shift Directory | Orders & Money | 1 | 4 | yes |
-| `BO-040` | Variance Approval | Orders & Money | 1 | 8 | yes |
+| `BO-040` | Variance Approval | Orders & Money | 1 | 9 | yes |
 | `BO-041` | Cash Movements | Orders & Money | 2 | 4 | yes |
 | `BO-042` | Banking & Safe | Orders & Money | 2 | 4 | yes |
 | `BO-043` | Daily Reconciliation | Orders & Money | 1 | 12 | yes |

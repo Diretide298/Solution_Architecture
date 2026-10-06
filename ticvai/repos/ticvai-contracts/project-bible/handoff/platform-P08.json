@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1661,
-  "operations": 1880,
+  "operations": 1881,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
@@ -234,11 +234,11 @@
    "operations": 46
   },
   {
-   "contract": "subscription",
+   "contract": "tenancy",
    "operations": 45
   },
   {
-   "contract": "tenancy",
+   "contract": "subscription",
    "operations": 45
   },
   {
@@ -246,11 +246,11 @@
    "operations": 44
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {
@@ -279,7 +279,7 @@
   },
   {
    "contract": "shift",
-   "operations": 15
+   "operations": 16
   },
   {
    "contract": "venue-map",
@@ -4863,7 +4863,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/variance-approval",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {

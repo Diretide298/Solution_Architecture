@@ -1,6 +1,6 @@
 # P02-discovery-01 — P02 · Discovery
 
-**1 screens · 1 operations · 4 schemas · 0 permissions**
+**1 screens · 1 operations · 3 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

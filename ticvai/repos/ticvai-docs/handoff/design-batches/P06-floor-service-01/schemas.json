@@ -444,7 +444,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/common::OutletPaymentTiming"
      }
     ],
     "readOnly": true,

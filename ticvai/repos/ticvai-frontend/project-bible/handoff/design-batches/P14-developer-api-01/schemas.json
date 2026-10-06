@@ -264,7 +264,7 @@
     "type": "array",
     "description": "**The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one. **The platform module list** (17 September minutes, M17-05), so the licence, the scope catalogue and the modules a tenant buys are one vocabulary.\n",
     "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+     "$ref": "#/components/schemas/common::ModuleKey"
     }
    },
    "callAllowancePerMonth": {
@@ -405,7 +405,7 @@
     "description": "e.g. `ticketing.read`."
    },
    "module": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "access": {
     "type": "string",

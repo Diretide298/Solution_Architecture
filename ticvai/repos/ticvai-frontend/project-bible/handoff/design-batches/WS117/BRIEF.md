@@ -1,6 +1,6 @@
 # WS117 — AI Configuration Assistant board 2
 
-**10 screens · 8 operations · 14 schemas · 3 permissions**
+**10 screens · 8 operations · 13 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

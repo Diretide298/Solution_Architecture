@@ -470,11 +470,11 @@ contracts:
   ref: diagrams/lld/contracts/transport.yaml
 - contract: shift
   tier: spine
-  operations: 27
+  operations: 28
   holds: null
   service: OrderService
   verbs:
-    POST: 16
+    POST: 17
     GET: 9
     PUT: 2
   guestCallable: 0

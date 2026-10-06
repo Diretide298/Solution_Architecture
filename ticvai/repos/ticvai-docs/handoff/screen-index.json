@@ -14862,7 +14862,7 @@
     "carries": [
      "orderId"
     ],
-    "provenance": "derived \u2014 POS-010 declares entryState.params mediaCode, mediaId, orderId and POS-002 holds orderId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-010 declares entryState.params mediaCode, orderId and POS-002 holds orderId, so an edge into it carries them"
    },
    {
     "to": "POS-020",
@@ -16497,6 +16497,7 @@
    "listCashMovements",
    "listDenominations",
    "rejectShiftVariance",
+   "giveShiftVarianceReason",
    "getShiftCountLines",
    "closeShift",
    "listShifts"
@@ -16615,6 +16616,10 @@
     "recountRequested": {
      "operation": "rejectShiftVariance",
      "note": "The supervisor asked for a recount; the cashier recounts blind and resubmits (DEC-175; CHG-CSP-013)."
+    },
+    "reasonRequired": {
+     "operation": "giveShiftVarianceReason",
+     "note": "**\"Give a reason to close\".** The count is locked; it differed within the venue's threshold and no reason came with it, so the shift waits in pendingClosure until the cashier gives one (the client's policy of 6 October 2026, T10.1; CHG-R4-019). No amount and no over or short (CHG-FIN-003)."
     }
    },
    "transitions": [
@@ -16644,6 +16649,18 @@
      "from": "recountRequested",
      "on": "Recount",
      "to": "count"
+    },
+    {
+     "from": "summary",
+     "on": "submitShiftCount returns varianceReasonRequired",
+     "to": "reasonRequired",
+     "note": "Within the threshold but not exact, with no reason given with the count (CHG-R4-019)."
+    },
+    {
+     "from": "reasonRequired",
+     "on": "giveShiftVarianceReason",
+     "to": "summary",
+     "note": "The reason is recorded and the shift closes; the screen leaves for POS-000 as after a clean close."
     }
    ]
   },
@@ -16656,7 +16673,8 @@
    "offline": "Cannot close. Closing requires the server total, and a locally computed variance is not a variance",
    "denied": "`acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor accepts it on this till (audit R080 (e)).",
    "pendingVariance": "**Counted; \"Under review\".** `submitShiftCount` answered `referredToSupervisor`. The cashier sees \"Under review\" and no amount, **and may sign out**: the shift waits, and the next cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves it with their PIN on this till or any till of the venue (accept the variance, ask for a recount, or close it with `closeShift`), or in the daily cash reconciliation, which lists every shift of the day and resolves them one by one (decided 2 October 2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit R080 (e)).",
-   "recountRequested": "**\"Recount requested\".** A supervisor rejected the variance (`rejectShiftVariance`) with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set. The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`; a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013)."
+   "recountRequested": "**\"Recount requested\".** A supervisor rejected the variance (`rejectShiftVariance`) with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set. The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`; a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013).",
+   "reasonRequired": "**\"Give a reason to close\".** `submitShiftCount` answered `awaitingCloseApproval` with `varianceReasonRequired`: the count differed from the expected figure within the venue's threshold and no reason came with it. The count is locked; the till asks for a reason (till error, unrecorded refund, miscount, other, with a note) and `giveShiftVarianceReason` closes the shift. No amount, no over or short (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). A reason given with the count skips this step."
   },
   "overlays": [
    {
@@ -16713,6 +16731,25 @@
      ]
     },
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/reject-variance"
+   },
+   {
+    "id": "formGiveShiftVarianceReason",
+    "component": "modal",
+    "trigger": "Give the reason and close",
+    "body": "**Collects what `giveShiftVarianceReason` sends.** Required: `reason` (till error, unrecorded refund, miscount, other); `note`, required with other. Says \"Your count found a difference. Give a reason to close your shift\" and never the amount or whether it is over or short: the count is already locked (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). Dismissing sends nothing; the shift stays waiting for the reason.",
+    "confirm": {
+     "label": "Close shift",
+     "operation": "giveShiftVarianceReason"
+    },
+    "dismiss": {
+     "label": "Not yet",
+     "discards": [
+      "reason",
+      "note"
+     ]
+    },
+    "bindsTo": "ShiftVarianceReasonRequest",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/variance-reason"
    },
    {
     "id": "formCloseShiftForCashier",
@@ -16959,13 +16996,11 @@
   "operations": [
    "getMediaEntitlements",
    "appendEntitlementToMedia",
-   "getMediaAsset",
    "getCart",
    "exchangeOrderLines"
   ],
   "services": [
-   "OrderService",
-   "VenueOpsService"
+   "OrderService"
   ],
   "stores": [
    "postgres",
@@ -16974,8 +17009,6 @@
   "reads": [
    "access.entitlement",
    "access.scan_event",
-   "assets.media_asset",
-   "assets.media_usage",
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.entitlement_template",
@@ -17061,7 +17094,7 @@
    "loading": "The add existing ticket, read by `getMediaEntitlements`.",
    "error": "Could not load. Names which read failed and leaves the add existing ticket untouched.",
    "emptyFirstRun": "No add existing ticket yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`.",
    "offline": "**Not available.** The entitlement set must be read live; appending to a stale picture double-sells a locker"
   },
   "overlays": [
@@ -22221,6 +22254,7 @@
   "operations": [
    "submitShiftCount",
    "acceptShiftVariance",
+   "giveShiftVarianceReason",
    "getCurrentShift",
    "getShift",
    "listCashMovements",
@@ -22292,7 +22326,8 @@
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`; `SHIFT_CLOSE` for `submitShiftCount`; `SHIFT_SUSPEND` for `suspendShift`.",
-   "offline": "**Cannot close.** Closing needs the server total, and a locally computed variance is not a variance"
+   "offline": "**Cannot close.** Closing needs the server total, and a locally computed variance is not a variance",
+   "reasonRequired": "**\"Give a reason to close\".** `submitShiftCount` answered `awaitingCloseApproval` with `varianceReasonRequired`: the count differed within the venue's threshold and no reason came with it. The count is locked; the screen asks for a reason and `giveShiftVarianceReason` closes the shift. No amount, no over or short (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003)."
   },
   "overlays": [
    {
@@ -22322,6 +22357,25 @@
     "trigger": "Suspend shift",
     "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   },
+   {
+    "id": "formGiveShiftVarianceReason",
+    "component": "modal",
+    "trigger": "Give the reason and close",
+    "body": "**Collects what `giveShiftVarianceReason` sends.** Required: `reason` (till error, unrecorded refund, miscount, other); `note`, required with other. Says \"Your count found a difference. Give a reason to close your shift\" and never the amount or whether it is over or short: the count is already locked (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). Dismissing sends nothing; the shift stays waiting for the reason.",
+    "confirm": {
+     "label": "Close shift",
+     "operation": "giveShiftVarianceReason"
+    },
+    "dismiss": {
+     "label": "Not yet",
+     "discards": [
+      "reason",
+      "note"
+     ]
+    },
+    "bindsTo": "ShiftVarianceReasonRequest",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/variance-reason"
    },
    {
     "id": "formAcceptShiftVariance",
@@ -24538,7 +24592,7 @@
    {
     "to": "EMP-036",
     "trigger": "Issue media",
-    "provenance": "derived \u2014 EMP-036 declares entryState.params mediaCode, mediaId and EMP-034 holds none of them. The edge carries nothing: mediaCode, mediaId only pre-select (deep link or optional), and EMP-036 opens on its own"
+    "provenance": "derived \u2014 EMP-036 declares entryState.params mediaCode and EMP-034 holds none of them. The edge carries nothing: mediaCode only pre-selects (deep link or optional), and EMP-036 opens on its own"
    },
    {
     "to": "EMP-035",
@@ -24902,21 +24956,22 @@
   "operations": [
    "getMediaEntitlements",
    "appendEntitlementToMedia",
-   "getMediaAsset"
+   "setMediaBindingActivation"
   ],
   "services": [
-   "OrderService",
-   "VenueOpsService"
+   "AccessService",
+   "OrderService"
   ],
   "stores": [
    "postgres",
    "redis"
   ],
   "reads": [
+   "access.credential_binding",
    "access.entitlement",
+   "access.media_binding_rule",
+   "access.media_type",
    "access.scan_event",
-   "assets.media_asset",
-   "assets.media_usage",
    "cache:idempotency",
    "catalogue.entitlement_template",
    "orders.order_line",
@@ -24924,9 +24979,12 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order",
-   "pii.subject"
+   "pii.subject",
+   "pii.subject_biometric"
   ],
   "writes": [
+   "access.credential_binding",
+   "access.credential_event",
    "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
@@ -24968,8 +25026,8 @@
   "states": {
    "loading": "The issue media, read by `getMediaEntitlements`.",
    "error": "Could not load. Names which read failed and leaves the issue media untouched.",
-   "emptyFirstRun": "No issue media yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`.",
+   "emptyFirstRun": "Nothing is on this media yet. Offers Bind media to the ticket (`setMediaBindingActivation`) rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ACCESS_POINT_CONFIGURE` for `setMediaBindingActivation`.",
    "offline": "Issues from the local range allocated at shift start"
   },
   "overlays": [
@@ -24994,6 +25052,30 @@
      ]
     },
     "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+   },
+   {
+    "id": "formSetMediaBindingActivation",
+    "component": "modal",
+    "trigger": "Bind media to the ticket",
+    "body": "**Collects what `setMediaBindingActivation` sends before it is called.** Required: `virtualTicketId` (the guest's ticket), `mediaKind` (wristband, RFID, NFC, physical card, temporary credential) and `credentialIdUid` (read by tapping or scanning the medium, typed only as a fallback). Optional: `captureMethod`, `activationMode` (activate now by default), `provider`, `scheduledAt`. Dismissing sends nothing; the screen behind is unchanged (CHG-R4-013).",
+    "bindsTo": "MediaBindingActivationAssignmentOperationsInput",
+    "confirm": {
+     "label": "Bind media to the ticket",
+     "operation": "setMediaBindingActivation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "virtualTicketId",
+      "mediaKind",
+      "credentialIdUid",
+      "captureMethod",
+      "activationMode",
+      "provider",
+      "scheduledAt"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /media-binding-activation (CHG-R4-013)"
    }
   ]
  },
@@ -33785,7 +33867,7 @@
     "id": "formCreateProduct",
     "component": "modal",
     "trigger": "Create product",
-    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3: who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking flow the product is sold through; empty means the category's flow, then the venue's flow for its kind), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3: who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking flow the product is sold through; empty means the category's flow, then the venue's flow for its kind), decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per language with English and Arabic side by side, Arabic right to left, `name` and `description` the fallback (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreateProductRequest",
     "confirm": {
      "label": "Create product",
@@ -33799,6 +33881,8 @@
       "kind",
       "venueId",
       "description",
+      "nameLocalised",
+      "descriptionLocalised",
       "channels",
       "entitlementTemplateId",
       "dataMaskValues",
@@ -33871,7 +33955,7 @@
     "id": "formUpdateProduct",
     "component": "modal",
     "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per language (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "UpdateProductRequest",
     "confirm": {
      "label": "Save product",
@@ -33882,6 +33966,8 @@
      "discards": [
       "name",
       "description",
+      "nameLocalised",
+      "descriptionLocalised",
       "channels",
       "dataMaskValues",
       "guestListing",
@@ -34450,7 +34536,7 @@
     "id": "formCreatePromotion",
     "component": "modal",
     "trigger": "Create promotion",
-    "body": "**Collects what `createPromotion` sends before it is called.** Required: `code`, `name`, `venueId`, `discount`, `validFrom`. Optional: `description`, `conditions`, `stackingMode`, `stackingGroup`, `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPromotion` sends before it is called.** Required: `code`, `name`, `venueId`, `discount`, `validFrom`. Optional: `description`, `conditions`, `stackingMode`, `stackingGroup`, `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. **A code another promotion of the tenant already uses is refused `409 duplicate-code`** (CHG-R4-015); the form keeps what was typed and says so beside the code. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePromotionRequest",
     "confirm": {
      "label": "Create promotion",
@@ -35536,7 +35622,7 @@
     "id": "formCreatePerformances",
     "component": "modal",
     "trigger": "Create performances",
-    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `language` (BCP 47, e.g. `ar`, `fr`) and `format` (e.g. 2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `recurrence`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `language` (BCP 47, e.g. `ar`, `fr`) and `format` (e.g. 2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `minutesOnScreen` and `slotLengthMinutes` (DI-167, DI-169, DI-995), `recurrence` with `firstStartTime` and `lastStartTime` for the daily window (CHG-R4-014). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePerformancesRequest",
     "confirm": {
      "label": "Create performances",
@@ -35551,6 +35637,8 @@
       "seatMapId",
       "language",
       "format",
+      "minutesOnScreen",
+      "slotLengthMinutes",
       "recurrence"
      ]
     },
@@ -38846,7 +38934,8 @@
    "getShiftCountLines",
    "acceptShiftVariance",
    "rejectShiftVariance",
-   "closeShift"
+   "closeShift",
+   "giveShiftVarianceReason"
   ],
   "services": [
    "OrderService",
@@ -38902,7 +38991,8 @@
    "error": "Could not load. Names which read failed and leaves the variance approval untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the variance approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift`."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift` and `giveShiftVarianceReason` (for another person's shift the contract asks more, and says so on each).",
+   "reasonRequired": "**Waiting for a reason.** The selected shift's count differed within the threshold and no reason came with it (`Shift.varianceReasonRequired`); it stays `pendingClosure` until the cashier gives one at the till or a supervisor gives it here (`giveShiftVarianceReason`). The client's policy of 6 October 2026, T10.1 (CHG-R4-019)."
   },
   "overlays": [
    {
@@ -38938,6 +39028,25 @@
      ]
     },
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/reject-variance"
+   },
+   {
+    "id": "formGiveShiftVarianceReason",
+    "component": "modal",
+    "trigger": "Give the variance reason",
+    "body": "**Collects what `giveShiftVarianceReason` sends before it is called.** Required: `reason` (till error, unrecorded refund, miscount, other); `note`, required with other. Dismissing sends nothing; the shift keeps waiting for a reason (CHG-R4-019).",
+    "confirm": {
+     "label": "Close shift",
+     "operation": "giveShiftVarianceReason"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "note"
+     ]
+    },
+    "bindsTo": "ShiftVarianceReasonRequest",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/variance-reason"
    },
    {
     "id": "formCloseShift",

@@ -439,7 +439,7 @@
     "id": "formCreateProduct",
     "component": "modal",
     "trigger": "Create product",
-    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3: who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking flow the product is sold through; empty means the category's flow, then the venue's flow for its kind), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3: who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking flow the product is sold through; empty means the category's flow, then the venue's flow for its kind), decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per language with English and Arabic side by side, Arabic right to left, `name` and `description` the fallback (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreateProductRequest",
     "confirm": {
      "label": "Create product",
@@ -453,6 +453,8 @@
       "kind",
       "venueId",
       "description",
+      "nameLocalised",
+      "descriptionLocalised",
       "channels",
       "entitlementTemplateId",
       "dataMaskValues",
@@ -525,7 +527,7 @@
     "id": "formUpdateProduct",
     "component": "modal",
     "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September; `nameLocalised` and `descriptionLocalised`, the name and description per language (CHG-R4-011). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "UpdateProductRequest",
     "confirm": {
      "label": "Save product",
@@ -536,6 +538,8 @@
      "discards": [
       "name",
       "description",
+      "nameLocalised",
+      "descriptionLocalised",
       "channels",
       "dataMaskValues",
       "guestListing",
@@ -733,7 +737,9 @@
        "columns": [
         "Product.code",
         "Product.name",
+        "Product.nameLocalised",
         "Product.description",
+        "Product.descriptionLocalised",
         "Product.kind",
         "Product.onSaleFrom",
         "Product.onSaleTo",
@@ -847,6 +853,22 @@
        "operation": "updateProduct",
        "notes": "At most 200 characters per language, e.g. *Group courses are booked by phone*.",
        "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Name per language",
+       "bindsTo": "Product.nameLocalised",
+       "operation": "updateProduct",
+       "notes": "**The product name a guest reads, in each language the venue sells in** (CHG-R4-011). English and Arabic side by side; Arabic right to left; at most 200 characters per language. A language left empty shows `name`. Saved with `updateProduct`.",
+       "provenance": "contract catalogue.yaml Product.nameLocalised (6 October 2026, CHG-R4-011)"
+      },
+      {
+       "kind": "textField",
+       "label": "Description per language",
+       "bindsTo": "Product.descriptionLocalised",
+       "operation": "updateProduct",
+       "notes": "English and Arabic side by side; Arabic right to left. A language left empty shows `description`. Saved with `updateProduct` (CHG-R4-011).",
+       "provenance": "contract catalogue.yaml Product.descriptionLocalised (6 October 2026, CHG-R4-011)"
       }
      ]
     }
@@ -1906,7 +1928,7 @@
     "id": "formCreatePromotion",
     "component": "modal",
     "trigger": "Create promotion",
-    "body": "**Collects what `createPromotion` sends before it is called.** Required: `code`, `name`, `venueId`, `discount`, `validFrom`. Optional: `description`, `conditions`, `stackingMode`, `stackingGroup`, `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPromotion` sends before it is called.** Required: `code`, `name`, `venueId`, `discount`, `validFrom`. Optional: `description`, `conditions`, `stackingMode`, `stackingGroup`, `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. **A code another promotion of the tenant already uses is refused `409 duplicate-code`** (CHG-R4-015); the form keeps what was typed and says so beside the code. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePromotionRequest",
     "confirm": {
      "label": "Create promotion",
@@ -4406,7 +4428,8 @@
         "Performance.requiresApprovalToCancel",
         "Performance.status",
         "Performance.language",
-        "Performance.format"
+        "Performance.format",
+        "Performance.minutesOnScreen"
        ],
        "operation": "listPerformances",
        "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
@@ -4447,7 +4470,8 @@
         "Performance.requiresApprovalToCancel",
         "Performance.status",
         "Performance.language",
-        "Performance.format"
+        "Performance.format",
+        "Performance.minutesOnScreen"
        ],
        "operation": "getPerformance",
        "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
@@ -4494,8 +4518,8 @@
        "kind": "primaryButton",
        "label": "Create time slots",
        "operation": "createPerformances",
-       "notes": "**Time-slot creation, as the 24 September review asked (M24-01)**: start date and end date (`startsAt`, `recurrence.until`), first and last start time of the day, the interval between starts (`recurrence.intervalMinutes`, e.g. every 30 minutes), the slot length (`endsAt`), the days of the week (`recurrence.daysOfWeek`), language and format. A preview lists the slots it will create (`Prefer: validate-only`) before one is written; one performance per slot.",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September 2026, M24-01 (applied 30 September)"
+       "notes": "**Time-slot creation, as the 24 September review asked (M24-01, DI-995)**: start date and end date (`startsAt`, `recurrence.until`), first and last start time of the day (`recurrence.firstStartTime`, `recurrence.lastStartTime`), the interval between starts (`recurrence.intervalMinutes`, e.g. every 30 minutes), the slot length (`slotLengthMinutes`; the first slot's `endsAt` follows from it), the minutes on screen (`minutesOnScreen`: how long after its start a slot is still sold, e.g. 10 keeps a 10:00 slot on sale until 10:10; DI-167, DI-169), the days of the week (`recurrence.daysOfWeek`), language and format. A preview lists the slots it will create (`Prefer: validate-only`) before one is written; one performance per slot. A last start before the first is refused `422 slot-window-invalid` and the form says so beside the two times (CHG-R4-014).",
+       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September 2026, M24-01 (applied 30 September); minutes on screen and the daily window 6 October 2026 (CHG-R4-014)"
       },
       {
        "kind": "destructiveButton",
@@ -4543,7 +4567,7 @@
     "id": "formCreatePerformances",
     "component": "modal",
     "trigger": "Create performances",
-    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `language` (BCP 47, e.g. `ar`, `fr`) and `format` (e.g. 2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `recurrence`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `language` (BCP 47, e.g. `ar`, `fr`) and `format` (e.g. 2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `minutesOnScreen` and `slotLengthMinutes` (DI-167, DI-169, DI-995), `recurrence` with `firstStartTime` and `lastStartTime` for the daily window (CHG-R4-014). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePerformancesRequest",
     "confirm": {
      "label": "Create performances",
@@ -4558,6 +4582,8 @@
       "seatMapId",
       "language",
       "format",
+      "minutesOnScreen",
+      "slotLengthMinutes",
       "recurrence"
      ]
     },

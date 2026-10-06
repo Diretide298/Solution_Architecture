@@ -4524,6 +4524,7 @@ paths:
     put:
       operationId: setMediaBindingActivation
       x-ticvai-consumed-by:
+        - "P06 EMP-036 Issue media"
         - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-audience:
       - staff

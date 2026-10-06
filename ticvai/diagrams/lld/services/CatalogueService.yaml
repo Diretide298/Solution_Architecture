@@ -4268,7 +4268,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.performance
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -4419,7 +4419,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 42
+  columns: 44
   store: postgres
   parent: null
   writtenBy:

@@ -1,6 +1,6 @@
 # P16-analytics-01 — P16 · Analytics (1 of 2)
 
-**10 screens · 25 operations · 58 schemas · 10 permissions**
+**10 screens · 25 operations · 57 schemas · 10 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·

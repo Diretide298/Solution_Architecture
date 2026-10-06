@@ -1170,7 +1170,7 @@
     "description": "What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"
    },
    "mediaKind": {
-    "$ref": "#/components/schemas/MediaKind"
+    "$ref": "#/components/schemas/access::MediaKind"
    },
    "direction": {
     "$ref": "#/components/schemas/Direction"

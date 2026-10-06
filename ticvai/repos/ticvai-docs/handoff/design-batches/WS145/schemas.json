@@ -498,7 +498,7 @@
     "pattern": "^[a-z0-9-]+$"
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "body": {
     "$ref": "#/components/schemas/LocalisedRichText"
@@ -1011,7 +1011,7 @@
        "$ref": "#/components/schemas/HomepageSectionKind"
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "sortOrder": {
        "type": "integer"
@@ -1165,13 +1165,6 @@
    "type": "string"
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -1200,7 +1193,7 @@
   ],
   "properties": {
    "moduleKey": {
-    "$ref": "#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/white-label::ModuleKey"
    },
    "displayName": {
     "type": "string"
@@ -1268,7 +1261,7 @@
        "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "icon": {
        "type": "string"
@@ -1303,7 +1296,7 @@
       "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
      },
      "label": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     }
    }
@@ -1673,7 +1666,7 @@
    "maintenanceMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -1711,7 +1704,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -1733,7 +1726,7 @@
        "format": "uuid"
       },
       "name": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "city": {
        "type": "string",
@@ -1742,7 +1735,7 @@
       "openingHours": {
        "allOf": [
         {
-         "$ref": "#/components/schemas/LocalisedText"
+         "$ref": "#/components/schemas/white-label::LocalisedText"
         }
        ],
        "nullable": true,
@@ -1982,7 +1975,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -1990,7 +1983,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,

@@ -900,20 +900,6 @@
    }
   ]
  },
- "MediaKind": {
-  "type": "string",
-  "enum": [
-   "image",
-   "video",
-   "audio",
-   "document",
-   "vector",
-   "font",
-   "archive",
-   "model3d"
-  ],
-  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
- },
  "MfaMethod": {
   "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
@@ -1747,7 +1733,7 @@
     "description": "What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"
    },
    "mediaKind": {
-    "$ref": "#/components/schemas/MediaKind"
+    "$ref": "#/components/schemas/access::MediaKind"
    },
    "direction": {
     "$ref": "#/components/schemas/Direction"

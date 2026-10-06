@@ -1658,7 +1658,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -1761,12 +1761,12 @@
    "partLabel": "Navigation: menu, tab bar, Buy tickets button",
    "path": "items[].target.moduleKey",
    "label": "Target: module key",
-   "control": "field",
+   "control": "select",
    "mask": "",
    "required": false,
    "default": "—",
-   "allowed": "—",
-   "help": "",
+   "allowed": "Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty …",
+   "help": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown.",
    "effect": "",
    "configuredOn": [
     {
@@ -1776,8 +1776,10 @@
     }
    ],
    "reach": "shell",
-   "reachesText": "every guest screen (web, app and kiosk)",
-   "specific": [],
+   "reachesText": "WEB-050",
+   "specific": [
+    "WEB-050"
+   ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -2038,7 +2040,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -2565,12 +2567,12 @@
    "partLabel": "Modules shown to guests",
    "path": "modules[].moduleKey",
    "label": "Modules: module key",
-   "control": "field",
+   "control": "select",
    "mask": "",
    "required": true,
    "default": "—",
-   "allowed": "—",
-   "help": "",
+   "allowed": "Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty …",
+   "help": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown.",
    "effect": "",
    "configuredOn": [
     {
@@ -2585,8 +2587,10 @@
     }
    ],
    "reach": "shell",
-   "reachesText": "every guest screen (web, app and kiosk)",
-   "specific": [],
+   "reachesText": "WEB-050",
+   "specific": [
+    "WEB-050"
+   ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -5967,7 +5971,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -6161,7 +6165,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -6188,7 +6192,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -6318,12 +6322,12 @@
    "partLabel": "Banners",
    "path": "linkTarget.moduleKey",
    "label": "Link target: module key",
-   "control": "field",
+   "control": "select",
    "mask": "",
    "required": false,
    "default": "—",
-   "allowed": "—",
-   "help": "",
+   "allowed": "Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty …",
+   "help": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown.",
    "effect": "",
    "configuredOn": [
     {
@@ -6333,8 +6337,10 @@
     }
    ],
    "reach": "home",
-   "reachesText": "the guest home screens",
-   "specific": [],
+   "reachesText": "WEB-050",
+   "specific": [
+    "WEB-050"
+   ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6593,7 +6599,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -6620,7 +6626,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -6750,12 +6756,12 @@
    "partLabel": "Promo blocks",
    "path": "linkTarget.moduleKey",
    "label": "Link target: module key",
-   "control": "field",
+   "control": "select",
    "mask": "",
    "required": false,
    "default": "—",
-   "allowed": "—",
-   "help": "",
+   "allowed": "Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty …",
+   "help": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown.",
    "effect": "",
    "configuredOn": [
     {
@@ -6765,8 +6771,10 @@
     }
    ],
    "reach": "home",
-   "reachesText": "the guest home screens",
-   "specific": [],
+   "reachesText": "WEB-050",
+   "specific": [
+    "WEB-050"
+   ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7190,7 +7198,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -7318,7 +7326,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -7633,7 +7641,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -7947,7 +7955,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [],
    "reach": "faqs",
@@ -8031,7 +8039,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [],
    "reach": "faqs",
@@ -8156,7 +8164,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -8526,7 +8534,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -8649,7 +8657,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -9265,7 +9273,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Text keyed by locale code, one entry per locale the venue publishes.",
    "effect": "",
    "configuredOn": [
     {
@@ -9297,7 +9305,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Text keyed by locale code, one entry per locale the venue publishes.",
    "effect": "",
    "configuredOn": [
     {
@@ -9459,7 +9467,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Text keyed by locale code, one entry per locale the venue publishes.",
    "effect": "",
    "configuredOn": [
     {
@@ -9555,7 +9563,7 @@
    "required": true,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Text keyed by locale code, one entry per locale the venue publishes.",
    "effect": "",
    "configuredOn": [
     {
@@ -9683,7 +9691,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Text keyed by locale code, one entry per locale the venue publishes.",
    "effect": "",
    "configuredOn": [
     {
@@ -10334,7 +10342,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -10361,7 +10369,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -10388,7 +10396,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -10415,7 +10423,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -10604,7 +10612,7 @@
    "required": false,
    "default": "—",
    "allowed": "English and Arabic (Arabic right to left)",
-   "help": "",
+   "help": "Keyed by ISO 639-1 code. Every enabled language should be present.",
    "effect": "",
    "configuredOn": [
     {
@@ -12370,8 +12378,12 @@
   },
   "WEB-050": {
    "specific": [
+    "navigation.items[].target.moduleKey",
+    "modules.modules[].moduleKey",
     "bookingFlow.stepIndicator",
     "bookingFlow.venueOverrides[].settings.stepIndicator",
+    "banners.linkTarget.moduleKey",
+    "promoBlocks.linkTarget.moduleKey",
     "maintenance.isInMaintenance",
     "maintenance.message",
     "maintenance.expectedBackAt",

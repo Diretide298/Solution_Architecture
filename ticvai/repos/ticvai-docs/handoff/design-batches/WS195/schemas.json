@@ -193,7 +193,7 @@
     "description": "e.g. `ticketing.read`."
    },
    "module": {
-    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/common::ModuleKey"
    },
    "access": {
     "type": "string",

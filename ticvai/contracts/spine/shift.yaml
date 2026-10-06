@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Deposit Box
   version: 1.0.0
-  x-ticvai-screen-count: 25
+  x-ticvai-screen-count: 26
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]

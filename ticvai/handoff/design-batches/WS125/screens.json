@@ -350,29 +350,40 @@
       {
        "kind": "textField",
        "label": "New event name",
+       "bindsTo": "CloneEventRequest.newName",
        "operation": "cloneEvent",
        "notes": "Body newName; the source name with ' (copy)' by default.",
-       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+       "provenance": "defined 4 October 2026 (CHG-FXS-001); bound 6 October 2026 (CHG-R4-016)"
+      },
+      {
+       "kind": "textField",
+       "label": "New event code",
+       "bindsTo": "CloneEventRequest.newCode",
+       "operation": "cloneEvent",
+       "notes": "**Event codes are unique per tenant** (audit R108), so the copy needs its own. Prefilled with the source's code and the first free suffix (`-2`, `-3`, ...); a code already in use is refused `409 duplicate-code` and the form says so beside the field, keeping everything else (CHG-R4-016).",
+       "provenance": "contract catalogue.yaml CloneEventRequest.newCode (6 October 2026, CHG-R4-016)"
       },
       {
        "kind": "multiSelect",
        "label": "Copy",
+       "bindsTo": "CloneEventRequest.include",
        "operation": "cloneEvent",
        "notes": "Body include[]: the parts to copy (performances, prices, capacities, resources, content); all ticked by default.",
-       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+       "provenance": "defined 4 October 2026 (CHG-FXS-001); bound 6 October 2026 (CHG-R4-016)"
       },
       {
        "kind": "numberField",
        "label": "Move dates by (days)",
+       "bindsTo": "CloneEventRequest.shiftDatesByDays",
        "operation": "cloneEvent",
        "notes": "Body shiftDatesByDays; 0 keeps the dates, 7 moves every performance a week on.",
-       "provenance": "defined 4 October 2026 (CHG-FXS-001)"
+       "provenance": "defined 4 October 2026 (CHG-FXS-001); bound 6 October 2026 (CHG-R4-016)"
       },
       {
        "kind": "primaryButton",
        "label": "Copy event",
        "operation": "cloneEvent",
-       "notes": "On 201 opens the new event (the eventId returned) as a draft.",
+       "notes": "On 201 opens the new event (the eventId and code returned) as a draft.",
        "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {
@@ -425,7 +436,7 @@
     }
    ]
   },
-  "notes": "**Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent** (CHG-FXS-001)",
+  "notes": "**Defined 4 October 2026 from cloneEvent (include, shiftDatesByDays, newName) and getEvent** (CHG-FXS-001). **The copy takes its own event code** (`newCode`, 6 October 2026, CHG-R4-016): event codes are unique per tenant, and a duplicate is refused `409 duplicate-code`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

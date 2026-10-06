@@ -23,7 +23,6 @@ packages:
 contracts:
 - access
 - approvals
-- assets
 - catalogue
 - finance
 - fnb

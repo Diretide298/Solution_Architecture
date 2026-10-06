@@ -578,7 +578,7 @@
     "minItems": 1,
     "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
     "items": {
-     "$ref": "#/components/schemas/ModuleKey"
+     "$ref": "#/components/schemas/subscription::ModuleKey"
     }
    },
    "limits": {
@@ -637,7 +637,7 @@
   ],
   "properties": {
    "level": {
-    "$ref": "#/components/schemas/ScopeLevel"
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
    },
    "parentId": {
     "type": "string",
@@ -935,16 +935,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
- },
  "OrgUnit": {
   "x-ticvai-persistence": "platform.scope",
   "type": "object",
@@ -962,7 +952,7 @@
     "format": "uuid"
    },
    "level": {
-    "$ref": "#/components/schemas/ScopeLevel"
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
    },
    "parentId": {
     "type": "string",
@@ -1479,21 +1469,6 @@
     "description": "Required for `clientHosted`, where no in-region cloud exists."
    }
   }
- },
- "ScopeLevel": {
-  "type": "string",
-  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
-  "enum": [
-   "tenant",
-   "brand",
-   "region",
-   "venue",
-   "department",
-   "subDepartment",
-   "workstation",
-   "outlet",
-   "subject"
-  ]
  },
  "SetSubscriptionRequest": {
   "x-ticvai-persistence": "none — request only",
@@ -2033,7 +2008,7 @@
     "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
    },
    "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/subscription::LocalisedText",
     "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
    },
    "terminationScheduledAt": {

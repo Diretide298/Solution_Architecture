@@ -257,7 +257,7 @@
       "wording": {
        "allOf": [
         {
-         "$ref": "#/components/schemas/LocalisedText"
+         "$ref": "#/components/schemas/marketing-crm::LocalisedText"
         }
        ],
        "nullable": true,
@@ -460,10 +460,10 @@
     "nullable": true
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "body": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "position": {
     "type": "string",
@@ -498,7 +498,7 @@
        ]
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       }
      }
     }
@@ -518,7 +518,7 @@
      ],
      "properties": {
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "policyKind": {
        "type": "string",
@@ -552,7 +552,7 @@
        ]
       },
       "description": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "defaultOn": {
        "type": "boolean",
@@ -1172,7 +1172,7 @@
    "systemsModules": {
     "type": "array",
     "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+     "$ref": "#/components/schemas/common::ModuleKey"
     }
    },
    "countriesJurisdictions": {
@@ -1287,13 +1287,6 @@
     "format": "date-time",
     "readOnly": true
    }
-  }
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
   }
  },
  "MessageChannel": {

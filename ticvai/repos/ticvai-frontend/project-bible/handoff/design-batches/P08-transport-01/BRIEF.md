@@ -1,6 +1,6 @@
 # P08-transport-01 — P08 · Transport
 
-**7 screens · 27 operations · 34 schemas · 5 permissions**
+**7 screens · 27 operations · 32 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

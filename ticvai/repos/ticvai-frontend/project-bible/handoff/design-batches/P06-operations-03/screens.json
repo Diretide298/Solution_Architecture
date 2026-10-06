@@ -863,7 +863,7 @@
     {
      "to": "EMP-036",
      "trigger": "Issue media",
-     "provenance": "derived — EMP-036 declares entryState.params mediaCode, mediaId and EMP-034 holds none of them. The edge carries nothing: mediaCode, mediaId only pre-select (deep link or optional), and EMP-036 opens on its own"
+     "provenance": "derived — EMP-036 declares entryState.params mediaCode and EMP-034 holds none of them. The edge carries nothing: mediaCode only pre-selects (deep link or optional), and EMP-036 opens on its own"
     },
     {
      "to": "EMP-035",

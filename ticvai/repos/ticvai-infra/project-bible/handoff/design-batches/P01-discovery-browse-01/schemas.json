@@ -436,10 +436,10 @@
     "nullable": true
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "body": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "position": {
     "type": "string",
@@ -474,7 +474,7 @@
        ]
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       }
      }
     }
@@ -494,7 +494,7 @@
      ],
      "properties": {
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "policyKind": {
        "type": "string",
@@ -528,7 +528,7 @@
        ]
       },
       "description": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "defaultOn": {
        "type": "boolean",
@@ -1330,7 +1330,7 @@
        "description": "UUIDv7. The row's own key."
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "kind": {
        "type": "string",
@@ -1367,12 +1367,12 @@
           "description": "UUIDv7. The row's own key."
          },
          "title": {
-          "$ref": "#/components/schemas/LocalisedText"
+          "$ref": "#/components/schemas/white-label::LocalisedText"
          },
          "body": {
           "allOf": [
            {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            }
           ],
           "description": "The one-liner under the title, at most 140 characters in each language."
@@ -1386,7 +1386,7 @@
          "badge": {
           "allOf": [
            {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            }
           ],
           "nullable": true,
@@ -1483,10 +1483,10 @@
           "description": "The result card when this answer decides the result. Absent fields fall back to the target's own name, summary and image.",
           "properties": {
            "title": {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            },
            "body": {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            },
            "imageAssetRef": {
             "type": "string",
@@ -1592,7 +1592,7 @@
    "moduleKey": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/ModuleKey"
+      "$ref": "#/components/schemas/white-label::ModuleKey"
      }
     ],
     "nullable": true,
@@ -1690,7 +1690,7 @@
        "$ref": "#/components/schemas/HomepageSectionKind"
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "sortOrder": {
        "type": "integer"
@@ -1817,13 +1817,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -1841,9 +1834,6 @@
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Money": {
   "type": "object",
@@ -1919,7 +1909,7 @@
        "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "icon": {
        "type": "string"
@@ -1954,7 +1944,7 @@
       "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
      },
      "label": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     }
    }
@@ -2050,6 +2040,13 @@
     "nullable": true,
     "maxLength": 40,
     "description": "How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. A cinema screening shows language and format together. Null when it does not apply (decided 29 September, rev 3 REV3-17).\n"
+   },
+   "minutesOnScreen": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1440,
+    "default": 0,
+    "description": "**\"Minutes on screen\": how long after `startsAt` the slot is still sold** (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). A 10:00 slot with 10 stays on the till and the guest apps until 10:10 and then drops off; 0, the default, stops selling at the start time. Applies to every channel that sells the slot; the entry window is the admission rules' (`admissionRulesId`), not this.\n"
    }
   }
  },
@@ -2174,6 +2171,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
+   },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
    },
@@ -2278,7 +2293,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2455,7 +2470,7 @@
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2521,7 +2536,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -2689,7 +2704,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -2716,7 +2731,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -2846,7 +2861,7 @@
     "type": "array",
     "description": "The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.",
     "items": {
-     "$ref": "#/components/schemas/ModuleKey"
+     "$ref": "#/components/schemas/white-label::ModuleKey"
     }
    },
    "enabledFeatures": {
@@ -2863,7 +2878,7 @@
    "maintenanceMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -2882,7 +2897,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -3063,7 +3078,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -3082,7 +3097,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3157,7 +3172,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -3353,7 +3368,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -3361,7 +3376,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -4103,7 +4118,7 @@
     "format": "uuid"
    },
    "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/queue::LocalisedText"
    },
    "attractionProductId": {
     "type": "string",

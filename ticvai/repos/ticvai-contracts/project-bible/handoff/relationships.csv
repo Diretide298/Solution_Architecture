@@ -2338,6 +2338,7 @@ orders.pos_shift,recount_requested_by_principal_id,identity.principal,reference,
 orders.pos_shift,venue_id,platform.scope,reference,declared,yes,yes
 orders.pos_shift,via approveShiftClose,orders.pos_shift_approval,ambient,lineage,,
 orders.pos_shift,via approveShiftClose,platform.outbox,ambient,lineage,yes,
+orders.pos_shift,via giveShiftVarianceReason,platform.outbox,ambient,lineage,yes,
 orders.pos_shift,via rejectShiftVariance,orders.pos_shift_incident,ambient,lineage,,
 orders.pos_shift,workstation_id,platform.workstation,reference,declared,yes,yes
 orders.pos_shift_approval,pos_shift_id,orders.pos_shift,child,declared,,yes

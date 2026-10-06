@@ -76978,5 +76978,29 @@
    "postgres",
    "redis"
   ]
+ },
+ "giveShiftVarianceReason": {
+  "contract": "shift",
+  "verb": "POST",
+  "path": "/shifts/{shiftId}/variance-reason",
+  "reads": [],
+  "writes": [
+   "orders.pos_shift",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "SHIFT_CLOSE",
+  "offline": false,
+  "summary": "Give the reason for a difference within the threshold, and close the shift",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

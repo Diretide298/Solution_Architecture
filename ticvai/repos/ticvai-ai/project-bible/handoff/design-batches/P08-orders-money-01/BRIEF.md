@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 62 operations · 92 schemas · 21 permissions**
+**10 screens · 63 operations · 94 schemas · 21 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -172,7 +172,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-028` | Refund Approval Queue | C | 2 | 0 | 4 | 1 | 5 | 6 | — | notStarted (generated) |
 | `BO-029` | Report Builder | A | 76 | 13 | 6 | 88 | 1 | 0 | — | notStarted (generated) |
 | `BO-039` | Shift Directory | C | 4 | 21 | 6 | 1 | 2 | 6 | — | notStarted (generated) |
-| `BO-040` | Variance Approval | C | 26 | 34 | 6 | 5 | 1 | 3 | — | notStarted (generated) |
+| `BO-040` | Variance Approval | C | 28 | 38 | 7 | 5 | 1 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

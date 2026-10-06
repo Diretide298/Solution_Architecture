@@ -1,6 +1,6 @@
 # P01-membership-loyalty-value-01 — P01 · Membership, Loyalty & Value
 
-**5 screens · 52 operations · 70 schemas · 14 permissions**
+**5 screens · 52 operations · 69 schemas · 14 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

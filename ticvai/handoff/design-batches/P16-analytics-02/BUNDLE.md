@@ -420,7 +420,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Module | field | — | — | `getKpiValues` ?module |
+| Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
 | From | date picker | — | — | `getUnifiedReconciliation` ?from |
 | To | date picker | — | — | `getUnifiedReconciliation` ?to |
 | Order | picker: choose an order | — | — | `listTaxInvoices` ?orderId |

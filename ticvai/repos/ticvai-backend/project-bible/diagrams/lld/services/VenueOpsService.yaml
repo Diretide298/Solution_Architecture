@@ -3649,7 +3649,6 @@ screens:
 - P02:GST-078 Intercity Trip — Multi-trip Passes
 - P02:GST-079 Intercity Trip — Favourite Routes
 - P04:POS-002 Sell — Ticket Catalogue
-- P04:POS-010 Add to Existing Ticket
 - P06:EMP-003 Home — on duty
 - P06:EMP-004 Task list
 - P06:EMP-005 Task detail
@@ -3661,7 +3660,6 @@ screens:
 - P06:EMP-030 Venue map
 - P06:EMP-031 Queue monitor
 - P06:EMP-032 Manual wait entry
-- P06:EMP-036 Issue media
 - P06:EMP-048 Opening checklist
 - P06:EMP-050 Post-incident restore
 - P06:EMP-071 Rental Checkout Command Center

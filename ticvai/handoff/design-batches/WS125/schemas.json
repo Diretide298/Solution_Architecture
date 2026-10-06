@@ -1,4 +1,42 @@
 {
+ "CloneEventRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "description": "The body of `cloneEvent`. Named on 6 October 2026 (CHG-R4-016) so the clone screen (BO-696) can bind its fields; the first three properties are unchanged from the inline body.\n",
+  "properties": {
+   "include": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "schedule",
+      "pricing",
+      "seatMap",
+      "capacityProfile",
+      "resourceRequirements",
+      "staffPlan",
+      "registrationForm",
+      "accessRules"
+     ]
+    }
+   },
+   "shiftDatesByDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "newName": {
+    "type": "string",
+    "nullable": true
+   },
+   "newCode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "x-ticvai-unique": "tenant",
+    "description": "**The copy's event code** (6 October 2026, CHG-R4-016). Event codes are unique per tenant (`CreateEventRequest.code`, audit R108), so a copy cannot keep its source's. A code any event in the tenant already uses is refused `409 duplicate-code`. Omitted or null: the server gives the copy the source's code with the first free suffix `-2`, `-3`, ..., and returns it.\n"
+   }
+  }
+ },
  "Event": {
   "x-ticvai-persistence": "catalogue.event",
   "type": "object",

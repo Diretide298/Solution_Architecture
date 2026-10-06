@@ -2,14 +2,14 @@
  "generated": "2026-10-06",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
-  "operations": 2789,
+  "operations": 2790,
   "contracts": 33,
   "tables": 1129,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3191,
+  "relationships": 3192,
   "states": 207,
   "events": 77,
   "flows": 98,
@@ -38,29 +38,29 @@
   },
   {
    "link": "Operations declaring a service",
-   "done": 2789,
-   "total": 2789,
+   "done": 2790,
+   "total": 2790,
    "percent": 100,
    "note": "the operation is owned by one of the seventeen deployables"
   },
   {
    "link": "Operations declaring a permission",
-   "done": 2625,
-   "total": 2789,
+   "done": 2626,
+   "total": 2790,
    "percent": 94,
    "note": "the checklist a grant screen renders is built from these"
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 2762,
-   "total": 2789,
+   "done": 2763,
+   "total": 2790,
    "percent": 99,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
   },
   {
    "link": "Operations reaching a screen",
-   "done": 2551,
-   "total": 2789,
+   "done": 2552,
+   "total": 2790,
    "percent": 91,
    "note": "sync, webhook and job operations legitimately have none"
   },
@@ -87,9 +87,9 @@
   }
  ],
  "boundaries": {
-  "edgesTotal": 3191,
+  "edgesTotal": 3192,
   "insideOneService": 1941,
-  "crossingTwoServices": 1250,
+  "crossingTwoServices": 1251,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -169,7 +169,7 @@
    },
    {
     "table": "platform.outbox",
-    "edges": 49
+    "edges": 50
    },
    {
     "table": "orders.sales_order",
@@ -216,11 +216,11 @@
    "tier": "commerce",
    "contracts": 3,
    "schemas": 2,
-   "operations": 298,
+   "operations": 299,
    "tables": 115,
    "screens": 101,
-   "operationsOnAScreen": 281,
-   "edgesOut": 149,
+   "operationsOnAScreen": 282,
+   "edgesOut": 150,
    "edgesIn": 93
   },
   {
@@ -281,7 +281,7 @@
    "screens": 71,
    "operationsOnAScreen": 188,
    "edgesOut": 116,
-   "edgesIn": 366
+   "edgesIn": 367
   },
   {
    "service": "AiService",
@@ -607,10 +607,10 @@
   },
   {
    "contract": "shift",
-   "operations": 27,
-   "onAScreen": 25,
-   "withLineage": 27,
-   "withPermission": 27,
+   "operations": 28,
+   "onAScreen": 26,
+   "withLineage": 28,
+   "withPermission": 28,
    "percentOnAScreen": 93
   },
   {
@@ -723,7 +723,7 @@
    "operator": "venue",
    "screens": 96,
    "screensWithOperations": 94,
-   "distinctOperations": 222,
+   "distinctOperations": 223,
    "percentWithOperations": 98
   },
   {
@@ -745,7 +745,7 @@
    "operator": "venue",
    "screens": 1661,
    "screensWithOperations": 1608,
-   "distinctOperations": 1880,
+   "distinctOperations": 1881,
    "percentWithOperations": 97
   },
   {

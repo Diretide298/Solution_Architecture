@@ -1,6 +1,6 @@
 # P01-support-01 — P01 · Support
 
-**2 screens · 8 operations · 19 schemas · 1 permissions**
+**2 screens · 8 operations · 18 schemas · 1 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

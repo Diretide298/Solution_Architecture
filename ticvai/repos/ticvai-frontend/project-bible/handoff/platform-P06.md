@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 222 |
-| Contracts | 21 |
+| Operations | 223 |
+| Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
 | Operations with no screen | 139 |
@@ -91,7 +91,7 @@
 | `EMP-006` | Raise a task | Operations | 1 | 16 | yes |
 | `EMP-007` | Handover notes | Operations | 2 | 1 | yes |
 | `EMP-008` | Shift summary | Operations | 2 | 5 | yes |
-| `EMP-009` | End shift | Operations | 1 | 7 | yes |
+| `EMP-009` | End shift | Operations | 1 | 8 | yes |
 | `EMP-010` | Scan — ready | Operations | 1 | 5 | yes |
 | `EMP-014` | Ticket lookup | Operations | 1 | 5 | yes |
 | `EMP-015` | Group scan | Operations | 2 | 7 | yes |

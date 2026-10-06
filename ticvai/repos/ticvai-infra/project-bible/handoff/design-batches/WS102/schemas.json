@@ -621,13 +621,6 @@
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "OrgUnit": {
   "x-ticvai-persistence": "platform.scope",
   "type": "object",
@@ -645,7 +638,7 @@
     "format": "uuid"
    },
    "level": {
-    "$ref": "#/components/schemas/ScopeLevel"
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
    },
    "parentId": {
     "type": "string",
@@ -1290,21 +1283,6 @@
    }
   }
  },
- "ScopeLevel": {
-  "type": "string",
-  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
-  "enum": [
-   "tenant",
-   "brand",
-   "region",
-   "venue",
-   "department",
-   "subDepartment",
-   "workstation",
-   "outlet",
-   "subject"
-  ]
- },
  "SetPaymentProviderRequest": {
   "x-ticvai-persistence": "none — request only; the provider lands in payments.provider and its rules in payments.routing_rule",
   "description": "Request only. **A provider and the rules that route to it**, because `setPaymentProvider` is *\"configure a gateway and its routing\"* and writes both tables — and the provider schema alone carried no routing field, so the routing half had nothing to arrive in.\n",
@@ -1530,7 +1508,7 @@
     "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
    },
    "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
+    "$ref": "#/components/schemas/subscription::LocalisedText",
     "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
    },
    "terminationScheduledAt": {

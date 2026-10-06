@@ -741,208 +741,156 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
- "MediaAsset": {
-  "x-ticvai-persistence": "assets.media_asset",
+ "MediaBindingActivationAssignmentOperationsInput": {
   "type": "object",
-  "required": [
-   "id",
-   "kind",
-   "status",
-   "filename",
-   "contentType",
-   "sizeBytes",
-   "referenceCount",
-   "createdAt"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Media Binding, Activation & Assignment Operations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "id": {
+   "credentialIdUid": {
     "type": "string",
-    "format": "uuid"
+    "description": "Credential ID or UID read from the medium; for face, the biometric provider reference"
    },
-   "kind": {
-    "$ref": "#/components/schemas/MediaKind"
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket the medium is bound to"
    },
-   "status": {
-    "$ref": "#/components/schemas/MediaStatus"
-   },
-   "filename": {
-    "type": "string"
-   },
-   "contentType": {
-    "type": "string"
-   },
-   "sizeBytes": {
-    "type": "integer"
-   },
-   "title": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "description": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "rfid",
+     "nfc",
+     "wristband",
+     "physicalCard",
+     "faceRecognition",
+     "temporaryCredential"
     ],
-    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+    "description": "Medium being bound"
    },
-   "altText": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
+   "captureMethod": {
+    "type": "string",
+    "enum": [
+     "scan",
+     "tap",
+     "manualLookup",
+     "batchAssignment",
+     "encoderAssignment"
     ],
-    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+    "description": "How the medium was read or assigned"
    },
-   "width": {
-    "type": "integer",
-    "nullable": true
-   },
-   "height": {
-    "type": "integer",
-    "nullable": true
-   },
-   "durationSeconds": {
-    "type": "number",
-    "nullable": true
-   },
-   "customMetadata": {
-    "type": "object",
-    "nullable": true,
-    "additionalProperties": true,
-    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
-   },
-   "sharedWithTenantIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
-   },
-   "tags": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "categoryId": {
+   "activationMode": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+    "enum": [
+     "activateNow",
+     "schedule",
+     "activateOnFirstUse",
+     "activateOnCollection",
+     "temporaryActivation"
+    ],
+    "description": "When the bound medium becomes active"
    },
-   "venueId": {
+   "provider": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
+    "description": "Provider"
    },
-   "url": {
+   "scheduledAt": {
     "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
-   },
-   "thumbnailUrl": {
-    "type": "string",
-    "nullable": true
-   },
-   "referenceCount": {
-    "type": "integer",
-    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
-   },
-   "rights": {
-    "$ref": "#/components/schemas/MediaRights"
-   },
-   "isRightsExpired": {
-    "type": "boolean"
-   },
-   "version": {
-    "type": "integer"
-   },
-   "uploadedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Activation time when scheduled"
    }
-  }
+  },
+  "required": [
+   "virtualTicketId",
+   "mediaKind",
+   "credentialIdUid"
+  ]
  },
- "MediaAssetDetail": {
-  "x-ticvai-persistence": "assets.media_asset",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/MediaAsset"
+ "MediaBindingActivationAssignmentOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Binding, Activation & Assignment Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket the medium is bound to"
    },
-   {
-    "type": "object",
-    "properties": {
-     "derivatives": {
-      "type": "array",
-      "description": "Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n",
-      "items": {
-       "type": "object",
-       "properties": {
-        "label": {
-         "type": "string"
-        },
-        "width": {
-         "type": "integer"
-        },
-        "height": {
-         "type": "integer"
-        },
-        "sizeBytes": {
-         "type": "integer"
-        },
-        "url": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "usage": {
-      "type": "array",
-      "description": "Every place this asset is referenced.",
-      "items": {
-       "$ref": "#/components/schemas/MediaUsage"
-      }
-     },
-     "collections": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "id": {
-         "type": "string",
-         "format": "uuid"
-        },
-        "name": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "previousVersions": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "version": {
-         "type": "integer"
-        },
-        "replacedAt": {
-         "type": "string",
-         "format": "date-time"
-        },
-        "replacedByPrincipalId": {
-         "type": "string",
-         "format": "uuid"
-        }
-       }
-      }
-     }
-    }
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "rfid",
+     "nfc",
+     "wristband",
+     "physicalCard",
+     "faceRecognition",
+     "temporaryCredential"
+    ],
+    "description": "Medium being bound"
+   },
+   "virtualTicket": {
+    "type": "string",
+    "description": "Virtual Ticket"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "existingMedia": {
+    "type": "string",
+    "description": "Existing Media"
+   },
+   "credentialIdUid": {
+    "type": "string",
+    "description": "Credential ID / UID"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "activationMode": {
+    "type": "string",
+    "enum": [
+     "activateNow",
+     "schedule",
+     "activateOnFirstUse",
+     "activateOnCollection",
+     "temporaryActivation"
+    ],
+    "description": "When the bound medium becomes active"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "bindingRule": {
+    "type": "string",
+    "description": "Binding Rule"
+   },
+   "captureMethod": {
+    "type": "string",
+    "enum": [
+     "scan",
+     "tap",
+     "manualLookup",
+     "batchAssignment",
+     "encoderAssignment"
+    ],
+    "description": "How the medium was read or assigned"
+   },
+   "scheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Activation time when scheduled"
    }
+  },
+  "required": [
+   "virtualTicketId",
+   "mediaKind",
+   "credentialIdUid"
   ]
  },
  "MediaEntitlements": {
@@ -1048,54 +996,6 @@
       }
      }
     }
-   }
-  }
- },
- "MediaUsage": {
-  "x-ticvai-persistence": "assets.media_usage",
-  "type": "object",
-  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
-  "required": [
-   "surface",
-   "referenceId"
-  ],
-  "properties": {
-   "extractedText": {
-    "type": "string",
-    "description": "**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"
-   },
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "surface": {
-    "type": "string",
-    "enum": [
-     "tenantBranding",
-     "homepageBanner",
-     "promoBlock",
-     "contentPage",
-     "product",
-     "event",
-     "menuItem",
-     "merchandise",
-     "workOrder",
-     "incident",
-     "inspection",
-     "campaign"
-    ]
-   },
-   "referenceId": {
-    "type": "string"
-   },
-   "label": {
-    "type": "string"
-   },
-   "isLive": {
-    "type": "boolean",
-    "description": "True where the referencing surface is published to guests."
    }
   }
  },

@@ -1,6 +1,6 @@
 # P08-setup-go-live-01 — P08 · Setup & Go-Live
 
-**1 screens · 1 operations · 5 schemas · 1 permissions**
+**1 screens · 1 operations · 4 schemas · 1 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

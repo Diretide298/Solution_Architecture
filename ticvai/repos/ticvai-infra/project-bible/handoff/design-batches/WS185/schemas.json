@@ -288,7 +288,7 @@
    "module": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+      "$ref": "#/components/schemas/common::ModuleKey"
      }
     ],
     "nullable": true,

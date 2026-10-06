@@ -2855,7 +2855,7 @@ stateModels:
   owner: shift
   service: OrderService
   states: null
-  transitions: 13
+  transitions: 14
   initial:
   - pendingApproval
   - open
@@ -2865,11 +2865,12 @@ stateModels:
   - acceptShiftVariance
   - approveShiftOpen
   - closeShift
+  - giveShiftVarianceReason
   - reopenShift
   - resumeShift
   - submitShiftCount
   - suspendShift
-  guarded: 13
+  guarded: 14
   ref: diagrams/lld/lifecycles/shift.yaml
 - entity: Shop and drop
   contract: retail

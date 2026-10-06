@@ -1,6 +1,6 @@
 # P08-food-beverage-01 — P08 · Food & Beverage
 
-**8 screens · 40 operations · 47 schemas · 10 permissions**
+**8 screens · 40 operations · 46 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

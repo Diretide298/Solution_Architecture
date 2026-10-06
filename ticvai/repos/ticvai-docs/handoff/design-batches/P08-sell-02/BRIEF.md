@@ -1,6 +1,6 @@
 # P08-sell-02 — P08 · Sell (2 of 4)
 
-**10 screens · 56 operations · 67 schemas · 14 permissions**
+**10 screens · 56 operations · 66 schemas · 14 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -158,7 +158,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-017` | Capacity Management | B | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
 | `BO-018` | Allocation & Holds | B | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B | 49 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
 | `BO-037` | Offline Package Status | B | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-063` | Opening Hours & Calendar | B | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
 | `BO-102` | Sell | A | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |

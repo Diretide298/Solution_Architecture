@@ -1892,72 +1892,6 @@
    }
   }
  },
- "Invitation": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.invitation",
-  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
-  "required": [
-   "id",
-   "campaignId",
-   "token",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "campaignId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recipientEmail": {
-    "type": "string",
-    "format": "email",
-    "nullable": true
-   },
-   "token": {
-    "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
-   },
-   "plusOnes": {
-    "type": "integer",
-    "default": 0
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "viewed",
-     "accepted",
-     "declined",
-     "expired",
-     "revoked"
-    ]
-   },
-   "entitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "respondedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
  "LoyaltyProgramme": {
   "x-ticvai-persistence": "marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier",
   "type": "object",
@@ -3145,6 +3079,72 @@
      "thin"
     ],
     "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   }
+  }
+ },
+ "marketing-crm::Invitation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.invitation",
+  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
+  "required": [
+   "id",
+   "campaignId",
+   "token",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recipientEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "token": {
+    "type": "string",
+    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
+   },
+   "plusOnes": {
+    "type": "integer",
+    "default": 0
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "viewed",
+     "accepted",
+     "declined",
+     "expired",
+     "revoked"
+    ]
+   },
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "respondedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  }

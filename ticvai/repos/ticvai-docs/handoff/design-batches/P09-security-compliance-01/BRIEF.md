@@ -1,6 +1,6 @@
 # P09-security-compliance-01 — P09 · Security & Compliance
 
-**2 screens · 10 operations · 13 schemas · 6 permissions**
+**2 screens · 10 operations · 12 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

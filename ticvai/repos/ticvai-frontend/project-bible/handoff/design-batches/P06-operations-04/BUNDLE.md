@@ -1,6 +1,6 @@
 # P06-operations-04 — P06 · Operations (4 of 5)
 
-**10 screens · 26 operations · 39 schemas · 10 permissions**
+**10 screens · 26 operations · 38 schemas · 10 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -49,9 +49,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AI_USE, ANNOUNCEMENT_PUBLISH, APPROVAL_VIEW, ASSET_LIBRARY_VIEW, DEVICE_CONFIGURE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
+  `ACCESS_POINT_CONFIGURE, AI_USE, ANNOUNCEMENT_PUBLISH, APPROVAL_VIEW, DEVICE_CONFIGURE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **12 of these operations work offline**: acknowledgeAnnouncement, addTip, createPayment, getCurrentSession, getMediaAsset, getMediaEntitlements, listAnnouncements, listDevices
+- **11 of these operations work offline**: acknowledgeAnnouncement, addTip, createPayment, getCurrentSession, getMediaEntitlements, listAnnouncements, listDevices, listStaffConversations
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -168,7 +168,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `EMP-035` | Payment on device | C | 25 | 0 | 5 | 10 | 2 | 0 | — | notStarted (generated) |
-| `EMP-036` | Issue media | C | 8 | 10 | 5 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-036` | Issue media | C | 15 | 5 | 5 | 22 | 1 | 0 | — | notStarted (generated) |
 | `EMP-037` | Notifications | D | 1 | 34 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
 | `EMP-039` | Announcements | D | 1 | 9 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-038` | Broadcast to team | D | 12 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
@@ -373,14 +373,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
 | Block | Block C · task APP-STAFF-EMP-036 |
-| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `ORDER_CREATE`, `ORDER_VIEW` (2 read, 1 operate); in the flows as cashier |
+| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `ORDER_CREATE`, `ORDER_VIEW` (1 configure, 1 operate, 1 read); in the flows as cashier |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | Issues from the local range allocated at shift start |
-| Opens with | `mediaCode` (deepLink), `mediaId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
+| Opens with | `mediaCode` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/operations/issue-media` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **9 assets operations removed 18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.
+
+**Known gaps.** Removed 6 October 2026 (CHG-R4-013): getMediaAsset reads the digital-asset library (images, video, documents); the media this screen issues is what the guest wears (QR, wristband, RFID or NFC card). …
 
 **From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Issue media on the spot (wristband or card) so the gate can read the sale, or swap an online QR for a wristband as a zero-value transaction. After Block A.
 
@@ -403,6 +405,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or the entitlement cannot share media … (AppendRefusedProblem)
 
+**Form: Bind media to the ticket** (modal, opened by *Bind media to the ticket*; *Bind media to the ticket* calls `setMediaBindingActivation`, *Cancel* sends nothing)
+
+**Collects what `setMediaBindingActivation` sends before it is called.** Required: `virtualTicketId` (the guest's ticket), `mediaKind` (wristband, RFID, NFC, physical card, temporary credential) and `credentialIdUid` (read by tapping or scanning the medium, typed only as a fallback). Optional: `captureMethod`, `activationMode` (activate now by default), `provider`, `scheduledAt`. Dismissing sends nothing; the screen behind is unchanged (CHG-R4-013).
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Credential ID uid `credentialIdUid` | text field | required | — | — | — | Credential ID or UID read from the medium; for face, the biometric provider reference | `setMediaBindingActivation` body |
+| Virtual ticket `virtualTicketId` | text field | required | — | — | — | Virtual Ticket the medium is bound to | `setMediaBindingActivation` body |
+| Media kind `mediaKind` | select | required | — | RFID · NFC · Wristband · Physical card · Face recognition · Temporary credential | — | Medium being bound | `setMediaBindingActivation` body |
+| Capture method `captureMethod` | radio group | optional | — | Scan · Tap · Manual lookup · Batch assignment · Encoder assignment | — | How the medium was read or assigned | `setMediaBindingActivation` body |
+| Activation mode `activationMode` | radio group | optional | — | Activate now · Schedule · Activate on first use · Activate on collection · Temporary activation | — | When the bound medium becomes active | `setMediaBindingActivation` body |
+| Provider `provider` | text field | optional | — | — | — | Provider | `setMediaBindingActivation` body |
+| Scheduled at `scheduledAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Activation time when scheduled | `setMediaBindingActivation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -417,27 +433,18 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Invalid reason | text | — |
 | Entitlements | list or chips (count when long) | — |
 
-**The media asset** (detail panel, from `getMediaAsset`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Status | chip: Processing, Ready, Quarantined, Failed, Archived | — |
-| Filename | text | — |
-| Title | in the reader's language | — |
-| Description | in the reader's language | Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored. |
-| Duration seconds | 1,234.5 | — |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Append entitlement to media (primary button) | `appendEntitlementToMedia` POST `/media/{mediaCode}/entitlements` | AppendEntitlementRequest | AppendEntitlementResult | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or … | opens modal first; produces a document or message: Add something to a ticket the guest already holds |
+| Bind media to the ticket (primary button) | `setMediaBindingActivation` PUT `/media-binding-activation` | MediaBindingActivationAssignmentOperationsInput | MediaBindingActivationAssignmentOperationsView | — | opens modal first |
+| Append entitlement to media (secondary button) | `appendEntitlementToMedia` POST `/media/{mediaCode}/entitlements` | AppendEntitlementRequest | AppendEntitlementResult | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or … | opens modal first; produces a document or message: Add something to a ticket the guest already holds |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
 - **media**: The code written, the entitlements on it, and "Tap the wristband to the reader". *(source: contracts/spine/orders.yaml#getMediaEntitlements; DI-637)*
 
-**Data it reads**: `getMediaEntitlements` (onLoad, What is already on this media); `getMediaAsset` (onLoad, Read an asset with derivatives and usage)
+**Data it reads**: `getMediaEntitlements` (onLoad, What is already on this media)
 
 **Where the user goes next**
 
@@ -451,8 +458,8 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The issue media, read by `getMediaEntitlements`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the issue media untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No issue media yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing is on this media yet. Offers Bind media to the ticket (`setMediaBindingActivation`) rather than showing an empty table. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ACCESS_POINT_CONFIGURE` for `setMediaBindingActivation`. |
 | Offline (`?state=offline`) | Issues from the local range allocated at shift start |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or the entitlement cannot share media … (AppendRefusedProblem) |
 
@@ -472,13 +479,13 @@ media: Wristband WB-00418273 · Day Pass Adult
 
 - `getMediaEntitlements` → `ORDER_VIEW` (read) · staff
 - `appendEntitlementToMedia` → `ORDER_CREATE` (operate) · staff
-- `getMediaAsset` → `ASSET_LIBRARY_VIEW` (read) · staff
+- `setMediaBindingActivation` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ACCESS_POINT_CONFIGURE` for `setMediaBindingActivation`.
 
 #### Requirements it meets
 
-23 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+22 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -494,7 +501,7 @@ media: Wristband WB-00418273 · Day Pass Adult
 | 3.1.7 | Dynamic QR technology shall support memberships, annual passes, loyalty accounts, wallets, and other digital credentials in addition to standard tickets. | Admission and Access | CONTRACTED | `getMediaEntitlements` |
 | 3.2.63 | It is expected that the access code created by the system is unique and randomized to improve fraud prevention. | Admission and Access | CONTRACTED | `getMediaEntitlements` |
 | 5.4.18 | Provide digital loyalty card in app. | F&B & Guest Management | CONTRACTED | `getMediaEntitlements` |
-| … 11 more | | | | `traceability.json` |
+| … 10 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -516,12 +523,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-036?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Append entitlement to media.
+- [ ] Every action is wired with its success and its failure: Bind media to the ticket, Append entitlement to media.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
-- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`, `ORDER_CREATE`, `ORDER_VIEW`.
+- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `ORDER_CREATE`, `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -2086,7 +2093,6 @@ Method, path, parameters, request and response for every operation these screens
 "enrolMfaMethod": {"method":"POST","path":"/auth/mfa/methods","contract":"identity","summary":"Enrol an MFA method","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MfaEnrolment"},
 "getAnnouncementReach": {"method":"GET","path":"/announcements/{announcementId}/reach","contract":"workforce","summary":"Who has acknowledged, and who has not","permission":"WORKFORCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AnnouncementReach"},
 "getCurrentSession": {"method":"GET","path":"/auth/session","contract":"identity","summary":"Current session and effective permissions","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[],"requestBody":null,"responds":"Session"},
-"getMediaAsset": {"method":"GET","path":"/media/{mediaId}","contract":"assets","summary":"Read an asset with derivatives and usage","permission":"ASSET_LIBRARY_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"MediaAssetDetail"},
 "getMediaEntitlements": {"method":"GET","path":"/media/{mediaCode}/entitlements","contract":"orders","summary":"What is already on this media","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"MediaEntitlements"},
 "inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
 "listAnnouncements": {"method":"GET","path":"/announcements","contract":"workforce","summary":"What staff have been told","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"unacknowledgedOnly","in":"query","required":null}],"requestBody":null,"responds":"Announcement"},
@@ -2103,6 +2109,7 @@ Method, path, parameters, request and response for every operation these screens
 "removeMfaMethod": {"method":"DELETE","path":"/auth/mfa/methods/{methodId}","contract":"identity","summary":"Remove an MFA method","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "semanticSearch": {"method":"POST","path":"/search","contract":"ai","summary":"Search meaning, not words","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SearchResult"},
 "sendStaffMessage": {"method":"POST","path":"/staff-messages","contract":"workforce","summary":"Send a message to a colleague or a small group","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WorkforceSendStaffMessageRequest","responds":"WorkforceStaffMessage"},
+"setMediaBindingActivation": {"method":"PUT","path":"/media-binding-activation","contract":"access","summary":"Media Binding, Activation & Assignment Operations","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaBindingActivationAssignmentOperationsInput","responds":"MediaBindingActivationAssignmentOperationsView"},
 "verifyMfaEnrolment": {"method":"POST","path":"/auth/mfa/methods/{methodId}","contract":"identity","summary":"Complete enrolment","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MfaMethod"}
 }
 ```
@@ -2129,10 +2136,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DeviceKind": {"type":"string","enum":["receiptPrinter","ticketPrinter","labelPrinter","cashDrawer","barcodeScanner","rfidReader","nfcReader","cardReader","idReader","biometricReader","accessReader","paymentTerminal","customerDisplay","signageDisplay","kitchenDisplay","turnstileController","wristbandEncoder","signaturePad","scale","camera","mobileHandset","handheldScanner","accessPodium","bleBeacon"],"description":"`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"},
 "EntitlementStatus": {"type":"string","description":"**What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used from one that expired, was refunded, or was transferred to somebody else, and those are four different conversations at a gate.\nAdded 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract had no enum behind it, which the state checker reported correctly for three days.\n\n**The client's 13 Virtual Ticket statuses map onto these six** (decided 2 October 2026, Chinmay, critical set 2, BO-336: \"Map the pack's 13 names onto the model; add any missing states\"; DEC-266; CHG-CSP-033). Every name maps, so no value is added (one would be a breaking change against r1): Active is `issued`, Partially used `partiallyConsumed`, Used `fullyConsumed`, Expired `expired`, Transferred `surrendered`, Suspended and Blocked are `issued` with the suspended flag or an identity lock, and Cancelled, Voided, Refunded and Reissued / superseded are `cancelled` told apart by access `Entitlement.cancellationKind`. Created and Pending fulfilment (DI-670's Reserved) are the order before an entitlement exists. The table is `states/entitlement-status.yaml` (`pack_status_map`); access `Entitlement.lifecycleLabel` carries the name.\n","enum":["issued","partiallyConsumed","fullyConsumed","expired","cancelled","surrendered"]},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
-"MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
-"MediaAssetDetail": {"x-ticvai-persistence":"assets.media_asset","allOf":[{"$ref":"#/components/schemas/MediaAsset"},{"type":"object","properties":{"derivatives":{"type":"array","description":"Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n","items":{"type":"object","properties":{"label":{"type":"string"},"width":{"type":"integer"},"height":{"type":"integer"},"sizeBytes":{"type":"integer"},"url":{"type":"string"}}}},"usage":{"type":"array","description":"Every place this asset is referenced.","items":{"$ref":"#/components/schemas/MediaUsage"}},"collections":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"previousVersions":{"type":"array","items":{"type":"object","properties":{"version":{"type":"integer"},"replacedAt":{"type":"string","format":"date-time"},"replacedByPrincipalId":{"type":"string","format":"uuid"}}}}}}]},
+"MediaBindingActivationAssignmentOperationsInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Media Binding, Activation & Assignment Operations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"credentialIdUid":{"type":"string","description":"Credential ID or UID read from the medium; for face, the biometric provider reference"},"virtualTicketId":{"type":"string","description":"Virtual Ticket the medium is bound to"},"mediaKind":{"type":"string","enum":["rfid","nfc","wristband","physicalCard","faceRecognition","temporaryCredential"],"description":"Medium being bound"},"captureMethod":{"type":"string","enum":["scan","tap","manualLookup","batchAssignment","encoderAssignment"],"description":"How the medium was read or assigned"},"activationMode":{"type":"string","enum":["activateNow","schedule","activateOnFirstUse","activateOnCollection","temporaryActivation"],"description":"When the bound medium becomes active"},"provider":{"type":"string","description":"Provider"},"scheduledAt":{"type":"string","format":"date-time","description":"Activation time when scheduled"}},"required":["virtualTicketId","mediaKind","credentialIdUid"]},
+"MediaBindingActivationAssignmentOperationsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Binding, Activation & Assignment Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"virtualTicketId":{"type":"string","description":"Virtual Ticket the medium is bound to"},"mediaKind":{"type":"string","enum":["rfid","nfc","wristband","physicalCard","faceRecognition","temporaryCredential"],"description":"Medium being bound"},"virtualTicket":{"type":"string","description":"Virtual Ticket"},"customer":{"type":"string","description":"Customer"},"product":{"type":"string","description":"Product"},"existingMedia":{"type":"string","description":"Existing Media"},"credentialIdUid":{"type":"string","description":"Credential ID / UID"},"provider":{"type":"string","description":"Provider"},"activationMode":{"type":"string","enum":["activateNow","schedule","activateOnFirstUse","activateOnCollection","temporaryActivation"],"description":"When the bound medium becomes active"},"validity":{"type":"string","description":"Validity"},"bindingRule":{"type":"string","description":"Binding Rule"},"captureMethod":{"type":"string","enum":["scan","tap","manualLookup","batchAssignment","encoderAssignment"],"description":"How the medium was read or assigned"},"scheduledAt":{"type":"string","format":"date-time","description":"Activation time when scheduled"}},"required":["virtualTicketId","mediaKind","credentialIdUid"]},
 "MediaEntitlements": {"type":"object","x-ticvai-persistence":"none — projection over entitlement and scan history","required":["mediaCode","isValid","entitlements"],"properties":{"mediaCode":{"type":"string"},"mediaKind":{"type":"string","enum":["qr","wristband","card","nfc","mobilePass"]},"subjectId":{"type":"string","format":"uuid","nullable":true},"isValid":{"type":"boolean"},"invalidReason":{"type":"string","nullable":true},"canAcceptMore":{"type":"boolean","description":"False where the media has been surrendered, expired or blocked. A cashier should know before taking money, not after.\n"},"entitlements":{"type":"array","items":{"type":"object","properties":{"entitlementId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","enum":["admission","locker","fnb","retail","parking","rental","experience","membership"]},"orderId":{"type":"string","format":"uuid"},"addedAt":{"type":"string","format":"date-time"},"status":{"allOf":[{"$ref":"#/components/schemas/EntitlementStatus"}],"description":"**Replaced `isRedeemed` on 17 August.** A boolean could not distinguish a ticket that was used from one that expired, was refunded, or was transferred — four different conversations at a gate, and the steward could see only \"not valid\".\n"},"entriesUsed":{"type":"integer"},"entriesAllowed":{"type":"integer","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"transferredToSubjectId":{"type":"string","format":"uuid","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true}}}}}},
-"MediaUsage": {"x-ticvai-persistence":"assets.media_usage","type":"object","description":"One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n","required":["surface","referenceId"],"properties":{"extractedText":{"type":"string","description":"**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"surface":{"type":"string","enum":["tenantBranding","homepageBanner","promoBlock","contentPage","product","event","menuItem","merchandise","workOrder","incident","inspection","campaign"]},"referenceId":{"type":"string"},"label":{"type":"string"},"isLive":{"type":"boolean","description":"True where the referencing surface is published to guests."}}},
 "MfaEnrolment": {"x-ticvai-persistence":"none — transient","type":"object","required":["methodId","kind"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"},"methodId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MfaKind"},"secret":{"type":"string","nullable":true,"description":"TOTP shared secret. Returned once, at enrolment, and never again."},"qrCodeUri":{"type":"string","nullable":true},"recoveryCodes":{"type":"array","description":"Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n","items":{"type":"string"}},"expiresAt":{"type":"string","format":"date-time"}}},
 "MfaKind": {"type":"string","enum":["totp","smsOtp","emailOtp","biometric","hardwareToken"]},
 "MfaMethod": {"x-ticvai-persistence":"identity.mfa_method","type":"object","required":["id","kind","isActive","enrolledAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MfaKind"},"label":{"type":"string","nullable":true},"maskedTarget":{"type":"string","nullable":true,"description":"Partially masked destination, so a person can tell two methods apart."},"isActive":{"type":"boolean"},"isPrimary":{"type":"boolean"},"enrolledAt":{"type":"string","format":"date-time"},"lastUsedAt":{"type":"string","format":"date-time","nullable":true}}},

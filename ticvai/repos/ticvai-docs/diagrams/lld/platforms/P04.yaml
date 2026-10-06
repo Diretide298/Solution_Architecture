@@ -33,7 +33,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 94
+  operationCalls: 95
 - service: FnbService
   operationCalls: 31
 - service: CatalogueService
@@ -50,12 +50,12 @@ servicesCalled:
   operationCalls: 7
 - service: LedgerService
   operationCalls: 7
-- service: VenueOpsService
-  operationCalls: 2
 - service: WalletService
   operationCalls: 2
 - service: AccessService
   operationCalls: 2
+- service: VenueOpsService
+  operationCalls: 1
 - service: InventoryService
   operationCalls: 1
 coverage:
@@ -409,6 +409,7 @@ screens:
   - closeShift
   - getCurrentShift
   - getShiftCountLines
+  - giveShiftVarianceReason
   - listCashMovements
   - listDenominations
   - listShifts
@@ -423,6 +424,7 @@ screens:
   - loading
   - offline
   - pendingVariance
+  - reasonRequired
   - recountRequested
   offlineState: true
   entryParams:
@@ -507,7 +509,6 @@ screens:
   - appendEntitlementToMedia
   - exchangeOrderLines
   - getCart
-  - getMediaAsset
   - getMediaEntitlements
   states:
   - emptyFirstRun
@@ -518,7 +519,6 @@ screens:
   offlineState: true
   entryParams:
   - mediaCode<-deepLink
-  - mediaId<-deepLink
   - cartId<-session
   - orderId<-deepLink
   goesTo:

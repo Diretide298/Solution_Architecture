@@ -1,10 +1,10 @@
 id: LLD-OrderService
-title: OrderService — 298 operations, 116 tables
+title: OrderService — 299 operations, 116 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 298 operations, 116 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 299 operations, 116 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -28,7 +28,7 @@ why: '**The transactional core.** 298 operations, 116 tables, and the highest wr
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 298
+  operations: 299
   inAFlow: 141
   percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -2220,7 +2220,7 @@ operationsByContract:
     reads: 1
     writes: 1
 - contract: shift
-  count: 27
+  count: 28
   operations:
   - operation: acceptShiftVariance
     verb: POST
@@ -2326,6 +2326,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: giveShiftVarianceReason
+    verb: POST
+    path: /shifts/{shiftId}/variance-reason
+    scope: venue
+    permission: SHIFT_CLOSE
+    offline: false
+    reads: 0
+    writes: 2
   - operation: listCashMovements
     verb: GET
     path: /shifts/{shiftId}/cash-movements
@@ -3581,7 +3589,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 27
+  operations: 28
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3631,6 +3639,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: exchangeOrderLines
+    tables:
+    - platform.outbox
+  - operation: giveShiftVarianceReason
     tables:
     - platform.outbox
   - operation: holdResaleSettlement

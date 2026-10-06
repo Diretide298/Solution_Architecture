@@ -124,6 +124,8 @@ CHECKS = [
     "check-device-tiers",
     "check-plan-owners",
     "check-terraform-pools",
+    # 6 October (the client's tracker answers, CHG-R4-017): the load-acceptance targets are the client's figures.
+    "check-load-targets",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

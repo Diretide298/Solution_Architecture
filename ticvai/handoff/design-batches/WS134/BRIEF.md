@@ -1,6 +1,6 @@
 # WS134 — F&B Backend Structure Module Sample Reference v1.0 board 1
 
-**7 screens · 8 operations · 19 schemas · 6 permissions**
+**7 screens · 8 operations · 18 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

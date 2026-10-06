@@ -16,6 +16,9 @@ emittedBy:
 - submitShiftCount
 - approveShiftClose
 - acceptShiftVariance
+# CHG-R4-019 (the client's policy of 6 October 2026, T10.1): a difference within the threshold with no reason waits
+# in pendingClosure, and giveShiftVarianceReason closes it.
+- giveShiftVarianceReason
 payload:
 - field: shiftId
   type: uuid

@@ -233,6 +233,7 @@ class Package:
     def contracts(self) -> dict:
         def load():
             ops, schemas, params, resps = {}, {}, {}, {}
+            docs = []
             for f in sorted((ROOT / "contracts").rglob("*.yaml")):
                 text = f.read_text(encoding="utf-8")
                 try:
@@ -246,9 +247,23 @@ class Package:
                         doc = _sane(yaml.load(text, Loader=yaml.SafeLoader)) or {}
                     except Exception:
                         continue
+                docs.append((f.stem, doc))
+            # **A schema name two contracts define differently is resolved in the contract that refers
+            # to it** (6 October 2026, CHG-R4-012). Names were pooled first-come, so `access.yaml`'s
+            # `ValidateRequest.mediaKind` (`$ref: '#/components/schemas/MediaKind'`: qr, barcode, rfid,
+            # nfc ...) was drawn with `assets.yaml`'s MediaKind (image, video ... model3d), the first
+            # file read, and three scanner screens asked a gate operator to pick "Model3d". Every
+            # reference to a clashing name is rewritten to `<contract>::<Name>`, the key that contract's
+            # own definition is filed under; the bare name still finds the first definition.
+            clash = clashing_schema_names(docs)
+            for stem, doc in docs:
+                if clash:
+                    doc = qualify_refs(doc, stem, clash)
                 comp = doc.get("components") or {}
                 for n, s in (comp.get("schemas") or {}).items():
                     schemas.setdefault(n, s)
+                    if n in clash:
+                        schemas[f"{stem}::{n}"] = s
                 for n, s in (comp.get("parameters") or {}).items():
                     params.setdefault(n, s)
                 for n, s in (comp.get("responses") or {}).items():
@@ -259,7 +274,7 @@ class Package:
                     for method, op in item.items():
                         if isinstance(op, dict) and op.get("operationId"):
                             ops[op["operationId"]] = {"method": method.upper(), "path": path,
-                                                      "contract": f.stem, "op": op}
+                                                      "contract": stem, "op": op}
             return {"ops": ops, "schemas": schemas, "params": params, "responses": resps}
         return self._get("contracts", load)
 
@@ -688,8 +703,53 @@ def render_process_brief(sids: list[str]) -> str:
 # schemas: resolving, flattening, and how a field is drawn
 # ---------------------------------------------------------------------------------------------
 
-def _refname(ref: str) -> str:
+def _refkey(ref: str) -> str:
+    """The key a schema reference is filed under: `Name`, or `<contract>::Name` for a clashing name."""
     return str(ref).rsplit("/", 1)[-1]
+
+
+def _refname(ref: str) -> str:
+    """The schema's own name, for display and comparison (`access::MediaKind` -> `MediaKind`)."""
+    return _refkey(ref).rsplit("::", 1)[-1]
+
+
+_SCHEMA_REF = "#/components/schemas/"
+
+
+def _canon(x):
+    if isinstance(x, dict):
+        return {str(k): _canon(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_canon(v) for v in x]
+    return x
+
+
+def clashing_schema_names(docs) -> set:
+    """Schema names that two or more contracts define with different content (CHG-R4-012)."""
+    seen = {}
+    for _stem, doc in docs:
+        for n, s in (((doc or {}).get("components") or {}).get("schemas") or {}).items():
+            seen.setdefault(n, set()).add(json.dumps(_canon(s), sort_keys=True, default=str))
+    return {n for n, bodies in seen.items() if len(bodies) > 1}
+
+
+def qualify_refs(node, stem: str, clash: set):
+    """A copy of `node` with every schema reference to a clashing name pointed at the definition it
+    means: a local `#/components/schemas/X` at `<stem>::X`, `../shared/common.yaml#/...X` at
+    `common::X` (CHG-R4-012)."""
+    if isinstance(node, dict):
+        out = {}
+        for k, v in node.items():
+            if k == "$ref" and isinstance(v, str) and _SCHEMA_REF in v:
+                file_part, _, name = v.partition(_SCHEMA_REF)
+                if name in clash and "/" not in name:
+                    owner = pathlib.Path(file_part.split("#", 1)[0]).stem if file_part.split("#", 1)[0] else stem
+                    v = f"#/components/schemas/{owner}::{name}"
+            out[k] = qualify_refs(v, stem, clash) if k != "$ref" else v
+        return out
+    if isinstance(node, list):
+        return [qualify_refs(x, stem, clash) for x in node]
+    return node
 
 
 def resolve(node, depth: int = 0) -> tuple[dict, str | None]:
@@ -715,7 +775,7 @@ def _resolve(node, depth: int = 0) -> tuple[dict, str | None]:
             if k in node}
     if "$ref" in node:
         name = _refname(node["$ref"])
-        s, _ = resolve(PKG.schemas.get(name, {}), depth + 1)
+        s, _ = resolve(PKG.schemas.get(_refkey(node["$ref"]), {}), depth + 1)
         return ({**s, **meta} if meta else s), name
     if "allOf" in node:
         parts = [p for p in node["allOf"] if isinstance(p, dict)]

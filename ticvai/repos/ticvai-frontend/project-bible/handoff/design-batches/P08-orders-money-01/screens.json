@@ -3717,9 +3717,11 @@
         "Shift.depositBoxCode",
         "Shift.bagNumber",
         "Shift.countedCash",
-        "Shift.variance"
+        "Shift.variance",
+        "Shift.varianceReasonRequired"
        ],
        "operation": "listShifts",
+       "notes": "Waiting for a decision: beyond the threshold (pendingVariance, accept or reject), or within it with no reason yet (`varianceReasonRequired`, the client's policy of 6 October 2026, T10.1; CHG-R4-019).",
        "provenance": "contract shift.yaml GET /shifts"
       },
       {
@@ -3755,9 +3757,13 @@
         "Shift.salesTotal",
         "Shift.refundsTotal",
         "Shift.liftsTotal",
-        "Shift.variance"
+        "Shift.variance",
+        "Shift.cashierReason",
+        "Shift.cashierNote",
+        "Shift.varianceReasonRequired"
        ],
        "operation": "getShift",
+       "notes": "Every variance with its reason, for the audit and the report the client asked for (T10.1, 6 October 2026; CHG-R4-019): the reason given with the count or after it, and the approvals.",
        "provenance": "contract shift.yaml GET /shifts/{shiftId}"
       },
       {
@@ -3794,6 +3800,14 @@
        "operation": "closeShift",
        "notes": "Supervisor close of a pending shift (pre-apply round: closeShift on POS-007 and the daily reconciliation).",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Give the variance reason",
+       "operation": "giveShiftVarianceReason",
+       "permission": "SHIFT_CLOSE",
+       "notes": "For a shift waiting for a reason (`varianceReasonRequired`): a difference within the threshold with no reason from the cashier. The supervisor records the reason and the shift closes (the client's policy of 6 October 2026, T10.1; CHG-R4-019). Beyond the threshold the shift needs Accept variance (OVERSHORT_ACCEPT: the Supervisor and Venue Manager presets).",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/variance-reason"
       }
      ]
     }
@@ -3804,7 +3818,8 @@
    "error": "Could not load. Names which read failed and leaves the variance approval untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the variance approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift`."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift` and `giveShiftVarianceReason` (for another person's shift the contract asks more, and says so on each).",
+   "reasonRequired": "**Waiting for a reason.** The selected shift's count differed within the threshold and no reason came with it (`Shift.varianceReasonRequired`); it stays `pendingClosure` until the cashier gives one at the till or a supervisor gives it here (`giveShiftVarianceReason`). The client's policy of 6 October 2026, T10.1 (CHG-R4-019)."
   },
   "apis": [
    {
@@ -3859,6 +3874,12 @@
     "purpose": "Blind close-out",
     "trigger": "onAction",
     "provenance": "design-note correction, 2 October 2026 (BO-040)"
+   },
+   {
+    "operationId": "giveShiftVarianceReason",
+    "contract": "shift",
+    "purpose": "Record the reason for a difference within the threshold and close the shift (the client's policy of 6 October 2026, T10.1; CHG-R4-019)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -3968,6 +3989,25 @@
      ]
     },
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/reject-variance"
+   },
+   {
+    "id": "formGiveShiftVarianceReason",
+    "component": "modal",
+    "trigger": "Give the variance reason",
+    "body": "**Collects what `giveShiftVarianceReason` sends before it is called.** Required: `reason` (till error, unrecorded refund, miscount, other); `note`, required with other. Dismissing sends nothing; the shift keeps waiting for a reason (CHG-R4-019).",
+    "confirm": {
+     "label": "Close shift",
+     "operation": "giveShiftVarianceReason"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "note"
+     ]
+    },
+    "bindsTo": "ShiftVarianceReasonRequest",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/variance-reason"
    },
    {
     "id": "formCloseShift",

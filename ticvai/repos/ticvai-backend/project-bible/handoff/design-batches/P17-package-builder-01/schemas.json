@@ -84,7 +84,7 @@
     "minItems": 1,
     "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
     "items": {
-     "$ref": "#/components/schemas/ModuleKey"
+     "$ref": "#/components/schemas/subscription::ModuleKey"
     }
    },
    "limits": {

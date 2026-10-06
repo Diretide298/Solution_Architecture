@@ -1257,7 +1257,7 @@
    "text": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/marketing-crm::LocalisedText"
      }
     ],
     "description": "The question as the guest reads it, per locale."
@@ -1265,7 +1265,7 @@
    "helpText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/marketing-crm::LocalisedText"
      }
     ],
     "nullable": true
@@ -1876,7 +1876,7 @@
        "description": "UUIDv7. The row's own key."
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "kind": {
        "type": "string",
@@ -1913,12 +1913,12 @@
           "description": "UUIDv7. The row's own key."
          },
          "title": {
-          "$ref": "#/components/schemas/LocalisedText"
+          "$ref": "#/components/schemas/white-label::LocalisedText"
          },
          "body": {
           "allOf": [
            {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            }
           ],
           "description": "The one-liner under the title, at most 140 characters in each language."
@@ -1932,7 +1932,7 @@
          "badge": {
           "allOf": [
            {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            }
           ],
           "nullable": true,
@@ -2029,10 +2029,10 @@
           "description": "The result card when this answer decides the result. Absent fields fall back to the target's own name, summary and image.",
           "properties": {
            "title": {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            },
            "body": {
-            "$ref": "#/components/schemas/LocalisedText"
+            "$ref": "#/components/schemas/white-label::LocalisedText"
            },
            "imageAssetRef": {
             "type": "string",
@@ -2138,7 +2138,7 @@
    "moduleKey": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/ModuleKey"
+      "$ref": "#/components/schemas/white-label::ModuleKey"
      }
     ],
     "nullable": true,
@@ -2236,7 +2236,7 @@
        "$ref": "#/components/schemas/HomepageSectionKind"
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "sortOrder": {
        "type": "integer"
@@ -2371,13 +2371,6 @@
    "type": "string"
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -2417,7 +2410,7 @@
   ],
   "properties": {
    "moduleKey": {
-    "$ref": "#/components/schemas/ModuleKey"
+    "$ref": "#/components/schemas/white-label::ModuleKey"
    },
    "displayName": {
     "type": "string"
@@ -2485,7 +2478,7 @@
        "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "icon": {
        "type": "string"
@@ -2520,7 +2513,7 @@
       "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
      },
      "label": {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     }
    }
@@ -2543,7 +2536,7 @@
     "format": "uuid"
    },
    "level": {
-    "$ref": "#/components/schemas/ScopeLevel"
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
    },
    "parentId": {
     "type": "string",
@@ -2837,6 +2830,24 @@
    "description": {
     "type": "string"
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The product's description in each language, as `nameLocalised`; falls back to `description` (6 October 2026, CHG-R4-011).\n"
+   },
    "kind": {
     "$ref": "#/components/schemas/ProductKind"
    },
@@ -2941,7 +2952,7 @@
    "notBookableLabel": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3118,7 +3129,7 @@
    "description": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3184,7 +3195,7 @@
    "label": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
@@ -3260,7 +3271,7 @@
    "altText": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true
@@ -3287,7 +3298,7 @@
    "note": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3409,21 +3420,6 @@
     "type": "boolean"
    }
   }
- },
- "ScopeLevel": {
-  "type": "string",
-  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
-  "enum": [
-   "tenant",
-   "brand",
-   "region",
-   "venue",
-   "department",
-   "subDepartment",
-   "workstation",
-   "outlet",
-   "subject"
-  ]
  },
  "SeoMetadata": {
   "type": "object",
@@ -3730,7 +3726,7 @@
     "type": "boolean"
    },
    "maintenanceMessage": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/white-label::LocalisedText"
    },
    "expectedBackAt": {
     "type": "string",
@@ -3749,7 +3745,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -3824,7 +3820,7 @@
        "description": "When the release reached the tenant's cell."
       },
       "notes": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       }
      }
     }
@@ -3977,7 +3973,7 @@
    "maintenanceMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -4015,7 +4011,7 @@
    "availabilityMessage": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,
@@ -4037,7 +4033,7 @@
        "format": "uuid"
       },
       "name": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/white-label::LocalisedText"
       },
       "city": {
        "type": "string",
@@ -4046,7 +4042,7 @@
       "openingHours": {
        "allOf": [
         {
-         "$ref": "#/components/schemas/LocalisedText"
+         "$ref": "#/components/schemas/white-label::LocalisedText"
         }
        ],
        "nullable": true,
@@ -4346,7 +4342,7 @@
    "address": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true
@@ -4354,7 +4350,7 @@
    "openingHours": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/LocalisedText"
+      "$ref": "#/components/schemas/white-label::LocalisedText"
      }
     ],
     "nullable": true,

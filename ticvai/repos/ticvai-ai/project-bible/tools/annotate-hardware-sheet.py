@@ -122,8 +122,13 @@ DECISIONS = {
 DOCUMENTS = {
     'Boca Printer Integration': (
         '5 Oct 2026, Muhamed Allam: printer specifications; SDK sample codes; operator manuals and FGL programming '
-        'guide; RFID encoding on the BOCA Lemur; Windows driver (link titles only, URLs pending; '
-        'sources/client/2026-10-05-allam-boca-printer.md).'),
+        'guide; RFID encoding on the BOCA Lemur; Windows driver (sources/client/2026-10-05-allam-boca-printer.md).\n'
+        'Specifications: https://tls-bocasystems.com/en/857/specifications/\n'
+        'SDK sample code: https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000051763-sample-code-and-sdk\n'
+        'Operator manuals and programming guide: https://tlsbocasystems.freshdesk.com/support/solutions/articles/'
+        '62000068126-operator-s-manuals-and-programming-guide\n'
+        'RFID encoding on the Lemur: https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000201858\n'
+        'Windows driver: https://tlsbocasystems.freshdesk.com/support/solutions/articles/62000222844-windows-driver'),
     'Turnstile Reader Integration': 'Turnstile SDK: outstanding since 5 Aug 2026 (ADR-0015).',
     'RFID Reader Integration': ('RFID reader specifications and reference data: asked for on 19 Aug 2026 (MoM 19 Aug), '
                                 'still pending.'),

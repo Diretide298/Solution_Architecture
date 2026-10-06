@@ -273,10 +273,10 @@
     "nullable": true
    },
    "title": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "body": {
-    "$ref": "#/components/schemas/LocalisedText"
+    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
    },
    "position": {
     "type": "string",
@@ -311,7 +311,7 @@
        ]
       },
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       }
      }
     }
@@ -331,7 +331,7 @@
      ],
      "properties": {
       "label": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "policyKind": {
        "type": "string",
@@ -365,7 +365,7 @@
        ]
       },
       "description": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "defaultOn": {
        "type": "boolean",

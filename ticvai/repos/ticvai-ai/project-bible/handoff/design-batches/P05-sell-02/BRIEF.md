@@ -1,6 +1,6 @@
 # P05-sell-02 — P05 · Sell (2 of 2)
 
-**6 screens · 12 operations · 51 schemas · 4 permissions**
+**6 screens · 12 operations · 50 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·

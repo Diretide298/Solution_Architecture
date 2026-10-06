@@ -1,6 +1,6 @@
 # P06-operations-04 — P06 · Operations (4 of 5)
 
-**10 screens · 26 operations · 39 schemas · 10 permissions**
+**10 screens · 26 operations · 38 schemas · 10 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -49,9 +49,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AI_USE, ANNOUNCEMENT_PUBLISH, APPROVAL_VIEW, ASSET_LIBRARY_VIEW, DEVICE_CONFIGURE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
+  `ACCESS_POINT_CONFIGURE, AI_USE, ANNOUNCEMENT_PUBLISH, APPROVAL_VIEW, DEVICE_CONFIGURE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **12 of these operations work offline**: acknowledgeAnnouncement, addTip, createPayment, getCurrentSession, getMediaAsset, getMediaEntitlements, listAnnouncements, listDevices
+- **11 of these operations work offline**: acknowledgeAnnouncement, addTip, createPayment, getCurrentSession, getMediaEntitlements, listAnnouncements, listDevices, listStaffConversations
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -168,7 +168,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `EMP-035` | Payment on device | C | 25 | 0 | 5 | 10 | 2 | 0 | — | notStarted (generated) |
-| `EMP-036` | Issue media | C | 8 | 10 | 5 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-036` | Issue media | C | 15 | 5 | 5 | 22 | 1 | 0 | — | notStarted (generated) |
 | `EMP-037` | Notifications | D | 1 | 34 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
 | `EMP-039` | Announcements | D | 1 | 9 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-038` | Broadcast to team | D | 12 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |

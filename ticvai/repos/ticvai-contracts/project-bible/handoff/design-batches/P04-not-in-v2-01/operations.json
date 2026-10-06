@@ -99,19 +99,6 @@
   "requestBody": null,
   "responds": "GuestMenu"
  },
- "getMediaAsset": {
-  "method": "GET",
-  "path": "/media/{mediaId}",
-  "contract": "assets",
-  "summary": "Read an asset with derivatives and usage",
-  "permission": "ASSET_LIBRARY_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MediaAssetDetail"
- },
  "getMediaEntitlements": {
   "method": "GET",
   "path": "/media/{mediaCode}/entitlements",

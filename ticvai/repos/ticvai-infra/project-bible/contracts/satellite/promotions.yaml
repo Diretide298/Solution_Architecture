@@ -516,6 +516,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}:
@@ -8730,6 +8732,12 @@ components:
           type: string
           maxLength: 64
           pattern: ^[A-Za-z0-9_-]+$
+          x-ticvai-unique: tenant
+          description: '**Unique per tenant** (6 October 2026, CHG-R4-015; the rule of audit R108 for
+            configuration codes). A code already used by any promotion in the tenant, at any venue and in
+            any state, is refused by `createPromotion` with `409 duplicate-code`. Compared case-insensitively.
+
+            '
         name:
           type: string
           maxLength: 200

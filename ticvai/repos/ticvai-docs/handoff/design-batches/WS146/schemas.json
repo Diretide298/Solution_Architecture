@@ -354,7 +354,7 @@
        ]
       },
       "title": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "numbered": {
        "type": "boolean",
@@ -366,7 +366,7 @@
        "description": "The signatory must tick \"I have read and understood this section\" before continuing."
       },
       "acknowledgementText": {
-       "$ref": "#/components/schemas/LocalisedText"
+       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
       },
       "showWhen": {
        "type": "object",
@@ -434,7 +434,7 @@
           ]
          },
          "content": {
-          "$ref": "#/components/schemas/LocalisedText"
+          "$ref": "#/components/schemas/marketing-crm::LocalisedText"
          },
          "assetId": {
           "type": "string",
@@ -480,13 +480,6 @@
     "format": "date-time",
     "readOnly": true
    }
-  }
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
   }
  },
  "MessageChannel": {

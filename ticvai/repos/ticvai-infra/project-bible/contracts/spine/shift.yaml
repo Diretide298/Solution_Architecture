@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Deposit Box
   version: 1.0.0
-  x-ticvai-screen-count: 25
+  x-ticvai-screen-count: 26
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -1140,6 +1140,12 @@ paths:
         R080 (e)): a supervisor accepts the variance on the till. The close is not held for a PIN
         before this call, and no approval request is raised for it.
 
+        **Within the threshold, a difference closes only with a reason** (the client's policy of 6
+        October 2026, T10.1; CHG-R4-019): a non-zero variance within the threshold with no
+        `cashierReason` in the body holds the shift in `pendingClosure` with
+        `ShiftCloseResult.varianceReasonRequired` true, until `giveShiftVarianceReason` (the supervisor,
+        who sees the variance here, may give it at once) or `approveShiftClose` records one.
+
         Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
 
         Where the venue requires approval on close, the shift waits in `pendingClosure` for
@@ -1535,6 +1541,17 @@ paths:
         `Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read;
         they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
 
+        **A difference within the threshold closes only with a reason** (the client's policy, tracker
+        answer T10.1 of 6 October 2026, `sources/client/2026-10-06-tracker-answers.md`: "Variances within
+        the permitted threshold may be closed with mandatory reason capture"; CHG-R4-019). Where the count
+        differs from the expected figure at all, by no more than `shiftVarianceThreshold`, and no
+        `cashierReason` came with the count, the shift does not close: it is held in `pendingClosure`, the
+        receipt's outcome is `awaitingCloseApproval` with `varianceReasonRequired: true`, and the till asks
+        for a reason, which `giveShiftVarianceReason` records and which closes the shift. **The count is
+        locked before the reason is asked**, so the close stays blind: the cashier learns only that a
+        difference was found, never its amount or whether the drawer is over or short. A count that
+        matches exactly closes with no reason; one beyond the threshold goes to the supervisor as before.
+
         Online only, as `closeShift`: the expected figure is the server's.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
@@ -1576,6 +1593,95 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /shifts/{shiftId}/variance-reason:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: giveShiftVarianceReason
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-040 Variance Approval"
+      x-ticvai-audience: [staff]
+      summary: Give the reason for a difference within the threshold, and close the shift
+      description: >
+        **The client's policy for a variance within tolerance** (tracker answer T10.1, 6 October 2026,
+        `sources/client/2026-10-06-tracker-answers.md`: "The system should support configurable cash
+        variance tolerance. Variances within the permitted threshold may be closed with mandatory reason
+        capture. Variances exceeding the threshold should require supervisor/manager approval. All
+        variances and approvals must be fully audited and reported."; CHG-R4-019). Until 6 October a
+        difference within `shiftVarianceThreshold` closed the shift with no reason at all
+        (`CloseShiftRequest.cashierReason` was optional).
+
+        **From `pendingClosure` with `Shift.varianceReasonRequired` true only**: the count found a
+        difference within the threshold and no `cashierReason` came with it (`submitShiftCount`,
+        `closeShift`). Records `reason` and `note` as the shift's `cashierReason` and `cashierNote`,
+        writes the audit record (who, when, which shift) and closes the shift (`closed`, emitting
+        `shift.closed`), or, where the venue supervises every close (`TillShiftPolicy.requireCloseApproval`),
+        leaves it in `pendingClosure` for `approveShiftClose`.
+
+        **Still blind** (CHG-FIN-003). The count was locked when it was submitted; this call cannot change
+        it, and its receipt, like `submitShiftCount`'s, carries no expected figure, no variance and no over
+        or short. The cashier gives the reason for their own shift (SHIFT_CLOSE); a supervisor may give it
+        for somebody else's (SHIFT_CLOSE_OTHER), as on `closeShift`.
+
+        **Above the threshold nothing changes**: the shift is `pendingVariance` and only
+        `acceptShiftVariance` (OVERSHORT_ACCEPT, which the Supervisor and Venue Manager presets both hold:
+        the client's "supervisor/manager approval") finalises it; this operation refuses it with 409.
+        One threshold: a second tier for the manager is a question to the client, not decided here.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ShiftVarianceReasonRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Reason recorded; the receipt says what happens next and nothing about the variance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShiftCountReceipt' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403':
+          description: >
+            The shift is not the caller's own and the caller lacks SHIFT_CLOSE_OTHER at this venue (problem
+            type `not-shift-operator`).
+          x-ticvai-problem-types: [not-shift-operator]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            The shift is not waiting for a variance reason (problem type `variance-reason-not-required`): not
+            yet counted, closed, beyond the threshold (`pendingVariance`), or a reason is already recorded.
+          x-ticvai-problem-types: [variance-reason-not-required]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            `reason` is `other` and no `note` says what happened (problem type `reason-note-required`).
+          x-ticvai-problem-types: [reason-note-required]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
   /shifts/{shiftId}/approve-close:
     parameters:
       - name: shiftId
@@ -1601,6 +1707,11 @@ paths:
         **This never accepts a variance** (decided 28 September, audit R080 (e)): it releases a close
         the venue chose to supervise, and a variance above the threshold still goes to
         `acceptShiftVariance`, the only path for one.
+
+        **It also releases a shift held for a variance reason** (CHG-R4-019): a difference within the
+        threshold that came with no reason (`Shift.varianceReasonRequired`). The approver's `reason` is
+        then recorded as the variance reason, so the close is never without one, and a client built
+        before `giveShiftVarianceReason` existed still has a way to close the shift.
       tags: [shift]
       x-ticvai-permission: SHIFT_APPROVE_CLOSE
       x-ticvai-scope-level: venue
@@ -2224,7 +2335,9 @@ components:
           description: >
             Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund,
             miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the
-            supervisor reads it beside the variance on BO-040.
+            supervisor reads it beside the variance on BO-040. **Optional here, never skipped where it
+            matters** (CHG-R4-019): if the count differs within the threshold and this is empty, the
+            shift waits for `giveShiftVarianceReason` before it closes.
         releaseHeldLeases:
           type: boolean
           default: true
@@ -2254,6 +2367,14 @@ components:
             True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The
             shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit
             R080 (e)).
+        varianceReasonRequired:
+          type: boolean
+          default: false
+          description: >
+            True when the variance is non-zero and within the threshold and the body gave no
+            `cashierReason`: the shift is held in `pendingClosure` until `giveShiftVarianceReason` or
+            `approveShiftClose` records a reason (the client's policy of 6 October 2026, T10.1;
+            CHG-R4-019).
         nonCashVariances:
           type: array
           items:
@@ -2282,12 +2403,46 @@ components:
             `closed`: within the venue's threshold, the shift is closed. `referredToSupervisor`: a
             supervisor reviews the count (`pendingVariance`); the till says "Your count is with your
             supervisor" and nothing about the amount. `awaitingCloseApproval`: the venue supervises
-            every close (`pendingClosure`).
+            every close (`pendingClosure`), or, with `varianceReasonRequired` true, the shift waits for
+            the cashier's reason for a difference within the threshold (CHG-R4-019).
         countedAt: { type: string, format: date-time }
         countNumber:
           type: integer
           minimum: 1
           description: 1 for the first count of the close, 2 for a recount the supervisor asked for, and so on.
+        varianceReasonRequired:
+          type: boolean
+          default: false
+          description: >
+            **The count found a difference within the threshold and no reason came with it** (the client's
+            policy of 6 October 2026, T10.1; CHG-R4-019). The shift is held in `pendingClosure` (outcome
+            `awaitingCloseApproval`) and the till asks for a reason (`giveShiftVarianceReason`), which closes
+            it. Says only that a difference exists: never its amount or direction, and the count is already
+            locked (CHG-FIN-003). False when the count matched, when a `cashierReason` came with it, and
+            beyond the threshold (`referredToSupervisor`).
+
+    ShiftVarianceReasonRequest:
+      x-ticvai-persistence: orders.pos_shift
+      type: object
+      description: >
+        The reason for a difference within the threshold, given after the blind count is locked
+        (`giveShiftVarianceReason`; the client's policy of 6 October 2026, T10.1; CHG-R4-019).
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          enum: [tillError, unrecordedRefund, miscount, other]
+          x-ticvai-column: cashier_reason
+          description: >
+            The same reasons as `CloseShiftRequest.cashierReason` (DI-803), recorded as the shift's
+            `cashierReason`.
+        note:
+          type: string
+          maxLength: 1000
+          x-ticvai-column: cashier_note
+          description: >
+            What happened, in the cashier's words; recorded as the shift's `cashierNote` (appended to a
+            note given with the count). Required when `reason` is `other` (422 `reason-note-required`).
 
     Shift:
       x-ticvai-persistence: "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident"
@@ -2417,6 +2572,16 @@ components:
           readOnly: true
           maxLength: 1000
           description: The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003).
+        varianceReasonRequired:
+          type: boolean
+          readOnly: true
+          x-ticvai-persisted: false
+          description: >
+            **Computed, not stored** (CHG-R4-019): true while the shift is `pendingClosure` because its count
+            differs from the expected figure within the threshold and no `cashierReason` is recorded. The
+            till shows "Give a reason to close" (POS-007, EMP-009), BO-040 and BO-043 list it as waiting for a
+            reason; `giveShiftVarianceReason` or `approveShiftClose` clears it. Shown to the shift's own
+            cashier, since it carries no figure (CHG-FIN-003).
         heldLeaseCount:
           type: integer
           description: >

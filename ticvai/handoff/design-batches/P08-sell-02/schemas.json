@@ -843,6 +843,18 @@
     "maxLength": 40,
     "description": "As `Performance.format` (decided 29 September, rev 3 REV3-17)."
    },
+   "minutesOnScreen": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1440,
+    "description": "As `Performance.minutesOnScreen`; every performance of a generated series takes it (DI-167, DI-169; CHG-R4-014). Omitted means 0."
+   },
+   "slotLengthMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 1440,
+    "description": "**The slot length the form asks for** (DI-167, DI-995; CHG-R4-014): every generated performance ends this many minutes after it starts. Optional, because `endsAt` minus `startsAt` already says it for the first slot; when both are given they must agree, else `422 slot-window-invalid`.\n"
+   },
    "recurrence": {
     "type": "object",
     "description": "Generate a series rather than a single performance. **Read in the region's time zone**: the Region owns the zone and every venue inherits it without override (tenancy), so `daysOfWeek` are the region's calendar days and `until` is compared on the region's clock.\n",
@@ -862,6 +874,16 @@
        "minimum": 0,
        "maximum": 6
       }
+     },
+     "firstStartTime": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "description": "**The first start of each day**, `HH:MM` on the region's clock (DI-995, 24 September minutes M24-01; CHG-R4-014). Omitted means the time of day of `startsAt`. Each day's slots start here and repeat every `intervalMinutes`.\n"
+     },
+     "lastStartTime": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "description": "**The last start of each day**, `HH:MM` on the region's clock (DI-995; CHG-R4-014): no slot of the day starts after it, so a series every 30 minutes from 10:00 with a last start of 17:30 makes 16 slots a day rather than running through the night. Omitted means the series runs every `intervalMinutes` until `until`, as before. Before `firstStartTime` is `422 slot-window-invalid`.\n"
      }
     }
    }
@@ -1703,7 +1725,7 @@
    "paymentTiming": {
     "allOf": [
      {
-      "$ref": "#/components/schemas/OutletPaymentTiming"
+      "$ref": "#/components/schemas/tenancy::OutletPaymentTiming"
      }
     ],
     "default": "sendFirst",
@@ -1774,15 +1796,6 @@
    "type": "string",
    "maxLength": 200
   }
- },
- "OutletPaymentTiming": {
-  "type": "string",
-  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
-  "enum": [
-   "sendFirst",
-   "payFirst"
-  ],
-  "default": "sendFirst"
  },
  "OutletType": {
   "type": "string",
@@ -1910,6 +1923,13 @@
     "nullable": true,
     "maxLength": 40,
     "description": "How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. A cinema screening shows language and format together. Null when it does not apply (decided 29 September, rev 3 REV3-17).\n"
+   },
+   "minutesOnScreen": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1440,
+    "default": 0,
+    "description": "**\"Minutes on screen\": how long after `startsAt` the slot is still sold** (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). A 10:00 slot with 10 stays on the till and the guest apps until 10:10 and then drops off; 0, the default, stops selling at the start time. Applies to every channel that sells the slot; the entry window is the admission rules' (`admissionRulesId`), not this.\n"
    }
   }
  },
@@ -3458,7 +3478,7 @@
      }
     ],
     "nullable": true,
-    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).** The client's policy of 6 October 2026 (tracker answer T10.1, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-019): the tolerance is configurable, a difference within it closes only with a reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager approval (OVERSHORT_ACCEPT).\n"
    },
    "cashDrawerLimit": {
     "oneOf": [

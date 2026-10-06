@@ -1,6 +1,6 @@
 # P02-discovery-browse-01 — P02 · Discovery & Browse
 
-**7 screens · 22 operations · 66 schemas · 5 permissions**
+**7 screens · 22 operations · 64 schemas · 5 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
