@@ -16,7 +16,8 @@
       3. checks that they actually sign in to ADAM - before changing anything,
       4. lists the ADAM projects you can open and asks which one to use,
       5. asks whether you are a backend or a frontend developer,
-      6. creates <project>-<role> beside setup.cmd from the matching starter:
+      6. creates <project>-<role> beside setup.cmd: a clone of the team's repository when the
+         project has one for your role (TICVAI backend: GitLab ticvai/ticvai-backend), else the starter:
          the code skeleton, CLAUDE.md, .claude\ (permissions and /ticket,
          /board, /done) and project-bible\setup\ (the coding standards),
          renamed for the project, as a new git repository,
@@ -49,6 +50,13 @@
     The project folder. A new or empty one is created from the starter; one
     with files in it is only connected. Asked for when not given. "all"
     connects every folder and creates nothing.
+
+.PARAMETER RepoUrl
+    The git repository a new folder is cloned from, instead of the team repository setup knows
+    for the project and role. Without one, the folder is made from the starter.
+
+.PARAMETER GitUser
+    Your GitLab username for that clone. Asked for when not given; Git asks for the password.
 
 .PARAMETER Test
     ask (default), yes or no - whether to run the full connection test at the end.
@@ -84,6 +92,8 @@ param(
     [ValidateSet('', 'backend', 'frontend')]
     [string]$Role = '',
     [string]$Folder = '',
+    [string]$RepoUrl = '',
+    [string]$GitUser = '',
     [ValidateSet('ask', 'yes', 'no')]
     [string]$Test = 'ask',
     [switch]$Uninstall,
@@ -100,6 +110,13 @@ $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
 # The code skeletons, one per role, and the standards documents they share.
 # Only in the zip: the installed copy can connect a folder but not create one.
 $Starters = Join-Path $Here 'starters'
+# The team's own repository for a project and role, when it has one. A new folder is cloned from it,
+# so a developer starts from the team's code and pushes back to it, rather than from a copy of the
+# starter that lives nowhere else. The starter only fills in what ADAM needs and the clone lacks.
+# -RepoUrl overrides the list. ASCII only (see the note at the top).
+$TeamRepos = @{
+    'ticvai/backend' = 'http://gitlab.softlabsgroup.in/ticvai/ticvai-backend.git'
+}
 $Roles = [ordered]@{
     backend  = [pscustomobject]@{ Label = 'Backend  (.NET 10 API, clean architecture)'; Check = 'dotnet'; Docs = @(
         'naming-and-style', 'backend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
@@ -322,10 +339,83 @@ function Test-EmptyFolder([string]$Path) {
 $TextFiles = @('.cs', '.csproj', '.slnx', '.sln', '.json', '.http', '.md', '.ts', '.tsx', '.js', '.cjs',
     '.mjs', '.yml', '.yaml', '.props', '.targets', '.txt', '.gitignore', '.editorconfig')
 
+# The standards documents for a role, with an index Claude can start from.
+function Copy-StarterDocs([string]$Target, [string]$RoleName) {
+    $bible = Join-Path $Target 'project-bible\setup'
+    New-Item -ItemType Directory -Force -Path $bible | Out-Null
+    $index = @('# Coding standards', '', "What a $RoleName developer on this project reads. CLAUDE.md says in which order.", '')
+    foreach ($doc in $Roles[$RoleName].Docs) {
+        $from = Join-Path $Starters "docs\$doc.md"
+        if (-not (Test-Path -LiteralPath $from)) { continue }
+        Copy-Item -LiteralPath $from -Destination $bible -Force
+        $title = (Get-Content -LiteralPath $from -TotalCount 1) -replace '^#\s*', ''
+        $index += "- [$doc]($doc.md) - $title"
+    }
+    Set-Content -LiteralPath (Join-Path $bible 'README.md') -Value $index -Encoding UTF8
+}
+
 function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
+    $script:FolderFrom = "the $RoleName starter"
     $source = Join-Path $Starters $RoleName
     if (-not (Test-Path -LiteralPath $source)) {
         Stop-Setup "The $RoleName starter is missing next to this script. Run setup.cmd from the unzipped folder, not from the installed copy."
+    }
+
+    # The team's repository first, when there is one for this project and role.
+    $url = $RepoUrl
+    if (-not $url) { $url = $TeamRepos["$($picked.id)/$RoleName"] }
+    $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($url -and -not $git) { Note "git is not installed, so $url cannot be cloned; starting from the starter instead." }
+    if ($url -and $git) {
+        # A private GitLab project answers "not found" to a request without credentials instead of
+        # asking for them, so Git would never prompt. The username goes into the address and the
+        # credentials are sent up front (http.proactiveAuth); Git's own sign-in asks for the
+        # password. Naming the user also keeps Git from reusing somebody else's saved sign-in.
+        $cloneUrl = $url
+        if ($url -match '^(https?)://([^/@]+)/(.+)$') {
+            if (-not $GitUser) { $GitUser = (Read-Host '   Your GitLab username (Git asks for the password next)').Trim() }
+            if ($GitUser) { $cloneUrl = "$($Matches[1])://$([uri]::EscapeDataString($GitUser))@$($Matches[2])/$($Matches[3])" }
+        }
+        Note "Cloning $url (sign in with your GitLab account when Git asks)."
+        $ErrorActionPreference = 'Continue'
+        & $git.Source -c http.proactiveAuth=basic clone -q $cloneUrl $Target 2>&1 | ForEach-Object { Note "$_" }
+        $cloned = $LASTEXITCODE -eq 0
+        $ErrorActionPreference = 'Stop'
+        if ($cloned) {
+            $hasCode = @(Get-ChildItem -LiteralPath $Target -Force | Where-Object { $_.Name -ne '.git' }).Count -gt 0
+            if (-not $hasCode) {
+                # An empty repository: the starter is its first commit, ready to push.
+                Copy-Item -Path (Join-Path $source '*') -Destination $Target -Recurse -Force
+                Copy-StarterDocs $Target $RoleName
+                $ErrorActionPreference = 'Continue'
+                & $git.Source -C $Target add -A 2>$null | Out-Null
+                & $git.Source -C $Target commit -q -m "Start from the ADAM $RoleName starter" 2>$null | Out-Null
+                $ErrorActionPreference = 'Stop'
+                Good "cloned $url (empty), with the starter as its first commit"
+                Note 'Push it once, if you are the first: git push -u origin HEAD'
+            } else {
+                # The team's code stays as it is; only what ADAM needs and the clone lacks is added.
+                $added = @()
+                foreach ($item in @('CLAUDE.md', '.claude', '.mcp.json')) {
+                    $from = Join-Path $source $item
+                    $to = Join-Path $Target $item
+                    if ((Test-Path -LiteralPath $from) -and -not (Test-Path -LiteralPath $to)) {
+                        Copy-Item -LiteralPath $from -Destination $to -Recurse -Force
+                        $added += $item
+                    }
+                }
+                if (-not (Test-Path -LiteralPath (Join-Path $Target 'project-bible\setup'))) {
+                    Copy-StarterDocs $Target $RoleName
+                    $added += 'project-bible\setup'
+                }
+                Good "cloned $url"
+                if ($added.Count) { Note ("added what ADAM needs and the repository lacks, not committed: " + ($added -join ', ')) }
+            }
+            $script:FolderFrom = "a clone of $url"
+            return (Get-CodeName $picked)
+        }
+        Note "Could not clone $url. A wrong password says Authentication failed; a right one that says not found means your GitLab account has no access to the project yet. Starting from the starter instead; ask your lead for access and clone it later."
+        if (Test-Path -LiteralPath $Target) { Remove-Item -LiteralPath $Target -Recurse -Force -ErrorAction SilentlyContinue }
     }
     New-Item -ItemType Directory -Force -Path $Target | Out-Null
     # -Force brings the dot-folders too: .claude and .github matter.
@@ -358,17 +448,7 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
     }
 
     # The standards documents for this role, with an index Claude can start from.
-    $bible = Join-Path $Target 'project-bible\setup'
-    New-Item -ItemType Directory -Force -Path $bible | Out-Null
-    $index = @('# Coding standards', '', "What a $RoleName developer on this project reads. CLAUDE.md says in which order.", '')
-    foreach ($doc in $Roles[$RoleName].Docs) {
-        $from = Join-Path $Starters "docs\$doc.md"
-        if (-not (Test-Path -LiteralPath $from)) { continue }
-        Copy-Item -LiteralPath $from -Destination $bible -Force
-        $title = (Get-Content -LiteralPath $from -TotalCount 1) -replace '^#\s*', ''
-        $index += "- [$doc]($doc.md) - $title"
-    }
-    Set-Content -LiteralPath (Join-Path $bible 'README.md') -Value $index -Encoding UTF8
+    Copy-StarterDocs $Target $RoleName
 
     # A repository of its own, with the starter as its first commit, so
     # `git diff` shows exactly what was built on top of it.
@@ -624,7 +704,7 @@ $where = ''
 if ($Folder -ne 'all') {
     if ($create) {
         $codeName = New-ProjectFolder $Folder $Role $picked
-        Good "created $Folder from the $Role starter ($codeName)"
+        Good "created $Folder from $script:FolderFrom ($codeName)"
     }
     $scope = 'local'
     $where = Get-TrueCase $Folder
