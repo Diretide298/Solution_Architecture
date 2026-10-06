@@ -1,0 +1,45 @@
+id: CHG-SQL-001
+date: '2026-10-06'
+source: cr
+kind: spec
+summary: The six forward migrations derive-ddl wrote against the old r1 (V0100-V0102 under backend/control and
+  backend/tenant, 2-3 October) are deleted; the fresh r1 baseline already holds everything current in them.
+decision:
+  what: 'Delete backend/control/V0100__after_r1_20261002.sql, V0101__after_r1_20261002.sql, V0102__after_r1_20261003.sql
+    and the same three under backend/tenant. tools/check-migration-freeze.py keeps failing on any deleted or changed r1
+    file except these six, listed as RETIRED with this id. The baseline DDL (000-, 010-, 900-, 910-, 920-, 930-, 990-)
+    stays: it is the schema the team writes its own migrations from.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Chinmay, 6 October: "delete all the older sql files they are outdated" and "We have the schemas they can write
+  their own. and the migration files we have are outdated for sure." The files were written in frozen mode after the
+  old r1 (a1ba956). The fresh-start r1 (commit 9cec72df, 4 October) regenerated the baselines, so the files only re-added
+  columns with IF NOT EXISTS. Checked statement by statement on 6 October: control 18 of 18 and tenant 223 of 228
+  statements are in the r1 baseline; the other 5 are columns since renamed or moved (games.reader_sync_status
+  is_refusing_offline_taps, whitelabel.custom_domain is_cname_lost, template_key and landing_source on
+  homepage_layout, games.entitlement covers_games_added_later dropped), which V0101 itself listed for dropping.'
+keys_touched:
+  files:
+  - backend/control/V0100__after_r1_20261002.sql
+  - backend/control/V0101__after_r1_20261002.sql
+  - backend/control/V0102__after_r1_20261003.sql
+  - backend/tenant/V0100__after_r1_20261002.sql
+  - backend/tenant/V0101__after_r1_20261002.sql
+  - backend/tenant/V0102__after_r1_20261003.sql
+  - backend/MIGRATIONS.md
+  - tools/check-migration-freeze.py
+root_class: 'new: stale-forward-migrations-after-rebaseline'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR; the decision is Chinmay's instruction of 6 October quoted in why)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-freeze.py
+status: open
+notes: 'No ticket names these files (op-release.json searched). A developer who already ran them on a throw-away local
+  database rebuilds it from the baseline. handoff/refresh-manifest.json still lists two of the paths among derive-ddl''s
+  writes until its next rebuild (refresh-manifest.py rebuild).'
