@@ -55,6 +55,9 @@
     The git repository a new folder is cloned from, instead of the team repository setup knows
     for the project and role. Without one, the folder is made from the starter.
 
+.PARAMETER GitUser
+    Your GitLab username for that clone. Asked for when not given; Git asks for the password.
+
 .PARAMETER Test
     ask (default), yes or no - whether to run the full connection test at the end.
 
@@ -90,6 +93,7 @@ param(
     [string]$Role = '',
     [string]$Folder = '',
     [string]$RepoUrl = '',
+    [string]$GitUser = '',
     [ValidateSet('ask', 'yes', 'no')]
     [string]$Test = 'ask',
     [switch]$Uninstall,
@@ -363,9 +367,18 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
     $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($url -and -not $git) { Note "git is not installed, so $url cannot be cloned; starting from the starter instead." }
     if ($url -and $git) {
-        Note "Cloning $url (sign in with your GitLab account if Git asks)."
+        # A private GitLab project answers "not found" to a request without credentials instead of
+        # asking for them, so Git would never prompt. The username goes into the address and the
+        # credentials are sent up front (http.proactiveAuth); Git's own sign-in asks for the
+        # password. Naming the user also keeps Git from reusing somebody else's saved sign-in.
+        $cloneUrl = $url
+        if ($url -match '^(https?)://([^/@]+)/(.+)$') {
+            if (-not $GitUser) { $GitUser = (Read-Host '   Your GitLab username (Git asks for the password next)').Trim() }
+            if ($GitUser) { $cloneUrl = "$($Matches[1])://$([uri]::EscapeDataString($GitUser))@$($Matches[2])/$($Matches[3])" }
+        }
+        Note "Cloning $url (sign in with your GitLab account when Git asks)."
         $ErrorActionPreference = 'Continue'
-        & $git.Source clone -q $url $Target 2>&1 | ForEach-Object { Note "$_" }
+        & $git.Source -c http.proactiveAuth=basic clone -q $cloneUrl $Target 2>&1 | ForEach-Object { Note "$_" }
         $cloned = $LASTEXITCODE -eq 0
         $ErrorActionPreference = 'Stop'
         if ($cloned) {
@@ -401,7 +414,7 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
             $script:FolderFrom = "a clone of $url"
             return (Get-CodeName $picked)
         }
-        Note "Could not clone $url (no access yet, or the address is wrong). Starting from the starter instead; ask your lead for access and clone it later."
+        Note "Could not clone $url. A wrong password says Authentication failed; a right one that says not found means your GitLab account has no access to the project yet. Starting from the starter instead; ask your lead for access and clone it later."
         if (Test-Path -LiteralPath $Target) { Remove-Item -LiteralPath $Target -Recurse -Force -ErrorAction SilentlyContinue }
     }
     New-Item -ItemType Directory -Force -Path $Target | Out-Null

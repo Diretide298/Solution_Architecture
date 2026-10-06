@@ -57,8 +57,8 @@ SET IT UP
      a git repository           with the skeleton as its first commit
 
   TICVAI backend developers get a clone of the team repository instead
-  (http://gitlab.softlabsgroup.in/ticvai/ticvai-backend). Git asks you to sign
-  in with your GitLab account; ask your lead for access first. Setup only adds
+  (http://gitlab.softlabsgroup.in/ticvai/ticvai-backend). Setup asks for your
+  GitLab username, then Git asks for your GitLab password. Setup only adds
   CLAUDE.md, .claude\ and project-bible\setup\ where the repository lacks
   them, and commits nothing on top of the team's code. If the clone fails,
   you get the skeleton above and can clone later.
