@@ -67,7 +67,7 @@ The numbering:
 |---|---|---|
 | V0001 | the baseline: schemas, extensions, the register, the RLS and partition helpers (MIG-BASELINE) | the plan |
 | V0002 to V0099 | the first release, one migration per schema in key order, cross-schema keys last (MIG-<SCHEMA>, MIG-FOREIGN-KEYS) | the plan, in schema order |
-| V0100 to V0999 | derive-ddl's frozen-mode files in `backend/<db>/` (`V0100__after_r1_20261002.sql`, `V0101__...`) | derive-ddl, one number per run |
+| V0100 to V0999 | derive-ddl's frozen-mode files in `backend/<db>/` (`V<nnnn>__after_r1_<yyyymmdd>.sql`). The three written against the old r1 (V0100-V0102, 2-3 Oct) were deleted on 6 Oct (CHG-SQL-001): the fresh r1 baseline already holds them | derive-ddl, one number per run |
 | V1000 upwards | every later forward migration (VM-MIG-*, MIG-<SCHEMA>-<n>), in build order | the plan, kept once planned |
 
 **A number is never reused and never renumbered.** A forward migration keeps the number it was first
