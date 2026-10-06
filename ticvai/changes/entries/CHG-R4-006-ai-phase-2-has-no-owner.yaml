@@ -10,7 +10,7 @@ decision:
     developers'' back-end tasks inside those app-modules (AI-BE-SHARED-BASELINE-THEN-LEARN-n) keep their owners.'
   by: Chinmay
   date: '2026-10-06'
-why: 'The lead''s to-do list for r4, 6 October 2026: the schedule assigned TEST-AM-AI-ENGINE-SHARED-BASELINE-THEN-LEARN,
+why: 'The lead''s to-do list for r2, 6 October 2026: the schedule assigned TEST-AM-AI-ENGINE-SHARED-BASELINE-THEN-LEARN,
   TEST-AM-AI-ENGINE-ANOMALY-DETECTION and TEST-AM-AI-ENGINE-DYNAMIC-PRICING-AI (96 hours in July 2027) and named phase 2
   leads, while CHG-AIPH-001 (docs/active/ai-phase-plan.json) decided that phase 2 starts after 2 April 2027 with no owner.'
 keys_touched:
@@ -35,7 +35,7 @@ prevention:
 notes: 'Batch R4, 6 October 2026. None of the six is pushed (Block D, not ticketed at task level). check-plan-owners
   (O-PHASE2-OWNED) fails on the commit before this fix (9 findings) and passes after it.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
 triage: fix-forward
-release_tag: r4
+release_tag: r2
 status: open

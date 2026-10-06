@@ -272,7 +272,7 @@ def validate(entries: list[tuple[str, dict]], schema: dict, ctx) -> tuple[list[s
             errs.append(f"{where}: a plan change records when it was proposed (proposed: YYYY-MM-DD[THH:MM])")
         elif dec and (dec - prop).total_seconds() < 24 * 3600:
             # **The lead may waive the cooling-off for one release, in writing** (CHG-R4-004, 5 October 2026: Chinmay
-            # waived it for r4, "we add it as release now to make sure that it goes out"). The waiver names who (one of
+            # waived it for r2, "we add it as release now to make sure that it goes out"). The waiver names who (one of
             # `waivable_by`), when and their words; it is printed on every run like an exemption, never silent.
             w = (e.get("waivers") or {}).get("cooling_off") if isinstance(e.get("waivers"), dict) else None
             if isinstance(w, dict) and w.get("by") in (schema.get("waivable_by") or []) and _date(w.get("date")) \
@@ -450,7 +450,7 @@ def self_test(schema: dict) -> list[tuple[str, bool, str]]:
     case("a closed entry on none without approval fails",
          [(f, dict(good, prevention={"type": "none", "reason": "r"}))], False, "approved_by")
     plan = dict(good, kind="plan", source="plan", date="2026-10-06", adam_cr="CR-50", triage="defer",
-                keys_touched={}, release_tag="r4", proposed="2026-10-05T09:00",
+                keys_touched={}, release_tag="r2", proposed="2026-10-05T09:00",
                 decision={"what": "w", "by": "Chinmay", "date": "2026-10-06T10:00"})
     pf = "CHG-TST-001-plan.yaml"
     case("a plan change decided a day after it was proposed passes", [(pf, plan)], True)

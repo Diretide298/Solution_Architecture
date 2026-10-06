@@ -52,6 +52,10 @@ def main() -> int:
     kids = defaultdict(list)
     for r in rows:
         kids[r["parent"]].append(r)
+    team = g.load_json(g.ROOT / "docs" / "active" / "team.json", {}) or {}
+    ai_lead = ((team.get("ai") or {}).get("who") or [""])[0]
+    extra = g.load_json(g.ROOT / "docs" / "active" / "block-a-extra-tasks.json", {}) or {}
+    days_of = {t["key"]: float(t["days"]) for t in extra.get("tasks") or [] if t.get("days")}
     phase = g.load_json(g.ROOT / "docs" / "active" / "ai-phase-plan.json", {}) or {}
     phase2 = {m["key"] for m in phase.get("modules") or [] if m.get("phase") == 2 and m.get("key")}
     n_tests = 0
@@ -59,7 +63,8 @@ def main() -> int:
         k = r["key"]
         if k.startswith("TEST-AM-") and r["parent"] not in phase2:
             n_tests += 1
-            builder = td.main_builder([x for x in kids[r["parent"]] if x["type"] == "Task"], sp.PLAN_PACE)
+            builder = td.main_builder([x for x in kids[r["parent"]] if x["type"] == "Task"], sp.PLAN_PACE,
+                                     ai_lead, days_of)
             for where, who in (("plan", r["assignee"]), ("schedule", assign.get(k))):
                 if builder and who == builder:
                     guard.add("O-SELF-TEST", f"{k}:{where}", f"{k}: {who} tests in the {where} what they built most of "

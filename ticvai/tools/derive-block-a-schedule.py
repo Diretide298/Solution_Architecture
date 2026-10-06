@@ -62,15 +62,20 @@ def main():
     rows = [r for r in csv.DictReader(io.open(src, encoding="utf-8")) if r["type"] == "Task"]
     rows.sort(key=lambda r: (int(r["sequence"] or 0), r["key"]))
     pins, note = sp.pinned_owners(team, rebalance="--rebalance" in sys.argv[1:])
-    # **A module test is not pinned to its app-module's main builder** (CHG-R4-005): the plan gave it a peer, so the
-    # plan's owner wins over the pin there. **Phase 2 of the AI engine has no owner** (CHG-AIPH-001; CHG-R4-006).
+    # **A module test is not pinned to its app-module's main builder** (CHG-R4-005): where the plan gave a module test a
+    # peer, because its pinned owner builds most of its app-module or block-a-extra-tasks.json `moduleTestPeers` moves
+    # it from that owner, the plan's owner wins over the pin. **Phase 2 of the AI engine has no owner** (CHG-AIPH-001;
+    # CHG-R4-006).
     import ticket_done as td_
+    ai_lead = ((team.get("ai") or {}).get("who") or [""])[0]
+    moved = dict(extra.get("moduleTestPeers") or {})
     kids_ = defaultdict(list)
     for r in rows:
         kids_[r["parent"]].append(r)
     for r in rows:
         if r["key"].startswith("TEST-AM-") and pins.get(r["key"]) and pins[r["key"]] != r["assignee"] \
-                and pins[r["key"]] == td_.main_builder(kids_[r["parent"]], sp.PLAN_PACE):
+                and (moved.get(r["key"]) == pins[r["key"]]
+                     or pins[r["key"]] == td_.main_builder(kids_[r["parent"]], sp.PLAN_PACE, ai_lead, days_of)):
             pins.pop(r["key"])
     phase2_ams = {m_["key"] for m_ in (json.loads((ROOT / "docs" / "active" / "ai-phase-plan.json").read_text(
         encoding="utf-8")).get("modules") or []) if m_.get("phase") == 2} \

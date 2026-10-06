@@ -2850,6 +2850,40 @@
    ]
   }
  },
+ "check-plan-owners": {
+  "updated": "2026-10-06",
+  "commit": "9264fa2d",
+  "rules": {
+   "O-SELF-TEST": [
+    "TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A:plan",
+    "TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A:schedule",
+    "TEST-AM-APPROVALS-P04:plan",
+    "TEST-AM-APPROVALS-P04:schedule",
+    "TEST-AM-FOOD-BEVERAGE-P02:plan",
+    "TEST-AM-FOOD-BEVERAGE-P02:schedule",
+    "TEST-AM-IDENTITY-SECURITY-P09:plan",
+    "TEST-AM-IDENTITY-SECURITY-P09:schedule",
+    "TEST-AM-PAYMENTS-P01:plan",
+    "TEST-AM-PAYMENTS-P01:schedule",
+    "TEST-AM-PAYMENTS-P02:plan",
+    "TEST-AM-PAYMENTS-P02:schedule",
+    "TEST-AM-PRICING-PROMOTIONS-P01:plan",
+    "TEST-AM-PRICING-PROMOTIONS-P01:schedule",
+    "TEST-AM-PRICING-PROMOTIONS-P02:plan",
+    "TEST-AM-PRICING-PROMOTIONS-P02:schedule",
+    "TEST-AM-RESOURCES-CAPACITY-P02:plan",
+    "TEST-AM-RESOURCES-CAPACITY-P02:schedule",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P08:plan",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P08:schedule",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P09:plan",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P09:schedule",
+    "TEST-AM-SETUP-VENUE-OPERATIONS-P08:plan",
+    "TEST-AM-SETUP-VENUE-OPERATIONS-P08:schedule",
+    "TEST-AM-TENANCY-VENUES-P08-BLOCK-A:plan",
+    "TEST-AM-TENANCY-VENUES-P08-BLOCK-A:schedule"
+   ]
+  }
+ },
  "check-screen-wiring": {
   "updated": "2026-10-02",
   "commit": "8a4653bd",

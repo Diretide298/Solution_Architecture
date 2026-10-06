@@ -1,0 +1,31 @@
+id: CHG-R4-009
+date: '2026-10-06'
+source: cr
+kind: process
+summary: check-cited-sources notes a change entry's citation of a file deleted by decision (check-migration-freeze
+  RETIRED) instead of failing it as missing.
+decision:
+  what: 'tools/check-cited-sources.py reads RETIRED from tools/check-migration-freeze.py; a cited path in it is a note
+    ("retired by decision"), not CS-MISSING. Any other deleted or untracked file still fails.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The full gate of 6 October failed on check-cited-sources: CHG-SQL-001 (main b885f9ab) deleted the six forward
+  migrations V0100-V0102 and records them in RETIRED, and CHG-SQL-001 and CHG-FIN-001 cite them, as an entry that
+  deletes a file has to. The deletion and its record are the decision; the citation is its history.'
+keys_touched:
+  files:
+  - tools/check-cited-sources.py
+root_class: 'new: check-reads-history-as-a-gap'
+tickets:
+  started: []
+  unstarted: []
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+notes: 'Batch R4, 6 October 2026. The check fails on the commit before (the six V0100-V0102 citations, CS-MISSING) and
+  passes after it (34 known, 0 new).'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

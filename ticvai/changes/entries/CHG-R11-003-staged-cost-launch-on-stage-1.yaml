@@ -44,7 +44,7 @@ root_class: 'new: cost-basis-not-staged'
 tickets:
   started: []
   unstarted: []
-release_tag: pending
+release_tag: r2
 decision_owner: Chinmay
 triage: fix-forward
 prevention:
@@ -53,4 +53,5 @@ prevention:
 status: open
 notes: 'Batch R11 (r1.1, branch r11-ai-hosting), 4 October 2026. Not in the AWS figures: the g6.2xlarge price and
   me-central-1 availability are still to confirm. No Block A task provisions the Stage 1 shape in the Terraform cell
-  module yet (a plan change if one is added). Close on the commit that merges it.'
+  module yet (a plan change if one is added). Close on the commit that merges it.
+  The tags r2 (9cce86a0) and r3 (a67ca498) were renamed old-r2-ai-hosting and old-r3-aws on 6 October 2026 and never went live (OpenProject and ADAM are on r1); their changes ship in r2.'

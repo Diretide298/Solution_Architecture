@@ -55,11 +55,16 @@ column, screen id or ticket key is removed or renamed; no required field is adde
 operation's behaviour changes. New operations, schemas, optional fields, tables (as a new forward migration) and
 screens only.
 
-**The release.** It ships as release r4 ("we add it as release now to make sure that it goes out"). Chinmay waived,
+**The release.** It ships as release r2 ("we add it as release now to make sure that it goes out"). Chinmay waived,
 for this release only, the 24-hour cooling-off of a plan change (`ticvai/CLAUDE.md` rule 9) on 5 October 2026.
-**Updated the same evening (Chinmay, relayed by the lead):** r4 is not tagged on Monday 5 October; it is cut on
+**Updated the same evening (Chinmay, relayed by the lead):** r2 is not tagged on Monday 5 October; it is cut on
 Tuesday 6 October, a regular release day, together with the other changes going in, so the Tuesday and Friday cadence
 (rule 8) is kept. Only the cooling-off is waived.
+**The release is named r2 (Chinmay, relayed by the lead, 6 October 2026).** Only r1 has gone live (OpenProject and
+ADAM are on r1), so the release first called r4 is tagged r2. The earlier unreleased tags were renamed on both
+remotes: r2 (9cce86a0) is now old-r2-ai-hosting and r3 (a67ca498) old-r3-aws; neither went live, and their changes
+(CHG-R11-001 to 003, CHG-R3-001) ship in r2 with this one, with CHG-SQL-001 and the r4 batch (CHG-R4-001 onwards,
+whose ids stay as names).
 
 ## Why (the gap it closes)
 

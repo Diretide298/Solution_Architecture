@@ -11,7 +11,7 @@ decision:
     design notes.'
   by: Chinmay
   date: '2026-10-06'
-why: 'The lead''s to-do list for r4, 6 October 2026: a leftover of CHG-R11-002 and CHG-FXS-003 (guest accounts are
+why: 'The lead''s to-do list for r2, 6 October 2026: a leftover of CHG-R11-002 and CHG-FXS-003 (guest accounts are
   passwordless); the overlay was fixed, the notes a designer reads were not.'
 keys_touched:
   screens:
@@ -31,7 +31,7 @@ prevention:
 notes: 'Batch R4, 6 October 2026. The DEC rule fails on the old notes ("GST-010 ... its design notes (actions) still
   set a password") and passes after the fix.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
 triage: fix-forward
-release_tag: r4
+release_tag: r2
 status: open

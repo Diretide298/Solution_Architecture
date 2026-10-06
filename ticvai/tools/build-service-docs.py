@@ -725,7 +725,12 @@ def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset
         if ident[0] == "ops":
             cands += sorted({k for o in work for k in by_op.get(o, ())} - set(cands))
         for k in cands:
-            if k in fixed or (k in closed and k != t):
+            # A closed key is never given to other work; one whose pushed work is exactly this task's is the same
+            # ticket (CHG-R4-010, 6 October: op-retire.py closes SVC-CATALOGUE-DRAFTED-3 for the work it had before
+            # the fresh r1, and the fresh r1 pushed it again for listBundleCombo, listPackageBundleAdd,
+            # listPromotionLifecycleStatus and setProductServicePrice; once the catalogue chunks were numbered
+            # from 45, that work took SVC-CATALOGUE-DRAFTED-46 and the pushed key left the plan).
+            if k in fixed or (k in closed and k != t and not (pitems.get(k) and work == pitems[k])):
                 continue
             if k != t and k in naturals and ident[0] == "screen":
                 continue
@@ -3461,29 +3466,6 @@ def main() -> int:
         r_ = second.get(t_["key"])
         if not t_["assignee"] and r_ and r_["who"] and not (t_["key"] in ai_phase2 and t_["area"] in ("ai", "test")):
             t_["assignee"] = r_["who"]
-    # **A module test is never its app-module's main builder** (block-test-strategy, 1 October; CHG-R4-005, 6 October:
-    # TEST-AM-APPROVALS-P08-BLOCK-A was Hrushikant's and TEST-AM-AI-ENGINE-A2 Kalpita's, each the main builder of what it
-    # tests, because a pinned owner bypassed the scheduler's peer rule). Checked on the final owners: such a test goes to
-    # the peer in its stack who built the next most of the app-module (for AI work the other AI engineer), else to the
-    # first other person in its stack. Every other owner, pinned or planned, stays.
-    by_leaf = {t_["key"]: t_ for t_ in leaf}
-    pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
-    for t_ in leaf:
-        if not (t_["key"].startswith("TEST-AM-") and t_.get("peerOf") and t_["assignee"]) or t_["key"] in ai_phase2:
-            continue
-        ch_ = [by_leaf[x] for x in t_["peerOf"] if x in by_leaf]
-        b_ = ticket_done.main_builder(ch_, sp.PLAN_PACE)
-        if t_["assignee"] != b_:
-            continue
-        pool_ = t_.get("pool") or "be"
-        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n != b_]
-        c_ = Counter()
-        for x in ch_:
-            if x["assignee"] in stack_:
-                c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or 0) * sp.PLAN_PACE
-        peer_ = c_.most_common(1)[0][0] if c_ else (stack_[0] if stack_ else "")
-        print(f"  module test {t_['key']}: {b_} built most of it; {peer_ or 'nobody'} tests it (CHG-R4-005)")
-        t_["assignee"] = peer_
     # **The AI engine past 2 April** (Chinmay, 1 October): every task is created, and those the two AI engineers
     # cannot finish by the end of the six months stay unassigned for the AI developers joining later.
     ai_cut = sp.index_of(sp.PLAN_END) + 1
@@ -3742,6 +3724,44 @@ def main() -> int:
             "block", "accountable", "days"]
     # **What is ticketed** (1 October): every row of a block in team.json `sprintPlan.ticketBlocks`, every pushed
     # ticket wherever it is planned, and every block and app-module. plan-tasks.csv holds all of it.
+    # **A module test is never its app-module's main builder** (block-test-strategy, 1 October; CHG-R4-005, 6 October).
+    # Checked on the final owners, after every other owner is set, with the app-module's tasks (`parent`) as
+    # check-plan-owners counts them (tools/ticket_done.py main_builder: the most points, AI work by its days; a tie has
+    # no main builder, except AI work, where the AI lead is). Such a test goes to the peer in its stack who built the
+    # next most of the app-module (for AI work the other AI engineer), else to the first other person in its stack.
+    # A module test already in OpenProject keeps its owner unless block-a-extra-tasks.json `moduleTestPeers` names it
+    # with the owner it leaves (the lead moved TEST-AM-AI-ENGINE-A2 from Kalpita Mejari and TEST-AM-APPROVALS-P08-BLOCK-A
+    # from Hrushikant Patkar, and kept every other owner); the pushed ones still tested by their main builder are
+    # check-plan-owners' known findings (handoff/audit-baseline.json), the lead's call.
+    kids_f = defaultdict(list)
+    for t_ in tasks:
+        if t_["type"] == "Task":
+            kids_f[t_["parent"]].append(t_)
+    peers_ok = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("moduleTestPeers") or {}) \
+        if EXTRA.exists() else {}
+    pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
+    for t_ in [x for x in tasks if x["type"] == "Task"]:
+        if not (t_["key"].startswith("TEST-AM-") and t_["assignee"]) or t_["key"] in ai_phase2 \
+                or t_["parent"] in ai_phase2:
+            continue
+        ch_ = [x for x in kids_f[t_["parent"]] if not x["key"].startswith("TEST-")]
+        b_ = ticket_done.main_builder(ch_, sp.PLAN_PACE, ai_lead, days_ex)
+        if t_["key"] in kmap:
+            if peers_ok.get(t_["key"]) != t_["assignee"]:
+                continue
+        elif not b_ or t_["assignee"] != b_:
+            continue
+        ai_ = all(x["area"] == "ai" or x["track"] == "AI" for x in ch_)
+        pool_ = "ai" if ai_ else (t_.get("pool") or "be")
+        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])]
+        c_ = Counter()
+        for x in ch_:
+            if x["assignee"] in stack_:
+                c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or days_ex.get(x["key"]) or 0)
+        peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
+        why_ = f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}"
+        print(f"  module test {t_['key']}: {why_}; {peer_ or 'nobody'} tests it (CHG-R4-005)")
+        t_["assignee"] = peer_
     ticket_blocks = set(settings["ticketBlocks"])
     for t_ in tasks:
         t_["ticketed"] = "yes" if (t_["type"] != "Task" or t_["block"] in ticket_blocks or t_["key"] in kmap) else "no"

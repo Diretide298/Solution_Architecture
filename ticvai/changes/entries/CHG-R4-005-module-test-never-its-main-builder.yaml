@@ -2,30 +2,35 @@ id: CHG-R4-005
 date: '2026-10-06'
 source: cr
 kind: spec
-summary: A module test is never owned by its app-module's main builder; TEST-AM-APPROVALS-P08-BLOCK-A and
-  TEST-AM-AI-ENGINE-A2 move to a peer, and every other owner stays.
+summary: A module test is never owned by its app-module's main builder; TEST-AM-AI-ENGINE-A2 and
+  TEST-AM-APPROVALS-P08-BLOCK-A move to a peer, and every other pushed owner stays.
 decision:
-  what: 'tools/build-service-docs.py checks every module test on the final owners: when its owner is the main builder of
-    its app-module (tools/ticket_done.py main_builder: the most points, an AI task by its days at the plan''s pace), the
-    test goes to the peer in its stack who built the next most of it (for AI work the other AI engineer), else to the
-    first other person in its stack. tools/derive-block-a-schedule.py lets the plan''s owner win over a pin only there.
-    Pinned owners elsewhere are untouched.'
+  what: 'tools/build-service-docs.py checks every module test on the final owners, with the app-module''s tasks as
+    tools/check-plan-owners.py counts them (tools/ticket_done.py main_builder: the most points, an AI unit by its days;
+    a tie has no main builder, except AI work, where the AI lead of team.json is). A module test not pushed yet whose
+    owner is the main builder goes to the peer in its stack who built the next most of it (for AI work the other AI
+    engineer). A pushed module test changes owner only when docs/active/block-a-extra-tasks.json `moduleTestPeers`
+    names it with the owner it leaves: TEST-AM-AI-ENGINE-A2 from Kalpita Mejari (to Second AI engineer) and
+    TEST-AM-APPROVALS-P08-BLOCK-A from Hrushikant Patkar (to Tanmay Dukhande). tools/derive-block-a-schedule.py lets the
+    plan''s owner win over the pin only for those. Every other pushed owner stays.'
   by: Chinmay
   date: '2026-10-06'
-why: 'The lead''s to-do list for r4, 6 October 2026: TEST-AM-APPROVALS-P08-BLOCK-A was Hrushikant Patkar''s and
-  TEST-AM-AI-ENGINE-A2 Kalpita Mejari''s, each the main builder of what it tests, against the test strategy of the
-  council of 1 October (docs/active/block-test-strategy.md: "a peer in its stack who is not its main builder"). The
-  scheduler''s peer rule only ran for a test with no owner, and both had pinned owners.'
+why: 'The lead''s to-do list for r2, 6 October 2026: TEST-AM-APPROVALS-P08-BLOCK-A was Hrushikant Patkar''s and
+  TEST-AM-AI-ENGINE-A2 Kalpita Mejari''s, against the test strategy of the council of 1 October
+  (docs/active/block-test-strategy.md: "a peer in its stack who is not its main builder"); the scheduler''s peer rule
+  only ran for a test with no owner, and both had pinned owners. "Owners of all other tickets stay as they are."'
 keys_touched:
   tickets:
   - TEST-AM-APPROVALS-P08-BLOCK-A
   - TEST-AM-AI-ENGINE-A2
   files:
+  - docs/active/block-a-extra-tasks.json
   - tools/build-service-docs.py
   - tools/derive-block-a-schedule.py
   - tools/ticket_done.py
   - tools/check-plan-owners.py
   - tools/run-checks.py
+  - handoff/audit-baseline.json
 root_class: 'new: pinned-owner-bypasses-a-rule'
 tickets:
   started: []
@@ -35,10 +40,21 @@ tickets:
 prevention:
   type: check
   ref: tools/check-plan-owners.py
-notes: 'Batch R4, 6 October 2026. check-plan-owners (O-SELF-TEST) fails on the commit before this fix (both tests, in
-  the plan and the schedule) and passes after it.'
+notes: 'Batch R4, 6 October 2026. With the owners OpenProject holds (release r1, which the plan keeps since CHG-R4-003),
+  Hrushikant Patkar is not the main builder of AM-APPROVALS-P08-BLOCK-A (Pranay Shinde builds 9 of its points:
+  VM-MIG-APPROVALS and VM-TENANCY-REQUEST-1; Hrushikant 1, VM-MIG-AI), though its app-module is his in OpenProject;
+  it was in the plan file of r1, which placed owners afresh. The test moves because the lead named it. AM-AI-ENGINE-A2
+  is a tie (AI-ENGINE-PLANNER, Kalpita Mejari, and AI-ENGINE-SUGGESTIONS, Second AI engineer, 8 days each), so the AI
+  lead counts as its main builder. Thirteen other pushed module tests are still owned by their main builder in r1:
+  TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A, TEST-AM-APPROVALS-P04, TEST-AM-FOOD-BEVERAGE-P02,
+  TEST-AM-IDENTITY-SECURITY-P09, TEST-AM-PAYMENTS-P01, TEST-AM-PAYMENTS-P02, TEST-AM-PRICING-PROMOTIONS-P01,
+  TEST-AM-PRICING-PROMOTIONS-P02, TEST-AM-RESOURCES-CAPACITY-P02, TEST-AM-SETUP-AI-INTELLIGENCE-P08,
+  TEST-AM-SETUP-AI-INTELLIGENCE-P09, TEST-AM-SETUP-VENUE-OPERATIONS-P08 and TEST-AM-TENANCY-VENUES-P08-BLOCK-A. They
+  keep their owners as the lead asked and are check-plan-owners'' 26 known findings (plan and schedule) in
+  handoff/audit-baseline.json; listing one in `moduleTestPeers` moves it. check-plan-owners (O-SELF-TEST) fails on the
+  commit before this fix (TEST-AM-AI-ENGINE-A2) and passes after it.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
 triage: fix-forward
-release_tag: r4
+release_tag: r2
 status: open

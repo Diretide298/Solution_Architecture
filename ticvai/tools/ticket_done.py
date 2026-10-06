@@ -314,17 +314,32 @@ def merge_bindings(screens: dict) -> dict:
     return added
 
 
-def main_builder(rows, pace: float = 1.0) -> str:
-    """The person who builds most of a set of tasks: by points, an AI task (no points) by its days x `pace`. Shared by
+def main_builder(rows, pace: float = 1.0, lead: str = "", days_of=None) -> str:
+    """The person who builds most of an app-module's tasks (`rows`, its children; module tests are not counted): by
+    points, an AI task (no points) by its days x `pace` (`days_of` {key: days} where the row has none). Shared by
     build-service-docs.py, derive-block-a-schedule.py and check-plan-owners.py (CHG-R4-005): a module test never goes
-    to its app-module's main builder."""
+    to its app-module's main builder.
+
+    A tie has no main builder (""): two people who built as much are each a peer of the other. One exception, AI work
+    (every task an AI unit): `lead`, the AI lead (team.json `ai.who`, first), is its main builder when tied, so its
+    module test goes to the other AI engineer (the lead's to-do list for r2, 6 October: TEST-AM-AI-ENGINE-A2, over
+    AI-ENGINE-PLANNER and AI-ENGINE-SUGGESTIONS at 8 days each, was Kalpita Mejari's)."""
     from collections import Counter
     c = Counter()
+    ai = True
+    days_of = days_of or {}
     for r in rows:
         who = r.get("assignee") or r.get("who")
         if who and not str(r.get("key", "")).startswith("TEST-"):
-            c[who] += float(r.get("points") or 0) or float(r.get("days") or 0) * pace
-    return c.most_common(1)[0][0] if c else ""
+            c[who] += float(r.get("points") or 0) or float(r.get("days") or days_of.get(r.get("key")) or 0) * pace
+            ai = ai and (r.get("area") == "ai" or r.get("track") == "AI")
+    if not c:
+        return ""
+    top = max(c.values())
+    tied = [w for w, v in c.items() if abs(v - top) < 1e-9]
+    if len(tied) == 1:
+        return tied[0]
+    return lead if ai and lead in tied else ""
 
 
 def wiring_parts(app_modules) -> dict:

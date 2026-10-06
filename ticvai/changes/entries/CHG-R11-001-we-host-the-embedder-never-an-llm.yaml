@@ -70,7 +70,7 @@ tickets:
   - AI-ENGINE-GATEWAY
   - AI-ENGINE-SCRUB-GUARD
   - AI-ENGINE-CONCIERGE
-release_tag: pending
+release_tag: r2
 decision_owner: Chinmay
 triage: blocker
 prevention:
@@ -83,4 +83,5 @@ notes: 'Batch R11 (r1.1, branch r11-ai-hosting), 4 October 2026. Supersedes CHG-
   bodies at the next tag. Open for Chinmay: confirm github.com/data-privacy-stack/presidio is the Microsoft Presidio
   project before a release is pinned; the AWS g6.2xlarge price and me-central-1 availability; no Block A task yet
   provisions the AI GPU node pool in the Terraform cell module (a plan change if one is added). Close on the commit
-  that merges it.'
+  that merges it.
+  The tags r2 (9cce86a0) and r3 (a67ca498) were renamed old-r2-ai-hosting and old-r3-aws on 6 October 2026 and never went live (OpenProject and ADAM are on r1); their changes ship in r2.'

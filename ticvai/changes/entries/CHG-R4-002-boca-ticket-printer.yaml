@@ -52,9 +52,9 @@ root_class: 'new: accepted-decision-without-task'
 tickets:
   started: []
   unstarted: []
-release_tag: r4
+release_tag: r2
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r4; the source is sources/client/2026-10-05-allam-boca-printer.md)
+adam_cr: pending (the lead raises the ADAM CR for r2; the source is sources/client/2026-10-05-allam-boca-printer.md)
 triage: fix-forward
 prevention:
   type: check

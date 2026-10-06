@@ -1,0 +1,39 @@
+id: CHG-R4-010
+date: '2026-10-06'
+source: cr
+kind: spec
+summary: A pushed key that op-retire.py closes for older work keeps the ticket when its pushed work is exactly a
+  planned task's; SVC-CATALOGUE-DRAFTED-3 stays in the plan.
+decision:
+  what: 'tools/build-service-docs.py reconcile_keys: a closed key (op-retire.py OTHER merge, REPLACED, MERGED_R2) is still
+    never given to other work, but one whose pushed operations are exactly a planned task''s is that task''s key.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The regenerated plan of 6 October dropped pushed SVC-CATALOGUE-DRAFTED-3 (#28267: listBundleCombo,
+  listPackageBundleAdd, listPromotionLifecycleStatus, setProductServicePrice) and wrote the same four operations under a
+  new key, SVC-CATALOGUE-DRAFTED-46: op-retire.py closes SVC-CATALOGUE-DRAFTED-3 for the work it had before the fresh r1
+  (CHG-CLN-002), and the fresh r1 pushed the key again for other work. The release adds only: no ticket key leaves.'
+keys_touched:
+  tickets:
+  - SVC-CATALOGUE-DRAFTED-3
+  files:
+  - tools/build-service-docs.py
+  - tools/check-key-stability.py
+root_class: 'new: stale-retirement-list'
+tickets:
+  started: []
+  unstarted:
+  - SVC-CATALOGUE-DRAFTED-3
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+notes: 'Batch R4, 6 October 2026. Before the fix 1 of the 2,519 pushed task keys left the plan (SVC-CATALOGUE-DRAFTED-3);
+  after it none. Five other closed keys are live in OpenProject (SVC-IDENTITY-MFA-2, VM-BO-005, APP-SETUP-BO-013,
+  VM-MARKETING-MARKETING-2, VM-ORDER-SYNC-1) and keep their keys as before. op-retire.py''s lists date from before the
+  fresh r1; they are not changed here. check-key-stability now fails a new key whose work is exactly a closed key''s
+  (renamed): it fails on the plan before the fix and passes after it.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

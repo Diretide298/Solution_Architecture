@@ -12,7 +12,7 @@ decision:
     (1, validated 1 or 2). The NVIDIA driver and device plugin are installed at bootstrap (GPU Operator), not here.'
   by: Chinmay
   date: '2026-10-06'
-why: 'The lead''s to-do list for r4, 6 October 2026: CHG-R11-001 (4 October) decided the AI GPU node pool and the
+why: 'The lead''s to-do list for r2, 6 October 2026: CHG-R11-001 (4 October) decided the AI GPU node pool and the
   HLD/LLD and cost were rebuilt for it, but the Terraform kept only its CPU AI pool. AWS (g6.2xlarge, CHG-R3-001) has no
   Terraform module in the package.'
 keys_touched:
@@ -37,7 +37,7 @@ notes: 'Batch R4, 6 October 2026. Validated offline only: both files parse with 
   CPU pool, is a change for the bootstrap that moves the AI pods. check-terraform-pools fails on the commit before (the
   LLD''s AKS AI GPU pool is no node pool) and passes after.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
 triage: fix-forward
-release_tag: r4
+release_tag: r2
 status: open

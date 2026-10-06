@@ -121,20 +121,21 @@ root_class: 'new: channel-without-configuration'
 tickets:
   started: []
   unstarted: []
-release_tag: r4
+release_tag: r2
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r4; the decision is recorded in docs/active/decisions/answers-5-october.md)
+adam_cr: pending (the lead raises the ADAM CR for r2; the decision is recorded in docs/active/decisions/answers-5-october.md)
 triage: fix-forward
 prevention:
   type: check
   ref: tools/check-channel-config.py
 status: open
-notes: 'Batch R4 (branch r4-kiosk-config, from main e875d996; last release r3 = a67ca498), 5 October 2026. Contract
+notes: 'Batch R4 (branch r4-kiosk-config, from main e875d996; last tag r3 = a67ca498, since renamed old-r3-aws), 5 October 2026. Contract
   compatibility against r1: additive (check-contract-compat: no breaking change, nothing added to
   docs/active/breaking-changes.yaml); the only edit to an existing operation is setGameKioskConfiguration''s
   x-ticvai-consumed-by losing BO-485, which no longer binds it. The prevention, tools/check-channel-config.py
   (registered in run-checks.py), fails on the commit before this change (e875d996: "P05 Guest Kiosk: no entry screen
-  (KSK-001) binds a published configuration read") and passes after it. Released in r4 on Tuesday 6 October 2026, on
+  (KSK-001) binds a published configuration read") and passes after it. Released in r2 on Tuesday 6 October 2026, on
   the normal Tuesday and Friday cadence (Chinmay, 5 October, evening: not tagged on the Monday); only the 24-hour
   cooling-off of the plan change is waived (CHG-R4-003). Open for Chinmay and the client: the reachable-height threshold
-  (kioskReachableHeightThresholdCm, default 100 cm, client to confirm).'
+  (kioskReachableHeightThresholdCm, default 100 cm, client to confirm).
+  The tags r2 (9cce86a0) and r3 (a67ca498) were renamed old-r2-ai-hosting and old-r3-aws on 6 October 2026 and never went live (OpenProject and ADAM are on r1); their changes ship in r2.'

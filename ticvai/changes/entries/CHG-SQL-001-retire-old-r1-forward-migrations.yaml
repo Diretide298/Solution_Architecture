@@ -32,7 +32,7 @@ root_class: 'new: stale-forward-migrations-after-rebaseline'
 tickets:
   started: []
   unstarted: []
-release_tag: r4
+release_tag: r2
 decision_owner: Chinmay
 adam_cr: pending (the lead raises the ADAM CR; the decision is Chinmay's instruction of 6 October quoted in why)
 triage: fix-forward
