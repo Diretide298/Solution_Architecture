@@ -1,0 +1,44 @@
+id: CHG-R4-005
+date: '2026-10-06'
+source: cr
+kind: spec
+summary: A module test is never owned by its app-module's main builder; TEST-AM-APPROVALS-P08-BLOCK-A and
+  TEST-AM-AI-ENGINE-A2 move to a peer, and every other owner stays.
+decision:
+  what: 'tools/build-service-docs.py checks every module test on the final owners: when its owner is the main builder of
+    its app-module (tools/ticket_done.py main_builder: the most points, an AI task by its days at the plan''s pace), the
+    test goes to the peer in its stack who built the next most of it (for AI work the other AI engineer), else to the
+    first other person in its stack. tools/derive-block-a-schedule.py lets the plan''s owner win over a pin only there.
+    Pinned owners elsewhere are untouched.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The lead''s to-do list for r4, 6 October 2026: TEST-AM-APPROVALS-P08-BLOCK-A was Hrushikant Patkar''s and
+  TEST-AM-AI-ENGINE-A2 Kalpita Mejari''s, each the main builder of what it tests, against the test strategy of the
+  council of 1 October (docs/active/block-test-strategy.md: "a peer in its stack who is not its main builder"). The
+  scheduler''s peer rule only ran for a test with no owner, and both had pinned owners.'
+keys_touched:
+  tickets:
+  - TEST-AM-APPROVALS-P08-BLOCK-A
+  - TEST-AM-AI-ENGINE-A2
+  files:
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/ticket_done.py
+  - tools/check-plan-owners.py
+  - tools/run-checks.py
+root_class: 'new: pinned-owner-bypasses-a-rule'
+tickets:
+  started: []
+  unstarted:
+  - TEST-AM-APPROVALS-P08-BLOCK-A
+  - TEST-AM-AI-ENGINE-A2
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+notes: 'Batch R4, 6 October 2026. check-plan-owners (O-SELF-TEST) fails on the commit before this fix (both tests, in
+  the plan and the schedule) and passes after it.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+triage: fix-forward
+release_tag: r4
+status: open

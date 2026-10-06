@@ -1,0 +1,43 @@
+id: CHG-R4-008
+date: '2026-10-06'
+source: cr
+kind: spec
+summary: The Terraform cell module builds the AI GPU node pool CHG-R11-001 decided (Standard_NV6ads_A10_v5, tainted for
+  the AI pods, one node without HA, two with HA); additive, the CPU AI pool is kept.
+decision:
+  what: 'repos/ticvai-infra/terraform/modules/cell/main.tf gains azurerm_kubernetes_cluster_node_pool.ai_gpu ("aigpu",
+    count on dedicated cells and var.ai_gpu_enabled, vm_size var.ai_gpu_node_size, node_count var.ai_gpu_nodes, zones
+    var.zones, the AI subnet, labels ticvai.io/pool=ai and ticvai.io/accelerator=nvidia-a10, taints ticvai.io/pool=ai and
+    nvidia.com/gpu); variables.tf gains ai_gpu_enabled (true), ai_gpu_node_size (Standard_NV6ads_A10_v5) and ai_gpu_nodes
+    (1, validated 1 or 2). The NVIDIA driver and device plugin are installed at bootstrap (GPU Operator), not here.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The lead''s to-do list for r4, 6 October 2026: CHG-R11-001 (4 October) decided the AI GPU node pool and the
+  HLD/LLD and cost were rebuilt for it, but the Terraform kept only its CPU AI pool. AWS (g6.2xlarge, CHG-R3-001) has no
+  Terraform module in the package.'
+keys_touched:
+  files:
+  - repos/ticvai-infra/terraform/modules/cell/main.tf
+  - repos/ticvai-infra/terraform/modules/cell/variables.tf
+  - tools/check-terraform-pools.py
+  - tools/run-checks.py
+  other:
+  - CHG-R11-001
+root_class: 'new: decision-not-in-infrastructure'
+tickets:
+  started: []
+  unstarted: []
+prevention:
+  type: check
+  ref: tools/check-terraform-pools.py
+notes: 'Batch R4, 6 October 2026. Validated offline only: both files parse with python-hcl2; terraform validate and plan
+  were not run (no terraform binary here, and the client has no Terraform runs yet). Unvalidated: NV6ads A10 v5
+  availability per zone in UAE North (zones = var.zones), node_count with zones on a pool of one, the provider schema
+  (azurerm ~> 4.53) and quota. The CPU "ai" pool stays (additive); removing it, as CHG-R11-001''s target cell has no AI
+  CPU pool, is a change for the bootstrap that moves the AI pods. check-terraform-pools fails on the commit before (the
+  LLD''s AKS AI GPU pool is no node pool) and passes after.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+triage: fix-forward
+release_tag: r4
+status: open

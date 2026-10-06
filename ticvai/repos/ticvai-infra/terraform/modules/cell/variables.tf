@@ -138,6 +138,25 @@ variable "ai_max_nodes" {
   type    = number
   default = 4
 }
+# The AI GPU node pool (CHG-R11-001; CHG-R4-008): one node without HA, two with HA (one per zone).
+variable "ai_gpu_enabled" {
+  type        = bool
+  default     = true
+  description = "The AI GPU node pool: BGE-M3, the reranker, Presidio and the Arabic NER; never an LLM (CHG-R11-001)."
+}
+variable "ai_gpu_node_size" {
+  type    = string
+  default = "Standard_NV6ads_A10_v5"
+}
+variable "ai_gpu_nodes" {
+  type        = number
+  default     = 1
+  description = "1 without HA, 2 with HA (one per zone)."
+  validation {
+    condition     = var.ai_gpu_nodes >= 1 && var.ai_gpu_nodes <= 2
+    error_message = "The AI GPU pool has one node without HA and two with HA (CHG-R11-001)."
+  }
+}
 variable "qdrant_node_size" {
   type    = string
   default = "Standard_E4s_v5"

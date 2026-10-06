@@ -1,0 +1,41 @@
+id: CHG-R4-006
+date: '2026-10-06'
+source: cr
+kind: spec
+summary: Phase 2 of the AI engine has no owner in the plan or the schedule; its three module tests and its three
+  app-modules are unassigned, as docs/active/ai-phase-plan.json says.
+decision:
+  what: 'tools/build-service-docs.py leaves the AI units, the module tests and the app-modules (no lead) of every phase 2
+    module of the AI engine unassigned; tools/derive-block-a-schedule.py times them and gives them no owner. The
+    developers'' back-end tasks inside those app-modules (AI-BE-SHARED-BASELINE-THEN-LEARN-n) keep their owners.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The lead''s to-do list for r4, 6 October 2026: the schedule assigned TEST-AM-AI-ENGINE-SHARED-BASELINE-THEN-LEARN,
+  TEST-AM-AI-ENGINE-ANOMALY-DETECTION and TEST-AM-AI-ENGINE-DYNAMIC-PRICING-AI (96 hours in July 2027) and named phase 2
+  leads, while CHG-AIPH-001 (docs/active/ai-phase-plan.json) decided that phase 2 starts after 2 April 2027 with no owner.'
+keys_touched:
+  tickets:
+  - TEST-AM-AI-ENGINE-SHARED-BASELINE-THEN-LEARN
+  - TEST-AM-AI-ENGINE-ANOMALY-DETECTION
+  - TEST-AM-AI-ENGINE-DYNAMIC-PRICING-AI
+  - AM-AI-ENGINE-SHARED-BASELINE-THEN-LEARN
+  - AM-AI-ENGINE-ANOMALY-DETECTION
+  - AM-AI-ENGINE-DYNAMIC-PRICING-AI
+  files:
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/check-plan-owners.py
+root_class: 'new: decision-applied-in-part'
+tickets:
+  started: []
+  unstarted: []
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+notes: 'Batch R4, 6 October 2026. None of the six is pushed (Block D, not ticketed at task level). check-plan-owners
+  (O-PHASE2-OWNED) fails on the commit before this fix (9 findings) and passes after it.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+triage: fix-forward
+release_tag: r4
+status: open

@@ -62,6 +62,20 @@ def main():
     rows = [r for r in csv.DictReader(io.open(src, encoding="utf-8")) if r["type"] == "Task"]
     rows.sort(key=lambda r: (int(r["sequence"] or 0), r["key"]))
     pins, note = sp.pinned_owners(team, rebalance="--rebalance" in sys.argv[1:])
+    # **A module test is not pinned to its app-module's main builder** (CHG-R4-005): the plan gave it a peer, so the
+    # plan's owner wins over the pin there. **Phase 2 of the AI engine has no owner** (CHG-AIPH-001; CHG-R4-006).
+    import ticket_done as td_
+    kids_ = defaultdict(list)
+    for r in rows:
+        kids_[r["parent"]].append(r)
+    for r in rows:
+        if r["key"].startswith("TEST-AM-") and pins.get(r["key"]) and pins[r["key"]] != r["assignee"] \
+                and pins[r["key"]] == td_.main_builder(kids_[r["parent"]], sp.PLAN_PACE):
+            pins.pop(r["key"])
+    phase2_ams = {m_["key"] for m_ in (json.loads((ROOT / "docs" / "active" / "ai-phase-plan.json").read_text(
+        encoding="utf-8")).get("modules") or []) if m_.get("phase") == 2} \
+        if (ROOT / "docs" / "active" / "ai-phase-plan.json").exists() else set()
+    phase2_keys = {r["key"] for r in rows if r["parent"] in phase2_ams and r["track"] in ("AI", "Test")}
     # a service's owner: whoever carries most of its first-release back end (only used for a task with no owner)
     owners = Counter()
     for r in rows:
@@ -101,7 +115,8 @@ def main():
                       open_blocks=settings["fixed"], pace_at=pace_at)
     # **AI engine tasks past 2 April stay unassigned** (Chinmay, 1 October): they are timed here like any task,
     # but the plan left them without an owner, so the schedule gives them none either
-    unowned_ai = {r["key"] for r in rows if r["track"] == "AI" and not r["assignee"] and not pins.get(r["key"])}
+    unowned_ai = {r["key"] for r in rows if r["track"] == "AI" and not r["assignee"] and not pins.get(r["key"])} \
+        | phase2_keys
     block = {r["key"]: r.get("block") or "A" for r in rows}
     ai_engine = {r["key"] for r in rows if r["track"] == "AI" and r["block"] != "A"}
     placed = {k: v for k, v in res.items() if v["who"]}

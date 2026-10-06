@@ -302,6 +302,27 @@ resource "azurerm_kubernetes_cluster_node_pool" "ai" {
   tags = local.tags
 }
 
+# AI GPU pool (CHG-R11-001, 4 October 2026; added to the module 6 October, CHG-R4-008): BGE-M3, its reranker, Presidio
+# and the Arabic NER with the ticvai-ai pods, on Standard_NV6ads_A10_v5 (1/6 of an A10, 4 GB; 6 vCPU), one node without
+# HA, two with HA (one per zone: set ai_gpu_nodes = 2). Never an LLM. Tainted twice: the ticvai.io/pool=ai taint the
+# ticvai-ai pods already tolerate, and nvidia.com/gpu so nothing else lands on it. The NVIDIA driver and device plugin
+# are installed at bootstrap (the NVIDIA GPU Operator), not here. The CPU "ai" pool above stays until the bootstrap moves
+# the AI pods (decision CHG-R11-001: no AI CPU pool in the target cell; set ai_max_nodes and ai_min_nodes to 0 then).
+resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
+  count = local.is_dedicated && var.ai_gpu_enabled ? 1 : 0
+
+  name                  = "aigpu"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.cell[0].id
+  vm_size               = var.ai_gpu_node_size
+  node_count            = var.ai_gpu_nodes
+  zones                 = var.zones
+  vnet_subnet_id        = local.aks_subnet_ids.ai
+  node_labels           = { "ticvai.io/pool" = "ai", "ticvai.io/accelerator" = "nvidia-a10" }
+  node_taints           = ["ticvai.io/pool=ai:NoSchedule", "nvidia.com/gpu=present:NoSchedule"]
+
+  tags = merge(local.tags, { Role = "ai-gpu" })
+}
+
 # Data pool, part 1: Qdrant, one node per zone, replication factor 2 (ADR-0049).
 # Self-hosted open-source Qdrant from the official Helm chart, installed at bootstrap.
 resource "azurerm_kubernetes_cluster_node_pool" "qdrant" {

@@ -314,6 +314,19 @@ def merge_bindings(screens: dict) -> dict:
     return added
 
 
+def main_builder(rows, pace: float = 1.0) -> str:
+    """The person who builds most of a set of tasks: by points, an AI task (no points) by its days x `pace`. Shared by
+    build-service-docs.py, derive-block-a-schedule.py and check-plan-owners.py (CHG-R4-005): a module test never goes
+    to its app-module's main builder."""
+    from collections import Counter
+    c = Counter()
+    for r in rows:
+        who = r.get("assignee") or r.get("who")
+        if who and not str(r.get("key", "")).startswith("TEST-"):
+            c[who] += float(r.get("points") or 0) or float(r.get("days") or 0) * pace
+    return c.most_common(1)[0][0] if c else ""
+
+
 def wiring_parts(app_modules) -> dict:
     """{(screen, operation): wiring task key} from block-a-extra-tasks.json `appModules` (CHG-R4-003, 5 October): an
     operation a decided app-module's wiring task wires into a screen another ticket builds."""

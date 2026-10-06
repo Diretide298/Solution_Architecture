@@ -1,0 +1,37 @@
+id: CHG-R4-007
+date: '2026-10-06'
+source: cr
+kind: spec
+summary: GST-010's design notes and prototype note say "Create an account" (passwordless) instead of the prototype's
+  "Set a password".
+decision:
+  what: 'handoff/design-notes/ticketing-guest.yaml GST-010 action "Set a password" becomes "Create an account" (an
+    emailed code, no password field); screens/P02-guest-mobile-app.yaml GST-010 wireframe.prototype.differences says the
+    screen offers "Create an account" instead. check-screen-patterns'' passwordless rule (DEC) also reads the screen''s
+    design notes.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The lead''s to-do list for r4, 6 October 2026: a leftover of CHG-R11-002 and CHG-FXS-003 (guest accounts are
+  passwordless); the overlay was fixed, the notes a designer reads were not.'
+keys_touched:
+  screens:
+  - GST-010
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - handoff/design-notes/ticketing-guest.yaml
+  - tools/check-screen-patterns.py
+root_class: 'new: decision-applied-in-part'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-010
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+notes: 'Batch R4, 6 October 2026. The DEC rule fails on the old notes ("GST-010 ... its design notes (actions) still
+  set a password") and passes after the fix.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request came from the lead's to-do list for r4, 6 October 2026)
+triage: fix-forward
+release_tag: r4
+status: open

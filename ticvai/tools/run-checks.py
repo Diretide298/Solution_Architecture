@@ -122,6 +122,8 @@ CHECKS = [
     "check-parameter-columns",
     "check-channel-config",
     "check-device-tiers",
+    "check-plan-owners",
+    "check-terraform-pools",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

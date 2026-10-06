@@ -3451,11 +3451,39 @@ def main() -> int:
             t_["assignee"] = pins[t_["key"]]
     print(f"owners: {pin_note}")
     leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
+    # **Phase 2 of the AI engine has no owner** (CHG-AIPH-001, docs/active/ai-phase-plan.json; CHG-R4-006): its AI units,
+    # its module tests and its app-modules stay unassigned until the AI developers join after 2 April.
+    for t_ in leaf:
+        if t_["key"] in ai_phase2 and t_["area"] in ("ai", "test"):
+            t_["assignee"] = ""
     second = run_schedule(leaf)
     for t_ in leaf:
         r_ = second.get(t_["key"])
-        if not t_["assignee"] and r_ and r_["who"]:
+        if not t_["assignee"] and r_ and r_["who"] and not (t_["key"] in ai_phase2 and t_["area"] in ("ai", "test")):
             t_["assignee"] = r_["who"]
+    # **A module test is never its app-module's main builder** (block-test-strategy, 1 October; CHG-R4-005, 6 October:
+    # TEST-AM-APPROVALS-P08-BLOCK-A was Hrushikant's and TEST-AM-AI-ENGINE-A2 Kalpita's, each the main builder of what it
+    # tests, because a pinned owner bypassed the scheduler's peer rule). Checked on the final owners: such a test goes to
+    # the peer in its stack who built the next most of the app-module (for AI work the other AI engineer), else to the
+    # first other person in its stack. Every other owner, pinned or planned, stays.
+    by_leaf = {t_["key"]: t_ for t_ in leaf}
+    pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
+    for t_ in leaf:
+        if not (t_["key"].startswith("TEST-AM-") and t_.get("peerOf") and t_["assignee"]) or t_["key"] in ai_phase2:
+            continue
+        ch_ = [by_leaf[x] for x in t_["peerOf"] if x in by_leaf]
+        b_ = ticket_done.main_builder(ch_, sp.PLAN_PACE)
+        if t_["assignee"] != b_:
+            continue
+        pool_ = t_.get("pool") or "be"
+        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n != b_]
+        c_ = Counter()
+        for x in ch_:
+            if x["assignee"] in stack_:
+                c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or 0) * sp.PLAN_PACE
+        peer_ = c_.most_common(1)[0][0] if c_ else (stack_[0] if stack_ else "")
+        print(f"  module test {t_['key']}: {b_} built most of it; {peer_ or 'nobody'} tests it (CHG-R4-005)")
+        t_["assignee"] = peer_
     # **The AI engine past 2 April** (Chinmay, 1 October): every task is created, and those the two AI engineers
     # cannot finish by the end of the six months stay unassigned for the AI developers joining later.
     ai_cut = sp.index_of(sp.PLAN_END) + 1
@@ -3567,7 +3595,7 @@ def main() -> int:
         pts = sum(int(x["points"] or 0) for x in ch)
         sp_ = span([x["key"] for x in ch])
         t_["points"] = pts
-        t_["assignee"] = lead_of.get(t_["key"], "")
+        t_["assignee"] = "" if t_["key"] in ai_phase2 else lead_of.get(t_["key"], "")   # phase 2: no lead (CHG-R4-006)
         t_["accountable"] = t_["assignee"]
         t_["area"] = {"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS", "P15": "POS"}.get(a["platform"], a["platform"])
         when = (f"planned Sprint {sp_[0]}" + (f" to Sprint {sp_[1]}" if sp_[1] != sp_[0] else "")
