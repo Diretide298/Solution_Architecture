@@ -18,7 +18,7 @@
 
 | Azure (UAE North) | AWS (me-central-1, UAE) |
 |---|---|
-| Azure Front Door Premium + WAF (waiting-room page from cache) | Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache |
+| Azure Front Door Premium + WAF (waiting-room page from cache; built-in DDoS protection) | Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache; AWS Shield Standard for DDoS |
 | Internal load balancer + Private Link service; AKS App Routing (Gateway API) | Internal Application Load Balancer (AWS Load Balancer Controller, Gateway API or Ingress), CloudFront VPC origin |
 | AKS, Standard tier: system, workload, AI GPU, qdrant and broker pools | Amazon EKS: system, workload, AI GPU, qdrant and broker managed node groups, the same taints |
 | AKS AI GPU pool: NV6ads A10 v5 (1/6 A10, 4 GB) | EKS GPU node group: g6.2xlarge (1 x L4, 24 GB) |
@@ -76,7 +76,7 @@ box dashed, as open.
 
 | Tier | What runs there | Size (production, with HA) |
 |---|---|---|
-| Edge | CloudFront with AWS WAF (AWS managed core rule set for OWASP, Bot Control, rate-based rules per client IP), TLS 1.2+, a VPC origin to the internal ALB. Serves the on-sale waiting-room page from its cache (ADR-0066) | One distribution, one web ACL |
+| Edge | CloudFront with AWS WAF (AWS managed core rule set for OWASP, Bot Control, rate-based rules per client IP), TLS 1.2+, a VPC origin to the internal ALB. **DDoS protection:** AWS Shield Standard, automatic on CloudFront at no extra charge (network and transport layers), the WAF's rate-based and Bot Control rules for the application layer; Shield Advanced (a subscription) is an option for a major event, not in the costed cell. Serves the on-sale waiting-room page from its cache (ADR-0066) | One distribution, one web ACL |
 | Ingress | An internal Application Load Balancer run by the AWS Load Balancer Controller (Gateway API or Ingress), reachable only as CloudFront's VPC origin | In the system node group |
 | EKS cluster | Amazon EKS, VPC CNI with custom networking (pods from the secondary range `100.64.0.0/16`, outside the node subnets), Cilium (or the VPC CNI's own) network policy, egress through the NAT Gateways, five managed node groups, a subnet per group and AZ | Standard support |
 | EKS system node group | Kubernetes system services, the ingress controller | m6i.xlarge, autoscale 2-4, AZs a-c |
@@ -129,6 +129,10 @@ are ever peered.
 - **Secrets:** Secrets Manager only; the Qdrant API key and the waiting-room token key are read only by their issuers.
 - **Detection:** GuardDuty (EKS Runtime Monitoring, RDS Protection, VPC flow, DNS and CloudTrail analysis),
   Inspector (node and image scanning) and Security Hub: the Defender for Cloud line.
+- **DDoS and bot protection** (the client's T9, 6 October, CHG-R4-018): AWS Shield Standard on CloudFront
+  (network and transport layers, automatic, no charge); AWS WAF rate-based rules and Bot Control for the application
+  layer; the waiting room (ADR-0066) absorbs legitimate floods. Shield Advanced is an option for a major event, not
+  costed here. The ALB is internal, reachable only as CloudFront's VPC origin.
 - Tenant isolation, least privilege between deployables and encryption in transit are the Azure LLD's, unchanged.
 
 ## Availability and backup

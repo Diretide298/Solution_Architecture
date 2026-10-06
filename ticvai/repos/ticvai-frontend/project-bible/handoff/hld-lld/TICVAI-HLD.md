@@ -49,10 +49,15 @@ in `deploy/a-independent-tenant.yml` and `deploy/b-shared-platform.yml`, and `DE
 ## On the request path
 
 - **One entry.** Front Door Premium with WAF: OWASP and bot rules, and rate rules per client IP against abuse.
+  **DDoS protection** (the client's T9, 6 October, CHG-R4-018): Front Door's built-in infrastructure DDoS protection
+  absorbs network-layer floods at the edge, at no extra charge, and the WAF's rate and bot rules take the
+  application-layer ones; the origin has no public address (Private Link). On AWS, AWS Shield Standard on CloudFront.
 - **The on-sale waiting room sits at the edge, apart from the ride queue** (ADR-0066, amended ADR-0012's Q2). The
   waiting page is static and served from Front Door's cache; a guest's position comes from a Redis counter (no
   database write); a release controller admits guests per second from the health of `commerce` (latency and 429
-  rate). An admitted guest gets a short-lived signed admission token (the signing key is a Key Vault secret).
+  rate). It is sized and load-tested for **50,000+ simultaneous arrivals**, the client's figure (6 October), with the
+  sale behind it accepted at 3,000 concurrent B2C users, a benchmark and not a limit (ADR-0066, amended 6 October).
+  An admitted guest gets a short-lived signed admission token (the signing key is a Key Vault secret).
   **Only online cart holds need it**: `addCartLine` forwards it and `acquireInventoryHold` checks the signature in
   middleware, with no database read, for a `cart` hold on a performance whose room is on. A `workstation` hold (a
   till, a kiosk, an edge node) is not behind the room. The endpoints (`enterWaitingRoom`,
@@ -152,7 +157,7 @@ lines; only the services under them change. **Disaster recovery on AWS is open**
 
 | Azure (UAE North) | AWS (me-central-1) |
 |---|---|
-| Azure Front Door Premium + WAF (waiting-room page from cache) | Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache |
+| Azure Front Door Premium + WAF (waiting-room page from cache; built-in DDoS protection) | Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache; AWS Shield Standard for DDoS |
 | Internal load balancer + Private Link service; AKS App Routing (Gateway API) | Internal Application Load Balancer (AWS Load Balancer Controller, Gateway API or Ingress), CloudFront VPC origin |
 | AKS, Standard tier: system, workload, AI GPU, qdrant and broker pools | Amazon EKS: system, workload, AI GPU, qdrant and broker managed node groups, the same taints |
 | AKS AI GPU pool: NV6ads A10 v5 (1/6 A10, 4 GB) | EKS GPU node group: g6.2xlarge (1 x L4, 24 GB) |

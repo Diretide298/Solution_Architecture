@@ -1712,8 +1712,8 @@
   ],
   "serviceMap": [
    {
-    "azure": "Azure Front Door Premium + WAF (waiting-room page from cache)",
-    "aws": "Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache"
+    "azure": "Azure Front Door Premium + WAF (waiting-room page from cache; built-in DDoS protection)",
+    "aws": "Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache; AWS Shield Standard for DDoS"
    },
    {
     "azure": "Internal load balancer + Private Link service; AKS App Routing (Gateway API)",

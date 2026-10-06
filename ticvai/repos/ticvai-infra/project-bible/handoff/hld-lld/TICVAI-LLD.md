@@ -27,7 +27,7 @@
 
 | Tier | What runs there | Size (production, with HA) |
 |---|---|---|
-| Edge | Azure Front Door Premium with WAF (OWASP and bot rules, rate rules per client IP), TLS 1.2+, Private Link to the origin. Serves the on-sale waiting-room page from its cache (ADR-0066) | One profile |
+| Edge | Azure Front Door Premium with WAF (OWASP and bot rules, rate rules per client IP), TLS 1.2+, Private Link to the origin. **DDoS protection:** Front Door's built-in infrastructure DDoS protection (network layer, no extra charge) at the edge, the WAF's rate and bot rules for the application layer; the origin has no public address, so no Azure DDoS Protection plan sits in front of it (one can be added for a tenant that requires it). Serves the on-sale waiting-room page from its cache (ADR-0066) | One profile |
 | Ingress | A Gateway API ingress: the AKS App Routing add-on's Gateway API implementation behind an internal load balancer, published to Front Door by Private Link. Not NGINX (ingress-nginx is out of maintenance; the add-on's NGINX is supported only through November 2026). Application Gateway for Containers is the alternative, with `snet-agc` reserved. Installed at bootstrap, not by the Terraform | In the system pool; the gateway pods tolerate its `CriticalAddonsOnly` taint |
 | AKS cluster | Azure CNI Overlay (pods from `10.244.0.0/16`, outside the VNet), Cilium network policy and data plane, egress through the NAT Gateway (`userAssignedNATGateway`), five node pools, a subnet per pool (the qdrant and broker pools share `snet-aks-data`) | Standard tier |
 | AKS system pool | Kubernetes system services, the ingress gateway | D4s v5, autoscale 2-4 nodes, zones 1-3 |
@@ -126,6 +126,10 @@ ranges (`snet-agc`, `snet-jump`) are not created until they are needed.
 
 ## Security
 
+- **DDoS and bot protection** (the client's T9, 6 October, CHG-R4-018): Front Door's built-in infrastructure DDoS
+  protection at the edge (network layer, included); the WAF's rate rules per client IP and bot rules for the
+  application layer; the on-sale waiting room (ADR-0066) absorbs legitimate floods. The origin is reachable only
+  through Private Link, so no public address behind the edge needs an Azure DDoS Protection plan.
 - **Identity:** Entra ID for administrators; the platform's own identity for staff, guests and partners.
   Workloads use managed identities (workload identity) to reach Key Vault, storage, Redis and the registry.
 - **Tenant isolation:** each tenant's database (with row-level security for venue scope) and each tenant's
