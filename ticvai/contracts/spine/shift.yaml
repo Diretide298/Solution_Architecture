@@ -2422,6 +2422,7 @@ components:
             beyond the threshold (`referredToSupervisor`).
 
     ShiftVarianceReasonRequest:
+      x-ticvai-persistence: orders.pos_shift
       type: object
       description: >
         The reason for a difference within the threshold, given after the blind count is locked
@@ -2431,12 +2432,14 @@ components:
         reason:
           type: string
           enum: [tillError, unrecordedRefund, miscount, other]
+          x-ticvai-column: cashier_reason
           description: >
             The same reasons as `CloseShiftRequest.cashierReason` (DI-803), recorded as the shift's
             `cashierReason`.
         note:
           type: string
           maxLength: 1000
+          x-ticvai-column: cashier_note
           description: >
             What happened, in the cashier's words; recorded as the shift's `cashierNote` (appended to a
             note given with the count). Required when `reason` is `other` (422 `reason-note-required`).

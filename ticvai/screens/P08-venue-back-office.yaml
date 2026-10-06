@@ -12123,7 +12123,7 @@ screens:
       - kind: secondaryButton
         label: Give the variance reason
         operation: giveShiftVarianceReason
-        permission: SHIFT_CLOSE_OTHER
+        permission: SHIFT_CLOSE
         notes: 'For a shift waiting for a reason (`varianceReasonRequired`): a difference within the threshold
           with no reason from the cashier. The supervisor records the reason and the shift closes (the
           client''s policy of 6 October 2026, T10.1; CHG-R4-019). Beyond the threshold the shift needs Accept
@@ -12141,7 +12141,7 @@ screens:
       say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question. A caller who can see the screen but lacks what an action
       needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`,
-      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift`; `SHIFT_CLOSE_OTHER` for `giveShiftVarianceReason`.'
+      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift` and `giveShiftVarianceReason` (for another person''s shift the contract asks more, and says so on each).'
     reasonRequired: '**Waiting for a reason.** The selected shift''s count differed within the threshold and
       no reason came with it (`Shift.varianceReasonRequired`); it stays `pendingClosure` until the cashier gives
       one at the till or a supervisor gives it here (`giveShiftVarianceReason`). The client''s policy of 6
