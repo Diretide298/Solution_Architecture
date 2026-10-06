@@ -62,6 +62,8 @@ mitigation, and a register that only tracks hardware will under-plan the other t
 H-K, H-L, H-M. Either the sheet is incomplete or these are out of scope. Both answers
 are acceptable; the ambiguity is not.
 
+**H-D status, BOCA (5 October 2026, CHG-R4-002).** Documentation received 5 Oct 2026 from Muhamed Allam: the specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the BOCA Lemur and the Windows driver (`sources/client/2026-10-05-allam-boca-printer.md`; link titles only, the URLs to follow). Hardware shipping to the India office, date not given. Owner: backend, task DEVICE-BOCA-FGL (Block A2): the FGL driver behind `ticketPrinter` on an emulator now (ADR-0015 Tier A), hardware validation on arrival. Next step for the client (Allam): the six BOCA questions in the Decisions Register, pending.
+
 ### 3.2 Tier 1 — Device-blocked (21 sub-domains, 316 reqs)
 
 | Domain | Sub-domain | Reqs | Classes |

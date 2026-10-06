@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 1661 |
-| Operations | 1872 |
+| Operations | 1880 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
 | Operations with no screen | 189 |
-| Waves | wave1 139 · wave2 58 · wave3 1464 |
+| Waves | wave1 140 · wave2 58 · wave3 1463 |
 
 ## Gaps
 
@@ -460,7 +460,7 @@
 | `ADM-579` | Terminal & Card-Present Command Center | Commercial | 3 | 1 | yes |
 | `ADM-580` | Payment Terminal & Device Inventory | Commercial | 3 | 4 | yes |
 | `ADM-581` | Terminal Provisioning & Device Configuration | Commercial | 3 | 2 | yes |
-| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | Commercial | 3 | 1 | yes |
+| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | Commercial | 3 | 4 | yes |
 | `ADM-583` | EMV & Card-Present Processing Configuration | Commercial | 3 | 2 | yes |
 | `ADM-584` | Payment Server & Terminal Connectivity Manager | Commercial | 3 | 1 | yes |
 | `ADM-585` | Card-Present Transaction Monitor & Operations | Commercial | 3 | 1 | yes |
@@ -1248,7 +1248,7 @@
 | `BO-482` | Device Diagnostics & Integration Logs | Games & Rides | 3 | 1 | yes |
 | `BO-483` | Integration Certification & Test Console | Games & Rides | 3 | 0 | yes |
 | `BO-484` | Self-Service Experience Command Center | Games & Rides | 3 | 0 | yes |
-| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | Games & Rides | 3 | 1 | yes |
+| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | Games & Rides | 1 | 7 | yes |
 | `BO-486` | Customer Card / Wallet Identification | Games & Rides | 3 | 1 | yes |
 | `BO-487` | Customer Wallet & Balance Summary | Games & Rides | 3 | 3 | yes |
 | `BO-488` | Self-Service Wallet Top-Up | Games & Rides | 3 | 2 | yes |

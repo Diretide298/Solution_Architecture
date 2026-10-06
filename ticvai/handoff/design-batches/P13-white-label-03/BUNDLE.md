@@ -258,6 +258,7 @@ Errors to draw in the form: 400 An unknown flow type, a step the type does not h
 
 **Where the user goes next**
 
+- → `CMS-105` Kiosk Builder: *Kiosks*
 - → `CMS-001` Tenant Workspace: *1 Venue and modules*
 - → `CMS-103` Booking Flows: *2 Ticketing flows*; carries `bookingFlowId`
 - → `CMS-103` Booking Flows: *3 Compose steps*; carries `bookingFlowId`
@@ -398,7 +399,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 - [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-102?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save and continue, Add these flows, Check what blocks a publish.
-- [ ] Every transition is wired: `CMS-001`, `CMS-103`, `CMS-103`, `CMS-101`, `CMS-007`, `CMS-009`, `CMS-002`, `CMS-004`, `CMS-008`, `CMS-005`, `CMS-003`, `CMS-009`, `CMS-004`, `CMS-007`, `CMS-006`, `CMS-012`, `CMS-014`, `CMS-015`, `CMS-104`.
+- [ ] Every transition is wired: `CMS-105`, `CMS-001`, `CMS-103`, `CMS-103`, `CMS-101`, `CMS-007`, `CMS-009`, `CMS-002`, `CMS-004`, `CMS-008`, `CMS-005`, `CMS-003`, `CMS-009`, `CMS-004`, `CMS-007`, `CMS-006`, `CMS-012`, `CMS-014`, `CMS-015`, `CMS-104`.
 - [ ] Every gated control is gated: `TENANT_CONFIGURE`.
 - [ ] The 7 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Every field shows its allowed values and default, and a live preview shows the output on the guest screen it reaches.

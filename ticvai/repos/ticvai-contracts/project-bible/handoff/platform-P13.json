@@ -7,18 +7,18 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 103,
-  "operations": 197,
+  "screens": 104,
+  "operations": 207,
   "contracts": 8,
-  "modules": 3,
+  "modules": 4,
   "undrawn": 0,
   "operationsWithNoScreen": 98
  },
  "waves": {
-  "wave1": 25,
+  "wave1": 26,
   "wave3": 78
  },
  "modules": [
@@ -43,12 +43,19 @@
    "waves": [
     1
    ]
+  },
+  {
+   "module": "Kiosk",
+   "screens": 1,
+   "waves": [
+    1
+   ]
   }
  ],
  "contracts": [
   {
    "contract": "white-label",
-   "operations": 85
+   "operations": 95
   },
   {
    "contract": "marketing-crm",
@@ -1005,6 +1012,15 @@
    "wave": 1,
    "route": "/white-label/app-publishing",
    "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "CMS-105",
+   "name": "Kiosk Builder",
+   "module": "Kiosk",
+   "wave": 1,
+   "route": "/white-label/kiosk",
+   "operations": 10,
    "drawn": true
   }
  ],

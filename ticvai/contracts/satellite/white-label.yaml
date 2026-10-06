@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 93
+  x-ticvai-screen-count: 106
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -439,9 +439,9 @@ paths:
     get:
       operationId: listKioskConfigs
       x-ticvai-consumed-by:
-        - "P13 CMS-105 Kiosk Builder"
-        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, the kiosk is the builder''s third channel
         (docs/active/decisions/answers-5-october.md, CHG-R4-001); shape follows listBookingFlows'
       x-ticvai-audience:
@@ -493,8 +493,8 @@ paths:
     post:
       operationId: createKioskConfig
       x-ticvai-consumed-by:
-        - "P13 CMS-105 Kiosk Builder"
         - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         shape follows createBookingFlowDefinition'
       x-ticvai-audience:
@@ -1581,7 +1581,7 @@ paths:
         - "P05 KSK-002 Language Select"
         - "P05 KSK-008 Payment unresolved"
         - "P05 KSK-010 Print failure"
-        - "P05 KSK-013 Call Staff"
+        - "P05 KSK-013 Call staff"
         - "P05 KSK-014 Out of service"
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
@@ -3530,8 +3530,8 @@ paths:
     get:
       operationId: getKioskConfig
       x-ticvai-consumed-by:
-        - "P13 CMS-105 Kiosk Builder"
         - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         shape follows getBookingFlow'
       x-ticvai-audience:
@@ -3558,8 +3558,8 @@ paths:
     patch:
       operationId: updateKioskConfig
       x-ticvai-consumed-by:
-        - "P13 CMS-105 Kiosk Builder"
         - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         shape follows updateBookingFlowDefinition'
       x-ticvai-audience:

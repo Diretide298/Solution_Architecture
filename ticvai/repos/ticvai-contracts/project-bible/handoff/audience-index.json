@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,9 +111,9 @@
   }
  },
  "totals": {
-  "operations": 2776,
-  "screens": 2450,
-  "flows": 290
+  "operations": 2789,
+  "screens": 2451,
+  "flows": 291
  },
  "audiences": {
   "anonymous": {
@@ -125,6 +125,7 @@
     "getCookieConsentRuntime",
     "getDeviceConsentHistory",
     "getPaymentLink",
+    "getPublishedKioskConfig",
     "getPublishedTenantConfig",
     "getWaitingRoomPosition",
     "guestPasswordLogin",
@@ -156,6 +157,7 @@
     "F104",
     "F109",
     "F110",
+    "F304",
     "F32",
     "F56",
     "F61",
@@ -225,15 +227,20 @@
     "whitelabel.footer_config_social_link",
     "whitelabel.homepage_layout",
     "whitelabel.homepage_section",
+    "whitelabel.kiosk_assignment",
+    "whitelabel.kiosk_config",
+    "whitelabel.kiosk_config_attract_slide",
+    "whitelabel.kiosk_config_start_tile",
+    "whitelabel.kiosk_config_version",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item"
    ],
    "counts": {
-    "operations": 27,
+    "operations": 28,
     "screens": 0,
-    "flows": 13,
+    "flows": 14,
     "contracts": 7,
-    "tables": 54
+    "tables": 59
    }
   },
   "device": {
@@ -242,6 +249,7 @@
     "authoriseStoredValue",
     "captureStoredValue",
     "endKioskAssist",
+    "getPublishedKioskConfig",
     "getPublishedTenantConfig",
     "getSignageQueueBoard",
     "getSignageQueueCalls",
@@ -267,6 +275,7 @@
     "F102",
     "F22",
     "F25",
+    "F304",
     "F34",
     "F57",
     "F58",
@@ -316,16 +325,21 @@
     "whitelabel.footer_config_social_link",
     "whitelabel.homepage_layout",
     "whitelabel.homepage_section",
+    "whitelabel.kiosk_assignment",
+    "whitelabel.kiosk_config",
+    "whitelabel.kiosk_config_attract_slide",
+    "whitelabel.kiosk_config_start_tile",
+    "whitelabel.kiosk_config_version",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item",
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 19,
+    "operations": 20,
     "screens": 0,
-    "flows": 10,
+    "flows": 11,
     "contracts": 6,
-    "tables": 38
+    "tables": 43
    }
   },
   "guest": {
@@ -427,6 +441,7 @@
     "getPromotion",
     "getPublishedBookingFlow",
     "getPublishedGuidedChoice",
+    "getPublishedKioskConfig",
     "getPublishedTenantConfig",
     "getRecommendations",
     "getRentalAvailability",
@@ -770,6 +785,7 @@
     "F24",
     "F25",
     "F26",
+    "F304",
     "F48",
     "F49",
     "F50",
@@ -1127,17 +1143,22 @@
     "whitelabel.guided_choice_question",
     "whitelabel.homepage_layout",
     "whitelabel.homepage_section",
+    "whitelabel.kiosk_assignment",
+    "whitelabel.kiosk_config",
+    "whitelabel.kiosk_config_attract_slide",
+    "whitelabel.kiosk_config_start_tile",
+    "whitelabel.kiosk_config_version",
     "whitelabel.module_enablement",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item",
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 276,
+    "operations": 277,
     "screens": 144,
-    "flows": 22,
+    "flows": 23,
     "contracts": 22,
-    "tables": 324
+    "tables": 329
    }
   },
   "partner": {
@@ -1982,6 +2003,7 @@
     "assignApprovalRequest",
     "assignChargeback",
     "assignCoupon",
+    "assignKiosk",
     "assignPerformanceMedia",
     "assignRentalEquipment",
     "assignSeats",
@@ -2147,6 +2169,7 @@
     "createInvitationCampaign",
     "createJournalEntry",
     "createJourney",
+    "createKioskConfig",
     "createKnowledgeCollection",
     "createKpi",
     "createLegalEntity",
@@ -2281,6 +2304,7 @@
     "deleteDelegatedAccess",
     "deleteGuidedChoice",
     "deleteJourneySequenceRule",
+    "deleteKioskConfig",
     "deleteMediaAsset",
     "deleteMediaBindingRule",
     "deleteOperatingCalendarEntry",
@@ -2494,6 +2518,8 @@
     "getInventoryKitDefinition",
     "getJournalEntry",
     "getJourneyPerformance",
+    "getKioskConfig",
+    "getKioskConfigValidation",
     "getKitchenRoutingRules",
     "getKitchenSla",
     "getKpiValues",
@@ -2555,6 +2581,7 @@
     "getPromotionUsage",
     "getPublishReviewPolicy",
     "getPublishedBookingFlow",
+    "getPublishedKioskConfig",
     "getPurchaseOrder",
     "getQueue",
     "getQueueFeedHealth",
@@ -3112,6 +3139,9 @@
     "listJobTitles",
     "listJournalEntries",
     "listJourneys",
+    "listKioskAssignments",
+    "listKioskConfigVersions",
+    "listKioskConfigs",
     "listKitchenStations",
     "listKitchenTickets",
     "listKnowledgeCollections",
@@ -3624,6 +3654,7 @@
     "publishForecastVersion",
     "publishGuidedChoice",
     "publishHardwareDeployment",
+    "publishKioskConfigs",
     "publishMediaCompatibilityTesting",
     "publishMenu",
     "publishPricingEffectiveDate",
@@ -3780,6 +3811,7 @@
     "respondToReview",
     "restoreAuthorisationPolicyVersion",
     "restoreConfigVersion",
+    "restoreKioskConfigVersion",
     "restoreProductVersion",
     "restoreWalletConfigurationVersion",
     "resubmitAccreditationApplication",
@@ -4046,6 +4078,7 @@
     "setJobTitle",
     "setJourneyProfile",
     "setJourneySequenceRule",
+    "setKioskOutOfService",
     "setKitchenRoutingRules",
     "setKitchenSla",
     "setKitchenStations",
@@ -4405,6 +4438,7 @@
     "updateGuidedChoice",
     "updateIncident",
     "updateInventoryItem",
+    "updateKioskConfig",
     "updateLoyaltyProgramme",
     "updateMaintenancePlan",
     "updateMediaAsset",
@@ -6465,6 +6499,7 @@
     "CMS-102",
     "CMS-103",
     "CMS-104",
+    "CMS-105",
     "EMP-001",
     "EMP-002",
     "EMP-003",
@@ -6742,6 +6777,7 @@
     "F29",
     "F30",
     "F303",
+    "F304",
     "F31",
     "F32",
     "F33",
@@ -7891,6 +7927,11 @@
     "whitelabel.guided_choice_question",
     "whitelabel.homepage_layout",
     "whitelabel.homepage_section",
+    "whitelabel.kiosk_assignment",
+    "whitelabel.kiosk_config",
+    "whitelabel.kiosk_config_attract_slide",
+    "whitelabel.kiosk_config_start_tile",
+    "whitelabel.kiosk_config_version",
     "whitelabel.module_enablement",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item",
@@ -7931,11 +7972,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2589,
-    "screens": 2155,
-    "flows": 137,
+    "operations": 2602,
+    "screens": 2156,
+    "flows": 138,
     "contracts": 33,
-    "tables": 1105
+    "tables": 1110
    }
   }
  }

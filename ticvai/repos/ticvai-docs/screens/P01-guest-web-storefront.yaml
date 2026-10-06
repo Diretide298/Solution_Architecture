@@ -3394,8 +3394,8 @@ screens:
     trigger: onAction
   - operationId: linkGuestCheckout
     contract: identity
-    purpose: 'Create an account: once verifyGuestEmail proves the code, move the guest-checkout order to
-      the new account (parity with GST-010; CHG-R11-002)'
+    purpose: 'Create an account: once verifyGuestEmail proves the code, move the guest-checkout order
+      to the new account (parity with GST-010; CHG-R11-002)'
     trigger: onAction
   - operationId: registerGuest
     contract: identity
@@ -3449,11 +3449,11 @@ screens:
   - id: formLinkGuestCheckout
     component: modal
     trigger: Create an account
-    body: '**Create an account, with no password** (guest accounts are passwordless, CHG-FXS-003): the email
-      for the account, the order''s email prefilled; **Send me a code** (`registerGuest`, channel email); the
-      six-digit code sent to it; **Verify the code** (`verifyGuestEmail`, mode code); then the order moves to
-      the new account (`linkGuestCheckout`). There is no password field. Dismissing before the code is verified
-      links nothing.'
+    body: '**Create an account, with no password** (guest accounts are passwordless, CHG-FXS-003): the
+      email for the account, the order''s email prefilled; **Send me a code** (`registerGuest`, channel
+      email); the six-digit code sent to it; **Verify the code** (`verifyGuestEmail`, mode code); then
+      the order moves to the new account (`linkGuestCheckout`). There is no password field. Dismissing
+      before the code is verified links nothing.'
     confirm:
       label: Create an account
       operation: linkGuestCheckout

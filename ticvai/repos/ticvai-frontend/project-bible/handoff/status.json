@@ -1,22 +1,22 @@
 {
  "scope": "platform",
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2776,
+  "operations": 2789,
   "contracts": 33,
-  "tables": 1124,
+  "tables": 1129,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3173,
+  "relationships": 3191,
   "states": 207,
   "events": 77,
-  "flows": 97,
+  "flows": 98,
   "flowsDerived": 193,
   "adrs": 70,
-  "screens": 2450,
+  "screens": 2451,
   "platforms": 16,
   "frontends": 13,
   "apps": 5,
@@ -26,22 +26,22 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2743,
-    "total": 2776,
+    "done": 2756,
+    "total": 2789,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2776,
-    "total": 2776,
+    "done": 2789,
+    "total": 2789,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 2450,
-    "total": 2450,
+    "done": 2451,
+    "total": 2451,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -75,15 +75,15 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 1036,
-    "total": 1138,
+    "done": 1041,
+    "total": 1143,
     "percent": 91,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 2386,
-    "total": 2450,
+    "done": 2387,
+    "total": 2451,
     "percent": 97,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
@@ -103,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2538,
-    "total": 2776,
+    "done": 2551,
+    "total": 2789,
     "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -117,9 +117,9 @@
    },
    {
     "name": "Flows",
-    "done": 97,
+    "done": 98,
     "total": 120,
-    "percent": 81,
+    "percent": 82,
     "note": "**Raised from 60 to 120 on 24 August**, after the journey pass took the count past the old estimate and the invariant fired. The estimate was set when flows were being written one domain at a time; **walking the guest and staff platforms screen by screen showed the real surface is roughly twice that.** 120 is an estimate and not a commitment. Every flow written has found a defect \u2014 a till that could author the catalogue, a scanner that could create gates, a shift summary that could sign off its own review. **Counts authored flows only.** 72 more are derived from the client boards and carry `provenance: derived-from-board`; they route screens the client specified and do not yet say why anyone walks them, so they are scaffolding to write against rather than journeys already written."
    }
   ],
@@ -127,8 +127,8 @@
    {
     "name": "Tables written",
     "done": 1123,
-    "total": 1124,
-    "percent": 100,
+    "total": 1129,
+    "percent": 99,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
@@ -176,9 +176,9 @@
   "build": 33
  },
  "waves": {
-  "wave1": 417,
+  "wave1": 419,
   "wave2": 134,
-  "wave3": 1899
+  "wave3": 1898
  },
  "platformBreakdown": [
   {
@@ -275,7 +275,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 103
+   "screens": 104
   },
   {
    "code": "P14",

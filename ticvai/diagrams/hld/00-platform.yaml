@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2776
+  operations: 2789
   contracts: 33
-  tables: 1128
+  tables: 1133
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -27,8 +27,8 @@ scale:
   services: 17
   platforms: 16
   apps: 13
-  screens: 2450
-  flows: 290
+  screens: 2451
+  flows: 291
   stateModels: 207
   events: 77
   decisions: 71
@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 264
+  operations: 265
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff
@@ -51,7 +51,7 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2582
+  operations: 2595
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
@@ -80,7 +80,7 @@ actors:
   reaches:
   - P07
   - P15
-  operations: 17
+  operations: 18
   note: Turnstiles, scanners, kitchen displays. **A device authenticates and does not authorise.**
 surfaces:
 - platform: P01
@@ -387,7 +387,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 103
+  screens: 104
   modules:
   - core
   callsServices:
@@ -518,7 +518,7 @@ services:
     workers: []
 stores:
 - store: postgres
-  operations: 2762
+  operations: 2775
   usedBy:
   - service: CatalogueService
     operations: 447
@@ -539,7 +539,7 @@ stores:
   - service: FnbService
     operations: 135
   - service: WhiteLabelService
-    operations: 95
+    operations: 108
   - service: IdentityService
     operations: 89
   - service: LedgerService
@@ -557,7 +557,7 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 2245
+  operations: 2258
   usedBy:
   - service: CatalogueService
     operations: 392
@@ -577,10 +577,10 @@ stores:
     operations: 134
   - service: FnbService
     operations: 114
+  - service: WhiteLabelService
+    operations: 95
   - service: IdentityService
     operations: 85
-  - service: WhiteLabelService
-    operations: 82
   - service: LedgerService
     operations: 46
   - service: InventoryService
@@ -685,9 +685,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2776 operations across 28 contracts — the join
+  holds: 2789 operations across 28 contracts — the join
 - layer: backend
-  holds: 1128 tables in 26 schemas, 910 relationships
+  holds: 1133 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

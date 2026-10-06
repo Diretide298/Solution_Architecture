@@ -23,7 +23,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 12 | `V0013__assets.sql` | MIG-ASSETS | tenant | assets | 7 | 74 | identity, platform | Hrushikant Patkar | 5 |
 | 13 | `V0014__ai.sql` | MIG-AI | tenant | ai | 49 | 714 | assets, identity, pii, platform | Tanmay Dukhande | 8 |
 | 14 | `V0015__resources.sql` | MIG-RESOURCES | tenant | resources | 7 | 89 | identity, orders, pii, platform | Hrushikant Patkar | 5 |
-| 15 | `V0016__whitelabel.sql` | MIG-WHITELABEL | tenant | whitelabel | 29 | 270 | identity, platform, promotions | Tanmay Dukhande | 8 |
+| 15 | `V0016__whitelabel.sql` | MIG-WHITELABEL | tenant | whitelabel | 29 | 267 | identity, platform, promotions | Tanmay Dukhande | 8 |
 | 16 | `V0017__platform.sql` | MIG-PLATFORM | tenant | platform | 17 | 204 | access, approvals, identity, inventory, ledger | Hrushikant Patkar | 8 |
 | 17 | `V0018__workforce.sql` | MIG-WORKFORCE | tenant | workforce | 3 | 39 | access, identity, platform | Hrushikant Patkar | 2 |
 | 18 | `V0019__seating.sql` | MIG-SEATING | tenant | seating | 10 | 82 | catalogue, identity, pii, platform | Hrushikant Patkar | 5 |
@@ -204,7 +204,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-WHITELABEL | `whitelabel.booking_flow_step` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 10 | 4 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.config_version` | 13 | scope_path |  | 8 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.content_page` | 11 | scope_path |  | 5 | 2 | used by the first release |
-| MIG-WHITELABEL | `whitelabel.custom_domain` | 18 | tenant root (one tenant per database; no tenant_id by design) |  | 6 | 5 | used by the first release |
+| MIG-WHITELABEL | `whitelabel.custom_domain` | 17 | tenant root (one tenant per database; no tenant_id by design) |  | 6 | 5 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.faq_category` | 5 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.faq_entry` | 6 | through its owner |  | 2 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.feature_toggle` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 4 | 2 | used by the first release |
@@ -215,7 +215,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-WHITELABEL | `whitelabel.guided_choice_answer` | 12 | through its owner |  | 10 | 4 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.guided_choice_question` | 5 | through its owner |  | 8 | 4 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.homepage_layout` | 3 | tenant root (one tenant per database; no tenant_id by design) |  | 6 | 1 | used by the first release |
-| MIG-WHITELABEL | `whitelabel.homepage_section` | 12 | tenant root (one tenant per database; no tenant_id by design) |  | 7 | 2 | used by the first release |
+| MIG-WHITELABEL | `whitelabel.homepage_section` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 7 | 2 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.module_enablement` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 4 | 2 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.navigation_config` | 3 | tenant root (one tenant per database; no tenant_id by design) |  | 5 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.navigation_item` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 5 | 2 | used by the first release |
@@ -231,7 +231,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.device` | 41 | tenant root (one tenant per database; no tenant_id by design) |  | 3 | 1 | used by the first release |
 | MIG-PLATFORM | `platform.device_heartbeat` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-PLATFORM | `platform.dsar_request` | 7 | through its owner |  | 0 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.guest_link` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.guest_profile |
+| MIG-PLATFORM | `platform.guest_link` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by platform.dsar_request |
 | MIG-PLATFORM | `platform.idempotency_record` | 11 | scope_path |  | 0 | 6 | used by the first release |
 | MIG-PLATFORM | `platform.outbox` | 15 | scope_path | yes | 0 | 46 | used by the first release |
 | MIG-PLATFORM | `platform.outlet` | 16 | venue_id |  | 10 | 2 | used by the first release |
@@ -254,9 +254,9 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-SEATING | `seating.seat_category` | 7 | venue_id |  | 4 | 1 | used by the first release |
 | MIG-SEATING | `seating.seat_hold` | 12 | through its owner |  | 6 | 4 | used by the first release |
 | MIG-SEATING | `seating.seat_hold_item` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-SEATING | `seating.seat_map` | 12 | venue_id |  | 0 | 0 | referenced by catalogue.performance |
+| MIG-SEATING | `seating.seat_map` | 12 | venue_id |  | 0 | 0 | referenced by seating.seat |
 | MIG-SEATING | `seating.seat_price_band` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 3 | 2 | used by the first release |
-| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by queue.queue |
+| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.incident` | 28 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection` | 14 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection_template` | 9 | venue_id |  | 2 | 1 | used by the first release |
@@ -306,8 +306,8 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.product_version` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 2 | used by the first release |
 | MIG-CATALOGUE | `catalogue.published_bundle` | 10 | venue_id |  | 3 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.variant` | 9 | through its owner |  | 10 | 3 | used by the first release |
-| MIG-LEDGER | `ledger.account` | 15 | through its owner |  | 0 | 0 | referenced by ledger.posting |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by inventory.movement |
+| MIG-LEDGER | `ledger.account` | 15 | through its owner |  | 0 | 0 | referenced by inventory.supplier |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by marketing.invitation |
 | MIG-LEDGER | `ledger.credit_memo` | 30 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | through its owner |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
@@ -328,14 +328,14 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.item` | 26 | venue_id |  | 6 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.kit_component` | 6 | scope_path |  | 3 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by inventory.stock_batch |
+| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by platform.outlet |
 | MIG-INVENTORY | `inventory.movement` | 17 | through its owner |  | 4 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.purchase_order` | 29 | scope_path |  | 0 | 0 | referenced by inventory.goods_receipt |
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_reservation` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by maintenance.asset |
+| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-PROMOTIONS | `promotions.allocation_component` | 9 | venue_id |  | 3 | 2 | used by the first release |
 | MIG-PROMOTIONS | `promotions.allocation_split` | 4 | through its owner |  | 0 | 0 | referenced by promotions.allocation_component |
 | MIG-PROMOTIONS | `promotions.bundle` | 20 | venue_id |  | 5 | 2 | used by the first release |
@@ -547,7 +547,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 
 ## Forward migrations after the first release
 
-**186 forward migrations**, V1000 upwards in build order (the Venue Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in `backend/<db>/`; a number is never reused, and a planned number is kept on the next refresh. The ticket's subject names the same file.
+**187 forward migrations**, V1000 upwards in build order (the Venue Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in `backend/<db>/`; a number is never reused, and a planned number is kept on the next refresh. The ticket's subject names the same file.
 
 | Number | File | Task | Database | Schema | Tables | Which tables |
 |---|---|---|---|---|---|---|
@@ -563,8 +563,6 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1009 | `V1009__approvals.sql` | MIG-APPROVALS-5 | tenant | approvals | 3 | approvals.automation_execution, approvals.external_dispatch, approvals.step_up_policy |
 | 1010 | `V1010__ai.sql` | MIG-AI-2 | tenant | ai | 1 | ai.action_step |
 | 1011 | `V1011__ai.sql` | MIG-AI-3 | tenant | ai | 1 | ai.tool |
-| 1012 | `V1012__ai.sql` | MIG-AI-4 | tenant | ai | 3 | ai.risk_assessment, ai.risk_case, ai.risk_strategy |
-| 1013 | `V1013__ai.sql` | MIG-AI-5 | tenant | ai | 6 | ai.case_action, ai.case_evidence, ai.entity_risk, ai.layout_draft, ai.risk_alert, ai.risk_edge |
 | 1014 | `V1014__rental.sql` | VM-MIG-RENTAL | tenant | rental | 2 | rental.booking, rental.participant |
 | 1015 | `V1015__resources.sql` | VM-MIG-RESOURCES | tenant | resources | 3 | resources.performance_participant, resources.qualification, resources.selection_policy |
 | 1016 | `V1016__ledger.sql` | VM-MIG-LEDGER | tenant | ledger | 7 | ledger.account_mapping, ledger.deposit, ledger.event_budget, ledger.fiscal_period_event, ledger.recognition_schedule, ledger.settlement, ledger.settlement_exception |
@@ -574,13 +572,10 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1020 | `V1020__payments.sql` | VM-MIG-PAYMENTS | tenant | payments | 1 | payments.provider_cost |
 | 1021 | `V1021__rental.sql` | MIG-RENTAL-2 | tenant | rental | 7 | rental.availability_rules, rental.blackout, rental.duration_rules, rental.equipment_assignment, rental.inventory_model, rental.location_rule, rental.product |
 | 1022 | `V1022__rental.sql` | MIG-RENTAL-3 | tenant | rental | 6 | rental.deposit_policy, rental.incident, rental.inspection, rental.inspection_item, rental.pricing_profile, rental.quote |
-| 1023 | `V1023__orders.sql` | MIG-ORDERS-10 | tenant | orders | 2 | orders.payment_allocation_rule, orders.payment_tip |
-| 1024 | `V1024__orders.sql` | MIG-ORDERS-11 | tenant | orders | 3 | orders.order_source_channel, orders.reservation_hold_policy, orders.status_transition_rule |
 | 1025 | `V1025__orders.sql` | MIG-ORDERS-2 | tenant | orders | 3 | orders.membership_activation_action, orders.membership_migration, orders.membership_renewal |
 | 1026 | `V1026__orders.sql` | MIG-ORDERS-4 | tenant | orders | 1 | orders.member_exception |
 | 1027 | `V1027__orders.sql` | MIG-ORDERS-5 | tenant | orders | 1 | orders.order_relationship |
 | 1028 | `V1028__orders.sql` | MIG-ORDERS-6 | tenant | orders | 5 | orders.b2b_credit, orders.credit_override, orders.guest_credit_account, orders.invitation_allowance, orders.order_fee |
-| 1029 | `V1029__orders.sql` | MIG-ORDERS-8 | tenant | orders | 1 | orders.resale_recommendation |
 | 1030 | `V1030__payments.sql` | MIG-PAYMENTS-7 | tenant | payments | 5 | payments.currency_rule, payments.eligibility_rule, payments.failover_policy, payments.fee_rule, payments.provider_event |
 | 1031 | `V1031__platform.sql` | MIG-PLATFORM-3 | tenant | platform | 2 | platform.cross_region_entitlement, platform.wallet_authorisation |
 | 1032 | `V1032__ledger.sql` | MIG-LEDGER-2 | tenant | ledger | 2 | ledger.inter_entity_obligation, ledger.tax_exemption |
@@ -589,16 +584,12 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1035 | `V1035__fnb.sql` | MIG-FNB-4 | tenant | fnb | 3 | fnb.ingredient_substitute, fnb.prep_sheet_template, fnb.product_recommendation |
 | 1036 | `V1036__workforce.sql` | VM-MIG-WORKFORCE | tenant | workforce | 6 | workforce.announcement, workforce.announcement_receipt, workforce.employee, workforce.job_title, workforce.shift, workforce.work_assignment |
 | 1037 | `V1037__maintenance.sql` | VM-MIG-MAINTENANCE | tenant | maintenance | 9 | maintenance.asset_document, maintenance.asset_status_change, maintenance.incident_authority_notification, maintenance.incident_history, maintenance.incident_investigation_note, maintenance.incident_involved_party, maintenance.preventive_plan, maintenance.priority_scoring_model, maintenance.vendor_service_request |
-| 1038 | `V1038__maintenance.sql` | MIG-MAINTENANCE-3 | tenant | maintenance | 1 | maintenance.asset_category |
 | 1039 | `V1039__games.sql` | VM-MIG-GAMES | tenant | games | 5 | games.game, games.operational_config, games.play, games.pricing, games.reader_profile |
 | 1040 | `V1040__games.sql` | MIG-GAMES-2 | tenant | games | 3 | games.authorisation, games.reader, games.reader_sync_status |
 | 1041 | `V1041__accreditation.sql` | VM-MIG-ACCREDITATION | tenant | accreditation | 4 | accreditation.application, accreditation.credential, accreditation.holder, accreditation.validity |
 | 1042 | `V1042__accreditation.sql` | MIG-ACCREDITATION-2 | tenant | accreditation | 1 | accreditation.audit |
 | 1043 | `V1043__accreditation.sql` | MIG-ACCREDITATION-3 | tenant | accreditation | 1 | accreditation.access_profile |
 | 1044 | `V1044__accreditation.sql` | MIG-ACCREDITATION-4 | tenant | accreditation | 2 | accreditation.holder_access, accreditation.programme |
-| 1045 | `V1045__accreditation.sql` | MIG-ACCREDITATION-5 | tenant | accreditation | 4 | accreditation.document, accreditation.identity_conflict, accreditation.notification_rules, accreditation.requirements |
-| 1046 | `V1046__accreditation.sql` | MIG-ACCREDITATION-6 | tenant | accreditation | 3 | accreditation.badge_template, accreditation.mobile_credential_delivery, accreditation.print_job |
-| 1047 | `V1047__accreditation.sql` | MIG-ACCREDITATION-7 | tenant | accreditation | 1 | accreditation.data_export |
 | 1048 | `V1048__reporting.sql` | VM-MIG-REPORTING | tenant | reporting | 2 | reporting.kpi_target, reporting.schedule_recipient |
 | 1049 | `V1049__inventory.sql` | VM-MIG-INVENTORY | tenant | inventory | 9 | inventory.count, inventory.count_line, inventory.purchase_order_line, inventory.quotation, inventory.quotation_line, inventory.requisition_line, inventory.supplier_contract, inventory.transfer, inventory.transfer_line |
 | 1050 | `V1050__inventory.sql` | MIG-INVENTORY-2 | tenant | inventory | 1 | inventory.daily_count_list |
@@ -606,21 +597,17 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1052 | `V1052__marketing.sql` | VM-MIG-MARKETING | tenant | marketing | 1 | marketing.journey_step |
 | 1053 | `V1053__marketing.sql` | MIG-MARKETING-5 | tenant | marketing | 1 | marketing.kiosk_assist_session |
 | 1054 | `V1054__marketing.sql` | MIG-MARKETING-6 | tenant | marketing | 29 | marketing.agent_service_profile, marketing.business_event, marketing.case_internal_request, marketing.case_linked_record, marketing.case_resolution, marketing.case_routing_rule, marketing.communication_routing_rule, marketing.consent_record_channel, marketing.contact_automation, marketing.guest_extra_field, marketing.guest_extra_option, marketing.guest_extra_value, marketing.guest_match_policy, marketing.guest_relationship, marketing.message_trigger, marketing.message_trigger_condition, marketing.privacy_request_deadline, marketing.privacy_request_type, marketing.quality_evaluation, marketing.reward_assignment, marketing.sla_policy, marketing.suppression, marketing.tracking_technology_catalogue, marketing.waiver_association, marketing.waiver_exception, marketing.waiver_form_layout, marketing.waiver_master, marketing.waiver_trigger_rule, marketing.waiver_version_control |
-| 1055 | `V1055__marketing.sql` | MIG-MARKETING-7 | tenant | marketing | 5 | marketing.duplicate_candidate, marketing.guest_attribute_model, marketing.identity_rules, marketing.privacy_exception, marketing.privacy_request |
 | 1056 | `V1056__marketing.sql` | MIG-MARKETING-9 | tenant | marketing | 5 | marketing.case_category, marketing.case_service_action, marketing.communication_provider, marketing.message_dispatch_attempt, marketing.service_queue |
 | 1057 | `V1057__subscription.sql` | MIG-SUBSCRIPTION-2 | tenant | subscription | 1 | subscription.go_live_readiness |
 | 1058 | `V1058__identity.sql` | MIG-IDENTITY-3 | tenant | identity | 12 | identity.access_override, identity.access_review_campaign, identity.access_review_item, identity.authorisation_policy, identity.authorisation_policy_version, identity.authz_audit, identity.benefit_usage, identity.customer_membership, identity.membership_history, identity.module, identity.module_access, identity.permission |
 | 1059 | `V1059__workforce.sql` | MIG-WORKFORCE-2 | tenant | workforce | 1 | workforce.shift_swap |
 | 1060 | `V1060__marketing.sql` | MIG-MARKETING-10 | tenant | marketing | 3 | marketing.case_escalation, marketing.feedback_classification, marketing.review_response |
-| 1061 | `V1061__marketing.sql` | MIG-MARKETING-12 | tenant | marketing | 4 | marketing.consent_capture_point, marketing.minor_privacy_rule, marketing.privacy_change_set, marketing.processing_purpose |
 | 1062 | `V1062__marketing.sql` | MIG-MARKETING-2 | tenant | marketing | 4 | marketing.guest_note, marketing.loyalty_points, marketing.touch_point, marketing.waiver_signature |
 | 1063 | `V1063__reporting.sql` | MIG-REPORTING-2 | tenant | reporting | 1 | reporting.analytics_governance_policy |
-| 1064 | `V1064__reporting.sql` | MIG-REPORTING-3 | tenant | reporting | 1 | reporting.anomaly |
 | 1065 | `V1065__control.sql` | MIG-CONTROL-2 | control | control | 3 | control.billing_entity, control.onboarding_application, control.venue_type_template |
-| 1066 | `V1066__ai.sql` | MIG-AI-8 | tenant | ai | 4 | ai.blueprint, ai.blueprint_decision, ai.config_session, ai.config_source |
-| 1067 | `V1067__ai.sql` | MIG-AI-9 | tenant | ai | 4 | ai.control, ai.control_test, ai.evidence_package, ai.risk_register |
-| 1068 | `V1068__seating.sql` | MIG-SEATING-6 | tenant | seating | 3 | seating.import_job, seating.seat_map_template, seating.zone |
-| 1069 | `V1069__marketing.sql` | MIG-MARKETING-4 | tenant | marketing | 1 | marketing.audience_list |
+| 1066 | `V1066__ai.sql` | MIG-AI-8 | tenant | ai | 1 | ai.suggestion_outcome |
+| 1067 | `V1067__ai.sql` | MIG-AI-9 | tenant | ai | 1 | ai.signal_source |
+| 1068 | `V1068__seating.sql` | MIG-SEATING-6 | tenant | seating | 2 | seating.hold_type, seating.seat_rules |
 | 1070 | `V1070__payments.sql` | MIG-PAYMENTS-2 | tenant | payments | 1 | payments.reconciliation_source |
 | 1071 | `V1071__payments.sql` | MIG-PAYMENTS-9 | tenant | payments | 4 | payments.chargeback_evidence, payments.credit_account, payments.matching_rules, payments.merchant_account |
 | 1072 | `V1072__control.sql` | MIG-CONTROL-3 | control | control | 6 | control.channel_listing, control.partner_allocation, control.partner_booking_limit, control.partner_commercial_exception, control.partner_status_history, control.partner_user |
@@ -630,7 +617,6 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1076 | `V1076__platform.sql` | MIG-PLATFORM-2 | tenant | platform | 1 | platform.cell_endpoint |
 | 1077 | `V1077__tenancy.sql` | MIG-TENANCY-3 | tenant | tenancy | 2 | tenancy.data_retention_setting, tenancy.device_telemetry |
 | 1078 | `V1078__access.sql` | MIG-ACCESS-2 | tenant | access | 1 | access.access_area |
-| 1079 | `V1079__access.sql` | MIG-ACCESS-6 | tenant | access | 10 | access.access_map, access.attraction_access, access.configuration_version, access.consumption_rule, access.gate_lane, access.group_admission_rule, access.hardware_deployment, access.journey_sequence_rule, access.offline_policy, access.operating_calendar_entry |
 | 1080 | `V1080__payments.sql` | MIG-PAYMENTS-3 | tenant | payments | 3 | payments.terminal, payments.terminal_certification, payments.terminal_certification_level3 |
 | 1081 | `V1081__wallet.sql` | VM-MIG-WALLET | tenant | wallet | 1 | wallet.adjustment |
 | 1082 | `V1082__marketing.sql` | MIG-MARKETING-3 | tenant | marketing | 5 | marketing.legal_hold, marketing.privacy_action, marketing.privacy_audit_event, marketing.retention_policy, marketing.retention_run |
@@ -649,8 +635,6 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1098 | `V1098__control.sql` | MIG-CONTROL-9 | control | control | 2 | control.credit_note, control.credit_note_line |
 | 1099 | `V1099__approvals.sql` | MIG-APPROVALS-6 | tenant | approvals | 12 | approvals.approved_action_execution, approvals.automation, approvals.business_rule, approvals.control_policy, approvals.decision_record, approvals.decision_table, approvals.decision_table_row, approvals.workflow_exception, approvals.workflow_instance, approvals.workflow_intervention, approvals.workflow_step_execution, approvals.workflow_trigger |
 | 1100 | `V1100__seating.sql` | MIG-SEATING-2 | tenant | seating | 1 | seating.hold_pool |
-| 1101 | `V1101__seating.sql` | MIG-SEATING-4 | tenant | seating | 2 | seating.hold_type, seating.seat_rules |
-| 1102 | `V1102__workforce.sql` | MIG-WORKFORCE-4 | tenant | workforce | 4 | workforce.employment, workforce.staff_conversation, workforce.staff_conversation_participant, workforce.staff_message |
 | 1103 | `V1103__approvals.sql` | MIG-APPROVALS-7 | tenant | approvals | 2 | approvals.evidence_package, approvals.signature |
 | 1104 | `V1104__catalogue.sql` | MIG-CATALOGUE-3 | tenant | catalogue | 2 | catalogue.approval_policy, catalogue.audit_entry |
 | 1105 | `V1105__approvals.sql` | MIG-APPROVALS-8 | tenant | approvals | 1 | approvals.approver_availability |
@@ -663,7 +647,6 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1113 | `V1113__catalogue.sql` | MIG-CATALOGUE-4 | tenant | catalogue | 5 | catalogue.package_pricing, catalogue.price_assignment, catalogue.rate, catalogue.rollback_action, catalogue.variant_dimension |
 | 1114 | `V1114__promotions.sql` | MIG-PROMOTIONS-2 | tenant | promotions | 4 | promotions.campaign, promotions.campaign_budget, promotions.stacking_rule, promotions.voucher_batch |
 | 1115 | `V1115__access.sql` | MIG-ACCESS-3 | tenant | access | 1 | access.companion_rule |
-| 1116 | `V1116__access.sql` | MIG-ACCESS-9 | tenant | access | 5 | access.fast_pass_profile, access.identity_lock, access.journey_profile, access.reason_code, access.security_investigation |
 | 1117 | `V1117__fnb.sql` | MIG-FNB-2 | tenant | fnb | 3 | fnb.combo, fnb.combo_slot, fnb.combo_slot_option |
 | 1118 | `V1118__catalogue.sql` | MIG-CATALOGUE-5 | tenant | catalogue | 5 | catalogue.event_change_treatment_policy, catalogue.membership_benefit, catalogue.seat_pricing_rule, catalogue.tax_profile, catalogue.waiting_room_setting |
 | 1119 | `V1119__catalogue.sql` | MIG-CATALOGUE-6 | tenant | catalogue | 15 | catalogue.calculation_profile, catalogue.calculation_step, catalogue.demand_forecast, catalogue.dynamic_pricing_control, catalogue.dynamic_pricing_strategy, catalogue.fee, catalogue.fee_rule, catalogue.price_execution, catalogue.price_resolution_policy, catalogue.pricing_experiment, catalogue.pricing_recommendation, catalogue.pricing_recommendation_decision, catalogue.pricing_simulation, catalogue.rounding_profile, catalogue.tax_rule |
@@ -672,57 +655,41 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1122 | `V1122__catalogue.sql` | MIG-CATALOGUE-9 | tenant | catalogue | 1 | catalogue.pricing_publication_target |
 | 1123 | `V1123__catalogue.sql` | MIG-CATALOGUE-10 | tenant | catalogue | 3 | catalogue.demand_signal, catalogue.price_ladder, catalogue.signal_registry |
 | 1124 | `V1124__promotions.sql` | MIG-PROMOTIONS-3 | tenant | promotions | 2 | promotions.promotion_alert, promotions.recommendation_outcome |
-| 1125 | `V1125__promotions.sql` | MIG-PROMOTIONS-5 | tenant | promotions | 2 | promotions.bundle_capacity_policy, promotions.promotion_conflict |
 | 1126 | `V1126__catalogue.sql` | MIG-CATALOGUE-11 | tenant | catalogue | 2 | catalogue.channel_connection, catalogue.channel_sales_rule |
 | 1127 | `V1127__orders.sql` | MIG-ORDERS-3 | tenant | orders | 1 | orders.discount |
 | 1128 | `V1128__wallet.sql` | MIG-WALLET-2 | tenant | wallet | 1 | wallet.risk_rule |
 | 1129 | `V1129__catalogue.sql` | MIG-CATALOGUE-12 | tenant | catalogue | 2 | catalogue.channel_incident, catalogue.channel_sync |
 | 1130 | `V1130__catalogue.sql` | MIG-CATALOGUE-13 | tenant | catalogue | 3 | catalogue.event_type, catalogue.pricing_test_case, catalogue.space |
 | 1131 | `V1131__promotions.sql` | MIG-PROMOTIONS-4 | tenant | promotions | 1 | promotions.partner_bundle_product |
-| 1132 | `V1132__promotions.sql` | MIG-PROMOTIONS-6 | tenant | promotions | 4 | promotions.product_relationship, promotions.recommendation_experiment, promotions.recommendation_strategy, promotions.recommendation_suppression |
 | 1134 | `V1134__maintenance.sql` | MIG-MAINTENANCE-2 | tenant | maintenance | 1 | maintenance.inspection_item |
 | 1135 | `V1135__rental.sql` | MIG-RENTAL-5 | tenant | rental | 5 | rental.agreement, rental.agreement_item, rental.agreement_rules, rental.fee_policy, rental.operational_rules |
-| 1136 | `V1136__seating.sql` | MIG-SEATING-5 | tenant | seating | 4 | seating.group_request, seating.group_request_participant, seating.reassignment, seating.section_row |
-| 1137 | `V1137__access.sql` | MIG-ACCESS-4 | tenant | access | 2 | access.podium, access.podium_shift |
-| 1138 | `V1138__orders.sql` | MIG-ORDERS-7 | tenant | orders | 4 | orders.resale_eligibility_rule, orders.resale_fee_policy, orders.resale_marketplace_config, orders.resale_settlement |
 | 1139 | `V1139__payments.sql` | MIG-PAYMENTS-4 | tenant | payments | 2 | payments.mixed_tender_rules, payments.payment_terms |
-| 1140 | `V1140__orders.sql` | MIG-ORDERS-9 | tenant | orders | 2 | orders.upgrade, orders.upgrade_rule |
-| 1141 | `V1141__payments.sql` | MIG-PAYMENTS-5 | tenant | payments | 1 | payments.risk_rules |
-| 1142 | `V1142__payments.sql` | MIG-PAYMENTS-6 | tenant | payments | 1 | payments.deposit_activity |
-| 1143 | `V1143__orders.sql` | MIG-ORDERS-12 | tenant | orders | 6 | orders.after_sale_policy_window, orders.deposit_policy, orders.external_reference_mapping, orders.group_payment_milestone, orders.group_payment_schedule, orders.refund_calculation_policy |
-| 1144 | `V1144__payments.sql` | MIG-PAYMENTS-8 | tenant | payments | 2 | payments.authentication_policy, payments.hosted_checkout |
+| 1143 | `V1143__orders.sql` | MIG-ORDERS-12 | tenant | orders | 4 | orders.resale_eligibility_rule, orders.resale_fee_policy, orders.resale_marketplace_config, orders.resale_settlement |
 | 1145 | `V1145__wallet.sql` | MIG-WALLET-3 | tenant | wallet | 1 | wallet.dispute |
-| 1146 | `V1146__wallet.sql` | MIG-WALLET-4 | tenant | wallet | 1 | wallet.credit_eligibility |
-| 1147 | `V1147__wallet.sql` | MIG-WALLET-5 | tenant | wallet | 3 | wallet.credential, wallet.shared_wallet, wallet.shared_wallet_member |
 | 1148 | `V1148__access.sql` | MIG-ACCESS-5 | tenant | access | 1 | access.hardware_certification |
-| 1149 | `V1149__access.sql` | MIG-ACCESS-7 | tenant | access | 7 | access.credential_event_propagation_rule, access.credential_security_profile, access.external_credential_integration, access.media_compatibility_test, access.media_encoding_profile, access.security_alert, access.verification_method_policy |
+| 1149 | `V1149__access.sql` | MIG-ACCESS-7 | tenant | access | 2 | access.podium, access.podium_shift |
 | 1150 | `V1150__access.sql` | MIG-ACCESS-8 | tenant | access | 6 | access.access_point_configuration, access.device_configuration, access.edge_node, access.edge_package, access.gate_outcome_profile, access.hardware_model |
-| 1151 | `V1151__access.sql` | MIG-ACCESS-10 | tenant | access | 5 | access.access_attribute, access.credential_sharing_case, access.fraud_rule, access.policy_evaluation_setting, access.risk_scoring_config |
-| 1152 | `V1152__access.sql` | MIG-ACCESS-11 | tenant | access | 5 | access.credential_exception, access.credential_issuance, access.media_binding_rule, access.security_playbook, access.ticket_status_transition |
-| 1153 | `V1153__access.sql` | MIG-ACCESS-12 | tenant | access | 5 | access.branding_profile, access.credential_delivery, access.credential_issuance_retry_policy, access.dynamic_field, access.media_template_version |
-| 1156 | `V1156__fnb.sql` | MIG-FNB-5 | tenant | fnb | 3 | fnb.kitchen_routing_rule, fnb.outlet_template, fnb.service_charge_policy |
+| 1151 | `V1151__access.sql` | MIG-ACCESS-10 | tenant | access | 10 | access.access_map, access.attraction_access, access.configuration_version, access.consumption_rule, access.gate_lane, access.group_admission_rule, access.hardware_deployment, access.journey_sequence_rule, access.offline_policy, access.operating_calendar_entry |
+| 1152 | `V1152__access.sql` | MIG-ACCESS-11 | tenant | access | 7 | access.credential_event_propagation_rule, access.credential_security_profile, access.external_credential_integration, access.media_compatibility_test, access.media_encoding_profile, access.security_alert, access.verification_method_policy |
 | 1158 | `V1158__retail.sql` | MIG-RETAIL-2 | tenant | retail | 2 | retail.exchange, retail.product_recommendation |
 | 1159 | `V1159__rental.sql` | MIG-RENTAL-4 | tenant | rental | 2 | rental.damage_assessment, rental.settlement |
 | 1160 | `V1160__rental.sql` | MIG-RENTAL-6 | tenant | rental | 2 | rental.agreement_signature, rental.override |
 | 1161 | `V1161__resources.sql` | MIG-RESOURCES-2 | tenant | resources | 1 | resources.resource_type |
 | 1162 | `V1162__workforce.sql` | MIG-WORKFORCE-3 | tenant | workforce | 4 | workforce.field_ownership, workforce.integration_source, workforce.staffing_rules, workforce.training_record |
-| 1163 | `V1163__resources.sql` | MIG-RESOURCES-3 | tenant | resources | 6 | resources.attribute_definition, resources.resource_audit, resources.resource_category, resources.resource_dependency, resources.resource_relation, resources.venue_assignment |
 | 1164 | `V1164__workforce.sql` | MIG-WORKFORCE-5 | tenant | workforce | 9 | workforce.labour_budget, workforce.leave_balance, workforce.leave_request, workforce.leave_type, workforce.open_shift, workforce.position_requirement, workforce.shift_template, workforce.sync_conflict, workforce.sync_run |
 | 1165 | `V1165__maintenance.sql` | MIG-MAINTENANCE-4 | tenant | maintenance | 2 | maintenance.incident_media, maintenance.work_order_attachment |
-| 1166 | `V1166__games.sql` | MIG-GAMES-3 | tenant | games | 7 | games.attraction_type, games.entitlement, games.gameplay_transaction, games.pricing_exception, games.reader_deployment, games.redemption_rules, games.validation_rules |
-| 1167 | `V1167__games.sql` | MIG-GAMES-4 | tenant | games | 5 | games.card_expiry_rules, games.prize, games.prize_cost, games.redemption, games.redemption_line |
-| 1168 | `V1168__games.sql` | MIG-GAMES-5 | tenant | games | 1 | games.kiosk_config |
-| 1169 | `V1169__marketing.sql` | MIG-MARKETING-8 | tenant | marketing | 5 | marketing.audience_activation, marketing.communication_preference_type, marketing.journey_enrollment, marketing.privacy_export_package, marketing.privacy_incident |
-| 1170 | `V1170__marketing.sql` | MIG-MARKETING-11 | tenant | marketing | 4 | marketing.communication_policy_decision, marketing.sender_identity, marketing.waiver_signatory_rule, marketing.waiver_verification |
-| 1171 | `V1171__marketing.sql` | MIG-MARKETING-13 | tenant | marketing | 1 | marketing.waiver_localisation |
-| 1172 | `V1172__marketing.sql` | MIG-MARKETING-14 | tenant | marketing | 1 | marketing.case_compensation_request |
+| 1167 | `V1167__games.sql` | MIG-GAMES-4 | tenant | games | 7 | games.attraction_type, games.entitlement, games.gameplay_transaction, games.pricing_exception, games.reader_deployment, games.redemption_rules, games.validation_rules |
+| 1168 | `V1168__games.sql` | MIG-GAMES-5 | tenant | games | 5 | games.card_expiry_rules, games.prize, games.prize_cost, games.redemption, games.redemption_line |
+| 1169 | `V1169__marketing.sql` | MIG-MARKETING-8 | tenant | marketing | 1 | marketing.audience_list |
+| 1171 | `V1171__marketing.sql` | MIG-MARKETING-13 | tenant | marketing | 5 | marketing.duplicate_candidate, marketing.guest_attribute_model, marketing.identity_rules, marketing.privacy_exception, marketing.privacy_request |
+| 1172 | `V1172__marketing.sql` | MIG-MARKETING-14 | tenant | marketing | 5 | marketing.audience_activation, marketing.communication_preference_type, marketing.journey_enrollment, marketing.privacy_export_package, marketing.privacy_incident |
 | 1173 | `V1173__marketing.sql` | MIG-MARKETING-15 | tenant | marketing | 3 | marketing.badge, marketing.loyalty_campaign, marketing.message_delivery |
 | 1174 | `V1174__marketing.sql` | MIG-MARKETING-16 | tenant | marketing | 3 | marketing.cookie_scan_finding, marketing.cookie_scan_policy, marketing.cookie_scan_run |
-| 1175 | `V1175__ai.sql` | MIG-AI-6 | tenant | ai | 1 | ai.suggestion_outcome |
-| 1176 | `V1176__ai.sql` | MIG-AI-7 | tenant | ai | 1 | ai.signal_source |
-| 1177 | `V1177__reporting.sql` | MIG-REPORTING-4 | tenant | reporting | 1 | reporting.export |
-| 1178 | `V1178__reporting.sql` | MIG-REPORTING-5 | tenant | reporting | 2 | reporting.pipeline, reporting.site_normalisation_basis |
-| 1179 | `V1179__reporting.sql` | MIG-REPORTING-6 | tenant | reporting | 2 | reporting.delivery, reporting.subscription |
+| 1175 | `V1175__ai.sql` | MIG-AI-6 | tenant | ai | 3 | ai.risk_assessment, ai.risk_case, ai.risk_strategy |
+| 1176 | `V1176__ai.sql` | MIG-AI-7 | tenant | ai | 6 | ai.case_action, ai.case_evidence, ai.entity_risk, ai.layout_draft, ai.risk_alert, ai.risk_edge |
+| 1177 | `V1177__reporting.sql` | MIG-REPORTING-4 | tenant | reporting | 1 | reporting.anomaly |
+| 1178 | `V1178__reporting.sql` | MIG-REPORTING-5 | tenant | reporting | 1 | reporting.export |
+| 1179 | `V1179__reporting.sql` | MIG-REPORTING-6 | tenant | reporting | 2 | reporting.pipeline, reporting.site_normalisation_basis |
 | 1181 | `V1181__control.sql` | MIG-CONTROL-13 | control | control | 2 | control.api_anomaly_rule, control.api_limit |
 | 1182 | `V1182__payments.sql` | MIG-PAYMENTS-10 | tenant | payments | 1 | payments.method_config |
 | 1184 | `V1184__ai.sql` | MIG-AI-10 | tenant | ai | 2 | ai.index_failure, ai.spend_ceiling |
@@ -731,12 +698,46 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1188 | `V1188__ai.sql` | MIG-AI-11 | tenant | ai | 1 | ai.forecast_export |
 | 1189 | `V1189__control.sql` | MIG-CONTROL-12 | control | control | 1 | control.sandbox |
 | 1190 | `V1190__catalogue.sql` | MIG-CATALOGUE-14 | tenant | catalogue | 2 | catalogue.event_reschedule, catalogue.prepaid_minutes |
-| 1192 | `V1192__orders.sql` | MIG-ORDERS-13 | tenant | orders | 6 | orders.group_enquiry, orders.group_quote_line, orders.group_task, orders.group_ticket_allocation, orders.group_ticket_allocation_line, orders.group_ticket_fulfillment |
-| 1194 | `V1194__wallet.sql` | MIG-WALLET-6 | tenant | wallet | 2 | wallet.gift_card_product, wallet.voucher_type |
-| 1195 | `V1195__resources.sql` | MIG-RESOURCES-4 | tenant | resources | 1 | resources.allocation_policy |
+| 1192 | `V1192__orders.sql` | MIG-ORDERS-13 | tenant | orders | 1 | orders.resale_recommendation |
+| 1194 | `V1194__wallet.sql` | MIG-WALLET-6 | tenant | wallet | 1 | wallet.credit_eligibility |
+| 1195 | `V1195__resources.sql` | MIG-RESOURCES-4 | tenant | resources | 6 | resources.attribute_definition, resources.resource_audit, resources.resource_category, resources.resource_dependency, resources.resource_relation, resources.venue_assignment |
 | 1196 | `V1196__catalogue.sql` | MIG-CATALOGUE-15 | tenant | catalogue | 1 | catalogue.performance_media |
-| 1197 | `V1197__wallet.sql` | MIG-WALLET-7 | tenant | wallet | 1 | wallet.restriction |
-| 1198 | `V1198__resources.sql` | MIG-RESOURCES-5 | tenant | resources | 2 | resources.resource_cost, resources.resource_request |
+| 1197 | `V1197__wallet.sql` | MIG-WALLET-7 | tenant | wallet | 3 | wallet.credential, wallet.shared_wallet, wallet.shared_wallet_member |
+| 1198 | `V1198__resources.sql` | MIG-RESOURCES-5 | tenant | resources | 1 | resources.allocation_policy |
+| 1199 | `V1199__whitelabel.sql` | MIG-WHITELABEL-2 | tenant | whitelabel | 5 | whitelabel.kiosk_assignment, whitelabel.kiosk_config, whitelabel.kiosk_config_attract_slide, whitelabel.kiosk_config_start_tile, whitelabel.kiosk_config_version |
+| 1200 | `V1200__promotions.sql` | MIG-PROMOTIONS-8 | tenant | promotions | 2 | promotions.bundle_capacity_policy, promotions.promotion_conflict |
+| 1201 | `V1201__promotions.sql` | MIG-PROMOTIONS-9 | tenant | promotions | 4 | promotions.product_relationship, promotions.recommendation_experiment, promotions.recommendation_strategy, promotions.recommendation_suppression |
+| 1202 | `V1202__seating.sql` | MIG-SEATING-7 | tenant | seating | 4 | seating.group_request, seating.group_request_participant, seating.reassignment, seating.section_row |
+| 1203 | `V1203__seating.sql` | MIG-SEATING-8 | tenant | seating | 3 | seating.import_job, seating.seat_map_template, seating.zone |
+| 1204 | `V1204__orders.sql` | MIG-ORDERS-14 | tenant | orders | 2 | orders.upgrade, orders.upgrade_rule |
+| 1205 | `V1205__orders.sql` | MIG-ORDERS-15 | tenant | orders | 2 | orders.payment_allocation_rule, orders.payment_tip |
+| 1206 | `V1206__payments.sql` | MIG-PAYMENTS-11 | tenant | payments | 1 | payments.risk_rules |
+| 1207 | `V1207__orders.sql` | MIG-ORDERS-16 | tenant | orders | 3 | orders.order_source_channel, orders.reservation_hold_policy, orders.status_transition_rule |
+| 1208 | `V1208__orders.sql` | MIG-ORDERS-17 | tenant | orders | 6 | orders.after_sale_policy_window, orders.deposit_policy, orders.external_reference_mapping, orders.group_payment_milestone, orders.group_payment_schedule, orders.refund_calculation_policy |
+| 1209 | `V1209__payments.sql` | MIG-PAYMENTS-12 | tenant | payments | 1 | payments.deposit_activity |
+| 1210 | `V1210__orders.sql` | MIG-ORDERS-18 | tenant | orders | 6 | orders.group_enquiry, orders.group_quote_line, orders.group_task, orders.group_ticket_allocation, orders.group_ticket_allocation_line, orders.group_ticket_fulfillment |
+| 1211 | `V1211__payments.sql` | MIG-PAYMENTS-14 | tenant | payments | 2 | payments.authentication_policy, payments.hosted_checkout |
+| 1212 | `V1212__wallet.sql` | MIG-WALLET-8 | tenant | wallet | 2 | wallet.gift_card_product, wallet.voucher_type |
+| 1213 | `V1213__wallet.sql` | MIG-WALLET-9 | tenant | wallet | 1 | wallet.restriction |
+| 1214 | `V1214__access.sql` | MIG-ACCESS-13 | tenant | access | 5 | access.fast_pass_profile, access.identity_lock, access.journey_profile, access.reason_code, access.security_investigation |
+| 1215 | `V1215__access.sql` | MIG-ACCESS-14 | tenant | access | 5 | access.access_attribute, access.credential_sharing_case, access.fraud_rule, access.policy_evaluation_setting, access.risk_scoring_config |
+| 1216 | `V1216__access.sql` | MIG-ACCESS-15 | tenant | access | 5 | access.credential_exception, access.credential_issuance, access.media_binding_rule, access.security_playbook, access.ticket_status_transition |
+| 1217 | `V1217__access.sql` | MIG-ACCESS-16 | tenant | access | 5 | access.branding_profile, access.credential_delivery, access.credential_issuance_retry_policy, access.dynamic_field, access.media_template_version |
+| 1218 | `V1218__fnb.sql` | MIG-FNB-8 | tenant | fnb | 3 | fnb.kitchen_routing_rule, fnb.outlet_template, fnb.service_charge_policy |
+| 1219 | `V1219__maintenance.sql` | MIG-MAINTENANCE-5 | tenant | maintenance | 1 | maintenance.asset_category |
+| 1220 | `V1220__accreditation.sql` | MIG-ACCREDITATION-8 | tenant | accreditation | 4 | accreditation.document, accreditation.identity_conflict, accreditation.notification_rules, accreditation.requirements |
+| 1221 | `V1221__accreditation.sql` | MIG-ACCREDITATION-9 | tenant | accreditation | 3 | accreditation.badge_template, accreditation.mobile_credential_delivery, accreditation.print_job |
+| 1222 | `V1222__accreditation.sql` | MIG-ACCREDITATION-10 | tenant | accreditation | 1 | accreditation.data_export |
+| 1223 | `V1223__resources.sql` | MIG-RESOURCES-6 | tenant | resources | 2 | resources.resource_cost, resources.resource_request |
+| 1224 | `V1224__workforce.sql` | MIG-WORKFORCE-8 | tenant | workforce | 4 | workforce.employment, workforce.staff_conversation, workforce.staff_conversation_participant, workforce.staff_message |
+| 1225 | `V1225__games.sql` | MIG-GAMES-6 | tenant | games | 1 | games.kiosk_config |
+| 1226 | `V1226__marketing.sql` | MIG-MARKETING-20 | tenant | marketing | 4 | marketing.communication_policy_decision, marketing.sender_identity, marketing.waiver_signatory_rule, marketing.waiver_verification |
+| 1227 | `V1227__marketing.sql` | MIG-MARKETING-21 | tenant | marketing | 4 | marketing.consent_capture_point, marketing.minor_privacy_rule, marketing.privacy_change_set, marketing.processing_purpose |
+| 1228 | `V1228__marketing.sql` | MIG-MARKETING-22 | tenant | marketing | 1 | marketing.waiver_localisation |
+| 1229 | `V1229__marketing.sql` | MIG-MARKETING-23 | tenant | marketing | 1 | marketing.case_compensation_request |
+| 1230 | `V1230__ai.sql` | MIG-AI-12 | tenant | ai | 4 | ai.blueprint, ai.blueprint_decision, ai.config_session, ai.config_source |
+| 1231 | `V1231__ai.sql` | MIG-AI-13 | tenant | ai | 4 | ai.control, ai.control_test, ai.evidence_package, ai.risk_register |
+| 1232 | `V1232__reporting.sql` | MIG-REPORTING-7 | tenant | reporting | 2 | reporting.delivery, reporting.subscription |
 
 ## Tables no migration creates
 

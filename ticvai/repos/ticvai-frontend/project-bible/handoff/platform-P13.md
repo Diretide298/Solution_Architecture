@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 103 |
-| Operations | 197 |
+| Screens | 104 |
+| Operations | 207 |
 | Contracts | 8 |
-| Modules | 3 |
+| Modules | 4 |
 | Undrawn | 0 |
 | Operations with no screen | 98 |
-| Waves | wave1 25 · wave3 78 |
+| Waves | wave1 26 · wave3 78 |
 
 ## Gaps
 
@@ -75,6 +75,7 @@
 | Policy | 40 | 1, 3 |
 | Media Library | 40 | 3 |
 | White Label | 23 | 1 |
+| Kiosk | 1 | 1 |
 
 ## Screens
 
@@ -183,4 +184,5 @@
 | `CMS-102` | Site Builder | White Label | 1 | 7 | yes |
 | `CMS-103` | Booking Flows | White Label | 1 | 14 | yes |
 | `CMS-104` | App Build & Store Publishing | White Label | 1 | 9 | yes |
+| `CMS-105` | Kiosk Builder | Kiosk | 1 | 10 | yes |
 

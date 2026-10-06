@@ -43,6 +43,10 @@ named vendor is a driver behind a stable shape, not a core change.
 Boca maps to `ticketPrinter`, Zebra Bluetooth to `labelPrinter`, Chainway to a handheld running
 the venue-scanner app, Emirates ID to `idReader`, facial readers to `biometricReader`.
 
+| Device | Port | Status | Owner and next step |
+|---|---|---|---|
+| **BOCA** ticket and wristband printer (Lemur family) | `ticketPrinter` (FGL, ADR-0015 Tier A) | **Documentation received 5 Oct 2026** (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the Lemur, Windows driver; `sources/client/2026-10-05-allam-boca-printer.md`, URLs to follow). **Hardware shipping to India**, date not given | Backend: DEVICE-BOCA-FGL (Block A2) builds the FGL driver on an emulator now; hardware validation when the unit reaches India. Client (Allam): the six BOCA questions in the Decisions Register (model, connection and host OS, stock, RFID scope, arrival and BOCA contact, mandated settings). CHG-R4-002 |
+
 ---
 
 ## The finding this exercise produced

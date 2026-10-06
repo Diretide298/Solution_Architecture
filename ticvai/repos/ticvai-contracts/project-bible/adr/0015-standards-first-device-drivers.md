@@ -1,6 +1,6 @@
 # ADR-0015: Standards-First Device Drivers
 
-**Status:** Accepted · amended by [ADR-0067](0067-one-device-register.md), 1 October 2026: every device class, gate devices included, is registered once in `platform.device`; Access keeps only where a device is placed
+**Status:** Accepted · amended by [ADR-0067](0067-one-device-register.md), 1 October 2026: every device class, gate devices included, is registered once in `platform.device`; Access keeps only where a device is placed · amended 5 October 2026 (CHG-R4-002): BOCA confirmed as the ticket and wristband printer, its documents received (see the last section)
 **Date:** 13 August 2026
 **Unblocks:** hardware-dependent work currently waiting on the model list and turnstile SDK
 **Related:** ADR-0012 adaptor-first integration (its Q2 waiting room amended by ADR-0066; the adaptor-first rule stands)
@@ -187,3 +187,22 @@ standard removes most of the risk, not all of it.
 
 **The lab still decides.** This ADR moves work off the critical path; it does not remove the
 need to prove each driver against real hardware before acceptance.
+
+---
+
+## Amendment, 5 October 2026 (CHG-R4-002): BOCA confirmed, its documents received
+
+The client confirmed BOCA as the ticket and wristband printer and sent, on 5 October 2026, the printer
+specifications, the SDK sample code, the operator manuals and the FGL programming guide, RFID encoding on the BOCA
+Lemur, and the Windows driver (Muhamed Allam's email, filed verbatim in
+`sources/client/2026-10-05-allam-boca-printer.md`; link titles only, the URLs to follow). The printer ships to the
+India office when it is ready.
+
+**The Tier A decision stands.** The ticket printer is built to BOCA FGL now, behind the `ticketPrinter` port of
+the integration register, against an emulated (virtual) printer in tests and CI; the hardware validation runs when
+the unit reaches India, as this ADR's caveat requires ("the lab still decides"). The work is the Block A2 task
+DEVICE-BOCA-FGL (`docs/active/block-a-extra-tasks.json`).
+
+**New scope to confirm: RFID encoding on the Lemur.** Encoding RFID wristbands or tickets at print time was not in
+this ADR's Tier A table. It is built behind a flag, off, until the client confirms whether RFID-encoded media are in
+scope, which chip and which data (the questions are in the Decisions Register, pending).

@@ -1,6 +1,6 @@
 # WS149 — Payment Payment Orchestration board 3
 
-**10 screens · 14 operations · 19 schemas · 6 permissions**
+**10 screens · 17 operations · 36 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `DEVICE_MANAGE, DEVICE_VIEW, PAYMENT_CONFIGURE, PAYMENT_PROVIDER_MANAGE, PAYMENT_VIEW, WORK_ORDER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `DEVICE_MANAGE, DEVICE_VIEW, PAYMENT_CONFIGURE, PAYMENT_PROVIDER_MANAGE, PAYMENT_VIEW, TENANT_CONFIGURE, WORK_ORDER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-579` | Terminal & Card-Present Command Center | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-580` | Payment Terminal & Device Inventory | C | 0 | 0 | 6 | 8 | 0 | 4 | — | notStarted (—) |
 | `ADM-581` | Terminal Provisioning & Device Configuration | B | 9 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B | 2 | 3 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `ADM-583` | EMV & Card-Present Processing Configuration | C | 8 | 17 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-584` | Payment Server & Terminal Connectivity Manager | B | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-585` | Card-Present Transaction Monitor & Operations | C | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -143,7 +143,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**ADM-582, ADM-584, ADM-586, ADM-587 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-584, ADM-586, ADM-587 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

@@ -19,6 +19,9 @@ package or repository root (`sources/`, `docs/`, `handoff/`, `tools/`, `contract
     CS-MISSING      a path git does not track (resolved from ticvai/, the repository root, or the citing
                     file's folder): a renamed, deleted or never-committed file
 
+A file the package deleted by a recorded decision (tools/check-migration-freeze.py `RETIRED`, CHG-SQL-001) is
+noted, not failed: the change entry that deleted it has to name it (CHG-R4-009).
+
 Patterns (`*`, `<id>`, `{...}`) are not citations and are skipped. The findings that were there when the
 check was written are its baseline (`handoff/audit-baseline.json`, `audit_guard.py`): only a new one fails,
 and `--update-baseline` after a fix tightens it.
@@ -28,6 +31,7 @@ and `--update-baseline` after a fix tightens it.
 from __future__ import annotations
 
 import collections
+import functools
 import re
 import subprocess
 import sys
@@ -81,6 +85,23 @@ def resolves(path: str, doc: Path, files: set | None) -> bool:
     return any(c in files for c in cands)
 
 
+@functools.lru_cache(maxsize=None)
+def retired_files() -> frozenset:
+    """Files the package deleted by a recorded decision (check-migration-freeze.py RETIRED, CHG-SQL-001; CHG-R4-009):
+    a change entry that cites one is history, not a missing source. Any other deleted file still fails."""
+    import importlib.util
+    f = ROOT / "tools" / "check-migration-freeze.py"
+    if not f.exists():
+        return frozenset()
+    spec = importlib.util.spec_from_file_location("cmf", f)
+    m = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(m)
+    except Exception:
+        return frozenset()
+    return frozenset(getattr(m, "RETIRED", ()))
+
+
 def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-cited-sources", RULES)
@@ -100,6 +121,8 @@ def main() -> int:
             if OUTSIDE.search(p):
                 guard.add("CS-OUTSIDE-GIT", f"{rel}|{p}", f"{rel}: cites {p}")
                 per_doc[rel] += 1
+            elif p.removeprefix("ticvai/") in retired_files():
+                guard.note(f"{rel}: cites {p}, retired by decision (check-migration-freeze RETIRED, CHG-SQL-001)")
             elif not resolves(p, doc, files):
                 guard.add("CS-MISSING", f"{rel}|{p}", f"{rel}: cites {p}, which git does not track")
                 per_doc[rel] += 1

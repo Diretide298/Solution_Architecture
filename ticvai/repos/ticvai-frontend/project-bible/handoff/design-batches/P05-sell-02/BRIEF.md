@@ -1,6 +1,6 @@
 # P05-sell-02 — P05 · Sell (2 of 2)
 
-**6 screens · 11 operations · 37 schemas · 4 permissions**
+**6 screens · 12 operations · 51 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -154,14 +154,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `KSK-011` | Collect a booking | C | 1 | 3 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
 | `KSK-012` | Booking found | C | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
-| `KSK-013` | Call staff | D | 3 | 0 | 4 | 4 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-014` | Out of service | B | 0 | 20 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-013` | Call staff | D | 3 | 1 | 4 | 4 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-014` | Out of service | B | 0 | 23 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-016` | Order Food | C | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-017` | Shop | C | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**KSK-011, KSK-012, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-011, KSK-012, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

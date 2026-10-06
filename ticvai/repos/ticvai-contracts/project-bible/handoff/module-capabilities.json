@@ -3974,9 +3974,31 @@
   },
   "white-label": {
    "title": "19 — Guest Mobile App & Branding (builder)",
-   "capabilityCount": 3,
-   "unguardedOperations": 9,
+   "capabilityCount": 5,
+   "unguardedOperations": 10,
    "capabilities": [
+    {
+     "key": "DEVICE_MANAGE",
+     "label": "enrol, assign, re-key, roll out firmware, retire",
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "assignKiosk"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "listKioskAssignments"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "MARKETING_VIEW",
      "label": "segments, campaigns, loyalty, reviews",
@@ -3992,7 +4014,7 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 76,
+     "operationCount": 84,
      "operations": [
       "buildDeepLink",
       "claimCustomDomain",
@@ -4008,14 +4030,14 @@
      "key": "TENANT_PUBLISH",
      "label": "publish a configuration version, restore a prior one",
      "group": "Tenant experience",
-     "operationCount": 9,
+     "operationCount": 11,
      "operations": [
       "exportSitePackage",
       "getSitePackage",
       "publishContentBlock",
       "publishGuidedChoice",
-      "publishTenantConfig",
-      "requestAppBuild"
+      "publishKioskConfigs",
+      "publishTenantConfig"
      ],
      "elevated": false,
      "segregationConstrained": false

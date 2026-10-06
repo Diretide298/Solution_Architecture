@@ -1,21 +1,21 @@
 {
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
-  "operations": 2776,
+  "operations": 2789,
   "contracts": 33,
-  "tables": 1124,
+  "tables": 1129,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3173,
+  "relationships": 3191,
   "states": 207,
   "events": 77,
-  "flows": 97,
+  "flows": 98,
   "flowsDerived": 193,
   "adrs": 70,
-  "screens": 2450,
+  "screens": 2451,
   "platforms": 16,
   "frontends": 13,
   "apps": 5,
@@ -38,58 +38,58 @@
   },
   {
    "link": "Operations declaring a service",
-   "done": 2776,
-   "total": 2776,
+   "done": 2789,
+   "total": 2789,
    "percent": 100,
    "note": "the operation is owned by one of the seventeen deployables"
   },
   {
    "link": "Operations declaring a permission",
-   "done": 2613,
-   "total": 2776,
+   "done": 2625,
+   "total": 2789,
    "percent": 94,
    "note": "the checklist a grant screen renders is built from these"
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 2749,
-   "total": 2776,
+   "done": 2762,
+   "total": 2789,
    "percent": 99,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
   },
   {
    "link": "Operations reaching a screen",
-   "done": 2538,
-   "total": 2776,
+   "done": 2551,
+   "total": 2789,
    "percent": 91,
    "note": "sync, webhook and job operations legitimately have none"
   },
   {
    "link": "Screens naming an operation",
-   "done": 2386,
-   "total": 2450,
+   "done": 2387,
+   "total": 2451,
    "percent": 97,
    "note": "the rest are static, navigation shells or workshop-blocked"
   },
   {
    "link": "Tables reached by an operation",
-   "done": 1119,
-   "total": 1124,
+   "done": 1124,
+   "total": 1129,
    "percent": 100,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
    "link": "Tables carrying a relationship",
-   "done": 1035,
-   "total": 1124,
+   "done": 1040,
+   "total": 1129,
    "percent": 92,
    "note": "either end of a declared reference"
   }
  ],
  "boundaries": {
-  "edgesTotal": 3173,
-  "insideOneService": 1928,
-  "crossingTwoServices": 1245,
+  "edgesTotal": 3191,
+  "insideOneService": 1941,
+  "crossingTwoServices": 1250,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -157,11 +157,11 @@
   "topTargets": [
    {
     "table": "identity.principal",
-    "edges": 350
+    "edges": 352
    },
    {
     "table": "platform.scope",
-    "edges": 183
+    "edges": 185
    },
    {
     "table": "pii.subject",
@@ -196,7 +196,7 @@
     "edges": 17
    }
   ],
-  "inTopThreeTargets": 627
+  "inTopThreeTargets": 631
  },
  "services": [
   {
@@ -281,7 +281,7 @@
    "screens": 71,
    "operationsOnAScreen": 188,
    "edgesOut": 116,
-   "edgesIn": 363
+   "edgesIn": 366
   },
   {
    "service": "AiService",
@@ -312,11 +312,11 @@
    "tier": "platform",
    "contracts": 1,
    "schemas": 1,
-   "operations": 95,
-   "tables": 29,
+   "operations": 108,
+   "tables": 34,
    "screens": 25,
-   "operationsOnAScreen": 93,
-   "edgesOut": 13,
+   "operationsOnAScreen": 106,
+   "edgesOut": 18,
    "edgesIn": 5
   },
   {
@@ -329,7 +329,7 @@
    "screens": 36,
    "operationsOnAScreen": 80,
    "edgesOut": 25,
-   "edgesIn": 459
+   "edgesIn": 461
   },
   {
    "service": "LedgerService",
@@ -655,10 +655,10 @@
   },
   {
    "contract": "white-label",
-   "operations": 95,
-   "onAScreen": 93,
-   "withLineage": 88,
-   "withPermission": 86,
+   "operations": 108,
+   "onAScreen": 106,
+   "withLineage": 101,
+   "withPermission": 98,
    "percentOnAScreen": 98
   },
   {
@@ -712,7 +712,7 @@
    "operator": "guest",
    "screens": 17,
    "screensWithOperations": 17,
-   "distinctOperations": 22,
+   "distinctOperations": 23,
    "percentWithOperations": 100
   },
   {
@@ -745,7 +745,7 @@
    "operator": "venue",
    "screens": 1661,
    "screensWithOperations": 1608,
-   "distinctOperations": 1872,
+   "distinctOperations": 1880,
    "percentWithOperations": 97
   },
   {
@@ -798,9 +798,9 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 103,
-   "screensWithOperations": 103,
-   "distinctOperations": 197,
+   "screens": 104,
+   "screensWithOperations": 104,
+   "distinctOperations": 207,
    "percentWithOperations": 100
   },
   {
@@ -859,7 +859,7 @@
   "operationsNoLineage": 27,
   "tablesNotReached": 5,
   "permissionsWithoutLabel": 70,
-  "capabilityPairs": 282,
+  "capabilityPairs": 284,
   "modulesWithCapabilities": 33
  }
 }

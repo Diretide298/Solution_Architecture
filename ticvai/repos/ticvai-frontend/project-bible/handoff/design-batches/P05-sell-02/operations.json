@@ -104,6 +104,30 @@
   "requestBody": null,
   "responds": "Order"
  },
+ "getPublishedKioskConfig": {
+  "method": "GET",
+  "path": "/venues/{venueId}/kiosk-config",
+  "contract": "white-label",
+  "summary": "The published kiosk configuration a kiosk renders, before anyone touches it",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "kioskConfigId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedKioskConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",

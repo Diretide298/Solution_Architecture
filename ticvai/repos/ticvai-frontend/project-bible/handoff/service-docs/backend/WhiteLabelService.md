@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `white-label` |
 | Schemas owned | `whitelabel` |
-| Operations in the slice | 93 of 95 |
+| Operations in the slice | 93 of 108 |
 | Scale | Read-heavy and heavily cached. Published, not queried. |
 | If it is down | Down freezes the current published config. Guests see the last good version. |
 
@@ -6643,9 +6643,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-2 operations, added to this service in later releases without changing any of the above.
+15 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | content | `listFaqs` |
+| kiosk | `assignKiosk`, `createKioskConfig`, `deleteKioskConfig`, `getKioskConfig`, `getKioskConfigValidation`, `getPublishedKioskConfig`, `listKioskAssignments`, `listKioskConfigVersions`, `listKioskConfigs`, `publishKioskConfigs`, `restoreKioskConfigVersion`, `setKioskOutOfService`, `updateKioskConfig` |
 | overview | `getStorefrontInsights` |

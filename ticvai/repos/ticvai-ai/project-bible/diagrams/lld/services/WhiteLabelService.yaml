@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 95 operations, 29 tables
+title: WhiteLabelService — 108 operations, 34 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -10,21 +10,29 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 95
-  inAFlow: 20
-  percent: 21%
+  operations: 108
+  inAFlow: 30
+  percent: 28%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 29
+  tables: 34
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 95
+  count: 108
   operations:
+  - operation: assignKiosk
+    verb: PUT
+    path: /venues/{venueId}/kiosk-assignments/{workstationId}
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
   - operation: buildDeepLink
     verb: POST
     path: /deep-links
@@ -81,6 +89,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: createKioskConfig
+    verb: POST
+    path: /venues/{venueId}/kiosk-configs
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 4
   - operation: createPreview
     verb: POST
     path: /tenant-config/preview
@@ -128,6 +144,14 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 4
+    writes: 4
+  - operation: deleteKioskConfig
+    verb: DELETE
+    path: /kiosk-configs/{kioskConfigId}
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
     writes: 4
   - operation: deletePromoBlock
     verb: DELETE
@@ -225,6 +249,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getKioskConfig
+    verb: GET
+    path: /kiosk-configs/{kioskConfigId}
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getKioskConfigValidation
+    verb: GET
+    path: /kiosk-configs/{kioskConfigId}/validation
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 7
+    writes: 0
   - operation: getModuleEnablement
     verb: GET
     path: /tenant-config/modules
@@ -272,6 +312,14 @@ operationsByContract:
     permission: null
     offline: true
     reads: 3
+    writes: 0
+  - operation: getPublishedKioskConfig
+    verb: GET
+    path: /venues/{venueId}/kiosk-config
+    scope: venue
+    permission: null
+    offline: true
+    reads: 5
     writes: 0
   - operation: getPublishedTenantConfig
     verb: GET
@@ -425,6 +473,30 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listKioskAssignments
+    verb: GET
+    path: /venues/{venueId}/kiosk-assignments
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listKioskConfigVersions
+    verb: GET
+    path: /kiosk-configs/{kioskConfigId}/versions
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listKioskConfigs
+    verb: GET
+    path: /venues/{venueId}/kiosk-configs
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 0
   - operation: listLandingPageTemplates
     verb: GET
     path: /landing-page-templates
@@ -497,6 +569,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: publishKioskConfigs
+    verb: POST
+    path: /venues/{venueId}/kiosk-configs/publish
+    scope: venue
+    permission: TENANT_PUBLISH
+    offline: false
+    reads: 4
+    writes: 3
   - operation: publishTenantConfig
     verb: POST
     path: /tenant-config/publish
@@ -545,6 +625,14 @@ operationsByContract:
     offline: false
     reads: 13
     writes: 7
+  - operation: restoreKioskConfigVersion
+    verb: POST
+    path: /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore
+    scope: venue
+    permission: TENANT_PUBLISH
+    offline: false
+    reads: 4
+    writes: 4
   - operation: setAnalyticsProvider
     verb: PUT
     path: /tenant-config/analytics-providers
@@ -625,6 +713,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: setKioskOutOfService
+    verb: PUT
+    path: /kiosk-configs/{kioskConfigId}/out-of-service
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 2
   - operation: setLanguages
     verb: PUT
     path: /tenant-config/languages
@@ -753,6 +849,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 4
+  - operation: updateKioskConfig
+    verb: PATCH
+    path: /kiosk-configs/{kioskConfigId}
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 4
   - operation: updatePromoBlock
     verb: PATCH
     path: /tenant-config/promo-blocks/{promoBlockId}
@@ -798,24 +902,29 @@ tables:
   - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
     Monday'
   writtenBy:
+  - assignKiosk
   - claimCustomDomain
   - createBanner
   - createBookingFlowDefinition
   - createContentBlock
   - createContentPage
+  - createKioskConfig
   - createPreview
   - createPromoBlock
   - deleteBanner
   - deleteBookingFlow
   - deleteContentPage
   - deleteGuidedChoice
+  - deleteKioskConfig
   - deletePromoBlock
   - publishContentBlock
   - publishGuidedChoice
+  - publishKioskConfigs
   - publishTenantConfig
   - recordStorefrontSessionEvents
   - requestAppBuild
   - restoreConfigVersion
+  - restoreKioskConfigVersion
   - setAnalyticsProvider
   - setAppIcons
   - setBookingFlowConfig
@@ -826,6 +935,7 @@ tables:
   - setFooter
   - setHeader
   - setHomepageLayout
+  - setKioskOutOfService
   - setLanguages
   - setMaintenanceMode
   - setModuleEnablement
@@ -838,6 +948,7 @@ tables:
   - updateBookingFlowDefinition
   - updateContentPage
   - updateGuidedChoice
+  - updateKioskConfig
   - updatePromoBlock
   - validateBookingFlow
   - validateTenantConfig
@@ -1188,6 +1299,41 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
+- table: whitelabel.kiosk_assignment
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.kiosk_config
+  columns: 23
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.kiosk_config_attract_slide
+  columns: 9
+  store: postgres
+  parent: whitelabel.kiosk_config
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.kiosk_config_start_tile
+  columns: 9
+  store: postgres
+  parent: whitelabel.kiosk_config
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.kiosk_config_version
+  columns: 10
+  store: postgres
+  parent: whitelabel.kiosk_config
+  writtenBy:
+  - white-label
+  foreignWriters: null
 - table: whitelabel.module_enablement
   columns: 7
   store: postgres
@@ -1262,10 +1408,12 @@ readsFrom:
 - service: PlatformService
   operations: 7
 - service: CatalogueService
-  operations: 2
+  operations: 3
 - service: IdentityService
   operations: 1
 - service: MarketingService
+  operations: 1
+- service: TenancyService
   operations: 1
 writesOutside:
 - service: PlatformService
@@ -1328,11 +1476,17 @@ screens:
 - P02:GST-051 Plan
 - P02:GST-057 Accessibility Information
 - P02:GST-071 Payment Methods
+- P05:KSK-001 Attract Loop
 - P05:KSK-002 Language Select
+- P05:KSK-008 Payment unresolved
+- P05:KSK-010 Print failure
+- P05:KSK-013 Call staff
 - P05:KSK-014 Out of service
+- P08:ADM-582 POS, Kiosk & Terminal Assignment Manager
 - P08:BO-007 Product Directory
 - P08:BO-008 Product Detail & Variants
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
+- P08:BO-485 Self-Service Kiosk Profile & Channel Configuration
 - P08:BO-748 Consent Capture & Versions
 - P08:BO-834 Digital Experience Center
 - P08:BO-835 Site, Brand & Domain Setup
@@ -1366,10 +1520,12 @@ screens:
 - P13:CMS-102 Site Builder
 - P13:CMS-103 Booking Flows
 - P13:CMS-104 App Build & Store Publishing
+- P13:CMS-105 Kiosk Builder
 flows:
 - F01 Guest buys a ticket online
 - F07 Guest buys at a kiosk
 - F102 A brand is set, previewed, published and rolled back
 - F103 A tenant claims a domain and gets a certificate
 - F22 A tenant rebrands their app
+- F304 A kiosk group is customised, published, assigned and rolled back
 - F75 A kiosk serves itself and calls for help

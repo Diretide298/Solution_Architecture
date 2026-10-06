@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -24,22 +24,22 @@
   }
  },
  "counts": {
-  "batches": 305,
-  "screens": 2450,
+  "batches": 306,
+  "screens": 2451,
   "framesOnDisk": 159,
   "byStatus": {
-   "pending": 266,
+   "pending": 267,
    "partial": 0,
    "drawn": 34,
    "locked": 5
   },
   "screensByStatus": {
-   "pending": 2291,
+   "pending": 2292,
    "partial": 0,
    "drawn": 134,
    "locked": 25
   },
-  "fullyDrawableBatches": 63
+  "fullyDrawableBatches": 64
  },
  "batches": [
   {
@@ -536,6 +536,19 @@
     "SUP-008"
    ],
    "drawable": 2,
+   "thin": 0,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P13-kiosk-01",
+   "kind": "module",
+   "label": "P13 · Kiosk",
+   "platform": "P13",
+   "screens": [
+    "CMS-105"
+   ],
+   "drawable": 1,
    "thin": 0,
    "frames": 0,
    "status": "pending"
@@ -2232,6 +2245,24 @@
    "status": "pending"
   },
   {
+   "id": "P05-sell-02",
+   "kind": "module",
+   "label": "P05 · Sell (2 of 2)",
+   "platform": "P05",
+   "screens": [
+    "KSK-011",
+    "KSK-012",
+    "KSK-013",
+    "KSK-014",
+    "KSK-016",
+    "KSK-017"
+   ],
+   "drawable": 3,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P09-infrastructure-resilienc-01",
    "kind": "module",
    "label": "P09 · Infrastructure & Resilience",
@@ -2730,6 +2761,28 @@
    "status": "pending"
   },
   {
+   "id": "WS149",
+   "kind": "workshop",
+   "label": "Payment Payment Orchestration board 3",
+   "platform": "P08",
+   "screens": [
+    "ADM-579",
+    "ADM-580",
+    "ADM-581",
+    "ADM-582",
+    "ADM-583",
+    "ADM-584",
+    "ADM-585",
+    "ADM-586",
+    "ADM-587",
+    "ADM-588"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS154",
    "kind": "workshop",
    "label": "Payment Payment Orchestration board 8",
@@ -2858,24 +2911,6 @@
    ],
    "drawable": 7,
    "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P05-sell-02",
-   "kind": "module",
-   "label": "P05 · Sell (2 of 2)",
-   "platform": "P05",
-   "screens": [
-    "KSK-011",
-    "KSK-012",
-    "KSK-013",
-    "KSK-014",
-    "KSK-016",
-    "KSK-017"
-   ],
-   "drawable": 2,
-   "thin": 4,
    "frames": 0,
    "status": "pending"
   },
@@ -3248,28 +3283,6 @@
     "BO-831",
     "BO-832",
     "BO-833"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS149",
-   "kind": "workshop",
-   "label": "Payment Payment Orchestration board 3",
-   "platform": "P08",
-   "screens": [
-    "ADM-579",
-    "ADM-580",
-    "ADM-581",
-    "ADM-582",
-    "ADM-583",
-    "ADM-584",
-    "ADM-585",
-    "ADM-586",
-    "ADM-587",
-    "ADM-588"
    ],
    "drawable": 6,
    "thin": 4,
@@ -4127,6 +4140,28 @@
    "status": "pending"
   },
   {
+   "id": "WS87",
+   "kind": "workshop",
+   "label": "Game and Ride board 10",
+   "platform": "P08",
+   "screens": [
+    "BO-484",
+    "BO-485",
+    "BO-486",
+    "BO-487",
+    "BO-488",
+    "BO-489",
+    "BO-490",
+    "BO-491",
+    "BO-492",
+    "BO-493"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS89",
    "kind": "workshop",
    "label": "Rental Management board 2",
@@ -4532,28 +4567,6 @@
     "BO-481",
     "BO-482",
     "BO-483"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS87",
-   "kind": "workshop",
-   "label": "Game and Ride board 10",
-   "platform": "P08",
-   "screens": [
-    "BO-484",
-    "BO-485",
-    "BO-486",
-    "BO-487",
-    "BO-488",
-    "BO-489",
-    "BO-490",
-    "BO-491",
-    "BO-492",
-    "BO-493"
    ],
    "drawable": 3,
    "thin": 7,
@@ -5130,6 +5143,28 @@
    "status": "pending"
   },
   {
+   "id": "P05-sell-01",
+   "kind": "module",
+   "label": "P05 · Sell (1 of 2)",
+   "platform": "P05",
+   "screens": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-004",
+    "KSK-005",
+    "KSK-006",
+    "KSK-007",
+    "KSK-008",
+    "KSK-009",
+    "KSK-010"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P06-rentals-01",
    "kind": "module",
    "label": "P06 · Rentals (1 of 3)",
@@ -5412,28 +5447,6 @@
    ],
    "drawable": 1,
    "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P05-sell-01",
-   "kind": "module",
-   "label": "P05 · Sell (1 of 2)",
-   "platform": "P05",
-   "screens": [
-    "KSK-001",
-    "KSK-002",
-    "KSK-003",
-    "KSK-004",
-    "KSK-005",
-    "KSK-006",
-    "KSK-007",
-    "KSK-008",
-    "KSK-009",
-    "KSK-010"
-   ],
-   "drawable": 0,
-   "thin": 10,
    "frames": 0,
    "status": "pending"
   },

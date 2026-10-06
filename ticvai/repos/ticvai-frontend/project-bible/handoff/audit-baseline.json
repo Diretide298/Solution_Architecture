@@ -2341,6 +2341,22 @@
   },
   "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
  },
+ "check-device-tiers": {
+  "updated": "2026-10-05",
+  "commit": "7f132ef2",
+  "rules": {
+   "D-TIER-A-UNPLANNED": [
+    "Access reader ↔ controller",
+    "Barcode venue-scanner",
+    "Cash drawer",
+    "Customer / line display",
+    "Magnetic stripe reader",
+    "Mobile printer",
+    "POS peripheral abstraction",
+    "Receipt printer"
+   ]
+  }
+ },
  "check-glossary-terms": {
   "updated": "2026-10-01",
   "commit": "278cc437",
@@ -2831,6 +2847,40 @@
     "signRentalAgreement.bookingId",
     "skipRolloutCell.cellId",
     "updateAdmissionRules.profileId"
+   ]
+  }
+ },
+ "check-plan-owners": {
+  "updated": "2026-10-06",
+  "commit": "9264fa2d",
+  "rules": {
+   "O-SELF-TEST": [
+    "TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A:plan",
+    "TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A:schedule",
+    "TEST-AM-APPROVALS-P04:plan",
+    "TEST-AM-APPROVALS-P04:schedule",
+    "TEST-AM-FOOD-BEVERAGE-P02:plan",
+    "TEST-AM-FOOD-BEVERAGE-P02:schedule",
+    "TEST-AM-IDENTITY-SECURITY-P09:plan",
+    "TEST-AM-IDENTITY-SECURITY-P09:schedule",
+    "TEST-AM-PAYMENTS-P01:plan",
+    "TEST-AM-PAYMENTS-P01:schedule",
+    "TEST-AM-PAYMENTS-P02:plan",
+    "TEST-AM-PAYMENTS-P02:schedule",
+    "TEST-AM-PRICING-PROMOTIONS-P01:plan",
+    "TEST-AM-PRICING-PROMOTIONS-P01:schedule",
+    "TEST-AM-PRICING-PROMOTIONS-P02:plan",
+    "TEST-AM-PRICING-PROMOTIONS-P02:schedule",
+    "TEST-AM-RESOURCES-CAPACITY-P02:plan",
+    "TEST-AM-RESOURCES-CAPACITY-P02:schedule",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P08:plan",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P08:schedule",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P09:plan",
+    "TEST-AM-SETUP-AI-INTELLIGENCE-P09:schedule",
+    "TEST-AM-SETUP-VENUE-OPERATIONS-P08:plan",
+    "TEST-AM-SETUP-VENUE-OPERATIONS-P08:schedule",
+    "TEST-AM-TENANCY-VENUES-P08-BLOCK-A:plan",
+    "TEST-AM-TENANCY-VENUES-P08-BLOCK-A:schedule"
    ]
   }
  },

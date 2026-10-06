@@ -2333,8 +2333,8 @@ screens:
       - action: Send or share
         result: Opens the transfer and sharing screen (GST-014 / GST-045).
         source: DI-198; DI-1078
-      - action: Set a password
-        result: For a guest-checkout profile, turns it into an account; optional, never blocking.
+      - action: Create an account
+        result: For a guest-checkout profile, turns it into an account with an emailed code (passwordless, no password field); optional, never blocking.
         source: screens/P02-guest-mobile-app.yaml#GST-010 wireframe.prototype.differences; MoM 29 Sep W1 (profile completed later)
     consistency:
       - with: WEB-013

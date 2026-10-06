@@ -92,11 +92,14 @@ def block_a_decisions() -> dict:
       screenModules       screen -> {module, why}: the business module a screen's tasks are grouped under when its
                           operations' majority would put it elsewhere (CHG-RFM-006: ADM-503/504/505 stay in Identity, Roles
                           & Security, Block B, as r2 had them, after binding listForecastDefinitions made them AI's)
+      appModules          [{key, name, module, platform, block, operations, screens, wiring, tasks}]: an app-module the lead
+                          decided as one piece of work in a named block (CHG-R4-003, 5 October: the kiosk customisation in
+                          Block A2), built as written and never moved by the block filling
 
     tools/check-plan-closure.py reads the same file and checks that the plan holds them."""
     if not EXTRA.exists():
         return {"aiEngineOperations": {}, "blockA1Operations": {}, "blockAOperations": {}, "blockAScreens": {},
-                "screenNotes": {}, "navHomes": {}, "screensNotBuilt": {}, "screenModules": {}}
+                "screenNotes": {}, "navHomes": {}, "screensNotBuilt": {}, "screenModules": {}, "appModules": []}
     ex = json.loads(EXTRA.read_text(encoding="utf-8"))
     ai = {o: t["key"] for t in ex.get("tasks") or [] for o in t.get("operations") or []}
     return {"aiEngineOperations": ai, "blockA1Operations": dict(ex.get("blockA1Operations") or {}),
@@ -106,7 +109,9 @@ def block_a_decisions() -> dict:
             # screen -> {kind, into, why}: a replaced page or a screen nobody could define, given no build task
             # (CHG-FXP-002, ticket_done.screen_hold)
             "screensNotBuilt": dict(ex.get("screensNotBuilt") or {}),
-            "screenModules": {k: v["module"] for k, v in (ex.get("screenModules") or {}).items()}}
+            "screenModules": {k: v["module"] for k, v in (ex.get("screenModules") or {}).items()},
+            # a decided app-module: its operations, whole screens and wiring tasks, in its block (CHG-R4-003)
+            "appModules": list(ex.get("appModules") or [])}
 
 # **The one authored table in this file.** The decomposition explains each service to an architect
 # ("platform.org_unit is reached by 304 of 379 tables"); a client needs what it does for the venue.
@@ -720,7 +725,12 @@ def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset
         if ident[0] == "ops":
             cands += sorted({k for o in work for k in by_op.get(o, ())} - set(cands))
         for k in cands:
-            if k in fixed or (k in closed and k != t):
+            # A closed key is never given to other work; one whose pushed work is exactly this task's is the same
+            # ticket (CHG-R4-010, 6 October: op-retire.py closes SVC-CATALOGUE-DRAFTED-3 for the work it had before
+            # the fresh r1, and the fresh r1 pushed it again for listBundleCombo, listPackageBundleAdd,
+            # listPromotionLifecycleStatus and setProductServicePrice; once the catalogue chunks were numbered
+            # from 45, that work took SVC-CATALOGUE-DRAFTED-46 and the pushed key left the plan).
+            if k in fixed or (k in closed and k != t and not (pitems.get(k) and work == pitems[k])):
                 continue
             if k != t and k in naturals and ident[0] == "screen":
                 continue
@@ -866,6 +876,14 @@ def main() -> int:
     ops = read_operations()
     screens = all_screens()
     merged_in = ticket_done.merge_bindings(screens)     # a merged screen's operations are its target's (CHG-FXP-002)
+    # **A decided app-module's wiring is not the wired screen's ticket** (CHG-R4-003, 5 October): the kiosk configuration
+    # read is wired into KSK-001 (an A1 screen) and five later kiosk screens, and the kiosk assignment into ADM-582, by
+    # the Block A2 app-module's own tasks. Taken off those screens here, in memory, so their tickets keep the scope,
+    # points and waits they were pushed with; the wiring tasks are made with the app-module below.
+    decided_ams = block_a_decisions()["appModules"]
+    wired_off = ticket_done.strip_wiring(screens, decided_ams)
+    print(f"operations a decided app-module wires into screens other tickets build: "
+          f"{sum(len(v['ops']) for v in wired_off.values())} on {len(wired_off)} screens")
     print(f"operations a merged screen brings to the screen it is merged into: {sum(map(len, merged_in.values()))} "
           f"on {len(merged_in)} screens")
     state_models = read_state_models()
@@ -1678,6 +1696,8 @@ def main() -> int:
         for sid, s_ in sorted(screens.items()):
             if not sid.startswith("BO-") or s_.get("wave") not in vm["waves"] or sid in setup_screens                     or sid in held_screen:
                 continue
+            if any(sid in (a.get("screens") or []) for a in decided_ams):
+                continue                 # built by its decided app-module, in its block (CHG-R4-003)
             ol = [a["operationId"] for a in s_.get("apis") or [] if a.get("operationId")]
             if ol and all(agreed(o) for o in ol):
                 cand.append((sid, s_, ol))
@@ -1924,6 +1944,8 @@ def main() -> int:
     mig_of.update(vm_mig)
     later_op_task, later_mig, later_items = {}, {}, []      # later_items: (key, module, platform, kind) per screen
     later_ams = {}                                          # (module, platform) -> [(sid, key, pts, kind)]
+    decided_screen = {sid: am["key"] for am in decided_ams for sid in am.get("screens") or [] if sid in screens}
+    decided_op = {o: am["key"] for am in decided_ams for o in am.get("operations") or [] if o in ops}
     fam_used = defaultdict(set)                             # ops family -> numbers planned or pushed
 
     def note_family(k):
@@ -2030,6 +2052,8 @@ def main() -> int:
             continue
         if sid in gone_screens or sid in held_screen:
             continue                     # built inside its venue screen (CHG-CLN-002), or not built (CHG-FXP-002)
+        if sid in decided_screen:
+            continue                     # built by its decided app-module (CHG-R4-003), placed below
         have = built_screen.get(sid)
         if have and not have.startswith("APP-SETUP-"):
             if have.startswith("VM-"):           # Venue Management waves 1-2: ticketed, planned with the rest of P08
@@ -2091,6 +2115,21 @@ def main() -> int:
         am_info[k]["completion"] = True
         return k
 
+    # **The decided app-modules** (CHG-R4-003): made as written, in their block, with their whole screens under the keys
+    # those screens would have anywhere (the screen id is the key's identity), never cut into parts.
+    for am in decided_ams:
+        k = add_am(am["module"], am["platform"], None, 1, key=am["key"], name=am["name"], block=am["block"],
+                   order=sp.am_order(am["module"], am["platform"], 9, "decided"))
+        am_info[k]["decided"] = True
+        if am.get("scheduleAfter"):
+            am_info[k]["scheduleAfter"] = am["scheduleAfter"]
+        for sid in am.get("screens") or []:
+            if sid not in screens:
+                raise SystemExit(f"block-a-extra-tasks.json appModules {k}: no screen {sid}")
+            if built_screen.get(sid):
+                raise SystemExit(f"block-a-extra-tasks.json appModules {k}: {sid} is already built by {built_screen[sid]}")
+            pre = sp.SCREEN_PREFIX.get(plat_of(sid), "APP-" + plat_of(sid))
+            later_items.append((f"{pre}-{sid}", sid, k, "new", points_of(screen_raw(screens[sid]))))
     a_plain = set()           # (module, platform) with a Block A app-module of the same name
     parts_total = {}          # (module, platform) -> how many parts it has, Block A's included
     for t_ in tasks:
@@ -2153,8 +2192,9 @@ def main() -> int:
                 callers[o].add(k)
     home = {}
     for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
-        if a.get("completion"):
-            continue                     # an operation no screen calls is no completion work (CHG-RONEP-007)
+        if a.get("completion") or a.get("decided"):
+            continue                     # an operation no screen calls is no completion work (CHG-RONEP-007), and a
+            #                              decided app-module holds what it was decided with only (CHG-R4-003)
         if a["platform"] == "P08":
             home.setdefault((a["module"], "P08"), k)
         home.setdefault((a["module"], "*"), k)
@@ -2169,6 +2209,9 @@ def main() -> int:
           + (f" ({', '.join(held[:6])}{' ...' if len(held) > 6 else ''})" if held else ""))
     for o in sorted(ops):
         if o in planned_ops or ops[o]["provisional"]:
+            continue
+        if o in decided_op:                  # a decided app-module's operation is built there (CHG-R4-003)
+            am_ops[decided_op[o]].append(o)
             continue
         # **An operation Block A needs is planned with a Block A app-module** (CHG-RONEP-001), so the four-operation
         # tasks it is cut into hold only Block A work. Until 3 October it went with its first caller in build order
@@ -2275,6 +2318,36 @@ def main() -> int:
              s_.get("wave") or "", platform=s_["_platform"].get("shortName", ""), depends=deps | {"SETUP-CLIENTS"},
              pts=pts, area=area)
         am_of[key] = k
+    # **A decided app-module's wiring tasks** (CHG-R4-003, 5 October): one front-end task per `wiring` entry, wiring its
+    # operations into screens other tickets build (the operations strip_wiring took off them). It builds the operations
+    # it wires, so ADAM links their contract, and names the screens and their tickets in its scope; it waits on the
+    # back-end tasks that build those operations. Sized like a screen's share: one point of setup, 0.4 an operation a
+    # screen binds, a sixth of a point a component.
+    for am in decided_ams:
+        for w in am.get("wiring") or []:
+            sids = [x for x in w.get("screens") or [] if x in wired_off]
+            if not sids:
+                raise SystemExit(f"block-a-extra-tasks.json appModules {am['key']}: wiring {w['key']} wires no screen")
+            w_ops = sorted({o for x in sids for o in wired_off[x]["ops"]})
+            raw_ = 1 + sum(0.4 * len(wired_off[x]["ops"]) + wired_off[x]["components"] / 6 for x in sids)
+            pf = w.get("platform") or plat_of(sids[0])
+            deps = {op_task.get(o) or vm_op_task.get(o) or later_op_task.get(o) for o in w_ops} - {None}
+            owners_ = sorted({k_ for x in sids for k_, t_ in by_key.items() if t_["type"] == "Task"
+                              and not k_.startswith("TEST-") and (key_identity(k_) or (None, None)) == ("screen", x)})
+            task(w["key"], am["key"], "Task", w["subject"],
+                 "Builds: " + ", ".join(f"`operation {ops[o]['contract']}#{o}`" for o in w_ops) + ". "
+                 + w["detail"].rstrip(".") + ". Scope: " + ", ".join(w_ops) + " on " + ", ".join(sids)
+                 + "; the rest of each screen is its own ticket (" + ", ".join(owners_) + "). "
+                 f"Decided by {am['decided'].split(' (')[0]} ({am['key']}, CHG-R4-003). "
+                 f"Done when {', '.join(sids)} call{'s' if len(sids) == 1 else ''} {', '.join(w_ops)} as "
+                 f"{'its spec says' if len(sids) == 1 else 'their specs say'} (every state the wired components list, "
+                 "the cached answer offline where the spec says so, every refusal the contract documents), the rest "
+                 f"of {'the screen' if len(sids) == 1 else 'each screen'} still passes its own ticket's done-when, and "
+                 "a peer in the same stack has reviewed it.",
+                 1, platform=sp.PLATFORM_NAME.get(pf, pf), depends=deps | {"SETUP-CLIENTS"}, pts=points_of(raw_),
+                 area={"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS", "P15": "POS"}.get(pf, pf))
+            by_key[w["key"]]["pool"] = sp.POOL_OF_PLATFORM.get(pf, "web")
+            am_of[w["key"]] = am["key"]
     # **A screen whose spec says a person must define it is built only after its definition** (4 October, the Sprint
     # 1-2 judging; CHG-FXP-004). ADM-506's table had no operation and its columns were sample values ("92% / High"):
     # the screen's gaps say "it needs a person before it is built", and the plan gave it a build task in Sprint 2 anyway.
@@ -2421,8 +2494,10 @@ def main() -> int:
                 continue
             m_ = t_.get("module") or sp.FOUNDATION
             pf = t_.get("platform") or "API"
-            k = add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
-                       name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
+            # a task a decided app-module lists goes there, in its block (CHG-R4-003: DEVICE-BOCA-FGL in Block A2)
+            dec_ = next((a["key"] for a in decided_ams if t_["key"] in (a.get("tasks") or [])), None)
+            k = dec_ or add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
+                               name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
             task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 3,
                  pts=int(t_["points"]), area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
             am_of[t_["key"]] = k
@@ -2711,6 +2786,7 @@ def main() -> int:
                  "days": t_.get("days") or days_ex.get(t_["key"]), "notBefore": t_.get("notBefore") or 0,
                  "deps": t_["dependsOn"].split(), "client": t_["area"] == "client",
                  "block": block_of_task(t_["key"]), "peerOf": t_.get("peerOf"),
+                 "paceExclude": bool(am_of.get(t_["key"]) and (am_info.get(am_of[t_["key"]]) or {}).get("scheduleAfter")),
                  "fallback": {"pos": ("mob", "web"), "mob": ("web",)}.get(t_.get("pool")) if t_.get("peerOf") else None}
                 for t_ in order]
 
@@ -2790,7 +2866,9 @@ def main() -> int:
 
     # **Pass 1: where each later app-module finishes**, with Block A first and the rest in build order. B, C and D
     # are then the app-modules that finish by each block's target sprint (team.json sprintPlan.blocks).
-    first_run = run_schedule(topo(lambda t_: (BRANK[am_info[am_of[t_["key"]]]["block"]]
+    # a decided app-module scheduled after a block (CHG-R4-003) goes last here, so it moves no other app-module's finish
+    first_run = run_schedule(topo(lambda t_: (3 if am_info[am_of[t_["key"]]].get("scheduleAfter")
+                                              else BRANK[am_info[am_of[t_["key"]]]["block"]]
                                               if am_info[am_of[t_["key"]]]["block"] in sp.BLOCK_A_FAMILY else 2,
                                               am_info[am_of[t_["key"]]]["order"],
                                               t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
@@ -3108,7 +3186,11 @@ def main() -> int:
             late_ = am_of[t_["key"]] in ai_needs and a_["block"] not in settings["ticketBlocks"]
             return (len(sp.BLOCKS) if late_ else BRANK[a_["block"]], (8, 99, 99, 9, 99), (9, 0), 9, step[t_["key"]], 6,
                     t_["key"])
-        return (BRANK[a_["block"]], a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
+        # **A decided app-module added after its block's tickets were pushed is scheduled after them** (CHG-R4-003,
+        # 5 October): `scheduleAfter: B` places its tasks behind every Block B task in the build order, so the work
+        # already pushed keeps its owners and sprints, and the new work takes the capacity left (its block is unchanged)
+        rank_ = BRANK[a_["block"]] if not a_.get("scheduleAfter") else BRANK[a_["scheduleAfter"]] + 0.5
+        return (rank_, a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
                 step[t_["key"]], TRACK_ORDER[t_["track"]], t_["key"])
 
     # **Pass 2: each block on a sprint boundary, its test in the last three days.** Scheduled block first, with each
@@ -3122,8 +3204,10 @@ def main() -> int:
     for _round in range(10):
         for tk, b in block_tests.items():
             # the AI engine's module tests may overlap the block test (Chinmay, 1 October): they do not gate it
+            # a decided app-module scheduled after a block (CHG-R4-003) is tested in its block test, and does not hold the
+            # block test's window: its module test ending before the window is checked below, not waited on
             mods = [f"TEST-{k}" for k, a in am_info.items() if a["block"] == b and k in am_tasks
-                    and a["platform"] != "AI"]
+                    and a["platform"] != "AI" and not a.get("scheduleAfter")]
             by_key[tk]["dependsOn"] = " ".join(sorted(mods))
             w0, w1 = sp.window_of(final[b], tests["days"])
             by_key[tk]["notBefore"] = w0
@@ -3170,6 +3254,10 @@ def main() -> int:
         w0, w1 = sp.window_of(block_final[b], tests["days"])
         by_key[tk]["notBefore"] = w0
         windows[b] = (w0, w1)
+    for k, a in am_info.items():                          # CHG-R4-003: a late-added module must still end before its window
+        if a and a.get("scheduleAfter") and k in fin and a["block"] in windows and fin[k] > windows[a["block"]][0] + 1e-6:
+            print(f"WARNING: {k} (scheduled after Block {a['scheduleAfter']}) ends on day {fin[k]:.1f}, after Block "
+                  f"{a['block']}'s test window opens (day {windows[a['block']][0]:g}); its block test will not cover it")
 
     # **The hierarchy** (1 October): Epic = Block, Feature = app-module, Task = the work under its pushed key. The
     # service and app epics and their group features of 23-30 September leave the plan; op-release.py closes them
@@ -3368,10 +3456,15 @@ def main() -> int:
             t_["assignee"] = pins[t_["key"]]
     print(f"owners: {pin_note}")
     leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
+    # **Phase 2 of the AI engine has no owner** (CHG-AIPH-001, docs/active/ai-phase-plan.json; CHG-R4-006): its AI units,
+    # its module tests and its app-modules stay unassigned until the AI developers join after 2 April.
+    for t_ in leaf:
+        if t_["key"] in ai_phase2 and t_["area"] in ("ai", "test"):
+            t_["assignee"] = ""
     second = run_schedule(leaf)
     for t_ in leaf:
         r_ = second.get(t_["key"])
-        if not t_["assignee"] and r_ and r_["who"]:
+        if not t_["assignee"] and r_ and r_["who"] and not (t_["key"] in ai_phase2 and t_["area"] in ("ai", "test")):
             t_["assignee"] = r_["who"]
     # **The AI engine past 2 April** (Chinmay, 1 October): every task is created, and those the two AI engineers
     # cannot finish by the end of the six months stay unassigned for the AI developers joining later.
@@ -3484,7 +3577,7 @@ def main() -> int:
         pts = sum(int(x["points"] or 0) for x in ch)
         sp_ = span([x["key"] for x in ch])
         t_["points"] = pts
-        t_["assignee"] = lead_of.get(t_["key"], "")
+        t_["assignee"] = "" if t_["key"] in ai_phase2 else lead_of.get(t_["key"], "")   # phase 2: no lead (CHG-R4-006)
         t_["accountable"] = t_["assignee"]
         t_["area"] = {"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS", "P15": "POS"}.get(a["platform"], a["platform"])
         when = (f"planned Sprint {sp_[0]}" + (f" to Sprint {sp_[1]}" if sp_[1] != sp_[0] else "")
@@ -3574,6 +3667,23 @@ def main() -> int:
                 d_ = d_[:cut_] + "." + d_[cut_:].lstrip(".")
                 cut_ += 1
         t_["description"] = (d_[:cut_].rstrip() + " " + sent_ + " " + d_[cut_:].lstrip()).strip()
+    # **A wired screen's own ticket says what it leaves to the wiring task** (CHG-R4-003): its scope is the screen's other
+    # operations, and the wired ones are named with the task that wires them, as a split screen's two tickets do
+    # (CHG-FXP-001).
+    for t_ in tasks:
+        if t_["type"] != "Task" or t_["key"].startswith("TEST-") or ticket_done.scope_of(t_):
+            continue
+        ident = key_identity(t_["key"])
+        if not ident or ident[0] != "screen" or ident[1] not in wired_off:
+            continue
+        w_ = wired_off[ident[1]]
+        mine_ = set(w_["all"]) - set(w_["ops"])
+        if not mine_ or w_["key"] not in by_key:
+            continue
+        sent_ = ticket_done.scope_sentence(ident[1], mine_, w_["all"], w_["key"], True).replace(
+            " is " + w_["key"], f" is wired by {w_['key']}").replace(" are " + w_["key"], f" are wired by {w_['key']}")
+        d_ = (t_["description"] or "").rstrip()
+        t_["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " " + sent_).strip()
     # The build of a screen that needs a person says so (CHG-FXP-004; the wait itself is `notBefore` above).
     for t_ in tasks:
         if t_["type"] != "Task" or t_["key"].startswith("TEST-") or "Waits for its definition:" in (t_["description"] or ""):
@@ -3614,6 +3724,44 @@ def main() -> int:
             "block", "accountable", "days"]
     # **What is ticketed** (1 October): every row of a block in team.json `sprintPlan.ticketBlocks`, every pushed
     # ticket wherever it is planned, and every block and app-module. plan-tasks.csv holds all of it.
+    # **A module test is never its app-module's main builder** (block-test-strategy, 1 October; CHG-R4-005, 6 October).
+    # Checked on the final owners, after every other owner is set, with the app-module's tasks (`parent`) as
+    # check-plan-owners counts them (tools/ticket_done.py main_builder: the most points, AI work by its days; a tie has
+    # no main builder, except AI work, where the AI lead is). Such a test goes to the peer in its stack who built the
+    # next most of the app-module (for AI work the other AI engineer), else to the first other person in its stack.
+    # A module test already in OpenProject keeps its owner unless block-a-extra-tasks.json `moduleTestPeers` names it
+    # with the owner it leaves (the lead moved TEST-AM-AI-ENGINE-A2 from Kalpita Mejari and TEST-AM-APPROVALS-P08-BLOCK-A
+    # from Hrushikant Patkar, and kept every other owner); the pushed ones still tested by their main builder are
+    # check-plan-owners' known findings (handoff/audit-baseline.json), the lead's call.
+    kids_f = defaultdict(list)
+    for t_ in tasks:
+        if t_["type"] == "Task":
+            kids_f[t_["parent"]].append(t_)
+    peers_ok = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("moduleTestPeers") or {}) \
+        if EXTRA.exists() else {}
+    pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
+    for t_ in [x for x in tasks if x["type"] == "Task"]:
+        if not (t_["key"].startswith("TEST-AM-") and t_["assignee"]) or t_["key"] in ai_phase2 \
+                or t_["parent"] in ai_phase2:
+            continue
+        ch_ = [x for x in kids_f[t_["parent"]] if not x["key"].startswith("TEST-")]
+        b_ = ticket_done.main_builder(ch_, sp.PLAN_PACE, ai_lead, days_ex)
+        if t_["key"] in kmap:
+            if peers_ok.get(t_["key"]) != t_["assignee"]:
+                continue
+        elif not b_ or t_["assignee"] != b_:
+            continue
+        ai_ = all(x["area"] == "ai" or x["track"] == "AI" for x in ch_)
+        pool_ = "ai" if ai_ else (t_.get("pool") or "be")
+        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])]
+        c_ = Counter()
+        for x in ch_:
+            if x["assignee"] in stack_:
+                c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or days_ex.get(x["key"]) or 0)
+        peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
+        why_ = f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}"
+        print(f"  module test {t_['key']}: {why_}; {peer_ or 'nobody'} tests it (CHG-R4-005)")
+        t_["assignee"] = peer_
     ticket_blocks = set(settings["ticketBlocks"])
     for t_ in tasks:
         t_["ticketed"] = "yes" if (t_["type"] != "Task" or t_["block"] in ticket_blocks or t_["key"] in kmap) else "no"

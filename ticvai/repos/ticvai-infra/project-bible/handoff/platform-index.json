@@ -53,7 +53,7 @@
   "operator": "guest",
   "counts": {
    "screens": 17,
-   "operations": 22,
+   "operations": 23,
    "contracts": 7,
    "modules": 2,
    "undrawn": 0,
@@ -104,16 +104,16 @@
   "operator": "venue",
   "counts": {
    "screens": 1661,
-   "operations": 1872,
+   "operations": 1880,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,
    "operationsWithNoScreen": 189
   },
   "waves": {
-   "wave1": 139,
+   "wave1": 140,
    "wave2": 58,
-   "wave3": 1464
+   "wave3": 1463
   }
  },
  "P09": {
@@ -190,15 +190,15 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 103,
-   "operations": 197,
+   "screens": 104,
+   "operations": 207,
    "contracts": 8,
-   "modules": 3,
+   "modules": 4,
    "undrawn": 0,
    "operationsWithNoScreen": 98
   },
   "waves": {
-   "wave1": 25,
+   "wave1": 26,
    "wave3": 78
   }
  },

@@ -1,6 +1,6 @@
 # WS87 — Game and Ride board 10
 
-**10 screens · 9 operations · 10 schemas · 4 permissions**
+**10 screens · 16 operations · 30 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PRODUCT_VIEW, TENANT_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `DEVICE_VIEW, PRODUCT_VIEW, TENANT_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-484` | Self-Service Experience Command Center | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | D | 167 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-486` | Customer Card / Wallet Identification | D | 0 | 4 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-487` | Customer Wallet & Balance Summary | C | 0 | 6 | 6 | 16 | 1 | 6 | — | notStarted (—) |
 | `BO-488` | Self-Service Wallet Top-Up | C | 0 | 15 | 6 | 33 | 1 | 6 | — | notStarted (—) |
@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-485, BO-486, BO-487, BO-488, BO-490, BO-491, BO-492 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-486, BO-487, BO-488, BO-490, BO-491, BO-492 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

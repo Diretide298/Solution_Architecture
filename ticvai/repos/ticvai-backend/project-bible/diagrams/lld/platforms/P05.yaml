@@ -34,10 +34,10 @@ modulesUsed:
 servicesCalled:
 - service: OrderService
   operationCalls: 12
+- service: WhiteLabelService
+  operationCalls: 9
 - service: CatalogueService
   operationCalls: 7
-- service: WhiteLabelService
-  operationCalls: 3
 - service: MarketingService
   operationCalls: 3
 - service: AiService
@@ -60,6 +60,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - getPublishedKioskConfig
   - listProducts
   states:
   - emptyFirstRun
@@ -79,6 +80,7 @@ screens:
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-001
   inFlows:
   - F07 Guest buys at a kiosk
+  - F304 A kiosk group is customised, published, assigned and rolled back
   - F75 A kiosk serves itself and calls for help
 - screen: KSK-002
   name: Language Select
@@ -87,6 +89,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
+  - getPublishedKioskConfig
   - getPublishedTenantConfig
   - getTenantAppStatus
   states:
@@ -261,6 +264,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
+  - getPublishedKioskConfig
   - inquirePaymentStatus
   states:
   - emptyFirstRun
@@ -318,6 +322,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
+  - getPublishedKioskConfig
   - reprintOrder
   states:
   - emptyFirstRun
@@ -395,6 +400,7 @@ screens:
   density: touchLarge
   operations:
   - endKioskAssist
+  - getPublishedKioskConfig
   - handoverToAgent
   states:
   - emptyFirstRun
@@ -422,6 +428,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
+  - getPublishedKioskConfig
   - getTenantAppStatus
   states:
   - emptyFirstRun

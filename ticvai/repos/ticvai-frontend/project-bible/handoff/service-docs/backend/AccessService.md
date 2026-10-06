@@ -1022,8 +1022,8 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `access.device_placement`, `access.access_point`, `cache:idempotency` |
-| Writes | `access.device_placement`, `access.access_point`, `access.configuration_change`, `cache:idempotency` |
+| Reads | `access.access_point`, `access.device_placement`, `cache:idempotency` |
+| Writes | `access.access_point`, `access.configuration_change`, `access.device_placement`, `cache:idempotency` |
 | Called by | BO-168 |
 
 **Parameters**

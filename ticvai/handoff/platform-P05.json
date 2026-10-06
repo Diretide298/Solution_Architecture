@@ -7,11 +7,11 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
-  "operations": 22,
+  "operations": 23,
   "contracts": 7,
   "modules": 2,
   "undrawn": 0,
@@ -52,19 +52,19 @@
    "operations": 3
   },
   {
+   "contract": "white-label",
+   "operations": 3
+  },
+  {
    "contract": "catalogue",
    "operations": 3
   },
   {
-   "contract": "white-label",
+   "contract": "marketing-crm",
    "operations": 2
   },
   {
    "contract": "fnb",
-   "operations": 2
-  },
-  {
-   "contract": "marketing-crm",
    "operations": 2
   }
  ],
@@ -75,7 +75,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/attract-loop",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -84,7 +84,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/language-select",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -138,7 +138,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/payment-unresolved",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -156,7 +156,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/print-failure",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -183,7 +183,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/call-staff",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -192,7 +192,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/out-of-service",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {

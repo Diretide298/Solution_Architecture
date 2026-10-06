@@ -176,6 +176,17 @@ earlier build, and a copy of the POS terminal that is byte-identical to the one 
 
 ---
 
+## `client/` — Client correspondence
+
+Rank 3 unless a MoM or the matrix adopts it: a client email or letter that supplies information (a vendor's
+documents, a device, a contact). Filed verbatim, dated, one file per message.
+
+| Date | File | Supplies |
+|---|---|---|
+| 05 Oct 2026 | `client/2026-10-05-allam-boca-printer.md` | Muhamed Allam: the BOCA printer documents (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the BOCA Lemur, Windows driver), link titles only; the printer ships to India when ready (CHG-R4-002) |
+
+---
+
 ## `diagrams/`
 
 | File | Covers |

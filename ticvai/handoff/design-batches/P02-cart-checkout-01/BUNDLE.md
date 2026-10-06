@@ -625,7 +625,7 @@ Errors to draw in the form: 410 The token expired or was already used. Distinct 
 - **Add to Apple Wallet / Google Wallet**: One button for the device's wallet. *(source: DI-1096; DI-609)*
 - **Add to calendar**: Adds the visit with a reminder (GST-018). *(source: DI-202)*
 - **Send or share**: Opens the transfer and sharing screen (GST-014 / GST-045). *(source: DI-198; DI-1078)*
-- **Set a password**: For a guest-checkout profile, turns it into an account; optional, never blocking. *(source: screens/P02-guest-mobile-app.yaml#GST-010 wireframe.prototype.differences; MoM 29 Sep W1 (profile completed later))*
+- **Create an account**: For a guest-checkout profile, turns it into an account with an emailed code (passwordless, no password field); optional, never blocking. *(source: screens/P02-guest-mobile-app.yaml#GST-010 wireframe.prototype.differences; MoM 29 Sep W1 (profile completed later))*
 
 **Data it reads**: `getOrder` (onLoad, Read an order With the guest session the device already …)
 
@@ -716,7 +716,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-010` · status **notStarted** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 1 → Booking confirmation (#confirm)*. Differences: Prototype offers "Set a password" to turn a guest-checkout profile into an account (linkGuestCheckout, GST-042); not declared on this screen in YAML.
+- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 1 → Booking confirmation (#confirm)*. Differences: Prototype offers "Set a password" to turn a guest-checkout profile into an account; the screen offers "Create an account" instead (passwordless, with an emailed code, then linkGuestCheckout; CHG-FXS-003, CHG-R11-002, CHG-R4-007).
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 

@@ -142,7 +142,12 @@ def check(rows, mp, closed, retired=frozenset()):
             if not same:
                 continue
             what = ", ".join(sorted(same)[:4]) + (" ..." if len(same) > 4 else "")
-            if p in closed:
+            if (p in closed or p in retired) and p not in planned and kind != "screen" and pitems[p] == work[k]:
+                # CHG-R4-010 (6 October): op-retire.py closes keys for the work they had before the fresh r1; one
+                # pushed again for exactly this work is the same ticket, not a closed one (SVC-CATALOGUE-DRAFTED-3).
+                errors.append(f"renamed    {k} is new, but its work {what} is exactly #{mp[p]} {p}, which op-retire "
+                              f"closes for older work: {p} is the key for it (pushing {k} makes a second ticket)")
+            elif p in closed:
                 notes.append(f"{k}: {what} was on #{mp[p]} {p}, closed by op-retire; a new ticket is right")
             elif p in planned:
                 notes.append(f"{k}: {what} is a sub-task of #{mp[p]} {p}, still in the plan; move the sub-task")

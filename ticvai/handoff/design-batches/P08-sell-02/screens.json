@@ -1812,9 +1812,15 @@
     "ADM-164",
     "ADM-570",
     "ADM-603",
-    "BO-696"
+    "BO-696",
+    "BO-485"
    ],
    "transitions": [
+    {
+     "to": "BO-485",
+     "trigger": "Kiosk groups",
+     "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the venue's kiosk groups and what each offers"
+    },
     {
      "to": "BO-007",
      "trigger": "Product Directory",

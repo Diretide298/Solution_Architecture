@@ -28423,7 +28423,8 @@ screens:
     transitions:
     - to: BO-485
       trigger: Kiosk groups
-      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); the venue's kiosk groups and what each offers
+      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); the venue's kiosk groups and what each
+        offers
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-102 holds none of them.
@@ -78832,32 +78833,33 @@ screens:
       back: true
     - to: BO-102
       trigger: Back to Sell
-      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk groups are reached from the Sell home
+      provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk groups are reached from the
+        Sell home
       back: true
     - to: ADM-582
       trigger: Put kiosks in this group
       provenance: decided 5 October 2026 by Chinmay (CHG-R4-001); a kiosk is assigned to a group on ADM-582
-  notes: '**Rebuilt 5 October 2026 as the venue''s kiosk groups** (decided by Chinmay, CHG-R4-001;
-    docs/active/decisions/answers-5-october.md). It was an empty Save and Cancel form on the games-only
-    `setGameKioskConfiguration`, waiting for a person to define it. It now lists the venue''s kiosk groups (by access
-    point, operating area or outlet, and the venue''s default for every kiosk in no group), the functions each offers,
-    how many kiosks are in it and whether its configuration is published; sets a group''s basics; and takes a group
-    out of service with an expected-back time. What a group''s kiosks show is customised in the white-label builder''s
-    kiosk tab (CMS-105, Venue CMS); a kiosk is put in a group on ADM-582. The arcade''s own self-service journey stays
-    on BO-493 (`setGameKioskConfiguration`). The id is kept, so its ticket keeps its key; it no longer needs the games
-    module.'
+  notes: '**Rebuilt 5 October 2026 as the venue''s kiosk groups** (decided by Chinmay, CHG-R4-001; docs/active/decisions/answers-5-october.md).
+    It was an empty Save and Cancel form on the games-only `setGameKioskConfiguration`, waiting for a
+    person to define it. It now lists the venue''s kiosk groups (by access point, operating area or outlet,
+    and the venue''s default for every kiosk in no group), the functions each offers, how many kiosks
+    are in it and whether its configuration is published; sets a group''s basics; and takes a group out
+    of service with an expected-back time. What a group''s kiosks show is customised in the white-label
+    builder''s kiosk tab (CMS-105, Venue CMS); a kiosk is put in a group on ADM-582. The arcade''s own
+    self-service journey stays on BO-493 (`setGameKioskConfiguration`). The id is kept, so its ticket
+    keeps its key; it no longer needs the games module.'
   density: compact
   purposeNote: Administrators can determine which self-service functions are available on each kiosk/device.
   pattern: listDetail
-  patternReason: '`listKioskConfigs` reads the venue''s kiosk groups and `getKioskConfig` reads one — list, select,
-    act'
-  purpose: List the venue's kiosk groups and the functions each offers, see which kiosks are in each and whether its
-    configuration is published, set a group's name and place, and take a group out of service.
+  patternReason: '`listKioskConfigs` reads the venue''s kiosk groups and `getKioskConfig` reads one —
+    list, select, act'
+  purpose: List the venue's kiosk groups and the functions each offers, see which kiosks are in each and
+    whether its configuration is published, set a group's name and place, and take a group out of service.
   gaps:
   - operation: setGameKioskConfiguration
     removed: true
-    why: 'Rebuilt 5 October 2026 (CHG-R4-001): the kiosk groups are the white-label kiosk configuration; the arcade''s
-      self-service journey stays on BO-493, which binds it.'
+    why: 'Rebuilt 5 October 2026 (CHG-R4-001): the kiosk groups are the white-label kiosk configuration;
+      the arcade''s self-service journey stays on BO-493, which binds it.'
     source: decided 5 October 2026 by Chinmay (CHG-R4-001)
   layout:
     template: split
@@ -78884,8 +78886,8 @@ screens:
         - KioskConfig.assignedKioskCount
         - KioskConfig.publishedVersion
         operation: listKioskConfigs
-        notes: The venue's default first (every kiosk in no group), then the groups by name. A group with unpublished
-          changes is marked, and a group out of service shows its expected-back time.
+        notes: The venue's default first (every kiosk in no group), then the groups by name. A group with
+          unpublished changes is marked, and a group out of service shows its expected-back time.
         provenance: contract white-label.yaml GET /venues/{venueId}/kiosk-configs
     - name: contextPanel
       slot: selection
@@ -78900,8 +78902,9 @@ screens:
         - KioskConfig.isDefault
         - KioskConfig.hasUnpublishedChanges
         operation: getKioskConfig
-        notes: Where its kiosks stand (an access point, an operating area or an outlet) and whether the published
-          configuration is behind the draft; "Customise" opens the group in the Venue CMS kiosk builder (CMS-105).
+        notes: Where its kiosks stand (an access point, an operating area or an outlet) and whether the
+          published configuration is behind the draft; "Customise" opens the group in the Venue CMS kiosk
+          builder (CMS-105).
         provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId}
       - kind: dataTable
         label: Functions offered
@@ -78911,8 +78914,8 @@ screens:
         - KioskStartTile.isEnabled
         - KioskStartTile.sortOrder
         operation: getKioskConfig
-        notes: Sell tickets, collect a booking, order food, shop, membership, wallet top-up, map and assistant, as the
-          group's start screen offers them.
+        notes: Sell tickets, collect a booking, order food, shop, membership, wallet top-up, map and assistant,
+          as the group's start screen offers them.
         provenance: contract white-label.yaml GET /kiosk-configs/{kioskConfigId} (KioskConfig.startTiles)
       - kind: dataTable
         label: Kiosks in this group
@@ -78951,19 +78954,19 @@ screens:
       - kind: destructiveButton
         label: Remove group
         operation: deleteKioskConfig
-        notes: Refused `409` for the venue's default and while kiosks are in the group; the refusal names them and
-          links to ADM-582.
+        notes: Refused `409` for the venue's default and while kiosks are in the group; the refusal names
+          them and links to ADM-582.
         provenance: contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}
   states:
     loading: The venue's kiosk groups, read by `listKioskConfigs`.
     error: Could not load. Names which read failed and leaves the groups untouched.
-    emptyFirstRun: '**No kiosk group yet.** Every kiosk shows the venue''s default once one is published; offers "Add a
-      kiosk group" (the first is the default).'
+    emptyFirstRun: '**No kiosk group yet.** Every kiosk shows the venue''s default once one is published;
+      offers "Add a kiosk group" (the first is the default).'
     emptyNoResults: Not applicable — the list is not filtered beyond the venue.
-    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this
-      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question. A caller who can see the screen but lacks what a part needs sees that part
-      disabled, naming its permission: `DEVICE_VIEW` for `listKioskAssignments`.'
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what a part needs sees that part disabled, naming its permission: `DEVICE_VIEW` for `listKioskAssignments`.'
   apis:
   - operationId: listKioskConfigs
     contract: white-label
@@ -79022,15 +79025,15 @@ screens:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-485
     workshopBoard: wireframes/WS67 Game and Ride Board 10.dc.html#bo-485
-  apisNote: 'Rebuilt 5 October 2026 (CHG-R4-001) from Chinmay''s kiosk customisation decision; it was regenerated 9
-    September 2026 from Game_and_Ride_Module.pdf page 97, which gave it nothing that could be drawn.'
+  apisNote: Rebuilt 5 October 2026 (CHG-R4-001) from Chinmay's kiosk customisation decision; it was regenerated
+    9 September 2026 from Game_and_Ride_Module.pdf page 97, which gave it nothing that could be drawn.
   overlays:
   - id: formCreateKioskConfig
     component: modal
     trigger: Add a kiosk group
-    body: '**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` and `placementId`.
-      The group starts from the venue default''s settings; it is customised in the Venue CMS kiosk builder. Dismissing
-      sends nothing.'
+    body: '**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` and
+      `placementId`. The group starts from the venue default''s settings; it is customised in the Venue
+      CMS kiosk builder. Dismissing sends nothing.'
     bindsTo: KioskConfig
     confirm:
       label: Add group
@@ -79045,9 +79048,9 @@ screens:
   - id: formSetKioskOutOfService
     component: modal
     trigger: Take out of service
-    body: '**Collects what `setKioskOutOfService` sends**: `active`, an optional `expectedBackAt` (in the future) and an
-      optional `messageOverride` in each kiosk language. Says it is live at once on every kiosk of the group (a guest
-      mid-session finishes first). Dismissing sends nothing.'
+    body: '**Collects what `setKioskOutOfService` sends**: `active`, an optional `expectedBackAt` (in
+      the future) and an optional `messageOverride` in each kiosk language. Says it is live at once on
+      every kiosk of the group (a guest mid-session finishes first). Dismissing sends nothing.'
     bindsTo: KioskOutOfService
     confirm:
       label: Apply now
@@ -79062,8 +79065,8 @@ screens:
   - id: confirmDeleteKioskConfig
     component: confirmDialog
     trigger: Remove group
-    body: Names the group and says its published versions stay in the history. Refused `409` for the default and while
-      kiosks are in the group, and names them.
+    body: Names the group and says its published versions stay in the history. Refused `409` for the default
+      and while kiosks are in the group, and names them.
     confirm:
       label: Remove
       operation: deleteKioskConfig
@@ -201001,6 +201004,11 @@ screens:
       trigger: Back to Terminal & Card-Present Command Center\t48
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+    - to: KSK-001
+      trigger: The kiosk plays the group's attract loop until a guest touches it
+      provenance: flow F304 step 4→5
+      crossesDevice: true
+      back: false
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -201046,25 +201054,29 @@ screens:
     - name: kioskGroups
       components:
       - kind: dataTable
-        label: 'Kiosks and their groups'
+        label: Kiosks and their groups
         bindsTo: KioskAssignment
         columns:
         - KioskAssignment.workstationId
         - KioskAssignment.kioskConfigId
         - KioskAssignment.assignedAt
         operation: listKioskAssignments
-        notes: '**Which kiosk group each kiosk is in** (decided 5 October 2026 by Chinmay, CHG-R4-001): a kiosk in no group shows the venue''s default kiosk configuration. The groups and what they offer are on BO-485.'
+        notes: '**Which kiosk group each kiosk is in** (decided 5 October 2026 by Chinmay, CHG-R4-001):
+          a kiosk in no group shows the venue''s default kiosk configuration. The groups and what they
+          offer are on BO-485.'
         provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
       - kind: selectField
-        label: 'Kiosk group'
+        label: Kiosk group
         bindsTo: KioskAssignment.kioskConfigId
         operation: listKioskConfigs
-        notes: 'The venue''s kiosk groups (`listKioskConfigs`), the default first; choosing the default sends null.'
+        notes: The venue's kiosk groups (`listKioskConfigs`), the default first; choosing the default
+          sends null.
         provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
       - kind: secondaryButton
-        label: 'Put in kiosk group'
+        label: Put in kiosk group
         operation: assignKiosk
-        notes: 'Moves the selected kiosk into the chosen group; it shows that group''s published configuration from its next return to the attract loop. Refused `409` when the workstation is not a kiosk.'
+        notes: Moves the selected kiosk into the chosen group; it shows that group's published configuration
+          from its next return to the attract loop. Refused `409` when the workstation is not a kiosk.
         provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   states:
     loading: The pos kiosk terminal list.
@@ -201083,17 +201095,17 @@ screens:
     provenance: board reading, 19 September 2026
   - operationId: listKioskAssignments
     contract: white-label
-    purpose: 'Which kiosk group each kiosk of the venue is in (CHG-R4-001)'
+    purpose: Which kiosk group each kiosk of the venue is in (CHG-R4-001)
     trigger: onLoad
     provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   - operationId: listKioskConfigs
     contract: white-label
-    purpose: 'The venue''s kiosk groups to choose from (CHG-R4-001)'
+    purpose: The venue's kiosk groups to choose from (CHG-R4-001)
     trigger: onLoad
     provenance: decided 5 October 2026 by Chinmay (CHG-R4-001)
   - operationId: assignKiosk
     contract: white-label
-    purpose: 'Put a kiosk in a kiosk group, or back on the default (CHG-R4-001)'
+    purpose: Put a kiosk in a kiosk group, or back on the default (CHG-R4-001)
     trigger: onAction
     invalidates:
     - listKioskAssignments
@@ -201109,6 +201121,10 @@ screens:
   entryState:
     params:
     - name: deviceId
+      from: session
+    - name: venueId
+      from: session
+    - name: workstationId
       from: session
 - id: ADM-583
   name: EMV & Card-Present Processing Configuration

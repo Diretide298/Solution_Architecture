@@ -42,6 +42,19 @@ from release_baseline import ROOT, baseline_commit, changed_since, describe  # n
 FORWARD = re.compile(r"^backend/(?:control|tenant)/V\d+__[\w.-]+\.sql$")
 REVIEW = ROOT / "handoff" / "migration-review.md"
 
+# Deleted on purpose after r1, decided by the lead (CHG-SQL-001, Chinmay, 6 October 2026): the forward
+# migrations derive-ddl wrote against the OLD r1 (a1ba956) before the fresh start. The fresh r1 (9cec72d)
+# regenerated the baselines with all of their changes (five columns since renamed or moved), so they only
+# re-applied columns with IF NOT EXISTS. These six paths, and nothing else, may be absent.
+RETIRED = {
+    "backend/control/V0100__after_r1_20261002.sql",
+    "backend/control/V0101__after_r1_20261002.sql",
+    "backend/control/V0102__after_r1_20261003.sql",
+    "backend/tenant/V0100__after_r1_20261002.sql",
+    "backend/tenant/V0101__after_r1_20261002.sql",
+    "backend/tenant/V0102__after_r1_20261003.sql",
+}
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -60,6 +73,8 @@ def main() -> int:
             continue
         if status == "M":
             errors.append(f"changed   {path} differs from {describe(a.baseline, commit)}")
+        elif status == "D" and path in RETIRED:
+            print(f"  retired   {path} (CHG-SQL-001)")
         elif status == "D":
             errors.append(f"deleted   {path} existed at {describe(a.baseline, commit)}")
         elif FORWARD.match(path):

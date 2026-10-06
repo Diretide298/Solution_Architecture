@@ -6,7 +6,7 @@ This table was maintained by hand until 26 August and held **twelve rows against
 
 **A figure typed once is correct once.** `platform-P01.md` claimed 35 screens against a live 46; the viewer carried *654 operations* in 25 places against a live 1,023. This file is now derived for the same reason both of those were fixed.
 
-**16 platforms · 2450 screens · 44 drawn.**
+**16 platforms · 2451 screens · 44 drawn.**
 
 | | Short | Purpose | Audience | Form factor | App | Offline | Screens | Drawn |
 |---|---|---|---|---|---|---|---:|---:|
@@ -21,7 +21,7 @@ This table was maintained by hand until 26 August and held **twelve rows against
 | P10 | **Partner Web** | Partner Web — Reseller Portal | partner | web | `partner-web` | no | 43 | 0 |
 | P11 | **Accreditation Web** | Accreditation Web — Applications | public | web | `accreditation-web` | no | 8 | 0 |
 | P12 | **Venue Support** | Venue Support — Agent Console | staff | web | `venue-support-web` | no | 28 | 0 |
-| P13 | **Venue CMS** | Venue CMS — White Label | staff | web | `venue-management-web` | no | 103 | 0 |
+| P13 | **Venue CMS** | Venue CMS — White Label | staff | web | `venue-management-web` | no | 104 | 0 |
 | P14 | **Developer** | Developer Portal | partner | web | `developer-portal-web` | no | 8 | 0 |
 | P15 | **Kitchen Display** | Kitchen Display — Pass and Stations | staff | kiosk | `kitchen-display` | yes | 10 | 0 |
 | P16 | **Venue Analytics** | Venue Analytics — Cross-Domain Reporti | staff | web | `venue-management-web` | no | 71 | 0 |

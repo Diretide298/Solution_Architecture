@@ -161,6 +161,26 @@ NP_LATER_CEILING = 191
 BUTTONS = {"primaryButton", "secondaryButton", "destructiveButton", "iconButton"}
 
 
+_NOTES: dict | None = None
+
+
+def _design_notes() -> dict:
+    """screen id -> [its entries in handoff/design-notes/*.yaml] (read once)."""
+    global _NOTES
+    if _NOTES is None:
+        import glob
+        import os
+        import yaml
+        _NOTES = {}
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        for f in sorted(glob.glob(os.path.join(root, "handoff", "design-notes", "*.yaml"))):
+            doc = yaml.load(open(f, encoding="utf-8").read(), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader)) or {}
+            for sid, note in ((doc.get("screens") or {}) if isinstance(doc.get("screens"), dict) else {}).items():
+                if isinstance(note, dict):
+                    _NOTES.setdefault(sid, []).append(note)
+    return _NOTES
+
+
 def decided(S) -> list:
     out = []
     for chg, sid, rule, op in DECIDED:
@@ -188,6 +208,15 @@ def decided(S) -> list:
                 if "password" in words:
                     out.append(("DEC", sid, f"{chg}: overlay {o.get('id')} asks for a password; guest accounts "
                                             f"are passwordless (Create an account: email, code, verify)"))
+            # and its design notes (CHG-R4-007, 6 October: GST-010's notes still offered "Set a password" from the
+            # prototype after CHG-R11-002): no action or output of the screen's design notes sets a password
+            for note in _design_notes().get(sid, []):
+                for part in ("actions", "outputs", "inputs"):
+                    for item in note.get(part) or []:
+                        txt = " ".join(str(v) for k, v in (item or {}).items() if k != "source").lower()
+                        if "set a password" in txt or "password field" in txt.replace("no password field", ""):
+                            out.append(("DEC", sid, f"{chg}: its design notes ({part}) still set a password; guest "
+                                                    f"accounts are passwordless (Create an account)"))
     return out
 
 

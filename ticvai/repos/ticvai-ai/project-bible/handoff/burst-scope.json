@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2776,
+  "ofTotalOperations": 2789,
   "tables": 62,
-  "ofTotalTables": 1124
+  "ofTotalTables": 1129
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2744,
-    "tables": 1124,
+    "operations": 2757,
+    "tables": 1129,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -423,7 +423,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`. **Reached by**: 8 operatio"
+   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`, `identity.role`. **Reached"
   },
   {
    "table": "approvals.matrix",
@@ -445,7 +445,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.external_provider`, `approvals.matrix`. **Reac"
+   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.external_provider`, `approvals.matrix`, `ident"
   },
   {
    "table": "catalogue.entitlement_template",

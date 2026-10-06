@@ -1,4 +1,42 @@
 {
+ "createKioskConfig": {
+  "method": "POST",
+  "path": "/venues/{venueId}/kiosk-configs",
+  "contract": "white-label",
+  "summary": "Add a kiosk group to a venue, with its kiosk configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KioskConfig",
+  "responds": "KioskConfig"
+ },
+ "deleteKioskConfig": {
+  "method": "DELETE",
+  "path": "/kiosk-configs/{kioskConfigId}",
+  "contract": "white-label",
+  "summary": "Remove a kiosk group's configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getGameCard": {
   "method": "GET",
   "path": "/game-cards/{cardCode}",
@@ -40,6 +78,19 @@
   ],
   "requestBody": null,
   "responds": "GameEligibility"
+ },
+ "getKioskConfig": {
+  "method": "GET",
+  "path": "/kiosk-configs/{kioskConfigId}",
+  "contract": "white-label",
+  "summary": "Read one kiosk configuration from the working draft, every part included",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KioskConfig"
  },
  "getWallet": {
   "method": "GET",
@@ -102,6 +153,59 @@
   "requestBody": null,
   "responds": "GameplayTransaction"
  },
+ "listKioskAssignments": {
+  "method": "GET",
+  "path": "/venues/{venueId}/kiosk-assignments",
+  "contract": "white-label",
+  "summary": "Which kiosk group each kiosk of the venue is in",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kioskConfigId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listKioskConfigs": {
+  "method": "GET",
+  "path": "/venues/{venueId}/kiosk-configs",
+  "contract": "white-label",
+  "summary": "A venue's kiosk configurations, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPrizes": {
   "method": "GET",
   "path": "/prizes",
@@ -155,6 +259,25 @@
   "requestBody": "GameKioskConfig",
   "responds": "GameKioskConfig"
  },
+ "setKioskOutOfService": {
+  "method": "PUT",
+  "path": "/kiosk-configs/{kioskConfigId}/out-of-service",
+  "contract": "white-label",
+  "summary": "Take a kiosk group out of service, or put it back, at once",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KioskOutOfService",
+  "responds": "KioskOutOfService"
+ },
  "settleWalletAtExit": {
   "method": "POST",
   "path": "/wallets/{walletId}/exit-settlement",
@@ -192,5 +315,24 @@
   ],
   "requestBody": null,
   "responds": "Wallet"
+ },
+ "updateKioskConfig": {
+  "method": "PATCH",
+  "path": "/kiosk-configs/{kioskConfigId}",
+  "contract": "white-label",
+  "summary": "Change a kiosk configuration in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KioskConfig"
  }
 }

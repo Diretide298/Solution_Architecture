@@ -20155,20 +20155,28 @@
   "app": "guest-app",
   "route": "/sell/attract-loop",
   "operations": [
-   "listProducts"
+   "listProducts",
+   "getPublishedKioskConfig"
   ],
   "services": [
-   "CatalogueService"
+   "CatalogueService",
+   "WhiteLabelService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
-   "whitelabel.guided_choice_answer"
+   "whitelabel.guided_choice_answer",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20212,6 +20220,17 @@
     "to": "KSK-015",
     "trigger": "Opens Assistant",
     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "CMS-105",
+    "trigger": "Rolls back when something is wrong",
+    "provenance": "flow F304 step 5\u21926",
+    "operation": "getPublishedKioskConfig",
+    "crossesDevice": true,
+    "back": false,
+    "carries": [
+     "kioskConfigId"
+    ]
    }
   ],
   "machine": null,
@@ -20219,7 +20238,7 @@
    "loading": "Not applicable \u2014 the attract loop is the idle state",
    "error": "Falls through to KSK-014 if the kiosk cannot reach the server",
    "emptyFirstRun": "Not applicable",
-   "offline": "**Not available.** An unattended terminal selling from a stale catalogue oversells with nobody watching"
+   "offline": "**The last cached attract loop plays, with the group's offline message** (decided 5 October 2026, CHG-R4-001: `getPublishedKioskConfig` and the loop's media are served from the kiosk's cache). **Nothing is sold**: an unattended terminal selling from a stale catalogue oversells with nobody watching"
   },
   "overlays": []
  },
@@ -20232,7 +20251,8 @@
   "route": "/sell/language-select",
   "operations": [
    "getTenantAppStatus",
-   "getPublishedTenantConfig"
+   "getPublishedTenantConfig",
+   "getPublishedKioskConfig"
   ],
   "services": [
    "WhiteLabelService"
@@ -20248,6 +20268,11 @@
    "whitelabel.footer_config_social_link",
    "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
@@ -20670,10 +20695,12 @@
   "app": "guest-app",
   "route": "/sell/payment-unresolved",
   "operations": [
-   "inquirePaymentStatus"
+   "inquirePaymentStatus",
+   "getPublishedKioskConfig"
   ],
   "services": [
-   "OrderService"
+   "OrderService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -20681,7 +20708,12 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.payment"
+   "orders.payment",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [
    "cache:idempotency",
@@ -20818,10 +20850,12 @@
   "app": "guest-app",
   "route": "/sell/print-failure",
   "operations": [
-   "reprintOrder"
+   "reprintOrder",
+   "getPublishedKioskConfig"
   ],
   "services": [
-   "OrderService"
+   "OrderService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -20829,7 +20863,12 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.sales_order"
+   "orders.sales_order",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [
    "cache:idempotency",
@@ -20982,10 +21021,12 @@
   "route": "/sell/call-staff",
   "operations": [
    "endKioskAssist",
-   "handoverToAgent"
+   "handoverToAgent",
+   "getPublishedKioskConfig"
   ],
   "services": [
-   "MarketingService"
+   "MarketingService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -20997,7 +21038,12 @@
    "marketing.conversation",
    "marketing.conversation_message",
    "marketing.conversation_message_attachment",
-   "marketing.kiosk_assist_session"
+   "marketing.kiosk_assist_session",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
   ],
   "writes": [
    "cache:idempotency",
@@ -21051,16 +21097,23 @@
   "app": "guest-app",
   "route": "/sell/out-of-service",
   "operations": [
-   "getTenantAppStatus"
+   "getTenantAppStatus",
+   "getPublishedKioskConfig"
   ],
   "services": [
    "WhiteLabelService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "whitelabel.config_version",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -48461,13 +48514,19 @@
    "ADM-164",
    "ADM-570",
    "ADM-603",
-   "BO-696"
+   "BO-696",
+   "BO-485"
   ],
   "pattern": "listDetail",
   "entryFrom": [
    "BO-100"
   ],
   "transitions": [
+   {
+    "to": "BO-485",
+    "trigger": "Kiosk groups",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the venue's kiosk groups and what each offers"
+   },
    {
     "to": "BO-007",
     "trigger": "Product Directory",
@@ -76414,31 +76473,46 @@
   "app": "venue-management-web",
   "route": "/games-rides/self-service-kiosk-profile-channel-configuration-bo-485",
   "operations": [
-   "setGameKioskConfiguration"
+   "listKioskConfigs",
+   "getKioskConfig",
+   "createKioskConfig",
+   "updateKioskConfig",
+   "deleteKioskConfig",
+   "setKioskOutOfService",
+   "listKioskAssignments"
   ],
   "services": [
-   "VenueOpsService"
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
    "redis"
   ],
   "reads": [
-   "games.kiosk_config"
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [
-   "games.kiosk_config"
+   "cache:idempotency",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
-   "BO-484"
+   "BO-484",
+   "BO-102",
+   "ADM-582"
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-484"
+   "BO-484",
+   "BO-102"
   ],
   "transitions": [
    {
@@ -76446,17 +76520,83 @@
     "trigger": "Back to Self-Service Experience Command Center",
     "provenance": "structural \u2014 pack board 10 wiring, 11 September 2026",
     "back": true
+   },
+   {
+    "to": "BO-102",
+    "trigger": "Back to Sell",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk groups are reached from the Sell home",
+    "back": true
+   },
+   {
+    "to": "ADM-582",
+    "trigger": "Put kiosks in this group",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); a kiosk is assigned to a group on ADM-582"
    }
   ],
   "machine": null,
   "states": {
-   "loading": "The self-service kiosk profile list.",
-   "error": "Could not load. Names which read failed and leaves the self-service kiosk profile untouched.",
-   "emptyFirstRun": "No self-service kiosk profile yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the self-service kiosk profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The venue's kiosk groups, read by `listKioskConfigs`.",
+   "error": "Could not load. Names which read failed and leaves the groups untouched.",
+   "emptyFirstRun": "**No kiosk group yet.** Every kiosk shows the venue's default once one is published; offers \"Add a kiosk group\" (the first is the default).",
+   "emptyNoResults": "Not applicable \u2014 the list is not filtered beyond the venue.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what a part needs sees that part disabled, naming its permission: `DEVICE_VIEW` for `listKioskAssignments`."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateKioskConfig",
+    "component": "modal",
+    "trigger": "Add a kiosk group",
+    "body": "**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` and `placementId`. The group starts from the venue default's settings; it is customised in the Venue CMS kiosk builder. Dismissing sends nothing.",
+    "bindsTo": "KioskConfig",
+    "confirm": {
+     "label": "Add group",
+     "operation": "createKioskConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "placementKind",
+      "placementId"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /venues/{venueId}/kiosk-configs"
+   },
+   {
+    "id": "formSetKioskOutOfService",
+    "component": "modal",
+    "trigger": "Take out of service",
+    "body": "**Collects what `setKioskOutOfService` sends**: `active`, an optional `expectedBackAt` (in the future) and an optional `messageOverride` in each kiosk language. Says it is live at once on every kiosk of the group (a guest mid-session finishes first). Dismissing sends nothing.",
+    "bindsTo": "KioskOutOfService",
+    "confirm": {
+     "label": "Apply now",
+     "operation": "setKioskOutOfService"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "active",
+      "expectedBackAt",
+      "messageOverride"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /kiosk-configs/{kioskConfigId}/out-of-service"
+   },
+   {
+    "id": "confirmDeleteKioskConfig",
+    "component": "confirmDialog",
+    "trigger": "Remove group",
+    "body": "Names the group and says its published versions stay in the history. Refused `409` for the default and while kiosks are in the group, and names them.",
+    "confirm": {
+     "label": "Remove",
+     "operation": "deleteKioskConfig"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}"
+   }
+  ]
  },
  "BO-486": {
   "name": "Customer Card / Wallet Identification",
@@ -141894,20 +142034,31 @@
   "app": "venue-management-web",
   "route": "/commercial/pos-kiosk-terminal-assignment-manager-t52-adm-582",
   "operations": [
-   "setDeviceAssignment"
+   "setDeviceAssignment",
+   "listKioskAssignments",
+   "listKioskConfigs",
+   "assignKiosk"
   ],
   "services": [
-   "TenancyService"
+   "TenancyService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
    "redis"
   ],
   "reads": [
-   "tenancy.device_assignment"
+   "platform.workstation",
+   "tenancy.device_assignment",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile"
   ],
   "writes": [
-   "tenancy.device_assignment"
+   "cache:idempotency",
+   "tenancy.device_assignment",
+   "whitelabel.kiosk_assignment"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -141926,6 +142077,13 @@
     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
     "provenance": "structural \u2014 pack board 3 wiring, 19 September 2026",
     "back": true
+   },
+   {
+    "to": "KSK-001",
+    "trigger": "The kiosk plays the group's attract loop until a guest touches it",
+    "provenance": "flow F304 step 4\u21925",
+    "crossesDevice": true,
+    "back": false
    }
   ],
   "machine": null,
@@ -189951,13 +190109,19 @@
    "CMS-012",
    "CMS-014",
    "CMS-015",
-   "CMS-104"
+   "CMS-104",
+   "CMS-105"
   ],
   "pattern": "multiStepForm",
   "entryFrom": [
    "CMS-001"
   ],
   "transitions": [
+   {
+    "to": "CMS-105",
+    "trigger": "Kiosks",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk tab of the builder beside the web and the app"
+   },
    {
     "to": "CMS-001",
     "trigger": "1 Venue and modules",
@@ -190407,6 +190571,165 @@
      "label": "Cancel"
     },
     "provenance": "contract white-label.yaml POST /tenant-config/app-builds"
+   }
+  ]
+ },
+ "CMS-105": {
+  "name": "Kiosk Builder",
+  "platform": "P13",
+  "platformName": "Venue CMS",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/white-label/kiosk",
+  "operations": [
+   "listKioskConfigs",
+   "getKioskConfig",
+   "createKioskConfig",
+   "updateKioskConfig",
+   "deleteKioskConfig",
+   "getKioskConfigValidation",
+   "getPublishedKioskConfig",
+   "publishKioskConfigs",
+   "listKioskConfigVersions",
+   "restoreKioskConfigVersion"
+  ],
+  "services": [
+   "WhiteLabelService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "catalogue.product",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
+   "whitelabel.config_version",
+   "whitelabel.kiosk_assignment",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.kiosk_config",
+   "whitelabel.kiosk_config_attract_slide",
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.kiosk_config_version"
+  ],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "CMS-102",
+   "CMS-010",
+   "CMS-103"
+  ],
+  "pattern": "listDetail",
+  "entryFrom": [
+   "CMS-102"
+  ],
+  "transitions": [
+   {
+    "to": "CMS-102",
+    "trigger": "Back to the Site Builder",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)",
+    "back": true
+   },
+   {
+    "to": "CMS-010",
+    "trigger": "Add photos and videos to the media library",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the attract loop's slides are media library assets"
+   },
+   {
+    "to": "CMS-103",
+    "trigger": "The venue's booking flows",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); a kiosk journey uses the venue's booking flows",
+    "carries": [
+     "productId"
+    ]
+   },
+   {
+    "to": "ADM-582",
+    "trigger": "Puts the gate's kiosks in the group",
+    "provenance": "flow F304 step 3\u21924",
+    "operation": "publishKioskConfigs",
+    "crossesDevice": true,
+    "back": false
+   }
+  ],
+  "machine": null,
+  "states": {
+   "loading": "The venue's kiosk groups, read by `listKioskConfigs`, then the selected group by `getKioskConfig`.",
+   "error": "Could not load. Names which read failed and leaves the draft untouched.",
+   "emptyFirstRun": "**No kiosk configuration at this venue yet.** Kiosks show the platform's neutral holding screen until one is published. Offers \"Set up the kiosks\", which creates the venue's default from the published brand with the standard settings (portrait, medium tiles, a 60-second idle timeout).",
+   "emptyNoResults": "Not applicable \u2014 the list is not filtered beyond the venue.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishKioskConfigs` and `restoreKioskConfigVersion`."
+  },
+  "overlays": [
+   {
+    "id": "formCreateKioskConfig",
+    "component": "modal",
+    "trigger": "Add a kiosk group",
+    "body": "**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` (an access point, an operating area or an outlet) and `placementId`; every other part starts from the venue default's values and is edited in the panels. Dismissing sends nothing.",
+    "bindsTo": "KioskConfig",
+    "confirm": {
+     "label": "Add group",
+     "operation": "createKioskConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "placementKind",
+      "placementId"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /venues/{venueId}/kiosk-configs"
+   },
+   {
+    "id": "confirmPublishKioskConfigs",
+    "component": "confirmDialog",
+    "trigger": "Publish to this group",
+    "body": "**Names what goes live**: the groups that change and how many kiosks show each. Asks for the publish note `publishKioskConfigs` requires. \"Publish to every kiosk\" sends no `kioskConfigIds`; \"Publish to this group\" sends the selected one.",
+    "confirm": {
+     "label": "Publish",
+     "operation": "publishKioskConfigs"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract white-label.yaml POST /venues/{venueId}/kiosk-configs/publish"
+   },
+   {
+    "id": "confirmRestoreKioskConfigVersion",
+    "component": "confirmDialog",
+    "trigger": "Restore this version",
+    "body": "Names the version and says it replaces the draft without publishing. When the draft has unpublished changes the refusal (`409`, `unpublished-changes`) offers to discard them (`discardDraftChanges`).",
+    "confirm": {
+     "label": "Restore",
+     "operation": "restoreKioskConfigVersion"
+    },
+    "dismiss": {
+     "label": "Keep the draft"
+    },
+    "provenance": "contract white-label.yaml POST /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore"
+   },
+   {
+    "id": "confirmDeleteKioskConfig",
+    "component": "confirmDialog",
+    "trigger": "Remove group",
+    "body": "Names the group and says its published versions stay in the history. Refused `409` for the default and while kiosks are in the group, and names them.",
+    "confirm": {
+     "label": "Remove",
+     "operation": "deleteKioskConfig"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}"
    }
   ]
  },

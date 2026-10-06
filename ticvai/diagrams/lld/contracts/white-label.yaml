@@ -1,10 +1,25 @@
 id: LLD-white-label
-title: white-label — 95 operations
+title: white-label — 108 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: WhiteLabelService
 operations:
+- operation: assignKiosk
+  verb: PUT
+  path: /venues/{venueId}/kiosk-assignments/{workstationId}
+  scope: venue
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.workstation
+  - whitelabel.kiosk_assignment
+  - whitelabel.kiosk_config
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_assignment
 - operation: buildDeepLink
   verb: POST
   path: /deep-links
@@ -104,6 +119,23 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
+- operation: createKioskConfig
+  verb: POST
+  path: /venues/{venueId}/kiosk-configs
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
 - operation: createPreview
   verb: POST
   path: /tenant-config/preview
@@ -194,6 +226,22 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
+- operation: deleteKioskConfig
+  verb: DELETE
+  path: /kiosk-configs/{kioskConfigId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_assignment
+  - whitelabel.kiosk_config
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
 - operation: deletePromoBlock
   verb: DELETE
   path: /tenant-config/promo-blocks/{promoBlockId}
@@ -333,6 +381,36 @@ operations:
   - whitelabel.homepage_layout
   - whitelabel.homepage_section
   writes: []
+- operation: getKioskConfig
+  verb: GET
+  path: /kiosk-configs/{kioskConfigId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  writes: []
+- operation: getKioskConfigValidation
+  verb: GET
+  path: /kiosk-configs/{kioskConfigId}/validation
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
+  - whitelabel.config_version
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  writes: []
 - operation: getModuleEnablement
   verb: GET
   path: /tenant-config/modules
@@ -411,6 +489,24 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
+  writes: []
+- operation: getPublishedKioskConfig
+  verb: GET
+  path: /venues/{venueId}/kiosk-config
+  scope: venue
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  - device
+  - staff
+  offline: true
+  reads:
+  - whitelabel.kiosk_assignment
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  - whitelabel.kiosk_config_version
   writes: []
 - operation: getPublishedTenantConfig
   verb: GET
@@ -656,6 +752,42 @@ operations:
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes: []
+- operation: listKioskAssignments
+  verb: GET
+  path: /venues/{venueId}/kiosk-assignments
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_assignment
+  writes: []
+- operation: listKioskConfigVersions
+  verb: GET
+  path: /kiosk-configs/{kioskConfigId}/versions
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config_version
+  writes: []
+- operation: listKioskConfigs
+  verb: GET
+  path: /venues/{venueId}/kiosk-configs
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_assignment
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  writes: []
 - operation: listLandingPageTemplates
   verb: GET
   path: /landing-page-templates
@@ -774,6 +906,23 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.guided_choice
+- operation: publishKioskConfigs
+  verb: POST
+  path: /venues/{venueId}/kiosk-configs/publish
+  scope: venue
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  - whitelabel.kiosk_config_version
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_version
 - operation: publishTenantConfig
   verb: POST
   path: /tenant-config/publish
@@ -874,6 +1023,24 @@ operations:
   - whitelabel.module_enablement
   - whitelabel.navigation_item
   - whitelabel.tenant_config
+- operation: restoreKioskConfigVersion
+  verb: POST
+  path: /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore
+  scope: venue
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  - whitelabel.kiosk_config_version
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
 - operation: setAnalyticsProvider
   verb: PUT
   path: /tenant-config/analytics-providers
@@ -1025,6 +1192,19 @@ operations:
   - cache:idempotency
   - whitelabel.homepage_layout
   - whitelabel.homepage_section
+- operation: setKioskOutOfService
+  verb: PUT
+  path: /kiosk-configs/{kioskConfigId}/out-of-service
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_config
 - operation: setLanguages
   verb: PUT
   path: /tenant-config/languages
@@ -1255,6 +1435,23 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
+- operation: updateKioskConfig
+  verb: PATCH
+  path: /kiosk-configs/{kioskConfigId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
+  writes:
+  - cache:idempotency
+  - whitelabel.kiosk_config
+  - whitelabel.kiosk_config_attract_slide
+  - whitelabel.kiosk_config_start_tile
 - operation: updatePromoBlock
   verb: PATCH
   path: /tenant-config/promo-blocks/{promoBlockId}

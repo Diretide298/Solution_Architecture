@@ -147,7 +147,13 @@ def main() -> int:
     # the others; each must find its operations built by its own drop or an earlier one (A1 then A2, CHG-RONEP-007)
     by_key = {r["key"]: r for r in rows if r.get("type") == "Task"}
 
+    # a decided app-module's wiring task wires its operations into a screen another ticket builds (CHG-R4-003): such an
+    # operation is wired in the wiring task's drop (getPublishedKioskConfig on KSK-001 in A2, the screen in A1)
+    wiring = td.wiring_parts(extra.get("appModules"))
+
     def wired_in(sid, o):
+        if (sid, o) in wiring and wiring[(sid, o)] in by_key:
+            return by_key[wiring[(sid, o)]].get("block") or "A"
         setup = by_key.get(f"APP-SETUP-{sid}")
         if not setup:
             return screen_block[sid]

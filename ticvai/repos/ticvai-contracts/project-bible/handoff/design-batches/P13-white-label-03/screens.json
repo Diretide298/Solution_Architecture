@@ -31,11 +31,17 @@
     "CMS-012",
     "CMS-014",
     "CMS-015",
-    "CMS-104"
+    "CMS-104",
+    "CMS-105"
    ],
    "inferred": false,
    "notes": "**The step-based CMS (decided 29 September, W12 and M24-05).** Each of the seven steps opens the full screen for its details and comes back here; progress is saved on every return, so the builder reopens where the operator left it.",
    "transitions": [
+    {
+     "to": "CMS-105",
+     "trigger": "Kiosks",
+     "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk tab of the builder beside the web and the app"
+    },
     {
      "to": "CMS-001",
      "trigger": "1 Venue and modules",

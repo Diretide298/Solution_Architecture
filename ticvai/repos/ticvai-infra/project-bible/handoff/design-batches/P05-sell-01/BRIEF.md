@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 12 operations · 46 schemas · 4 permissions**
+**10 screens · 13 operations · 60 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -122,20 +122,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | A | 0 | 2 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-002` | Language Select | B | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-001` | Attract Loop | A | 0 | 7 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-002` | Language Select | B | 1 | 22 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-005` | Choose a performance | C | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-006` | Review | C | 10 | 31 | 5 | 11 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-008` | Payment unresolved | C | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-008` | Payment unresolved | C | 0 | 1 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-009` | Ticket issued | C | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-010` | Print failure | C | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-010` | Print failure | C | 6 | 1 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**KSK-001, KSK-002, KSK-003, KSK-004, KSK-005, KSK-006, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-002, KSK-003, KSK-004, KSK-005, KSK-006, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

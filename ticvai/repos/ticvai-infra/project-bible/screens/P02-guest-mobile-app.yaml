@@ -2713,8 +2713,8 @@ screens:
     trigger: onAction
   - operationId: linkGuestCheckout
     contract: identity
-    purpose: 'Create an account: once verifyGuestEmail proves the code, move the guest-checkout order to
-      the new account (CHG-R11-002)'
+    purpose: 'Create an account: once verifyGuestEmail proves the code, move the guest-checkout order
+      to the new account (CHG-R11-002)'
     trigger: onAction
   - operationId: registerGuest
     contract: identity
@@ -2742,8 +2742,9 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 1 → Booking confirmation (#confirm)
-      differences: Prototype offers "Set a password" to turn a guest-checkout profile into an account
-        (linkGuestCheckout, GST-042); not declared on this screen in YAML.
+      differences: Prototype offers "Set a password" to turn a guest-checkout profile into an account;
+        the screen offers "Create an account" instead (passwordless, with an emailed code, then linkGuestCheckout;
+        CHG-FXS-003, CHG-R11-002, CHG-R4-007).
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2768,11 +2769,11 @@ screens:
   - id: formLinkGuestCheckout
     component: modal
     trigger: Create an account
-    body: '**Create an account, with no password** (guest accounts are passwordless, CHG-FXS-003): the email
-      for the account, the order''s email prefilled; **Send me a code** (`registerGuest`, channel email); the
-      six-digit code sent to it; **Verify the code** (`verifyGuestEmail`, mode code); then the order moves to
-      the new account (`linkGuestCheckout`). There is no password field. Dismissing before the code is verified
-      links nothing.'
+    body: '**Create an account, with no password** (guest accounts are passwordless, CHG-FXS-003): the
+      email for the account, the order''s email prefilled; **Send me a code** (`registerGuest`, channel
+      email); the six-digit code sent to it; **Verify the code** (`verifyGuestEmail`, mode code); then
+      the order moves to the new account (`linkGuestCheckout`). There is no password field. Dismissing
+      before the code is verified links nothing.'
     confirm:
       label: Create an account
       operation: linkGuestCheckout

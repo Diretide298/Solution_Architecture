@@ -624,6 +624,13 @@
      "trigger": "Back to Terminal & Card-Present Command Center\\t48",
      "provenance": "structural — pack board 3 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "KSK-001",
+     "trigger": "The kiosk plays the group's attract loop until a guest touches it",
+     "provenance": "flow F304 step 4→5",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
@@ -670,6 +677,39 @@
        "impliedBy": "setDeviceAssignment"
       }
      ]
+    },
+    {
+     "name": "kioskGroups",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Kiosks and their groups",
+       "bindsTo": "KioskAssignment",
+       "columns": [
+        "KioskAssignment.workstationId",
+        "KioskAssignment.kioskConfigId",
+        "KioskAssignment.assignedAt"
+       ],
+       "operation": "listKioskAssignments",
+       "notes": "**Which kiosk group each kiosk is in** (decided 5 October 2026 by Chinmay, CHG-R4-001): a kiosk in no group shows the venue's default kiosk configuration. The groups and what they offer are on BO-485.",
+       "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kiosk group",
+       "bindsTo": "KioskAssignment.kioskConfigId",
+       "operation": "listKioskConfigs",
+       "notes": "The venue's kiosk groups (`listKioskConfigs`), the default first; choosing the default sends null.",
+       "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Put in kiosk group",
+       "operation": "assignKiosk",
+       "notes": "Moves the selected kiosk into the chosen group; it shows that group's published configuration from its next return to the attract loop. Refused `409` when the workstation is not a kiosk.",
+       "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+      }
+     ]
     }
    ]
   },
@@ -687,6 +727,30 @@
     "purpose": "Assign it to a workstation",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listKioskAssignments",
+    "contract": "white-label",
+    "purpose": "Which kiosk group each kiosk of the venue is in (CHG-R4-001)",
+    "trigger": "onLoad",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "listKioskConfigs",
+    "contract": "white-label",
+    "purpose": "The venue's kiosk groups to choose from (CHG-R4-001)",
+    "trigger": "onLoad",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "assignKiosk",
+    "contract": "white-label",
+    "purpose": "Put a kiosk in a kiosk group, or back on the default (CHG-R4-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKioskAssignments"
+    ],
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
    }
   ],
   "wireframe": {
@@ -699,6 +763,14 @@
    "params": [
     {
      "name": "deviceId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "workstationId",
      "from": "session"
     }
    ]

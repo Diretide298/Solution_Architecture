@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-10-04'
+generated: '2026-10-06'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 174
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2614 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2626 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -30,7 +30,7 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 228
+    operations: 229
     permissions: 24
     tiers:
       read:
@@ -99,9 +99,9 @@ apps:
     - getParkingEntitlement
     - getPublishedBookingFlow
     - getPublishedGuidedChoice
+    - getPublishedKioskConfig
     - getPublishedTenantConfig
-    - getTenantAppStatus
-    operationsWithNoPermissionCount: 112
+    operationsWithNoPermissionCount: 113
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -213,8 +213,8 @@ apps:
     - P12
     - P13
     - P16
-    screens: 1863
-    operations: 2079
+    screens: 1864
+    operations: 2092
     permissions: 149
     tiers:
       read:
@@ -377,6 +377,7 @@ apps:
     - getCurrentSession
     - getGameCard
     - getPublishedBookingFlow
+    - getPublishedKioskConfig
     - getTenantAppStatus
     - getTransportFareTable
     - getTransportRoute
@@ -393,7 +394,7 @@ apps:
     - startSsoAuthorization
     - verifyMfaChallenge
     - verifyMfaEnrolment
-    operationsWithNoPermissionCount: 23
+    operationsWithNoPermissionCount: 24
   venue-pos:
     name: TICVAI POS
     platforms:

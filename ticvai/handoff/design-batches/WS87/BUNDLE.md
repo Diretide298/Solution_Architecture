@@ -1,6 +1,6 @@
 # WS87 — Game and Ride board 10
 
-**10 screens · 9 operations · 10 schemas · 4 permissions**
+**10 screens · 16 operations · 30 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PRODUCT_VIEW, TENANT_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `DEVICE_VIEW, PRODUCT_VIEW, TENANT_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-484` | Self-Service Experience Command Center | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | D | 167 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-486` | Customer Card / Wallet Identification | D | 0 | 4 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-487` | Customer Wallet & Balance Summary | C | 0 | 6 | 6 | 16 | 1 | 6 | — | notStarted (—) |
 | `BO-488` | Self-Service Wallet Top-Up | C | 0 | 15 | 6 | 33 | 1 | 6 | — | notStarted (—) |
@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-485, BO-486, BO-487, BO-488, BO-490, BO-491, BO-492 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-486, BO-487, BO-488, BO-490, BO-491, BO-492 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -340,21 +340,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-485` Self-Service Kiosk Profile & Channel Configuration
 
-**Define the business role of each kiosk or customer-facing station.**
+**List the venue's kiosk groups and the functions each offers, see which kiosks are in each and whether its configuration is published, set a group's name and place, and take a group out of service.**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Games & Rides · wave 3 · needs the `games` module |
+| Module | Games & Rides · wave 1 · needs the `core` module |
 | Block | Block D · task VM-BO-485 |
-| Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `DEVICE_VIEW`, `TENANT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): `listKioskConfigs` reads the venue's kiosk groups and `getKioskConfig` reads one — list, select, act |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `venueId` (session), `kioskConfigId` (navigation) · cold entry: Resolves the venue from the session and opens on the venue's kiosk groups. |
 | Route | `/games-rides/self-service-kiosk-profile-channel-configuration-bo-485` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the game kiosk configuration.
+**What the spec says about it.** **Rebuilt 5 October 2026 as the venue's kiosk groups** (decided by Chinmay, CHG-R4-001; docs/active/decisions/answers-5-october.md). It was an empty Save and Cancel form on the games-only `setGameKioskConfiguration`, waiting for a person to define it. It now lists the venue's kiosk groups (by access point, operating area or outlet, and the venue's default for every kiosk in no group), the functions each offers, how many kiosks are in it and whether its configuration is published; sets a group's basics; and takes a group out of service with an expected-back time. What a group's kiosks show is customised in the white-label builder's kiosk tab (CMS-105, Venue CMS); a kiosk is put in a group on ADM-582. The arcade's own self-service journey stays on BO-493 (`setGameKioskConfiguration`). The id is kept, so its ticket keeps its key; it no longer needs the games module.
+
+**Known gaps.** Rebuilt 5 October 2026 (CHG-R4-001): the kiosk groups are the white-label kiosk configuration; the arcade's self-service journey stays on BO-493, which binds it.
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Defines each kiosk's role: which game-wallet functions it offers, how a guest identifies, which languages it speaks. A balance station in the arcade may only show balances; a kiosk at the entrance may top up and sell packages. The one thing to get right: the functions list is a set of switches in the guest's words, and it decides which journey steps the kiosk shows.
 
@@ -366,7 +368,137 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Venue | picker: choose a venue | optional | — | — | shows names, sends the id | The venue whose kiosk groups are shown (path `venueId`); defaults to the session venue. | `KioskConfig.venueId` |
+
+**Form: Add a kiosk group** (modal, opened by *Add a kiosk group*; *Add group* calls `createKioskConfig`, *Cancel* sends nothing)
+
+**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` and `placementId`. The group starts from the venue default's settings; it is customised in the Venue CMS kiosk builder. Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | required | — | max length 80 | — | Staff-facing, e.g. "North gate kiosks". | `createKioskConfig` body |
+| Is default `isDefault` | toggle | optional | off | The first configuration of a venue is the default; it cannot be deleted or stop being the default. | — | The venue's default configuration, for every kiosk in no group. The first configuration of a venue is the default; it cannot be deleted or stop being the default. | `createKioskConfig` body |
+| Placement kind `placementKind` | radio group | optional | — | Venue · Access point · Operating area · Outlet | — | Where a kiosk group's kiosks stand (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk groups by gate, zone or outlet). | `createKioskConfig` body |
+| Placement `placementId` | picker: choose a placement | optional | — | — | shows names, sends the id | The access point, operating area or outlet `placementKind` names; null for `venue`. | `createKioskConfig` body |
+| Display `display` | group | optional | — | — | — | The device profile of a kiosk group (decided 5 October 2026 by Chinmay, CHG-R4-001): what the kiosk's screen is, so the attract loop's media is checked against it and the start … | `createKioskConfig` body |
+| Orientation `display.orientation` | segmented control | optional | Portrait | Portrait · Landscape | — | — | `createKioskConfig` body |
+| Screen size inches `display.screenSizeInches` | stepper or slider | optional | — | min 7; max 100 | — | The diagonal, for the layout's touch targets. Null until the hardware is known. | `createKioskConfig` body |
+| Resolution width px `display.resolutionWidthPx` | number field | optional | 1080 | min 320; max 7680 | — | — | `createKioskConfig` body |
+| Resolution height px `display.resolutionHeightPx` | number field | optional | 1920 | min 320; max 7680 | — | — | `createKioskConfig` body |
+| Mounting height cm `display.mountingHeightCm` | number field | optional | — | min 50; max 250 | — | The height of the screen's lower edge from the floor. Sets `reachableHeightByDefault` when that is not given. | `createKioskConfig` body |
+| Reachable height by default `display.reachableHeightByDefault` | toggle | optional | — | Whether the kiosk opens in the reachable-height mode of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). | — | Whether the kiosk opens in the reachable-height mode of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). | `createKioskConfig` body |
+| Touch scale `display.touchScale` | stepper or slider | optional | 1.25 | min 1; max 2 | — | Multiplies every touch target and text size on the kiosk (1 is the guest app's size). | `createKioskConfig` body |
+| Product tile size `display.productTileSize` | segmented control | optional | — | Small · Medium · Large | — | The size of a tile or of a product tile on the kiosk ("the size of the card", decided 5 October 2026 by Chinmay, CHG-R4-001). | `createKioskConfig` body |
+| Tiles per row `display.tilesPerRow` | stepper or slider | optional | 3 | min 1; max 6 | — | Product tiles per row on the selling screens (KSK-003, KSK-016, KSK-017). | `createKioskConfig` body |
+| Attract loop `attractLoop` | group | optional | — | — | — | How the attract loop plays (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides themselves are `KioskConfig.attractSlides`. | `createKioskConfig` body |
+| Transition `attractLoop.transition` | segmented control | optional | Fade | Cut · Fade · Slide | — | — | `createKioskConfig` body |
+| Sound on `attractLoop.soundOn` | toggle | optional | off | — | — | Whether a video slide plays its sound. Off by default (a kiosk in a queue hall). | `createKioskConfig` body |
+| Play windows `attractLoop.playWindows` | repeatable rows | optional | — | at most 21 | — | When the open loop plays, by time of day and weekday, in the venue's time zone. A slide plays only inside a window; with no window the loop plays all day. | `createKioskConfig` body |
+| Weekdays `attractLoop.playWindows[].weekdays` | multi-select chips | required | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun; at least 1; at most 7 | — | — | `createKioskConfig` body |
+| From `attractLoop.playWindows[].from` | time picker | required | — | — | HH:mm, 24-hour | Local time, inclusive. | `createKioskConfig` body |
+| To `attractLoop.playWindows[].to` | time picker | required | — | — | HH:mm, 24-hour | Local time, exclusive; earlier than `from` runs past midnight. | `createKioskConfig` body |
+| Touch to start `attractLoop.touchToStart` | group | optional | — | — | — | The "Touch to start" call to action over the loop. | `createKioskConfig` body |
+| Text `attractLoop.touchToStart.text` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `createKioskConfig` body |
+| Position `attractLoop.touchToStart.position` | segmented control | optional | Bottom | Top · Middle · Bottom | — | — | `createKioskConfig` body |
+| Animation `attractLoop.touchToStart.animation` | segmented control | optional | Pulse | None · Pulse · Bounce | — | — | `createKioskConfig` body |
+| App download slide `attractLoop.appDownloadSlide` | group | optional | — | — | — | A "Download our app" slide with a QR code, added to the loop when on. The QR points at the tenant's store listings (the published app's deep-link scheme, `getDeepLinkScheme`). | `createKioskConfig` body |
+| Enabled `attractLoop.appDownloadSlide.enabled` | toggle | optional | off | — | — | — | `createKioskConfig` body |
+| Caption `attractLoop.appDownloadSlide.caption` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `createKioskConfig` body |
+| Every nth slide `attractLoop.appDownloadSlide.everyNthSlide` | stepper or slider | optional | 4 | min 1; max 20 | — | Shown after every n-th slide of the loop. | `createKioskConfig` body |
+| Attract slides `attractSlides` | repeatable rows | optional | — | at most 40 | — | The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). | `createKioskConfig` body |
+| Kind `attractSlides[].kind` | segmented control | required | — | Video · Photo · Text | — | — | `createKioskConfig` body |
+| Media image `attractSlides[].mediaAssetRef` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | The `MediaAsset` (a video for `video`, an image for `photo`); required for both, null for `text`. | `createKioskConfig` body |
+| Text `attractSlides[].text` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | The slide's words in every kiosk language; required for `text`, a caption otherwise. | `createKioskConfig` body |
+| Sort order `attractSlides[].sortOrder` | number field | required | — | min 0 | — | — | `createKioskConfig` body |
+| Duration seconds `attractSlides[].durationSeconds` | number field (seconds) | optional | 8 | min 3; max 120 | — | How long a photo or text slide shows. A video plays to its end and ignores it. | `createKioskConfig` body |
+| Plays when `attractSlides[].playsWhen` | segmented control | optional | Open | Open · Closed | — | `closed` slides play only outside the opening hours (the "Closed" loop); `open` slides only inside them. | `createKioskConfig` body |
+| Start screen `startScreen` | group | optional | — | — | — | The start screen around the tiles (`KioskConfig.startTiles`); one hero banner. | `createKioskConfig` body |
+| Hero banner `startScreen.heroBanner` | group | optional | — | — | — | — | `createKioskConfig` body |
+| Image `startScreen.heroBanner.imageAssetRef` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | `createKioskConfig` body |
+| Title `startScreen.heroBanner.title` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `createKioskConfig` body |
+| Link target `startScreen.heroBanner.linkTarget` | group | optional | — | — | — | — | `createKioskConfig` body |
+| Start tiles `startTiles` | repeatable rows | optional | — | at most 8; A function given twice is refused 400. | — | The functions this kiosk offers, in `sortOrder` (child rows, `whitelabel.kiosk_config_start_tile`). | `createKioskConfig` body |
+| Function `startTiles[].function` | select | required | — | Sell tickets · Collect reservation · Order food · Shop · Membership · Wallet top up · Map · Assistant; A function whose module the tenant has not enabled cannot be switched on (the tile is refused at publish, `tileWithoutProducts`). | — | What a kiosk offers on its start screen (decided 5 October 2026 by Chinmay, CHG-R4-001). | `createKioskConfig` body |
+| Is enabled `startTiles[].isEnabled` | toggle | optional | on | — | — | — | `createKioskConfig` body |
+| Sort order `startTiles[].sortOrder` | number field | required | — | min 0 | — | — | `createKioskConfig` body |
+| … 44 more | | | | | | the rest are in `schemas.json` | `createKioskConfig` body |
+
+Errors to draw in the form: 400 A malformed body, a placement id with no placement kind, or a repeated slide or tile order; 403 Authenticated but not permitted at the requested scope; 409 The venue already has a default kiosk configuration, or one of this name
+
+**Form: Take out of service** (modal, opened by *Take out of service*; *Apply now* calls `setKioskOutOfService`, *Cancel* sends nothing)
+
+**Collects what `setKioskOutOfService` sends**: `active`, an optional `expectedBackAt` (in the future) and an optional `messageOverride` in each kiosk language. Says it is live at once on every kiosk of the group (a guest mid-session finishes first). Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Active `active` | toggle | required | — | — | — | — | `setKioskOutOfService` body |
+| Expected back at `expectedBackAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Shown on KSK-014. Must be in the future. | `setKioskOutOfService` body |
+| Message override `messageOverride` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | Replaces the group's `messages.outOfService` until it is put back in service. | `setKioskOutOfService` body |
+
+Errors to draw in the form: 400 `expectedBackAt` is in the past; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.
+
+**Form: Remove group** (confirmDialog, opened by *Remove group*; *Remove* calls `deleteKioskConfig`, *Keep it* sends nothing)
+
+Names the group and says its published versions stay in the history. Refused `409` for the default and while kiosks are in the group, and names them.
+
+Sends no fields: a confirmation, not a form.
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 It is the venue's default, or kiosks are still assigned to it; the problem names them
+
+**Sent by *Save*** (`updateKioskConfig`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 80 | — | — | `updateKioskConfig` body |
+| Placement kind `placementKind` | radio group | optional | — | Venue · Access point · Operating area · Outlet | — | Where a kiosk group's kiosks stand (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk groups by gate, zone or outlet). | `updateKioskConfig` body |
+| Placement `placementId` | picker: choose a placement | optional | — | — | shows names, sends the id | — | `updateKioskConfig` body |
+| Display `display` | group | optional | — | — | — | The device profile of a kiosk group (decided 5 October 2026 by Chinmay, CHG-R4-001): what the kiosk's screen is, so the attract loop's media is checked against it and the start … | `updateKioskConfig` body |
+| Orientation `display.orientation` | segmented control | optional | Portrait | Portrait · Landscape | — | — | `updateKioskConfig` body |
+| Screen size inches `display.screenSizeInches` | stepper or slider | optional | — | min 7; max 100 | — | The diagonal, for the layout's touch targets. Null until the hardware is known. | `updateKioskConfig` body |
+| Resolution width px `display.resolutionWidthPx` | number field | optional | 1080 | min 320; max 7680 | — | — | `updateKioskConfig` body |
+| Resolution height px `display.resolutionHeightPx` | number field | optional | 1920 | min 320; max 7680 | — | — | `updateKioskConfig` body |
+| Mounting height cm `display.mountingHeightCm` | number field | optional | — | min 50; max 250 | — | The height of the screen's lower edge from the floor. Sets `reachableHeightByDefault` when that is not given. | `updateKioskConfig` body |
+| Reachable height by default `display.reachableHeightByDefault` | toggle | optional | — | Whether the kiosk opens in the reachable-height mode of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). | — | Whether the kiosk opens in the reachable-height mode of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). | `updateKioskConfig` body |
+| Touch scale `display.touchScale` | stepper or slider | optional | 1.25 | min 1; max 2 | — | Multiplies every touch target and text size on the kiosk (1 is the guest app's size). | `updateKioskConfig` body |
+| Product tile size `display.productTileSize` | segmented control | optional | — | Small · Medium · Large | — | The size of a tile or of a product tile on the kiosk ("the size of the card", decided 5 October 2026 by Chinmay, CHG-R4-001). | `updateKioskConfig` body |
+| Tiles per row `display.tilesPerRow` | stepper or slider | optional | 3 | min 1; max 6 | — | Product tiles per row on the selling screens (KSK-003, KSK-016, KSK-017). | `updateKioskConfig` body |
+| Attract loop `attractLoop` | group | optional | — | — | — | How the attract loop plays (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides themselves are `KioskConfig.attractSlides`. | `updateKioskConfig` body |
+| Transition `attractLoop.transition` | segmented control | optional | Fade | Cut · Fade · Slide | — | — | `updateKioskConfig` body |
+| Sound on `attractLoop.soundOn` | toggle | optional | off | — | — | Whether a video slide plays its sound. Off by default (a kiosk in a queue hall). | `updateKioskConfig` body |
+| Play windows `attractLoop.playWindows` | repeatable rows | optional | — | at most 21 | — | When the open loop plays, by time of day and weekday, in the venue's time zone. A slide plays only inside a window; with no window the loop plays all day. | `updateKioskConfig` body |
+| Weekdays `attractLoop.playWindows[].weekdays` | multi-select chips | required | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun; at least 1; at most 7 | — | — | `updateKioskConfig` body |
+| From `attractLoop.playWindows[].from` | time picker | required | — | — | HH:mm, 24-hour | Local time, inclusive. | `updateKioskConfig` body |
+| To `attractLoop.playWindows[].to` | time picker | required | — | — | HH:mm, 24-hour | Local time, exclusive; earlier than `from` runs past midnight. | `updateKioskConfig` body |
+| Touch to start `attractLoop.touchToStart` | group | optional | — | — | — | The "Touch to start" call to action over the loop. | `updateKioskConfig` body |
+| Text `attractLoop.touchToStart.text` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateKioskConfig` body |
+| Position `attractLoop.touchToStart.position` | segmented control | optional | Bottom | Top · Middle · Bottom | — | — | `updateKioskConfig` body |
+| Animation `attractLoop.touchToStart.animation` | segmented control | optional | Pulse | None · Pulse · Bounce | — | — | `updateKioskConfig` body |
+| App download slide `attractLoop.appDownloadSlide` | group | optional | — | — | — | A "Download our app" slide with a QR code, added to the loop when on. The QR points at the tenant's store listings (the published app's deep-link scheme, `getDeepLinkScheme`). | `updateKioskConfig` body |
+| Enabled `attractLoop.appDownloadSlide.enabled` | toggle | optional | off | — | — | — | `updateKioskConfig` body |
+| Caption `attractLoop.appDownloadSlide.caption` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateKioskConfig` body |
+| Every nth slide `attractLoop.appDownloadSlide.everyNthSlide` | stepper or slider | optional | 4 | min 1; max 20 | — | Shown after every n-th slide of the loop. | `updateKioskConfig` body |
+| Start screen `startScreen` | group | optional | — | — | — | The start screen around the tiles (`KioskConfig.startTiles`); one hero banner. | `updateKioskConfig` body |
+| Hero banner `startScreen.heroBanner` | group | optional | — | — | — | — | `updateKioskConfig` body |
+| Image `startScreen.heroBanner.imageAssetRef` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | `updateKioskConfig` body |
+| Title `startScreen.heroBanner.title` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateKioskConfig` body |
+| Link target `startScreen.heroBanner.linkTarget` | group | optional | — | — | — | — | `updateKioskConfig` body |
+| Header footer `headerFooter` | group | optional | — | — | — | The kiosk's header and footer (decided 5 October 2026 by Chinmay, CHG-R4-001). The logo and colours are the published brand's; this says what the kiosk's bars hold. | `updateKioskConfig` body |
+| Logo position `headerFooter.logoPosition` | segmented control | optional | Start | Start · Centre · End | — | `start` and `end` follow the reading direction, so Arabic mirrors them. | `updateKioskConfig` body |
+| Language switch visible `headerFooter.languageSwitchVisible` | toggle | optional | on | — | — | — | `updateKioskConfig` body |
+| Cart visible `headerFooter.cartVisible` | toggle | optional | on | — | — | The order summary button with its count. | `updateKioskConfig` body |
+| Call staff visible `headerFooter.callStaffVisible` | toggle | optional | on | — | — | Opens KSK-013 Call Staff. | `updateKioskConfig` body |
+| Accessibility button visible `headerFooter.accessibilityButtonVisible` | toggle | optional | on | — | — | Opens the tenant's `AccessibilitySettings` modes (BL-065). | `updateKioskConfig` body |
+| Clock visible `headerFooter.clockVisible` | toggle | optional | off | — | — | — | `updateKioskConfig` body |
+| Footer payment logos `headerFooter.footerPaymentLogos` | toggle | optional | on | — | — | Shows the logos of `paymentOutput.paymentMethodIds` in the footer. | `updateKioskConfig` body |
+| Footer help text `headerFooter.footerHelpText` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateKioskConfig` body |
+| Legal links as QR `headerFooter.legalLinksAsQr` | toggle | optional | on | — | — | The legal links shown as QR codes, because a kiosk cannot open a policy page in a browser: each published policy (`listPublishedPolicies`) gets a code that opens it on the guest's … | `updateKioskConfig` body |
+| Journey `journey` | group | optional | — | — | — | The kiosk channel's journeys (decided 5 October 2026 by Chinmay, CHG-R4-001). The kiosk books through the venue's booking flows like the web and app; custom flows are allowed, and … | `updateKioskConfig` body |
+| Booking flows `journey.bookingFlowIds` | multi-picker: choose booking flows | optional | — | at most 30 | — | The venue's booking flows the kiosk uses, by id (`listBookingFlows`). Empty uses the venue's default flow for each type, as the web does. | `updateKioskConfig` body |
+| … 29 more | | | | | | the rest are in `schemas.json` | `updateKioskConfig` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -378,12 +510,59 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Kiosk groups** (data table, from `listKioskConfigs`): The venue's default first (every kiosk in no group), then the groups by name. A group with unpublished changes is marked, and a group out of service shows its expected-back time.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | Staff-facing, e.g. "North gate kiosks". |
+| Placement kind | chip: Venue, Access point, Operating area, Outlet | Where a kiosk group's kiosks stand (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk groups by gate, zone or outlet). |
+| Enabled functions | list or chips (count when long) | The functions of the enabled start tiles, in order, for the group list (BO-485). |
+| Assigned kiosk count | 1,234 | How many kiosks `assignKiosk` put in this group; for the default, the venue's kiosks in no group. |
+| Published version | 1,234 | The `versionNumber` of the current `KioskConfigVersion`; null until first published. |
+
+**The selected group** (detail panel, from `getKioskConfig`): Where its kiosks stand (an access point, an operating area or an outlet) and whether the published configuration is behind the draft; "Customise" opens the group in the Venue CMS kiosk builder (CMS-105).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | Staff-facing, e.g. "North gate kiosks". |
+| Placement kind | chip: Venue, Access point, Operating area, Outlet | Where a kiosk group's kiosks stand (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk groups by gate, zone or outlet). |
+| Placement | the name it points at, never the id | The access point, operating area or outlet `placementKind` names; null for `venue`. |
+| Is default | yes / no (icon or chip) | The venue's default configuration, for every kiosk in no group. The first configuration of a venue is the default; it cannot be deleted or … |
+| Has unpublished changes | yes / no (icon or chip) | True after any write to the draft since the last publish or restore; false once published. |
+
+**Functions offered** (data table, from `getKioskConfig`): Sell tickets, collect a booking, order food, shop, membership, wallet top-up, map and assistant, as the group's start screen offers them.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Function | chip: Sell tickets, Collect reservation, Order food, Shop, Membership, Wallet top up… | What a kiosk offers on its start screen (decided 5 October 2026 by Chinmay, CHG-R4-001). |
+| Is enabled | yes / no (icon or chip) | — |
+| Sort order | 1,234 | — |
+
+**Kiosks in this group** (data table, from `listKioskAssignments`): Sends `?kioskConfigId=`. Each kiosk by its workstation; moved between groups on ADM-582.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Workstation | the name it points at, never the id | The kiosk's workstation (tenancy `Workstation.id`), from the path. One assignment per kiosk. |
+| Assigned at | 1 Oct 2026, 14:30 | — |
+
+**Out of service** (detail panel, from `getKioskConfig`): Live at once on every kiosk of the group (KSK-014), never drafted or published.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Active | yes / no (icon or chip) | — |
+| Expected back at | 1 Oct 2026, 14:30 | Shown on KSK-014. Must be in the future. |
+| Message override | in the reader's language | Replaces the group's `messages.outOfService` until it is put back in service. |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Add a kiosk group (primary button) | `createKioskConfig` POST `/venues/{venueId}/kiosk-configs` | KioskConfig | KioskConfig | 400 A malformed body, a placement id with no placement kind, or a repeated slide or tile order; 403 Authenticated but not permitted at the requested scope; 409 The venue already has a default kiosk configuration, or one … | opens modal first |
+| Save (secondary button) | `updateKioskConfig` PATCH `/kiosk-configs/{kioskConfigId}` | inline | KioskConfig | 400 A malformed part, a repeated slide or tile order, or an attempt to change `isDefault`; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Another … | — |
+| Take out of service (secondary button) | `setKioskOutOfService` PUT `/kiosk-configs/{kioskConfigId}/out-of-service` | KioskOutOfService | KioskOutOfService | 400 `expectedBackAt` is in the past; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
+| Remove group (destructive button) | `deleteKioskConfig` DELETE `/kiosk-configs/{kioskConfigId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 It is the venue's default, or kiosks are still assigned to it; the problem names them | opens confirmDialog first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -393,20 +572,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Save**: Saves the kiosk's whole configuration (VO-R04), including the steps also ordered on BO-493. *(source: contracts/satellite/games.yaml#setGameKioskConfiguration)*
 
+**Data it reads**: `listKioskConfigs` (onLoad, The venue's kiosk groups, the functions each offers and its …)
+
 **Where the user goes next**
 
 - → `BO-484` Self-Service Experience Command Center: *Back to Self-Service Experience Command Center*
+- → `BO-102` Sell: *Back to Sell*
+- → `ADM-582` POS, Kiosk & Terminal Assignment Manager: *Put kiosks in this group*
 
 #### States
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The self-service kiosk profile list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the self-service kiosk profile untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No self-service kiosk profile yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the self-service kiosk profile are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | The venue's kiosk groups, read by `listKioskConfigs`. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the groups untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **No kiosk group yet.** Every kiosk shows the venue's default once one is published; offers "Add a kiosk group" (the first is the default). |
+| Empty, no results (`?state=emptyNoResults`) | Not applicable — the list is not filtered beyond the venue. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what a part needs sees that part disabled, naming its permission: `DEVICE_VIEW` for `listKioskAssignments`. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A malformed body, a placement id with no placement kind, or a repeated slide or tile order; 400 A malformed part, a repeated slide or tile order, or an attempt to change `isDefault`; 400 `expectedBackAt` is in the past; 409 Another configuration of the venue has this name |
 
 #### Edge cases to draw
 
@@ -433,9 +617,17 @@ kiosk:
 
 #### Permissions
 
-- `setGameKioskConfiguration` → `TENANT_CONFIGURE` (configure) · staff
+- `listKioskConfigs` → `TENANT_CONFIGURE` (configure) · staff
+- `getKioskConfig` → `TENANT_CONFIGURE` (configure) · staff
+- `createKioskConfig` → `TENANT_CONFIGURE` (configure) · staff
+- `updateKioskConfig` → `TENANT_CONFIGURE` (configure) · staff
+- `deleteKioskConfig` → `TENANT_CONFIGURE` (configure) · staff
+- `setKioskOutOfService` → `TENANT_CONFIGURE` (configure) · staff
+- `listKioskAssignments` → `DEVICE_VIEW` (read) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what a part needs sees that part disabled, naming its permission: `DEVICE_VIEW` for `listKioskAssignments`.
+
+Screen guard: `TENANT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -462,12 +654,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (167), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-485?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel.
-- [ ] Every transition is wired: `BO-484`.
-- [ ] Every gated control is gated: `TENANT_CONFIGURE`.
+- [ ] Every action is wired with its success and its failure: Add a kiosk group, Save, Take out of service, Remove group.
+- [ ] Every transition is wired: `BO-484`, `BO-102`, `ADM-582`.
+- [ ] Every gated control is gated: `DEVICE_VIEW`, `TENANT_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -1838,15 +2030,22 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"createKioskConfig": {"method":"POST","path":"/venues/{venueId}/kiosk-configs","contract":"white-label","summary":"Add a kiosk group to a venue, with its kiosk configuration","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"KioskConfig","responds":"KioskConfig"},
+"deleteKioskConfig": {"method":"DELETE","path":"/kiosk-configs/{kioskConfigId}","contract":"white-label","summary":"Remove a kiosk group's configuration","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getGameCard": {"method":"GET","path":"/game-cards/{cardCode}","contract":"games","summary":"Read a card's balances","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GameCard"},
 "getGameEligibility": {"method":"GET","path":"/game-eligibility","contract":"games","summary":"What this guest can play right now, and what it would cost","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"cardId","in":"query","required":null},{"name":"subjectId","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"GameEligibility"},
+"getKioskConfig": {"method":"GET","path":"/kiosk-configs/{kioskConfigId}","contract":"white-label","summary":"Read one kiosk configuration from the working draft, every part included","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"KioskConfig"},
 "getWallet": {"method":"GET","path":"/wallets/{subjectId}","contract":"wallet","summary":"Read a guest wallet","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"},
 "getWalletExitBalance": {"method":"GET","path":"/wallets/{walletId}/exit-balance","contract":"wallet","summary":"What the holder owes or is owed on leaving","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletExitBalance"},
 "listGameplayTransactions": {"method":"GET","path":"/gameplay-transactions","contract":"games","summary":"Taps, decisions and what they cost","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"readerId","in":"query","required":null},{"name":"outcome","in":"query","required":null}],"requestBody":null,"responds":"GameplayTransaction"},
+"listKioskAssignments": {"method":"GET","path":"/venues/{venueId}/kiosk-assignments","contract":"white-label","summary":"Which kiosk group each kiosk of the venue is in","permission":"DEVICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kioskConfigId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listKioskConfigs": {"method":"GET","path":"/venues/{venueId}/kiosk-configs","contract":"white-label","summary":"A venue's kiosk configurations, in the working draft","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPrizes": {"method":"GET","path":"/prizes","contract":"games","summary":"The prize catalogue","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"maxPoints","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setGameKioskConfiguration": {"method":"PUT","path":"/game-kiosk-config","contract":"games","summary":"The self-service journey, its theme and its languages","permission":"TENANT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GameKioskConfig","responds":"GameKioskConfig"},
+"setKioskOutOfService": {"method":"PUT","path":"/kiosk-configs/{kioskConfigId}/out-of-service","contract":"white-label","summary":"Take a kiosk group out of service, or put it back, at once","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"KioskOutOfService","responds":"KioskOutOfService"},
 "settleWalletAtExit": {"method":"POST","path":"/wallets/{walletId}/exit-settlement","contract":"wallet","summary":"Settle a short balance, or refund a credit, when the holder leaves","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletExitSettlement"},
-"topUpWallet": {"method":"POST","path":"/wallets/{subjectId}/top-ups","contract":"wallet","summary":"Add value to a wallet","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"}
+"topUpWallet": {"method":"POST","path":"/wallets/{subjectId}/top-ups","contract":"wallet","summary":"Add value to a wallet","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"},
+"updateKioskConfig": {"method":"PATCH","path":"/kiosk-configs/{kioskConfigId}","contract":"white-label","summary":"Change a kiosk configuration in the working draft","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KioskConfig"}
 }
 ```
 
@@ -1860,6 +2059,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "GameEligibility": {"type":"object","description":"Board 10.7 — *\"What Can I Play?\"*, and every fact in it lives somewhere different.","properties":{"gameId":{"type":"string","format":"uuid"},"name":{"type":"string"},"playable":{"type":"boolean"},"costKind":{"type":"string","enum":["freeWithEntitlement","credit","directPay","notPlayable"]},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingPlays":{"type":"integer","nullable":true},"blockedReason":{"type":"string","nullable":true},"ticketsTypicallyEarned":{"type":"integer","nullable":true}}},
 "GameKioskConfig": {"type":"object","x-ticvai-persistence":"games.kiosk_config","description":"Boards 10.2 and 10.10. **Used by a child holding a wristband.**","properties":{"kioskDeviceId":{"type":"string","format":"uuid"},"steps":{"type":"array","items":{"type":"string","enum":["identify","balance","topUp","entitlements","whatCanIPlay","redemption","history"]}},"languages":{"type":"array","items":{"type":"string"}},"themeCode":{"type":"string","nullable":true},"idleTimeoutSeconds":{"type":"integer","default":30},"requiresPinForTopUp":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "GameplayTransaction": {"type":"object","x-ticvai-persistence":"games.gameplay_transaction","description":"Boards 8.2 and 8.5. **The refused ones are the valuable half.**","properties":{"id":{"type":"string","format":"uuid"},"readerId":{"type":"string","format":"uuid"},"gameId":{"type":"string","format":"uuid","nullable":true},"cardId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"outcome":{"type":"string","enum":["allowed","refused","reversed"]},"reason":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargedFrom":{"type":"string","nullable":true},"entitlementId":{"type":"string","format":"uuid","nullable":true},"ticketsEarned":{"type":"integer","nullable":true},"decidedOffline":{"type":"boolean","default":false},"syncedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"KioskAssignment": {"x-ticvai-persistence":"whitelabel.kiosk_assignment","type":"object","description":"**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001). One row per assigned kiosk; a kiosk with no row takes the venue's default configuration.","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"workstationId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-unique":"tenant","description":"The kiosk's workstation (tenancy `Workstation.id`), from the path. One assignment per kiosk."},"venueId":{"type":"string","format":"uuid","readOnly":true},"kioskConfigId":{"type":"string","format":"uuid","nullable":true,"description":"The group's configuration; null puts the kiosk on the venue's default."},"assignedAt":{"type":"string","format":"date-time","readOnly":true},"assignedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `venue` scope."}}},
+"KioskAttractLoop": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**How the attract loop plays** (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides themselves are `KioskConfig.attractSlides`. Offline, the kiosk plays the last loop it cached.","properties":{"transition":{"type":"string","enum":["cut","fade","slide"],"default":"fade"},"soundOn":{"type":"boolean","default":false,"description":"Whether a video slide plays its sound. Off by default (a kiosk in a queue hall)."},"playWindows":{"type":"array","maxItems":21,"description":"**When the open loop plays, by time of day and weekday**, in the venue's time zone. A slide plays only inside a window; with no window the loop plays all day. Outside the opening hours the `closed` slides play regardless.","items":{"type":"object","required":["weekdays","from","to"],"properties":{"weekdays":{"type":"array","minItems":1,"maxItems":7,"items":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]}},"from":{"type":"string","format":"time","description":"Local time, inclusive."},"to":{"type":"string","format":"time","description":"Local time, exclusive; earlier than `from` runs past midnight."}}}},"touchToStart":{"type":"object","description":"The \"Touch to start\" call to action over the loop.","properties":{"text":{"$ref":"#/components/schemas/LocalisedText"},"position":{"type":"string","enum":["top","middle","bottom"],"default":"bottom"},"animation":{"type":"string","enum":["none","pulse","bounce"],"default":"pulse"}}},"appDownloadSlide":{"type":"object","description":"**A \"Download our app\" slide with a QR code**, added to the loop when on. The QR points at the tenant's store listings (the published app's deep-link scheme, `getDeepLinkScheme`).","properties":{"enabled":{"type":"boolean","default":false},"caption":{"$ref":"#/components/schemas/LocalisedText"},"everyNthSlide":{"type":"integer","minimum":1,"maximum":20,"default":4,"description":"Shown after every n-th slide of the loop."}}}}},
+"KioskAttractSlide": {"x-ticvai-persistence":"whitelabel.kiosk_config_attract_slide","type":"object","description":"**One slide of the attract loop**, the kiosk's screen saver (decided 5 October 2026 by Chinmay, CHG-R4-001). A video or photo from the media library, or a text slide in the brand's fonts. Slides play in `sortOrder`; `playsWhen` `closed` slides make the \"Closed\" loop shown outside the group's opening hours.","required":["kind","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kioskConfigId":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["video","photo","text"]},"mediaAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"The `MediaAsset` (a video for `video`, an image for `photo`); required for both, null for `text`. Refused at publish when it does not fit the display (`mediaDoesNotFit`)."},"text":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The slide's words in every kiosk language; required for `text`, a caption otherwise."},"sortOrder":{"type":"integer","minimum":0},"durationSeconds":{"type":"integer","minimum":3,"maximum":120,"default":8,"description":"How long a photo or text slide shows. A video plays to its end and ignores it."},"playsWhen":{"type":"string","enum":["open","closed"],"default":"open","description":"`closed` slides play only outside the opening hours (the \"Closed\" loop); `open` slides only inside them."},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `venue` scope."}}},
+"KioskConfig": {"x-ticvai-persistence":"whitelabel.kiosk_config","type":"object","description":"**A kiosk group's configuration, in the working draft: the kiosk channel of the white-label builder** (decided 5 October 2026 by Chinmay, CHG-R4-001; `docs/active/decisions/answers-5-october.md`). The kiosk is the third channel beside the web and the app. It inherits what the tenant has published for them (the brand, theme, fonts with the Arabic pair, content pages, products, waivers and consents, read through `getPublishedTenantConfig`) and holds here only what differs on a kiosk. **Not carried over from the app, deliberately:** app icons, the store listing, push notifications, dark mode and saved sign-in.\n\n**One per kiosk group of a venue, plus the venue's default** (`isDefault`), which every kiosk in no group takes (`assignKiosk` puts a kiosk in a group). Published copies are `KioskConfigVersion` rows; kiosks read the current one through `getPublishedKioskConfig`.\n","required":["name"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of `createKioskConfig`."},"name":{"type":"string","maxLength":80,"description":"Staff-facing, e.g. \"North gate kiosks\". Unique in the venue. Not shown to guests."},"isDefault":{"type":"boolean","default":false,"description":"The venue's default configuration, for every kiosk in no group. The first configuration of a venue is the default; it cannot be deleted or stop being the default."},"placementKind":{"$ref":"#/components/schemas/KioskPlacementKind"},"placementId":{"type":"string","format":"uuid","nullable":true,"description":"The access point, operating area or outlet `placementKind` names; null for `venue`."},"display":{"$ref":"#/components/schemas/KioskDisplaySettings"},"attractLoop":{"$ref":"#/components/schemas/KioskAttractLoop"},"attractSlides":{"type":"array","maxItems":40,"description":"The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). Given on a write, it replaces the whole list.","items":{"$ref":"#/components/schemas/KioskAttractSlide"}},"startScreen":{"$ref":"#/components/schemas/KioskStartScreen"},"startTiles":{"type":"array","maxItems":8,"description":"The functions this kiosk offers, in `sortOrder` (child rows, `whitelabel.kiosk_config_start_tile`). Given on a write, it replaces the whole list. A function given twice is refused 400.","items":{"$ref":"#/components/schemas/KioskStartTile"}},"headerFooter":{"$ref":"#/components/schemas/KioskHeaderFooter"},"journey":{"$ref":"#/components/schemas/KioskJourneySettings"},"session":{"$ref":"#/components/schemas/KioskSessionSettings"},"paymentOutput":{"$ref":"#/components/schemas/KioskPaymentOutput"},"languages":{"$ref":"#/components/schemas/KioskLanguages"},"messages":{"$ref":"#/components/schemas/KioskMessages"},"openingHours":{"$ref":"#/components/schemas/KioskOpeningHours"},"outOfService":{"allOf":[{"$ref":"#/components/schemas/KioskOutOfService"}],"readOnly":true,"description":"Live state, written only by `setKioskOutOfService`."},"enabledFunctions":{"type":"array","readOnly":true,"x-ticvai-derived":"onRead","description":"The functions of the enabled start tiles, in order, for the group list (BO-485).","items":{"$ref":"#/components/schemas/KioskFunction"}},"assignedKioskCount":{"type":"integer","readOnly":true,"x-ticvai-derived":"onRead","description":"How many kiosks `assignKiosk` put in this group; for the default, the venue's kiosks in no group."},"publishedVersion":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The `versionNumber` of the current `KioskConfigVersion`; null until first published. Set by `publishKioskConfigs` in the same transaction."},"hasUnpublishedChanges":{"type":"boolean","readOnly":true,"x-ticvai-derived":"onWrite","description":"True after any write to the draft since the last publish or restore; false once published."},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `venue` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"KioskDisplaySettings": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The device profile of a kiosk group** (decided 5 October 2026 by Chinmay, CHG-R4-001): what the kiosk's screen is, so the attract loop's media is checked against it and the start screen is laid out for it.","properties":{"orientation":{"type":"string","enum":["portrait","landscape"],"default":"portrait"},"screenSizeInches":{"type":"number","minimum":7,"maximum":100,"nullable":true,"description":"The diagonal, for the layout's touch targets. Null until the hardware is known."},"resolutionWidthPx":{"type":"integer","minimum":320,"maximum":7680,"default":1080},"resolutionHeightPx":{"type":"integer","minimum":320,"maximum":7680,"default":1920},"mountingHeightCm":{"type":"integer","minimum":50,"maximum":250,"nullable":true,"description":"The height of the screen's lower edge from the floor. Sets `reachableHeightByDefault` when that is not given."},"reachableHeightByDefault":{"type":"boolean","description":"**Whether the kiosk opens in the reachable-height mode** of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). When not given it is set from `mountingHeightCm`: true at or above 100 cm (the setting `kioskReachableHeightThresholdCm`, default 100; client to confirm), false below it or with no height."},"touchScale":{"type":"number","minimum":1,"maximum":2,"default":1.25,"description":"Multiplies every touch target and text size on the kiosk (1 is the guest app's size)."},"productTileSize":{"$ref":"#/components/schemas/KioskTileSize"},"tilesPerRow":{"type":"integer","minimum":1,"maximum":6,"default":3,"description":"Product tiles per row on the selling screens (KSK-003, KSK-016, KSK-017)."}}},
+"KioskFunction": {"type":"string","description":"**What a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay, CHG-R4-001). Each opens an existing kiosk screen: `sellTickets` KSK-003, `collectReservation` KSK-011 (collect a booking), `orderFood` KSK-016, `shop` KSK-017, `membership` and `walletTopUp` the guest app's membership and wallet screens drawn for the kiosk, `map` the venue map, `assistant` KSK-015. A function whose module the tenant has not enabled cannot be switched on (the tile is refused at publish, `tileWithoutProducts`).","enum":["sellTickets","collectReservation","orderFood","shop","membership","walletTopUp","map","assistant"]},
+"KioskHeaderFooter": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The kiosk's header and footer** (decided 5 October 2026 by Chinmay, CHG-R4-001). The logo and colours are the published brand's; this says what the kiosk's bars hold.","properties":{"logoPosition":{"type":"string","enum":["start","centre","end"],"default":"start","description":"`start` and `end` follow the reading direction, so Arabic mirrors them."},"languageSwitchVisible":{"type":"boolean","default":true},"cartVisible":{"type":"boolean","default":true,"description":"The order summary button with its count."},"callStaffVisible":{"type":"boolean","default":true,"description":"Opens KSK-013 Call Staff."},"accessibilityButtonVisible":{"type":"boolean","default":true,"description":"Opens the tenant's `AccessibilitySettings` modes (BL-065)."},"clockVisible":{"type":"boolean","default":false},"footerPaymentLogos":{"type":"boolean","default":true,"description":"Shows the logos of `paymentOutput.paymentMethodIds` in the footer."},"footerHelpText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"legalLinksAsQr":{"type":"boolean","default":true,"description":"**The legal links shown as QR codes**, because a kiosk cannot open a policy page in a browser: each published policy (`listPublishedPolicies`) gets a code that opens it on the guest's phone."}}},
+"KioskJourneySettings": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The kiosk channel's journeys** (decided 5 October 2026 by Chinmay, CHG-R4-001). The kiosk books through the venue's booking flows like the web and app; custom flows are allowed, and the payment and legal steps stay locked exactly as `validateBookingFlow` holds them on the web and app.","properties":{"bookingFlowIds":{"type":"array","maxItems":30,"description":"The venue's booking flows the kiosk uses, by id (`listBookingFlows`). Empty uses the venue's default flow for each type, as the web does.","items":{"type":"string","format":"uuid"}},"maxSteps":{"type":"integer","minimum":2,"maximum":12,"default":6,"description":"The most steps a kiosk journey may take; a flow with more enabled steps is refused at publish (`journeyInvalid`)."},"upsellEnabled":{"type":"boolean","default":true,"description":"Add-ons and cross-sell offers (KSK-004, KSK-006)."},"upsellOfferCount":{"type":"integer","minimum":0,"maximum":6,"default":2,"description":"How many offers a step shows at most."}}},
+"KioskLanguages": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The languages KSK-002 offers and the one the kiosk returns to** (decided 5 October 2026 by Chinmay, CHG-R4-001). Each must be one the tenant has published (`LanguageConfig`); empty offers them all.","properties":{"languageCodes":{"type":"array","maxItems":12,"items":{"type":"string","pattern":"^[a-z]{2}$"}},"defaultLanguageCode":{"type":"string","pattern":"^[a-z]{2}$","nullable":true,"description":"Null takes the tenant's published default."}}},
+"KioskMessages": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The kiosk's own messages, in every kiosk language** (decided 5 October 2026 by Chinmay, CHG-R4-001). Null shows the platform's standard words.","properties":{"idleWarning":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The \"Still there?\" prompt."},"outOfService":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-014, with the expected-back time when `setKioskOutOfService` gives one."},"offline":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Over the cached loop while the kiosk cannot reach the server."},"printerFailure":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-010 Print failure."},"paymentUnresolved":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-008 Payment unresolved."},"callStaff":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-013 Call Staff, while help is on its way."},"closed":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Over the \"Closed\" loop outside the opening hours."}}},
+"KioskOpeningHours": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**When a kiosk group sells** (decided 5 October 2026 by Chinmay, CHG-R4-001), in the venue's time zone. Outside them the kiosk plays its `closed` slides with the `closed` message and sells nothing. With no hours set the kiosk follows the venue's own opening hours.","properties":{"weekly":{"type":"array","maxItems":14,"items":{"type":"object","required":["weekday","opensAt","closesAt"],"properties":{"weekday":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"opensAt":{"type":"string","format":"time"},"closesAt":{"type":"string","format":"time","description":"Earlier than `opensAt` runs past midnight."}}}}}},
+"KioskOutOfService": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**A kiosk group taken out of service** (`setKioskOutOfService`; decided 5 October 2026 by Chinmay, CHG-R4-001). Live state, never drafted or published.","required":["active"],"properties":{"active":{"type":"boolean"},"expectedBackAt":{"type":"string","format":"date-time","nullable":true,"description":"Shown on KSK-014. Must be in the future."},"messageOverride":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Replaces the group's `messages.outOfService` until it is put back in service."}}},
+"KioskPaymentOutput": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**What a kiosk takes and what it gives back** (decided 5 October 2026 by Chinmay, CHG-R4-001).","properties":{"paymentMethodIds":{"type":"array","maxItems":20,"description":"The venue's configured payment methods this kiosk accepts (payments `listPaymentMethods`). One not configured for the venue is refused at publish (`paymentMethodUnavailable`).","items":{"type":"string","format":"uuid"}},"receiptChannels":{"type":"array","description":"How the guest may take the receipt; the kiosk offers these on KSK-009.","maxItems":4,"items":{"type":"string","enum":["print","email","sms","qr"]}},"ticketStock":{"type":"string","nullable":true,"enum":["thermal80mm","wristband","plasticTicket"],"description":"What the kiosk's printer issues; null when it issues nothing printed (QR only)."},"ticketTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"The print layout from the ticket designer (orders `updateTicketTemplate`) for `ticketStock`; required when `ticketStock` is set (`ticketTemplateMissing` at publish)."},"sendToPhoneQr":{"type":"boolean","default":true,"description":"Offers a \"Send to my phone\" QR on KSK-009 that opens the order in the guest app or web."}}},
+"KioskPlacementKind": {"type":"string","description":"**Where a kiosk group's kiosks stand** (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk groups by gate, zone or outlet). `accessPoint` is a gate (access `AccessPoint`), `operatingArea` a zone of the venue (tenancy), `outlet` an outlet (tenancy `Outlet`); `venue` is the venue's default configuration, which every kiosk in no group takes, and names no place.","enum":["venue","accessPoint","operatingArea","outlet"]},
+"KioskSessionSettings": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**When a kiosk forgets its guest** (decided 5 October 2026 by Chinmay, CHG-R4-001). After `idleTimeoutSeconds` without a touch the kiosk asks \"Still there?\" with a countdown of `stillTherePromptSeconds`; with no touch by its end it clears the cart, signs the guest out, returns to the attract loop and switches to the default language. The tenant's `AccessibilitySettings.sessionTimeoutMultiplier` multiplies both while an accessibility mode is on. A payment in progress is never interrupted.","properties":{"idleTimeoutSeconds":{"type":"integer","minimum":15,"maximum":600,"default":60},"stillTherePromptSeconds":{"type":"integer","minimum":5,"maximum":60,"default":15},"signInMethods":{"type":"array","description":"**How a guest signs in at a kiosk: never with a password.** By scanning a QR code from the guest app (`appQr`) or with a one-time code sent to their phone or email (`oneTimeCode`). Empty: no sign-in at this kiosk. Saved sign-in is never offered (decided 5 October 2026).","maxItems":2,"items":{"type":"string","enum":["appQr","oneTimeCode"]}}}},
+"KioskStartScreen": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"The start screen around the tiles (`KioskConfig.startTiles`); one hero banner.","properties":{"heroBanner":{"type":"object","nullable":true,"properties":{"imageAssetRef":{"type":"string","format":"uuid"},"title":{"$ref":"#/components/schemas/LocalisedText"},"linkTarget":{"$ref":"#/components/schemas/LinkTarget"}}}}},
+"KioskStartTile": {"x-ticvai-persistence":"whitelabel.kiosk_config_start_tile","type":"object","description":"**One function a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay, CHG-R4-001), in `sortOrder`. A function appears at most once per kiosk configuration.","required":["function","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kioskConfigId":{"type":"string","format":"uuid","readOnly":true},"function":{"$ref":"#/components/schemas/KioskFunction"},"isEnabled":{"type":"boolean","default":true},"sortOrder":{"type":"integer","minimum":0},"tileSize":{"$ref":"#/components/schemas/KioskTileSize"},"imageAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"The tile's image from the media library; null shows the function's icon."},"label":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Null shows the function's standard label in each language."},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `venue` scope."}}},
+"KioskTileSize": {"type":"string","description":"The size of a tile or of a product tile on the kiosk (\"the size of the card\", decided 5 October 2026 by Chinmay, CHG-R4-001).","enum":["small","medium","large"]},
+"LinkTarget": {"x-ticvai-persistence":"none — embedded","type":"object","required":["kind"],"properties":{"kind":{"type":"string","enum":["module","contentPage","product","event","externalUrl","appSection","none"],"description":"`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."},"moduleKey":{"$ref":"#/components/schemas/ModuleKey"},"appSection":{"type":"string","enum":["home","explore","plan","tickets","map","account","buyTickets"],"description":"Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it."},"contentPageId":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"eventId":{"type":"string","format":"uuid"},"url":{"type":"string"}}},
+"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Prize": {"x-ticvai-persistence":"games.prize","type":"object","required":["id","name","venueId","pointCost","onHand"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":200},"description":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid"},"merchandiseId":{"type":"string","format":"uuid","nullable":true,"description":"Links to retail. Redemption depletes stock through the inventory ledger — a prize wall running out is a stock problem and should look like one.\n"},"pointCost":{"type":"integer","minimum":1},"onHand":{"type":"integer"},"isAvailable":{"type":"boolean"},"tier":{"type":"string","nullable":true,"description":"Small, medium, large, jackpot. Drives prize-wall layout."},"imageAssetRef":{"type":"string","nullable":true},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"The prize's own barcode, read by `lookupPrize` before the linked retail item's barcode or SKU. Unique within the venue (VM close-out, 29 September)."},"isActive":{"type":"boolean"}}},

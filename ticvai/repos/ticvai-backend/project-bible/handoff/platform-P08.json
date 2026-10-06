@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1661,
-  "operations": 1872,
+  "operations": 1880,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
   "operationsWithNoScreen": 189
  },
  "waves": {
-  "wave1": 139,
+  "wave1": 140,
   "wave2": 58,
-  "wave3": 1464
+  "wave3": 1463
  },
  "modules": [
   {
@@ -210,11 +210,11 @@
    "operations": 61
   },
   {
-   "contract": "resources",
+   "contract": "ai",
    "operations": 56
   },
   {
-   "contract": "ai",
+   "contract": "resources",
    "operations": 56
   },
   {
@@ -246,11 +246,11 @@
    "operations": 44
   },
   {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {
@@ -274,6 +274,10 @@
    "operations": 24
   },
   {
+   "contract": "white-label",
+   "operations": 19
+  },
+  {
    "contract": "shift",
    "operations": 15
   },
@@ -291,10 +295,6 @@
   },
   {
    "contract": "retail",
-   "operations": 11
-  },
-  {
-   "contract": "white-label",
    "operations": 11
   },
   {
@@ -3468,7 +3468,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pos-kiosk-terminal-assignment-manager-t52-adm-582",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -10558,9 +10558,9 @@
    "id": "BO-485",
    "name": "Self-Service Kiosk Profile & Channel Configuration",
    "module": "Games & Rides",
-   "wave": 3,
+   "wave": 1,
    "route": "/games-rides/self-service-kiosk-profile-channel-configuration-bo-485",
-   "operations": 1,
+   "operations": 7,
    "drawn": true
   },
   {

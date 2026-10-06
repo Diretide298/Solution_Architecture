@@ -1,5 +1,5 @@
 {
- "note": "How 33 contracts and 1124 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
+ "note": "How 33 contracts and 1129 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -526,16 +526,17 @@
    "schemas": [
     "whitelabel"
    ],
-   "operations": 95,
-   "tables": 29,
+   "operations": 108,
+   "tables": 34,
    "why": "Branding, content, navigation and the tenant's own app configuration. Separate because **it is the only service a tenant edits directly and publishes from** — its deploy cadence follows tenant appetite, not the platform's.",
    "scale": "Read-heavy and heavily cached. Published, not queried.",
    "risk": "Down freezes the current published config. Guests see the last good version.",
    "readsFrom": {
     "PlatformService": 7,
-    "CatalogueService": 2,
+    "CatalogueService": 3,
     "IdentityService": 1,
-    "MarketingService": 1
+    "MarketingService": 1,
+    "TenancyService": 1
    },
    "writesOutside": {
     "PlatformService": 3,

@@ -215,8 +215,9 @@
   "id": "BO-485",
   "name": "Self-Service Kiosk Profile & Channel Configuration",
   "module": "Games & Rides",
-  "requiresModule": "games",
-  "wave": 3,
+  "permission": "TENANT_CONFIGURE",
+  "requiresModule": "core",
+  "wave": 1,
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -231,10 +232,13 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-484"
+    "BO-484",
+    "BO-102"
    ],
    "exitTo": [
-    "BO-484"
+    "BO-484",
+    "BO-102",
+    "ADM-582"
    ],
    "transitions": [
     {
@@ -242,77 +246,312 @@
      "trigger": "Back to Self-Service Experience Command Center",
      "provenance": "structural — pack board 10 wiring, 11 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Back to Sell",
+     "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); the kiosk groups are reached from the Sell home",
+     "back": true
+    },
+    {
+     "to": "ADM-582",
+     "trigger": "Put kiosks in this group",
+     "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001); a kiosk is assigned to a group on ADM-582"
     }
    ]
   },
+  "notes": "**Rebuilt 5 October 2026 as the venue's kiosk groups** (decided by Chinmay, CHG-R4-001; docs/active/decisions/answers-5-october.md). It was an empty Save and Cancel form on the games-only `setGameKioskConfiguration`, waiting for a person to define it. It now lists the venue's kiosk groups (by access point, operating area or outlet, and the venue's default for every kiosk in no group), the functions each offers, how many kiosks are in it and whether its configuration is published; sets a group's basics; and takes a group out of service with an expected-back time. What a group's kiosks show is customised in the white-label builder's kiosk tab (CMS-105, Venue CMS); a kiosk is put in a group on ADM-582. The arcade's own self-service journey stays on BO-493 (`setGameKioskConfiguration`). The id is kept, so its ticket keeps its key; it no longer needs the games module.",
   "density": "compact",
   "purposeNote": "Administrators can determine which self-service functions are available on each kiosk/device.",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Define the business role of each kiosk or customer-facing station.",
+  "patternReason": "`listKioskConfigs` reads the venue's kiosk groups and `getKioskConfig` reads one — list, select, act",
+  "purpose": "List the venue's kiosk groups and the functions each offers, see which kiosks are in each and whether its configuration is published, set a group's name and place, and take a group out of service.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 97"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 97"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the game kiosk configuration.",
-    "source": "contracts/satellite/games.yaml#setGameKioskConfiguration"
+    "operation": "setGameKioskConfiguration",
+    "removed": true,
+    "why": "Rebuilt 5 October 2026 (CHG-R4-001): the kiosk groups are the white-label kiosk configuration; the arcade's self-service journey stays on BO-493, which binds it.",
+    "source": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
    }
   ],
   "layout": {
    "template": "split",
    "regions": [
     {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "bindsTo": "KioskConfig.venueId",
+       "operation": "listKioskConfigs",
+       "notes": "The venue whose kiosk groups are shown (path `venueId`); defaults to the session venue.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/kiosk-configs"
+      }
+     ]
+    },
+    {
      "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Kiosk groups",
+       "bindsTo": "KioskConfig",
+       "columns": [
+        "KioskConfig.name",
+        "KioskConfig.placementKind",
+        "KioskConfig.enabledFunctions",
+        "KioskConfig.assignedKioskCount",
+        "KioskConfig.publishedVersion"
+       ],
+       "operation": "listKioskConfigs",
+       "notes": "The venue's default first (every kiosk in no group), then the groups by name. A group with unpublished changes is marked, and a group out of service shows its expected-back time.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/kiosk-configs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group",
+       "bindsTo": "KioskConfig",
+       "columns": [
+        "KioskConfig.name",
+        "KioskConfig.placementKind",
+        "KioskConfig.placementId",
+        "KioskConfig.isDefault",
+        "KioskConfig.hasUnpublishedChanges"
+       ],
+       "operation": "getKioskConfig",
+       "notes": "Where its kiosks stand (an access point, an operating area or an outlet) and whether the published configuration is behind the draft; \"Customise\" opens the group in the Venue CMS kiosk builder (CMS-105).",
+       "provenance": "contract white-label.yaml GET /kiosk-configs/{kioskConfigId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Functions offered",
+       "bindsTo": "KioskStartTile",
+       "columns": [
+        "KioskStartTile.function",
+        "KioskStartTile.isEnabled",
+        "KioskStartTile.sortOrder"
+       ],
+       "operation": "getKioskConfig",
+       "notes": "Sell tickets, collect a booking, order food, shop, membership, wallet top-up, map and assistant, as the group's start screen offers them.",
+       "provenance": "contract white-label.yaml GET /kiosk-configs/{kioskConfigId} (KioskConfig.startTiles)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Kiosks in this group",
+       "bindsTo": "KioskAssignment",
+       "columns": [
+        "KioskAssignment.workstationId",
+        "KioskAssignment.assignedAt"
+       ],
+       "operation": "listKioskAssignments",
+       "notes": "Sends `?kioskConfigId=`. Each kiosk by its workstation; moved between groups on ADM-582.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/kiosk-assignments"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Out of service",
+       "bindsTo": "KioskOutOfService",
+       "columns": [
+        "KioskOutOfService.active",
+        "KioskOutOfService.expectedBackAt",
+        "KioskOutOfService.messageOverride"
+       ],
+       "operation": "getKioskConfig",
+       "notes": "Live at once on every kiosk of the group (KSK-014), never drafted or published.",
+       "provenance": "contract white-label.yaml GET /kiosk-configs/{kioskConfigId} (KioskConfig.outOfService)"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setGameKioskConfiguration",
-       "label": "Save",
-       "notes": "The act the screen exists for."
+       "label": "Add a kiosk group",
+       "operation": "createKioskConfig",
+       "provenance": "contract white-label.yaml POST /venues/{venueId}/kiosk-configs"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setGameKioskConfiguration"
+       "label": "Save",
+       "operation": "updateKioskConfig",
+       "provenance": "contract white-label.yaml PATCH /kiosk-configs/{kioskConfigId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Take out of service",
+       "operation": "setKioskOutOfService",
+       "provenance": "contract white-label.yaml PUT /kiosk-configs/{kioskConfigId}/out-of-service"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove group",
+       "operation": "deleteKioskConfig",
+       "notes": "Refused `409` for the venue's default and while kiosks are in the group; the refusal names them and links to ADM-582.",
+       "provenance": "contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The self-service kiosk profile list.",
-   "error": "Could not load. Names which read failed and leaves the self-service kiosk profile untouched.",
-   "emptyFirstRun": "No self-service kiosk profile yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the self-service kiosk profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The venue's kiosk groups, read by `listKioskConfigs`.",
+   "error": "Could not load. Names which read failed and leaves the groups untouched.",
+   "emptyFirstRun": "**No kiosk group yet.** Every kiosk shows the venue's default once one is published; offers \"Add a kiosk group\" (the first is the default).",
+   "emptyNoResults": "Not applicable — the list is not filtered beyond the venue.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listKioskConfigs` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what a part needs sees that part disabled, naming its permission: `DEVICE_VIEW` for `listKioskAssignments`."
   },
   "apis": [
    {
-    "operationId": "setGameKioskConfiguration",
-    "contract": "games",
-    "purpose": "Kiosk profile and channel",
+    "operationId": "listKioskConfigs",
+    "contract": "white-label",
+    "purpose": "The venue's kiosk groups, the functions each offers and its kiosk count",
+    "trigger": "onLoad",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "getKioskConfig",
+    "contract": "white-label",
+    "purpose": "One group's place, functions and out-of-service state",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "createKioskConfig",
+    "contract": "white-label",
+    "purpose": "Add a kiosk group",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKioskConfigs"
+    ],
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "updateKioskConfig",
+    "contract": "white-label",
+    "purpose": "Change a group's name and place",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKioskConfigs",
+     "getKioskConfig"
+    ],
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "deleteKioskConfig",
+    "contract": "white-label",
+    "purpose": "Remove a group no kiosk is in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKioskConfigs"
+    ],
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "setKioskOutOfService",
+    "contract": "white-label",
+    "purpose": "Take the group's kiosks out of service, or put them back",
+    "trigger": "onAction",
+    "invalidates": [
+     "getKioskConfig"
+    ],
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
+   },
+   {
+    "operationId": "listKioskAssignments",
+    "contract": "white-label",
+    "purpose": "The kiosks in the selected group",
+    "trigger": "onAction",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "kioskConfigId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the screen lists the venue's groups and opens the default."
+    }
+   ],
+   "coldEntry": "Resolves the venue from the session and opens on the venue's kiosk groups."
+  },
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-485",
    "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-485"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 5 October 2026 (CHG-R4-001) from Chinmay's kiosk customisation decision; it was regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 97, which gave it nothing that could be drawn.",
+  "overlays": [
+   {
+    "id": "formCreateKioskConfig",
+    "component": "modal",
+    "trigger": "Add a kiosk group",
+    "body": "**Collects what `createKioskConfig` sends.** Required: `name`. Optional: `placementKind` and `placementId`. The group starts from the venue default's settings; it is customised in the Venue CMS kiosk builder. Dismissing sends nothing.",
+    "bindsTo": "KioskConfig",
+    "confirm": {
+     "label": "Add group",
+     "operation": "createKioskConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "placementKind",
+      "placementId"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /venues/{venueId}/kiosk-configs"
+   },
+   {
+    "id": "formSetKioskOutOfService",
+    "component": "modal",
+    "trigger": "Take out of service",
+    "body": "**Collects what `setKioskOutOfService` sends**: `active`, an optional `expectedBackAt` (in the future) and an optional `messageOverride` in each kiosk language. Says it is live at once on every kiosk of the group (a guest mid-session finishes first). Dismissing sends nothing.",
+    "bindsTo": "KioskOutOfService",
+    "confirm": {
+     "label": "Apply now",
+     "operation": "setKioskOutOfService"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "active",
+      "expectedBackAt",
+      "messageOverride"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /kiosk-configs/{kioskConfigId}/out-of-service"
+   },
+   {
+    "id": "confirmDeleteKioskConfig",
+    "component": "confirmDialog",
+    "trigger": "Remove group",
+    "body": "Names the group and says its published versions stay in the history. Refused `409` for the default and while kiosks are in the group, and names them.",
+    "confirm": {
+     "label": "Remove",
+     "operation": "deleteKioskConfig"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract white-label.yaml DELETE /kiosk-configs/{kioskConfigId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

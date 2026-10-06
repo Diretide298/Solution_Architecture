@@ -1,4 +1,23 @@
 {
+ "assignKiosk": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/kiosk-assignments/{workstationId}",
+  "contract": "white-label",
+  "summary": "Put a kiosk in a kiosk group, or back on the venue's default",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KioskAssignment",
+  "responds": "KioskAssignment"
+ },
  "createDeviceFirmware": {
   "method": "POST",
   "path": "/device-firmware",
@@ -142,6 +161,59 @@
     "in": "query",
     "required": null
    },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listKioskAssignments": {
+  "method": "GET",
+  "path": "/venues/{venueId}/kiosk-assignments",
+  "contract": "white-label",
+  "summary": "Which kiosk group each kiosk of the venue is in",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kioskConfigId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listKioskConfigs": {
+  "method": "GET",
+  "path": "/venues/{venueId}/kiosk-configs",
+  "contract": "white-label",
+  "summary": "A venue's kiosk configurations, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
    {
     "name": null,
     "in": null,

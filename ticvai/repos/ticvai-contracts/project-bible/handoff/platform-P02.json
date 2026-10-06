@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
@@ -171,6 +171,10 @@
    "operations": 12
   },
   {
+   "contract": "white-label",
+   "operations": 8
+  },
+  {
    "contract": "wallet",
    "operations": 8
   },
@@ -179,19 +183,15 @@
    "operations": 8
   },
   {
-   "contract": "white-label",
-   "operations": 8
-  },
-  {
    "contract": "ai",
    "operations": 7
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -199,11 +199,7 @@
    "operations": 5
   },
   {
-   "contract": "payments",
-   "operations": 4
-  },
-  {
-   "contract": "seating",
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -211,7 +207,11 @@
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "seating",
+   "operations": 4
+  },
+  {
+   "contract": "payments",
    "operations": 4
   },
   {

@@ -303,7 +303,9 @@ def pace_model(team, items):
     tpd = cfg.get("tasksPerDevDay")
     if not tpd:
         return (lambda i: PLAN_PACE), f"{PLAN_PACE:.2f} points per developer per day (Block A's plan of record)", PLAN_PACE
-    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI"]
+    # a task of a decided app-module scheduled after a block (`paceExclude`, CHG-R4-003) does not re-pace the work already
+    # pushed: the average a developer-day is measured on the plan without it
+    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI" and not it.get("paceExclude")]
     avg = sum(pts) / max(len(pts), 1)
     base = float(tpd) * avg
     to, a, b = float(cfg.get("rampTo") or 1.0), int(cfg.get("rampFromSprint") or 5), int(cfg.get("rampFullSprint") or 11)
@@ -354,9 +356,19 @@ def pinned_owners(team, rebalance=False, bundle_path=None):
     if release_number(rel) < release_number(since):
         return {}, f"last bundle is {rel}, before {since}: owners are placed afresh (the replan moves New tickets)"
     back = {v: k for k, v in (b.get("aliases") or {}).items()}
+    # **Pushed is what OpenProject holds** (CHG-R4-003, 5 October): the bundle's `ids` are pms-map.json as it was when
+    # the bundle was built, so the r1 bundle, built before its own push, names none of the 7,967 tickets it created;
+    # pms-map.json, written back by the push, does.
+    pushed = set(b.get("ids") or {})
+    kmap = path.parent / "pms-map.json"
+    if kmap.exists():
+        try:
+            pushed |= {k for k in json.loads(kmap.read_text(encoding="utf-8")) if "#" not in k}
+        except Exception:
+            pass
     pins = {}
     for t in b.get("tickets") or []:
-        if t.get("type") == "Task" and t.get("assignee") and t["key"] in (b.get("ids") or {}):
+        if t.get("type") == "Task" and t.get("assignee") and t["key"] in pushed:
             pins[t["key"]] = back.get(t["assignee"], t["assignee"])
     return pins, f"{len(pins)} pushed tickets keep the owner release {rel} gave them"
 

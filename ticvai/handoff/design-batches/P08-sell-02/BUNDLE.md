@@ -1514,6 +1514,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Where the user goes next**
 
+- → `BO-485` Self-Service Kiosk Profile & Channel Configuration: *Kiosk groups*
 - → `BO-007` Product Directory: *Product Directory*
 - → `BO-009` Pricing Rules: *Pricing Rules*
 - → `BO-010` Promotions & Coupons: *Promotions & Coupons*
@@ -1643,7 +1644,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-102?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-010`, `BO-011`, `BO-012`, `BO-013`, `BO-014`, `BO-015`, `BO-016`, `BO-017`, `BO-018`, `BO-019`, `BO-037`, `BO-063`, `BO-109`, `BO-110`, `BO-111`, `BO-112`, `BO-113`, `BO-114`, `BO-115`, `BO-116`, `BO-117`, `BO-118`, `BO-119`, `BO-120`, `BO-121`, `BO-122`, `BO-123`, `BO-124`, `BO-125`, `BO-126`, `BO-142`, `BO-143`, `BO-1190`, `ADM-164`, `ADM-570`, `ADM-603`, `BO-696`.
+- [ ] Every transition is wired: `BO-485`, `BO-007`, `BO-009`, `BO-010`, `BO-011`, `BO-012`, `BO-013`, `BO-014`, `BO-015`, `BO-016`, `BO-017`, `BO-018`, `BO-019`, `BO-037`, `BO-063`, `BO-109`, `BO-110`, `BO-111`, `BO-112`, `BO-113`, `BO-114`, `BO-115`, `BO-116`, `BO-117`, `BO-118`, `BO-119`, `BO-120`, `BO-121`, `BO-122`, `BO-123`, `BO-124`, `BO-125`, `BO-126`, `BO-142`, `BO-143`, `BO-1190`, `ADM-164`, `ADM-570`, `ADM-603`, `BO-696`.
 - [ ] Every gated control is gated: `AI_USE`, `PRODUCT_VIEW`, `TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).

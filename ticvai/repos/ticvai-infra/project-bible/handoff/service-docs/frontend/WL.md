@@ -1273,6 +1273,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
+| CMS-105 | Kiosks |  |  |
 | CMS-001 | 1 Venue and modules |  |  |
 | CMS-103 | 2 Ticketing flows | bookingFlowId |  |
 | CMS-103 | 3 Compose steps | bookingFlowId |  |

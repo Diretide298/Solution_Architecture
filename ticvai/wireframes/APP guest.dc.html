@@ -5036,14 +5036,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>What&#x27;s on</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Published products only, primary media first; a touch opens the language choice (CHG-R1S-022).</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>What&#x27;s on</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Published products only, primary media first; a touch opens the language choice (CHG-R1S-022).</span></div><div class="panel"><b>Attract loop</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The screen saver the venue set up** in the white-label builder&#x27;s kiosk tab (CMS-105): the kiosk group&#x27;s video, photo and text slides in order, each for its se</span></div><div class="panel"><b>Touch to start</b><div class="chip cta">Touch to start</div><span class="why">The kiosk group&#x27;s &quot;Touch to start&quot; text in the current language, at its position and with its animation; a touch opens the language choice (KSK-002) and st</span></div></div><div class="side"><div class="panel"><b>Still there?</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**The kiosk shell&#x27;s idle rule, read here at every return to the loop**: after `idleTimeoutSeconds` without a touch on any kiosk screen the shell asks &quot;Still the</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · getPublishedKioskConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#ksk-002">KSK-002</a>  &mdash; <i>Chooses a language</i><br><a href="#ksk-003">KSK-003</a>  &mdash; <i>What are you buying</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i> <span class="car">productId</span><br><a href="#ksk-014">KSK-014</a>  &mdash; <i>Out of service</i><br><a href="#ksk-015">KSK-015</a>  &mdash; <i>Opens Assistant</i></div>
           
           
@@ -5066,14 +5066,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Choose your language</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when </span></div><div class="panel"><b>Closed for maintenance</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Only when `isInMaintenance`: the tenant&#x27;s message and expected-back time, and nothing can be bought.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Choose your language</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when </span></div><div class="panel"><b>Closed for maintenance</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Only when `isInMaintenance`: the tenant&#x27;s message and expected-back time, and nothing can be bought.</span></div><div class="panel"><b>This kiosk&#x27;s languages</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s `languageCodes` narrow the published languages to the ones this kiosk offers (all of them when empty); `defaultLanguageCode` is preselected and is </span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getPublishedTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getPublishedTenantConfig · getPublishedKioskConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-003">KSK-003</a>  &mdash; <i>Chooses buy or collect</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i></div>
           
           
@@ -5246,14 +5246,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Payment unresolved message</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.paymentUnresolved`); the platform&#x27;s standard words when the group set none.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; inquirePaymentStatus</div>
+          <div><b>OPERATIONS</b> &middot; inquirePaymentStatus · getPublishedKioskConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; paymentId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; paymentId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-010">KSK-010</a>  &mdash; <i>Or it resolves and the printer fails</i> <span class="car">orderId</span></div>
           
           
@@ -5306,14 +5306,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Send to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest&#x27;s phone.</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Send to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest&#x27;s phone.</span></div><div class="panel"><b>Printer failure message</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.printerFailure`); the platform&#x27;s standard words when the group set none.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; reprintOrder</div>
+          <div><b>OPERATIONS</b> &middot; reprintOrder · getPublishedKioskConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-013">KSK-013</a>  &mdash; <i>They call for help</i></div>
           
           
@@ -5396,14 +5396,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Call staff message</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.callStaff`); the platform&#x27;s standard words when the group set none.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; endKioskAssist · handoverToAgent</div>
+          <div><b>OPERATIONS</b> &middot; endKioskAssist · handoverToAgent · getPublishedKioskConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, conversationId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, conversationId&larr;navigation, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formHandoverToAgent &middot; <i>Call a member of staff</i> &middot; <b>Call a member of staff</b> &middot; Back</div></div>
@@ -5426,14 +5426,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Out of service</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shown while the tenant&#x27;s app status or this kiosk&#x27;s own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns </span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Out of service</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shown while the tenant&#x27;s app status or this kiosk&#x27;s own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns </span></div><div class="panel"><b>Out of service, back at</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**A kiosk group taken out of service on BO-485** (`setKioskOutOfService`): the group&#x27;s `messageOverride` or `messages.outOfService` in the guest&#x27;s language, wit</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getPublishedKioskConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>
           
           

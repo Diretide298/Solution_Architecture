@@ -3793,7 +3793,6 @@ screens:
 - P08:BO-480 Reader Screen, LED & Sound Output Mapping
 - P08:BO-481 Edge Cache & Offline Rule Package
 - P08:BO-482 Device Diagnostics & Integration Logs
-- P08:BO-485 Self-Service Kiosk Profile & Channel Configuration
 - P08:BO-486 Customer Card / Wallet Identification
 - P08:BO-489 Bonus, Free Game & Benefit View
 - P08:BO-490 Game & Ride Eligibility / “What Can I Play?”

@@ -501,7 +501,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 1 → Booking confirmation (#confirm)",
-    "differences": "Prototype offers \"Set a password\" to turn a guest-checkout profile into an account (linkGuestCheckout, GST-042); not declared on this screen in YAML."
+    "differences": "Prototype offers \"Set a password\" to turn a guest-checkout profile into an account; the screen offers \"Create an account\" instead (passwordless, with an emailed code, then linkGuestCheckout; CHG-FXS-003, CHG-R11-002, CHG-R4-007)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

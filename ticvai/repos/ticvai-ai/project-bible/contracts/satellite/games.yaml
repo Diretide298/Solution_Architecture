@@ -1690,7 +1690,6 @@ paths:
     put:
       operationId: setGameKioskConfiguration
       x-ticvai-consumed-by:
-        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
         - "P08 BO-493 Self-Service UI Theme, Language & Journey Configuration"
       summary: The self-service journey, its theme and its languages
       description: 'Boards 10.2 and 10.10. **A kiosk in an arcade is used by a child holding a

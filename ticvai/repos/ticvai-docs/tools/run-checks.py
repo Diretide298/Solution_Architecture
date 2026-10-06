@@ -120,6 +120,10 @@ CHECKS = [
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",
+    "check-channel-config",
+    "check-device-tiers",
+    "check-plan-owners",
+    "check-terraform-pools",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

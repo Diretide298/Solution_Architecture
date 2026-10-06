@@ -247,6 +247,932 @@
    }
   }
  },
+ "KioskAssignment": {
+  "x-ticvai-persistence": "whitelabel.kiosk_assignment",
+  "type": "object",
+  "description": "**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001). One row per assigned kiosk; a kiosk with no row takes the venue's default configuration.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-unique": "tenant",
+    "description": "The kiosk's workstation (tenancy `Workstation.id`), from the path. One assignment per kiosk."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kioskConfigId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The group's configuration; null puts the kiosk on the venue's default."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "assignedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   }
+  }
+ },
+ "KioskAttractLoop": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**How the attract loop plays** (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides themselves are `KioskConfig.attractSlides`. Offline, the kiosk plays the last loop it cached.",
+  "properties": {
+   "transition": {
+    "type": "string",
+    "enum": [
+     "cut",
+     "fade",
+     "slide"
+    ],
+    "default": "fade"
+   },
+   "soundOn": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether a video slide plays its sound. Off by default (a kiosk in a queue hall)."
+   },
+   "playWindows": {
+    "type": "array",
+    "maxItems": 21,
+    "description": "**When the open loop plays, by time of day and weekday**, in the venue's time zone. A slide plays only inside a window; with no window the loop plays all day. Outside the opening hours the `closed` slides play regardless.",
+    "items": {
+     "type": "object",
+     "required": [
+      "weekdays",
+      "from",
+      "to"
+     ],
+     "properties": {
+      "weekdays": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 7,
+       "items": {
+        "type": "string",
+        "enum": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri",
+         "sat",
+         "sun"
+        ]
+       }
+      },
+      "from": {
+       "type": "string",
+       "format": "time",
+       "description": "Local time, inclusive."
+      },
+      "to": {
+       "type": "string",
+       "format": "time",
+       "description": "Local time, exclusive; earlier than `from` runs past midnight."
+      }
+     }
+    }
+   },
+   "touchToStart": {
+    "type": "object",
+    "description": "The \"Touch to start\" call to action over the loop.",
+    "properties": {
+     "text": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "position": {
+      "type": "string",
+      "enum": [
+       "top",
+       "middle",
+       "bottom"
+      ],
+      "default": "bottom"
+     },
+     "animation": {
+      "type": "string",
+      "enum": [
+       "none",
+       "pulse",
+       "bounce"
+      ],
+      "default": "pulse"
+     }
+    }
+   },
+   "appDownloadSlide": {
+    "type": "object",
+    "description": "**A \"Download our app\" slide with a QR code**, added to the loop when on. The QR points at the tenant's store listings (the published app's deep-link scheme, `getDeepLinkScheme`).",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "caption": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "everyNthSlide": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20,
+      "default": 4,
+      "description": "Shown after every n-th slide of the loop."
+     }
+    }
+   }
+  }
+ },
+ "KioskAttractSlide": {
+  "x-ticvai-persistence": "whitelabel.kiosk_config_attract_slide",
+  "type": "object",
+  "description": "**One slide of the attract loop**, the kiosk's screen saver (decided 5 October 2026 by Chinmay, CHG-R4-001). A video or photo from the media library, or a text slide in the brand's fonts. Slides play in `sortOrder`; `playsWhen` `closed` slides make the \"Closed\" loop shown outside the group's opening hours.",
+  "required": [
+   "kind",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kioskConfigId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "video",
+     "photo",
+     "text"
+    ]
+   },
+   "mediaAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `MediaAsset` (a video for `video`, an image for `photo`); required for both, null for `text`. Refused at publish when it does not fit the display (`mediaDoesNotFit`)."
+   },
+   "text": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The slide's words in every kiosk language; required for `text`, a caption otherwise."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "durationSeconds": {
+    "type": "integer",
+    "minimum": 3,
+    "maximum": 120,
+    "default": 8,
+    "description": "How long a photo or text slide shows. A video plays to its end and ignores it."
+   },
+   "playsWhen": {
+    "type": "string",
+    "enum": [
+     "open",
+     "closed"
+    ],
+    "default": "open",
+    "description": "`closed` slides play only outside the opening hours (the \"Closed\" loop); `open` slides only inside them."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   }
+  }
+ },
+ "KioskConfig": {
+  "x-ticvai-persistence": "whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**A kiosk group's configuration, in the working draft: the kiosk channel of the white-label builder** (decided 5 October 2026 by Chinmay, CHG-R4-001; `docs/active/decisions/answers-5-october.md`). The kiosk is the third channel beside the web and the app. It inherits what the tenant has published for them (the brand, theme, fonts with the Arabic pair, content pages, products, waivers and consents, read through `getPublishedTenantConfig`) and holds here only what differs on a kiosk. **Not carried over from the app, deliberately:** app icons, the store listing, push notifications, dark mode and saved sign-in.\n\n**One per kiosk group of a venue, plus the venue's default** (`isDefault`), which every kiosk in no group takes (`assignKiosk` puts a kiosk in a group). Published copies are `KioskConfigVersion` rows; kiosks read the current one through `getPublishedKioskConfig`.\n",
+  "required": [
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createKioskConfig`."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"North gate kiosks\". Unique in the venue. Not shown to guests."
+   },
+   "isDefault": {
+    "type": "boolean",
+    "default": false,
+    "description": "The venue's default configuration, for every kiosk in no group. The first configuration of a venue is the default; it cannot be deleted or stop being the default."
+   },
+   "placementKind": {
+    "$ref": "#/components/schemas/KioskPlacementKind"
+   },
+   "placementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The access point, operating area or outlet `placementKind` names; null for `venue`."
+   },
+   "display": {
+    "$ref": "#/components/schemas/KioskDisplaySettings"
+   },
+   "attractLoop": {
+    "$ref": "#/components/schemas/KioskAttractLoop"
+   },
+   "attractSlides": {
+    "type": "array",
+    "maxItems": 40,
+    "description": "The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). Given on a write, it replaces the whole list.",
+    "items": {
+     "$ref": "#/components/schemas/KioskAttractSlide"
+    }
+   },
+   "startScreen": {
+    "$ref": "#/components/schemas/KioskStartScreen"
+   },
+   "startTiles": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "The functions this kiosk offers, in `sortOrder` (child rows, `whitelabel.kiosk_config_start_tile`). Given on a write, it replaces the whole list. A function given twice is refused 400.",
+    "items": {
+     "$ref": "#/components/schemas/KioskStartTile"
+    }
+   },
+   "headerFooter": {
+    "$ref": "#/components/schemas/KioskHeaderFooter"
+   },
+   "journey": {
+    "$ref": "#/components/schemas/KioskJourneySettings"
+   },
+   "session": {
+    "$ref": "#/components/schemas/KioskSessionSettings"
+   },
+   "paymentOutput": {
+    "$ref": "#/components/schemas/KioskPaymentOutput"
+   },
+   "languages": {
+    "$ref": "#/components/schemas/KioskLanguages"
+   },
+   "messages": {
+    "$ref": "#/components/schemas/KioskMessages"
+   },
+   "openingHours": {
+    "$ref": "#/components/schemas/KioskOpeningHours"
+   },
+   "outOfService": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/KioskOutOfService"
+     }
+    ],
+    "readOnly": true,
+    "description": "Live state, written only by `setKioskOutOfService`."
+   },
+   "enabledFunctions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "The functions of the enabled start tiles, in order, for the group list (BO-485).",
+    "items": {
+     "$ref": "#/components/schemas/KioskFunction"
+    }
+   },
+   "assignedKioskCount": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "How many kiosks `assignKiosk` put in this group; for the default, the venue's kiosks in no group."
+   },
+   "publishedVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The `versionNumber` of the current `KioskConfigVersion`; null until first published. Set by `publishKioskConfigs` in the same transaction."
+   },
+   "hasUnpublishedChanges": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "True after any write to the draft since the last publish or restore; false once published."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "KioskDisplaySettings": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**The device profile of a kiosk group** (decided 5 October 2026 by Chinmay, CHG-R4-001): what the kiosk's screen is, so the attract loop's media is checked against it and the start screen is laid out for it.",
+  "properties": {
+   "orientation": {
+    "type": "string",
+    "enum": [
+     "portrait",
+     "landscape"
+    ],
+    "default": "portrait"
+   },
+   "screenSizeInches": {
+    "type": "number",
+    "minimum": 7,
+    "maximum": 100,
+    "nullable": true,
+    "description": "The diagonal, for the layout's touch targets. Null until the hardware is known."
+   },
+   "resolutionWidthPx": {
+    "type": "integer",
+    "minimum": 320,
+    "maximum": 7680,
+    "default": 1080
+   },
+   "resolutionHeightPx": {
+    "type": "integer",
+    "minimum": 320,
+    "maximum": 7680,
+    "default": 1920
+   },
+   "mountingHeightCm": {
+    "type": "integer",
+    "minimum": 50,
+    "maximum": 250,
+    "nullable": true,
+    "description": "The height of the screen's lower edge from the floor. Sets `reachableHeightByDefault` when that is not given."
+   },
+   "reachableHeightByDefault": {
+    "type": "boolean",
+    "description": "**Whether the kiosk opens in the reachable-height mode** of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). When not given it is set from `mountingHeightCm`: true at or above 100 cm (the setting `kioskReachableHeightThresholdCm`, default 100; client to confirm), false below it or with no height."
+   },
+   "touchScale": {
+    "type": "number",
+    "minimum": 1,
+    "maximum": 2,
+    "default": 1.25,
+    "description": "Multiplies every touch target and text size on the kiosk (1 is the guest app's size)."
+   },
+   "productTileSize": {
+    "$ref": "#/components/schemas/KioskTileSize"
+   },
+   "tilesPerRow": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 6,
+    "default": 3,
+    "description": "Product tiles per row on the selling screens (KSK-003, KSK-016, KSK-017)."
+   }
+  }
+ },
+ "KioskFunction": {
+  "type": "string",
+  "description": "**What a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay, CHG-R4-001). Each opens an existing kiosk screen: `sellTickets` KSK-003, `collectReservation` KSK-011 (collect a booking), `orderFood` KSK-016, `shop` KSK-017, `membership` and `walletTopUp` the guest app's membership and wallet screens drawn for the kiosk, `map` the venue map, `assistant` KSK-015. A function whose module the tenant has not enabled cannot be switched on (the tile is refused at publish, `tileWithoutProducts`).",
+  "enum": [
+   "sellTickets",
+   "collectReservation",
+   "orderFood",
+   "shop",
+   "membership",
+   "walletTopUp",
+   "map",
+   "assistant"
+  ]
+ },
+ "KioskHeaderFooter": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**The kiosk's header and footer** (decided 5 October 2026 by Chinmay, CHG-R4-001). The logo and colours are the published brand's; this says what the kiosk's bars hold.",
+  "properties": {
+   "logoPosition": {
+    "type": "string",
+    "enum": [
+     "start",
+     "centre",
+     "end"
+    ],
+    "default": "start",
+    "description": "`start` and `end` follow the reading direction, so Arabic mirrors them."
+   },
+   "languageSwitchVisible": {
+    "type": "boolean",
+    "default": true
+   },
+   "cartVisible": {
+    "type": "boolean",
+    "default": true,
+    "description": "The order summary button with its count."
+   },
+   "callStaffVisible": {
+    "type": "boolean",
+    "default": true,
+    "description": "Opens KSK-013 Call Staff."
+   },
+   "accessibilityButtonVisible": {
+    "type": "boolean",
+    "default": true,
+    "description": "Opens the tenant's `AccessibilitySettings` modes (BL-065)."
+   },
+   "clockVisible": {
+    "type": "boolean",
+    "default": false
+   },
+   "footerPaymentLogos": {
+    "type": "boolean",
+    "default": true,
+    "description": "Shows the logos of `paymentOutput.paymentMethodIds` in the footer."
+   },
+   "footerHelpText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "legalLinksAsQr": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The legal links shown as QR codes**, because a kiosk cannot open a policy page in a browser: each published policy (`listPublishedPolicies`) gets a code that opens it on the guest's phone."
+   }
+  }
+ },
+ "KioskJourneySettings": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**The kiosk channel's journeys** (decided 5 October 2026 by Chinmay, CHG-R4-001). The kiosk books through the venue's booking flows like the web and app; custom flows are allowed, and the payment and legal steps stay locked exactly as `validateBookingFlow` holds them on the web and app.",
+  "properties": {
+   "bookingFlowIds": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "The venue's booking flows the kiosk uses, by id (`listBookingFlows`). Empty uses the venue's default flow for each type, as the web does.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "maxSteps": {
+    "type": "integer",
+    "minimum": 2,
+    "maximum": 12,
+    "default": 6,
+    "description": "The most steps a kiosk journey may take; a flow with more enabled steps is refused at publish (`journeyInvalid`)."
+   },
+   "upsellEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Add-ons and cross-sell offers (KSK-004, KSK-006)."
+   },
+   "upsellOfferCount": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 6,
+    "default": 2,
+    "description": "How many offers a step shows at most."
+   }
+  }
+ },
+ "KioskLanguages": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**The languages KSK-002 offers and the one the kiosk returns to** (decided 5 October 2026 by Chinmay, CHG-R4-001). Each must be one the tenant has published (`LanguageConfig`); empty offers them all.",
+  "properties": {
+   "languageCodes": {
+    "type": "array",
+    "maxItems": 12,
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "defaultLanguageCode": {
+    "type": "string",
+    "pattern": "^[a-z]{2}$",
+    "nullable": true,
+    "description": "Null takes the tenant's published default."
+   }
+  }
+ },
+ "KioskMessages": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**The kiosk's own messages, in every kiosk language** (decided 5 October 2026 by Chinmay, CHG-R4-001). Null shows the platform's standard words.",
+  "properties": {
+   "idleWarning": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The \"Still there?\" prompt."
+   },
+   "outOfService": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "KSK-014, with the expected-back time when `setKioskOutOfService` gives one."
+   },
+   "offline": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Over the cached loop while the kiosk cannot reach the server."
+   },
+   "printerFailure": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "KSK-010 Print failure."
+   },
+   "paymentUnresolved": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "KSK-008 Payment unresolved."
+   },
+   "callStaff": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "KSK-013 Call Staff, while help is on its way."
+   },
+   "closed": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Over the \"Closed\" loop outside the opening hours."
+   }
+  }
+ },
+ "KioskOpeningHours": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**When a kiosk group sells** (decided 5 October 2026 by Chinmay, CHG-R4-001), in the venue's time zone. Outside them the kiosk plays its `closed` slides with the `closed` message and sells nothing. With no hours set the kiosk follows the venue's own opening hours.",
+  "properties": {
+   "weekly": {
+    "type": "array",
+    "maxItems": 14,
+    "items": {
+     "type": "object",
+     "required": [
+      "weekday",
+      "opensAt",
+      "closesAt"
+     ],
+     "properties": {
+      "weekday": {
+       "type": "string",
+       "enum": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+       ]
+      },
+      "opensAt": {
+       "type": "string",
+       "format": "time"
+      },
+      "closesAt": {
+       "type": "string",
+       "format": "time",
+       "description": "Earlier than `opensAt` runs past midnight."
+      }
+     }
+    }
+   }
+  }
+ },
+ "KioskOutOfService": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**A kiosk group taken out of service** (`setKioskOutOfService`; decided 5 October 2026 by Chinmay, CHG-R4-001). Live state, never drafted or published.",
+  "required": [
+   "active"
+  ],
+  "properties": {
+   "active": {
+    "type": "boolean"
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Shown on KSK-014. Must be in the future."
+   },
+   "messageOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Replaces the group's `messages.outOfService` until it is put back in service."
+   }
+  }
+ },
+ "KioskPaymentOutput": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**What a kiosk takes and what it gives back** (decided 5 October 2026 by Chinmay, CHG-R4-001).",
+  "properties": {
+   "paymentMethodIds": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "The venue's configured payment methods this kiosk accepts (payments `listPaymentMethods`). One not configured for the venue is refused at publish (`paymentMethodUnavailable`).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "receiptChannels": {
+    "type": "array",
+    "description": "How the guest may take the receipt; the kiosk offers these on KSK-009.",
+    "maxItems": 4,
+    "items": {
+     "type": "string",
+     "enum": [
+      "print",
+      "email",
+      "sms",
+      "qr"
+     ]
+    }
+   },
+   "ticketStock": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "thermal80mm",
+     "wristband",
+     "plasticTicket"
+    ],
+    "description": "What the kiosk's printer issues; null when it issues nothing printed (QR only)."
+   },
+   "ticketTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The print layout from the ticket designer (orders `updateTicketTemplate`) for `ticketStock`; required when `ticketStock` is set (`ticketTemplateMissing` at publish)."
+   },
+   "sendToPhoneQr": {
+    "type": "boolean",
+    "default": true,
+    "description": "Offers a \"Send to my phone\" QR on KSK-009 that opens the order in the guest app or web."
+   }
+  }
+ },
+ "KioskPlacementKind": {
+  "type": "string",
+  "description": "**Where a kiosk group's kiosks stand** (decided 5 October 2026 by Chinmay, CHG-R4-001: kiosk groups by gate, zone or outlet). `accessPoint` is a gate (access `AccessPoint`), `operatingArea` a zone of the venue (tenancy), `outlet` an outlet (tenancy `Outlet`); `venue` is the venue's default configuration, which every kiosk in no group takes, and names no place.",
+  "enum": [
+   "venue",
+   "accessPoint",
+   "operatingArea",
+   "outlet"
+  ]
+ },
+ "KioskSessionSettings": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "**When a kiosk forgets its guest** (decided 5 October 2026 by Chinmay, CHG-R4-001). After `idleTimeoutSeconds` without a touch the kiosk asks \"Still there?\" with a countdown of `stillTherePromptSeconds`; with no touch by its end it clears the cart, signs the guest out, returns to the attract loop and switches to the default language. The tenant's `AccessibilitySettings.sessionTimeoutMultiplier` multiplies both while an accessibility mode is on. A payment in progress is never interrupted.",
+  "properties": {
+   "idleTimeoutSeconds": {
+    "type": "integer",
+    "minimum": 15,
+    "maximum": 600,
+    "default": 60
+   },
+   "stillTherePromptSeconds": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 60,
+    "default": 15
+   },
+   "signInMethods": {
+    "type": "array",
+    "description": "**How a guest signs in at a kiosk: never with a password.** By scanning a QR code from the guest app (`appQr`) or with a one-time code sent to their phone or email (`oneTimeCode`). Empty: no sign-in at this kiosk. Saved sign-in is never offered (decided 5 October 2026).",
+    "maxItems": 2,
+    "items": {
+     "type": "string",
+     "enum": [
+      "appQr",
+      "oneTimeCode"
+     ]
+    }
+   }
+  }
+ },
+ "KioskStartScreen": {
+  "x-ticvai-persistence": "none — jsonb column of whitelabel.kiosk_config",
+  "type": "object",
+  "description": "The start screen around the tiles (`KioskConfig.startTiles`); one hero banner.",
+  "properties": {
+   "heroBanner": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "imageAssetRef": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "title": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "linkTarget": {
+      "$ref": "#/components/schemas/LinkTarget"
+     }
+    }
+   }
+  }
+ },
+ "KioskStartTile": {
+  "x-ticvai-persistence": "whitelabel.kiosk_config_start_tile",
+  "type": "object",
+  "description": "**One function a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay, CHG-R4-001), in `sortOrder`. A function appears at most once per kiosk configuration.",
+  "required": [
+   "function",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kioskConfigId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "function": {
+    "$ref": "#/components/schemas/KioskFunction"
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "tileSize": {
+    "$ref": "#/components/schemas/KioskTileSize"
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The tile's image from the media library; null shows the function's icon."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Null shows the function's standard label in each language."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   }
+  }
+ },
+ "KioskTileSize": {
+  "type": "string",
+  "description": "The size of a tile or of a product tile on the kiosk (\"the size of the card\", decided 5 October 2026 by Chinmay, CHG-R4-001).",
+  "enum": [
+   "small",
+   "medium",
+   "large"
+  ]
+ },
+ "LinkTarget": {
+  "x-ticvai-persistence": "none — embedded",
+  "type": "object",
+  "required": [
+   "kind"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "module",
+     "contentPage",
+     "product",
+     "event",
+     "externalUrl",
+     "appSection",
+     "none"
+    ],
+    "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."
+   },
+   "moduleKey": {
+    "$ref": "#/components/schemas/ModuleKey"
+   },
+   "appSection": {
+    "type": "string",
+    "enum": [
+     "home",
+     "explore",
+     "plan",
+     "tickets",
+     "map",
+     "account",
+     "buyTickets"
+    ],
+    "description": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it."
+   },
+   "contentPageId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "url": {
+    "type": "string"
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "Money": {
   "type": "object",
   "x-ticvai-persistence-kind": "valueObject",

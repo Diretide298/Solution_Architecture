@@ -222,7 +222,7 @@
  "counts": {
   "core": 517,
   "setup": 239,
-  "allOperations": 2776
+  "allOperations": 2789
  },
  "services": {
   "AccessService": {
@@ -303,7 +303,7 @@
   "WhiteLabelService": {
    "core": 92,
    "setup": 1,
-   "total": 95
+   "total": 108
   }
  },
  "operations": {

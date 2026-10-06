@@ -20,7 +20,7 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 363
+  screens: 364
 - module: marketing
   screens: 284
 - module: ticketing
@@ -32,7 +32,7 @@ modulesUsed:
 - module: seating
   screens: 128
 - module: games
-  screens: 98
+  screens: 97
 - module: accreditation
   screens: 78
 - module: fnb
@@ -59,7 +59,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 821
 - service: VenueOpsService
-  operationCalls: 532
+  operationCalls: 531
 - service: TenancyService
   operationCalls: 492
 - service: OrderService
@@ -84,10 +84,10 @@ servicesCalled:
   operationCalls: 82
 - service: IdentityService
   operationCalls: 65
+- service: WhiteLabelService
+  operationCalls: 24
 - service: RetailService
   operationCalls: 17
-- service: WhiteLabelService
-  operationCalls: 14
 coverage:
   screens: 1661
   inAFlow: 1562
@@ -3567,6 +3567,7 @@ screens:
   - BO-126
   - BO-142
   - BO-143
+  - BO-485
   - BO-696
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-102
@@ -12893,11 +12894,17 @@ screens:
 - screen: BO-485
   name: Self-Service Kiosk Profile & Channel Configuration
   module: Games & Rides
-  requiresModule: games
-  wave: 3
+  requiresModule: core
+  wave: 1
   density: compact
   operations:
-  - setGameKioskConfiguration
+  - createKioskConfig
+  - deleteKioskConfig
+  - getKioskConfig
+  - listKioskAssignments
+  - listKioskConfigs
+  - setKioskOutOfService
+  - updateKioskConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12905,8 +12912,12 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - venueId<-session
+  - kioskConfigId<-navigation
   goesTo:
+  - ADM-582
+  - BO-102
   - BO-484
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-485
@@ -36998,6 +37009,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - assignKiosk
+  - listKioskAssignments
+  - listKioskConfigs
   - setDeviceAssignment
   states:
   - emptyFirstRun
@@ -37014,6 +37028,7 @@ screens:
   wireframe: wireframes/P08 Venue Management.dc.html#adm-582
   inFlows:
   - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+  - F304 A kiosk group is customised, published, assigned and rolled back
 - screen: ADM-583
   name: EMV & Card-Present Processing Configuration
   module: Commercial

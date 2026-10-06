@@ -169,17 +169,17 @@ contracts:
   ref: diagrams/lld/contracts/fnb.yaml
 - contract: white-label
   tier: satellite
-  operations: 95
+  operations: 108
   holds: null
   service: WhiteLabelService
   verbs:
-    GET: 41
-    POST: 23
-    PUT: 20
-    DELETE: 6
-    PATCH: 5
-  guestCallable: 12
-  offlineCapable: 9
+    GET: 47
+    POST: 26
+    PUT: 22
+    DELETE: 7
+    PATCH: 6
+  guestCallable: 13
+  offlineCapable: 10
   events: null
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity

@@ -323,6 +323,17 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "endKioskAssist"
+      },
+      {
+       "kind": "banner",
+       "label": "Call staff message",
+       "bindsTo": "PublishedKioskConfig.messages",
+       "columns": [
+        "KioskMessages.callStaff"
+       ],
+       "operation": "getPublishedKioskConfig",
+       "notes": "The kiosk group's own words for this moment in the guest's language (`messages.callStaff`); the platform's standard words when the group set none.",
+       "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
       }
      ]
     }
@@ -347,6 +358,13 @@
     "purpose": "Call a member of staff: the conversation goes to the agent workspace (BO-799), where staff join with startKioskAssist",
     "trigger": "onAction",
     "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+   },
+   {
+    "operationId": "getPublishedKioskConfig",
+    "contract": "white-label",
+    "purpose": "The kiosk group's call staff message, in the guest's language (CHG-R4-001)",
+    "trigger": "onLoad",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
    }
   ],
   "entryState": {
@@ -360,6 +378,10 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional: opened without it, the screen makes one with `createAiConversation`."
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
@@ -456,6 +478,19 @@
        "operation": "getTenantAppStatus",
        "notes": "Shown while the tenant's app status or this kiosk's own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns when both clear (CHG-R1S-022).",
        "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+      },
+      {
+       "kind": "banner",
+       "label": "Out of service, back at",
+       "bindsTo": "PublishedKioskConfig.outOfService",
+       "columns": [
+        "KioskOutOfService.active",
+        "KioskOutOfService.expectedBackAt",
+        "KioskMessages.outOfService"
+       ],
+       "operation": "getPublishedKioskConfig",
+       "notes": "**A kiosk group taken out of service on BO-485** (`setKioskOutOfService`): the group's `messageOverride` or `messages.outOfService` in the guest's language, with `expectedBackAt` in the venue's time zone; the attract loop returns when it is put back in service. Also shown outside the opening hours is the closed loop on KSK-001, not this screen.",
+       "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
       }
      ]
     }
@@ -474,6 +509,13 @@
     "purpose": "Read whether the app is in service; the screen leaves when it is back",
     "trigger": "onLoad",
     "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+   },
+   {
+    "operationId": "getPublishedKioskConfig",
+    "contract": "white-label",
+    "purpose": "Whether this kiosk's group is out of service, its message and expected-back time (CHG-R4-001)",
+    "trigger": "onLoad",
+    "provenance": "decided 5 October 2026 by Chinmay (CHG-R4-001)"
    }
   ],
   "wireframe": {
@@ -484,6 +526,14 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P05",
    "audience": "guest",

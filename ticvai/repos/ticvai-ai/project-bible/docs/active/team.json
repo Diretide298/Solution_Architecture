@@ -224,7 +224,8 @@
    {
     "block": "A2",
     "endSprint": 5,
-    "note": "A2, the second drop of Block A: the completion work that does not fit in A1, right after it and ahead of Block B (Chinmay, 3 October, CHG-RONEP-007)"
+    "fixed": true,
+    "note": "A2, the second drop of Block A: the completion work that does not fit in A1, right after it and ahead of Block B (Chinmay, 3 October, CHG-RONEP-007). Fixed at Sprint 5 since r2: its block test sits in the last three working days of Sprint 5 whatever the schedule says (Chinmay, 5 October 2026: A2 ends Friday 11 December; CHG-R4-003)"
    },
    {
     "block": "B",
@@ -246,7 +247,7 @@
   ],
   "fePointsPerAppModule": 45,
   "stableOwners": {
-   "since": "r2"
+   "since": "r1"
   },
   "blockAApps": [
    "P01",

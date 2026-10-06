@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-10-04",
+ "generated": "2026-10-06",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
@@ -43,11 +43,11 @@
    "operations": 2
   },
   {
-   "contract": "orders",
+   "contract": "accreditation",
    "operations": 1
   },
   {
-   "contract": "accreditation",
+   "contract": "orders",
    "operations": 1
   }
  ],

@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 12 operations · 46 schemas · 4 permissions**
+**10 screens · 13 operations · 60 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -122,20 +122,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | A | 0 | 2 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-002` | Language Select | B | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-001` | Attract Loop | A | 0 | 7 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-002` | Language Select | B | 1 | 22 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-005` | Choose a performance | C | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-006` | Review | C | 10 | 31 | 5 | 11 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-008` | Payment unresolved | C | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-008` | Payment unresolved | C | 0 | 1 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-009` | Ticket issued | C | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-010` | Print failure | C | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-010` | Print failure | C | 6 | 1 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**KSK-001, KSK-002, KSK-003, KSK-004, KSK-005, KSK-006, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-002, KSK-003, KSK-004, KSK-005, KSK-006, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -152,11 +152,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 1 · needs the `core` module |
 | Block | Block A · ticket #28168 (APP-KIOSK-KSK-001) |
-| Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
+| Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest, venue manager |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): **the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision |
-| Offline | **Not available.** An unattended terminal selling from a stale catalogue oversells with nobody watching |
-| Opens with | nothing: it opens on its own |
+| Offline | **The last cached attract loop plays, with the group's offline message** (decided 5 October 2026, CHG-R4-001: `getPublishedKioskConfig` and the loop's media are served from the kiosk's cache). **Nothing is sold**: an unattended terminal selling from a stale catalogue oversells with nobody watching |
+| Opens with | `venueId` (session) |
 | Route | `/sell/attract-loop` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.
@@ -176,6 +176,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
+| Workstation | picker: choose a workstation | — | — | `getPublishedKioskConfig` ?workstationId |
+| Kiosk config | picker: choose a kiosk config | — | — | `getPublishedKioskConfig` ?kioskConfigId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -190,6 +192,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Name | text | — |
 | Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
 
+**Attract loop** (canvas, from `getPublishedKioskConfig`): **The screen saver the venue set up** in the white-label builder's kiosk tab (CMS-105): the kiosk group's video, photo and text slides in order, each for its seconds, with the group's transition and sound; the open slides inside the play windows and opening hours, the closed slides outside the opening hours, when nothing is sold; and the "Download our app" QR slide every n-th slide. With no slide …
+
+| Shows | Format | Notes |
+|---|---|---|
+| Attract slides | list or chips (count when long) | Every slide, `open` and `closed`, in order; the kiosk plays the set `isOpenNow` selects. |
+| Attract loop | grouped details | How the attract loop plays (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides themselves are `KioskConfig.attractSlides`. |
+| Is open now | yes / no (icon or chip) | Whether the group is inside its opening hours now, in the venue's time zone. Outside them the kiosk sells nothing. |
+
+**Still there?** (banner, from `getPublishedKioskConfig`): **The kiosk shell's idle rule, read here at every return to the loop**: after `idleTimeoutSeconds` without a touch on any kiosk screen the shell asks "Still there?" (the group's `idleWarning` message) with a countdown of `stillTherePromptSeconds`; with no touch it clears the cart, signs the guest out, returns here and switches to the default language. A payment in progress is never interrupted.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Idle timeout seconds | 1,234 | — |
+| Still there prompt seconds | 1,234 | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Touch to start (primary button) | `getPublishedKioskConfig` GET `/venues/{venueId}/kiosk-config` | — | PublishedKioskConfig | 400 Neither `workstationId` nor `kioskConfigId` was given; 404 The host belongs to no tenant (`not-found`), the workstation or configuration is not in this venue (`not-found`), or nothing is published for it yet … | — |
+
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
 - **loop content**: The venue's product clips (6 to 12 s, no audio) and "Touch to buy tickets" in English and Arabic; a short line for collecting an online booking. *(source: DI-298; DI-297; DI-1080; F07 step 1)*
@@ -198,7 +221,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Touch anywhere**: Language choice, then What are you buying (KSK-003). *(source: F07 step 1-3)*
 
-**Data it reads**: `listProducts` (onLoad, Fill the loop with the venue's products and their media)
+**Data it reads**: `listProducts` (onLoad, Fill the loop with the venue's products and their media); `getPublishedKioskConfig` (onLoad, The kiosk group's published configuration: the attract …)
 
 **Where the user goes next**
 
@@ -207,6 +230,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `KSK-004` Choose tickets: *Choose tickets*; carries `productId`
 - → `KSK-014` Out of service: *Out of service*
 - → `KSK-015` Assistant: *Opens Assistant*
+- → `CMS-105` Kiosk Builder: *Rolls back when something is wrong*; carries `kioskConfigId`; calls `getPublishedKioskConfig`
 
 #### States
 
@@ -215,8 +239,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Loading (`?state=loading`) | Not applicable — the attract loop is the idle state |
 | Error (`?state=error`) | Falls through to KSK-014 if the kiosk cannot reach the server |
 | Empty, first run (`?state=emptyFirstRun`) | Not applicable |
-| Offline (`?state=offline`) | **Not available.** An unattended terminal selling from a stale catalogue oversells with nobody watching |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 … |
+| Offline (`?state=offline`) | **The last cached attract loop plays, with the group's offline message** (decided 5 October 2026, CHG-R4-001: `getPublishedKioskConfig` and the loop's media are served from the kiosk's cache). **Nothing is sold**: an unattended terminal selling from a stale catalogue oversells with nobody watching |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Neither `workstationId` nor `kioskConfigId` was given |
 
 #### Edge cases to draw
 
@@ -239,6 +263,7 @@ loop:
 #### Permissions
 
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
+- `getPublishedKioskConfig` → no permission · anonymous, guest, device, staff
 
 #### Requirements it meets
 
@@ -281,18 +306,21 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Derived from `wireframes/reference/Kiosk Board 1.dc.html`
 - Client design-board frames: `Kiosk Board 1.dc.html#KSK-001`
 - Flow F07 *Guest buys at a kiosk*, step 1: Touches the attract loop → Wakes to language selection **Calls nothing** — the attract loop is idle video until somebody touches it.
+- Flow F304 *A kiosk group is customised, published, assigned and rolled back*, step 5: The kiosk plays the group's attract loop until a guest touches it. → The screen saver, "Touch to start", the start tiles and the idle reset are the group's; the brand, theme and fonts are the tenant's published ones.
 - Flow F75 *A kiosk serves itself and calls for help*, step 1: The kiosk attracts and a guest touches it. → **No operation.** The attract loop is a local asset — a kiosk that needs the network to show its own screensaver looks broken when it is not.
 - Flow F07 branch at step 1 (abandonsFlow): when Kiosk cannot reach the server, KSK-014 out of service. It does not attempt a cached sale.
+- Flow F304 branch at step 5 (low): when The kiosk cannot reach the server., **The last cached attract loop plays with the offline message**; nothing that needs the server is sold.
+- Flow F304 branch at step 5 (medium): when The group has been taken out of service., The kiosk shows KSK-014 with the group's message and expected-back time until it is put back in service on BO-485.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-001?state=<state>`: loading, error, emptyFirstRun, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `KSK-002`, `KSK-003`, `KSK-004`, `KSK-014`, `KSK-015`.
+- [ ] Every action is wired with its success and its failure: Touch to start.
+- [ ] Every transition is wired: `KSK-002`, `KSK-003`, `KSK-004`, `KSK-014`, `KSK-015`, `CMS-105`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
@@ -314,7 +342,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **From the cached configuration.** The languages the kiosk last read stay on screen; buying waits for the connection. |
-| Opens with | nothing: it opens on its own |
+| Opens with | `venueId` (session) |
 | Route | `/sell/language-select` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
@@ -336,6 +364,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Choose your language | group | optional | — | — | — | One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when the kiosk is offline. | `PublishedTenantConfig.languages` |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Workstation | picker: choose a workstation | — | — | `getPublishedKioskConfig` ?workstationId |
+| Kiosk config | picker: choose a kiosk config | — | — | `getPublishedKioskConfig` ?kioskConfigId |
 
 **Rules for these inputs** (from the White Label & CMS process; these refine the tables above and win where they differ)
 
@@ -370,11 +405,18 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Address | in the reader's language | — |
 | Opening hours | in the reader's language | Prose, as the guest reads it. The bookable hours are the catalogue's. |
 
+**This kiosk's languages** (banner, from `getPublishedKioskConfig`): The kiosk group's `languageCodes` narrow the published languages to the ones this kiosk offers (all of them when empty); `defaultLanguageCode` is preselected and is the language the idle reset returns to.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Language codes | list or chips (count when long) | — |
+| Default language code | text | Null takes the tenant's published default. |
+
 **Rules for what is shown** (from the White Label & CMS process; these refine the tables above and win where they differ)
 
 - **Brand**: Tenant logo, theme and fonts; Powered by TICVAI at the foot. *(source: DI-298; DI-297)*
 
-**Data it reads**: `getTenantAppStatus` (onLoad, App status and recent changes); `getPublishedTenantConfig` (onLoad, The published languages and branding the kiosk renders in …)
+**Data it reads**: `getTenantAppStatus` (onLoad, App status and recent changes); `getPublishedTenantConfig` (onLoad, The published languages and branding the kiosk renders in …); `getPublishedKioskConfig` (onLoad, The languages this kiosk group offers and its default …)
 
 **Where the user goes next**
 
@@ -390,6 +432,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Empty, first run (`?state=emptyFirstRun`) | No language select yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Permission denied (`?state=emptyNoAccess`) | **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission. |
 | Offline (`?state=offline`) | **From the cached configuration.** The languages the kiosk last read stay on screen; buying waits for the connection. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither `workstationId` nor `kioskConfigId` was given |
 
 #### Edge cases to draw
 
@@ -410,6 +453,7 @@ buttons:
 
 - `getTenantAppStatus` → no permission · device, guest, staff
 - `getPublishedTenantConfig` → no permission · anonymous, guest, device
+- `getPublishedKioskConfig` → no permission · anonymous, guest, device, staff
 
 **A refused user sees:** **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.
 
@@ -462,8 +506,8 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 404).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-002?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `KSK-003`, `KSK-004`.
@@ -1382,7 +1426,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `inquirePaymentStatus` asks the provider what became of one payment; the screen shows the answer, it edits nothing (CHG-R1S-022) |
 | Offline | Not applicable |
-| Opens with | `paymentId` (deepLink) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
+| Opens with | `paymentId` (deepLink), `venueId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/sell/payment-unresolved` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
@@ -1393,9 +1437,24 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Workstation | picker: choose a workstation | — | — | `getPublishedKioskConfig` ?workstationId |
+| Kiosk config | picker: choose a kiosk config | — | — | `getPublishedKioskConfig` ?kioskConfigId |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Payment unresolved message** (banner, from `getPublishedKioskConfig`): The kiosk group's own words for this moment in the guest's language (`messages.paymentUnresolved`); the platform's standard words when the group set none.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Payment unresolved | in the reader's language | KSK-008 Payment unresolved. |
 
 **Actions and what each produces**
 
@@ -1407,6 +1466,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
 - **message**: "We're checking your payment. Please don't pay again." with the reference and Call staff. *(source: F57 step 2-4)*
+
+**Data it reads**: `getPublishedKioskConfig` (onLoad, The kiosk group's payment unresolved message, in the …)
 
 **Where the user goes next**
 
@@ -1421,6 +1482,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No payment unresolved configured. The form opens empty and `inquirePaymentStatus` saves the first one; it says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission. |
 | Offline (`?state=offline`) | Not applicable |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither `workstationId` nor `kioskConfigId` was given |
 
 #### Sample data for the mock-up
 
@@ -1433,6 +1495,7 @@ message: We're checking your payment of AED 655. Please don't pay again. Referen
 #### Permissions
 
 - `inquirePaymentStatus` → `ORDER_CREATE` (operate) · staff, guest, partner
+- `getPublishedKioskConfig` → no permission · anonymous, guest, device, staff
 
 **A refused user sees:** **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.
 
@@ -1467,8 +1530,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404).
+- [ ] Every output is drawn (1 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Check the payment again, Cancel.
 - [ ] Every transition is wired: `KSK-010`.
@@ -1657,7 +1720,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list |
 | Offline | Not applicable |
-| Opens with | `orderId` (deepLink) · cold entry: **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the … |
+| Opens with | `orderId` (deepLink), `venueId` (session) · cold entry: **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the … |
 | Route | `/sell/print-failure` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
@@ -1676,6 +1739,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|---|---|---|---|---|---|
 | Send to | select field | — | — | — | — | Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest's phone. | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Workstation | picker: choose a workstation | — | — | `getPublishedKioskConfig` ?workstationId |
+| Kiosk config | picker: choose a kiosk config | — | — | `getPublishedKioskConfig` ?kioskConfigId |
+
 **Sent by *Send to my phone*** (`reprintOrder`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -1688,6 +1758,14 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Printer failure message** (banner, from `getPublishedKioskConfig`): The kiosk group's own words for this moment in the guest's language (`messages.printerFailure`); the platform's standard words when the group set none.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Printer failure | in the reader's language | KSK-010 Print failure. |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -1697,6 +1775,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 **What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
 - **Send to my phone**: Email or SMS the tickets (resend), or call staff to print at the desk. *(source: F57 step 3-4; contracts/spine/orders.yaml#reprintOrder)*
+
+**Data it reads**: `getPublishedKioskConfig` (onLoad, The kiosk group's printer failure message, in the guest's …)
 
 **Where the user goes next**
 
@@ -1710,7 +1790,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Error (`?state=error`) | **The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself degraded rather than dead |
 | Empty, first run (`?state=emptyFirstRun`) | Not applicable |
 | Offline (`?state=offline`) | Not applicable |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither `workstationId` nor `kioskConfigId` was given; 400 Validation failed |
 
 #### Sample data for the mock-up
 
@@ -1723,6 +1803,7 @@ message: Your 3 tickets are paid but did not print. Send them to +971 50 ••�
 #### Permissions
 
 - `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
+- `getPublishedKioskConfig` → no permission · anonymous, guest, device, staff
 
 #### Requirements it meets
 
@@ -1763,8 +1844,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 404).
+- [ ] Every output is drawn (1 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-010?state=<state>`: loading, error, emptyFirstRun, offline.
 - [ ] Every action is wired with its success and its failure: Send to my phone.
 - [ ] Every transition is wired: `KSK-013`.
@@ -1941,6 +2022,7 @@ Method, path, parameters, request and response for every operation these screens
 "getAvailability": {"method":"GET","path":"/availability","contract":"catalogue","summary":"Live remaining capacity","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null},{"name":"channelCapacityId","in":"query","required":null},{"name":"eventId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PerformanceAvailabilityPage"},
 "getCart": {"method":"GET","path":"/carts/{cartId}","contract":"orders","summary":"The cart, priced and checked, right now","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
 "getOrder": {"method":"GET","path":"/orders/{orderId}","contract":"orders","summary":"Read an order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"},
+"getPublishedKioskConfig": {"method":"GET","path":"/venues/{venueId}/kiosk-config","contract":"white-label","summary":"The published kiosk configuration a kiosk renders, before anyone touches it","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workstationId","in":"query","required":false},{"name":"kioskConfigId","in":"query","required":false}],"requestBody":null,"responds":"PublishedKioskConfig"},
 "getPublishedTenantConfig": {"method":"GET","path":"/storefront/tenant-config","contract":"white-label","summary":"The published guest-facing configuration, before anyone signs in","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"venueId","in":"query","required":false}],"requestBody":null,"responds":"PublishedTenantConfig"},
 "getTenantAppStatus": {"method":"GET","path":"/tenant-config/status","contract":"white-label","summary":"App status and recent changes","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"TenantAppStatus"},
 "inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
@@ -1975,6 +2057,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
 "HeaderConfig": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","required":["layout"],"properties":{"layout":{"type":"string","enum":["logoLeft","logoCentre","logoWithMenu"]},"showLogo":{"type":"boolean","default":true},"showMenu":{"type":"boolean","default":true},"showNotifications":{"type":"boolean","default":true},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"}}},
 "HomepageLayout": {"x-ticvai-persistence":"whitelabel.homepage_layout + whitelabel.homepage_section","x-ticvai-retired-columns":["whitelabel.homepage_section.homepage_section_id"],"type":"object","description":"**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).","required":["sections"],"properties":{"templateKey":{"type":"string","nullable":true,"description":"The landing-page template this layout started from (`listLandingPageTemplates`), or null for a layout composed from scratch (CHG-CSA-037)."},"landingSource":{"type":"string","enum":["storefront","ownSite"],"default":"storefront","description":"`storefront`: this home is the tenant's landing page. `ownSite`: the tenant's own website is the landing page and links in with deep links; this home is still served at the storefront address."},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"sections":{"type":"array","items":{"type":"object","required":["kind","sortOrder","isVisible"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"},"kind":{"$ref":"#/components/schemas/HomepageSectionKind"},"title":{"$ref":"#/components/schemas/LocalisedText"},"sortOrder":{"type":"integer"},"isVisible":{"type":"boolean"},"contentPageId":{"type":"string","format":"uuid","nullable":true},"maxItems":{"type":"integer","nullable":true,"description":"**How many cards the section shows, the venue's choice** (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved wireframe offers."},"scrollAnimation":{"type":"string","enum":["rise","scale","slide","blur","none"],"default":"rise","description":"**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: \"must be there\"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers; `none` for guests who asked the device for reduced motion is applied whatever is set."},"heroStyle":{"type":"string","nullable":true,"enum":["carousel","video","poster","split",null],"description":"For `heroBanner` only (decided 29 September, MOB-3)."}}}}}},
+"KioskAttractLoop": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**How the attract loop plays** (decided 5 October 2026 by Chinmay, CHG-R4-001); the slides themselves are `KioskConfig.attractSlides`. Offline, the kiosk plays the last loop it cached.","properties":{"transition":{"type":"string","enum":["cut","fade","slide"],"default":"fade"},"soundOn":{"type":"boolean","default":false,"description":"Whether a video slide plays its sound. Off by default (a kiosk in a queue hall)."},"playWindows":{"type":"array","maxItems":21,"description":"**When the open loop plays, by time of day and weekday**, in the venue's time zone. A slide plays only inside a window; with no window the loop plays all day. Outside the opening hours the `closed` slides play regardless.","items":{"type":"object","required":["weekdays","from","to"],"properties":{"weekdays":{"type":"array","minItems":1,"maxItems":7,"items":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]}},"from":{"type":"string","format":"time","description":"Local time, inclusive."},"to":{"type":"string","format":"time","description":"Local time, exclusive; earlier than `from` runs past midnight."}}}},"touchToStart":{"type":"object","description":"The \"Touch to start\" call to action over the loop.","properties":{"text":{"$ref":"#/components/schemas/LocalisedText"},"position":{"type":"string","enum":["top","middle","bottom"],"default":"bottom"},"animation":{"type":"string","enum":["none","pulse","bounce"],"default":"pulse"}}},"appDownloadSlide":{"type":"object","description":"**A \"Download our app\" slide with a QR code**, added to the loop when on. The QR points at the tenant's store listings (the published app's deep-link scheme, `getDeepLinkScheme`).","properties":{"enabled":{"type":"boolean","default":false},"caption":{"$ref":"#/components/schemas/LocalisedText"},"everyNthSlide":{"type":"integer","minimum":1,"maximum":20,"default":4,"description":"Shown after every n-th slide of the loop."}}}}},
+"KioskAttractSlide": {"x-ticvai-persistence":"whitelabel.kiosk_config_attract_slide","type":"object","description":"**One slide of the attract loop**, the kiosk's screen saver (decided 5 October 2026 by Chinmay, CHG-R4-001). A video or photo from the media library, or a text slide in the brand's fonts. Slides play in `sortOrder`; `playsWhen` `closed` slides make the \"Closed\" loop shown outside the group's opening hours.","required":["kind","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kioskConfigId":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["video","photo","text"]},"mediaAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"The `MediaAsset` (a video for `video`, an image for `photo`); required for both, null for `text`. Refused at publish when it does not fit the display (`mediaDoesNotFit`)."},"text":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The slide's words in every kiosk language; required for `text`, a caption otherwise."},"sortOrder":{"type":"integer","minimum":0},"durationSeconds":{"type":"integer","minimum":3,"maximum":120,"default":8,"description":"How long a photo or text slide shows. A video plays to its end and ignores it."},"playsWhen":{"type":"string","enum":["open","closed"],"default":"open","description":"`closed` slides play only outside the opening hours (the \"Closed\" loop); `open` slides only inside them."},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `venue` scope."}}},
+"KioskDisplaySettings": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The device profile of a kiosk group** (decided 5 October 2026 by Chinmay, CHG-R4-001): what the kiosk's screen is, so the attract loop's media is checked against it and the start screen is laid out for it.","properties":{"orientation":{"type":"string","enum":["portrait","landscape"],"default":"portrait"},"screenSizeInches":{"type":"number","minimum":7,"maximum":100,"nullable":true,"description":"The diagonal, for the layout's touch targets. Null until the hardware is known."},"resolutionWidthPx":{"type":"integer","minimum":320,"maximum":7680,"default":1080},"resolutionHeightPx":{"type":"integer","minimum":320,"maximum":7680,"default":1920},"mountingHeightCm":{"type":"integer","minimum":50,"maximum":250,"nullable":true,"description":"The height of the screen's lower edge from the floor. Sets `reachableHeightByDefault` when that is not given."},"reachableHeightByDefault":{"type":"boolean","description":"**Whether the kiosk opens in the reachable-height mode** of the tenant's `AccessibilitySettings` (BL-065; the mode is offered only when `reachableHeightModeAvailable` is true there). When not given it is set from `mountingHeightCm`: true at or above 100 cm (the setting `kioskReachableHeightThresholdCm`, default 100; client to confirm), false below it or with no height."},"touchScale":{"type":"number","minimum":1,"maximum":2,"default":1.25,"description":"Multiplies every touch target and text size on the kiosk (1 is the guest app's size)."},"productTileSize":{"$ref":"#/components/schemas/KioskTileSize"},"tilesPerRow":{"type":"integer","minimum":1,"maximum":6,"default":3,"description":"Product tiles per row on the selling screens (KSK-003, KSK-016, KSK-017)."}}},
+"KioskHeaderFooter": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The kiosk's header and footer** (decided 5 October 2026 by Chinmay, CHG-R4-001). The logo and colours are the published brand's; this says what the kiosk's bars hold.","properties":{"logoPosition":{"type":"string","enum":["start","centre","end"],"default":"start","description":"`start` and `end` follow the reading direction, so Arabic mirrors them."},"languageSwitchVisible":{"type":"boolean","default":true},"cartVisible":{"type":"boolean","default":true,"description":"The order summary button with its count."},"callStaffVisible":{"type":"boolean","default":true,"description":"Opens KSK-013 Call Staff."},"accessibilityButtonVisible":{"type":"boolean","default":true,"description":"Opens the tenant's `AccessibilitySettings` modes (BL-065)."},"clockVisible":{"type":"boolean","default":false},"footerPaymentLogos":{"type":"boolean","default":true,"description":"Shows the logos of `paymentOutput.paymentMethodIds` in the footer."},"footerHelpText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"legalLinksAsQr":{"type":"boolean","default":true,"description":"**The legal links shown as QR codes**, because a kiosk cannot open a policy page in a browser: each published policy (`listPublishedPolicies`) gets a code that opens it on the guest's phone."}}},
+"KioskJourneySettings": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The kiosk channel's journeys** (decided 5 October 2026 by Chinmay, CHG-R4-001). The kiosk books through the venue's booking flows like the web and app; custom flows are allowed, and the payment and legal steps stay locked exactly as `validateBookingFlow` holds them on the web and app.","properties":{"bookingFlowIds":{"type":"array","maxItems":30,"description":"The venue's booking flows the kiosk uses, by id (`listBookingFlows`). Empty uses the venue's default flow for each type, as the web does.","items":{"type":"string","format":"uuid"}},"maxSteps":{"type":"integer","minimum":2,"maximum":12,"default":6,"description":"The most steps a kiosk journey may take; a flow with more enabled steps is refused at publish (`journeyInvalid`)."},"upsellEnabled":{"type":"boolean","default":true,"description":"Add-ons and cross-sell offers (KSK-004, KSK-006)."},"upsellOfferCount":{"type":"integer","minimum":0,"maximum":6,"default":2,"description":"How many offers a step shows at most."}}},
+"KioskLanguages": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The languages KSK-002 offers and the one the kiosk returns to** (decided 5 October 2026 by Chinmay, CHG-R4-001). Each must be one the tenant has published (`LanguageConfig`); empty offers them all.","properties":{"languageCodes":{"type":"array","maxItems":12,"items":{"type":"string","pattern":"^[a-z]{2}$"}},"defaultLanguageCode":{"type":"string","pattern":"^[a-z]{2}$","nullable":true,"description":"Null takes the tenant's published default."}}},
+"KioskMessages": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**The kiosk's own messages, in every kiosk language** (decided 5 October 2026 by Chinmay, CHG-R4-001). Null shows the platform's standard words.","properties":{"idleWarning":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The \"Still there?\" prompt."},"outOfService":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-014, with the expected-back time when `setKioskOutOfService` gives one."},"offline":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Over the cached loop while the kiosk cannot reach the server."},"printerFailure":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-010 Print failure."},"paymentUnresolved":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-008 Payment unresolved."},"callStaff":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"KSK-013 Call Staff, while help is on its way."},"closed":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Over the \"Closed\" loop outside the opening hours."}}},
+"KioskOpeningHours": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**When a kiosk group sells** (decided 5 October 2026 by Chinmay, CHG-R4-001), in the venue's time zone. Outside them the kiosk plays its `closed` slides with the `closed` message and sells nothing. With no hours set the kiosk follows the venue's own opening hours.","properties":{"weekly":{"type":"array","maxItems":14,"items":{"type":"object","required":["weekday","opensAt","closesAt"],"properties":{"weekday":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"opensAt":{"type":"string","format":"time"},"closesAt":{"type":"string","format":"time","description":"Earlier than `opensAt` runs past midnight."}}}}}},
+"KioskOutOfService": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**A kiosk group taken out of service** (`setKioskOutOfService`; decided 5 October 2026 by Chinmay, CHG-R4-001). Live state, never drafted or published.","required":["active"],"properties":{"active":{"type":"boolean"},"expectedBackAt":{"type":"string","format":"date-time","nullable":true,"description":"Shown on KSK-014. Must be in the future."},"messageOverride":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Replaces the group's `messages.outOfService` until it is put back in service."}}},
+"KioskPaymentOutput": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**What a kiosk takes and what it gives back** (decided 5 October 2026 by Chinmay, CHG-R4-001).","properties":{"paymentMethodIds":{"type":"array","maxItems":20,"description":"The venue's configured payment methods this kiosk accepts (payments `listPaymentMethods`). One not configured for the venue is refused at publish (`paymentMethodUnavailable`).","items":{"type":"string","format":"uuid"}},"receiptChannels":{"type":"array","description":"How the guest may take the receipt; the kiosk offers these on KSK-009.","maxItems":4,"items":{"type":"string","enum":["print","email","sms","qr"]}},"ticketStock":{"type":"string","nullable":true,"enum":["thermal80mm","wristband","plasticTicket"],"description":"What the kiosk's printer issues; null when it issues nothing printed (QR only)."},"ticketTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"The print layout from the ticket designer (orders `updateTicketTemplate`) for `ticketStock`; required when `ticketStock` is set (`ticketTemplateMissing` at publish)."},"sendToPhoneQr":{"type":"boolean","default":true,"description":"Offers a \"Send to my phone\" QR on KSK-009 that opens the order in the guest app or web."}}},
+"KioskSessionSettings": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"**When a kiosk forgets its guest** (decided 5 October 2026 by Chinmay, CHG-R4-001). After `idleTimeoutSeconds` without a touch the kiosk asks \"Still there?\" with a countdown of `stillTherePromptSeconds`; with no touch by its end it clears the cart, signs the guest out, returns to the attract loop and switches to the default language. The tenant's `AccessibilitySettings.sessionTimeoutMultiplier` multiplies both while an accessibility mode is on. A payment in progress is never interrupted.","properties":{"idleTimeoutSeconds":{"type":"integer","minimum":15,"maximum":600,"default":60},"stillTherePromptSeconds":{"type":"integer","minimum":5,"maximum":60,"default":15},"signInMethods":{"type":"array","description":"**How a guest signs in at a kiosk: never with a password.** By scanning a QR code from the guest app (`appQr`) or with a one-time code sent to their phone or email (`oneTimeCode`). Empty: no sign-in at this kiosk. Saved sign-in is never offered (decided 5 October 2026).","maxItems":2,"items":{"type":"string","enum":["appQr","oneTimeCode"]}}}},
+"KioskStartScreen": {"x-ticvai-persistence":"none — jsonb column of whitelabel.kiosk_config","type":"object","description":"The start screen around the tiles (`KioskConfig.startTiles`); one hero banner.","properties":{"heroBanner":{"type":"object","nullable":true,"properties":{"imageAssetRef":{"type":"string","format":"uuid"},"title":{"$ref":"#/components/schemas/LocalisedText"},"linkTarget":{"$ref":"#/components/schemas/LinkTarget"}}}}},
+"KioskStartTile": {"x-ticvai-persistence":"whitelabel.kiosk_config_start_tile","type":"object","description":"**One function a kiosk offers on its start screen** (decided 5 October 2026 by Chinmay, CHG-R4-001), in `sortOrder`. A function appears at most once per kiosk configuration.","required":["function","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kioskConfigId":{"type":"string","format":"uuid","readOnly":true},"function":{"$ref":"#/components/schemas/KioskFunction"},"isEnabled":{"type":"boolean","default":true},"sortOrder":{"type":"integer","minimum":0},"tileSize":{"$ref":"#/components/schemas/KioskTileSize"},"imageAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"The tile's image from the media library; null shows the function's icon."},"label":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Null shows the function's standard label in each language."},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `venue` scope."}}},
 "LanguageConfig": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","required":["languages","defaultLanguage"],"properties":{"languages":{"type":"array","description":"**A tenant may add or select interface languages beyond English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI translation and reviewed (T03), and a string with no translation falls back to English. Content (pages, products, banners) is the tenant's to translate (`translationGaps`).","items":{"type":"string","pattern":"^[a-z]{2}$"}},"defaultLanguage":{"type":"string","pattern":"^[a-z]{2}$"},"uiStringCoverage":{"type":"array","readOnly":true,"description":"How complete the interface strings are in each enabled language (CHG-CSA-039). English and Arabic are always complete.","items":{"type":"object","properties":{"language":{"type":"string"},"coveragePercent":{"type":"number","minimum":0,"maximum":100},"status":{"type":"string","enum":["complete","draft","missing"]}}}},"rtlLanguages":{"type":"array","readOnly":true,"x-ticvai-derived":"onRead","description":"The enabled languages written right to left — those whose Unicode CLDR character order is `right-to-left` (Arabic, `ar`, among them). Not configured; it follows from `languages`.","items":{"type":"string","pattern":"^[a-z]{2}$"}},"translationGaps":{"type":"array","readOnly":true,"description":"Content lacking a version in an enabled language.","items":{"type":"object","properties":{"language":{"type":"string"},"missingCount":{"type":"integer"},"areas":{"type":"array","items":{"type":"string"}}}}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MinimumAppVersion": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","nullable":true,"description":"**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n","properties":{"ios":{"type":"string","nullable":true,"pattern":"^\\d+\\.\\d+\\.\\d+$"},"android":{"type":"string","nullable":true,"pattern":"^\\d+\\.\\d+\\.\\d+$"}}},
@@ -1997,6 +2092,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ProductSalesContact": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","description":"Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n","minProperties":1,"properties":{"phone":{"type":"string","maxLength":32,"nullable":true},"email":{"type":"string","format":"email","maxLength":254,"nullable":true},"note":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."}}},
 "ProductVariant": {"x-ticvai-persistence":"catalogue.variant","type":"object","required":["id","productId","sku","axisValues","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"sku":{"type":"string"},"axisValues":{"type":"object","additionalProperties":{"type":"string"}},"name":{"type":"string","maxLength":150,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"},"isDefault":{"type":"boolean","default":false,"description":"Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"},"isActive":{"type":"boolean","description":"False when retired. Retired variants are never deleted — orders reference them."},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"}}},
 "PublishedAnalyticsProvider": {"x-ticvai-persistence":"none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only","description":"**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.","type":"object","required":["provider","measurementId","surfaces","consentCategory"],"properties":{"provider":{"type":"string","enum":["googleAnalytics4","googleTagManager","adobeAnalytics","metaPixel","matomo","other"]},"otherProviderName":{"type":"string","maxLength":100,"nullable":true,"description":"The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`)."},"measurementId":{"type":"string","maxLength":100,"description":"What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id)."},"surfaces":{"type":"array","minItems":1,"items":{"type":"string","enum":["guestWeb","guestApp"]}},"consentCategory":{"type":"string","enum":["functional","analytics","personalisation","marketing"],"description":"The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`)."}}},
+"PublishedKioskConfig": {"x-ticvai-persistence":"none — computed from the current KioskConfigVersion snapshot and the live state on whitelabel.kiosk_config and whitelabel.kiosk_assignment","type":"object","description":"**The public view of a kiosk configuration** (`getPublishedKioskConfig`, decided 5 October 2026 by Chinmay, CHG-R4-001): the published parts a kiosk renders with, beside the tenant's published brand, theme, fonts, policies, accessibility and languages from `getPublishedTenantConfig`. No draft marker, no counts, no person.","required":["kioskConfigId","venueId","publishedVersion","publishedAt","isOpenNow"],"properties":{"kioskConfigId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"isDefault":{"type":"boolean","description":"True when the kiosk is in no group and shows the venue's default."},"publishedVersion":{"type":"integer","description":"The `KioskConfigVersion.versionNumber` this answer was read from; a kiosk holding the same version and `contentHash` keeps its cache."},"contentHash":{"type":"string"},"publishedAt":{"type":"string","format":"date-time"},"display":{"$ref":"#/components/schemas/KioskDisplaySettings"},"attractLoop":{"$ref":"#/components/schemas/KioskAttractLoop"},"attractSlides":{"type":"array","description":"Every slide, `open` and `closed`, in order; the kiosk plays the set `isOpenNow` selects.","items":{"$ref":"#/components/schemas/KioskAttractSlide"}},"startScreen":{"$ref":"#/components/schemas/KioskStartScreen"},"startTiles":{"type":"array","description":"The enabled tiles only, in order.","items":{"$ref":"#/components/schemas/KioskStartTile"}},"headerFooter":{"$ref":"#/components/schemas/KioskHeaderFooter"},"journey":{"$ref":"#/components/schemas/KioskJourneySettings"},"session":{"$ref":"#/components/schemas/KioskSessionSettings"},"paymentOutput":{"$ref":"#/components/schemas/KioskPaymentOutput"},"languages":{"$ref":"#/components/schemas/KioskLanguages"},"messages":{"$ref":"#/components/schemas/KioskMessages"},"openingHours":{"$ref":"#/components/schemas/KioskOpeningHours"},"isOpenNow":{"type":"boolean","x-ticvai-derived":"onRead","description":"Whether the group is inside its opening hours now, in the venue's time zone. Outside them the kiosk sells nothing."},"outOfService":{"allOf":[{"$ref":"#/components/schemas/KioskOutOfService"}],"nullable":true,"description":"Live state (`setKioskOutOfService`); null when in service. While `active`, the kiosk shows KSK-014."}}},
 "PublishedTenantConfig": {"x-ticvai-persistence":"none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config","type":"object","x-ticvai-agreed":"2 October: decided by Chinmay, fix before Block A starts (GFIX-1)","description":"**The public view of the tenant's configuration** (`getPublishedTenantConfig`, decided 2 October, GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no CMS counts, no sender addresses, no licensing, no person.\n","required":["tenantId","publishedVersion","publishedAt","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"publishedVersion":{"type":"string","description":"The `ConfigVersion.version` this answer was read from; a client holding the same version keeps its copy."},"publishedAt":{"type":"string","format":"date-time"},"brand":{"$ref":"#/components/schemas/BrandIdentity"},"appIcons":{"$ref":"#/components/schemas/AppIcons"},"theme":{"$ref":"#/components/schemas/Theme"},"fonts":{"$ref":"#/components/schemas/FontConfig"},"header":{"$ref":"#/components/schemas/HeaderConfig"},"footer":{"$ref":"#/components/schemas/FooterConfig"},"navigation":{"$ref":"#/components/schemas/NavigationConfig"},"homepage":{"$ref":"#/components/schemas/HomepageLayout"},"bookingFlow":{"allOf":[{"$ref":"#/components/schemas/BookingFlowConfig"}],"description":"The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11)."},"languages":{"$ref":"#/components/schemas/LanguageConfig"},"accessibility":{"$ref":"#/components/schemas/AccessibilitySettings"},"enabledModules":{"type":"array","description":"The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.","items":{"$ref":"#/components/schemas/ModuleKey"}},"enabledFeatures":{"type":"array","description":"The `featureKey` of every feature toggle that is on in the published version.","items":{"type":"string"}},"isInMaintenance":{"type":"boolean","description":"Live state (`setMaintenanceMode`), as on `getTenantAppStatus`."},"maintenanceMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"contact":{"$ref":"#/components/schemas/VenueContact"},"analyticsProviders":{"type":"array","description":"**The analytics platforms the storefront and app load** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): a guest reads them here instead of `listAnalyticsProviders`, which needs `TENANT_CONFIGURE`. The enabled `StorefrontAnalyticsProvider` rows in force for the venue being browsed (that venue's own rows when `venueId` was sent and it has any, else the tenant-wide ones), read live, with only what the tag loader needs. **A provider loads only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58).","items":{"$ref":"#/components/schemas/PublishedAnalyticsProvider"}},"paymentTokenisation":{"type":"object","nullable":true,"description":"**The provider the guest app tokenises cards with** (4 October 2026, CHG-FXC-010; GST-071): the `providerId` `storePaymentToken` requires, its kind and the publishable key the client SDK needs. Never a secret. Null where no provider with tokenisation is connected.","required":["providerId","providerKind"],"properties":{"providerId":{"type":"string","format":"uuid"},"providerKind":{"type":"string"},"publishableKey":{"type":"string","nullable":true}}}}},
 "TenantAppStatus": {"x-ticvai-persistence":"none — computed","type":"object","description":"Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n","required":["tenantId","isPublished","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"isPublished":{"type":"boolean","x-ticvai-derived":"onRead","description":"True once any version has been published."},"publishedVersion":{"type":"string","nullable":true},"publishedAt":{"type":"string","format":"date-time","nullable":true},"draftVersion":{"type":"string","description":"Staff only."},"hasUnpublishedChanges":{"type":"boolean","x-ticvai-derived":"onRead","description":"Staff only. The working draft differs from the current version's `snapshot`."},"activeModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isEnabled` true."},"licensedModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isLicensed` true."},"activePageCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. Content pages that are `published` and enabled."},"isInMaintenance":{"type":"boolean"},"maintenanceMessage":{"$ref":"#/components/schemas/LocalisedText"},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"contact":{"$ref":"#/components/schemas/VenueContact"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"What the sold-out or closed screen says (WEB-029). Null shows the default wording."},"venues":{"type":"array","maxItems":200,"x-ticvai-derived":"onRead","description":"**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n","items":{"type":"object","required":["venueId","name"],"properties":{"venueId":{"type":"string","format":"uuid","description":"**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."},"name":{"type":"string","maxLength":200,"description":"The venue's name (`tenancy.OrgUnit.name`)."},"city":{"type":"string","maxLength":120,"nullable":true,"description":"Shown under the name so two venues with similar names can be told apart."},"openingHoursToday":{"type":"object","nullable":true,"description":"Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.","properties":{"opens":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"},"closes":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"}}}}}},"whatsNew":{"type":"array","maxItems":10,"x-ticvai-derived":"onRead","description":"**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n","items":{"type":"object","required":["version","publishedAt","notes"],"properties":{"version":{"type":"string","description":"The release version."},"publishedAt":{"type":"string","format":"date-time","description":"When the release reached the tenant's cell."},"notes":{"$ref":"#/components/schemas/LocalisedText"}}}},"recentChanges":{"type":"array","description":"Staff only. Names the principal behind each change, so it never reaches a public response.","items":{"type":"object","properties":{"area":{"type":"string"},"description":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"}}}}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},

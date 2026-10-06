@@ -1,5 +1,5 @@
 id: LLD-P13
-title: P13 Venue CMS — White Label — 103 screens
+title: P13 Venue CMS — White Label — 104 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,10 +20,10 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 103
+  screens: 104
 servicesCalled:
 - service: WhiteLabelService
-  operationCalls: 109
+  operationCalls: 119
 - service: VenueOpsService
   operationCalls: 73
 - service: MarketingService
@@ -39,9 +39,9 @@ servicesCalled:
 - service: TenancyService
   operationCalls: 1
 coverage:
-  screens: 103
-  inAFlow: 90
-  drawn: 103
+  screens: 104
+  inAFlow: 91
+  drawn: 104
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -2601,6 +2601,7 @@ screens:
   - CMS-101
   - CMS-103
   - CMS-104
+  - CMS-105
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-102
   inFlows: null
@@ -2677,3 +2678,38 @@ screens:
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-104
   inFlows: null
+- screen: CMS-105
+  name: Kiosk Builder
+  module: Kiosk
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createKioskConfig
+  - deleteKioskConfig
+  - getKioskConfig
+  - getKioskConfigValidation
+  - getPublishedKioskConfig
+  - listKioskConfigVersions
+  - listKioskConfigs
+  - publishKioskConfigs
+  - restoreKioskConfigVersion
+  - updateKioskConfig
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - kioskConfigId<-navigation
+  goesTo:
+  - CMS-010
+  - CMS-102
+  - CMS-103
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-105
+  inFlows:
+  - F304 A kiosk group is customised, published, assigned and rolled back
