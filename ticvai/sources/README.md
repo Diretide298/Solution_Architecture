@@ -183,7 +183,7 @@ documents, a device, a contact). Filed verbatim, dated, one file per message.
 
 | Date | File | Supplies |
 |---|---|---|
-| 05 Oct 2026 | `client/2026-10-05-allam-boca-printer.md` | Muhamed Allam: the BOCA printer documents (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the BOCA Lemur, Windows driver), link titles only; the printer ships to India when ready (CHG-R4-002) |
+| 05 Oct 2026 | `client/2026-10-05-allam-boca-printer.md` | Muhamed Allam: the BOCA printer documents (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the BOCA Lemur, Windows driver), with the five addresses Chinmay forwarded on 6 Oct 2026; the printer ships to India when ready (CHG-R4-002) |
 
 ---
 

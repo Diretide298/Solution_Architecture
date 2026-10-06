@@ -9,7 +9,8 @@ summary: BOCA is confirmed as the ticket and wristband printer and its documents
   and a Block A2 task builds the driver (DEVICE-BOCA-FGL, planned by CHG-R4-003).
 decision:
   what: 'sources/client/2026-10-05-allam-boca-printer.md files Muhamed Allam''s email of 5 October 2026 verbatim (link
-    titles only; the URLs are added when Chinmay forwards them), registered in sources/README.md. ADR-0015 gains an
+    titles only; the five addresses Chinmay forwarded on 6 October 2026 are listed below it, and the hardware
+    workbook''s Client documents cell carries them), registered in sources/README.md. ADR-0015 gains an
     amendment: the client confirmed BOCA and sent the specifications, SDK samples, operator manuals and FGL programming
     guide, RFID encoding on the BOCA Lemur and the Windows driver; the unit ships to the India office; the Tier A
     decision stands (FGL now on an emulator, the lab validates on arrival); RFID encoding is new scope to confirm.
