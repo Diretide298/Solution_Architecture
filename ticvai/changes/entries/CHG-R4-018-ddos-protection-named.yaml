@@ -1,0 +1,48 @@
+id: CHG-R4-018
+date: '2026-10-06'
+source: client-review
+kind: spec
+summary: The HLD and both LLDs name the platform's DDoS protection (Front Door's built-in infrastructure protection on
+  Azure, AWS Shield Standard on CloudFront), beside the WAF and bot rules they already named, and the generator refuses
+  an edge that leaves any of the three out.
+decision:
+  what: 'tools/build-hld-lld.py (the generator of handoff/hld-lld/*.md; the .md files are derived and not edited): the
+    Azure LLD''s Edge tier row and Security section name Front Door''s built-in infrastructure DDoS protection
+    (network layer, no extra charge), the WAF''s rate and bot rules for the application layer, and that the origin has
+    no public address (Private Link), so no Azure DDoS Protection plan sits in front of it (one can be added for a
+    tenant that requires it); the AWS LLD''s Edge row and Security section name AWS Shield Standard (automatic on
+    CloudFront, no charge) with WAF rate-based and Bot Control rules, Shield Advanced an option for a major event and
+    not costed; the HLD''s "On the request path" names both; the Azure-to-AWS map row carries them. No cost line
+    changes: both protections are included in the services already costed. A new generator rule,
+    edge_protection_named(), stops the build when an LLD''s Edge row or Security section, or the HLD''s request path,
+    omits WAF, DDoS or bot protection.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The client''s tracker answer T9 of 6 October 2026 (sources/client/2026-10-06-tracker-answers.md): "The solution
+  must support ... CDN/WAF/DDoS/bot protection". The LLDs named the CDN, the WAF and the bot rules (handoff/hld-lld/
+  TICVAI-LLD.md:30, TICVAI-LLD-AWS.md:79 before this change) but DDoS protection nowhere in the package. The source
+  was filed by CHG-R4-017; the edge it protects is ADR-0066''s.'
+keys_touched:
+  files:
+  - tools/build-hld-lld.py
+  other:
+  - handoff/hld-lld/TICVAI-HLD.md (derived)
+  - handoff/hld-lld/TICVAI-LLD.md (derived)
+  - handoff/hld-lld/TICVAI-LLD-AWS.md (derived)
+root_class: 'new: client-target-not-adopted'
+tickets:
+  started: []
+  unstarted: []
+prevention:
+  type: generator-rule
+  ref: tools/build-hld-lld.py::edge_protection_named
+notes: 'Batch R4, 6 October 2026. edge_protection_named() run against the generator of the commit before this change
+  returns seven omissions (DDoS missing from both Edge rows, both Security sections and the HLD''s request path; bot
+  missing from both Security sections) and none after it; the generator writes nothing while it has any. The derived
+  documents are rebuilt at the refresh (the generator was run here only to verify, and its outputs discarded). No
+  OpenProject ticket carries the LLD text; the infrastructure tickets point at the LLD.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the client's tracker answers of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open
