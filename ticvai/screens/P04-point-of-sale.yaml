@@ -4001,6 +4001,11 @@ screens:
       recountRequested:
         operation: rejectShiftVariance
         note: The supervisor asked for a recount; the cashier recounts blind and resubmits (DEC-175; CHG-CSP-013).
+      reasonRequired:
+        operation: giveShiftVarianceReason
+        note: '**"Give a reason to close".** The count is locked; it differed within the venue''s threshold
+          and no reason came with it, so the shift waits in pendingClosure until the cashier gives one (the
+          client''s policy of 6 October 2026, T10.1; CHG-R4-019). No amount and no over or short (CHG-FIN-003).'
     transitions:
     - from: count
       'on': Submit count
@@ -4020,6 +4025,14 @@ screens:
     - from: recountRequested
       'on': Recount
       to: count
+    - from: summary
+      'on': submitShiftCount returns varianceReasonRequired
+      to: reasonRequired
+      note: Within the threshold but not exact, with no reason given with the count (CHG-R4-019).
+    - from: reasonRequired
+      'on': giveShiftVarianceReason
+      to: summary
+      note: The reason is recorded and the shift closes; the screen leaves for POS-000 as after a clean close.
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting
     for a person, so the empty state is success'
@@ -4141,6 +4154,14 @@ screens:
       - kind: primaryButton
         label: Submit count
         provenance: carried from the previous definition
+      - kind: primaryButton
+        label: Give the reason and close
+        operation: giveShiftVarianceReason
+        permission: SHIFT_CLOSE
+        notes: 'Shown in the reasonRequired state only: the count differed within the threshold and came
+          with no reason. Opens the reason form; never shows the amount or the direction (the client''s policy
+          of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003).'
+        provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
       - kind: secondaryButton
         label: Ask for a recount
         operation: rejectShiftVariance
@@ -4206,6 +4227,24 @@ screens:
       discards:
       - reason
     provenance: contract shift.yaml POST /shifts/{shiftId}/reject-variance
+  - id: formGiveShiftVarianceReason
+    component: modal
+    trigger: Give the reason and close
+    body: '**Collects what `giveShiftVarianceReason` sends.** Required: `reason` (till error, unrecorded
+      refund, miscount, other); `note`, required with other. Says "Your count found a difference. Give a
+      reason to close your shift" and never the amount or whether it is over or short: the count is already
+      locked (the client''s policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). Dismissing sends
+      nothing; the shift stays waiting for the reason.'
+    confirm:
+      label: Close shift
+      operation: giveShiftVarianceReason
+    dismiss:
+      label: Not yet
+      discards:
+      - reason
+      - note
+    bindsTo: ShiftVarianceReasonRequest
+    provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
   - id: formCloseShiftForCashier
     component: modal
     trigger: Close shift for the cashier
@@ -4249,6 +4288,12 @@ screens:
       with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set.
       The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`;
       a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013).'
+    reasonRequired: '**"Give a reason to close".** `submitShiftCount` answered `awaitingCloseApproval`
+      with `varianceReasonRequired`: the count differed from the expected figure within the venue''s
+      threshold and no reason came with it. The count is locked; the till asks for a reason (till error,
+      unrecorded refund, miscount, other, with a note) and `giveShiftVarianceReason` closes the shift. No
+      amount, no over or short (the client''s policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003).
+      A reason given with the count skips this step.'
   apis:
   - operationId: submitShiftCount
     contract: shift
@@ -4283,6 +4328,11 @@ screens:
     trigger: onAction
     invalidates:
     - listCashMovements
+  - operationId: giveShiftVarianceReason
+    contract: shift
+    purpose: The cashier's reason for a difference within the threshold, given after the blind count is
+      locked; closes the shift (the client's policy of 6 October 2026, T10.1; CHG-R4-019)
+    trigger: onAction
   - operationId: getShiftCountLines
     contract: shift
     purpose: The denominations the cashier counted, line by line, for the supervisor reviewing the shift;

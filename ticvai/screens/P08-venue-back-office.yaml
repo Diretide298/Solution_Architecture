@@ -12053,7 +12053,11 @@ screens:
         - Shift.bagNumber
         - Shift.countedCash
         - Shift.variance
+        - Shift.varianceReasonRequired
         operation: listShifts
+        notes: 'Waiting for a decision: beyond the threshold (pendingVariance, accept or reject), or within it
+          with no reason yet (`varianceReasonRequired`, the client''s policy of 6 October 2026, T10.1;
+          CHG-R4-019).'
         provenance: contract shift.yaml GET /shifts
       - kind: dataTable
         label: Every cash movement
@@ -12082,7 +12086,12 @@ screens:
         - Shift.refundsTotal
         - Shift.liftsTotal
         - Shift.variance
+        - Shift.cashierReason
+        - Shift.cashierNote
+        - Shift.varianceReasonRequired
         operation: getShift
+        notes: 'Every variance with its reason, for the audit and the report the client asked for (T10.1,
+          6 October 2026; CHG-R4-019): the reason given with the count or after it, and the approvals.'
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: dataTable
         label: Count by denomination
@@ -12111,6 +12120,15 @@ screens:
         notes: 'Supervisor close of a pending shift (pre-apply round: closeShift on POS-007 and the daily
           reconciliation).'
         provenance: contract shift.yaml POST /shifts/{shiftId}/close
+      - kind: secondaryButton
+        label: Give the variance reason
+        operation: giveShiftVarianceReason
+        permission: SHIFT_CLOSE_OTHER
+        notes: 'For a shift waiting for a reason (`varianceReasonRequired`): a difference within the threshold
+          with no reason from the cashier. The supervisor records the reason and the shift closes (the
+          client''s policy of 6 October 2026, T10.1; CHG-R4-019). Beyond the threshold the shift needs Accept
+          variance (OVERSHORT_ACCEPT: the Supervisor and Venue Manager presets).'
+        provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
   states:
     loading: The variance approval list.
     error: Could not load. Names which read failed and leaves the variance approval untouched.
@@ -12123,7 +12141,11 @@ screens:
       say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question. A caller who can see the screen but lacks what an action
       needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`,
-      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift`.'
+      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift`; `SHIFT_CLOSE_OTHER` for `giveShiftVarianceReason`.'
+    reasonRequired: '**Waiting for a reason.** The selected shift''s count differed within the threshold and
+      no reason came with it (`Shift.varianceReasonRequired`); it stays `pendingClosure` until the cashier gives
+      one at the till or a supervisor gives it here (`giveShiftVarianceReason`). The client''s policy of 6
+      October 2026, T10.1 (CHG-R4-019).'
   apis:
   - operationId: listShifts
     contract: shift
@@ -12162,6 +12184,11 @@ screens:
     purpose: Blind close-out
     trigger: onAction
     provenance: design-note correction, 2 October 2026 (BO-040)
+  - operationId: giveShiftVarianceReason
+    contract: shift
+    purpose: Record the reason for a difference within the threshold and close the shift (the client's
+      policy of 6 October 2026, T10.1; CHG-R4-019)
+    trigger: onAction
   entryState:
     params:
     - name: shiftId
@@ -12267,6 +12294,22 @@ screens:
       discards:
       - reason
     provenance: contract shift.yaml POST /shifts/{shiftId}/reject-variance
+  - id: formGiveShiftVarianceReason
+    component: modal
+    trigger: Give the variance reason
+    body: '**Collects what `giveShiftVarianceReason` sends before it is called.** Required: `reason` (till
+      error, unrecorded refund, miscount, other); `note`, required with other. Dismissing sends nothing; the
+      shift keeps waiting for a reason (CHG-R4-019).'
+    confirm:
+      label: Close shift
+      operation: giveShiftVarianceReason
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+      - note
+    bindsTo: ShiftVarianceReasonRequest
+    provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
   - id: formCloseShift
     component: modal
     trigger: Close shift

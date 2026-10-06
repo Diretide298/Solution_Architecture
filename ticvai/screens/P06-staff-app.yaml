@@ -1333,6 +1333,14 @@ screens:
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
         permission: OVERSHORT_ACCEPT
+      - kind: primaryButton
+        label: Give the reason and close
+        operation: giveShiftVarianceReason
+        permission: SHIFT_CLOSE
+        notes: 'Shown when the count''s receipt says `varianceReasonRequired`: the count differed within the
+          threshold and came with no reason. Opens the reason form; never the amount or the direction (the
+          client''s policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003).'
+        provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
       - kind: destructiveButton
         label: Suspend shift
         operation: suspendShift
@@ -1363,6 +1371,24 @@ screens:
       the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects
       what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
     provenance: contract shift.yaml POST /shifts/{shiftId}/suspend
+  - id: formGiveShiftVarianceReason
+    component: modal
+    trigger: Give the reason and close
+    body: '**Collects what `giveShiftVarianceReason` sends.** Required: `reason` (till error, unrecorded
+      refund, miscount, other); `note`, required with other. Says "Your count found a difference. Give a
+      reason to close your shift" and never the amount or whether it is over or short: the count is already
+      locked (the client''s policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). Dismissing sends
+      nothing; the shift stays waiting for the reason.'
+    confirm:
+      label: Close shift
+      operation: giveShiftVarianceReason
+    dismiss:
+      label: Not yet
+      discards:
+      - reason
+      - note
+    bindsTo: ShiftVarianceReasonRequest
+    provenance: contract shift.yaml POST /shifts/{shiftId}/variance-reason
   - id: formAcceptShiftVariance
     component: modal
     trigger: Accept shift variance
@@ -1391,6 +1417,11 @@ screens:
       `SHIFT_CLOSE` for `submitShiftCount`; `SHIFT_SUSPEND` for `suspendShift`.'
     offline: '**Cannot close.** Closing needs the server total, and a locally computed variance is not
       a variance'
+    reasonRequired: '**"Give a reason to close".** `submitShiftCount` answered `awaitingCloseApproval`
+      with `varianceReasonRequired`: the count differed within the venue''s threshold and no reason came
+      with it. The count is locked; the screen asks for a reason and `giveShiftVarianceReason` closes the
+      shift. No amount, no over or short (the client''s policy of 6 October 2026, T10.1; CHG-R4-019;
+      CHG-FIN-003).'
   apis:
   - operationId: submitShiftCount
     contract: shift
@@ -1402,6 +1433,11 @@ screens:
     trigger: onAction
     invalidates:
     - listCashMovements
+  - operationId: giveShiftVarianceReason
+    contract: shift
+    purpose: The cashier's reason for a difference within the threshold, given after the blind count is
+      locked; closes the shift (the client's policy of 6 October 2026, T10.1; CHG-R4-019)
+    trigger: onAction
   - operationId: getCurrentShift
     contract: shift
     purpose: The open or suspended shift on the session's workstation

@@ -24,6 +24,10 @@ that the package used to contradict; each fails on the state before the decision
   F-RECON-DAILY    (CHG-FIN-009) `ingestSettlementFile` still refuses a settlement period that is not one day.
   F-TAX-DOCS       (CHG-FIN-011) The tax invoice and the tax credit note keep the fields UAE law requires
                    (amounts in AED with the rate; the credit note's before, after and parties).
+  F-VARIANCE-REASON (CHG-R4-019, the client's policy of 6 October 2026, T10.1) A difference within the shift
+                   variance threshold closes only with a reason: an operation takes pendingClosure to closed
+                   with a required `reason`, the receipt and close result carry `varianceReasonRequired`, and
+                   every cashier screen that submits the blind count can give the reason.
 
     python3 tools/check-finance-rules.py
 """
@@ -60,6 +64,50 @@ def components(screen):
     for region in (screen.get("layout") or {}).get("regions") or []:
         for c in region.get("components") or []:
             yield c
+
+
+def variance_reason_rule() -> list[str]:
+    """F-VARIANCE-REASON (CHG-R4-019): the client's policy of 6 October 2026 (T10.1,
+    sources/client/2026-10-06-tracker-answers.md): a difference within the threshold closes only with a reason.
+    states/shift.yaml must have an operation (not a job) taking a shift from pendingClosure to closed whose body
+    requires `reason`; the cashier's receipt and the supervisor's close result must say when a reason is needed
+    (`varianceReasonRequired`); and every cashier screen (P04, P06) that submits the blind count must also call
+    that operation, or the till has no way to give the reason."""
+    errs: list[str] = []
+    sdoc = load("contracts/spine/shift.yaml")
+    schemas = sdoc["components"]["schemas"]
+    ops = {op.get("operationId"): op for item in sdoc["paths"].values() for op in item.values()
+           if isinstance(op, dict) and op.get("operationId")}
+
+    def body_required(op):
+        sch = (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+        ref = sch.get("$ref", "")
+        if ref.startswith("#/components/schemas/"):
+            sch = schemas.get(ref.rsplit("/", 1)[1], {})
+        return set(sch.get("required") or [])
+
+    states = load("states/shift.yaml")
+    reason_ops = [t["operation"] for t in states.get("transitions") or []
+                  if t.get("from") == "pendingClosure" and t.get("to") == "closed" and t.get("trigger") == "operation"
+                  and t.get("operation") in ops and "reason" in body_required(ops[t["operation"]])]
+    if not reason_ops:
+        errs.append("F-VARIANCE-REASON states/shift.yaml has no operation taking a shift from pendingClosure to "
+                    "closed with a required reason: a difference within the threshold closes with no reason "
+                    "(the client's T10.1; CHG-R4-019)")
+    for name in ("ShiftCountReceipt", "ShiftCloseResult"):
+        if "varianceReasonRequired" not in (schemas.get(name, {}).get("properties") or {}):
+            errs.append(f"F-VARIANCE-REASON {name}.varianceReasonRequired is missing: the caller cannot tell the "
+                        "shift waits for a reason (CHG-R4-019)")
+    for f in sorted(glob.glob(str(ROOT / "screens" / "P*.yaml"))):
+        doc = yaml.safe_load(open(f, encoding="utf-8"))
+        if doc["platform"]["code"] not in CASHIER_PLATFORMS:
+            continue
+        for s in doc["screens"]:
+            apis = {a.get("operationId") for a in s.get("apis") or []}
+            if "submitShiftCount" in apis and reason_ops and not apis & set(reason_ops):
+                errs.append(f"F-VARIANCE-REASON {s['id']}: submits the blind count but never calls "
+                            f"{' or '.join(reason_ops)}, so the cashier cannot give the reason (CHG-R4-019)")
+    return errs
 
 
 def main() -> int:
@@ -154,6 +202,8 @@ def main() -> int:
         for fld in fields:
             if fld not in fin[name]["properties"]:
                 errors.append(f"F-TAX-DOCS {name}.{fld} is missing (Executive Regulation Art. 59-60; CHG-FIN-011)")
+
+    errors += variance_reason_rule()
 
     for e in errors:
         print("  FAIL", e)

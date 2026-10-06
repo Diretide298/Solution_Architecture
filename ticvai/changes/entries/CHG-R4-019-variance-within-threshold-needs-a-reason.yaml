@@ -1,0 +1,101 @@
+id: CHG-R4-019
+date: '2026-10-06'
+source: client-review
+kind: contract
+summary: A shift whose blind count differs within the variance threshold closes only with a reason, given after the
+  count is locked (new operation giveShiftVarianceReason); above the threshold supervisor or manager acceptance is
+  unchanged, and the close stays blind.
+decision:
+  what: 'Additive, contracts/spine/shift.yaml. New operation giveShiftVarianceReason (POST
+    /shifts/{shiftId}/variance-reason; SHIFT_CLOSE, escalated SHIFT_CLOSE_OTHER for somebody else''s shift; venue
+    scope; online only; body ShiftVarianceReasonRequest {reason: tillError | unrecordedRefund | miscount | other,
+    required; note, required with other (422 reason-note-required)}; returns ShiftCountReceipt; 409
+    variance-reason-not-required; 403 not-shift-operator). submitShiftCount and closeShift: a non-zero variance
+    within shiftVarianceThreshold with no cashierReason in the body no longer closes the shift; it is held in
+    pendingClosure (outcome awaitingCloseApproval, an existing value) with the new response fields
+    ShiftCountReceipt.varianceReasonRequired and ShiftCloseResult.varianceReasonRequired true, and
+    giveShiftVarianceReason records the reason in the existing cashierReason / cashierNote columns, writes the audit
+    record and closes the shift (or leaves it for approveShiftClose where the venue supervises every close).
+    approveShiftClose also releases such a shift, its required reason recorded as the variance reason, so a client
+    built at r1 still has a way to close it. Shift.varianceReasonRequired is a new computed response field
+    (x-ticvai-persisted false; no column, no migration). A reason given with the count, or an exact count, closes
+    as before. Blind close (CHG-FIN-003) is kept: the reason is asked only after the count is locked, and nothing
+    the cashier sees carries the amount or the direction. Above the threshold nothing changes: pendingVariance and
+    acceptShiftVariance (OVERSHORT_ACCEPT, held by both the Supervisor and the Venue Manager presets,
+    docs/active/seed-data-proposal.md 2.2-2.3: the client''s "supervisor/manager approval"); no second threshold
+    tier (asked of the client on 7 October). states/shift.yaml gains the pendingClosure -> closed transition on
+    giveShiftVarianceReason (emits shift.closed); events/shift-closed.yaml lists it as an emitter;
+    tenancy.yaml shiftVarianceThreshold''s description and docs/active/configured-limits-proposal.md row 11 state
+    the policy. Screens: POS-007 (P04) gains the reasonRequired machine state, a "Give the reason and close"
+    action, its form and the API; EMP-009 (P06) the action, form, state and API; BO-040 (P08) shows
+    varianceReasonRequired, cashierReason and cashierNote, and a supervisor''s "Give the variance reason" action
+    (SHIFT_CLOSE_OTHER). The prevention: check-finance-rules gains F-VARIANCE-REASON.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The client''s tracker answer T10.1 of 6 October 2026 (sources/client/2026-10-06-tracker-answers.md, filed by
+  CHG-R4-017): "The system should support configurable cash variance tolerance. Variances within the permitted
+  threshold may be closed with mandatory reason capture. Variances exceeding the threshold should require
+  supervisor/manager approval. All variances and approvals must be fully audited and reported." The package had the
+  threshold (tenancy.yaml VenueSettings.shiftVarianceThreshold, audit R094) and the acceptance above it
+  (acceptShiftVariance, required reason and PIN, audit R080 (e)) and reported it (reporting.yaml shiftSummary), but
+  within the threshold the shift closed on the count alone (states/shift.yaml, pendingClosure -> closed by job) and
+  CloseShiftRequest.cashierReason was optional (DI-803). Making that field required would break clients built at
+  r1, so the reason is a new state of the receipt and a new operation.'
+keys_touched:
+  screens:
+  - POS-007
+  - EMP-009
+  - BO-040
+  operations:
+  - giveShiftVarianceReason
+  - submitShiftCount
+  - closeShift
+  - approveShiftClose
+  schemas:
+  - ShiftVarianceReasonRequest
+  - ShiftCountReceipt
+  - ShiftCloseResult
+  - Shift
+  - CloseShiftRequest
+  - VenueSettings
+  files:
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - states/shift.yaml
+  - events/shift-closed.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P06-staff-app.yaml
+  - screens/P08-venue-back-office.yaml
+  - docs/active/configured-limits-proposal.md
+  - tools/check-finance-rules.py
+root_class: 'new: client-target-not-adopted'
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-SHIFT-1
+  - SVC-ORDER-SHIFT-5
+  - SVC-ORDER-SHIFT-7
+  - APP-POS-POS-007
+  - APP-STAFF-EMP-009
+  - VM-BO-040
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+notes: 'Batch R4, 6 October 2026. F-VARIANCE-REASON (check-finance-rules, already in run-checks.py) fails on the
+  commit before this change with three findings (no pendingClosure -> closed operation with a required reason;
+  ShiftCountReceipt and ShiftCloseResult lack varianceReasonRequired) and passes after it. check-contract-compat
+  against r1: PASS, 0 unapproved breaking changes (a new operation, a new request schema, new response fields and
+  description changes only; no response enum gained a value: the hold reuses pendingClosure and
+  awaitingCloseApproval). check-states, check-screens, check-step-up, check-screen-wiring, check-navigation and
+  check-contract-shapes pass; check-contract-storage and check-audience-match fail only on findings that predate
+  this branch (CHG-R4-011/014 fields awaiting their derived migration; getGameCard and the approvals audience). The
+  derive gives giveShiftVarianceReason its own backend ticket at the next release. SVC-ORDER-SHIFT-1 (closeShift)
+  starts at day 9.91, -5 (submitShiftCount) at 29.03, -7 (approveShiftClose) at 9.86, APP-POS-POS-007 at 8.65,
+  APP-STAFF-EMP-009 at 55.19, VM-BO-040 at 57.60 (handoff/service-docs/block-a-schedule.json; no status snapshot
+  in git): none started. Wireframes that change: POS-007, EMP-009, BO-040. The client is asked on 7 October whether
+  a second, manager-only tier is wanted; nothing here presumes it.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the client's tracker answers of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open
