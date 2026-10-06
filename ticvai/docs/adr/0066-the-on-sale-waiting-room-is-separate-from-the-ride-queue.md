@@ -1,6 +1,6 @@
 # ADR-0066: The on-sale waiting room sits at the edge, apart from the ride queue
 
-**Status:** Accepted · 1 October 2026 · Chinmay Parab — a vendor stays the fallback, and only a vendor would need the client
+**Status:** Accepted · 1 October 2026 · Chinmay Parab — a vendor stays the fallback, and only a vendor would need the client · **amended 6 October 2026**: sized and load-tested at 50,000+ arrivals, the sale behind it accepted at 3,000 concurrent ([below](#amendment-6-october-2026-sized-for-50000-arrivals-the-sale-behind-it-accepted-at-3000-concurrent-chinmay-chg-r4-017))
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab (the client only if a vendor is bought)
 **Finding:** SD-039 (high)
 **Amends:** ADR-0012 (queue integration, amended by this ADR) — Q2 gets its own endpoints and screens, not Q1's
@@ -118,8 +118,29 @@ fallback for a very large sale before B is proven.
 **B1 (or Block A, if an on-sale is booked in Block A)**
 
 3. [ ] **EDGE-WAITING-ROOM**: Redis positions, cached page, release controller, token issue and check. (8 pts)
-4. [ ] Load test at 30,000 arrivals in the burst environment before the first large sale.
+4. [ ] Load test at 50,000 simultaneous arrivals (was 30,000; amended 6 October, below) in the burst environment before the first large sale.
 
 ## Amendment, 1 October 2026: admission token scope (Chinmay)
 
 The admission token is required on **online cart holds only** (`addCartLine`, `acquireInventoryHold` from a guest channel). Holds taken at a till, a kiosk or a venue workstation are exempt: those channels have a known device, a shift and a lease, and the queue in front of them is physical.
+
+## Amendment, 6 October 2026: sized for 50,000+ arrivals, the sale behind it accepted at 3,000 concurrent (Chinmay, CHG-R4-017)
+
+**The client set the numbers** (tracker answer T9, 6 October 2026, `sources/client/2026-10-06-tracker-answers.md`):
+*"High-demand onsales may generate 50,000+ simultaneous incoming visitors; therefore, an independently scalable
+edge-level Virtual Waiting Room/Queue Management layer should absorb excess demand and progressively admit customers
+into B2C."* For the sale itself, 1,000-2,000 active concurrent B2C users is the expected peak and **3,000 the initial
+performance acceptance benchmark**, which *"must not be treated as a hard architectural limit"*.
+
+**What changes.** The 30,000 above (Context; action item 4) was the Bahrain figure of 31 July. The waiting room is now
+sized for **50,000+ simultaneous arrivals**, and that is a floor, not a ceiling:
+
+- **Arrivals scale apart from the sale.** The waiting page is Front Door's cache and a position is a Redis increment,
+  so arrivals never reach `commerce`; the release controller admits from the health of `commerce` (unchanged), which is
+  the progressive admission the client asked for. The decision is unchanged; only the figure it is sized and tested at.
+- **The admission rate is set against the 3,000-concurrent benchmark, not capped by it:** the controller admits while
+  `commerce` holds its latency and 429 targets (ADR-0064), and admits more when `commerce` scales out.
+- **Action item 4 becomes:** load test at **50,000 simultaneous arrivals** in the burst environment before the first
+  large sale, with the sale behind the room held at 3,000 concurrent B2C users and then stepped above it, to show the
+  benchmark is not a limit. The scenarios are in `docs/active/block-test-strategy.md` ("Load scenarios").
+- **Revisit** (Consequences) is unchanged: on-sales above 5,000 rps, or more than one a week, consider the vendor.

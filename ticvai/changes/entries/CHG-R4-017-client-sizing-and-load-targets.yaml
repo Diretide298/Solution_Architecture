@@ -1,0 +1,75 @@
+id: CHG-R4-017
+date: '2026-10-06'
+source: client-review
+kind: spec
+summary: The client's sizing benchmarks (tracker answer T9) become the package's load-acceptance targets. The waiting
+  room is sized and load-tested at 50,000+ arrivals (ADR-0066 and ADR-0035 amended), 3,000 concurrent B2C users is the
+  acceptance benchmark and not a limit, and the block test strategy gains small-site and major-event load scenarios.
+decision:
+  what: 'sources/client/2026-10-06-tracker-answers.md files the client''s "Viva Notes" answers to tracker rows T1-T10
+    verbatim (registered in sources/README.md); this entry and CHG-R4-018..020 cite it. From T9: ADR-0066 gains a dated
+    amendment (sized for 50,000+ simultaneous arrivals, a floor not a ceiling; the release controller admits against
+    the 3,000-concurrent benchmark without being capped by it; action item 4 becomes a 50,000-arrival load test with
+    the sale held at 3,000 concurrent and then stepped above it); ADR-0035 gains a dated amendment (the 30,000 in its
+    Context was the Bahrain failure, not a target; a burst environment is sized for the admitted sale and keeps scaling
+    past 3,000); docs/adr/README.md rows for 0035 and 0066 say so. docs/active/block-test-strategy.md: the Load row
+    names the scenarios, and a new section "Load scenarios" holds five runs (small site with 1-2 POS and access
+    points beside a bursting neighbour; major-event venue day at 30,000-50,000 attendees and 1,000-2,000 concurrent
+    B2C; 3,000 concurrent B2C; above the benchmark; 50,000 on-sale arrivals) with pass criteria. docs/active/
+    development-plan.md: section 10 gains a "Sizing and load acceptance" row and the Block A go-live load test names
+    the 3,000-concurrent and 50,000-arrival runs. docs/active/deployment-and-scaling-brief.md: Part 2 gains the 6
+    October targets table. docs/active/deployment-configs-costed.md: the Small tier is named as the client''s 1-2 POS /
+    access point site, and the RPS tiers stay the capacity model (finding a: already covered at :59-63; ADR-0042 and
+    ADR-0016 unchanged). tools/build-hld-lld.py: the HLD''s waiting-room paragraph states the 50,000+ sizing and the
+    3,000 benchmark. Data residency (UAE first, regional later) was already decided (ADR-0042): nothing changes.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'The client''s tracker answer T9 of 6 October 2026 (sources/client/2026-10-06-tracker-answers.md): "use
+  1,000–2,000 active concurrent B2C users as the expected peak and 3,000 as the initial performance acceptance
+  benchmark ... High-demand onsales may generate 50,000+ simultaneous incoming visitors ... The 3,000-user benchmark
+  must not be treated as a hard architectural limit ... Load testing should cover both small-site and major-event
+  scenarios." The package sized in RPS (deployment-configs-costed.md Part 2) with no concurrent-user acceptance
+  target, and ADR-0066 was sized and tested at 30,000 arrivals (its Context and action item 4, from the Bahrain
+  figure of 31 July, ADR-0035).'
+keys_touched:
+  files:
+  - sources/client/2026-10-06-tracker-answers.md
+  - sources/README.md
+  - docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md
+  - docs/adr/0035-burst-environments.md
+  - docs/adr/README.md
+  - docs/active/block-test-strategy.md
+  - docs/active/development-plan.md
+  - docs/active/deployment-and-scaling-brief.md
+  - docs/active/deployment-configs-costed.md
+  - tools/build-hld-lld.py
+  - tools/check-load-targets.py
+  - tools/run-checks.py
+  other:
+  - ADR-0066
+  - ADR-0035
+root_class: 'new: client-target-not-adopted'
+tickets:
+  started: []
+  unstarted:
+  - EDGE-WAITING-ROOM
+  - EDGE-WAITING-ROOM-LOAD
+  - TEST-BLOCK-A-BE
+  - TEST-BLOCK-A-FE
+prevention:
+  type: check
+  ref: tools/check-load-targets.py
+notes: 'Batch R4, 6 October 2026. check-load-targets (registered in run-checks.py) fails on the commit before this
+  change with nine findings (eight L-TARGET-MISSING and L-TARGET-BELOW on ADR-0066:121, "Load test at 30,000
+  arrivals") and passes after it. **Not changed, by rule:** the ticket EDGE-WAITING-ROOM-LOAD (docs/active/
+  block-a-extra-tasks.json, a plan input) still says "30,000 arrivals"; changing its text is a change of kind plan,
+  which needs its 24-hour cooling-off (ticvai/CLAUDE.md rule 9), so it is proposed to the lead for the next release
+  rather than made here. The ticket is unstarted (block-a-schedule.json day 28.67, block B1) and its pointer body
+  reaches ADR-0066, whose amendment now says 50,000. EDGE-WAITING-ROOM starts at day 18.51 and the Block A tests at
+  37.83: none started ("started" read from handoff/service-docs/block-a-schedule.json; no status snapshot is in git).
+  No contract changes. The derived HLD (handoff/hld-lld/TICVAI-HLD.md) picks the sentence up at the refresh.'
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r2; the request is the client's tracker answers of 6 October 2026)
+triage: fix-forward
+release_tag: r2
+status: open

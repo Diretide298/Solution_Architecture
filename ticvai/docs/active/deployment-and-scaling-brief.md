@@ -46,6 +46,25 @@ contract, **the contract is right and the diagram has not been regenerated.**
 
 **Six workshops touched this. The quotations are from the minutes, not paraphrase.**
 
+## 6 October — the sizing benchmarks (the client's tracker answer T9)
+
+**The firm numbers Part 5 asked for have arrived** (`sources/client/2026-10-06-tracker-answers.md`, T9; CHG-R4-017).
+They are the package's performance acceptance targets; the RPS sizing in `deployment-configs-costed.md` stays the
+capacity model behind them.
+
+| Target | The client's figure | Where it is held |
+|---|---|---|
+| Venue range | From small sites with only 1-2 POS / access points and low B2C traffic to 30,000-50,000+ attendee events, starting at the tenant's size and scaling with traffic *"without fundamental application redesign"* | `deployment-configs-costed.md` (the Small tier is the 1-2 POS site); ADR-0042, ADR-0016 |
+| Major-event B2C concurrency | **1,000-2,000 active concurrent users, the expected peak** | Load scenario "Major event, venue day" |
+| Acceptance benchmark | **3,000 concurrent B2C users, the initial performance acceptance benchmark**; *"must not be treated as a hard architectural limit"* | Load scenarios "3,000 concurrent" and "Above the benchmark" |
+| On-sale arrivals | **50,000+ simultaneous visitors**, absorbed by an independently scalable edge waiting room that admits progressively | ADR-0066 (amended 6 October); load scenario "On-sale, 50,000 arrivals" |
+| Protection | CDN, WAF, DDoS and bot protection; multi-tenant workload isolation; concurrency-safe seat and ticket inventory | `handoff/hld-lld/` (edge tier); ADR-0064; ADR-0031 |
+| Load testing | *"both small-site and major-event scenarios"* | `block-test-strategy.md`, "Load scenarios"; development plan §11 |
+| Residency | UAE first; tenant-specific regional deployments later where required | ADR-0042 |
+
+The 2,000-3,000 below (31 July) was Softlabs' stated baseline; the client's 3,000 is now an acceptance figure, not a
+ceiling, and the 30,000 is superseded by 50,000+ arrivals at the waiting room.
+
 ## 31 July — the founding constraint
 
 **Read this minute first.** Qossai described a ticketing platform his team installed for a theatre

@@ -184,6 +184,7 @@ documents, a device, a contact). Filed verbatim, dated, one file per message.
 | Date | File | Supplies |
 |---|---|---|
 | 05 Oct 2026 | `client/2026-10-05-allam-boca-printer.md` | Muhamed Allam: the BOCA printer documents (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the BOCA Lemur, Windows driver), with the five addresses Chinmay forwarded on 6 Oct 2026; the printer ships to India when ready (CHG-R4-002) |
+| 06 Oct 2026 | `client/2026-10-06-tracker-answers.md` | Allam / Qossai: the "Viva Notes" answers to tracker rows T1-T10, verbatim: sizing (small sites to 30-50k-attendee events; 1,000-2,000 concurrent B2C users expected peak, 3,000 the initial acceptance benchmark; 50,000+ arrivals absorbed by an edge waiting room; DDoS protection; small-site and major-event load tests; UAE residency), the weekly stand-up (Tuesdays 10:00), and three policies (shift-close cash variance, dynamic QR for B2B tickets, F&B quick service vs dine-in) (CHG-R4-017 onward) |
 
 ---
 
