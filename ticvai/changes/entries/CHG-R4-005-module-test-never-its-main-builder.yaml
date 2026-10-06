@@ -1,7 +1,8 @@
 id: CHG-R4-005
 date: '2026-10-06'
 source: cr
-kind: spec
+kind: plan
+proposed: '2026-10-06'
 summary: A module test is never owned by its app-module's main builder; TEST-AM-AI-ENGINE-A2 and
   TEST-AM-APPROVALS-P08-BLOCK-A move to a peer, and every other pushed owner stays.
 decision:
@@ -25,6 +26,7 @@ keys_touched:
   - TEST-AM-AI-ENGINE-A2
   files:
   - docs/active/block-a-extra-tasks.json
+  - docs/active/team.json
   - tools/build-service-docs.py
   - tools/derive-block-a-schedule.py
   - tools/ticket_done.py
@@ -58,3 +60,8 @@ adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the 
 triage: fix-forward
 release_tag: r2
 status: open
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-05'
+    quote: we add it as release now to make sure that it goes out
