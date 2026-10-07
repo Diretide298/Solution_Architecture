@@ -93,12 +93,16 @@ public sealed class RefundAuthoriser(
 
 - Every query runs with `ticvai.scope_paths` set from `ITenantContext.ScopePaths`. RLS is
   defence in depth, not the only line.
-- **The schema is the package's derived DDL, not EF Core migrations.** `backend/tenant/*.sql`
-  and `backend/control/*.sql` (000 schemas, 002 the migration register, 010 per module, 900
-  foreign keys, 910 indexes, 920 row-level security) are applied in file order by
-  `SqlMigrationRunner`, which records each file and its checksum in `platform.schema_version`.
-  A [DB] ticket is done when its file applies to an empty database and a second run applies
-  nothing. Never edit an applied file: add a new one.
+- **The schema is plain SQL migrations we write, not EF Core migrations.** Each [DB] ticket names
+  its file (`V0001__baseline.sql`, `V0022__catalogue.sql`, ...); you write it in our `db/tenant`
+  or `db/control` folder. The package's numbered files (`backend/tenant` and `backend/control`:
+  000 schemas, 002 the migration register, 010 per module, 900 foreign keys, 910 indexes, 920
+  row-level security, 930 partitioning, and the `V01nn__after_r1_*` files) are the **reference you
+  copy from, never run as they are**. Copying functions or tables out of them, such as the
+  helpers at the top of 920 and 930, is expected; their "Do not hand-edit" is about the package's
+  own files. `SqlMigrationRunner` applies our files in order and records each with its checksum in
+  `platform.schema_version`. A [DB] ticket is done when its file applies to an empty database and
+  a second run applies nothing. Never edit an applied file: add a new one.
 - A retried mutating request with the same `Idempotency-Key` gets the first answer, from
   `IIdempotencyStore` (in memory in development; Redis in production).
 - Parameterised always. String-concatenated SQL is a build-blocking review finding.

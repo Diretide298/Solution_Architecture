@@ -723,6 +723,10 @@ foreach ($file in ($Files + $Tools)) {
     if ($from -ine $to) { Copy-Item -LiteralPath $from -Destination $to -Force }
 }
 $server = Join-Path $InstallDir 'server.mjs'
+# Where ADAM is, for /update-adam. The registration below hands the address to
+# the connector's own process only, so a shell running update.mjs did not have
+# it and tried localhost (7 Oct 2026). The URL alone: no name, no password.
+Set-Content -LiteralPath (Join-Path $InstallDir 'viewer-url.txt') -Value $ViewerUrl -Encoding ascii
 Good "copied to $InstallDir"
 
 # /update-adam, for every folder rather than only this one.
