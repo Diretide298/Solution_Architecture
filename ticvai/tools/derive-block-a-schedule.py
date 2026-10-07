@@ -77,6 +77,14 @@ def main():
                 and (moved.get(r["key"]) == pins[r["key"]]
                      or pins[r["key"]] == td_.main_builder(kids_[r["parent"]], sp.PLAN_PACE, ai_lead, days_of)):
             pins.pop(r["key"])
+    # **Every migration is the migration owner's** (team.json `migrations`, CHG-R5-001): the plan gave it to them, and
+    # the pin of the last release does not take it back.
+    mig_owner, mig_rx = sp.migration_owner(team)
+    if mig_owner:
+        for r in rows:
+            if sp.is_migration_of(mig_rx, r["key"]):
+                pins.pop(r["key"], None)
+                r["assignee"] = mig_owner
     phase2_ams = {m_["key"] for m_ in (json.loads((ROOT / "docs" / "active" / "ai-phase-plan.json").read_text(
         encoding="utf-8")).get("modules") or []) if m_.get("phase") == 2} \
         if (ROOT / "docs" / "active" / "ai-phase-plan.json").exists() else set()

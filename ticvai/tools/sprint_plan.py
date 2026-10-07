@@ -373,6 +373,21 @@ def pinned_owners(team, rebalance=False, bundle_path=None):
     return pins, f"{len(pins)} pushed tickets keep the owner release {rel} gave them"
 
 
+def migration_owner(team):
+    """(owner, compiled key pattern) of team.json `migrations` (CHG-R5-001, 7 October): every task whose key matches
+    is that person's, with its table sub-tasks, whoever the plan or a pin would give it -- a rule on the key, so a
+    migration the plan makes later is theirs too. (None, None) when team.json has no such rule."""
+    m = team.get("migrations") or {}
+    if not m.get("owner"):
+        return None, None
+    return m["owner"], re.compile(m.get("keys") or r"^MIG-")
+
+
+def is_migration_of(rx, key):
+    """True for a task key the migration rule covers; a sub-task (KEY#schema.table) by its task's key."""
+    return bool(rx and rx.search(str(key or "").partition("#")[0]))
+
+
 # ---------------------------------------------------------------------------------------------- testing
 # **The test strategy** (decided 1 October, docs/active/block-test-strategy.md): one module test per app-module
 # (about 10% of its points, at least 2, by a peer in its stack who is not its main builder, right after its last

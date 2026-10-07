@@ -1207,6 +1207,13 @@ def main() -> int:
     PACE = team.get("pace") or {}
     HELPER_SHARE = team.get("helperShare") or {}
     areas = team.get("areas") or {}
+    # **Every migration is one person's** (team.json `migrations`, CHG-R5-001, 7 October): a task whose key matches the
+    # rule is given to its owner after the pins of the last release, so a pushed migration moves to them too, and the
+    # final schedule times it on them; its table sub-tasks follow it (op-release.py). Not earlier: the passes that
+    # split Block A into A1 and A2 and fill Blocks B-D keep the owners they had, so moving the migrations moves no
+    # app-module into another block (measured 7 October: giving them to one person before those passes took seven
+    # apps' completion work out of A1, which the pushed tickets would have followed).
+    MIG_OWNER, MIG_RX = sp.migration_owner(team)
     tasks = []
 
     # **Frontend or backend is on every task, and in its OpenProject subject**, so a board, a filter or a
@@ -1500,7 +1507,8 @@ def main() -> int:
              + "Applied forward by SqlMigrationRunner; test that it applies to a database with its Follows applied and that a second run applies nothing.", 1, service=svc, pts=pts, area="backend", assignee=who,
              depends=["MIG-BASELINE"] + back)
         migrations.append([i - 1, mig_key[g], fname, g[0], g[1], len(ts), n_cols,
-                           ", ".join(r.replace("MIG-", "").lower() for r in refs), who, pts, svc])
+                           ", ".join(r.replace("MIG-", "").lower() for r in refs),
+                           MIG_OWNER if MIG_OWNER and sp.is_migration_of(MIG_RX, mig_key[g]) else who, pts, svc])
     if deferred:
         n_def = sum(deferred.values())
         # **The ticket names its keys and links their tables** (4 October, the Sprint 1-2 judging; CHG-FXP-005): it said
@@ -3455,6 +3463,17 @@ def main() -> int:
         if t_["type"] == "Task" and t_["key"] in pins and t_["key"] in kmap:
             t_["assignee"] = pins[t_["key"]]
     print(f"owners: {pin_note}")
+    # **The migration rule wins over the pin** (CHG-R5-001): a pushed migration goes to the migration owner, so the
+    # release bundle reassigns it and its table sub-tasks (op-release.rb moves New tickets; the lead moved the started
+    # ones in OpenProject on 7 October).
+    if MIG_OWNER:
+        mig_moved = [t_["key"] for t_ in tasks if t_["type"] == "Task" and sp.is_migration_of(MIG_RX, t_["key"])
+                     and t_["assignee"] != MIG_OWNER]
+        for t_ in tasks:
+            if t_["type"] == "Task" and sp.is_migration_of(MIG_RX, t_["key"]):
+                t_["assignee"] = MIG_OWNER
+        print(f"migrations: every task matching {MIG_RX.pattern} is {MIG_OWNER}'s (CHG-R5-001); "
+              f"{len(mig_moved)} moved from the pin or the plan")
     leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
     # **Phase 2 of the AI engine has no owner** (CHG-AIPH-001, docs/active/ai-phase-plan.json; CHG-R4-006): its AI units,
     # its module tests and its app-modules stay unassigned until the AI developers join after 2 April.

@@ -1,0 +1,83 @@
+id: CHG-R5-001
+date: '2026-10-07'
+source: cr
+kind: plan
+proposed: '2026-10-07'
+summary: Every migration task (key MIG-*, every block and wave, ticketed or not, and every one the plan makes later)
+  and its table sub-tasks are Hrushikant Patkar's, overriding the owner a pushed ticket keeps from the last release;
+  the schedule re-paces around it.
+decision:
+  what: 'docs/active/team.json gains `migrations: {owner: Hrushikant Patkar, keys: ^MIG-}`, a rule on the key, not a
+    list of tickets, so a migration the plan makes later is his too (tools/sprint_plan.py migration_owner,
+    is_migration_of). tools/build-service-docs.py gives every matching task to him after the pins of the last
+    release, so a pushed migration moves to him and the final schedule times it on him (MIGRATIONS.md''s Assignee
+    column says so too), but not before the passes that split Block A into A1 and A2 and fill Blocks B-D: measured on
+    7 October, giving him the migrations before them took seven apps'' completion work out of A1 (496 hours of A1
+    overtime against 28), and pushed tickets would have changed block; tools/derive-block-a-schedule.py drops the
+    pin of a matching task, so the schedule times it on him and op-release.py gives the task and its sub-tasks
+    (KEY#schema.table, which take their task''s owner from the schedule) to him in the r3 bundle. At r2: 199 MIG
+    tasks, 135 of them pushed with 825 table sub-tasks (the 960 tickets the lead reassigned in OpenProject on 7
+    October, without notifications, so OpenProject and the plan agree); 171 tasks change owner (Deep Khanvilkar 48,
+    Tanmay Dukhande 31, Pranay Shinde 30, Pallavi Sawant 18, Chinmay Patkar 17, Sanket Keluskar 12, Surendra 7, the
+    two new full-stack developers 8). The Venue Management migrations VM-MIG-* (24 tasks, pushed) are not matched by
+    the pattern and keep their owners; adding them is one edit to `keys`. Two pushed module tests move to a peer
+    (docs/active/block-a-extra-tasks.json `moduleTestPeers`, as CHG-R4-005): the move made Hrushikant Patkar the main
+    builder of AM-SUBSCRIPTION-LICENSING-P09 (MIG-CONTROL-6, -7, -8: 17 points), whose test was his, so
+    TEST-AM-SUBSCRIPTION-LICENSING-P09 goes to Pallavi Sawant; and it broke the tie in AM-IDENTITY-SECURITY-P09-3
+    (MIG-CONTROL-2 left Sanket Keluskar) so Chinmay Patkar became its main builder and his test
+    TEST-AM-IDENTITY-SECURITY-P09-3 goes to Chitrangi Mestry. No other owner the pins hold changes; no task changes
+    block or ticketed state.'
+  by: Chinmay
+  date: '2026-10-07'
+why: 'Chinmay, 7 October 2026, to the lead''s agent: "shift all the migration tickets to Hrushikant", and "Can we do
+  that now instead of friday" (the 24-hour cooling-off waived for r3, below). The owners a pushed ticket keeps
+  (sprint_plan.pinned_owners, CHG-R4-003) would have put every pushed migration back on its r2 owner at the next
+  regeneration, and the plan''s balancing would have kept giving new forward migrations to whoever could start
+  first (Deep Khanvilkar had 48 of them); CHG-R4-005 made the same kind of exception for module tests
+  (moduleTestPeers).'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/check-plan-owners.py
+  tickets:
+  - MIG-*
+  - TEST-AM-SUBSCRIPTION-LICENSING-P09
+  - TEST-AM-IDENTITY-SECURITY-P09-3
+  other:
+  - CHG-R4-003
+  - CHG-R4-005
+root_class: 'new: owner-by-rule-not-by-pin'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r3
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r3; the request is Chinmay's of 7 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-07'
+    quote: Can we do that now instead of friday
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Batch R5, 7 October 2026. Proposed and decided the same day; Chinmay waived the 24-hour cooling-off ("Can we
+  do that now instead of friday"), so it ships in r3 rather than Friday''s release; the release cadence itself is not
+  waived. check-plan-owners gains O-MIG-OWNER: a task the rule matches owned by anyone else in the plan or the
+  schedule fails, and so does a team.json with no `migrations` owner; on the regenerated r2 plan it fails 342 times
+  (171 tasks, plan and schedule) and passes after this change. Started migration tickets were moved by the lead in
+  OpenProject; op-release.rb changes the assignee of New tickets only. The schedule, measured 7 October against the
+  r2 plan regenerated on a clean tree (the same derives, without this change): Hrushikant Patkar goes from 296 tasks
+  (1,393 points) to 412 (1,759); he is fully busy in Sprints 1-8 (Sprint 4 from 7.5 to 10 of 10 days, Sprint 8 from
+  0.5 to 10, Sprint 9 from 0 to 2.4) and his last day stays 8 February. Block A keeps its fixed end (Sprint 4,
+  Friday 27 November) but its last work moves from 25 November to 7 December, and the A1 work still running when its
+  block-test window opens rises from 18 to about 200 developer-hours (Hrushikant about 70): overtime against the 43
+  accepted. A2 keeps Sprint 5 (11 December) with its last work moving from 4 to 23 December (at normal hours it would
+  end 8 January). B, C and D keep their end sprints (25 December, 22 January, 19 February). 834 pushed tasks change
+  sprint by one to four (98 migrations, 736 others), which the r3 bundle carries for New tickets.'

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""A module test is never tested by its app-module's main builder, and phase 2 of the AI engine has no owner.
+"""A module test is never tested by its app-module's main builder, phase 2 of the AI engine has no owner, and every
+migration is the migration owner's.
 
 **6 October 2026, CHG-R4-005 and CHG-R4-006.** The test strategy (docs/active/block-test-strategy.md, 1 October) gives
 each app-module's module test to "a peer in its stack who is not its main builder"; the scheduler skipped the main
@@ -16,6 +17,9 @@ docs/active/ai-phase-plan.json):
                    most points; an AI task counts its days at the plan's pace)
   O-PHASE2-OWNED   an AI unit, a module test or the app-module of a phase 2 module of the AI engine has an owner, in the
                    plan or the schedule
+  O-MIG-OWNER      a migration task (team.json `migrations`: its key pattern, ^MIG- since CHG-R5-001 on 7 October) owned,
+                   in the plan or the schedule, by anyone but the migration owner, or team.json has no such rule. Its
+                   table sub-tasks take their task's owner (op-release.py), so the task is the one checked.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -34,6 +38,7 @@ import ticket_done as td  # noqa: E402
 RULES = {
     "O-SELF-TEST": "a module test owned by its app-module's main builder (block-test-strategy; CHG-R4-005)",
     "O-PHASE2-OWNED": "phase 2 of the AI engine has an owner, against ai-phase-plan.json (CHG-AIPH-001; CHG-R4-006)",
+    "O-MIG-OWNER": "a migration task not owned by the migration owner of team.json (CHG-R5-001)",
 }
 SD = Path("handoff") / "service-docs"
 
@@ -73,7 +78,23 @@ def main() -> int:
             for where, who in (("plan", r["assignee"]), ("schedule", assign.get(k))):
                 if who:
                     guard.add("O-PHASE2-OWNED", f"{k}:{where}", f"{k} (phase 2 of the AI engine) is {who}'s in the {where}")
-    guard.note(f"{n_tests} module tests, {len(phase2)} phase 2 app-modules of the AI engine")
+    # **Every migration is one person's** (CHG-R5-001, 7 October: "shift all the migration tickets to Hrushikant"):
+    # the owner a pushed ticket keeps from the last release does not hold against it.
+    mig_owner, mig_rx = sp.migration_owner(team)
+    n_mig = 0
+    if not mig_owner:
+        guard.add("O-MIG-OWNER", "team.json", "docs/active/team.json has no `migrations` owner (CHG-R5-001)")
+    else:
+        for r in rows:
+            if r["type"] != "Task" or not sp.is_migration_of(mig_rx, r["key"]):
+                continue
+            n_mig += 1
+            for where, who in (("plan", r["assignee"]), ("schedule", assign.get(r["key"]))):
+                if who != mig_owner:
+                    guard.add("O-MIG-OWNER", f"{r['key']}:{where}",
+                              f"{r['key']} is {who or 'nobody'}'s in the {where}, not {mig_owner}'s (CHG-R5-001)")
+    guard.note(f"{n_tests} module tests, {len(phase2)} phase 2 app-modules of the AI engine, "
+               f"{n_mig} migration tasks ({mig_owner or 'no owner'}'s)")
     return guard.finish()
 
 
