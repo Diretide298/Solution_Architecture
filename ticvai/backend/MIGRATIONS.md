@@ -61,6 +61,19 @@ same run, into `handoff/service-docs/backend/MIGRATIONS.md` (generated), so a ti
 disagree. Until 3 October this section listed twenty files numbered V0002 to V0021, a hand-written
 plan from before the DDL was derived: none of those files exists, and the tickets named other numbers
 for the same schemas (access was V0026 on its ticket and V0007 here; retail had two numbers).
+
+**Write each migration yourself, in our repository** (CHG-R5-002, 7 October). The package's numbered
+SQL files (`backend/tenant` and `backend/control`: 000-930 and the V01nn after-r1 files) are the
+reference you copy from, never run as they are. Copying functions or tables out of them, such as the
+helpers at the top of 920 and 930, is expected; "Do not hand-edit" is about the package's own files.
+V0001 (MIG-BASELINE) is a file of ours, not the package's: it creates the helper functions of
+`920-row-level-security.sql` (`platform.current_scope_paths`, `in_scope`, `rls_policy_name` and the
+`platform.apply_*` policy functions the schema migrations call) and of `930-partitioning.sql`
+(`platform.uuidv7_floor`, `ensure_month_partition`, `ensure_month_partitions`). Every [DB] migration
+ticket carries the same sentence, and a V01nn file that changes a table it does not create (a column,
+an index) is named on the ticket whose migration creates that table, as "Source DDL after r1", because
+the 010 files are frozen at r1 (`tools/check-migration-wording.py`).
+
 The numbering:
 
 | Range | What | Who numbers it |

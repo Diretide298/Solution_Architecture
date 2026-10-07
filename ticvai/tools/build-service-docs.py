@@ -1565,7 +1565,10 @@ def main() -> int:
          "migration takes its schema's tables from there, with the matching foreign keys, indexes and row-level "
          "security, and a ROLLBACK section tested in CI (`backend/MIGRATIONS.md`). Generated; do not edit.", "",
          "Each migration only references tables created by the ones above it. Keys that would point forward "
-         "are added by the last migration.", "", "## Order", ""]
+         "are added by the last migration.", "",
+         # CHG-R5-002 (7 October): the same words every [DB] migration ticket carries
+         f"**Where a migration is written.** {ticket_done.MIGRATION_WORDING} "
+         f"{ticket_done.baseline_wording(ROOT)}", "", "## Order", ""]
     M += table(MIG_COLS, [[m[0], f"`{m[2]}`", m[1], m[3], m[4], m[5], m[6], m[7], m[8], m[9]] for m in migrations])
     M += ["", "## Tables", ""]
     M += table(["Migration", "Table", "Columns", "Row-level security", "Partitioned", "Read by", "Written by",
@@ -3723,6 +3726,46 @@ def main() -> int:
     # the first full stop (S-SETUP-COUNT read none of them in the first refresh with this rule).
     # A decided sentence a screen's tasks carry comes just before it (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001:
     # BO-1065's AI residency section is drawn and built in Block A).
+    # **Every [DB] migration says it is written in our repository, copied from the package's SQL** (CHG-R5-002, 7
+    # October): MIG-BASELINE was stopped by an agent that read 920/930's "Do not hand-edit" as a ban on copying from
+    # them. MIG-BASELINE also names the helper functions it copies (ticket_done.baseline_wording, from the files).
+    # Two more from the lead's check of every migration ticket against r2 (7 October): a frozen after-r1 file (V01nn)
+    # that changes a table goes on the ticket whose migration creates that table (V0101's three catalogue columns were on
+    # no ticket), and MIG-FOREIGN-KEYS and MIG-PARTITIONS name their Source DDL like every other migration.
+    base_words_ = ticket_done.baseline_wording(ROOT)
+    made_by_ = {}
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
+            m_ = re.search(r"Tables: (.+?)\. Source", t_["description"] or "")
+            for x_ in (m_.group(1).split(", ") if m_ else []):
+                made_by_.setdefault(x_.strip(), t_["key"])
+    after_r1_ = defaultdict(lambda: defaultdict(dict))
+    for (rel_, tbl_), items_ in ticket_done.after_r1_changes(ROOT).items():
+        if tbl_ in made_by_:
+            after_r1_[made_by_[tbl_]][rel_][tbl_] = items_
+        else:
+            print(f"WARNING: {rel_} changes {tbl_}, which no migration ticket creates (CHG-R5-002)")
+    own_src_ = {"MIG-FOREIGN-KEYS": "Source DDL: backend/tenant/900-foreign-keys.sql and backend/control/900-foreign-keys.sql "
+                                    "(the constraints named here, nothing else from those files).",
+                "MIG-PARTITIONS": "Source DDL: backend/tenant/930-partitioning.sql (the monthly partitions and default "
+                                  "partitions of the time-partitioned tables; its helper functions platform.uuidv7_floor, "
+                                  "platform.ensure_month_partition and platform.ensure_month_partitions are already in "
+                                  "the baseline, MIG-BASELINE)."}
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
+            src_ = ([own_src_[t_["key"]]] if t_["key"] in own_src_ and "Source DDL:" not in (t_["description"] or "")
+                    else [])
+            ar1_ = [ticket_done.after_r1_sentence(rel_, ch_) for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
+            add_ = [w_ for w_ in (src_ + ar1_ + [ticket_done.MIGRATION_WORDING]
+                                  + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
+                    if w_ not in (t_["description"] or "")]
+            if add_:
+                # before its own "Done when", which op-release.py reads to the end of the text
+                d_ = (t_["description"] or "").rstrip()
+                m_ = ticket_done.DONE_WHEN.search(d_)
+                head_, tail_ = (d_[:m_.start()].rstrip(), " " + d_[m_.start():]) if m_ else (d_, "")
+                t_["description"] = (head_ + ("" if not head_ or head_[-1] in ".!?" else ".") + " "
+                                     + " ".join(add_) + tail_).strip()
     for t_ in tasks:
         m_ = ticket_done.SCREEN.search(t_["key"]) if t_["type"] == "Task" and t_["track"] == "Frontend" else None
         note_ = decided["screenNotes"].get(m_.group(1)) if m_ else None

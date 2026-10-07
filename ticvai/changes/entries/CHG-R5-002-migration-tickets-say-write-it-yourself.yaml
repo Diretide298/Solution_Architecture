@@ -1,0 +1,86 @@
+id: CHG-R5-002
+date: '2026-10-07'
+source: developer
+kind: spec
+summary: Every [DB] migration ticket says the migration is written in our repository, copied from the package's
+  numbered SQL files and never run as they are, and that "Do not hand-edit" is about the package's own files;
+  MIG-BASELINE names the helper functions it copies from 920 and 930; a frozen after-r1 file that changes a table is
+  cited by the ticket that creates the table, and MIG-FOREIGN-KEYS and MIG-PARTITIONS name their Source DDL.
+decision:
+  what: 'tools/ticket_done.py gains MIGRATION_WORDING, written by tools/build-service-docs.py into the description of
+    every [DB] migration task (MIG-* and VM-MIG-*, 223 at r2), before its own Done when: "Write this migration
+    yourself, in our repository: the package''s numbered SQL files (backend/tenant and backend/control: 000-930 and
+    the V01nn after-r1 files) are the reference you copy from, never run as they are. Copying functions or tables out
+    of them, such as the helpers at the top of 920 and 930, is expected; ''Do not hand-edit'' is about the package''s
+    own files." MIG-BASELINE also says the baseline file its subject names is ours to write (the package keeps none; no
+    V-number in the text, check-ticket-text T-MIG-DONE) and names,
+    read from the files themselves (ticket_done.baseline_functions), every function it copies: from
+    920-row-level-security.sql platform.current_scope_paths, platform.in_scope and platform.rls_policy_name and the
+    platform.apply_* policy functions and scope predicates after them, which the row-level security of every schema
+    migration calls; from 930-partitioning.sql platform.uuidv7_floor, platform.ensure_month_partition and
+    platform.ensure_month_partitions. The generated handoff/service-docs/backend/MIGRATIONS.md carries the same
+    words, and the package''s backend/MIGRATIONS.md says it under "The migration files the developers write".
+    Two more, from the lead''s check of every migration ticket''s Source DDL against r2 (7 October): (1) a frozen
+    after-r1 file that changes a table without creating it (ticket_done.after_r1_changes: ALTER TABLE, a new index,
+    constraint or row-level security) goes on the migration ticket that creates the table, as "Source DDL after r1:
+    <file> (<table>: columns ..., indexes ...)": at r2 backend/tenant/V0101__after_r1_20261006.sql reaches MIG-CATALOGUE
+    (catalogue.performance minutes_on_screen; catalogue.product name_localised and description_localised,
+    CHG-R4-011/014), MIG-PROMOTIONS (promotions.promotion index promotion_code_uniq, CHG-R4-015) and MIG-WHITELABEL-2
+    (eight indexes on the five kiosk tables V0100 creates); (2) MIG-FOREIGN-KEYS names its Source DDL
+    (backend/tenant and backend/control 900-foreign-keys.sql) and MIG-PARTITIONS its own (backend/tenant/930-partitioning.sql,
+    its helpers already in the baseline). op-descriptions.py carries the description into the ticket text; a started ticket
+    gets it as a comment, not a rewrite (ticvai/CLAUDE.md rule 6).'
+  by: Chinmay
+  date: '2026-10-07'
+why: 'A developer''s agent blocked MIG-BASELINE (#27646, in progress) on 7 October 2026, a finding the lead relayed:
+  the ticket names V0001__baseline.sql, though the package deleted its own V0001 when the DDL became derived (commit
+  e0c86d41, 2 September: "Delete the V0001-V0003b migrations superseded by derive-ddl.py"), and its source helpers sit at the top of 920-row-level-security.sql and
+  930-partitioning.sql, files headed "Derived by tools/derive-ddl.py. Do not hand-edit.", so copying them read as
+  forbidden. Nothing on the ticket said the package''s SQL is a reference to copy from. 920 defines twelve functions
+  and the schema migrations call the platform.apply_* ones, so the ticket names all fifteen, not only the six the
+  lead listed (current_scope_paths, in_scope, rls_policy_name, uuidv7_floor, ensure_month_partition,
+  ensure_month_partitions).'
+keys_touched:
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/check-migration-wording.py
+  - tools/run-checks.py
+  - backend/MIGRATIONS.md
+  tickets:
+  - MIG-BASELINE
+  - MIG-CATALOGUE
+  - MIG-PROMOTIONS
+  - MIG-WHITELABEL-2
+  - MIG-FOREIGN-KEYS
+  - MIG-PARTITIONS
+  - MIG-*
+  - VM-MIG-*
+  other:
+  - CHG-R4-011
+  - CHG-R4-014
+  - CHG-R4-015
+root_class: 'new: derived-header-read-as-a-ban'
+tickets:
+  started:
+  - MIG-BASELINE (#27646, in progress: the two sentences as a comment, no rewrite)
+  unstarted:
+  - MIG-CATALOGUE (#27671, unstarted per the lead; its V0101 columns through its description at r3)
+  - every other [DB] migration ticket, through its description at r3 (MIG-PROMOTIONS, MIG-WHITELABEL-2,
+    MIG-FOREIGN-KEYS and MIG-PARTITIONS were not checked for a start; if one has started, it gets a comment)
+release_tag: r3
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r3; the finding came from a developer's agent on MIG-BASELINE)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-wording.py
+status: open
+notes: 'Batch R5, 7 October 2026. check-migration-wording (registered in run-checks): MW-SENTENCE fails a [DB]
+  migration task without the sentence, MW-BASELINE a MIG-BASELINE that does not name every function 920 and 930
+  define (read from the files, so a helper added there must be named), MW-MIGRATIONS a generated MIGRATIONS.md
+  without the words, MW-SOURCE a migration ticket with no Source DDL, MW-AFTER-R1 a table an after-r1 file changes
+  that the ticket creating it does not cite (or that no ticket creates). On the plan before this change it fails 223
+  + 2 + 8 times (MW-SENTENCE, MW-SOURCE, MW-AFTER-R1) and passes after it. The developer starter''s backend-patterns.md (ADAM''s viewer/mcp/setup/starters/docs, mirrored
+  in repos/*/project-bible/setup/) still says the package''s backend/*.sql files "are applied in file order by
+  SqlMigrationRunner"; it is outside the package and is left to the lead.'

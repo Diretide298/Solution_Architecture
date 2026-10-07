@@ -244,6 +244,100 @@ def define_sentence(sid: str, day: float, why: str | None = "gaps") -> str:
 
 CARRY = re.compile(r"((?:Scope|Waits for its definition): [^\n]+?\.)(?= |$)")
 
+# **A migration is written in the developer's repository, copied from the package's SQL** (CHG-R5-002, 7 October). A
+# developer's agent stopped MIG-BASELINE (#27646): the ticket names V0001__baseline.sql, which the package no longer
+# holds, and points at the helpers on top of 920-row-level-security.sql and 930-partitioning.sql, files headed
+# "Derived by tools/derive-ddl.py. Do not hand-edit.", so copying from them read as forbidden. Every [DB] migration
+# task (MIGRATION_KEY) carries MIGRATION_WORDING (build-service-docs.py; check-migration-wording.py gates it), and
+# MIG-BASELINE names the functions it copies (baseline_wording, from the files themselves).
+MIGRATION_KEY = re.compile(r"^(?:VM-)?MIG-")
+MIGRATION_WORDING = ("Write this migration yourself, in our repository: the package's numbered SQL files "
+                     "(backend/tenant and backend/control: 000-930 and the V01nn after-r1 files) are the reference "
+                     "you copy from, never run as they are. Copying functions or tables out of them, such as the "
+                     "helpers at the top of 920 and 930, is expected; 'Do not hand-edit' is about the package's own "
+                     "files.")
+BASELINE_FILES = ("backend/tenant/920-row-level-security.sql", "backend/tenant/930-partitioning.sql")
+FUNCTION_DEF = re.compile(r"^CREATE OR REPLACE FUNCTION (\w+\.\w+)\(", re.M)
+
+
+def baseline_functions(root) -> dict:
+    """{file name: [function, ...]} every function BASELINE_FILES define, in file order: what V0001 copies."""
+    from pathlib import Path
+    out = {}
+    for rel in BASELINE_FILES:
+        f = Path(root) / rel
+        out[Path(rel).name] = FUNCTION_DEF.findall(f.read_text(encoding="utf-8")) if f.exists() else []
+    return out
+
+
+AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d__after_r1_\d{8}\.sql$")
+_AR1 = [
+    (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),
+    (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD COLUMN (?:IF NOT EXISTS )?(\w+)"), "column"),
+    (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD CONSTRAINT (\w+)"), "constraint"),
+    (re.compile(r"^CREATE (?:UNIQUE )?INDEX (?:IF NOT EXISTS )?(\w+) ON (?:ONLY )?(\w+\.\w+)"), "index"),
+    (re.compile(r"^SELECT platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
+    (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) (.+?);?$"), "change"),
+]
+
+
+def after_r1_changes(root) -> dict:
+    """{(file path relative to the package, table): [(kind, name), ...]} for every table a frozen after-r1 file
+    (backend/<db>/V01nn__after_r1_<date>.sql, derive-ddl's frozen mode) changes but does not create (CHG-R5-002, the
+    lead's check of 7 October: V0101 adds three catalogue columns no migration ticket cited). A table the same file
+    creates is left out: the ticket that creates it cites that file already (src_files)."""
+    from pathlib import Path
+    out = {}
+    for f in sorted((Path(root) / "backend").glob("*/V0*.sql")):
+        if not AFTER_R1_FILE.match(f.name):
+            continue
+        rel = f.relative_to(root).as_posix()
+        made, seen = set(), []
+        for ln in f.read_text(encoding="utf-8").splitlines():
+            ln = ln.strip()
+            for rx, kind in _AR1:
+                m = rx.match(ln)
+                if not m:
+                    continue
+                if kind is None:
+                    made.add(m.group(1))
+                elif kind in ("index", "row-level security"):
+                    seen.append((m.group(2), kind, m.group(1)))
+                else:
+                    seen.append((m.group(1), kind, m.group(2)))
+                break
+        for t, kind, name in seen:
+            if t not in made:
+                out.setdefault((rel, t), []).append((kind, name))
+    return out
+
+
+def after_r1_sentence(rel: str, changes: dict) -> str:
+    """The sentence a migration ticket carries for a frozen after-r1 file that changes the tables it creates."""
+    parts = []
+    for t, items in sorted(changes.items()):
+        by = {}
+        for kind, name in items:
+            by.setdefault(kind, []).append(name)
+        parts.append(f"{t}: " + ", ".join(
+            "; ".join(v) if k == "change" else
+            f"{k}{'es' if k == 'index' and len(v) > 1 else 's' if len(v) > 1 and k != 'row-level security' else ''} "
+            f"{', '.join(v[:-1]) + ' and ' + v[-1] if len(v) > 1 else v[0]}"
+            for k, v in by.items()))
+    return (f"Source DDL after r1: {rel} ({'; '.join(parts)}); the files above are frozen at r1, so this migration, "
+            "which creates those tables, carries these changes too.")
+
+
+def baseline_wording(root) -> str:
+    """The sentences MIG-BASELINE carries: its file is ours to write, and the helper functions it copies, by name."""
+    fns = baseline_functions(root)
+    parts = [f"from the top of {name}: {', '.join(names)}" for name, names in fns.items() if names]
+    # no V-number here: check-ticket-text T-MIG-DONE keeps file numbers to the subject and MIGRATIONS.md
+    return ("The baseline file named in the subject is one you write in our repository; the package keeps no baseline "
+            "file of its own. It creates the helper functions every later migration calls, copied as they are "
+            + "; ".join(parts) + " (the row-level security of each schema migration calls the platform.apply_* "
+            "functions, so they come first).")
+
 
 def carried(r) -> list:
     """The sentences of a task's description its pointer must carry: its scope and its wait for a definition."""
