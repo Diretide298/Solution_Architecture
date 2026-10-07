@@ -1,0 +1,70 @@
+id: CHG-R5-003
+date: '2026-10-07'
+source: cr
+kind: plan
+proposed: '2026-10-07'
+summary: The Venue Management migrations (VM-MIG-*) are Hrushikant Patkar's too, and 47 of his other pushed tasks move
+  to the people who lost migration work, so Block A keeps its r2 dates (A1 last work 25 November, block test 25-27
+  November ending 30 November).
+decision:
+  what: 'docs/active/team.json `migrations.keys` becomes ^(VM-)?MIG- (CHG-R5-001''s rule, now 223 tasks; the lead
+    reassigns the VM-MIG tickets in OpenProject). docs/active/block-a-extra-tasks.json gains `ownerMoves` {key: {from,
+    to}}: 47 pushed tasks of Hrushikant Patkar move, Pallavi Sawant 27, Tanmay Dukhande 13, Pranay Shinde 3, Deep
+    Khanvilkar 2, Sanket Keluskar 1, Chinmay Patkar 1 (all back-end or module tests in the back-end stack; a helper
+    only within their backendHelpers cap; a module test never to its app-module''s main builder). The list is in the
+    file; it was found by a search over the schedule that moved the fewest pushed tickets and changed the fewest
+    pushed sprints, and left out every task the r2 schedule started by 7 October (SETUP-HOSTS, SETUP-QDRANT,
+    DB-READ-VIEWS, DB-ROLES), which may be in progress. tools/sprint_plan.py owner_moves; tools/build-service-docs.py
+    applies a move after the pins and the migration rule while `from` still holds the task; tools/derive-block-a-schedule.py
+    drops the pin it leaves. check-plan-owners gains O-MOVE (a moved task not owned by `to`, plan or schedule).
+    Hrushikant keeps every migration, his DevOps and setup tasks and the rest of his work.'
+  by: Chinmay
+  date: '2026-10-07'
+why: 'Chinmay, 7 October 2026, relayed by the lead: "Rebalance (Recommended)", and the Venue Management migrations to
+  Hrushikant as well. CHG-R5-001 measured the cost of one person holding every migration: Block A''s last work moved
+  from 25 November to 7 December and the A1 work running past its block-test window from 18 to 194 developer-hours;
+  with VM-MIG too, 14 December and 273 hours, and Block B ran into its window. Migrations are hard waits for every
+  service, so the chain on one person held everyone else.'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/check-plan-owners.py
+  - handoff/audit-baseline.json
+  tickets:
+  - VM-MIG-*
+  - ownerMoves (47 keys, docs/active/block-a-extra-tasks.json)
+  other:
+  - CHG-R5-001
+  - CHG-R4-005
+root_class: 'new: owner-by-rule-not-by-pin'
+tickets:
+  started: []
+  unstarted:
+  - the 47 ownerMoves keys (none planned to start before 8 October at r2; the lead confirms each is New before the push)
+release_tag: r3
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r3; Chinmay's decision of 7 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-07'
+    quote: Rebalance (Recommended)
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Batch R5, 7 October 2026. Chinmay waived the cooling-off for r3 ("Rebalance (Recommended)"; the migration move
+  itself under "Can we do that now instead of friday", CHG-R5-001). Measured 7 October against the r2 plan regenerated
+  on a clean tree: Block A last work 25 November as in r2, block test 25-27 November ending 30 November as in r2, and
+  the A1 work past its window 7 developer-hours (r2 18; 43 accepted); A2 last work 7 December (r2 4 December, no
+  overrun; the kiosk app-module, scheduled after Block B, waits for MIG-WHITELABEL-2 in Hrushikant''s queue); B 16
+  December (r2 14), C 4 January, D 9 February, every block on its target sprint and none over its window. Hrushikant:
+  296 tasks and 1,393 points in r2, 382 and 1,537 after (all 223 migrations); Sprints 1-3 and 5-7 full as in r2, Sprint
+  4 7.2 of 10 days (r2 7.5), Sprint 8 6.2 (r2 0.5). Pushed owners that change: 47 moves, 18 VM-MIG tasks and the two
+  module tests of CHG-R5-001; 536 pushed tasks change sprint (834 without the rebalance). check-plan-owners'' known
+  self-tests fall from 26 to 22.'

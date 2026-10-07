@@ -32,9 +32,9 @@
  },
  "migrations": {
   "owner": "Hrushikant Patkar",
-  "keys": "^MIG-"
+  "keys": "^(VM-)?MIG-"
  },
- "migrationsNote": "Every migration task is its owner's, with its table sub-tasks (KEY#schema.table), in every block and wave, ticketed or not, now and for every migration the plan makes later: the rule is the key pattern, not a list (CHG-R5-001; Chinmay, 7 October 2026: \"shift all the migration tickets to Hrushikant\"). It overrides the owner a pushed ticket keeps from the last release (sprintPlan.stableOwners): tools/build-service-docs.py and tools/derive-block-a-schedule.py apply it after the pins, so op-release moves them, and tools/check-plan-owners.py (O-MIG-OWNER) fails on a migration task anyone else owns. The Venue Management migrations (VM-MIG-*) are not matched by the pattern.",
+ "migrationsNote": "Every migration task is its owner's, with its table sub-tasks (KEY#schema.table), in every block and wave, ticketed or not, now and for every migration the plan makes later: the rule is the key pattern, not a list (CHG-R5-001; Chinmay, 7 October 2026: \"shift all the migration tickets to Hrushikant\"). It overrides the owner a pushed ticket keeps from the last release (sprintPlan.stableOwners): tools/build-service-docs.py and tools/derive-block-a-schedule.py apply it after the pins, so op-release moves them, and tools/check-plan-owners.py (O-MIG-OWNER) fails on a migration task anyone else owns. The Venue Management migrations (VM-MIG-*) are matched too (Chinmay, 7 October; CHG-R5-003).",
  "onboard": {
   "Pradnya Yeram": "frontend",
   "Chitrangi Mestry": "frontend",

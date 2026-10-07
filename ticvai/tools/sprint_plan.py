@@ -383,6 +383,13 @@ def migration_owner(team):
     return m["owner"], re.compile(m.get("keys") or r"^MIG-")
 
 
+def owner_moves(extra):
+    """{task key: (from, to)} of block-a-extra-tasks.json `ownerMoves` (CHG-R5-003, 7 October): the lead's moves of
+    pushed or planned tasks, applied over the pin while `from` still holds the task."""
+    return {k: (v.get("from"), v.get("to")) for k, v in (extra.get("ownerMoves") or {}).items()
+            if isinstance(v, dict) and v.get("from") and v.get("to")}
+
+
 def is_migration_of(rx, key):
     """True for a task key the migration rule covers; a sub-task (KEY#schema.table) by its task's key."""
     return bool(rx and rx.search(str(key or "").partition("#")[0]))

@@ -85,6 +85,11 @@ def main():
             if sp.is_migration_of(mig_rx, r["key"]):
                 pins.pop(r["key"], None)
                 r["assignee"] = mig_owner
+    # the lead's owner moves (block-a-extra-tasks.json `ownerMoves`, CHG-R5-003): the plan applied them; the pin of the
+    # owner a task leaves does not take it back
+    for k_, (from_, to_) in sp.owner_moves(extra).items():
+        if pins.get(k_) == from_:
+            pins.pop(k_)
     phase2_ams = {m_["key"] for m_ in (json.loads((ROOT / "docs" / "active" / "ai-phase-plan.json").read_text(
         encoding="utf-8")).get("modules") or []) if m_.get("phase") == 2} \
         if (ROOT / "docs" / "active" / "ai-phase-plan.json").exists() else set()

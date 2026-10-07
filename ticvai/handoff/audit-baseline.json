@@ -2865,8 +2865,8 @@
   }
  },
  "check-plan-owners": {
-  "updated": "2026-10-06",
-  "commit": "9264fa2d",
+  "updated": "2026-10-07",
+  "commit": "d62486e4",
   "rules": {
    "O-SELF-TEST": [
     "TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A:plan",
@@ -2887,10 +2887,6 @@
     "TEST-AM-PRICING-PROMOTIONS-P02:schedule",
     "TEST-AM-RESOURCES-CAPACITY-P02:plan",
     "TEST-AM-RESOURCES-CAPACITY-P02:schedule",
-    "TEST-AM-SETUP-AI-INTELLIGENCE-P08:plan",
-    "TEST-AM-SETUP-AI-INTELLIGENCE-P08:schedule",
-    "TEST-AM-SETUP-AI-INTELLIGENCE-P09:plan",
-    "TEST-AM-SETUP-AI-INTELLIGENCE-P09:schedule",
     "TEST-AM-SETUP-VENUE-OPERATIONS-P08:plan",
     "TEST-AM-SETUP-VENUE-OPERATIONS-P08:schedule",
     "TEST-AM-TENANCY-VENUES-P08-BLOCK-A:plan",

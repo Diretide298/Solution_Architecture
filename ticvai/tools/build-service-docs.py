@@ -3477,6 +3477,18 @@ def main() -> int:
                 t_["assignee"] = MIG_OWNER
         print(f"migrations: every task matching {MIG_RX.pattern} is {MIG_OWNER}'s (CHG-R5-001); "
               f"{len(mig_moved)} moved from the pin or the plan")
+    # **The lead's owner moves** (block-a-extra-tasks.json `ownerMoves`, CHG-R5-003, 7 October): a task named there moves
+    # from `from` to `to` while `from` still holds it (the pin or the plan), so the work the migrations took away is
+    # given back and Block A keeps its r2 dates. Once pushed at the new owner the pin holds it, and the entry is inert.
+    moves_ = sp.owner_moves(json.loads(EXTRA.read_text(encoding="utf-8")) if EXTRA.exists() else {})
+    n_moves_ = 0
+    for t_ in tasks:
+        mv_ = moves_.get(t_["key"]) if t_["type"] == "Task" else None
+        if mv_ and t_["assignee"] == mv_[0]:
+            t_["assignee"] = mv_[1]
+            n_moves_ += 1
+    if moves_:
+        print(f"owner moves: {n_moves_} of {len(moves_)} applied (CHG-R5-003)")
     leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
     # **Phase 2 of the AI engine has no owner** (CHG-AIPH-001, docs/active/ai-phase-plan.json; CHG-R4-006): its AI units,
     # its module tests and its app-modules stay unassigned until the AI developers join after 2 April.
