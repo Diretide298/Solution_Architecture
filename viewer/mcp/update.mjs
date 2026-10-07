@@ -30,10 +30,45 @@
  */
 
 import { readFile, writeFile, mkdir, rename, copyFile } from 'node:fs/promises';
+import { readFileSync, realpathSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { FILES, HERE, buildOf } from './version.mjs';
 
-const BASE = (process.env.ADAM_VIEWER_URL ?? 'http://127.0.0.1:4173').replace(/\/+$/, '');
+// **The address the connector was registered with, not a guess.** Setup hands
+// ADAM_VIEWER_URL to the connector's own process (`claude mcp add -e`), so a
+// shell running /update-adam does not have it and used to fall back to
+// localhost, which is not where ADAM is for anybody but its own developer
+// (7 October 2026). In order: the environment, the viewer-url.txt setup writes
+// beside the connector, then the registration Claude Code keeps in
+// ~/.claude.json for this connector's server.mjs (its URL only; nothing else
+// in that entry is read). Still one configured address and no URL argument.
+function configuredBase() {
+  if (process.env.ADAM_VIEWER_URL) return [process.env.ADAM_VIEWER_URL, 'ADAM_VIEWER_URL'];
+  try {
+    const url = readFileSync(path.join(HERE, 'viewer-url.txt'), 'utf8').trim();
+    if (/^https?:\/\//.test(url)) return [url, 'viewer-url.txt'];
+  } catch { /* an install from before 7 October has none */ }
+  try {
+    const cfg = JSON.parse(readFileSync(path.join(os.homedir(), '.claude.json'), 'utf8'));
+    // Resolved on both sides: a registration may spell the folder in Windows'
+    // short form (CHINMA~1.PAR) where this file sees the long one.
+    const real = (f) => { try { return realpathSync.native(f); } catch { return f; } };
+    const norm = (f) => real(String(f)).toLowerCase().replace(/\\/g, '/');
+    const mine = norm(path.join(HERE, 'server.mjs'));
+    const servers = [cfg.mcpServers ?? {}, ...Object.values(cfg.projects ?? {}).map((p) => p?.mcpServers ?? {})];
+    for (const group of servers) {
+      for (const s of Object.values(group)) {
+        const args = (s?.args ?? []).map(norm);
+        const url = s?.env?.ADAM_VIEWER_URL;
+        if (url && args.some((a) => a === mine)) return [url, 'the connector registration in ~/.claude.json'];
+      }
+    }
+  } catch { /* no readable registration */ }
+  return ['http://127.0.0.1:4173', 'the default'];
+}
+const [CONFIGURED, FROM] = configuredBase();
+const BASE = CONFIGURED.replace(/\/+$/, '');
 const CHECK_ONLY = process.argv.includes('--check');
 
 // Long enough for a server on the other side of a VPN, short enough that a
@@ -91,7 +126,7 @@ async function main() {
   try {
     theirs = await ask('/connector/version');
   } catch (error) {
-    say(`could not reach ADAM at ${BASE} — ${error.message}`);
+    say(`could not reach ADAM at ${BASE} (from ${FROM}) — ${error.message}`);
     say('If ADAM is on another machine, set ADAM_VIEWER_URL and try again.');
     process.exit(2);
   }
