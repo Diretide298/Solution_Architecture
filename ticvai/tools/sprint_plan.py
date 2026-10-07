@@ -389,6 +389,12 @@ def never_testers(team):
     return set(team.get("neverTests") or [])
 
 
+def no_test_takeover(team):
+    """The people team.json `noTestTakeover` keeps off the module tests a `neverTests` person gives up (CHG-R5-005,
+    7 October: Surendra)."""
+    return set(team.get("noTestTakeover") or [])
+
+
 def owner_moves(extra):
     """{task key: (from, to)} of block-a-extra-tasks.json `ownerMoves` (CHG-R5-003, 7 October): the lead's moves of
     pushed or planned tasks, applied over the pin while `from` still holds the task."""

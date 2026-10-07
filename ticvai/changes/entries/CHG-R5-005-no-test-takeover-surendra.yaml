@@ -1,0 +1,52 @@
+id: CHG-R5-005
+date: '2026-10-07'
+source: cr
+kind: plan
+proposed: '2026-10-07'
+summary: Surendra takes none of the module tests Hrushikant Patkar gives up under CHG-R5-004; they are spread over
+  the other peers in each test's stack.
+decision:
+  what: 'docs/active/team.json gains `noTestTakeover: [Surendra]` (tools/sprint_plan.py no_test_takeover):
+    tools/build-service-docs.py, spreading a module test someone in `neverTests` holds (CHG-R5-004), picks among the
+    test''s builders (else its stack) less the people `noTestTakeover` names; the fewest module-test points so far
+    still decides between them. A module test Surendra already owned stays his (6 in the plan). check-plan-owners
+    gains O-NO-TAKEOVER: a module test the last release gave someone in `neverTests`, owned in the plan or the
+    schedule by someone in `noTestTakeover`.'
+  by: Chinmay
+  date: '2026-10-07'
+why: 'Chinmay, 7 October 2026, asked whether Surendra (0.6 pace) keeps the module tests the CHG-R5-004 spread gave
+  him off Hrushikant: "No".'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/check-plan-owners.py
+  tickets:
+  - TEST-AM-* that were Hrushikant Patkar's
+  other:
+  - CHG-R5-004
+  - CHG-R4-005
+root_class: 'new: owner-by-rule-not-by-pin'
+tickets:
+  started: []
+  unstarted:
+  - TEST-AM-* that were Hrushikant Patkar's (New in OpenProject; module tests start after their app-module)
+release_tag: r3
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r3; Chinmay's decision of 7 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-07'
+    quote: 'No'
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Batch R5, 7 October 2026. Measured on the r3 branch (d8910c35 plus this entry) with build-service-docs and
+  derive-block-a-schedule run in place: the 19 module tests Hrushikant gives up go to Deep Khanvilkar 6, Sanket
+  Keluskar 5, New full-stack developer 2 5, Pallavi Sawant 2, Tanmay Dukhande 1 (Surendra had 10 of them).
+  Block A last work 25 November, block test 25-27 November ending 30 November; A2 last work 3 December; B 16
+  December; C 29 December; D 9 February; no block over its window. check-plan-owners: 0 new, 20 known.'

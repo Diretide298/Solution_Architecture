@@ -22,6 +22,8 @@ docs/active/ai-phase-plan.json):
                    table sub-tasks take their task's owner (op-release.py), so the task is the one checked.
   O-NO-CHECKER     a module test (TEST-AM-*) owned, in the plan or the schedule, by someone team.json `neverTests` names
                    (Hrushikant Patkar, never a checker; CHG-R5-004)
+  O-NO-TAKEOVER    a module test the last release gave someone `neverTests` names, now owned, in the plan or the
+                   schedule, by someone team.json `noTestTakeover` names (Surendra; CHG-R5-005)
   O-MOVE           a task block-a-extra-tasks.json `ownerMoves` moves (CHG-R5-003) still owned, in the plan or the
                    schedule, by the person it leaves, or by anyone but the person it goes to
 
@@ -45,6 +47,7 @@ RULES = {
     "O-MIG-OWNER": "a migration task not owned by the migration owner of team.json (CHG-R5-001)",
     "O-MOVE": "a task the lead's ownerMoves moves not owned by the person it goes to (CHG-R5-003)",
     "O-NO-CHECKER": "a module test owned by someone who never tests (team.json neverTests; CHG-R5-004)",
+    "O-NO-TAKEOVER": "a module test given up by someone who never tests, taken by someone team.json noTestTakeover keeps off it (CHG-R5-005)",
 }
 SD = Path("handoff") / "service-docs"
 
@@ -121,6 +124,17 @@ def main() -> int:
                 if who in never:
                     guard.add("O-NO-CHECKER", f"{r['key']}:{where}",
                               f"{r['key']} is {who}'s in the {where}, who never tests (neverTests, CHG-R5-004)")
+    # **Nor to these** (CHG-R5-005, 7 October: Surendra takes none of the module tests Hrushikant gives up). The last
+    # release's owners say who gave a test up; once a release pushes the new owners the rule has nothing left to check.
+    no_take = sp.no_test_takeover(team)
+    pins, _ = sp.pinned_owners(team)
+    for r in rows:
+        if r["type"] == "Task" and r["key"].startswith("TEST-AM-") and pins.get(r["key"]) in never:
+            for where, who in (("plan", r["assignee"]), ("schedule", assign.get(r["key"]))):
+                if who in no_take:
+                    guard.add("O-NO-TAKEOVER", f"{r['key']}:{where}",
+                              f"{r['key']} is {who}'s in the {where}, given up by {pins[r['key']]}; "
+                              f"noTestTakeover keeps {who} off it (CHG-R5-005)")
     guard.note(f"{n_tests} module tests, {len(phase2)} phase 2 app-modules of the AI engine, "
                f"{n_mig} migration tasks ({mig_owner or 'no owner'}'s)")
     return guard.finish()

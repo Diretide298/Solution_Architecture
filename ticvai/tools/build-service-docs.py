@@ -3817,6 +3817,7 @@ def main() -> int:
     # **Never a checker, never a module tester** (team.json `neverTests`, CHG-R5-004, 7 October): such a test goes to a
     # peer, pushed or not; the peer is spread by the module-test points each already carries.
     never_ = sp.never_testers(team)
+    no_take_ = sp.no_test_takeover(team)    # nor to these (team.json `noTestTakeover`, CHG-R5-005)
     test_load_ = Counter()
     for x in tasks:
         if x["type"] == "Task" and x["key"].startswith("TEST-AM-") and x["assignee"] not in never_:
@@ -3844,7 +3845,8 @@ def main() -> int:
                 c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or days_ex.get(x["key"]) or 0)
         if t_["assignee"] in never_:
             # spread: whoever of its builders (else of its stack) carries the fewest module-test points so far
-            peer_ = min(c_ or stack_ or [""], key=lambda n: (test_load_[n], -c_.get(n, 0), n))
+            pick_ = [n for n in (c_ or stack_) if n not in no_take_] or [n for n in stack_ if n not in no_take_]
+            peer_ = min(pick_ or c_ or stack_ or [""], key=lambda n: (test_load_[n], -c_.get(n, 0), n))
             test_load_[peer_] += float(t_["points"] or 0)
         else:
             peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
