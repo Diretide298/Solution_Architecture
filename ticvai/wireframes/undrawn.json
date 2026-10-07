@@ -1,8 +1,8 @@
 {
  "generatedBy": "tools/list-undrawn.py",
- "generated": "2026-10-06",
+ "generated": "2026-10-08",
  "basedOn": {
-  "boardIndex": "2026-10-06",
+  "boardIndex": "2026-10-07",
   "packageScreens": 2451
  },
  "note": "Screens with no `clientPack` or `claudeDesign` frame. **Wave is the schedule** \u2014 the Wave 1 and 2 rows are the tranche worth starting; Wave 3 is most of the total and none of the urgency.",

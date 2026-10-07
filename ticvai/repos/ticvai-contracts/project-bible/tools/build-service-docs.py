@@ -1207,6 +1207,13 @@ def main() -> int:
     PACE = team.get("pace") or {}
     HELPER_SHARE = team.get("helperShare") or {}
     areas = team.get("areas") or {}
+    # **Every migration is one person's** (team.json `migrations`, CHG-R5-001, 7 October): a task whose key matches the
+    # rule is given to its owner after the pins of the last release, so a pushed migration moves to them too, and the
+    # final schedule times it on them; its table sub-tasks follow it (op-release.py). Not earlier: the passes that
+    # split Block A into A1 and A2 and fill Blocks B-D keep the owners they had, so moving the migrations moves no
+    # app-module into another block (measured 7 October: giving them to one person before those passes took seven
+    # apps' completion work out of A1, which the pushed tickets would have followed).
+    MIG_OWNER, MIG_RX = sp.migration_owner(team)
     tasks = []
 
     # **Frontend or backend is on every task, and in its OpenProject subject**, so a board, a filter or a
@@ -1500,7 +1507,8 @@ def main() -> int:
              + "Applied forward by SqlMigrationRunner; test that it applies to a database with its Follows applied and that a second run applies nothing.", 1, service=svc, pts=pts, area="backend", assignee=who,
              depends=["MIG-BASELINE"] + back)
         migrations.append([i - 1, mig_key[g], fname, g[0], g[1], len(ts), n_cols,
-                           ", ".join(r.replace("MIG-", "").lower() for r in refs), who, pts, svc])
+                           ", ".join(r.replace("MIG-", "").lower() for r in refs),
+                           MIG_OWNER if MIG_OWNER and sp.is_migration_of(MIG_RX, mig_key[g]) else who, pts, svc])
     if deferred:
         n_def = sum(deferred.values())
         # **The ticket names its keys and links their tables** (4 October, the Sprint 1-2 judging; CHG-FXP-005): it said
@@ -1557,7 +1565,10 @@ def main() -> int:
          "migration takes its schema's tables from there, with the matching foreign keys, indexes and row-level "
          "security, and a ROLLBACK section tested in CI (`backend/MIGRATIONS.md`). Generated; do not edit.", "",
          "Each migration only references tables created by the ones above it. Keys that would point forward "
-         "are added by the last migration.", "", "## Order", ""]
+         "are added by the last migration.", "",
+         # CHG-R5-002 (7 October): the same words every [DB] migration ticket carries
+         f"**Where a migration is written.** {ticket_done.MIGRATION_WORDING} "
+         f"{ticket_done.baseline_wording(ROOT)}", "", "## Order", ""]
     M += table(MIG_COLS, [[m[0], f"`{m[2]}`", m[1], m[3], m[4], m[5], m[6], m[7], m[8], m[9]] for m in migrations])
     M += ["", "## Tables", ""]
     M += table(["Migration", "Table", "Columns", "Row-level security", "Partitioned", "Read by", "Written by",
@@ -3455,6 +3466,29 @@ def main() -> int:
         if t_["type"] == "Task" and t_["key"] in pins and t_["key"] in kmap:
             t_["assignee"] = pins[t_["key"]]
     print(f"owners: {pin_note}")
+    # **The migration rule wins over the pin** (CHG-R5-001): a pushed migration goes to the migration owner, so the
+    # release bundle reassigns it and its table sub-tasks (op-release.rb moves New tickets; the lead moved the started
+    # ones in OpenProject on 7 October).
+    if MIG_OWNER:
+        mig_moved = [t_["key"] for t_ in tasks if t_["type"] == "Task" and sp.is_migration_of(MIG_RX, t_["key"])
+                     and t_["assignee"] != MIG_OWNER]
+        for t_ in tasks:
+            if t_["type"] == "Task" and sp.is_migration_of(MIG_RX, t_["key"]):
+                t_["assignee"] = MIG_OWNER
+        print(f"migrations: every task matching {MIG_RX.pattern} is {MIG_OWNER}'s (CHG-R5-001); "
+              f"{len(mig_moved)} moved from the pin or the plan")
+    # **The lead's owner moves** (block-a-extra-tasks.json `ownerMoves`, CHG-R5-003, 7 October): a task named there moves
+    # from `from` to `to` while `from` still holds it (the pin or the plan), so the work the migrations took away is
+    # given back and Block A keeps its r2 dates. Once pushed at the new owner the pin holds it, and the entry is inert.
+    moves_ = sp.owner_moves(json.loads(EXTRA.read_text(encoding="utf-8")) if EXTRA.exists() else {})
+    n_moves_ = 0
+    for t_ in tasks:
+        mv_ = moves_.get(t_["key"]) if t_["type"] == "Task" else None
+        if mv_ and t_["assignee"] == mv_[0]:
+            t_["assignee"] = mv_[1]
+            n_moves_ += 1
+    if moves_:
+        print(f"owner moves: {n_moves_} of {len(moves_)} applied (CHG-R5-003)")
     leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
     # **Phase 2 of the AI engine has no owner** (CHG-AIPH-001, docs/active/ai-phase-plan.json; CHG-R4-006): its AI units,
     # its module tests and its app-modules stay unassigned until the AI developers join after 2 April.
@@ -3704,6 +3738,46 @@ def main() -> int:
     # the first full stop (S-SETUP-COUNT read none of them in the first refresh with this rule).
     # A decided sentence a screen's tasks carry comes just before it (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001:
     # BO-1065's AI residency section is drawn and built in Block A).
+    # **Every [DB] migration says it is written in our repository, copied from the package's SQL** (CHG-R5-002, 7
+    # October): MIG-BASELINE was stopped by an agent that read 920/930's "Do not hand-edit" as a ban on copying from
+    # them. MIG-BASELINE also names the helper functions it copies (ticket_done.baseline_wording, from the files).
+    # Two more from the lead's check of every migration ticket against r2 (7 October): a frozen after-r1 file (V01nn)
+    # that changes a table goes on the ticket whose migration creates that table (V0101's three catalogue columns were on
+    # no ticket), and MIG-FOREIGN-KEYS and MIG-PARTITIONS name their Source DDL like every other migration.
+    base_words_ = ticket_done.baseline_wording(ROOT)
+    made_by_ = {}
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
+            m_ = re.search(r"Tables: (.+?)\. Source", t_["description"] or "")
+            for x_ in (m_.group(1).split(", ") if m_ else []):
+                made_by_.setdefault(x_.strip(), t_["key"])
+    after_r1_ = defaultdict(lambda: defaultdict(dict))
+    for (rel_, tbl_), items_ in ticket_done.after_r1_changes(ROOT).items():
+        if tbl_ in made_by_:
+            after_r1_[made_by_[tbl_]][rel_][tbl_] = items_
+        else:
+            print(f"WARNING: {rel_} changes {tbl_}, which no migration ticket creates (CHG-R5-002)")
+    own_src_ = {"MIG-FOREIGN-KEYS": "Source DDL: backend/tenant/900-foreign-keys.sql and backend/control/900-foreign-keys.sql "
+                                    "(the constraints named here, nothing else from those files).",
+                "MIG-PARTITIONS": "Source DDL: backend/tenant/930-partitioning.sql (the monthly partitions and default "
+                                  "partitions of the time-partitioned tables; its helper functions platform.uuidv7_floor, "
+                                  "platform.ensure_month_partition and platform.ensure_month_partitions are already in "
+                                  "the baseline, MIG-BASELINE)."}
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
+            src_ = ([own_src_[t_["key"]]] if t_["key"] in own_src_ and "Source DDL:" not in (t_["description"] or "")
+                    else [])
+            ar1_ = [ticket_done.after_r1_sentence(rel_, ch_) for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
+            add_ = [w_ for w_ in (src_ + ar1_ + [ticket_done.MIGRATION_WORDING]
+                                  + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
+                    if w_ not in (t_["description"] or "")]
+            if add_:
+                # before its own "Done when", which op-release.py reads to the end of the text
+                d_ = (t_["description"] or "").rstrip()
+                m_ = ticket_done.DONE_WHEN.search(d_)
+                head_, tail_ = (d_[:m_.start()].rstrip(), " " + d_[m_.start():]) if m_ else (d_, "")
+                t_["description"] = (head_ + ("" if not head_ or head_[-1] in ".!?" else ".") + " "
+                                     + " ".join(add_) + tail_).strip()
     for t_ in tasks:
         m_ = ticket_done.SCREEN.search(t_["key"]) if t_["type"] == "Task" and t_["track"] == "Frontend" else None
         note_ = decided["screenNotes"].get(m_.group(1)) if m_ else None
@@ -3740,26 +3814,44 @@ def main() -> int:
     peers_ok = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("moduleTestPeers") or {}) \
         if EXTRA.exists() else {}
     pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
+    # **Never a checker, never a module tester** (team.json `neverTests`, CHG-R5-004, 7 October): such a test goes to a
+    # peer, pushed or not; the peer is spread by the module-test points each already carries.
+    never_ = sp.never_testers(team)
+    no_take_ = sp.no_test_takeover(team)    # nor to these (team.json `noTestTakeover`, CHG-R5-005)
+    test_load_ = Counter()
+    for x in tasks:
+        if x["type"] == "Task" and x["key"].startswith("TEST-AM-") and x["assignee"] not in never_:
+            test_load_[x["assignee"]] += float(x["points"] or 0)
     for t_ in [x for x in tasks if x["type"] == "Task"]:
         if not (t_["key"].startswith("TEST-AM-") and t_["assignee"]) or t_["key"] in ai_phase2 \
                 or t_["parent"] in ai_phase2:
             continue
         ch_ = [x for x in kids_f[t_["parent"]] if not x["key"].startswith("TEST-")]
         b_ = ticket_done.main_builder(ch_, sp.PLAN_PACE, ai_lead, days_ex)
-        if t_["key"] in kmap:
+        if t_["assignee"] in never_:
+            pass
+        elif t_["key"] in kmap:
             if peers_ok.get(t_["key"]) != t_["assignee"]:
                 continue
         elif not b_ or t_["assignee"] != b_:
             continue
         ai_ = all(x["area"] == "ai" or x["track"] == "AI" for x in ch_)
         pool_ = "ai" if ai_ else (t_.get("pool") or "be")
-        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])]
+        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])
+                  and n not in never_]
         c_ = Counter()
         for x in ch_:
             if x["assignee"] in stack_:
                 c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or days_ex.get(x["key"]) or 0)
-        peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
-        why_ = f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}"
+        if t_["assignee"] in never_:
+            # spread: whoever of its builders (else of its stack) carries the fewest module-test points so far
+            pick_ = [n for n in (c_ or stack_) if n not in no_take_] or [n for n in stack_ if n not in no_take_]
+            peer_ = min(pick_ or c_ or stack_ or [""], key=lambda n: (test_load_[n], -c_.get(n, 0), n))
+            test_load_[peer_] += float(t_["points"] or 0)
+        else:
+            peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
+        why_ = (f"{t_['assignee']} never tests (neverTests, CHG-R5-004)" if t_["assignee"] in never_
+                else f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}")
         print(f"  module test {t_['key']}: {why_}; {peer_ or 'nobody'} tests it (CHG-R4-005)")
         t_["assignee"] = peer_
     ticket_blocks = set(settings["ticketBlocks"])

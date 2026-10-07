@@ -373,6 +373,40 @@ def pinned_owners(team, rebalance=False, bundle_path=None):
     return pins, f"{len(pins)} pushed tickets keep the owner release {rel} gave them"
 
 
+def migration_owner(team):
+    """(owner, compiled key pattern) of team.json `migrations` (CHG-R5-001, 7 October): every task whose key matches
+    is that person's, with its table sub-tasks, whoever the plan or a pin would give it -- a rule on the key, so a
+    migration the plan makes later is theirs too. (None, None) when team.json has no such rule."""
+    m = team.get("migrations") or {}
+    if not m.get("owner"):
+        return None, None
+    return m["owner"], re.compile(m.get("keys") or r"^MIG-")
+
+
+def never_testers(team):
+    """The people team.json `neverTests` keeps off every module test (CHG-R5-004, 7 October: Hrushikant Patkar, never a
+    checker)."""
+    return set(team.get("neverTests") or [])
+
+
+def no_test_takeover(team):
+    """The people team.json `noTestTakeover` keeps off the module tests a `neverTests` person gives up (CHG-R5-005,
+    7 October: Surendra)."""
+    return set(team.get("noTestTakeover") or [])
+
+
+def owner_moves(extra):
+    """{task key: (from, to)} of block-a-extra-tasks.json `ownerMoves` (CHG-R5-003, 7 October): the lead's moves of
+    pushed or planned tasks, applied over the pin while `from` still holds the task."""
+    return {k: (v.get("from"), v.get("to")) for k, v in (extra.get("ownerMoves") or {}).items()
+            if isinstance(v, dict) and v.get("from") and v.get("to")}
+
+
+def is_migration_of(rx, key):
+    """True for a task key the migration rule covers; a sub-task (KEY#schema.table) by its task's key."""
+    return bool(rx and rx.search(str(key or "").partition("#")[0]))
+
+
 # ---------------------------------------------------------------------------------------------- testing
 # **The test strategy** (decided 1 October, docs/active/block-test-strategy.md): one module test per app-module
 # (about 10% of its points, at least 2, by a peer in its stack who is not its main builder, right after its last

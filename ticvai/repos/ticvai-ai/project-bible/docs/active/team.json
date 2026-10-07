@@ -30,6 +30,19 @@
    "Tanmay Dukhande"
   ]
  },
+ "neverTests": [
+  "Hrushikant Patkar"
+ ],
+ "neverTestsNote": "Never a checker, so never the tester of a module test (TEST-AM-*), pushed or not (Chinmay, 7 October 2026, CHG-R5-004: \"Yes, move them\"; tools/op-descriptions.py already keeps him off the reviewers). tools/build-service-docs.py gives such a test to a peer in its stack who is not its app-module's main builder (CHG-R4-005), over the pin; tools/derive-block-a-schedule.py drops that pin; tools/check-plan-owners.py (O-NO-CHECKER) fails a module test one of them owns.",
+ "noTestTakeover": [
+  "Surendra"
+ ],
+ "noTestTakeoverNote": "Never given a module test moved off someone who never tests (Chinmay, 7 October 2026, CHG-R5-005: asked whether Surendra keeps the 7 module tests Hrushikant gave up, \"No\"). tools/build-service-docs.py spreads such a test over the other peers in its stack; a test Surendra already owned for his own reasons stays his.",
+ "migrations": {
+  "owner": "Hrushikant Patkar",
+  "keys": "^(VM-)?MIG-"
+ },
+ "migrationsNote": "Every migration task is its owner's, with its table sub-tasks (KEY#schema.table), in every block and wave, ticketed or not, now and for every migration the plan makes later: the rule is the key pattern, not a list (CHG-R5-001; Chinmay, 7 October 2026: \"shift all the migration tickets to Hrushikant\"). It overrides the owner a pushed ticket keeps from the last release (sprintPlan.stableOwners): tools/build-service-docs.py and tools/derive-block-a-schedule.py apply it after the pins, so op-release moves them, and tools/check-plan-owners.py (O-MIG-OWNER) fails on a migration task anyone else owns. The Venue Management migrations (VM-MIG-*) are matched too (Chinmay, 7 October; CHG-R5-003).",
  "onboard": {
   "Pradnya Yeram": "frontend",
   "Chitrangi Mestry": "frontend",

@@ -74,9 +74,22 @@ def main():
         kids_[r["parent"]].append(r)
     for r in rows:
         if r["key"].startswith("TEST-AM-") and pins.get(r["key"]) and pins[r["key"]] != r["assignee"] \
-                and (moved.get(r["key"]) == pins[r["key"]]
+                and (moved.get(r["key"]) == pins[r["key"]] or pins[r["key"]] in sp.never_testers(team)
                      or pins[r["key"]] == td_.main_builder(kids_[r["parent"]], sp.PLAN_PACE, ai_lead, days_of)):
             pins.pop(r["key"])
+    # **Every migration is the migration owner's** (team.json `migrations`, CHG-R5-001): the plan gave it to them, and
+    # the pin of the last release does not take it back.
+    mig_owner, mig_rx = sp.migration_owner(team)
+    if mig_owner:
+        for r in rows:
+            if sp.is_migration_of(mig_rx, r["key"]):
+                pins.pop(r["key"], None)
+                r["assignee"] = mig_owner
+    # the lead's owner moves (block-a-extra-tasks.json `ownerMoves`, CHG-R5-003): the plan applied them; the pin of the
+    # owner a task leaves does not take it back
+    for k_, (from_, to_) in sp.owner_moves(extra).items():
+        if pins.get(k_) == from_:
+            pins.pop(k_)
     phase2_ams = {m_["key"] for m_ in (json.loads((ROOT / "docs" / "active" / "ai-phase-plan.json").read_text(
         encoding="utf-8")).get("modules") or []) if m_.get("phase") == 2} \
         if (ROOT / "docs" / "active" / "ai-phase-plan.json").exists() else set()

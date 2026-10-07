@@ -346,7 +346,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 1 · needs the `core` module |
-| Block | Block A2 · task VM-BO-485 |
+| Block | Block A2 · ticket #35602 (VM-BO-485) |
 | Who uses it | venue staff holding `DEVICE_VIEW`, `TENANT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listKioskConfigs` reads the venue's kiosk groups and `getKioskConfig` reads one — list, select, act |

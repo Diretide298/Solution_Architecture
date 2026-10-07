@@ -1,6 +1,6 @@
 # Package report
 
-**Generated 2026-10-06 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
+**Generated 2026-10-08 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
 
 ## Scale
 

@@ -126,6 +126,10 @@ CHECKS = [
     "check-terraform-pools",
     # 6 October (the client's tracker answers, CHG-R4-017): the load-acceptance targets are the client's figures.
     "check-load-targets",
+    # 7 October (CHG-R5-002): every [DB] migration ticket says it is written in our repository, copied from the
+    # package's SQL, and MIG-BASELINE names the helper functions it copies (check-plan-owners gained O-MIG-OWNER,
+    # CHG-R5-001).
+    "check-migration-wording",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
