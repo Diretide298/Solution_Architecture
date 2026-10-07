@@ -24,8 +24,8 @@
 2. **A local PostgreSQL 16.** There is no compose file in `ticvai-backend` yet; **SETUP-DB** adds one. Until then, run one container:
    `docker run -d --name ticvai-pg -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16`
    Redis and Jaeger are not needed until **SETUP-OBS**.
-3. **Apply the schema.** The schema is plain numbered SQL, not EF Core migrations, and there is no `Ticvai.Migrations` project.
-   - Copy the package's `backend/tenant` and `backend/control` folders into `db/tenant` and `db/control`.
+3. **Apply the schema.** The schema is plain SQL migrations, not EF Core migrations, and there is no `Ticvai.Migrations` project.
+   - `db/tenant` and `db/control` hold **our** migrations: one file per **[DB]** ticket, written from the package's numbered files (the reference; never copied in whole or run as they are). See `backend-patterns.md` §3.4.
    - Apply each with `SqlMigrationRunner` (`src/TICVAI.Infrastructure/Persistence/Migrations`):
      `await new SqlMigrationRunner(connectionString).ApplyAsync("db/tenant", ct);`
    - A second run applies nothing: that is the check every **[DB]** ticket uses.
