@@ -383,6 +383,12 @@ def migration_owner(team):
     return m["owner"], re.compile(m.get("keys") or r"^MIG-")
 
 
+def never_testers(team):
+    """The people team.json `neverTests` keeps off every module test (CHG-R5-004, 7 October: Hrushikant Patkar, never a
+    checker)."""
+    return set(team.get("neverTests") or [])
+
+
 def owner_moves(extra):
     """{task key: (from, to)} of block-a-extra-tasks.json `ownerMoves` (CHG-R5-003, 7 October): the lead's moves of
     pushed or planned tasks, applied over the pin while `from` still holds the task."""

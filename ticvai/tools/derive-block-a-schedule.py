@@ -74,7 +74,7 @@ def main():
         kids_[r["parent"]].append(r)
     for r in rows:
         if r["key"].startswith("TEST-AM-") and pins.get(r["key"]) and pins[r["key"]] != r["assignee"] \
-                and (moved.get(r["key"]) == pins[r["key"]]
+                and (moved.get(r["key"]) == pins[r["key"]] or pins[r["key"]] in sp.never_testers(team)
                      or pins[r["key"]] == td_.main_builder(kids_[r["parent"]], sp.PLAN_PACE, ai_lead, days_of)):
             pins.pop(r["key"])
     # **Every migration is the migration owner's** (team.json `migrations`, CHG-R5-001): the plan gave it to them, and

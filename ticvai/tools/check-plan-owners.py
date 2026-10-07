@@ -20,6 +20,8 @@ docs/active/ai-phase-plan.json):
   O-MIG-OWNER      a migration task (team.json `migrations`: its key pattern, ^MIG- since CHG-R5-001 on 7 October) owned,
                    in the plan or the schedule, by anyone but the migration owner, or team.json has no such rule. Its
                    table sub-tasks take their task's owner (op-release.py), so the task is the one checked.
+  O-NO-CHECKER     a module test (TEST-AM-*) owned, in the plan or the schedule, by someone team.json `neverTests` names
+                   (Hrushikant Patkar, never a checker; CHG-R5-004)
   O-MOVE           a task block-a-extra-tasks.json `ownerMoves` moves (CHG-R5-003) still owned, in the plan or the
                    schedule, by the person it leaves, or by anyone but the person it goes to
 
@@ -42,6 +44,7 @@ RULES = {
     "O-PHASE2-OWNED": "phase 2 of the AI engine has an owner, against ai-phase-plan.json (CHG-AIPH-001; CHG-R4-006)",
     "O-MIG-OWNER": "a migration task not owned by the migration owner of team.json (CHG-R5-001)",
     "O-MOVE": "a task the lead's ownerMoves moves not owned by the person it goes to (CHG-R5-003)",
+    "O-NO-CHECKER": "a module test owned by someone who never tests (team.json neverTests; CHG-R5-004)",
 }
 SD = Path("handoff") / "service-docs"
 
@@ -110,6 +113,14 @@ def main() -> int:
                 guard.add("O-MOVE", f"{k}:{where}", f"{k} is {who or 'nobody'}'s in the {where}; ownerMoves gives it "
                                                     f"to {to} (from {frm}, CHG-R5-003)")
     guard.note(f"{len(moves)} owner moves")
+    # **Never a checker** (CHG-R5-004, 7 October: Hrushikant Patkar tests no module): team.json `neverTests`.
+    never = sp.never_testers(team)
+    for r in rows:
+        if r["type"] == "Task" and r["key"].startswith("TEST-AM-"):
+            for where, who in (("plan", r["assignee"]), ("schedule", assign.get(r["key"]))):
+                if who in never:
+                    guard.add("O-NO-CHECKER", f"{r['key']}:{where}",
+                              f"{r['key']} is {who}'s in the {where}, who never tests (neverTests, CHG-R5-004)")
     guard.note(f"{n_tests} module tests, {len(phase2)} phase 2 app-modules of the AI engine, "
                f"{n_mig} migration tasks ({mig_owner or 'no owner'}'s)")
     return guard.finish()

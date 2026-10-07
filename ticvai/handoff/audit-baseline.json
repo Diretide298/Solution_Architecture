@@ -2866,7 +2866,7 @@
  },
  "check-plan-owners": {
   "updated": "2026-10-07",
-  "commit": "d62486e4",
+  "commit": "f1dacd2f",
   "rules": {
    "O-SELF-TEST": [
     "TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A:plan",
@@ -2875,8 +2875,6 @@
     "TEST-AM-APPROVALS-P04:schedule",
     "TEST-AM-FOOD-BEVERAGE-P02:plan",
     "TEST-AM-FOOD-BEVERAGE-P02:schedule",
-    "TEST-AM-IDENTITY-SECURITY-P09:plan",
-    "TEST-AM-IDENTITY-SECURITY-P09:schedule",
     "TEST-AM-PAYMENTS-P01:plan",
     "TEST-AM-PAYMENTS-P01:schedule",
     "TEST-AM-PAYMENTS-P02:plan",

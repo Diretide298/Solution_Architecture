@@ -1,0 +1,76 @@
+id: CHG-R5-004
+date: '2026-10-07'
+source: cr
+kind: plan
+proposed: '2026-10-07'
+summary: The platform tasks CHG-R5-003 moved off Hrushikant Patkar go to Pranay Shinde; the setup tasks are split
+  (Hrushikant keeps the infrastructure, Pranay takes auth, clients, database and seed); Hrushikant never tests a
+  module, by rule; Pranay's load is rebalanced so Block A keeps its dates.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json `ownerMoves`: ARCH-TESTS, OBS-TENANT-POOL, PLATFORM-IDEMPOTENCY,
+    PLATFORM-KERNEL, KERNEL-ID, KERNEL-TENANT-LIMITS, PLATFORM-AUDIT, PLATFORM-MIGRATE, PLATFORM-OBSERVE and
+    PLATFORM-OUTBOX go to Pranay Shinde (were Pallavi Sawant and Tanmay Dukhande in CHG-R5-003); SETUP-AUTH,
+    SETUP-CLIENTS, SETUP-DB and SETUP-SEED move from Hrushikant to Pranay, and Hrushikant keeps SETUP-ENV, SETUP-CI,
+    SETUP-HOSTS, SETUP-OBS and SETUP-QDRANT (the SETUP-ONBOARD-* tasks stay with each person). docs/active/team.json
+    gains `neverTests: [Hrushikant Patkar]` (tools/sprint_plan.py never_testers): tools/build-service-docs.py gives a
+    module test such a person holds, pushed or not, to a peer in its stack who is not its app-module''s main builder
+    (CHG-R4-005), the one of its builders (else of its stack) with the fewest module-test points so far, and
+    tools/derive-block-a-schedule.py drops that pin. Two kiosk tasks leave Pallavi Sawant, who carries most of
+    CHG-R5-003''s moves, so Block A2 is not held: TEST-AM-WHITE-LABEL-KIOSK to Deep Khanvilkar and VM-FE-ADM-582-KIOSK
+    to Chitrangi Mestry (front end, web). moduleTestPeers gains TEST-AM-FOUNDATION-PLATFORM (Pranay
+    became the main builder of AM-FOUNDATION-PLATFORM). The rebalance (the same search as CHG-R5-003: fewest pushed
+    tickets moved, nothing the r2 schedule started by 7 October, back end only, helpers within their caps) moves
+    SVC-ORDER-ORDER-4 from Pranay to Tanmay Dukhande and re-picks the recipients of CHG-R5-003''s other moves (the
+    full list, from and to, is `ownerMoves`). check-plan-owners gains O-NO-CHECKER (a module test owned by someone in
+    neverTests, plan or schedule).'
+  by: Chinmay
+  date: '2026-10-07'
+why: 'Chinmay, 7 October 2026, relayed by the lead after CHG-R5-003 (ce9c95a7): "No that should go to pranay." (the
+  platform tasks); "Start setup tasks to them both" then "Split: Hrushikant + Pranay" (the setup tasks; all nine are
+  New in OpenProject, checked by the lead); "Yes, move them" (Hrushikant''s module tests: he is never a checker, a rule
+  tools/op-descriptions.py applied only to reviewers, so the scheduler gave him 28 module tests).'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/check-plan-owners.py
+  - handoff/audit-baseline.json
+  tickets:
+  - ownerMoves (docs/active/block-a-extra-tasks.json)
+  - TEST-AM-* that were Hrushikant Patkar's
+  - TEST-AM-FOUNDATION-PLATFORM
+  other:
+  - CHG-R5-001
+  - CHG-R5-003
+  - CHG-R4-005
+root_class: 'new: owner-by-rule-not-by-pin'
+tickets:
+  started: []
+  unstarted:
+  - every ownerMoves key (nothing the r2 schedule started by 7 October; the setup tasks checked New by the lead)
+release_tag: r3
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r3; Chinmay's decisions of 7 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-07'
+    quote: No that should go to pranay.
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Batch R5, 7 October 2026. Chinmay waived the cooling-off for r3 (his words above; the migration move and the
+  first rebalance under "Can we do that now instead of friday" and "Rebalance (Recommended)", CHG-R5-001 and -003).
+  Measured 7 October on the branch with main''s r2 ids merged (f1dacd2f), against the r2 plan regenerated on a clean
+  tree: Block A last work 25 November, block test 25-27 November ending 30 November (as r2), A1 work past its window
+  8 developer-hours (r2 18); A2 last work 3 December (r2 4 December); B 15 December (r2 14); C 29 December; D 9
+  February; no block over its window. Hrushikant: 366 tasks, 1,445 points (r2 296, 1,393), no module test; Pranay:
+  233 tasks, 1,292 points (r2 238, 1,294). Pushed non-migration owner changes: 68 (54 ownerMoves, the 18 module tests
+  neverTests moves less the ones ownerMoves already names, and the module-test peers of CHG-R5-001 and this entry);
+  18 VM-MIG tasks to Hrushikant; 472 pushed tasks change sprint (834 with no rebalance). check-plan-owners'' known
+  self-tests fall to 20.'

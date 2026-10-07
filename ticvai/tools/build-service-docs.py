@@ -3814,26 +3814,42 @@ def main() -> int:
     peers_ok = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("moduleTestPeers") or {}) \
         if EXTRA.exists() else {}
     pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
+    # **Never a checker, never a module tester** (team.json `neverTests`, CHG-R5-004, 7 October): such a test goes to a
+    # peer, pushed or not; the peer is spread by the module-test points each already carries.
+    never_ = sp.never_testers(team)
+    test_load_ = Counter()
+    for x in tasks:
+        if x["type"] == "Task" and x["key"].startswith("TEST-AM-") and x["assignee"] not in never_:
+            test_load_[x["assignee"]] += float(x["points"] or 0)
     for t_ in [x for x in tasks if x["type"] == "Task"]:
         if not (t_["key"].startswith("TEST-AM-") and t_["assignee"]) or t_["key"] in ai_phase2 \
                 or t_["parent"] in ai_phase2:
             continue
         ch_ = [x for x in kids_f[t_["parent"]] if not x["key"].startswith("TEST-")]
         b_ = ticket_done.main_builder(ch_, sp.PLAN_PACE, ai_lead, days_ex)
-        if t_["key"] in kmap:
+        if t_["assignee"] in never_:
+            pass
+        elif t_["key"] in kmap:
             if peers_ok.get(t_["key"]) != t_["assignee"]:
                 continue
         elif not b_ or t_["assignee"] != b_:
             continue
         ai_ = all(x["area"] == "ai" or x["track"] == "AI" for x in ch_)
         pool_ = "ai" if ai_ else (t_.get("pool") or "be")
-        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])]
+        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])
+                  and n not in never_]
         c_ = Counter()
         for x in ch_:
             if x["assignee"] in stack_:
                 c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or days_ex.get(x["key"]) or 0)
-        peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
-        why_ = f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}"
+        if t_["assignee"] in never_:
+            # spread: whoever of its builders (else of its stack) carries the fewest module-test points so far
+            peer_ = min(c_ or stack_ or [""], key=lambda n: (test_load_[n], -c_.get(n, 0), n))
+            test_load_[peer_] += float(t_["points"] or 0)
+        else:
+            peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
+        why_ = (f"{t_['assignee']} never tests (neverTests, CHG-R5-004)" if t_["assignee"] in never_
+                else f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}")
         print(f"  module test {t_['key']}: {why_}; {peer_ or 'nobody'} tests it (CHG-R4-005)")
         t_["assignee"] = peer_
     ticket_blocks = set(settings["ticketBlocks"])

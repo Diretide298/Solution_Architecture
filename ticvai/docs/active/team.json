@@ -30,6 +30,10 @@
    "Tanmay Dukhande"
   ]
  },
+ "neverTests": [
+  "Hrushikant Patkar"
+ ],
+ "neverTestsNote": "Never a checker, so never the tester of a module test (TEST-AM-*), pushed or not (Chinmay, 7 October 2026, CHG-R5-004: \"Yes, move them\"; tools/op-descriptions.py already keeps him off the reviewers). tools/build-service-docs.py gives such a test to a peer in its stack who is not its app-module's main builder (CHG-R4-005), over the pin; tools/derive-block-a-schedule.py drops that pin; tools/check-plan-owners.py (O-NO-CHECKER) fails a module test one of them owns.",
  "migrations": {
   "owner": "Hrushikant Patkar",
   "keys": "^(VM-)?MIG-"
