@@ -77,6 +77,14 @@
 #                            the next run removes it. Never merges.
 #            --jobs N        checkers run N at a time (default 4; 1 = the original sequential loop).
 #                            The table, the verdict and every checker's output are the same either way.
+#            --parallel N    the derive steps too: independent steps run N at a time (CHG-R6-050).
+#                            Default 1 = one after another, as always. A step waits for every earlier
+#                            step that writes what it reads, writes what it writes, or reads what it
+#                            writes (handoff/refresh-manifest.json); a step the manifest cannot vouch
+#                            for (unknown to it, low confidence, shelling out) runs alone. The planned
+#                            waves and the expected time are printed before the run.
+#            --times FILE    the steps.tsv the expected time is computed from (default: the run under
+#                            the worktree dir with the most completed steps)
 #            --resume        after a failed run: reuse its worktree and skip the steps it completed.
 #                            Refused (and a fresh run started instead) if HEAD or any step's script
 #                            changed since. A resumed run never merges: it is for iterating, and a
@@ -130,7 +138,7 @@ done
 [ -n "$PY" ] || die "no working Python found"
 
 INCLUDE_WORKING=0; IGNORE_UNTRACKED=0; HEAD_ONLY=0; MERGE=1; TRACE=0; SKIP_CHECKS=0; ALLOW_DRIFT=0; QUIET=0
-MANIFEST_OUT=""; CHANGED=(); STEPS_ARG=""; KEEP_WT=0; SINCE=""; RESUME=0; JOBS=4
+MANIFEST_OUT=""; CHANGED=(); STEPS_ARG=""; KEEP_WT=0; SINCE=""; RESUME=0; JOBS=4; PARALLEL=1; TIMES=""
 WT_BASE="${REFRESH_SAFE_WT:-${TMPDIR:-${TEMP:-/tmp}}/ticvai-refresh-safe}"
 T_RUN0=$(date +%s)
 while [ $# -gt 0 ]; do
@@ -155,6 +163,9 @@ while [ $# -gt 0 ]; do
     --resume) RESUME=1 ;;
     --jobs) shift; [ $# -gt 0 ] || die "--jobs needs a number"; JOBS="$1"
       case "$JOBS" in ''|*[!0-9]*|0) die "--jobs needs a whole number of at least 1" ;; esac ;;
+    --parallel) shift; [ $# -gt 0 ] || die "--parallel needs a number"; PARALLEL="$1"
+      case "$PARALLEL" in ''|*[!0-9]*|0) die "--parallel needs a whole number of at least 1" ;; esac ;;
+    --times) shift; [ $# -gt 0 ] || die "--times needs a steps.tsv"; TIMES="$1" ;;
     -h|--help) sed -n '2,/^{$/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
     *) die "unknown option: $1 (see --help)" ;;
   esac
@@ -164,6 +175,7 @@ done
 [ "$HEAD_ONLY" = 0 ] || [ "$INCLUDE_WORKING" = 0 ] || die "--head-only and --include-working contradict"
 [ "$SKIP_CHECKS" = 0 ] || [ "$MERGE" = 0 ] || die "--skip-checks needs --no-merge: nothing unchecked is merged"
 [ "$TRACE" = 0 ] || [ ${#CHANGED[@]} -eq 0 ] || die "--trace is a full run; it cannot be scoped with --changed"
+[ "$TRACE" = 0 ] || [ "$PARALLEL" = 1 ] || die "--trace snapshots the tree between steps; it cannot run them --parallel"
 if [ -n "$MANIFEST_OUT" ]; then
   [ "$TRACE" = 1 ] || die "--manifest-out needs --trace"
   case "$MANIFEST_OUT" in /*|[A-Za-z]:*) ;; *) MANIFEST_OUT="$PKG_MAIN/$MANIFEST_OUT" ;; esac
@@ -173,7 +185,7 @@ if [ "$RESUME" = 1 ]; then
   # would mix two runs' state.
   [ ${#CHANGED[@]} -eq 0 ] && [ -z "$STEPS_ARG" ] && [ -z "$SINCE" ] && [ "$TRACE" = 0 ] \
     && [ "$INCLUDE_WORKING" = 0 ] && [ "$HEAD_ONLY" = 0 ] && [ "$SKIP_CHECKS" = 0 ] \
-    || die "--resume reuses the failed run's options; it combines only with --jobs, --quiet, --wt-dir, --no-merge, --keep-worktree"
+    || die "--resume reuses the failed run's options; it combines only with --jobs, --parallel, --times, --quiet, --wt-dir, --no-merge, --keep-worktree"
 fi
 
 mkdir -p "$WT_BASE"
@@ -895,7 +907,7 @@ fi
 # ------------------------------------------------------------------------------------------------
 if [ "$STEPS" != "none" ]; then
   T_DERIVE0=$(date +%s)
-  echo "4. refresh in the worktree ($( [ "$STEPS" = all ] && echo "all steps" || echo "steps $STEPS"))$( [ "$TRACE" = 1 ] && echo ", traced")$( [ "$RESUMING" = 1 ] && echo ", resumed")"
+  echo "4. refresh in the worktree ($( [ "$STEPS" = all ] && echo "all steps" || echo "steps $STEPS"))$( [ "$TRACE" = 1 ] && echo ", traced")$( [ "$RESUMING" = 1 ] && echo ", resumed")$( [ "$PARALLEL" -gt 1 ] && echo ", independent steps $PARALLEL at a time")"
   EMIT=(emit --refresh "$WPKG/tools/refresh.sh" --steps "$STEPS" --out "$RUN/run.sh"
         --manifest "$WPKG/handoff/refresh-manifest.json" --plan-out "$RUN/plan.json")
   if [ "$TRACE" = 1 ]; then
@@ -906,6 +918,19 @@ if [ "$STEPS" != "none" ]; then
     ALT="$(mixed "$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir)")/objects"
     printf '%s\n' "$ALT" > "$TD/alt"
     export REFRESH_TRACE_DIR="$TD" REFRESH_TRACE_ALT="$ALT"
+  fi
+  if [ "$PARALLEL" -gt 1 ]; then
+    # the expected time comes from an earlier run's per-step times: the one with the most completed steps
+    if [ -z "$TIMES" ]; then
+      _best=0
+      for _f in "$WT_BASE"/runs/*/steps.tsv; do
+        [ -f "$_f" ] && [ "$_f" != "$RUN/steps.tsv" ] || continue
+        _c=$(awk -F'\t' '$6 == "ok"' "$_f" | wc -l)
+        if [ "$_c" -ge "$_best" ] && [ "$_c" -gt 0 ]; then _best=$_c; TIMES="$_f"; fi
+      done
+    fi
+    EMIT+=(--parallel "$PARALLEL")
+    [ -z "$TIMES" ] || EMIT+=(--times "$TIMES")
   fi
   "$PY" "$SELF_DIR/refresh-manifest.py" "${EMIT[@]}"
   export REFRESH_TICVAI="$WPKG" REFRESH_TAIL_OUT="$RUN/tail.log" REFRESH_STEP_LOG="$RUN/steps.tsv" \
