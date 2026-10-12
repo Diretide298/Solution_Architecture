@@ -180,6 +180,13 @@ ticket filed from a request carries its intake in its description.
 compared as instants (git writes the tagger's offset, this service writes UTC). `to` defaults to
 the tag served; no `from` means everything up to `to`.
 
+**Settling a batch of requests from a workstation** (12 October): `settle_changes.py decisions.json
+[--apply]` resolves each request through `POST /api/changes/<n>/resolve` as `ADAM_EMAIL`, puts one
+comment headed `ADAM CR-nnn · <status>` on the ticket it was raised from (OpenProject's API,
+`TICVAI_OP_TOKEN`, no mail unless `--notify`), and can attach files to that ticket, from disk or as
+a release tag holds them (`{"git": "r4:ticvai/handoff/api-data-lineage.json"}`). Dry run by default;
+a second run changes nothing. The package's tickets follow with `ticvai/tools/op-release-api.py`.
+
 ## Why invites rather than signup
 
 Restricting signup to `@softlabsgroup.com` only checks the address a stranger
