@@ -1473,10 +1473,34 @@ def main() -> int:
     for k_ in pushed_map:
         if "#" not in k_ and OPS_KEY.fullmatch(k_):
             pushed_nums[k_.rsplit("-", 1)[0]].add(_key_num(k_))
+    # **A pushed operation stays under its pushed task when its first consumer moves** (12 October 2026, CHG-R6-054).
+    # A spec change can give an operation a first consumer in another app-module, or put it in the first-release slice
+    # or a Venue Management wave, while the rest of its pushed task stays in a later app-module: cut where it now sits,
+    # the operation left its pushed sub-task (11 such on the r4 gate). The task keeps its parent: an operation whose
+    # pushed task was a later app-module's task of Block A in the plan this run replaces (`prior_rows`), and whose
+    # task-mates are planned outside this cut, is left to that task (held_elsewhere); the later blocks then put it with
+    # its task-mates (rehome below).
+    _prior = OUT / "tasks.csv"
+    prior_rows = {r["key"]: r for r in csv.DictReader(_prior.open(encoding="utf-8"))} if _prior.exists() else {}
+    mates = defaultdict(set)                              # pushed task -> its operations still to be planned
+    for o_, p_ in pin.items():
+        if o_ in ops and not ops[o_]["provisional"] and o_ not in ai_ops and p_ not in closed_now:
+            mates[p_].add(o_)
+
+    held_out = set()                                       # operations left to their pushed task (below)
+
+    def held_elsewhere(o, here) -> bool:
+        p_ = pin.get(o)
+        r_ = prior_rows.get(p_) or {}
+        out_ = bool(p_ in mates and r_.get("block") == "A" and str(r_.get("parent", "")).startswith("AM-")
+                    and mates[p_] - set(here))
+        if out_:
+            held_out.add(o)
+        return out_
     for n, olist in sorted(by_service.items()):
         groups = defaultdict(list)
         for o in olist:
-            if o in ai_ops:
+            if o in ai_ops or held_elsewhere(o, slice_ops):
                 continue
             # a slice operation the contract marks a stub, provisional or deprecated is not put on a build ticket
             # either (CHG-FXP-003: SVC-MARKETING-MARKETING-2 built getMarketingSubscription, a proposal)
@@ -1763,12 +1787,13 @@ def main() -> int:
              "Only the setup operations each screen hosts are in the first release; the rest of the screen "
              "follows later.", 1, platform="Back Office / Admin", pts=sum(sizes.values()), area="SETUP")
         for sid in sorted(setup_screens, key=lambda x: (min(wave[o] for o in setup_screens[x]),
-                                                         deps_step({op_task[o] for o in setup_screens[x]}), x)):
+                                                         deps_step({op_task[o] for o in setup_screens[x]
+                                                                    if o in op_task}), x)):
             s = screens[sid]
             so = sorted(setup_screens[sid])
             task(f"APP-SETUP-{sid}", "APP-SETUP", "Task", f"{sid} {s['name']} ({setup_scope(s, so)})",
                  "In the slice: " + ", ".join(so), min(wave[o] for o in so),
-                 platform=s["_platform"].get("shortName", ""), depends={op_task[o] for o in so},
+                 platform=s["_platform"].get("shortName", ""), depends={op_task[o] for o in so if o in op_task},
                  pts=sizes[sid], area="SETUP", assignee=assign("SETUP", sizes[sid]))
     # --- Venue Management, full stack (team.json "venueManagement"): the back-office screens of the named
     # waves whose operations are all agreed (not provisional) and specified (have lineage), minus the ones
@@ -1833,6 +1858,8 @@ def main() -> int:
         vm_op_task = {}
         groups_vm = defaultdict(list)
         for o in new_ops:
+            if held_elsewhere(o, set(new_ops) | set(op_task)):
+                continue                      # its pushed task is a later app-module's (CHG-R6-054)
             groups_vm[(lineage[o]["service"], ops[o]["tag"])].append(o)
         for n in sorted({n for n, _ in groups_vm}):
             task(f"VM-BE-{re.sub(r'Service$', '', n).upper()}", "VM", "Feature",
@@ -2337,6 +2364,33 @@ def main() -> int:
             m_ = op_module[o]
             k = home.get((m_, "P08")) or home.get((m_, "*")) or add_am(m_, "API", None, 1)
         am_ops[k].append(o)
+    # **The pushed task keeps its parent, and follows the earliest block its operations need** (CHG-R6-054): the
+    # operations of one pushed task that landed in different app-modules all go to one of them, in the earliest block
+    # any of them needs; within that block, to the task's parent in the plan this run replaces when it is there, else to
+    # the first of them in build order. So listSegregationRules (ADM-340 moved to Block A, CHG-R6-042) takes
+    # SVC-IDENTITY-IDENTITY-7 into Block A with it, instead of leaving its pushed sub-task behind.
+    spread = defaultdict(set)
+    for k_, ol_ in am_ops.items():
+        for o_ in ol_:
+            if pin.get(o_) and pin[o_] not in closed_now:
+                spread[pin[o_]].add(k_)
+    for p_, ks_ in sorted(spread.items()):
+        if len(ks_) < 2:
+            continue
+        def blk(k_):
+            return am_info[k_]["block"] or "~"          # a later block is set by the scheduler: after A
+        first = min(blk(k_) for k_ in ks_)
+        pp_ = (prior_rows.get(p_) or {}).get("parent")
+        to_ = (pp_ if pp_ in am_info and blk(pp_) == first
+               else min((k_ for k_ in ks_ if blk(k_) == first), key=lambda x: am_info[x]["order"]))
+        for k_ in ks_ - {to_}:
+            moving = [o_ for o_ in am_ops[k_] if pin.get(o_) == p_]
+            am_ops[k_] = [o_ for o_ in am_ops[k_] if pin.get(o_) != p_]
+            am_ops[to_].extend(moving)
+        print(f"pushed task kept whole: {p_} -> {to_} ({', '.join(sorted(k_ for k_ in ks_ if k_ != to_))} gave its "
+              "operations back)")
+    for k_ in [k_ for k_, ol_ in am_ops.items() if not ol_]:
+        del am_ops[k_]
 
     # migrations, then back end, app-module by app-module in build order (the first that needs a table creates it)
     def fresh_mig_key(schema):
@@ -2408,6 +2462,17 @@ def main() -> int:
                      depends=deps or {"MIG-BASELINE"})
                 for o in part:
                     later_op_task[o] = tk
+    # A screen task planned before the later blocks waits on the pushed task that now builds an operation of its that
+    # was left to that task (CHG-R6-054): GST-007 and WEB-006 wait on SVC-CATALOGUE-CATALOGUE-7 for joinWaitlist.
+    if held_out:
+        for t_ in tasks:
+            ident_ = key_identity(t_["key"]) if t_["type"] == "Task" else None
+            sid_ = ident_[1] if ident_ and ident_[0] == "screen" else None
+            if not sid_ or sid_ not in screens:
+                continue
+            more = {later_op_task[o] for o in screen_op_ids(screens[sid_]) & held_out if o in later_op_task}
+            if more - set(t_["dependsOn"].split()):
+                t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | more))
     # the screens, each waiting on the tasks that build its operations (soft: built against the mock server)
     for key, sid, k, kind, pts in later_items:
         if kind == "ticketed":
