@@ -18,7 +18,7 @@ decision:
     in op-retire.py SUBTASK_MOVES passes, a new operation sorted into SVC-ORDER-SHIFT cut in plain fours moves pushed
     operations, and stable_chunks keeps every one with its task. Sub-tasks a release bundle already retires (the
     committed op-release.json `retire`) pass. tools/op-retire.py gains SUBTASK_MOVES (empty) for a move decided on
-    purpose, whose reason goes into the duplicate note; tools/op-release.py runs the moved rule with its key check.
+    purpose, whose reason goes into the duplicate note; tools/op-release.py runs the moved rule with its key check.'
   by: Chinmay
   date: '2026-10-12'
 why: 'The lead''s r4 tooling list, 12 October 2026: when the shift tasks were regrouped, openShift moved from
