@@ -22,11 +22,16 @@ Decisions file (JSON):
      {"cr": "CR-008", "status": "rejected", "resolution": "Not in the package: ..."},
      {"cr": "CR-003", "status": "done", "resolution": "...",
       "attach": [{"git": "r4:ticvai/handoff/api-data-lineage.json"}, {"path": "notes.md", "name": "notes.md"}]},
-     {"cr": "CR-011", "status": "accepted", "resolution": "...", "comment": false}
+     {"cr": "CR-011", "status": "accepted", "resolution": "...", "comment": false},
+     {"raise": {"match": "CHG-R4-017", "target_kind": "other", "target_id": "CHG-R4-017",
+                "title": "CHG-R4-017: ...", "problem": "...", "source": "audit", "source_ref": "..."},
+      "status": "done", "resolution": "...", "ref": "r2", "comment": false}
    ]}
 
   status: open | accepted | rejected | done. `ref` (per item, else the file's) is recorded on the request as what
-  settled it. `comment: false` skips the OpenProject comment for that item.
+  settled it. `comment: false` skips the OpenProject comment for that item. An item with `raise` instead of `cr`
+  files the request first (POST /api/changes, the fields of ChangeIn) unless one whose title starts with `match`
+  is already there -- the way a decision made outside ADAM gets its ADAM record -- and then settles it.
 
   python3 settle_changes.py decisions.json            # dry run: what would change
   python3 settle_changes.py decisions.json --apply
@@ -79,6 +84,11 @@ class Adam:
     def changes(self, project: str) -> dict:
         got = self._req("GET", f"/api/changes?project_id={urllib.parse.quote(project)}")
         return {c["id"]: c for c in (got.get("items") or got.get("changes") or [])}
+
+    def raise_change(self, project: str, fields: dict) -> dict:
+        body = {k: v for k, v in fields.items() if k != "match"}
+        body["project_id"] = project
+        return self._post("/api/changes", body)
 
     def resolve(self, project: str, number: int, status: str, resolution: str, ref: str) -> dict:
         return self._post(f"/api/changes/{number}/resolve",
@@ -161,6 +171,20 @@ def main() -> int:
     print(f"settle_changes: {len(spec['items'])} decision(s) for {project}; {mode}")
     failed = 0
     for it in spec["items"]:
+        if it.get("raise") and not it.get("cr"):
+            want = it["raise"]
+            found = [c for c in current.values() if c["title"].startswith(want["match"])]
+            if found:
+                it = dict(it, cr=found[0]["id"])
+            elif a.apply:
+                made = adam.raise_change(project, want)
+                row = made.get("change") or made
+                current[row["id"]] = row
+                print(f"  raised {row['id']}: {want['title'][:70]}")
+                it = dict(it, cr=row["id"])
+            else:
+                print(f"  (new) {want['title'][:70]}: would be raised, then {it['status']}")
+                continue
         cr = it["cr"].upper()
         status = it["status"].strip().lower()
         resolution = (it.get("resolution") or "").strip()
