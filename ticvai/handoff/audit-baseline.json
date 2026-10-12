@@ -2621,8 +2621,8 @@
   }
  },
  "check-parameter-columns": {
-  "updated": "2026-10-04",
-  "commit": "857986c1",
+  "updated": "2026-10-12",
+  "commit": "46cdea05",
   "rules": {
    "P-DRAFTED-UNMAPPED": [
     "approveManualOverrideSupervisor",
@@ -2724,7 +2724,7 @@
     "listSlaPolicies.approvals.sla_policy",
     "listStockReservations.rental.agreement_item",
     "listWalletHolds.control.rollout",
-    "listWalletHolds.seating.seat_hold_item",
+    "listWalletHolds.seating.seat_reservation_item",
     "placeAccessDevice.platform.device",
     "publishPromotion.promotions.promotion_conflict",
     "recordAuthorityNotification.maintenance.incident_authority_notification",
@@ -13138,9 +13138,8 @@
   }
  },
  "check-wireframe-coverage": {
-  "updated": "2026-10-02",
-  "commit": "1a9325a4",
-  "note": "Re-recorded 2 October on the r2 gate branch (CHG-GTB-011): ADM-699 (My Account & Security, CHG-SBO-022) and ADM-700 (Configuration Promotion, CHG-SBO-024) are console screens the lead added that day; no frame, prototype or workshop board exists for either, so they join the Claude Design work list like ADM-022 and ADM-023. Nothing else changed.",
+  "updated": "2026-10-12",
+  "commit": "46cdea05",
   "rules": {
    "W-INCOMING-UNLINKED": [
     "GST-001:wireframes/incoming/P02-mobile-v4/gst-001.html",
@@ -13289,6 +13288,8 @@
     "BO-1188",
     "BO-1189",
     "BO-1190",
+    "BO-1191",
+    "BO-1192",
     "BO-123",
     "BO-131",
     "BO-132",

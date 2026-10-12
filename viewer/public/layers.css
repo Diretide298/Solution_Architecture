@@ -2412,6 +2412,21 @@ textarea.rt-sendback-note {
   box-shadow: 0 0 0 2px var(--bg);
 }
 
+/* The bell's dialog. It kept the class the old centred account dialog used,
+   and that rule went when the account panel became a drawer (c07152bd), so
+   the bell opened as bare text over a blurred page (12 Oct 2026). A box of
+   its own: the panel colour, a border and room inside, under the scrim. */
+.account-dialog {
+  box-sizing: border-box;
+  width: min(520px, 92vw);
+  max-height: 80vh; overflow-y: auto;
+  padding: 20px 22px 16px;
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-3);
+}
 .bell-dialog { max-width: 460px; }
 .bell-list {
   margin: 4px 0 10px;
