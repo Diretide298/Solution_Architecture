@@ -95,6 +95,8 @@ const state = {
   filter: { text: '', status: '', openOnly: false },
   teamSort: 'behind',
   qaAll: false,
+  team: null,      // docs/active/team.json's people, for a person's role
+  changes: null,   // ADAM's change requests, read when somebody opens a person
   ganttOpenOnly: false,
 };
 
@@ -289,8 +291,9 @@ function count(items) {
 function setScope(change) {
   Object.assign(state.scope, change);
   const params = new URLSearchParams(location.search);
-  for (const [key, name] of [['person', 'who'], ['sprint', 'sprint'], ['type', 'type']]) {
-    if (state.scope[key]) params.set(name, state.scope[key]); else params.delete(name);
+  params.delete('who');   // the old name for `person`, read once on arrival
+  for (const key of ['person', 'sprint', 'type']) {
+    if (state.scope[key]) params.set(key, state.scope[key]); else params.delete(key);
   }
   const query = params.toString();
   history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
@@ -401,6 +404,7 @@ function draw() {
   drawScope();
   drawSprint(focus);
   drawRoster(focus);
+  drawPerson(focus);
   drawQueue();
   drawPlan(focus);
   drawAttention(items);
@@ -564,22 +568,12 @@ function drawSprint(focus) {
   }
 
   const items = inFocus(focus);
-  const c = count(items);
-  const k = clock(focus);
-  const expected = Math.round(c.live * k.frac);
+  const { c, k, expected, behind, tone } = paceFor(focus, items);
   const range = `${fmtWeekday(focus.start)} to ${fmtWeekday(focus.end)}`;
 
   when.replaceChildren(el('strong', null, focus.name), ` ${range}`,
     k.phase === 'running' && k.dayNo ? el('span', 'tk-day', `day ${k.dayNo} of ${k.n}`) : '');
 
-  let tone = 'ok';
-  if (k.phase === 'ahead') tone = 'idle';
-  else if (k.phase === 'over') tone = c.finished >= c.live ? 'ok' : 'over';
-  else if (expected > 0) {
-    const ratio = c.finished / expected;
-    tone = ratio >= 0.9 ? 'ok' : ratio >= 0.6 ? 'warn' : 'bad';
-  }
-  const behind = Math.max(0, expected - c.finished);
 
   if (!c.live) {
     title.replaceChildren(`Nothing in ${focus.name}${state.scope.person ? ` is ${state.scope.person}'s` : ''}.`);
@@ -666,9 +660,9 @@ function drawNext(focus) {
  * is a yardstick and not data. The gap at today is drawn and labelled, since
  * it is the one number the chart exists to show.
  */
-function drawBurn(focus, items, c, k) {
-  const figure = $('tk-burn');
-  const box = $('tk-burn-plot');
+function drawBurn(focus, items, c, k, where = { figure: 'tk-burn', box: 'tk-burn-plot', caption: 'tk-burn-caption' }) {
+  const figure = $(where.figure);
+  const box = $(where.box);
   figure.hidden = false;
   const W = Math.max(280, Math.round(box.clientWidth || 420));
   const H = 210;
@@ -720,9 +714,13 @@ function drawBurn(focus, items, c, k) {
     const ey = y(expected);
     pic.append(svg('line', { x1: endX, x2: endX, y1: ey, y2: endY - 6, class: 'tk-burn-gap' }));
     pic.append(svg('circle', { cx: endX, cy: ey, r: 3.5, class: 'tk-burn-expected' }));
-    // Halfway up the gap, but never on top of the "finished" label below it.
-    const labelY = Math.min((ey + endY) / 2 + 4, endY - 26);
-    pic.append(svg('text', { x: endX + 8, y: Math.max(ey + 4, labelY), class: 'tk-burn-label' }, `${num(expected - cum.at(-1))} short`));
+    // Halfway up the gap, right of it; a gap too short to hold the label
+    // beside the "finished" one puts it on the left of the line instead.
+    const roomy = endY - ey > 34;
+    pic.append(svg('text', roomy
+      ? { x: endX + 8, y: Math.min((ey + endY) / 2 + 4, endY - 26), class: 'tk-burn-label' }
+      : { x: endX - 8, y: (ey + endY) / 2 + 4, class: 'tk-burn-label', 'text-anchor': 'end' },
+    `${num(expected - cum.at(-1))} short`));
   }
   pic.append(svg('circle', { cx: endX, cy: endY, r: 4.5, class: 'tk-burn-dot' }));
   pic.append(svg('text', { x: endX + 8, y: endY - 6, class: 'tk-burn-label is-strong' }, `${num(cum.at(-1))} finished`));
@@ -754,7 +752,7 @@ function drawBurn(focus, items, c, k) {
   });
 
   box.replaceChildren(pic, table);
-  $('tk-burn-caption').textContent = 'Finished so far, against an even pace'
+  $(where.caption).textContent = 'Finished so far, against an even pace'
     + (Object.keys(state.data.closes ?? {}).length ? '' : ' (a ticket counts on the day it last changed)');
 }
 
@@ -827,8 +825,8 @@ function drawRoster(focus) {
     ? `Each bar is one person's tickets in ${focus.name}, on one scale. `
       + (running ? 'The upright mark is where an even pace would have their finished part by the end of today. ' : '')
       + 'Open in the plan is everything still theirs across every sprint, as a number, so a big backlog does not drown the sprint. '
-      + 'Select a person to show only their work on every section.'
-    : 'No dated sprint to measure against. Select a person to show only their work on every section.';
+      + 'Select a person to open everything about them.'
+    : 'No dated sprint to measure against. Select a person to open everything about them.';
 
   const box = $('tk-roster');
   box.replaceChildren(...rows.map((r) => {
@@ -865,8 +863,8 @@ function drawRoster(focus) {
     row.append(ident, bar, done, pace, open);
     row.setAttribute('aria-label', `${r.name}. ${focus ? `${focus.name}: ${num(r.c.finished)} of ${num(r.c.live)} finished` : ''}`
       + `${running && r.c.live ? (r.behind > 0 ? `, ${num(r.behind)} behind an even pace` : ', on pace') : ''}`
-      + `. ${num(r.open)} open in the whole plan. ${chosen ? 'Selected; select again to show everyone.' : 'Select to show only their work.'}`);
-    row.onclick = () => setScope({ person: chosen ? '' : r.name });
+      + `. ${num(r.open)} open in the whole plan. Opens everything about ${r.name}.`);
+    row.onclick = () => openPerson(r.name);
     return row;
   }));
   if (!rows.length) box.append(el('p', 'tk-empty', 'Nobody has a ticket in this view.'));
@@ -882,6 +880,19 @@ function drawRoster(focus) {
 // ── waiting for QA ──────────────────────────────────────────────────
 
 const QA_SHOWN = 8;
+
+/** One ticket waiting for QA: who finished it and how long it has waited. */
+function qaRow(t, { right = null } = {}) {
+  const row = el('div', 'tk-qa-row');
+  const w = waited(t);
+  const main = el('span', 'tk-main');
+  main.append(el('span', 'tk-subject', t.subject || '(no subject)'));
+  if (t.parentSubject) main.append(el('span', 'tk-parent', t.parentSubject));
+  row.append(link(t.url, 'tk-key', `#${t.key}`), main, el('span', 'tk-who', right ?? who(t)),
+    el('span', `tk-waited${w.n >= 3 ? ' is-long' : ''}`, w.text), el('span', 'tk-qa-sprint', t.version || 'no sprint'));
+  row.title = `${t.subject}\n${who(t)}, ${t.status} since ${fmtWhen(t.updatedAt)}`;
+  return row;
+}
 
 function waited(t) {
   const at = asDate(t.updatedAt);
@@ -911,17 +922,7 @@ function drawQueue() {
 
   const shown = state.qaAll ? list : list.slice(0, QA_SHOWN);
   const table = el('div', 'tk-qa-list');
-  for (const t of shown) {
-    const row = el('div', 'tk-qa-row');
-    const w = waited(t);
-    const main = el('span', 'tk-main');
-    main.append(el('span', 'tk-subject', t.subject || '(no subject)'));
-    if (t.parentSubject) main.append(el('span', 'tk-parent', t.parentSubject));
-    row.append(link(t.url, 'tk-key', `#${t.key}`), main, el('span', 'tk-who', who(t)),
-      el('span', `tk-waited${w.n >= 3 ? ' is-long' : ''}`, w.text), el('span', 'tk-qa-sprint', t.version || 'no sprint'));
-    row.title = `${t.subject}\n${who(t)}, ${t.status} since ${fmtWhen(t.updatedAt)}`;
-    table.append(row);
-  }
+  for (const t of shown) table.append(qaRow(t));
   box.replaceChildren(table);
   if (list.length > QA_SHOWN) {
     const more = el('button', 'chip tk-more', state.qaAll ? 'Show the oldest eight' : `Show all ${num(list.length)}`);
@@ -1095,28 +1096,31 @@ function drawPlan(focus) {
 
 // ── what needs somebody ─────────────────────────────────────────────
 
+/** A held ticket, with what was last said on it as the reason. */
+function heldItem(t) {
+  const item = el('div', 'tk-att-item');
+  const head = el('div', 'tk-att-head');
+  head.append(link(t.url, 'tk-key', `#${t.key}`), el('span', 'tk-att-subject', t.subject || '(no subject)'));
+  item.append(head, el('p', 'tk-att-meta',
+    `${t.assignee ? t.assignee : 'Nobody’s'}, ${t.version || 'no sprint'}, ${t.status}`));
+  const why = t.lastComment;
+  if (why?.text) {
+    // OpenProject comments are Markdown; the emphasis marks are noise here.
+    const text = why.text.replace(/\*\*|__|`/g, '').trim();
+    item.append(el('blockquote', 'tk-att-why', text.length > 220 ? `${text.slice(0, 220)}…` : text),
+      el('p', 'tk-att-meta', `${why.author || 'Somebody'}, ${fmtDay(why.at)}`));
+  } else {
+    item.append(el('p', 'tk-att-meta is-quiet', 'No comment on it says why.'));
+  }
+  return item;
+}
+
 function drawAttention(items) {
   // On hold, with what was last said on it.
   const held = items.filter(isStalled).sort((a, b) => Number(a.key) - Number(b.key));
   $('tk-held-title').textContent = held.length ? `On hold (${num(held.length)})` : 'On hold';
   const heldBox = $('tk-held');
-  heldBox.replaceChildren(...held.slice(0, 6).map((t) => {
-    const item = el('div', 'tk-att-item');
-    const head = el('div', 'tk-att-head');
-    head.append(link(t.url, 'tk-key', `#${t.key}`), el('span', 'tk-att-subject', t.subject || '(no subject)'));
-    item.append(head, el('p', 'tk-att-meta',
-      `${t.assignee ? t.assignee : 'Nobody’s'}, ${t.version || 'no sprint'}, ${t.status}`));
-    const why = t.lastComment;
-    if (why?.text) {
-      // OpenProject comments are Markdown; the emphasis marks are noise here.
-      const text = why.text.replace(/\*\*|__|`/g, '').trim();
-      const quote = el('blockquote', 'tk-att-why', text.length > 220 ? `${text.slice(0, 220)}…` : text);
-      item.append(quote, el('p', 'tk-att-meta', `${why.author || 'Somebody'}, ${fmtDay(why.at)}`));
-    } else {
-      item.append(el('p', 'tk-att-meta is-quiet', 'No comment on it says why.'));
-    }
-    return item;
-  }));
+  heldBox.replaceChildren(...held.slice(0, 6).map(heldItem));
   if (held.length > 6) heldBox.append(link('#states', 'tk-att-more', `${num(held.length - 6)} more on hold`));
   if (!held.length) heldBox.append(el('p', 'tk-empty', 'Nothing is on hold.'));
 
@@ -1159,6 +1163,472 @@ function drawAttention(items) {
     return row;
   }));
   if (list.length > 6) gate.append(link('#gate', 'tk-att-more', `${num(list.length - 6)} more on the gate`));
+}
+
+// ── one person ──────────────────────────────────────────────────────
+//
+// Everything about one developer, from the same payload as the rest of the
+// page: no read per person. It is the page's `person` filter given a page of
+// its own, so `?person=<name>#person` is a link somebody can send, every other
+// panel (All tickets, Late and due) is already narrowed to them when the rail
+// is used, and "Back to the team" is clearing that filter.
+//
+// The person is named by their OpenProject name, because that is all the
+// overview carries for an assignee: OpenProject 10's list gives the user's
+// title on the link, and the page is not given user ids.
+
+/** Who the delivery package says somebody is: their role, and whether the plan
+ *  keeps them off module tests. Optional: a package without docs/active/team.json
+ *  (or a reader who cannot fetch it) just shows no role. */
+async function loadTeam() {
+  try {
+    const answer = await fetch(auth.apiUrl('/api/file?path=docs/active/team.json'), { credentials: 'include' });
+    if (!answer.ok) return;
+    const doc = await answer.json();
+    state.team = {
+      roles: (doc.people ?? []).map((p) => ({ name: p.name, role: p.role, pools: p.pools ?? [] })),
+      neverTests: doc.neverTests ?? [],
+    };
+    if (state.data) drawPerson(focusSprint());
+  } catch { /* no role is a fine answer */ }
+}
+
+/** The package's entry for an OpenProject name: the same name, or the only one
+ *  whose first name matches ("Surendra" in the plan is "Surendra Loke" here). */
+function teamEntry(name, list) {
+  const exact = list.find((p) => norm(p.name ?? p) === norm(name));
+  if (exact) return exact;
+  const first = norm(name).split(' ')[0];
+  const close = list.filter((p) => norm(p.name ?? p).split(' ')[0] === first);
+  return close.length === 1 ? close[0] : null;
+}
+
+/** Change requests, read once when somebody opens a person and kept. One GET
+ *  of ADAM's own table; nothing is asked of OpenProject. */
+async function loadChanges() {
+  if (state.changes) return;
+  state.changes = { pending: true };
+  try {
+    const answer = await auth.listChanges(state.project);
+    state.changes = { items: answer.items ?? [] };
+  } catch (error) {
+    state.changes = { error: error.message || 'could not be read' };
+  }
+  if (state.scope.person) drawPersonChanges(state.scope.person, mineOf(state.scope.person));
+}
+
+function openPerson(name) {
+  setScope({ person: name });
+  if (location.hash !== '#person') location.hash = '#person';
+}
+
+function backToTeam() {
+  setScope({ person: '' });
+  location.hash = '#overview';
+}
+
+/** Every ticket a person holds, under the type filter but not the sprint one:
+ *  this page is about the person across the whole plan. */
+const mineOf = (name) => (state.data?.items ?? []).filter((t) => who(t) === name
+  && (!state.scope.type || (t.type || '') === state.scope.type));
+
+/** The bracketed tag a subject starts with: [BE], [FE], [DB], [Test]… */
+const tagOf = (t) => /^\[([^\]]{1,20})\]/.exec(t.subject || '')?.[1] ?? '';
+const isModuleTest = (t) => /^\[test\]\s*module test/i.test(t.subject || '');
+const ordinal = (n) => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
+};
+
+/** How a set of sprint tickets stands against an even pace: the one place the
+ *  sprint section and the person page both take their verdict from. */
+function paceFor(focus, items) {
+  const c = count(items);
+  const k = clock(focus);
+  const expected = Math.round(c.live * k.frac);
+  let tone = 'ok';
+  if (k.phase === 'ahead') tone = 'idle';
+  else if (k.phase === 'over') tone = c.finished >= c.live ? 'ok' : 'over';
+  else if (expected > 0) {
+    const ratio = c.finished / expected;
+    tone = ratio >= 0.9 ? 'ok' : ratio >= 0.6 ? 'warn' : 'bad';
+  }
+  return { c, k, expected, behind: Math.max(0, expected - c.finished), tone };
+}
+
+function drawPerson(focus) {
+  const name = state.scope.person;
+  const nav = $('tk-nav-person');
+  nav.textContent = name || 'One person';
+  $('tk-p-pick').hidden = !!name;
+  $('tk-p-body').hidden = !name;
+  if (!name) { drawPersonPicker(focus); return; }
+
+  const mine = mineOf(name);
+  const initialsBadge = $('tk-p-avatar');
+  initialsBadge.textContent = initials(name);
+  $('tk-p-name').textContent = name;
+  const entry = state.team ? teamEntry(name, state.team.roles) : null;
+  const stacks = (() => {
+    const tags = new Map();
+    for (const t of mine) { const g = tagOf(t); if (g) tags.set(g, (tags.get(g) ?? 0) + 1); }
+    const top = [...tags.entries()].sort((a, b) => b[1] - a[1]);
+    const total = top.reduce((n, [, v]) => n + v, 0);
+    return top.filter(([, v]) => v / Math.max(1, total) >= 0.2).slice(0, 2).map(([g]) => g);
+  })();
+  $('tk-p-role').textContent = [entry?.role, stacks.length ? `mostly ${stacks.join(' and ')} tickets` : '']
+    .filter(Boolean).join(', ') || (mine.length ? '' : 'No ticket in OpenProject is theirs.');
+
+  // This sprint: the verdict, their burn-up, the composition.
+  const sprintItems = focus ? mine.filter((t) => t.version === focus.name) : [];
+  const verdict = $('tk-p-verdict');
+  const pace = $('tk-p-pace');
+  const ledger = $('tk-p-ledger');
+  $('tk-p-burn').hidden = true;
+  if (!focus) {
+    verdict.replaceChildren('No dated sprint to measure against.');
+    pace.textContent = '';
+    ledger.replaceChildren();
+  } else if (!sprintItems.length) {
+    verdict.replaceChildren(verdictPill('idle', 'Nothing this sprint'), el('span', 'tk-p-verdict-text', `${focus.name}: nothing of theirs is planned in it.`));
+    pace.textContent = '';
+    ledger.replaceChildren();
+  } else {
+    const p = paceFor(focus, sprintItems);
+    const label = p.k.phase === 'over' && p.c.finished < p.c.live ? 'Ended unfinished' : undefined;
+    const words = `${focus.name}: ${num(p.c.finished)} of ${num(p.c.live)} finished`
+      + (p.k.phase === 'running' ? (p.behind ? `, ${num(p.behind)} behind an even pace` : ', on an even pace')
+        : p.k.phase === 'ahead' ? `, starts ${fmtWeekday(focus.start)}` : '');
+    verdict.replaceChildren(verdictPill(p.tone, label), el('span', 'tk-p-verdict-text', words));
+    if (p.k.phase === 'running') {
+      const gone = p.k.dayNo ? `by the end of today, day ${p.k.dayNo} of ${p.k.n}` : `after ${p.k.through} of ${p.k.n} working days`;
+      const bits = [`An even pace would have ${num(p.expected)} of theirs finished ${gone}.`];
+      if (p.c.finished && p.k.through) {
+        bits.push(`At their rate about ${num(Math.min(p.c.live, Math.round((p.c.finished / p.k.through) * p.k.n)))} will be finished by ${fmtWeekday(focus.end)}.`);
+      } else if (!p.c.finished) bits.push('Nothing of theirs in it is finished yet.');
+      pace.textContent = bits.join(' ');
+    } else pace.textContent = '';
+    ledger.replaceChildren(...[
+      ['Planned', p.c.live, ''], ['Closed', p.c.done, 'done'], ['Waiting for QA', p.c.qa, 'qa'],
+      ['In progress', p.c.going, 'going'], ['On hold', p.c.stalled, 'stalled'], ['Not started', p.c.fresh, 'fresh'],
+    ].filter(([label, n]) => n || label === 'Planned').map(([label, n, kind]) => {
+      const wrap = el('div', 'tk-ledger-item');
+      const dt = el('dt');
+      if (kind) dt.append(el('span', `tk-key-swatch tk-seg-${kind}`));
+      dt.append(label);
+      wrap.append(dt, el('dd', null, num(n)));
+      return wrap;
+    }));
+    if (p.k.phase !== 'ahead') {
+      drawBurn(focus, sprintItems, p.c, p.k, { figure: 'tk-p-burn', box: 'tk-p-burn-plot', caption: 'tk-p-burn-caption' });
+    }
+  }
+  drawPersonRank(name, focus);
+  drawPersonFeatures(name, focus, sprintItems);
+  drawPersonPlan(name, focus, mine);
+  drawPersonQueue(mine);
+  drawPersonFinished(mine);
+  drawPersonHeld(mine);
+  drawPersonGate(name);
+  drawPersonTests(name, mine);
+  drawPersonChanges(name, mine);
+  $('tk-p-all').textContent = `Search, filter and download all ${plural(mine.length, 'ticket', 'tickets')} of ${name.split(' ')[0]}'s`;
+  $('tk-p-all-note').textContent = 'Opens All tickets, already narrowed to them, with the search, the state filter and the CSV.';
+}
+
+/** With nobody chosen, the page is a list of everybody to choose from. */
+function drawPersonPicker(focus) {
+  const rows = sortPeople(people(focus)).filter((r) => r.all.length);
+  $('tk-p-pick-list').replaceChildren(...rows.map((r) => {
+    const b = el('button', 'tk-p-pick-item');
+    b.type = 'button';
+    b.append(el('span', 'tk-avatar', initials(r.name)), el('span', 'tk-person-name', r.name),
+      el('span', 'tk-quiet', `${focus ? `${num(r.c.live)} in ${focus.name}, ` : ''}${num(r.open)} open`));
+    b.onclick = () => openPerson(r.name);
+    return b;
+  }));
+}
+
+/** Where they sit among the team: three ranks in words, no chart. */
+function drawPersonRank(name, focus) {
+  const rows = people(focus).filter((r) => r.name !== 'Unassigned');
+  const box = $('tk-p-rank');
+  const me = rows.find((r) => r.name === name);
+  if (!me) { box.replaceChildren(); return; }
+  const rankBy = (get) => 1 + rows.filter((r) => get(r) > get(me)).length;
+  const most = (get) => {
+    const n = rankBy(get);
+    if (n === 1) return `the most of ${rows.length}`;
+    // Last, and not tied with everybody: "11th most of 11" says it the long way.
+    if (n === rows.length) return `the least of ${rows.length}`;
+    return `${ordinal(n)} most of ${rows.length}`;
+  };
+  const sprintTotal = rows.reduce((n, r) => n + r.c.live, 0) + (people(focus).find((r) => r.name === 'Unassigned')?.c.live ?? 0);
+  const openTotal = people(focus).reduce((n, r) => n + r.open, 0);
+  const k = focus ? clock(focus) : null;
+  const items = [];
+  if (focus && me.c.live) {
+    items.push([`Share of ${focus.name}`, `${share(me.c.live, sprintTotal)}`,
+      `${num(me.c.live)} of ${num(sprintTotal)} tickets, ${most((r) => r.c.live)}`]);
+  }
+  if (k?.phase === 'running' && me.c.live) {
+    items.push(['Behind pace', me.behind > 0 ? num(me.behind) : 'none',
+      me.behind > 0 ? (rankBy((r) => r.behind) === 1 ? `the furthest behind of ${rows.length}`
+        : `${ordinal(rankBy((r) => r.behind))} furthest behind of ${rows.length}`) : 'on or ahead of an even pace']);
+  }
+  items.push(['Open in the plan', num(me.open),
+    `${share(me.open, openTotal)} of the team's ${num(openTotal)}, ${most((r) => r.open)}`]);
+  if (me.finishedAll) {
+    items.push(['Finished so far', num(me.finishedAll), most((r) => r.finishedAll)]);
+  }
+  box.replaceChildren(...items.map(([label, value, words]) => {
+    const wrap = el('div', 'tk-p-rank-item');
+    wrap.append(el('dt', null, label), el('dd', null, value), el('dd', 'tk-p-rank-words', words));
+    return wrap;
+  }));
+}
+
+/** Their open sprint work as work: grouped by the feature it belongs to. */
+const FEATURES_SHOWN = 12;
+function drawPersonFeatures(name, focus, sprintItems) {
+  const box = $('tk-p-features');
+  $('tk-p-features-title').textContent = focus ? `Open in ${focus.name}, by feature` : 'Open this sprint, by feature';
+  const open = sprintItems.filter((t) => !isFinished(t) && !isRejected(t));
+  if (!focus || !open.length) {
+    box.replaceChildren(el('p', 'tk-empty', !focus ? 'No dated sprint.'
+      : sprintItems.length ? `Everything of theirs in ${focus.name} is finished.` : `Nothing of theirs is in ${focus.name}.`));
+    $('tk-p-features-note').textContent = '';
+    return;
+  }
+  const groups = new Map();
+  for (const t of sprintItems) {
+    const feature = tree.second.get(t.key);
+    const key = feature && feature !== t ? feature.key : '';
+    const g = groups.get(key) ?? { feature: key ? feature : null, open: [], finished: 0 };
+    if (isFinished(t)) g.finished += 1; else if (!isRejected(t)) g.open.push(t);
+    groups.set(key, g);
+  }
+  const list = [...groups.values()].filter((g) => g.open.length)
+    .sort((a, b) => b.open.length - a.open.length || String(a.feature?.subject).localeCompare(String(b.feature?.subject)));
+  $('tk-p-features-note').textContent = `${plural(open.length, 'open ticket', 'open tickets')} under `
+    + `${plural(list.length, 'feature', 'features')}, the biggest first. Open one to see its tickets.`;
+  const render = (all) => {
+    box.replaceChildren(...(all ? list : list.slice(0, FEATURES_SHOWN)).map((g) => {
+      const d = el('details', 'tk-p-feature');
+      const sum = el('summary');
+      const top = g.feature ? tree.top.get(g.feature.key) : null;
+      const code = top ? blockName(top.subject).code : '';
+      sum.append(el('span', 'tk-p-feature-name', g.feature?.subject || 'Not under a feature'),
+        code ? el('span', 'tk-p-chip', code) : '',
+        el('span', 'tk-p-feature-n', `${num(g.open.length)} open${g.finished ? `, ${num(g.finished)} finished` : ''}`));
+      d.append(sum);
+      // A sub-task is read under its task: "V0026__orders.sql, 39 sub-tasks
+      // open" is one piece of work, where 39 table rows are a list.
+      const nodes = new Map();
+      for (const t of g.open) {
+        const underTask = t.parent && g.feature && String(t.parent) !== String(g.feature.key) && tree.byKey.has(String(t.parent));
+        const head = underTask ? tree.byKey.get(String(t.parent)) : t;
+        const node = nodes.get(head.key) ?? { task: head, self: false, subs: [] };
+        if (underTask) node.subs.push(t); else node.self = true;
+        nodes.set(head.key, node);
+      }
+      const rows = el('div', 'tk-p-feature-rows');
+      const ordered = [...nodes.values()].sort((a, b) => Number(a.task.key) - Number(b.task.key));
+      for (const n of ordered.slice(0, 60)) {
+        const row = el('div', 'tk-p-ticket');
+        const right = n.subs.length
+          ? el('span', 'tk-p-when', `${plural(n.subs.length, 'sub-task', 'sub-tasks')} open${n.self ? ', and the task' : ''}`)
+          : stateBadge(n.task);
+        row.append(link(n.task.url, 'tk-key', `#${n.task.key}`), el('span', 'tk-subject', n.task.subject || '(no subject)'), right);
+        if (n.subs.length) row.title = n.subs.map((x) => `#${x.key} ${x.subject}`).slice(0, 30).join('\n');
+        rows.append(row);
+      }
+      if (ordered.length > 60) rows.append(el('p', 'tk-quiet', `and ${num(ordered.length - 60)} more, in All tickets`));
+      d.append(rows);
+      return d;
+    }));
+    // The biggest feature opens by itself when it is short enough to read.
+    const first = box.querySelector('details');
+    if (first && first.querySelectorAll('.tk-p-ticket').length <= 12) first.open = true;
+    if (list.length > FEATURES_SHOWN) {
+      const more = el('button', 'chip tk-more', all ? `Show the biggest ${FEATURES_SHOWN}` : `Show all ${num(list.length)} features`);
+      more.type = 'button';
+      more.setAttribute('aria-expanded', all ? 'true' : 'false');
+      more.onclick = () => render(!all);
+      box.append(more);
+    }
+  };
+  render(false);
+}
+
+/** Everything they hold, cut three ways: by sprint, by block, by type and tag. */
+function drawPersonPlan(name, focus, mine) {
+  const open = mine.filter(isOpenWork);
+  $('tk-p-plan-note').textContent = `${plural(open.length, 'ticket', 'tickets')} still theirs to do across the plan`
+    + `${mine.length - open.length ? `, beside ${num(mine.length - open.length)} finished or rejected` : ''}.`;
+
+  // Per sprint: one cell per sprint, the count printed, a column for its size.
+  const sprints = datedSprints().filter((s) => s.number != null);
+  const bySprint = new Map();
+  for (const t of open) bySprint.set(t.version || '', (bySprint.get(t.version || '') ?? 0) + 1);
+  const most = Math.max(1, ...bySprint.values());
+  const strip = $('tk-p-sprints');
+  const cells = sprints.map((s) => [s.name, String(s.number), bySprint.get(s.name) ?? 0, focus && s.name === focus.name]);
+  const loose = bySprint.get('') ?? 0;
+  if (loose) cells.push(['', 'none', loose, false]);
+  strip.style.setProperty('--n', String(cells.length));
+  strip.replaceChildren(...cells.map(([sprint, label, n, now]) => {
+    const cell = el('div', `tk-p-cell${now ? ' is-focus' : ''}${n ? '' : ' is-empty'}`);
+    const bar = el('span', 'tk-p-cell-bar');
+    bar.style.setProperty('--h', String(n / most));
+    cell.append(el('span', 'tk-p-cell-n', n ? num(n) : '–'), bar, el('span', 'tk-p-cell-label', label));
+    cell.dataset.tip = `${sprint || 'No sprint'}: ${plural(n, 'open ticket', 'open tickets')}`;
+    return cell;
+  }));
+  strip.setAttribute('aria-label', `Open tickets per sprint: ${cells.filter(([, , n]) => n)
+    .map(([s, , n]) => `${s || 'no sprint'} ${n}`).join(', ') || 'none'}.`);
+
+  // Per block, per type, per tag: short lists with a bar on one scale each.
+  const tally = (key) => {
+    const m = new Map();
+    for (const t of open) { const k = key(t); if (k) m.set(k, (m.get(k) ?? 0) + 1); }
+    return [...m.entries()];
+  };
+  const blockOf = (t) => {
+    const top = tree.top.get(t.key);
+    if (!top || top === t) return '';
+    const n = blockName(top.subject);
+    return n.code ? `Block ${n.code}` : top.subject;
+  };
+  const blocksList = tally(blockOf).sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }));
+  const noBlock = open.filter((t) => !blockOf(t)).length;
+  if (noBlock) blocksList.push(['Not under a block', noBlock]);
+  miniBars($('tk-p-blocks'), blocksList);
+  miniBars($('tk-p-types'), tally((t) => t.type || 'No type').sort((a, b) => b[1] - a[1]));
+  const tags = tally((t) => tagOf(t) || 'No tag').sort((a, b) => b[1] - a[1]);
+  miniBars($('tk-p-tags'), tags);
+}
+
+function miniBars(box, entries) {
+  const most = Math.max(1, ...entries.map(([, n]) => n));
+  box.replaceChildren(...entries.map(([label, n]) => {
+    const row = el('div', 'tk-p-mini');
+    const bar = el('span', 'tk-p-mini-bar');
+    const fill = el('span', 'tk-p-mini-fill');
+    fill.style.width = `${Math.max(2, (n / most) * 100)}%`;
+    bar.append(fill);
+    row.append(el('span', 'tk-p-mini-label', label), bar, el('span', 'tk-p-mini-n', num(n)));
+    return row;
+  }));
+  if (!entries.length) box.append(el('p', 'tk-empty', 'Nothing open.'));
+}
+
+function drawPersonQueue(mine) {
+  const list = mine.filter(isAwaiting).sort((a, b) => (asDate(a.updatedAt) ?? 0) - (asDate(b.updatedAt) ?? 0));
+  $('tk-p-qa-title').textContent = list.length ? `Waiting for QA (${num(list.length)})` : 'Waiting for QA';
+  const box = $('tk-p-qa');
+  if (!list.length) { box.replaceChildren(el('p', 'tk-empty', 'Nothing of theirs is waiting for QA.')); return; }
+  const table = el('div', 'tk-qa-list tk-p-list');
+  for (const t of list.slice(0, 10)) table.append(qaRow(t, { right: t.status }));
+  box.replaceChildren(table);
+  if (list.length > 10) box.append(el('p', 'tk-quiet', `and ${num(list.length - 10)} more, in All tickets`));
+}
+
+/** What they finished most recently: "search a name, show what they closed". */
+function drawPersonFinished(mine) {
+  const list = mine.filter(isFinished).map((t) => [t, finishedAt(t)]).sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
+  const box = $('tk-p-done');
+  $('tk-p-done-title').textContent = list.length ? `Recently finished (${num(list.length)})` : 'Recently finished';
+  if (!list.length) { box.replaceChildren(el('p', 'tk-empty', 'Nothing of theirs is finished yet.')); return; }
+  const fromAdam = list.filter(([t]) => state.data.closes?.[t.key]).length;
+  $('tk-p-done-note').textContent = 'Newest first. Closed and waiting for QA both count. '
+    + (fromAdam === list.length ? 'Every date is when ADAM closed it.'
+      : 'A date is when ADAM closed the ticket where it went through ADAM, otherwise the ticket’s last change in OpenProject.');
+  const table = el('div', 'tk-p-list');
+  for (const [t, at] of list.slice(0, 12)) {
+    const row = el('div', 'tk-p-ticket tk-p-done-row');
+    row.append(link(t.url, 'tk-key', `#${t.key}`), el('span', 'tk-subject', t.subject || '(no subject)'), stateBadge(t),
+      el('span', 'tk-p-when', at ? fmtWhen(at.toISOString()) : '—'));
+    table.append(row);
+  }
+  box.replaceChildren(table);
+  if (list.length > 12) box.append(el('p', 'tk-quiet', `and ${num(list.length - 12)} earlier, in All tickets`));
+}
+
+function drawPersonHeld(mine) {
+  const held = mine.filter(isStalled);
+  $('tk-p-held-title').textContent = held.length ? `On hold (${num(held.length)})` : 'On hold';
+  $('tk-p-held').replaceChildren(...(held.length ? held.slice(0, 8).map(heldItem)
+    : [el('p', 'tk-empty', 'Nothing of theirs is on hold.')]));
+}
+
+function drawPersonGate(name) {
+  const g = gateFor(name);
+  const box = $('tk-p-gate');
+  if (!g) {
+    box.replaceChildren(el('p', 'tk-att-text', `${name.split(' ')[0]} has not closed a ticket through ADAM yet, `
+      + `so the ${state.data.testEvery ?? 10}-ticket gate has not started for them.`));
+    return;
+  }
+  const s = gateState(g);
+  box.replaceChildren(gateMeter(g), el('p', 'tk-att-text', `${g.closed} of ${g.every} closed through ADAM since `
+    + `${g.lastPassedAt ? `their last batch passed on ${fmtDay(g.lastPassedAt)}` : 'they started'}: ${s.text}.`));
+}
+
+function drawPersonTests(name, mine) {
+  const tests = mine.filter(isModuleTest).sort((a, b) => bySprint(a.version || '(no sprint)', b.version || '(no sprint)'));
+  const box = $('tk-p-tests');
+  $('tk-p-tests-title').textContent = tests.length ? `Module tests they own (${num(tests.length)})` : 'Module tests they own';
+  const never = state.team && teamEntry(name, state.team.neverTests);
+  if (!tests.length) {
+    box.replaceChildren(el('p', 'tk-att-text', never
+      ? 'None, by design: the plan never gives them a module test, because a module test needs a checker who is not its builder.'
+      : 'None: no ticket of theirs is a "[Test] Module test".'));
+    return;
+  }
+  const list = el('div', 'tk-p-list');
+  // The plan says who never owns one; OpenProject is where it is enforced or not.
+  if (never) {
+    list.append(el('p', 'tk-att-text tk-p-warn', `The plan never gives ${name.split(' ')[0]} a module test (team.json, neverTests), `
+      + `yet ${tests.length === 1 ? 'this one is' : `these ${tests.length} are`} theirs in OpenProject.`));
+  }
+  for (const t of tests.slice(0, 8)) {
+    const row = el('div', 'tk-att-item');
+    const head = el('div', 'tk-att-head');
+    head.append(link(t.url, 'tk-key', `#${t.key}`),
+      el('span', 'tk-att-subject', (t.subject || '').replace(/^\[test\]\s*module test:\s*/i, '')));
+    row.append(head, el('p', 'tk-att-meta', `${t.version || 'no sprint'}, ${t.status}`));
+    list.append(row);
+  }
+  box.replaceChildren(list);
+  if (tests.length > 8) box.append(el('p', 'tk-quiet', `and ${num(tests.length - 8)} more`));
+}
+
+function drawPersonChanges(name, mine) {
+  const box = $('tk-p-crs');
+  const ch = state.changes;
+  if (!ch) { loadChanges(); box.replaceChildren(el('p', 'tk-quiet', 'Reading ADAM’s change requests…')); return; }
+  if (ch.pending) return;
+  if (ch.error) { box.replaceChildren(el('p', 'tk-att-text', `ADAM's change requests could not be read: ${ch.error}`)); return; }
+  const keys = new Set(mine.map((t) => String(t.key)));
+  const list = ch.items.filter((c) => keys.has(String(c.ticket || '').replace('#', ''))
+    || keys.has(String(c.childTicket || '').replace('#', '')));
+  $('tk-p-crs-title').textContent = list.length ? `Change requests (${num(list.length)})` : 'Change requests';
+  if (!list.length) {
+    box.replaceChildren(el('p', 'tk-att-text', `No ADAM change request was raised on one of ${name.split(' ')[0]}'s tickets `
+      + `or filed as one${ch.items.length ? ` (${plural(ch.items.length, 'request', 'requests')} in the project)` : ''}.`));
+    return;
+  }
+  const wrap = el('div', 'tk-p-list');
+  for (const c of list) {
+    const row = el('div', 'tk-p-ticket');
+    const which = keys.has(String(c.childTicket || '')) ? `filed as #${c.childTicket}` : `raised on #${c.ticket}`;
+    row.append(link('/changes.html', 'tk-key', c.id), el('span', 'tk-subject', c.title),
+      el('span', 'tk-badge tk-badge-open', c.status), el('span', 'tk-p-when', which));
+    wrap.append(row);
+  }
+  box.replaceChildren(wrap);
 }
 
 // ── the testing gate ────────────────────────────────────────────────
@@ -1268,7 +1738,7 @@ function drawPeopleTable(focus) {
     name.scope = 'row';
     const pick = el('button', 'tk-link', r.name);
     pick.type = 'button';
-    pick.onclick = () => setScope({ person: state.scope.person === r.name ? '' : r.name });
+    pick.onclick = () => openPerson(r.name);
     name.append(pick);
     tr.append(name);
     for (const [label, get] of kept) {
@@ -1707,6 +2177,11 @@ function redrawBurn() {
   const items = inFocus(focus);
   const c = count(items);
   if (c.live) drawBurn(focus, items, c, k);
+  if (state.scope.person) {
+    const theirs = mineOf(state.scope.person).filter((t) => t.version === focus.name);
+    const tc = count(theirs);
+    if (tc.live) drawBurn(focus, theirs, tc, k, { figure: 'tk-p-burn', box: 'tk-p-burn-plot', caption: 'tk-p-burn-caption' });
+  }
 }
 
 // ── start ───────────────────────────────────────────────────────────
@@ -1723,7 +2198,7 @@ function redrawBurn() {
   $('tasks').hidden = false;
 
   const params = new URLSearchParams(location.search);
-  state.scope = { person: params.get('who') ?? '', sprint: params.get('sprint') ?? '', type: params.get('type') ?? '' };
+  state.scope = { person: params.get('person') ?? params.get('who') ?? '', sprint: params.get('sprint') ?? '', type: params.get('type') ?? '' };
   try {
     const saved = localStorage.getItem('adam-tasks-team-sort');
     if (['behind', 'planned', 'done', 'name'].includes(saved)) state.teamSort = saved;
@@ -1752,10 +2227,18 @@ function redrawBurn() {
     state.ganttOpenOnly = e.target.checked;
     drawTimeline(scoped());
   };
-  $('tk-scope-person').onchange = (e) => setScope({ person: e.target.value });
+  $('tk-scope-person').onchange = (e) => (e.target.value ? openPerson(e.target.value) : backToTeam());
+  $('tk-p-back').onclick = (e) => { e.preventDefault(); backToTeam(); };
+  $('tk-p-all').onclick = () => { location.hash = '#tickets'; };
+  // A link to somebody's page opens on it, whatever the rail last showed.
+  if (state.scope.person && !location.hash) history.replaceState(null, '', `${location.pathname}${location.search}#person`);
+  loadTeam();
   $('tk-scope-sprint').onchange = (e) => setScope({ sprint: e.target.value });
   $('tk-scope-type').onchange = (e) => setScope({ type: e.target.value });
-  $('tk-scope-clear').onclick = () => setScope({ person: '', sprint: '', type: '' });
+  $('tk-scope-clear').onclick = () => {
+    setScope({ person: '', sprint: '', type: '' });
+    if (location.hash === '#person') location.hash = '#overview';
+  };
   $('tk-team-sort').onchange = (e) => {
     state.teamSort = e.target.value;
     try { localStorage.setItem('adam-tasks-team-sort', state.teamSort); } catch { /* storage denied */ }
@@ -1782,6 +2265,6 @@ function redrawBurn() {
   // One section at a time, driven by the rail. Same mechanism as the settings
   // page; see panels.js.
   mountPanels({ nav: document.querySelector('#tasks .set-nav'), fallback: 'overview',
-    onShow: (name) => { if (name === 'overview') redrawBurn(); } });
+    onShow: (name) => { if (name === 'overview' || name === 'person') redrawBurn(); } });
   hideLoader();
 })();

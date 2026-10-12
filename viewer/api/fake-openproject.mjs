@@ -491,6 +491,17 @@ createServer(async (req, res) => {
     await read(req);
     return json(res, 201, { _type: 'Activity', id: nextId++ });
   }
+  // The thread under a ticket. Only a held ticket says anything: it is the
+  // reason the delivery overview shows beside it (main.py `_held_reasons`).
+  if (activity && req.method === 'GET') {
+    const wp = packages.get(activity[1]);
+    const held = /hold/i.test(wp?._links?.status?.title ?? '');
+    return json(res, 200, { _type: 'Collection', _embedded: { elements: held ? [{
+      _type: 'Activity::Comment', createdAt: '2026-10-07T07:29:15Z',
+      comment: { raw: 'Waiting on the payments provider to confirm gift-card refunds.' },
+      _links: { user: { href: '/api/v3/users/9', title: 'Hrushikant Patkar' } },
+    }] : [] } });
+  }
 
   const make = path.match(/^\/api\/v3\/projects\/(\d+)\/work_packages$/);
   if (make && req.method === 'POST') {

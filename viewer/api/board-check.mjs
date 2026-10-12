@@ -365,6 +365,20 @@ check('the overview says where each developer is on the gate',
 check('and when ADAM closed the tickets it closed',
   Object.keys(after.data?.closes ?? {}).filter((k) => k.startsWith('80')).length === 10,
   Object.keys(after.data?.closes ?? {}).join(' '));
+// The Tasks page's per-developer view is drawn from this one payload, with no
+// read per person: so every row carries who holds it, where it sits in the
+// tree, its sprint and when it last changed, and a held ticket says why.
+const rows = after.data?.items ?? [];
+check('every overview row carries what the person view reads',
+  rows.length > 0 && rows.every((t) => 'assignee' in t && 'parent' in t && 'version' in t
+    && 'type' in t && 'updatedAt' in t && 'status' in t),
+  rows.length ? Object.keys(rows[0]).join(' ') : 'no rows');
+const held = rows.find((t) => t.key === '7203');
+check('a held ticket carries its last comment as the reason',
+  /payments provider/.test(held?.lastComment?.text ?? '') && held?.lastComment?.author === 'Hrushikant Patkar',
+  JSON.stringify(held?.lastComment));
+check('and a ticket that is not held carries none',
+  rows.filter((t) => t.lastComment && !/hold/i.test(t.status)).length === 0);
 check('the overview carries the project versions, for sprint dates',
   (after.data?.versions ?? []).some((v) => v.name === 'M1 Checkout'),
   (after.data?.versions ?? []).map((v) => v.name).join(' '));

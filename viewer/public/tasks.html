@@ -104,6 +104,7 @@
         <div class="set-nav-list">
           <a href="#overview">This sprint</a>
           <div class="set-nav-group">Who and when</div>
+          <a href="#person" id="tk-nav-person">One person</a>
           <a href="#people">People, in numbers</a>
           <a href="#gate">Testing gate</a>
           <a href="#dates">Late and due</a>
@@ -218,6 +219,99 @@
             <section class="tk-attend-col" aria-labelledby="tk-gatebox-title">
               <h3 class="tk-part-title" id="tk-gatebox-title">Testing gate</h3>
               <div id="tk-gatebox"></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ── one person ────────────────────────────────────────────────
+             Everything about one developer. The page's person filter with a
+             page of its own: ?person=<name>#person is the link to send. -->
+        <section class="admin-panel set-section tk-sheet" id="person" aria-labelledby="tk-p-name">
+          <a class="tk-back" id="tk-p-back" href="#overview">Back to the team</a>
+
+          <div id="tk-p-pick">
+            <h2 class="tk-part-title">Choose a person</h2>
+            <p class="tk-note">Everything about one developer: their sprint, what they hold across the plan, what waits on QA, what they finished, the gate and their module tests.</p>
+            <div class="tk-p-pick-list" id="tk-p-pick-list"></div>
+          </div>
+
+          <div id="tk-p-body" hidden>
+            <header class="tk-p-head">
+              <span class="tk-p-avatar" id="tk-p-avatar" aria-hidden="true"></span>
+              <div class="tk-p-id">
+                <h2 class="tk-p-name" id="tk-p-name"></h2>
+                <p class="tk-p-role" id="tk-p-role"></p>
+              </div>
+            </header>
+            <p class="tk-p-verdict" id="tk-p-verdict"></p>
+
+            <div class="tk-sprint-hero tk-p-hero">
+              <div class="tk-verdict">
+                <p class="tk-pace" id="tk-p-pace"></p>
+                <dl class="tk-ledger" id="tk-p-ledger"></dl>
+                <h3 class="tk-p-sub">Against the team</h3>
+                <dl class="tk-p-rank" id="tk-p-rank"></dl>
+              </div>
+              <figure class="tk-burn" id="tk-p-burn" hidden>
+                <figcaption class="tk-burn-caption" id="tk-p-burn-caption"></figcaption>
+                <div class="tk-burn-plot" id="tk-p-burn-plot"></div>
+              </figure>
+            </div>
+
+            <section class="tk-part" aria-labelledby="tk-p-features-title">
+              <h3 class="tk-part-title" id="tk-p-features-title">Open this sprint, by feature</h3>
+              <p class="tk-note" id="tk-p-features-note"></p>
+              <div class="tk-p-features" id="tk-p-features"></div>
+            </section>
+
+            <section class="tk-part" aria-labelledby="tk-p-plan-title">
+              <h3 class="tk-part-title" id="tk-p-plan-title">Everything they hold</h3>
+              <p class="tk-note" id="tk-p-plan-note"></p>
+              <h4 class="tk-p-sub">Open, sprint by sprint</h4>
+              <div class="tk-p-sprints" id="tk-p-sprints" role="img"></div>
+              <div class="tk-p-cuts">
+                <div><h4 class="tk-p-sub">By block</h4><div id="tk-p-blocks"></div></div>
+                <div><h4 class="tk-p-sub">By type</h4><div id="tk-p-types"></div></div>
+                <div><h4 class="tk-p-sub">By kind of work</h4><div id="tk-p-tags"></div></div>
+              </div>
+            </section>
+
+            <div class="tk-p-two">
+              <section class="tk-part" aria-labelledby="tk-p-qa-title">
+                <h3 class="tk-part-title" id="tk-p-qa-title">Waiting for QA</h3>
+                <p class="tk-note">Finished, waiting for somebody to test and close; oldest first, from the ticket&rsquo;s last change.</p>
+                <div id="tk-p-qa"></div>
+              </section>
+              <section class="tk-part" aria-labelledby="tk-p-done-title">
+                <h3 class="tk-part-title" id="tk-p-done-title">Recently finished</h3>
+                <p class="tk-note" id="tk-p-done-note"></p>
+                <div id="tk-p-done"></div>
+              </section>
+            </div>
+
+            <div class="tk-attend">
+              <section class="tk-attend-col" aria-labelledby="tk-p-held-title">
+                <h3 class="tk-part-title" id="tk-p-held-title">On hold</h3>
+                <div id="tk-p-held"></div>
+              </section>
+              <section class="tk-attend-col" aria-labelledby="tk-p-gate-title">
+                <h3 class="tk-part-title" id="tk-p-gate-title">Testing gate</h3>
+                <div id="tk-p-gate"></div>
+              </section>
+              <section class="tk-attend-col" aria-labelledby="tk-p-tests-title">
+                <h3 class="tk-part-title" id="tk-p-tests-title">Module tests they own</h3>
+                <div id="tk-p-tests"></div>
+              </section>
+            </div>
+
+            <section class="tk-part" aria-labelledby="tk-p-crs-title">
+              <h3 class="tk-part-title" id="tk-p-crs-title">Change requests</h3>
+              <div id="tk-p-crs"></div>
+            </section>
+
+            <section class="tk-part tk-p-allbox">
+              <button class="chip tk-p-all" id="tk-p-all" type="button"></button>
+              <p class="tk-note" id="tk-p-all-note"></p>
             </section>
           </div>
         </section>
