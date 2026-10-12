@@ -42,7 +42,7 @@ notes: 'Batch R4, 6 October 2026. edge_protection_named() run against the genera
   documents are rebuilt at the refresh (the generator was run here only to verify, and its outputs discarded). No
   OpenProject ticket carries the LLD text; the infrastructure tickets point at the LLD.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request is the client's tracker answers of 6 October 2026)
+adam_cr: CR-032 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

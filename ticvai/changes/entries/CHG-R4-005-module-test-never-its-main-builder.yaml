@@ -56,7 +56,7 @@ notes: 'Batch R4, 6 October 2026. With the owners OpenProject holds (release r1,
   handoff/audit-baseline.json; listing one in `moduleTestPeers` moves it. check-plan-owners (O-SELF-TEST) fails on the
   commit before this fix (TEST-AM-AI-ENGINE-A2) and passes after it.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
+adam_cr: CR-019 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

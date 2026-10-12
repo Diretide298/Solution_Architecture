@@ -34,7 +34,7 @@ tickets:
   unstarted: []
 release_tag: r2
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR; the decision is Chinmay's instruction of 6 October quoted in why)
+adam_cr: CR-039 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 prevention:
   type: check

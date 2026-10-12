@@ -95,7 +95,7 @@ notes: 'Batch R4, 6 October 2026. F-VARIANCE-REASON (check-finance-rules, alread
   in git): none started. Wireframes that change: POS-007, EMP-009, BO-040. The client is asked on 7 October whether
   a second, manager-only tier is wanted; nothing here presumes it.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request is the client's tracker answers of 6 October 2026)
+adam_cr: CR-033 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

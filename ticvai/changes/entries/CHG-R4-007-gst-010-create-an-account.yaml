@@ -31,7 +31,7 @@ prevention:
 notes: 'Batch R4, 6 October 2026. The DEC rule fails on the old notes ("GST-010 ... its design notes (actions) still
   set a password") and passes after the fix.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
+adam_cr: CR-021 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

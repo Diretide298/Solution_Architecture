@@ -62,7 +62,7 @@ notes: 'Batch R4, 6 October 2026. C-NAME-LOCALISED (a persisted schema that loca
   starts before Wed 7 October (APP-SETUP-BO-008 at day 4.38 is the earliest). The lead confirms against ADAM before
   the release.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+adam_cr: CR-025 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

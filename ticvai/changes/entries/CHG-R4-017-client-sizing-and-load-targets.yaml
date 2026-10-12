@@ -69,7 +69,7 @@ notes: 'Batch R4, 6 October 2026. check-load-targets (registered in run-checks.p
   37.83: none started ("started" read from handoff/service-docs/block-a-schedule.json; no status snapshot is in git).
   No contract changes. The derived HLD (handoff/hld-lld/TICVAI-HLD.md) picks the sentence up at the refresh.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request is the client's tracker answers of 6 October 2026)
+adam_cr: CR-031 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

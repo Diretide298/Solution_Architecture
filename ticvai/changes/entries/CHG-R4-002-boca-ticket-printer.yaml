@@ -55,7 +55,7 @@ tickets:
   unstarted: []
 release_tag: r2
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the source is sources/client/2026-10-05-allam-boca-printer.md)
+adam_cr: CR-016 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 prevention:
   type: check

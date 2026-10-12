@@ -33,7 +33,7 @@ notes: 'Batch R4, 6 October 2026. Before the fix 1 of the 2,519 pushed task keys
   fresh r1; they are not changed here. check-key-stability now fails a new key whose work is exactly a closed key''s
   (renamed): it fails on the plan before the fix and passes after it.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
+adam_cr: CR-024 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

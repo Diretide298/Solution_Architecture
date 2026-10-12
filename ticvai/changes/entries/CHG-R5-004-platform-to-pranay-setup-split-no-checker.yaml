@@ -53,7 +53,7 @@ tickets:
   - every ownerMoves key (nothing the r2 schedule started by 7 October; the setup tasks checked New by the lead)
 release_tag: r3
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r3; Chinmay's decisions of 7 October 2026)
+adam_cr: CR-037 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 waivers:
   cooling_off:

@@ -56,7 +56,7 @@ tickets:
   unstarted: []
 release_tag: r3
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r3; the request is Chinmay's of 7 October 2026)
+adam_cr: CR-034 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 waivers:
   cooling_off:

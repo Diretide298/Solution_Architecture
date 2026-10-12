@@ -47,7 +47,7 @@ notes: 'Batch R4, 6 October 2026. check-binding-ratchet''s new crossed-schema ru
   Block C (AM-ADMISSION-ACCESS-P07, no task ticket yet); APP-SCANNER-SCN-003 is scheduled from day 14.77. The
   wireframe boards (wireframes/P07) never drew the media kind; Claude Design reads the rebuilt batch.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+adam_cr: CR-026 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

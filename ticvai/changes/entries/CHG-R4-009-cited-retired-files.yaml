@@ -25,7 +25,7 @@ prevention:
 notes: 'Batch R4, 6 October 2026. The check fails on the commit before (the six V0100-V0102 citations, CS-MISSING) and
   passes after it (34 known, 0 new).'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request came from the lead's to-do list for r2, 6 October 2026)
+adam_cr: CR-023 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open

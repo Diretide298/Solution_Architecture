@@ -34,7 +34,7 @@ tickets:
   - TEST-AM-* that were Hrushikant Patkar's (New in OpenProject; module tests start after their app-module)
 release_tag: r3
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r3; Chinmay's decision of 7 October 2026)
+adam_cr: CR-038 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 waivers:
   cooling_off:

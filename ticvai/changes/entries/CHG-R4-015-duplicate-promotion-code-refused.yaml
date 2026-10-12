@@ -50,7 +50,7 @@ notes: 'Batch R4, 6 October 2026. C-CODE-409 (a create/add/register/import POST 
   unique, and where), not a mechanical fix. SVC-CATALOGUE-PROMOTION-1 starts at day 5.06, APP-SETUP-BO-010 at 4.05,
   MIG-PROMOTIONS at 4.55 (block-a-schedule.json): none started.'
 decision_owner: Chinmay
-adam_cr: pending (the lead raises the ADAM CR for r2; the request is the lead's r2 fix list of 6 October 2026)
+adam_cr: CR-029 (ADAM, raised and settled 12 Oct 2026)
 triage: fix-forward
 release_tag: r2
 status: open
