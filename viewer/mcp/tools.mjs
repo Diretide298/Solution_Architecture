@@ -1,5 +1,5 @@
 /**
- * The twenty-three tools, and where each gets its answer.
+ * The twenty-four tools, and where each gets its answer.
  *
  * **Nine read the package.** They are selectors over bulk payloads, not
  * proxies: there is no `/api/screen?id=BO-102`, so a layer is fetched whole,
@@ -17,10 +17,12 @@
  * | adam_file      | /api/file, windowed by line                              |
  * | adam_search    | /api/search .entries                                     |
  *
- * **Four are about scheduled work**, and they go to the accounts service rather
+ * **Five are about scheduled work**, and they go to the accounts service rather
  * than the package — uncached, because coordination changes while you are
  * looking at it. `adam_board` and `adam_work` read OpenProject live as the
- * caller. `adam_links` and `adam_link` read and write the one thing neither
+ * caller; `adam_team` reads a teammate's tickets, or what everybody has
+ * started, the same way (read-only, and only what the caller's own
+ * OpenProject account can see). `adam_links` and `adam_link` read and write the one thing neither
  * system can hold on its own: which artefact a work package is about.
  *
  * **Four are about doing the work.** `adam_pull` saves a ticket and everything
@@ -1134,6 +1136,178 @@ export const TOOLS = [
             + 'subtasks or the touched artefacts, and do not summarise them — the `subtasks` '
             + 'column already gives the count. Call this tool again with subtasks: true if the '
             + 'person asks to see them.',
+      };
+    },
+  },
+
+  {
+    name: 'adam_team',
+    description:
+      "Read-only: what your teammates are working on in OpenProject. Use for questions like 'what is "
+      + "Hrushikant working on', 'what has Deep got open', 'what's everyone doing', 'who is busy / who is "
+      + "free', or 'who is on the module ticket N is in' (read ticket N with adam_work first for its parent, "
+      + 'then look for that parent here). With `person` (a name; a first name or the start of one is '
+      + "enough, any case) it gives that person's open tickets (in progress first, then stalled, awaiting QA "
+      + 'and New) and what they finished in the last 14 days (or `days`, up to 60): closed or moved to Ready '
+      + 'for QA, each with its status, type, date and parent. Without it, it gives everybody on the project: '
+      + 'per person, how many tickets are in progress, awaiting QA, stalled (on hold or blocked), open, and '
+      + 'finished lately, and what each has in progress. Your own work is adam_board. Read as you, '
+      + 'with your OpenProject token, so it shows only what your OpenProject account can see.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        person: {
+          type: 'string',
+          description:
+            'A teammate\'s name, e.g. "Hrushikant", "hrushi" or "Patkar". Leave out for the whole team. '
+            + 'If it matches nobody or more than one person, the answer lists the names to choose from.',
+        },
+        limit: {
+          type: 'number',
+          description: 'How many ticket rows to show (default 30, at most 80). Counts always cover all of them.',
+        },
+        days: {
+          type: 'number',
+          description: 'With `person`: how far back the finished list reaches, in days (default 14, at most 60).',
+        },
+        refresh: {
+          type: 'boolean',
+          description: 'Whole team only: read OpenProject again rather than the copy held for two minutes.',
+        },
+      },
+    },
+    async run(client, args = {}) {
+      const limit = Math.min(Math.max(Math.trunc(Number(args?.limit)) || 30, 1), 80);
+      const person = String(args?.person ?? '').trim();
+      const days = Math.min(Math.max(Math.trunc(Number(args?.days)) || 14, 1), 60);
+      const answer = person
+        ? await client.service(`/api/board/person?${await scoped(client, { who: person, days: String(days) })}`)
+        : await client.service(`/api/board/team?${await scoped(client, args?.refresh ? { refresh: '1' } : {})}`);
+      if (answer.status === 428) return { found: false, needsSetup: true, error: answer.data?.detail };
+      if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      const data = answer.data;
+      const partOf = (t) => (t.parent ? `${t.parent}${t.parentSubject ? ` — ${t.parentSubject}` : ''}` : '—');
+      const day = (stamp) => String(stamp ?? '').slice(0, 10);
+
+      if (person) {
+        if (!data.person) {
+          return {
+            found: false,
+            [data.match === 'ambiguous' ? 'ambiguous' : 'unknown']: true,
+            asked: person,
+            candidates: (data.candidates ?? []).map((c) => c.name),
+            note: data.note,
+            display: 'Say in one line that the name was ambiguous or not found, list `candidates`, and ask '
+              + 'which one they meant (or call adam_team again with the full name).',
+          };
+        }
+        const all = data.items ?? [];
+        const rows = all.slice(0, limit).map((t) => ({
+          ticket: t.key,
+          task: t.subject,
+          partOf: partOf(t),
+          status: t.status,
+          due: t.dueDate ?? '',
+          order: t.buildOrder ?? '',
+        }));
+        // Most recent first, as the service sends them: closed, and moved to an awaiting-QA status, in
+        // the window. `lastChanged` is OpenProject's updatedAt (see finishedNote).
+        const doneAll = data.finished ?? [];
+        const finished = doneAll.slice(0, limit).map((t) => ({
+          ticket: t.key,
+          task: t.subject,
+          type: t.type ?? '',
+          status: t.status,
+          lastChanged: day(t.lastChangedAt ?? t.updatedAt),
+          partOf: partOf(t),
+        }));
+        return {
+          found: true,
+          person: data.person.name,
+          ...(data.match === 'partial' ? { matchedFrom: person } : {}),
+          open: data.total,
+          inProgress: data.inProgress,
+          awaitingQA: data.awaitingQA,
+          stalled: data.stalled,
+          shown: rows.length,
+          ...(all.length > rows.length
+            ? { more: `${all.length - rows.length} more open after these; pass a larger \`limit\` (up to 80) to see them` }
+            : {}),
+          columns: ['ticket', 'task', 'partOf', 'status', 'due', 'order'],
+          rows,
+          finishedWindowDays: data.windowDays,
+          finishedTotal: data.finishedTotal ?? doneAll.length,
+          finishedColumns: ['ticket', 'task', 'type', 'status', 'lastChanged', 'partOf'],
+          finished,
+          ...(doneAll.length > finished.length
+            ? { moreFinished: `${doneAll.length - finished.length} more finished in the window after these; pass a larger \`limit\`` }
+            : {}),
+          finishedNote: 'Finished means closed, or moved to a QA/review status, in the window; `status` says which. '
+            + '`lastChanged` is when OpenProject last changed the ticket (updatedAt): there is no separate '
+            + 'closing date, so a later edit moves it too.',
+          ...(data.note ? { note: data.note } : {}),
+          orderedBy: 'in progress, then stalled, then awaiting QA, then New; within each the build order, priority, due date',
+          display: `Say "${data.person.name}: N open (a in progress, b awaiting QA, c stalled); K finished in the last `
+            + `${data.windowDays} days" in one line, then show \`rows\` as a markdown table using \`columns\`, in the `
+            + 'order given. Then a heading "Finished in the last N days" and `finished` as a second table using '
+            + '`finishedColumns`, most recent first, with one line under it saying the date is the last change in '
+            + 'OpenProject; or "nothing finished in the last N days". If `more` or `moreFinished` is present, say '
+            + 'it in one line. Nothing else.',
+        };
+      }
+
+      const people = data.people ?? [];
+      const row = (p) => {
+        const current = p.current ?? [];
+        const named = current.slice(0, 3).map((t) => `#${t.key} ${trim(t.subject, 48)}`);
+        return {
+          person: p.name,
+          inProgress: p.inProgress,
+          awaitingQA: p.awaitingQA,
+          stalled: p.stalled,
+          open: p.open ?? '?',
+          finished14d: p.finishedRecently,
+          workingOn: named.length
+            ? named.join('; ') + (current.length > 3 ? `; +${current.length - 3} more` : '')
+            : '—',
+        };
+      };
+      const busy = (p) => p.inProgress || p.awaitingQA || p.stalled || p.open || p.finishedRecently;
+      const rows = people
+        .filter(busy)
+        .sort((a, b) => (b.inProgress - a.inProgress) || (b.awaitingQA - a.awaitingQA)
+          || ((b.open ?? 0) - (a.open ?? 0)) || a.name.localeCompare(b.name))
+        .map(row);
+      const idle = people.filter((p) => !busy(p)).map((p) => p.name);
+      const tickets = people.flatMap((p) => (p.current ?? []).map((t) => ({
+        person: p.name, ticket: t.key, task: t.subject, partOf: partOf(t), status: t.status, due: t.dueDate ?? '',
+      })));
+      const unassigned = data.unassigned ?? {};
+      return {
+        found: people.length > 0,
+        windowDays: data.windowDays,
+        asOf: data.asOf,
+        ...(data.fromCache ? { heldFor: `${data.ageSeconds}s (refresh: true reads again)` } : {}),
+        statusesMean: {
+          inProgress: (data.inProgressStatuses ?? []).join(', ') || 'none on this instance',
+          awaitingQA: (data.awaitingQAStatuses ?? []).join(', ') || 'none on this instance',
+          stalled: (data.stalledStatuses ?? []).join(', ') || 'none on this instance',
+          finished14d: data.finishedMeans,
+        },
+        columns: ['person', 'inProgress', 'awaitingQA', 'stalled', 'open', 'finished14d', 'workingOn'],
+        rows,
+        ...(idle.length ? { nothingAssigned: idle } : {}),
+        ...((unassigned.inProgress || unassigned.awaitingQA || unassigned.stalled || unassigned.open)
+          ? { unassigned: { open: unassigned.open ?? '?', inProgress: unassigned.inProgress,
+            awaitingQA: unassigned.awaitingQA, stalled: unassigned.stalled } } : {}),
+        ticketColumns: ['person', 'ticket', 'task', 'partOf', 'status', 'due'],
+        tickets: tickets.slice(0, limit),
+        ...(tickets.length > limit ? { moreTickets: `${tickets.length - limit} more in-progress tickets; pass a larger \`limit\`` } : {}),
+        ...(data.note ? { note: data.note } : {}),
+        display: 'Show `rows` as a markdown table using `columns`, busiest first, and if `nothingAssigned` is '
+          + 'present say those names in one line. Show `tickets` (a table using `ticketColumns`) only when the '
+          + 'person asked about specific tickets, a module or what someone is doing in detail. For one '
+          + 'person in depth, call adam_team again with `person`. Nothing else.',
       };
     },
   },

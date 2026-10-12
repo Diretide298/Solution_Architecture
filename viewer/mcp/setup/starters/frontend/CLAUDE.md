@@ -95,6 +95,9 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
+To see a teammate's work, ask ("what is Hrushikant working on?", "what's everyone doing?"):
+`adam_team` answers, read-only, with their open and in-progress tickets and what they finished lately.
+
 ## Ticket kinds
 
 | Ticket | Built means | Tested means |

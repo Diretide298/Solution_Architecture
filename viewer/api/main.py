@@ -15,6 +15,7 @@ binding it fails with Errno 10013.
 from __future__ import annotations
 
 import base64
+import difflib
 import json
 import os
 import re
@@ -2277,6 +2278,348 @@ def my_board(
                 f"'{scope['pmsName'] or scope['pmsIdentifier']}'. If its work has not "
                 f"been loaded there yet, that is why.",
     }
+
+
+# ── the team view: what a teammate is working on ─────────────────────
+#
+# `/api/board/mine` answers "what am I holding". These two answer "what is
+# Hrushikant working on" and "what has everybody started", for anyone on the
+# project's delivery team, so developers can see each other's work without
+# asking a lead to open the overview for them.
+#
+# **Read-only, and as the caller.** Every OpenProject call here runs on the
+# caller's own token, exactly as the board does, so a teammate's tickets come
+# back only as far as the caller's OpenProject account may see them. ADAM
+# widens who may ask; it never widens the answer. Nothing here writes.
+#
+# Not the overview: that reads every ticket in every state (minutes on a
+# release project). These ask OpenProject narrow questions — one person's open
+# tickets, the started statuses, counts grouped by assignee, closes inside the
+# window — which is a handful of pages. The team view is still cached for a
+# couple of minutes per caller, because a few people asking "what is everyone
+# doing" at stand-up should not be a few identical reads.
+
+TEAM_WINDOW_DAYS = 14
+# How far back a person's closed list may be asked for. Past this the walk over
+# closed tickets stops being "lately" and starts being an export.
+TEAM_WINDOW_MAX_DAYS = 60
+TEAM_TTL_SECONDS = 120
+# {(adam project, openproject id, account id): {"at", "asOf", "payload"}}
+_team_cache: dict = {}
+# Highest first. A priority this list does not know sorts after the ones it does.
+PRIORITY_RANK = {"immediate": 0, "urgent": 1, "high": 2, "normal": 3, "low": 4}
+
+
+def _team_scope(account: dict, project_id: str) -> dict:
+    """The OpenProject scope for a team read, refused to a client.
+
+    Somebody's workload is the delivery team's business: a client account, or
+    an account that is a client on this project, is told so rather than shown
+    it — the same line change requests draw (`_change_project`).
+    """
+    if account["role"] == "client":
+        raise HTTPException(403, "The team's work is for the delivery team.")
+    scope = _pms_scope(account, project_id)
+    role = next((p["role"] for p in projects_for(account) if p["id"] == scope["project"]), "")
+    if role == "client":
+        raise HTTPException(403, "The team's work is for the delivery team.")
+    return scope
+
+
+def _openproject_of(endpoint: str, scope: dict) -> dict:
+    return {
+        "id": scope["pmsId"],
+        "identifier": scope["pmsIdentifier"],
+        "name": scope["pmsName"],
+        "url": f"{endpoint}/projects/{scope['pmsIdentifier']}" if scope["pmsIdentifier"] else "",
+    }
+
+
+# How an open ticket's status reads on the team view, by its name. Checked in
+# this order, so "Waiting for QA" is awaiting QA rather than stalled. Names
+# rather than ids because they are the instance's own and the only thing that
+# says what a status is for; on pms.softlabsgroup.in finished work is moved to
+# "Ready for QA" and almost never to Closed, so a view that only counted closes
+# would show nobody finishing anything.
+QA_WORDS = ("qa", "review", "test", "verify")
+STALLED_WORDS = ("hold", "block", "wait")
+STAGE_RANK = {"inProgress": 0, "stalled": 1, "awaitingQA": 2, "new": 3}
+
+
+def _stage(status: str) -> str:
+    """new, awaitingQA, stalled or inProgress, for an OPEN ticket's status name."""
+    name = (status or "").strip().lower()
+    if name == "new":
+        return "new"
+    if any(word in name for word in QA_WORDS):
+        return "awaitingQA"
+    if any(word in name for word in STALLED_WORDS):
+        return "stalled"
+    return "inProgress"
+
+
+def _team_row(item: dict) -> dict:
+    """The fields somebody reads down a list of a teammate's work, and no more."""
+    return {
+        "key": item["key"],
+        "subject": item.get("subject", ""),
+        "type": item.get("type", ""),
+        "status": item.get("status", ""),
+        "priority": item.get("priority", ""),
+        "assignee": item.get("assignee", ""),
+        "version": item.get("version", ""),
+        "parent": item.get("parent"),
+        "parentSubject": item.get("parentSubject", ""),
+        "buildOrder": item.get("buildOrder"),
+        "startDate": item.get("startDate"),
+        "dueDate": item.get("dueDate"),
+        "percentDone": item.get("percentDone"),
+        "updatedAt": item.get("updatedAt"),
+        "url": item.get("url", ""),
+    }
+
+
+def _person_order(item: dict) -> tuple:
+    """In progress first, then stalled, awaiting QA and New; within each the
+    build order, then priority, then due date and number."""
+    order = item.get("buildOrder")
+    number = int(item["key"]) if str(item.get("key", "")).isdigit() else 0
+    return (
+        STAGE_RANK[_stage(item.get("status"))],
+        0 if order is not None else 1,
+        order if order is not None else 0,
+        PRIORITY_RANK.get((item.get("priority") or "").strip().lower(), len(PRIORITY_RANK)),
+        item.get("dueDate") or "9999",
+        number,
+    )
+
+
+def _match_person(who: str, people: list) -> tuple:
+    """`(how, matches)` for a typed name against the project's people.
+
+    `how` is exact, partial, ambiguous or unknown. Case does not matter, and a
+    first name or the start of one is enough: "hrushi" is Hrushikant Patkar
+    when nobody else's name starts that way. Every word typed has to start a
+    word of the name, so "hrushikant p" narrows and "kant" does not match by
+    accident; a plain substring is the fallback when no name matches that way.
+    """
+    wanted = " ".join(who.lower().split())
+    if not wanted:
+        return "unknown", []
+    exact = [p for p in people if " ".join(p["name"].lower().split()) == wanted]
+    if exact:
+        return ("exact" if len(exact) == 1 else "ambiguous"), exact
+    words = wanted.split()
+
+    def starts(name: str) -> bool:
+        parts = name.lower().split()
+        return all(any(part.startswith(word) for part in parts) for word in words)
+
+    partial = [p for p in people if starts(p["name"])] or \
+              [p for p in people if wanted in p["name"].lower()]
+    if partial:
+        return ("partial" if len(partial) == 1 else "ambiguous"), partial
+    names = {p["name"].lower(): p for p in people}
+    close = difflib.get_close_matches(wanted, list(names), n=5, cutoff=0.5)
+    return "unknown", [names[n] for n in close]
+
+
+FINISHED_AT_IS = ("updatedAt: when OpenProject last changed the ticket. OpenProject gives no "
+                  "closing date; for a ticket closed or moved to QA in the window that is "
+                  "normally the move, but any later edit moves it too.")
+
+
+@app.get("/api/board/person")
+def person_board(
+    who: str = Query(..., min_length=1, max_length=120),
+    project_id: str = Query(default=""),
+    days: int = Query(default=TEAM_WINDOW_DAYS, ge=1, le=TEAM_WINDOW_MAX_DAYS),
+    account: dict = Depends(require_account),
+):
+    """
+    One teammate's open tickets, in progress first, and what they finished lately.
+
+    `who` is a name as somebody would type it — "Hrushikant", "hrushi",
+    "patkar" — matched against the project's assignable people. A name that
+    matches nobody, or more than one person, answers with the candidates and no
+    tickets, so the caller can ask again with the one they meant.
+
+    Every open ticket carries a `stage`: inProgress, stalled (on hold, blocked,
+    waiting), awaitingQA (a QA, review, test or verify status) or new.
+    "Finished" is closed, or moved to an awaiting-QA status, inside the last
+    `days` (fourteen by default, at most TEAM_WINDOW_MAX_DAYS), each with its
+    status so the two can be told apart.
+    """
+    scope = _team_scope(account, project_id)
+    endpoint, token = _pms_for(account["id"])
+    base = {"project": scope["project"], "openproject": _openproject_of(endpoint, scope),
+            "who": who, "windowDays": days}
+    try:
+        try:
+            people = openproject.assignable(endpoint, token, scope["pmsId"])
+        except openproject.Refused:
+            people = []
+        if not people:
+            # An instance (or a token) that will not list members still says who
+            # holds open work, which is who anybody would ask about.
+            counts = openproject.open_counts(endpoint, token, scope["pmsId"]) or {}
+            people = sorted(({"id": uid, "name": c["name"]} for uid, c in counts.items()
+                             if uid is not None and c["name"]),
+                            key=lambda p: p["name"].lower())
+        how, matches = _match_person(who, people)
+        if how in ("ambiguous", "unknown"):
+            return {
+                **base, "match": how, "person": None,
+                "candidates": matches if matches or how == "ambiguous" else people[:50],
+                "note": (f"More than one person matches '{who}'. Ask again with one of these names."
+                         if how == "ambiguous" else
+                         f"Nobody on the OpenProject project "
+                         f"'{scope['pmsName'] or scope['pmsIdentifier']}' matches '{who}'."),
+            }
+        person = matches[0]
+        items = openproject.mine(endpoint, token, project_id=scope["pmsId"],
+                                 assignee=str(person["id"]))
+        since = security.stamp(security.now() - timedelta(days=days))
+        closed = openproject.closed_since(endpoint, token, scope["pmsId"], since,
+                                          assignee=str(person["id"]))
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+    # The same belt-and-braces as the board: never another project's tickets.
+    items = sorted((i for i in items if i.get("projectId") == scope["pmsId"]), key=_person_order)
+    closed = [i for i in closed if i.get("projectId") == scope["pmsId"]]
+    rows = [{**_team_row(item), "stage": _stage(item.get("status"))} for item in items]
+    tally = {stage: sum(1 for row in rows if row["stage"] == stage) for stage in STAGE_RANK}
+
+    # Finished: closed in the window, and moved to QA in the window. The QA ones
+    # are also open, so they are on the open list too; that is where they still
+    # are, and this is when they got there.
+    finished = [{**_team_row(item), "stage": "closed"} for item in closed] + [
+        row for row in rows if row["stage"] == "awaitingQA" and (row["updatedAt"] or "") >= since]
+    finished.sort(key=lambda row: row.get("updatedAt") or "", reverse=True)
+    return {
+        **base, "match": how, "person": person, "candidates": [],
+        "total": len(rows),
+        "inProgress": tally["inProgress"],
+        "awaitingQA": tally["awaitingQA"],
+        "stalled": tally["stalled"],
+        "new": tally["new"],
+        "items": rows,
+        # Most recent first. `lastChangedAt` is OpenProject's `updatedAt`, and
+        # `closedAtIs` says so, so nobody reads it as more than it is.
+        "finished": [{**row, "lastChangedAt": row.get("updatedAt")} for row in finished],
+        "finishedTotal": len(finished),
+        "closedAtIs": FINISHED_AT_IS,
+        "orderedBy": "in progress, then stalled, then awaiting QA, then New; within each the "
+                     "build order, then priority, then due date",
+        "note": None if rows or finished else
+                f"{person['name']} has nothing open in "
+                f"'{scope['pmsName'] or scope['pmsIdentifier']}' and finished nothing in the last "
+                f"{days} days that you can see.",
+    }
+
+
+def _team_payload(account: dict, scope: dict) -> dict:
+    """One read of what everybody has under way, with per-person counts."""
+    endpoint, token = _pms_for(account["id"])
+    since = security.stamp(security.now() - timedelta(days=TEAM_WINDOW_DAYS))
+    try:
+        known = openproject.statuses(endpoint, token)
+        # Every open status past New: in progress, stalled and awaiting QA. A
+        # handful of tickets on a release project, where New is thousands.
+        under_way = {s["id"]: _stage(s["name"]) for s in known
+                     if not s["isClosed"] and _stage(s["name"]) != "new"}
+        moving = openproject.in_statuses(endpoint, token, scope["pmsId"], list(under_way))
+        counts = openproject.open_counts(endpoint, token, scope["pmsId"])
+        closed = openproject.closed_since(endpoint, token, scope["pmsId"], since)
+        try:
+            members = openproject.assignable(endpoint, token, scope["pmsId"])
+        except openproject.Refused:
+            members = []
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+    moving = [i for i in moving if i.get("projectId") == scope["pmsId"]]
+    closed = [i for i in closed if i.get("projectId") == scope["pmsId"]]
+
+    # Keyed by name: the summaries carry the assignee's name, and the counts and
+    # the member list carry both. A person is everybody in any of the three.
+    people: dict = {}
+
+    def blank(uid=None, name="") -> dict:
+        return {"id": uid, "name": name, "open": 0 if counts is not None else None,
+                "inProgress": 0, "awaitingQA": 0, "stalled": 0, "finishedRecently": 0,
+                "current": []}
+
+    def at(name: str, uid=None) -> dict:
+        entry = people.setdefault(name.lower(), blank(uid, name))
+        if entry["id"] is None and uid is not None:
+            entry["id"] = uid
+        return entry
+
+    for member in members:
+        at(member["name"], member["id"])
+    unassigned = blank()
+    del unassigned["id"], unassigned["name"], unassigned["current"]
+    for uid, count in (counts or {}).items():
+        if uid is None or not count["name"]:
+            unassigned["open"] = (unassigned["open"] or 0) + count["count"]
+        else:
+            at(count["name"], uid)["open"] = count["count"]
+    for item in sorted(moving, key=_person_order):
+        stage = _stage(item.get("status"))
+        entry = at(item["assignee"]) if item.get("assignee") else unassigned
+        entry[stage] += 1
+        if stage == "awaitingQA" and (item.get("updatedAt") or "") >= since:
+            entry["finishedRecently"] += 1
+        if stage == "inProgress" and entry is not unassigned:
+            entry["current"].append(_team_row(item))
+    for item in closed:
+        entry = at(item["assignee"]) if item.get("assignee") else unassigned
+        entry["finishedRecently"] += 1
+
+    names = lambda stage: [s["name"] for s in known if under_way.get(s["id"]) == stage]  # noqa: E731
+    return {
+        "project": scope["project"],
+        "openproject": _openproject_of(endpoint, scope),
+        "windowDays": TEAM_WINDOW_DAYS,
+        # What each word was taken to mean on this instance, from its statuses.
+        "inProgressStatuses": names("inProgress"),
+        "awaitingQAStatuses": names("awaitingQA"),
+        "stalledStatuses": names("stalled"),
+        "finishedMeans": f"closed, or moved to an awaiting-QA status, in the last "
+                         f"{TEAM_WINDOW_DAYS} days (by updatedAt, OpenProject's last change)",
+        "countsKnown": counts is not None,
+        "people": sorted(people.values(), key=lambda p: p["name"].lower()),
+        "unassigned": unassigned,
+        "note": None if counts is not None else
+                "This OpenProject did not count open tickets per person, so `open` is unknown; "
+                "the other counts are still exact.",
+    }
+
+
+@app.get("/api/board/team")
+def team_board(
+    project_id: str = Query(default=""),
+    refresh: int = Query(default=0),
+    account: dict = Depends(require_account),
+):
+    """
+    For everybody on the project: what they have under way, and how much they hold.
+
+    Each person's in-progress tickets, with counts of open, in progress,
+    awaiting QA, stalled and finished in the last fourteen days. Cached two
+    minutes per caller — per caller, because it is read with the caller's token
+    and two people's tokens may see different things.
+    """
+    scope = _team_scope(account, project_id)
+    key = (scope["project"], scope["pmsId"], account["id"])
+    held = _team_cache.get(key)
+    if refresh or not held or time.monotonic() - held["at"] >= TEAM_TTL_SECONDS:
+        held = {"at": time.monotonic(), "asOf": security.stamp(),
+                "payload": _team_payload(account, scope)}
+        _team_cache[key] = held
+    age = int(time.monotonic() - held["at"])
+    return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,
+            "fromCache": age > 0, "cacheSeconds": TEAM_TTL_SECONDS}
 
 
 # ── the delivery overview: every ticket in the project, for an admin ─
