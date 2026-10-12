@@ -1,0 +1,47 @@
+id: CHG-R6-057
+date: '2026-10-13'
+source: plan
+kind: plan
+proposed: '2026-10-13'
+summary: 'The four back-end developers are planned at 7 tasks a day where the plan gives 6 (team.json pace 1.17), so
+  the move of Pallavi Sawant''s back end (CHG-R6-056) keeps every block date.'
+decision:
+  what: 'docs/active/team.json pace: Hrushikant Patkar, Pranay Shinde, Tanmay Dukhande and Deep Khanvilkar at 1.17. The
+    schedule (tools/sprint_plan.py duration) divides a task''s points by the sprint pace times the person''s pace, so
+    the multiplier also rides on the ramp from Sprint 5. Block last work days: A1 25 November, A2 2 December, B 16
+    December, C 29 December, D 9 February, as before CHG-R6-056 (A2 one day earlier).'
+  by: Chinmay
+  date: '2026-10-13'
+why: 'Lead decision in the r4 session (after commit 96249cce), Chinmay, 13 October 2026: "we can up the per day tasks
+  for backend devs", after CHG-R6-056 moved Block A1''s last work day from 25 November to 3 December.'
+keys_touched:
+  files:
+  - docs/active/team.json
+  tickets: []
+  other:
+  - CHG-R6-056
+  - CHG-RONEP-009
+root_class: 'new: lead-pace-change'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r4 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-13'
+    quote: 'we can up the per day tasks for backend devs'
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Measured by regenerating build-service-docs and derive-block-a-schedule in place (r4-cr-fixes, 13 October), A1 /
+  A2 / B / C last work days: pace 1.0, 3 Dec / 15 Dec / 29 Dec / 4 Jan; 1.17 for Pranay, Tanmay and Deep only, 26 Nov /
+  8 Dec / 16 Dec / 30 Dec (A2 held by Hrushikant''s kiosk tasks); 1.33 for those three, 24 Nov / 8 Dec / 8 Dec / 29 Dec;
+  1.17 for all four, 25 Nov / 2 Dec / 16 Dec / 29 Dec (chosen, the least that keeps every date); 1.25 for all four,
+  24 Nov / 1 Dec / 14 Dec / 22 Dec. check-plan-owners, check-key-stability, check-plan-closure and check-ticket-builds
+  PASS. Risk: on 13 October Hrushikant Patkar has 30 of 515 Sprint 1 tickets finished; the plan now assumes he runs
+  faster, not slower.'
