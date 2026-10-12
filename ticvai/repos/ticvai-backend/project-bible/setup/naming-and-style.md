@@ -106,7 +106,7 @@ Media Code changes, the Ticket ID does not. Any code that treats them as one fie
 wrong.
 
 
-### 3.3 Recorded exceptions (decided 28 September)
+### 3.3 Recorded exceptions (decided 28 September; DDL rows added 12 October)
 
 A banned word may appear only where this list allows it. **Code, contracts and DDL never take one unless the row says so.** The full glossary, including the domain nouns proposed under audit R146 (Attraction, Queue, Wait Time, Itinerary, Accreditation, Form, Settlement, Reconciliation, Report, Channel, Work Order, Segment, Campaign, Journey, Category, Tile), is `docs/glossary.md`.
 
@@ -118,6 +118,15 @@ A banned word may appear only where this list allows it. **Code, contracts and D
 | POS, drawer | Staff-facing copy. Never code, contracts or DDL | R156 |
 | QR | Guest-facing copy only (GST-055 *Dynamic QR Ticket*) | R210 |
 | Game Card, Gift Card | Everywhere, code included (`GameCard`, `GiftCard`, `cardCode`) | R220 |
+| Booking (DDL) | `resources.booking`, `whitelabel.booking_flow` and `whitelabel.booking_flow_step`, and the keys that name them: the guest-facing noun the guest books by | CR-011 |
+| Pool, drawer, POS (wire values) | Enum values a contract carries, which the DDL's CHECK repeats: `sharedPool` (`catalogue.channel_envelope.envelope_type`), `cashDrawer` (`platform.device.kind`), `posDemand` (`ai.forecast_definition.subject`), `posBasket` (`ai.rec_decision.placement`, `ai.rec_decline.placement`) and the sales channel `pos`. Changing a wire value is a breaking change. Table and column names still never take them | CR-011 |
+| Card (payment) | A payment card: the payment-method values `card` and `storedCard` (`wallet.exit_settlement.method`), the value `cardScheme`, and names in `payments` | CR-012, CR-014 |
+| Other | The value `other` where a contract carries it: `wallet.credit_type.category`, `seating.seat_block.reason`, `resources.resource.kind`. A new `other` needs its own row | CR-012 |
+| Barcode | A retail product's GTIN: `catalogue.variant.barcode`, `inventory.inventory_item.barcode`. Not a Media Code | CR-012, CR-014 |
+| Terminal | A payment (card) terminal: names in `payments`, and `terminal_id` keys to `payments.terminal` (`orders.payment.terminal_id`). Not a Workstation | CR-014 |
+| Serial | `orders.wallet_pass.serial_number`, the serial of an Apple or Google wallet pass. Not a Media Code | CR-014 |
+
+The DDL rows are held by `tools/check-ddl-conventions.py` (D-BANNED-NAME), which fails on a table, column or stored enum value the DDL takes after r1 with a banned word that no row allows. A name the frozen r1 DDL already has stays until a forward migration renames it (`handoff/migration-review.md`).
 
 ---
 

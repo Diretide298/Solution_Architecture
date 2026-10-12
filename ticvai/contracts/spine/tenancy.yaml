@@ -5148,6 +5148,7 @@ components:
             reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager
             approval (OVERSHORT_ACCEPT).
         cashDrawerLimit:
+          x-ticvai-column: deposit_box_limit_amount
           # oneOf with one member is Money: check-contract-compat reads an allOf'd Money's own required
           # fields as newly required request fields of an optional new property (CHG-CSP-016 notes).
           oneOf:
@@ -5726,6 +5727,7 @@ components:
             till override"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout,
             `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.
         cashDrawerLimit:
+          x-ticvai-column: deposit_box_limit_amount
           # oneOf with one member is Money: check-contract-compat reads an allOf'd Money's own required
           # fields as newly required request fields of an optional new property (CHG-CSP-016 notes).
           oneOf:

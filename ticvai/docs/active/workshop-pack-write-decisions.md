@@ -30,7 +30,7 @@ These carry an explicit per-entity directory - the client writing a row rather t
 | `setVirtualTicketCredential` | Virtual Ticket & Credential 360° Workspace | *For each media show* | 24 | `access.entitlement` 9% |
 | `setAttractionAccess` | Attraction Access Configuration | *For each attraction* | 17 | `access.parking_facility` 6% |
 | `setChannelPricingCommercial` | Channel Pricing & Commercial Profile Assignm | *For each assignment* | 17 | `catalogue.price_list` 6% |
-| `approvePricingWorkflowAuthority` | Pricing Approval Workflow & Authority Matrix | *Every approval action records* | 27 | `catalogue.channel_allocation` 4% |
+| `approvePricingWorkflowAuthority` | Pricing Approval Workflow & Authority Matrix | *Every approval action records* | 27 | `catalogue.channel_envelope` 4% |
 | `setRateStructure` | Rate Structure Builder | *Each rate should contain* | 25 | `catalogue.price` 4% |
 | `setChannelProvider` | Channel & Provider Configuration | *For each provider* | 26 | `control.api_client` 4% |
 | `setConsentCapturePoint` | Consent Capture Point & Customer Journey Con | *For each capture point define* | 28 | `marketing.attribution_touch` 4% |
@@ -93,12 +93,12 @@ These carry an explicit per-entity directory - the client writing a row rather t
 | Operation | Screen | Fields | Nearest | Permission | Scope |
 |---|---|---:|---|---|---|
 | `setChannelPricingCommercial` | Channel Pricing & Commercial Profile Assignmen | 17 | `catalogue.price_list` 6% | `PRODUCT_CONFIGURE` | venue |
-| `approvePricingWorkflowAuthority` | Pricing Approval Workflow & Authority Matrix | 27 | `catalogue.channel_allocation` 4% | `PRODUCT_CONFIGURE` | venue |
+| `approvePricingWorkflowAuthority` | Pricing Approval Workflow & Authority Matrix | 27 | `catalogue.channel_envelope` 4% | `PRODUCT_CONFIGURE` | venue |
 | `setRateStructure` | Rate Structure Builder | 25 | `catalogue.price` 4% | `PRODUCT_CONFIGURE` | venue |
 | `setPriceHierarchyInheritance` | Price Hierarchy & Inheritance Configuration | 6 | `catalogue.price_list` 17% | `PRODUCT_CONFIGURE` | venue |
-| `setFeeApplicabilityCharging` | Fee Applicability & Charging Rule Builder | 21 | `catalogue.channel_allocation` 5% | `PRODUCT_CONFIGURE` | venue |
-| `setPricingExperiment` | A/B Pricing Experiment Studio | 22 | `catalogue.channel_allocation` 5% | `PRODUCT_CONFIGURE` | venue |
-| `publishActivationScheduler` | Publication & Activation Scheduler | 23 | `catalogue.channel_allocation` 4% | `PRODUCT_CONFIGURE` | venue |
+| `setFeeApplicabilityCharging` | Fee Applicability & Charging Rule Builder | 21 | `catalogue.channel_envelope` 5% | `PRODUCT_CONFIGURE` | venue |
+| `setPricingExperiment` | A/B Pricing Experiment Studio | 22 | `catalogue.channel_envelope` 5% | `PRODUCT_CONFIGURE` | venue |
+| `publishActivationScheduler` | Publication & Activation Scheduler | 23 | `catalogue.channel_envelope` 4% | `PRODUCT_CONFIGURE` | venue |
 | `setPricingChangeRequest` | Pricing Change Request & Workspace | 30 | `catalogue.entitlement_template` 3% | `PRODUCT_CONFIGURE` | venue |
 | `approveReviewDecision` | Approval Review & Decision Workspace | 17 | — | `PRODUCT_CONFIGURE` | venue |
 | `approveWorkflow` | Approval Workflow Designer | 17 | — | `PRODUCT_CONFIGURE` | venue |
@@ -132,13 +132,13 @@ These carry an explicit per-entity directory - the client writing a row rather t
 | `setGroupQuotationProposal` | Group Quotation Builder & Proposal Generation | 30 | `orders.cart` 3% | `ORDER_CREATE` | venue |
 | `setOrderReservationStatus` | Order & Reservation Status Lifecycle Configura | 11 | — | `ORDER_CREATE` | venue |
 | `approveExceptionServiceRecovery` | Approval, Exception & Service Recovery Managem | 17 | `orders.cash_movement` 6% | `ORDER_CREATE` | venue |
-| `setCancellationPartialPolicy` | Cancellation & Partial Cancellation Policy Con | 18 | `catalogue.channel_allocation` 6% | `ORDER_CREATE` | venue |
-| `setMultiPaymentSplit` | Multi-Payment, Split Tender & Payment Allocati | 16 | `catalogue.channel_allocation` 6% | `ORDER_CREATE` | venue |
+| `setCancellationPartialPolicy` | Cancellation & Partial Cancellation Policy Con | 18 | `catalogue.channel_envelope` 6% | `ORDER_CREATE` | venue |
+| `setMultiPaymentSplit` | Multi-Payment, Split Tender & Payment Allocati | 16 | `catalogue.channel_envelope` 6% | `ORDER_CREATE` | venue |
 | `approveGroupDiscountException` | Group Discount, Exception & Approval Workflow | 20 | `orders.cash_movement` 5% | `ORDER_CREATE` | venue |
 | `setOrderAmendment` | Order Amendment Workspace | 22 | `catalogue.channel_capacity` 5% | `ORDER_CREATE` | venue |
-| `createOrderSourceChannel` | Order Creation & Source/Channel Configuration | 35 | `catalogue.channel_allocation` 3% | `ORDER_CREATE` | venue |
-| `setAmendmentEligibilityPolicy` | Amendment Eligibility & Policy Rule Builder | 33 | `catalogue.channel_allocation` 3% | `ORDER_CREATE` | venue |
-| `setReservationHoldPolicy` | Reservation & Hold Policy Configuration | 29 | `catalogue.channel_allocation` 3% | `ORDER_CREATE` | venue |
+| `createOrderSourceChannel` | Order Creation & Source/Channel Configuration | 35 | `catalogue.channel_envelope` 3% | `ORDER_CREATE` | venue |
+| `setAmendmentEligibilityPolicy` | Amendment Eligibility & Policy Rule Builder | 33 | `catalogue.channel_envelope` 3% | `ORDER_CREATE` | venue |
+| `setReservationHoldPolicy` | Reservation & Hold Policy Configuration | 29 | `catalogue.channel_envelope` 3% | `ORDER_CREATE` | venue |
 | `approveListingModeration` | Listing Approval & Moderation | 12 | — | `ORDER_CREATE` | venue |
 | `createListingSeller` | Listing Creation & Seller Configuration | 32 | — | `ORDER_CREATE` | venue |
 | `createUpgradeCredentialRegeneration` | Upgrade Execution, Credential Regeneration & C | 27 | — | `ORDER_CREATE` | venue |

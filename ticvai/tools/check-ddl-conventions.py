@@ -41,7 +41,190 @@ RULES = {
     "D-CHILD-PARENT": "an item, line, amendment or media table whose key to its parent is not a NOT NULL declared "
                       "reference (CHG-R6-004..006, CR-007 CR-009 CR-010)",
     "D-SCOPE-TREE": "the scope tree without its declared parent key, one tenant root or unique paths (CHG-R6-003, CR-006)",
+    "D-BANNED-NAME": "a table, column or stored enum value the derived DDL takes after r1 with a word naming-and-style "
+                     "bans in DDL, not a recorded exception (3.3) (CHG-R6-012, CR-011 CR-012 CR-014)",
+    "D-RENAME-APPLIED": "a table or column rename declared in derive-schema-history.py that the schema reference "
+                        "does not show (CHG-R6-010)",
 }
+
+# **Words naming-and-style bans in DDL** (CHG-R6-012, ADAM CR-011, CR-012 and CR-014, 12 October 2026). The
+# derived DDL had taken Hold, Booking, Allocation and Pool, drawer, POS, plural table names and bare money names,
+# all of which the standard bans, one migration ticket at a time. A name token (`_`-separated) or an enum value
+# word (camelCase) in this set fails unless r1 already had it (the r1 DDL is frozen; what it holds is the
+# migration's business, through handoff/migration-review.md) or 3.3 records it as an exception below.
+# `hold` is not checked in enum values: `onHold` is a state, not the Reservation concept.
+BANNED_NAME_WORDS = {"hold", "booking", "pool", "bucket", "quota", "allocation", "drawer", "pos", "till",
+                     "terminal", "barcode", "serial", "card", "other", "misc", "extra", "organization"}
+BANNED_VALUE_WORDS = {"pool", "bucket", "quota", "drawer", "pos", "till", "terminal", "barcode", "card", "other",
+                      "misc", "extra"}
+# A bare money name: 5.1 says `gross_amount`, `net_amount`, `list_price`..., never price, value or total alone.
+BARE_MONEY = re.compile(r"^(amount|price|value|total|subtotal|balance|face_value|variance|"
+                        r"\w+_(price|total|value))$")
+MONEY_TYPES = ("numeric",)
+
+# **The recorded exceptions, as naming-and-style 3.3 lists them** (CHG-R6-012). A word allowed by a row of 3.3
+# is allowed here only where that row allows it. Keep the two in step: SF-DOCS-MIRROR keeps the copies of
+# naming-and-style identical, and this list is the machine-readable half of its table.
+NAME_EXCEPTIONS = {
+    # Booking: a guest-facing noun (R145; CR-011)
+    "booking": {"resources.booking", "whitelabel.booking_flow", "whitelabel.booking_flow_step",
+                "*.booking_id", "*.booking_flow_id"},
+    # GTIN barcode: a retail product's barcode, not a Media Code (CR-012, CR-014)
+    "barcode": {"catalogue.variant.barcode", "inventory.inventory_item.barcode"},
+    # Payment terminal: a card terminal, not a Workstation (CR-014): `orders.payment.terminal_id` and the keys
+    # to `payments.terminal`
+    "terminal": {"payments.*", "*.terminal_id"},
+    # Wallet pass serial: an Apple or Google pass's serial number (CR-014)
+    "serial": {"orders.wallet_pass.serial_number"},
+    # Game Card, Gift Card (R220) and a payment card in payments
+    "card": {"games.*", "*gift_card*", "payments.*"},
+}
+VALUE_EXCEPTIONS = {
+    # wire values: changing one is a breaking change (CR-011, CR-012, CR-014)
+    ("catalogue.channel_envelope.envelope_type", "sharedPool"),
+    ("platform.device.kind", "cashDrawer"),
+    ("ai.forecast_definition.subject", "posDemand"),
+    ("ai.rec_decision.placement", "posBasket"),
+    ("ai.rec_decline.placement", "posBasket"),
+    ("wallet.exit_settlement.method", "card"),
+    ("wallet.exit_settlement.method", "storedCard"),
+    ("wallet.credit_type.category", "other"),
+    ("seating.seat_block.reason", "other"),
+    ("resources.resource.kind", "other"),
+    ("*", "pos"),          # the point-of-sale sales channel, a wire value in every channel enum
+    ("*", "cardScheme"),   # a payment card's scheme (CR-014)
+}
+
+
+def _allowed(word, table, column):
+    full = f"{table}.{column}" if column else table
+    for pat in NAME_EXCEPTIONS.get(word, ()):
+        if pat == full or pat == table:
+            return True
+        if pat.endswith(".*") and table.split(".")[0] == pat[:-2]:
+            return True
+        if pat.startswith("*.") and column and column == pat[2:]:
+            return True
+        if pat.startswith("*") and pat.endswith("*") and pat.strip("*") in full:
+            return True
+    return False
+
+
+def _value_words(v: str) -> list:
+    return [w.lower() for w in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])|\d+", v)]
+
+
+def _declared(name: str) -> list:
+    import ast
+    try:
+        tree = ast.parse((g.ROOT / "tools" / "derive-schema-history.py").read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):
+        return []
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == name for t in node.targets):
+            return ast.literal_eval(node.value)
+    return []
+
+
+def check_banned_names(guard, tables: dict, ref_cols: dict, by: dict) -> None:
+    """D-BANNED-NAME and D-RENAME-APPLIED. `tables` is the frozen r1 DDL (table -> column -> line), `ref_cols`
+    the schema reference derive-ddl writes the DDL from now."""
+    renames = _declared("RENAMES")
+    col_renames = _declared("COLUMN_RENAMES")
+    # only the renames made after r1: an older one's old name was never in the frozen DDL
+    was = {r["to"]: r["from"] for r in renames if r["from"] in tables and r["to"] not in tables}
+    retired_tables = set(was.values())
+    retired_cols = {(r["table"], r["from"]) for r in col_renames}
+    new_of = {(r["table"], r["to"]): r["from"] for r in col_renames}
+
+    # D-RENAME-APPLIED: a declared rename the schema reference does not show is a rename half made.
+    for r in renames:
+        if r["from"] in tables and r["to"] not in ref_cols:
+            guard.add("D-RENAME-APPLIED", r["from"], f"{r['from']} -> {r['to']} is declared and the schema "
+                      f"reference has no {r['to']}: the contract's x-ticvai-persistence was not changed")
+        if r["from"] in tables and r["from"] in ref_cols:
+            guard.add("D-RENAME-APPLIED", r["from"] + ":old", f"{r['from']} is declared renamed to {r['to']} and "
+                      "is still in the schema reference")
+    for r in col_renames:
+        names = {c.get("column") for c in ref_cols.get(r["table"], [])}
+        if r["to"] not in names or r["from"] in names:
+            guard.add("D-RENAME-APPLIED", f"{r['table']}.{r['from']}",
+                      f"{r['table']}.{r['from']} -> {r['to']} is declared and the schema reference has "
+                      + ", ".join(sorted(n for n in (r["from"], r["to"]) if n in names) or ["neither"])
+                      + ": give the contract field `x-ticvai-column`")
+
+    # what r1 had, under the names it has now; a name a declared rename retired is not r1's to keep
+    r1_tables = {t for t in tables if t not in retired_tables}
+    r1_values = {}
+    for t, cols in tables.items():
+        for c, line in cols.items():
+            m = re.search(r"CHECK \(\s*\"?" + re.escape(c) + r"\"?\s+IN\s*\(([^)]*)\)", line)
+            if m:
+                r1_values[(t, c)] = set(re.findall(r"'([^']*)'", m.group(1)))
+
+    def r1_has_table(t):
+        return t in r1_tables
+
+    def r1_has_col(t, c):
+        if (t, c) in retired_cols:
+            return False
+        t0 = was.get(t, t)
+        if (t, c) in new_of:
+            return False
+        return c in tables.get(t0, {})
+
+    def r1_values_of(t, c):
+        t0 = was.get(t, t)
+        return r1_values.get((t0, new_of.get((t, c), c)), set())
+
+    for t, cols in sorted(ref_cols.items()):
+        if not re.match(r"^[a-z_]+\.[a-z_0-9]+$", t):
+            continue
+        short = t.split(".", 1)[1]
+        if not r1_has_table(t):
+            for w in short.split("_"):
+                if w in BANNED_NAME_WORDS and not _allowed(w, t, None):
+                    guard.add("D-BANNED-NAME", t, f"table {t}: '{w}' is banned in DDL (naming-and-style 3, 7)")
+            last = short.split("_")[-1]
+            if last.endswith("s") and not last.endswith(("ss", "us", "is")):
+                guard.add("D-BANNED-NAME", f"{t}:plural", f"table {t}: a table is a singular noun (6.1)")
+        for c in cols:
+            col = str(c.get("column") or "")
+            if not col:
+                continue
+            if not r1_has_col(t, col):
+                for w in col.split("_"):
+                    if w in BANNED_NAME_WORDS and not _allowed(w, t, col):
+                        guard.add("D-BANNED-NAME", f"{t}.{col}",
+                                  f"{t}.{col}: '{w}' is banned in DDL (naming-and-style 3, 7)")
+                if BARE_MONEY.match(col) and col != "list_price" and \
+                        str(c.get("type") or "").startswith(MONEY_TYPES):
+                    guard.add("D-BANNED-NAME", f"{t}.{col}:money",
+                              f"{t}.{col}: a bare money name; 5.1 asks for list_price or *_amount")
+            # the values the CHECK will hold: the column's own (storage-only) enum, else its contract field's
+            # (derive-ddl checks a scalar text column only; an array's items are the application's)
+            if str(c.get("type") or "") != "text":
+                continue
+            values = list(c.get("enum") or [])
+            src = str(c.get("source") or "")
+            parts = src.split(".")
+            if not values and len(parts) == 3:
+                spec = ((by.get((parts[0], parts[1])) or {}).get("properties") or {}).get(parts[2]) or {}
+                values = list(spec.get("enum") or [])
+            if not values:
+                continue
+            old = r1_values_of(t, col)
+            for v in values:
+                v = str(v)
+                if v in old or (f"{t}.{col}", v) in VALUE_EXCEPTIONS or ("*", v) in VALUE_EXCEPTIONS:
+                    continue
+                ws = _value_words(v)
+                bad = [w for i, w in enumerate(ws) if w in BANNED_VALUE_WORDS
+                       and not (w == "card" and i > 0 and ws[i - 1] in ("gift", "game"))]
+                if bad:
+                    guard.add("D-BANNED-NAME", f"{t}.{col}={v}",
+                              f"{t}.{col}: value '{v}' carries '{bad[0]}', banned in DDL; a wire value is "
+                              "recorded in naming-and-style 3.3 or renamed in the contract")
 # `require_` beside `requires_`, as `allow_` beside `allows_` (CHG-GTRB-006: till_shift_policy.require_open_approval).
 BOOL_OK = re.compile(r"^(is|has|can|require|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
                      r"show|shows|auto|use|uses|supports|accepts|enable|enabled|send|notify|override)_|"
@@ -333,6 +516,9 @@ def main() -> int:
                       "nothing in backend/tenant makes the tenant root of platform.scope unique")
         if not re.search(r"CREATE UNIQUE INDEX[^;]*ON platform\.scope\s*\(path\)", series):
             guard.add("D-SCOPE-TREE", "platform.scope:path", "nothing in backend/tenant makes platform.scope.path unique")
+
+    # CHG-R6-012 (ADAM CR-011, CR-012, CR-014, 12 October 2026): banned words in what the DDL takes after r1.
+    check_banned_names(guard, tables, ref_cols, by)
 
     # R160: a renamed table's old name left in DDL comments and contract prose.
     renames = [(str(r.get("from")), str(r.get("to"))) for r in

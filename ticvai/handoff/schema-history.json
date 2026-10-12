@@ -1181,7 +1181,22 @@
   "whitelabel.kiosk_config": "2026-10-06",
   "whitelabel.kiosk_config_attract_slide": "2026-10-06",
   "whitelabel.kiosk_config_start_tile": "2026-10-06",
-  "whitelabel.kiosk_config_version": "2026-10-06"
+  "whitelabel.kiosk_config_version": "2026-10-06",
+  "catalogue.channel_envelope": "2026-10-12",
+  "catalogue.inventory_reservation": "2026-10-12",
+  "inventory.inventory_item": "2026-10-12",
+  "inventory.stock_earmark": "2026-10-12",
+  "orders.group_customer_organisation": "2026-10-12",
+  "orders.group_customer_organisation_contact": "2026-10-12",
+  "resources.resource_reservation": "2026-10-12",
+  "seating.recommendation_rule": "2026-10-12",
+  "seating.seat_reservation": "2026-10-12",
+  "seating.seat_reservation_item": "2026-10-12",
+  "wallet.channel_rule": "2026-10-12",
+  "wallet.fund_reservation": "2026-10-12",
+  "wallet.funding_rule": "2026-10-12",
+  "wallet.risk_rule_set": "2026-10-12",
+  "wallet.transfer_rule": "2026-10-12"
  },
  "renames": [
   {
@@ -1345,6 +1360,96 @@
    "to": "access.device_placement",
    "on": "2026-10-01",
    "why": "ADR-0067: platform.device is the one device register; identity, versions, health and lifecycle moved there and this table keeps only where a device is placed in the gate topology. Not access.device_binding, which already names a guest's phone bound to an entitlement"
+  },
+  {
+   "from": "seating.seat_hold",
+   "to": "seating.seat_reservation",
+   "on": "2026-10-12",
+   "why": "CR-011: naming-and-style 3 says a held, not-yet-paid commitment is a Reservation, never a Hold (Hold only in labels, 3.3)"
+  },
+  {
+   "from": "seating.seat_hold_item",
+   "to": "seating.seat_reservation_item",
+   "on": "2026-10-12",
+   "why": "CR-011: moved with seating.seat_reservation"
+  },
+  {
+   "from": "wallet.hold",
+   "to": "wallet.fund_reservation",
+   "on": "2026-10-12",
+   "why": "CR-011: money reserved on a wallet while an order or payment is in progress; Hold is banned in DDL, and reservation alone in the wallet schema would read as a guest's reservation"
+  },
+  {
+   "from": "catalogue.inventory_hold",
+   "to": "catalogue.inventory_reservation",
+   "on": "2026-10-12",
+   "why": "CR-011: capacity a cart or workstation holds until it converts or expires is a Reservation (naming-and-style 3)"
+  },
+  {
+   "from": "resources.resource_hold",
+   "to": "resources.resource_reservation",
+   "on": "2026-10-12",
+   "why": "CR-011: as catalogue.inventory_reservation, for bookable resources"
+  },
+  {
+   "from": "catalogue.channel_allocation",
+   "to": "catalogue.channel_envelope",
+   "on": "2026-10-12",
+   "why": "CR-011: a channel's capacity allocation container is an Envelope; Allocation and Pool are its banned synonyms (naming-and-style 3)"
+  },
+  {
+   "from": "seating.recommendation_rules",
+   "to": "seating.recommendation_rule",
+   "on": "2026-10-12",
+   "why": "CR-011: naming-and-style 6.1, a table is a singular noun"
+  },
+  {
+   "from": "wallet.channel_rules",
+   "to": "wallet.channel_rule",
+   "on": "2026-10-12",
+   "why": "CR-011: naming-and-style 6.1, a table is a singular noun"
+  },
+  {
+   "from": "wallet.funding_rules",
+   "to": "wallet.funding_rule",
+   "on": "2026-10-12",
+   "why": "CR-011: naming-and-style 6.1, a table is a singular noun"
+  },
+  {
+   "from": "wallet.risk_rules",
+   "to": "wallet.risk_rule_set",
+   "on": "2026-10-12",
+   "why": "CR-011: naming-and-style 6.1, a table is a singular noun. Not wallet.risk_rule, which already names its rows (one rule each); this is the published rule set they belong to"
+  },
+  {
+   "from": "wallet.transfer_rules",
+   "to": "wallet.transfer_rule",
+   "on": "2026-10-12",
+   "why": "CR-011: naming-and-style 6.1, a table is a singular noun"
+  },
+  {
+   "from": "inventory.item",
+   "to": "inventory.inventory_item",
+   "on": "2026-10-12",
+   "why": "CR-014: the canonical term is Inventory Item (InventoryItem), not a Product; item alone is the bare Item naming-and-style 3 bans"
+  },
+  {
+   "from": "inventory.stock_reservation",
+   "to": "inventory.stock_earmark",
+   "on": "2026-10-12",
+   "why": "CR-014: stock set aside for an order, a rental or a work order. Reservation is a guest's held, not-yet-paid commitment (naming-and-style 3.1), and this is not one"
+  },
+  {
+   "from": "orders.group_customer_organization",
+   "to": "orders.group_customer_organisation",
+   "on": "2026-10-12",
+   "why": "CR-014: one spelling throughout; the package writes organisation (organisation_type, organisation_id beside it)"
+  },
+  {
+   "from": "orders.group_customer_organization_contact",
+   "to": "orders.group_customer_organisation_contact",
+   "on": "2026-10-12",
+   "why": "CR-014: moved with orders.group_customer_organisation"
   }
  ],
  "withdrawn": {
@@ -1378,5 +1483,5 @@
   "ai.chunk_ref": "2026-09-30"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-07"
+ "generated": "2026-10-12"
 }

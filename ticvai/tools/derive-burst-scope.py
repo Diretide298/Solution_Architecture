@@ -101,13 +101,13 @@ TARGET_RPS = 5000
 # **Which mode each contended table runs in.** Derived from how the row is selected, not from the
 # table name - see the note on `contentionModel` below.
 #
-# **`seating.seat_hold` is unresolved deliberately.** It is `per_entity` where a guest picks a
+# **`seating.seat_reservation` is unresolved deliberately.** It is `per_entity` where a guest picks a
 # seat and `allocator_serialised` where the system picks, and **nobody has established which the
 # platform does** - `seatingRules` in the contract offers best-available, so both are reachable.
 # Marking it one or the other on a guess would tell the client a story that may be wrong in the
 # direction that matters.
 CONTENTION_MODEL = {
-    "catalogue.inventory_hold": {
+    "catalogue.inventory_reservation": {
         "modes": ["single_row"],
         "ceilingSource": "pinned",
         "note": "One counter per (performance, ticket type). Every buyer hits the same row.",
@@ -124,7 +124,7 @@ CONTENTION_MODEL = {
     # mode `seat_hold` is worse than `inventory_hold`, because losers retry and burn lock
     # acquisitions without producing sales, so effective throughput lands *below* the single-row
     # ceiling rather than at it.
-    "seating.seat_hold": {
+    "seating.seat_reservation": {
         "modes": ["per_entity", "allocator_serialised"],
         "ceilingSource": "worst_case_unless_pinned",
         "pinnedBy": "catalogue.performance.seatingRules",
@@ -265,10 +265,10 @@ def main() -> int:
             # red bars where there is one wall.**
             #
             # **Contention is not a property of a table.** It is a property of row cardinality
-            # times access distribution, and `seating.seat_hold` has three modes:
+            # times access distribution, and `seating.seat_reservation` has three modes:
             #
             # **single_row** - one counter per (performance, ticket type). Every buyer hits the
-            # same row. `catalogue.inventory_hold` is this, and it is the wall.
+            # same row. `catalogue.inventory_reservation` is this, and it is the wall.
             #
             # **per_entity** - 43,693 seat rows, a guest picking a specific one. Hot-spotted on
             # premium seats and **structurally not contended**.
@@ -279,7 +279,7 @@ def main() -> int:
             # FOR UPDATE` burns lock acquisitions on losers that retry, so effective throughput
             # lands *below* the single-row ceiling rather than at it.
             #
-            # **`seating.seat_hold` may legitimately be both, per event configuration** - a venue
+            # **`seating.seat_reservation` may legitimately be both, per event configuration** - a venue
             # offering seat selection and best-available on the same performance is running two
             # modes against one table. That is worth knowing before the next infra session.
             "contention": CONTENTION_MODEL.get(t),

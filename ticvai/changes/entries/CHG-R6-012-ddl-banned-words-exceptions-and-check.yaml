@@ -1,0 +1,74 @@
+id: CHG-R6-012
+date: '2026-10-12'
+source: cr
+kind: spec
+proposed: '2026-10-12'
+summary: 'naming-and-style 3.3 records the banned words the DDL keeps because a contract carries them as wire values or
+  they name an external thing (Booking as a guest noun, sharedPool, cashDrawer, pos*, payment card, other, GTIN barcode,
+  payment terminal, wallet pass serial), and check-ddl-conventions fails on a banned word the DDL takes after r1 that no
+  row allows.'
+decision:
+  what: 'repos/*/project-bible/setup/naming-and-style.md and repos/ticvai-docs/setup/naming-and-style.md, identically:
+    3.3 gains seven rows (Booking (DDL), Pool/drawer/POS wire values, Card (payment), Other, Barcode, Terminal, Serial)
+    with their audit references (CR-011, CR-012, CR-014) and a paragraph naming the check. tools/check-ddl-conventions.py
+    gains D-BANNED-NAME (a table, column or scalar enum value in the schema reference, so in the DDL derive-ddl writes,
+    with hold, booking, pool, bucket, quota, allocation, drawer, pos, till, terminal, barcode, serial, card, other, misc,
+    extra or organization; a plural table; a bare money name on a numeric column) and D-RENAME-APPLIED (a declared table
+    or column rename the schema reference does not show). A name the frozen r1 DDL already has passes unless a declared
+    rename retired it; the exceptions are NAME_EXCEPTIONS and VALUE_EXCEPTIONS beside the rules, the machine-readable half
+    of 3.3. No storage-only other value was replaced: the three CR-012 names are contract enums.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-011 and CR-012 (and CR-014, option 2): enum values a contract carries (sharedPool, cashDrawer, posDemand,
+  pos, posBasket, card, storedCard, other, cardScheme) are wire values, and changing one is a breaking change, so they are
+  recorded rather than renamed; Booking is the guest-facing noun, barcode a retail GTIN and not a Media Code, terminal_id
+  a card terminal and not a Workstation, wallet_pass.serial_number an Apple or Google pass serial. Chinmay decided on 12
+  October 2026. Nothing failed when the DDL took a banned word, which is how CR-011 found eleven tables.'
+keys_touched:
+  tables:
+  - catalogue.channel_envelope
+  - platform.device
+  - ai.forecast_definition
+  - ai.rec_decision
+  - ai.rec_decline
+  - wallet.exit_settlement
+  - wallet.credit_type
+  - seating.seat_block
+  - resources.resource
+  - catalogue.variant
+  - inventory.inventory_item
+  - orders.payment
+  - orders.wallet_pass
+  - resources.booking
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
+  files:
+  - repos/ticvai-ai/project-bible/setup/naming-and-style.md
+  - repos/ticvai-backend/project-bible/setup/naming-and-style.md
+  - repos/ticvai-contracts/project-bible/setup/naming-and-style.md
+  - repos/ticvai-frontend/project-bible/setup/naming-and-style.md
+  - repos/ticvai-infra/project-bible/setup/naming-and-style.md
+  - repos/ticvai-docs/setup/naming-and-style.md
+  - tools/check-ddl-conventions.py
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-011, CR-012, CR-014 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. The ADAM starter copy (viewer/mcp/setup/starters/docs/naming-and-style.md) is not
+  edited here; until it carries the same 3.3, check-starter-fit SF-DOCS-MIRROR reports the difference. D-BANNED-NAME
+  reads the schema reference (what derive-ddl writes from), not the frozen 010 files, as D-UNDEFINED-TYPE does; an
+  array''s enum items are not checked because derive-ddl puts no CHECK on them. Not in this change: docs/glossary.md,
+  which check-glossary-terms reads for contract names.'

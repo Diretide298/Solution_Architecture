@@ -19,7 +19,7 @@ database. A network boundary between them buys no data isolation.
 - ADR-0028 line 50: *"no schema is written by two services"*.
 - `docs/architecture/data-model.md:19`: *"Each service connects with a role granted access only to its own schema — enforced by Postgres grants"*.
 - `handoff/api-data-lineage.json`: **35 tables are written by more than one service**, and there are **894 cross-schema reads in 493 of 2,608 operations**.
-- The sale path writes across services (SD-002): `addCartLine` writes `catalogue.inventory_hold`; nine operations write `access.entitlement`; `createPayment` writes `ledger.journal_entry`.
+- The sale path writes across services (SD-002): `addCartLine` writes `catalogue.inventory_reservation`; nine operations write `access.entitlement`; `createPayment` writes `ledger.journal_entry`.
 
 Per-service grants would break 493 operations on day one. Without them, the boundary is convention only.
 

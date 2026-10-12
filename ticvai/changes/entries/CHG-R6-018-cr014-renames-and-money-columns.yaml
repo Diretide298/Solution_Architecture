@@ -1,0 +1,86 @@
+id: CHG-R6-018
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'CR-014: inventory.item becomes inventory.inventory_item, inventory.stock_reservation becomes
+  inventory.stock_earmark, orders.group_customer_organization takes the organisation spelling, and the bare money
+  columns he lists take *_amount names. External-system terms are recorded exceptions (CHG-R6-012).'
+decision:
+  what: 'His option 2. Tables, declared in tools/derive-schema-history.py RENAMES: inventory.item ->
+    inventory.inventory_item, inventory.stock_reservation -> inventory.stock_earmark, orders.group_customer_organization(
+    _contact) -> orders.group_customer_organisation(_contact). Columns, x-ticvai-column on the contract field and
+    COLUMN_RENAMES: ledger.account.balance -> balance_amount; ledger.price_variance quoted_price -> quoted_amount,
+    server_price -> server_amount, variance -> variance_amount; ledger.tax_invoice_line.unit_price -> unit_amount;
+    inventory.requisition.estimated_total -> estimated_amount; inventory.supplier.minimum_order_value ->
+    minimum_order_amount; inventory.inventory_item.last_purchase_price -> last_purchase_cost_amount; orders.payment.amount
+    -> payment_amount; orders.refund.amount -> refunded_amount; orders.cash_movement.amount -> movement_amount;
+    orders.deposit_box variance -> variance_amount, withdrawn_total -> withdrawn_amount, expected_total ->
+    expected_amount, counted_total -> counted_amount (and orders.deposit_box_foreign_holding.variance -> variance_amount);
+    marketing.processing_purpose.data_controller_applicable_organization -> ..._organisation;
+    rental.agreement_item.stock_reservation_id -> stock_earmark_id. Recorded, not renamed: payment terminal_id, the wallet
+    pass serial_number, the GTIN barcode on inventory_item and catalogue.variant, and the value cardScheme.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-014, raised by the backend developer: Item alone is the bare word naming-and-style 3 bans for an Inventory
+  Item, Reservation is a guest''s held, not-yet-paid commitment (3.1) and a stock earmark is not one, the package spells
+  organisation, and 5.1 bans price, value and total alone. Chinmay approved his option 2 on 12 October 2026, consistent
+  with CR-011.'
+keys_touched:
+  tables:
+  - inventory.inventory_item
+  - inventory.stock_earmark
+  - orders.group_customer_organisation
+  - orders.group_customer_organisation_contact
+  - ledger.account
+  - ledger.price_variance
+  - ledger.tax_invoice_line
+  - inventory.requisition
+  - inventory.supplier
+  - orders.payment
+  - orders.refund
+  - orders.cash_movement
+  - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - marketing.processing_purpose
+  - rental.agreement_item
+  files:
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - handoff/api-data-lineage.json
+  - handoff/schema-reference.json
+  - tools/derive-schema-history.py
+  tickets:
+  - MIG-INVENTORY
+  - MIG-ORDERS
+  - MIG-LEDGER
+  - MIG-MARKETING
+  - MIG-RENTAL
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-014 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. All listed in migration-review.md as renames for a forward migration. Names chosen by
+  the agent and open to correction: quoted_amount and server_amount (computed prices, not entered ones), unit_amount on the
+  invoice line, movement_amount, payment_amount, last_purchase_cost_amount (a cost, before tax, as
+  inventory.movement.net_cost_amount); deposit_box_foreign_holding.variance was added for one name per concept beside its
+  own expected_amount and counted_amount. With inventory.item gone, the name rule now reads fnb.production_plan_line.item_id
+  as fnb.menu_item (a convention index, no constraint); the inventory keys that relied on the name are declared
+  (CHG-R6-015). D-BANNED-NAME holds terminal, serial, barcode, card and organization for what the DDL takes after r1.'

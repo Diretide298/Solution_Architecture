@@ -1,0 +1,82 @@
+id: CHG-R6-015
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The in-schema keys CR-013 lists become declared references (a foreign key in 900, and where NOT NULL a parent
+  policy in 920): orders, promotions and inventory children point at their parent, location_id at inventory.location,
+  the item keys at inventory.inventory_item, requisition.cost_center_id at ledger.cost_center.'
+decision:
+  what: 'x-ticvai-references on the contract fields: orders.ParticipantGuestListView.groupBookingId -> orders.group_booking;
+    orders.OrderEvent.orderId -> orders.sales_order (verified: the order and reservation lifecycle log of an order);
+    promotions PromotionRule, PromotionVariant, PromotionAuditEvent, PromotionChannelPublication .promotionId ->
+    promotions.promotion; inventory InventoryStockReservation, GoodsReceipt, CreateStockMovementRequest (StockMovement),
+    SerialisedItem .locationId and PurchaseOrder.deliverToLocationId -> inventory.location; SerialisedItem.itemId,
+    InventoryStockReservation.itemId, InventoryKitComponent kitItemId and componentItemId -> inventory.inventory_item;
+    Requisition.costCenterId -> ledger.cost_center (verified: the one cost-centre table, which
+    inventory.movement.cost_center_id already declares). Also CountLine.itemId and reporting Alert.itemId ->
+    inventory.inventory_item, whose name rule stops resolving once inventory.item is renamed (CHG-R6-018), and
+    CartLine/CreateOrderLine.inventoryHoldId -> catalogue.inventory_reservation, which kept its declaration only as a
+    legacy label on the old column name. Declaring location_id gave inventory.movement, inventory.stock_earmark and
+    inventory.goods_receipt a second protected owner; ROW_OWNER keeps their owner (movement and stock_earmark: item_id,
+    as the movement had at r1; goods_receipt: purchase_order_id, as at r1). Wire types and required lists unchanged.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-013, option 1, the same shape as CR-007 and CR-010: these keys pointed at their parent by convention only
+  (an index, no constraint), so 920 could not scope the child through its parent and the rows sat at the tenant root.
+  Chinmay approved on 12 October 2026.'
+keys_touched:
+  tables:
+  - orders.group_participant_list
+  - orders.order_event
+  - promotions.promotion_rule
+  - promotions.promotion_variant
+  - promotions.promotion_audit
+  - promotions.promotion_channel_publication
+  - inventory.stock_earmark
+  - inventory.goods_receipt
+  - inventory.movement
+  - inventory.serialised_item
+  - inventory.kit_component
+  - inventory.purchase_order
+  - inventory.requisition
+  - inventory.count_line
+  - reporting.alert
+  - orders.order_line
+  - orders.cart_line
+  - orders.reservation_line
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/reporting.yaml
+  - tools/derive-ddl.py
+  - handoff/schema-reference.json
+  tickets:
+  - MIG-ORDERS
+  - MIG-PROMOTIONS
+  - MIG-INVENTORY
+  - MIG-REPORTING
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-013 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::ROW_OWNER
+status: open
+notes: 'Batch R6, 12 October 2026. Each new foreign key is a "constraint added" row in migration-review.md (existing rows
+  may violate it: validate, then add), and each policy switch a statement pair. Now through their parent:
+  orders.group_participant_list (and orders.group_participant below it), inventory.serialised_item, inventory.count_line.
+  The promotions children already carry venue_id and keep the venue policy. CHECK-GAP: no check yet fails on a NOT NULL
+  same-schema key left as a convention outside the item/line/amendment/media shape D-CHILD-PARENT reads; the prevention
+  here is the declaration plus ROW_OWNER, which derive-ddl warns about when a named column is not a declared key.'

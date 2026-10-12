@@ -1,0 +1,49 @@
+id: CHG-R6-013
+date: '2026-10-12'
+source: cr
+kind: spec
+proposed: '2026-10-12'
+summary: 'inventory.quotation_line follows its quotation and reporting.dashboard_tile its dashboard: each had two NOT NULL
+  declared references to protected tables, so neither took a parent policy and both sat at the tenant root.'
+decision:
+  what: 'tools/derive-ddl.py ROW_OWNER gains inventory.quotation_line -> quotation_id (the rows of Quotation.lines[];
+    item_id -> inventory.inventory_item names what is quoted) and reporting.dashboard_tile -> dashboard_id (the rows of
+    Dashboard.tiles[]; report_id -> reporting.report_definition names what the tile shows). 920 applies
+    platform.apply_parent_rls to each instead of apply_tenant_rls.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The same two-protected-owners problem CHG-R6-005 settled for catalogue.product_media (ADAM CR-009): which reference
+  owns the row is a modelling decision, and until it is made the table sits at the tenant root, where a venue-scoped
+  principal cannot read the lines of its own quotation or the tiles of its own dashboard. Chinmay decided on 12 October
+  2026 that each follows its parent.'
+keys_touched:
+  tables:
+  - inventory.quotation_line
+  - reporting.dashboard_tile
+  files:
+  - tools/derive-ddl.py
+  tickets:
+  - MIG-INVENTORY
+  - MIG-REPORTING
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-009 (ADAM), follow-up
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::ROW_OWNER
+status: open
+notes: 'Batch R6, 12 October 2026. Column names verified in handoff/schema-reference.json: quotation_line.quotation_id
+  (source inventory.Quotation.lines) and dashboard_tile.dashboard_id (source reporting.Dashboard.tiles), both NOT NULL
+  declared references. Switching an existing table''s policy is not additive: migration-review.md lists the dropped
+  apply_tenant_rls and the added apply_parent_rls statement for each. derive-ddl prints a warning when a ROW_OWNER column
+  is not a NOT NULL declared reference.'

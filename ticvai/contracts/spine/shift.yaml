@@ -2035,6 +2035,7 @@ components:
                   (pull audit R122).
               count: { type: integer, minimum: 0 }
         withdrawnTotal:
+          x-ticvai-column: withdrawn_amount
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
           readOnly: true
@@ -2080,16 +2081,16 @@ components:
                   - $ref: '../shared/common.yaml#/components/schemas/Money'
                 description: The sum of tenders taken in this currency during the shift.
               countedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-              variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              variance: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: variance_amount }
               baseEquivalent:
                 allOf:
                   - $ref: '../shared/common.yaml#/components/schemas/Money'
                 description: >
                   **At the rates on the payments, not today's.** A shift closed on Friday and reviewed on
                   Monday is reviewed at Friday's rates (CF-37).
-        expectedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        countedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        expectedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: expected_amount }
+        countedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: counted_amount }
+        variance: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: variance_amount }
         closedByPrincipalId:
           type: string
           format: uuid
@@ -2678,7 +2679,7 @@ components:
           format: uuid
           description: Client-generated UUIDv7.
         kind: { $ref: '#/components/schemas/CashMovementKind' }
-        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: movement_amount }
         denominations:
           $ref: '#/components/schemas/DenominationCount'
           x-ticvai-persisted: false
