@@ -38,13 +38,13 @@
   "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 146,
   "schemas": 125,
   "states": 42,
-  "events": 47,
+  "events": 48,
   "tables": 138,
   "screens": 194,
   "flows": 11,
@@ -76,9 +76,9 @@
    },
    {
     "name": "Events with a critical consumer",
-    "done": 30,
-    "total": 47,
-    "percent": 64,
+    "done": 32,
+    "total": 48,
+    "percent": 67,
     "note": "An event whose loss breaks something must say which consumer."
    }
   ],
@@ -93,7 +93,7 @@
   ]
  },
  "headline": {
-  "design": 87,
+  "design": 88,
   "build": 0
  },
  "waves": {

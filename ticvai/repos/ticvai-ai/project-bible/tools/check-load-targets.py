@@ -16,6 +16,10 @@ a document to the client's figures once they existed.
   L-TARGET-BELOW     a document in docs/adr or docs/active plans a waiting-room or on-sale load test at fewer
                      arrivals than the client's 50,000 ("load test at N arrivals"), unless the line says what it
                      was amended from ("was N")
+  L-TICKET-BELOW     an authored ticket list in docs/active (*.json: a task's subject or detail) plans a load test
+                     ("load test ... at N arrivals", "N arrivals in the opening seconds") below 50,000. **12 October
+                     2026, CHG-R6-034:** EDGE-WAITING-ROOM-LOAD still said 30,000 after CHG-R4-017, because the
+                     ticket text lives in docs/active/block-a-extra-tasks.json and this check read only Markdown
 
 Read-only. Exit 1 on any finding.
 
@@ -49,6 +53,10 @@ TARGETS = [
 ]
 
 BELOW = re.compile(r"[Ll]oad[- ]test(?:ed)? at ([\d,]+)(?: simultaneous)? arrivals")
+# A ticket's subject names the thing tested between "load test" and the figure ("Load test the waiting room at N
+# arrivals"), and its detail gives the burst ("N arrivals in the opening seconds"); CHG-R6-034.
+TICKET_BELOW = (re.compile(r"[Ll]oad[- ]test(?:ed)?\b[^.\"]{0,80}?\bat (\d[\d,]*)(?: simultaneous)? arrivals"),
+                re.compile(r"\b(\d[\d,]*)(?: simultaneous)? arrivals in the opening seconds"))
 
 
 def main() -> int:
@@ -67,6 +75,14 @@ def main() -> int:
                 for m in BELOW.finditer(line):
                     if int(m.group(1).replace(",", "")) < ARRIVALS and not re.search(r"\bwas [\d,]+", line):
                         bad.append(f"L-TARGET-BELOW    {p.relative_to(ROOT).as_posix()}:{n} plans a load test at "
+                                   f"{m.group(1)} arrivals; the client's figure is {ARRIVALS:,}+")
+    for p in sorted((ROOT / "docs" / "active").glob("*.json")):
+        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            for rx in TICKET_BELOW:
+                for m in rx.finditer(line):
+                    digits = m.group(1).replace(",", "")
+                    if digits and int(digits) < ARRIVALS and not re.search(r"\bwas [\d,]+", line):
+                        bad.append(f"L-TICKET-BELOW    {p.relative_to(ROOT).as_posix()}:{n} plans a load test at "
                                    f"{m.group(1)} arrivals; the client's figure is {ARRIVALS:,}+")
     print(f"check-load-targets: {len(TARGETS)} target statement(s); arrivals {ARRIVALS:,}+, "
           f"acceptance benchmark {BENCHMARK:,} concurrent")

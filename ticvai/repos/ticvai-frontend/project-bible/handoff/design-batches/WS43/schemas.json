@@ -873,7 +873,7 @@
   }
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -1803,7 +1803,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",
@@ -1862,7 +1863,7 @@
  "PublicationActivationSchedulerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Publication & Activation Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "actionType": {

@@ -8853,6 +8853,7 @@ components:
           format: uuid
           readOnly: true
         promotionId:
+          x-ticvai-references: promotions.promotion
           type: string
           format: uuid
           readOnly: true
@@ -9057,6 +9058,7 @@ components:
           type: string
           format: uuid
         promotionId:
+          x-ticvai-references: promotions.promotion
           type: string
           format: uuid
           nullable: true
@@ -9530,6 +9532,7 @@ components:
           type: string
           description: The changed row's id (a coupon code's `code`).
         promotionId:
+          x-ticvai-references: promotions.promotion
           type: string
           format: uuid
           nullable: true
@@ -9612,6 +9615,7 @@ components:
           type: string
           format: uuid
         promotionId:
+          x-ticvai-references: promotions.promotion
           type: string
           format: uuid
           nullable: true
@@ -9936,6 +9940,7 @@ components:
         code:
           type: string
         campaignId:
+          x-ticvai-references: promotions.coupon_campaign
           type: string
           format: uuid
         batchId:
@@ -10034,6 +10039,7 @@ components:
           format: uuid
           readOnly: true
         batchId:
+          x-ticvai-references: promotions.coupon_code_batch
           type: string
           format: uuid
         channelsType:
@@ -10669,7 +10675,7 @@ components:
         dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the
         booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation
         Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the
-        catalogue''s (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no
+        catalogue''s (`catalogue.channel_capacity`, `catalogue.inventory_reservation`). A row with no
         channel is the bundle''s default. (DM5, 29 September: data model for the agreed operations)
 
         **Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies,

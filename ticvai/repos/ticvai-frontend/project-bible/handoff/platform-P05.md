@@ -9,20 +9,18 @@
 | Contracts | 7 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 11 |
+| Operations with no screen | 9 |
 | Waves | wave1 2 · wave2 15 |
 
 ## Gaps
 
-### 11 operations with no screen here
+### 9 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |

@@ -2479,6 +2479,7 @@
   },
   "navigation": {
    "exitTo": [
+    "ADM-238",
     "BO-084",
     "BO-085",
     "BO-086"
@@ -2494,7 +2495,15 @@
      "to": "BO-085",
      "trigger": "Approval Request",
      "provenance": "derived — BO-085 declares entryState.params requestId and BO-087 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
+    },
+    {
+     "to": "ADM-238",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F164 step 10→11"
     }
+   ],
+   "entryFrom": [
+    "ADM-238"
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.\n\n**ADM-243 (merged into BO-087 as a section on 2 October) brings its bindings: the approval matrices are read with listApprovalMatrices and saved with setApprovalMatrix (the plan builds them on APP-SETUP-BO-087; ledger, 4 October 2026)** (CHG-FXS-002)",

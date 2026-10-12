@@ -55,7 +55,10 @@ EXEMPT_NAMES = ("schema-merge-decision-log.md", "schema-merge-decisions-20-septe
                 # The root-class register (the cited copy of 2 October, CHG-SEED-012) names R160, the
                 # platform.org_unit -> platform.scope rename itself; --fix turned its row into
                 # "platform.scope -> platform.scope" (CHG-GTB-007).
-                "root-classes.md")
+                "root-classes.md",
+                # The 26 August rename record (catalogue.inventory_lease -> catalogue.inventory_hold) records what
+                # was renamed then; the 12 October rename to inventory_reservation (CHG-R6-010) does not change it.
+                "renames-26-august.md")
 
 # `word.word` where the left side names a real schema. **A backtick is a boundary, not an
 # exclusion** - documentation wraps almost every table name in one, and excluding them found

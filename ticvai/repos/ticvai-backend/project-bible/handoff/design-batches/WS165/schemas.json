@@ -489,6 +489,14 @@
  },
  "Seat": {
   "x-ticvai-persistence": "seating.seat",
+  "x-ticvai-unique-together": [
+   [
+    "seat_map_id",
+    "sectionCode",
+    "rowLabel",
+    "seatNumber"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",

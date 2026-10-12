@@ -410,6 +410,44 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
+ "joinWaitlist": {
+  "method": "POST",
+  "path": "/waitlist-entries",
+  "contract": "catalogue",
+  "summary": "Ask to be told if capacity frees up",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WaitlistEntry",
+  "responds": "WaitlistEntry"
+ },
+ "leaveWaitlist": {
+  "method": "DELETE",
+  "path": "/waitlist-entries/{entryId}",
+  "contract": "catalogue",
+  "summary": "Stop waiting",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listBookableVenueMaps": {
   "method": "GET",
   "path": "/bookable-venue-maps",
@@ -591,6 +629,11 @@
    },
    {
     "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entitlementTemplateId",
     "in": "query",
     "required": null
    },

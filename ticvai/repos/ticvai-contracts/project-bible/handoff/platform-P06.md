@@ -9,12 +9,12 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 139 |
+| Operations with no screen | 136 |
 | Waves | wave1 30 · wave2 35 · wave3 31 |
 
 ## Gaps
 
-### 139 operations with no screen here
+### 136 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -58,9 +58,9 @@
 | `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
-| … | | | 99 more |
+| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
+| … | | | 96 more |
 
 ### 3 modules split across waves
 

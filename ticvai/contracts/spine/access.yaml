@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 247
+  x-ticvai-screen-count: 248
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -570,11 +570,11 @@ paths:
   /face-tag/enrolments:
     post:
       operationId: enrolFaceTag
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
-      x-ticvai-consumed-by:
-        - "P04 POS-005 Payment"
       x-ticvai-audience:
       - staff
       x-ticvai-make-or-break: 'May a Face Tag be captured on a notice alone, with no affirmative act by the guest
@@ -841,13 +841,13 @@ paths:
   /face-pass/enrolments:
     post:
       operationId: enrolFacePass
+      x-ticvai-consumed-by:
+        - "P02 GST-069 Face Pass"
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: biometric.enrolmentChanged
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
-      x-ticvai-consumed-by:
-        - "P02 GST-069 Face Pass"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1116,12 +1116,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeFacePass
-      x-ticvai-write-via:
-      - table: pii.subject_biometric
-        event: biometric.enrolmentChanged
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5104,6 +5104,8 @@ paths:
         format: uuid
     put:
       operationId: setAccessAreaCapacity
+      x-ticvai-consumed-by:
+        - "P08 BO-145 Venue & Park Access Structure"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '12 October 2026: CHG-R6-036 (the Vivaticket comparison of 6 October found the scanner''s
@@ -8363,11 +8365,11 @@ paths:
       x-ticvai-bounded: retention rules per biometric data category, defined by hand
     put:
       operationId: setBiometricLifecycleRetention
+      x-ticvai-consumed-by:
+        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-write-via:
       - table: tenancy.data_retention_setting
         operation: setDataRetentionSetting
-      x-ticvai-consumed-by:
-        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -15934,12 +15936,12 @@ paths:
         format: uuid
     post:
       operationId: reviewFaceReenrolment
-      x-ticvai-write-via:
-      - table: pii.subject_biometric
-        event: biometric.enrolmentChanged
       x-ticvai-consumed-by:
         - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listFaceChangeEnrollment reads (pack ''Access

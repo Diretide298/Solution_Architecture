@@ -968,7 +968,7 @@ def main() -> int:
         "orders.deposit",                    # money actually taken, like orders.payment.tender_currency beside it
         "orders.deposit_box_foreign_holding",  # foreign notes counted into a drawer: the currency IS the holding (audit R099)
         "wallet.balance",                    # a stored-value balance is denominated, the same reason wallet.wallet is exempt
-        "wallet.hold",                       # a hold on a denominated balance carries the balance's denomination
+        "wallet.fund_reservation",                       # a hold on a denominated balance carries the balance's denomination
         # **The two the 20 September amendment created, and they are the point of it.**
         # `platform.venue_settings` holds the venue's trading currency *because* it is frozen at
         # first trade and the frozen answer needs somewhere to live — a venue resolving purely

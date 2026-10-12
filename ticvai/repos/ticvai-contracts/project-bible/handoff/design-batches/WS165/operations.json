@@ -80,6 +80,30 @@
   "requestBody": null,
   "responds": "UploadTicket"
  },
+ "editSeatMapStructure": {
+  "method": "PATCH",
+  "path": "/seat-maps/{seatMapId}/structure",
+  "contract": "seating",
+  "summary": "Build a seat map by hand",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getSeatMap": {
   "method": "GET",
   "path": "/seat-maps/{seatMapId}",

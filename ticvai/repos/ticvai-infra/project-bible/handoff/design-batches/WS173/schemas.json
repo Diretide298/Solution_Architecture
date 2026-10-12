@@ -359,7 +359,7 @@
  },
  "SeatRecommendationRules": {
   "type": "object",
-  "x-ticvai-persistence": "seating.recommendation_rules",
+  "x-ticvai-persistence": "seating.recommendation_rule",
   "description": "Board 9, and the 21 August minute: *\"best-seat ranking… must be configurable per seat map/event.\"* **Five kinds, one scoring model** — five algorithms would eventually contradict each other.\n",
   "properties": {
    "seatMapId": {

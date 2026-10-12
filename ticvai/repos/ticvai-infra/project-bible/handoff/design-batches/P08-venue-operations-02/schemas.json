@@ -63,6 +63,7 @@
     "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1408,7 +1409,7 @@
    "dateFrom": {
     "type": "string",
     "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "dateTo": {
     "type": "string",
@@ -1588,6 +1589,7 @@
     "description": "**Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout, `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.\n"
    },
    "cashDrawerLimit": {
+    "x-ticvai-column": "deposit_box_limit_amount",
     "oneOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"

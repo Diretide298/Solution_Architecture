@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 213,
+  "operations": 215,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 16
+  "operationsWithNoScreen": 14
  },
  "waves": {
   "wave1": 50
@@ -135,7 +135,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 15
+   "operations": 17
   },
   {
    "contract": "fnb",
@@ -150,15 +150,15 @@
    "operations": 10
   },
   {
+   "contract": "wallet",
+   "operations": 8
+  },
+  {
    "contract": "white-label",
    "operations": 8
   },
   {
    "contract": "venue-map",
-   "operations": 8
-  },
-  {
-   "contract": "wallet",
    "operations": 8
   },
   {
@@ -174,15 +174,15 @@
    "operations": 6
   },
   {
+   "contract": "seating",
+   "operations": 5
+  },
+  {
    "contract": "queue",
    "operations": 5
   },
   {
    "contract": "promotions",
-   "operations": 5
-  },
-  {
-   "contract": "seating",
    "operations": 5
   },
   {
@@ -250,7 +250,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/date-and-session-selection",
-   "operations": 8,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -663,18 +663,6 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
    },
    {
     "operation": "listGuestMemberships",

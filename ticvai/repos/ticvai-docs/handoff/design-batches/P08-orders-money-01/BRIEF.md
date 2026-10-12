@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 63 operations · 94 schemas · 21 permissions**
+**10 screens · 64 operations · 96 schemas · 22 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 21 permissions apply here:
-  `LEDGER_POST, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REFUND_APPROVE, ORDER_REFUND_BULK, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 22 permissions apply here:
+  `LEDGER_POST, LEDGER_VIEW, MARKETING_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REFUND_APPROVE, ORDER_REFUND_BULK, ORDER_REPRINT, ORDER_RESCHEDULE`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -164,7 +164,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-022` | Order Detail | C | 127 | 39 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
-| `BO-023` | Refunds & Exchanges | A | 95 | 43 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
+| `BO-023` | Refunds & Exchanges | A | 95 | 63 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
 | `BO-024` | Payment Exceptions | A | 21 | 18 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-025` | Chargebacks & Disputes | C | 10 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 | `BO-026` | Group Bookings | C | 158 | 47 | 6 | 77 | 2 | 6 | — | notStarted (generated) |

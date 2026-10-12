@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 249 operations
+title: catalogue — 252 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -16,15 +16,15 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.channel_envelope
+  - catalogue.inventory_reservation
   - platform.workstation
   writes:
   - cache:idempotency
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.channel_envelope
+  - catalogue.inventory_reservation
 - operation: approvePricingWorkflowAuthority
   verb: PUT
   path: /pricing-workflow-authority
@@ -77,6 +77,18 @@ operations:
   - cache:idempotency
   - catalogue.approval_policy
   - catalogue.audit_entry
+- operation: archiveEntitlementTemplate
+  verb: POST
+  path: /entitlement-templates/{templateId}/archive
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.entitlement_template
+  writes:
+  - catalogue.entitlement_template
 - operation: assessProductChange
   verb: POST
   path: /products/{productId}/change-impact
@@ -217,6 +229,7 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
   - catalogue.variant
 - operation: commitCatalogueImport
   verb: POST
@@ -244,17 +257,17 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.channel_envelope
+  - catalogue.inventory_reservation
   writes:
   - cache:idempotency
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.channel_envelope
+  - catalogue.inventory_reservation
   - platform.outbox
-  - seating.seat_hold
-  - seating.seat_hold_item
+  - seating.seat_reservation
+  - seating.seat_reservation_item
 - operation: copyPriceList
   verb: POST
   path: /price-lists/{priceListId}/copy
@@ -499,11 +512,11 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   writes:
   - cache:idempotency
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
 - operation: freezeEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/freeze
@@ -517,6 +530,7 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
+  - platform.outbox
 - operation: getAvailability
   verb: GET
   path: /availability
@@ -529,7 +543,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - catalogue.performance
   writes: []
 - operation: getCatalogueImportJob
@@ -553,7 +567,7 @@ operations:
   - partner
   offline: false
   reads:
-  - catalogue.channel_allocation
+  - catalogue.channel_envelope
   writes: []
 - operation: getDynamicPriceRule
   verb: GET
@@ -567,6 +581,17 @@ operations:
   - pricing.dynamic_price_action
   - pricing.dynamic_price_condition
   - pricing.dynamic_price_rule
+  writes: []
+- operation: getEntitlementTemplate
+  verb: GET
+  path: /entitlement-templates/{templateId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.entitlement_template
   writes: []
 - operation: getEvent
   verb: GET
@@ -909,9 +934,9 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
   - catalogue.channel_connection
+  - catalogue.channel_envelope
   - catalogue.channel_incident
   - catalogue.channel_sync
   - catalogue.price_list
@@ -929,8 +954,8 @@ operations:
   offline: false
   reads:
   - catalogue.ai_finding
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
+  - catalogue.channel_envelope
   writes: []
 - operation: listChannelAllocationRebalancing
   verb: GET
@@ -941,10 +966,10 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
+  - catalogue.channel_envelope
   - catalogue.event
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - catalogue.performance
   writes: []
 - operation: listChannelBasedPricing
@@ -1046,8 +1071,8 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
+  - catalogue.channel_envelope
   - catalogue.product
   - catalogue.sales_channel
   - orders.sales_order
@@ -1386,8 +1411,8 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
+  - catalogue.channel_envelope
   - catalogue.event
   - catalogue.performance
   - catalogue.product
@@ -1403,9 +1428,9 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.channel_envelope
+  - catalogue.inventory_reservation
   - catalogue.performance
   - catalogue.sales_channel
   - catalogue.waitlist_entry
@@ -1419,7 +1444,7 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   writes: []
 - operation: listLearningModelPerformance
   verb: GET
@@ -1880,7 +1905,7 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
+  - catalogue.channel_envelope
   - catalogue.channel_sync
   - catalogue.price
   - catalogue.product
@@ -1981,10 +2006,10 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
+  - catalogue.channel_envelope
   - catalogue.event
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - catalogue.performance
   writes: []
 - operation: listRecommendationReviewDecision
@@ -2089,9 +2114,9 @@ operations:
   - staff
   offline: false
   reads:
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
   - catalogue.channel_connection
+  - catalogue.channel_envelope
   - catalogue.price_list
   - catalogue.product
   - catalogue.product_channel_assignment
@@ -2252,7 +2277,7 @@ operations:
   - catalogue.waitlist_entry
   writes:
   - cache:idempotency
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - catalogue.waitlist_entry
 - operation: publishActivationScheduler
   verb: PUT
@@ -2319,9 +2344,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.channel_allocation
   - catalogue.channel_capacity
   - catalogue.channel_connection
+  - catalogue.channel_envelope
   - catalogue.channel_sales_rule
   - catalogue.price_assignment
   - catalogue.price_list
@@ -2368,6 +2393,7 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
+  - platform.outbox
 - operation: relinquishChannelAllocation
   verb: POST
   path: /channel-capacities/{channelCapacityId}/channel-allocations/release
@@ -2378,9 +2404,9 @@ operations:
   - partner
   offline: false
   reads:
-  - catalogue.channel_allocation
+  - catalogue.channel_envelope
   writes:
-  - catalogue.channel_allocation
+  - catalogue.channel_envelope
 - operation: relinquishInventoryHold
   verb: DELETE
   path: /inventory-holds/{inventoryHoldId}
@@ -2391,10 +2417,10 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   writes:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
 - operation: renewInventoryHold
   verb: POST
   path: /inventory-holds/{inventoryHoldId}/renew
@@ -2406,11 +2432,11 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   writes:
   - cache:idempotency
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
 - operation: reportBundleApplied
   verb: POST
   path: /catalogue/bundles/{version}/applied
@@ -2584,10 +2610,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.channel_allocation
+  - catalogue.channel_envelope
   writes:
   - cache:idempotency
-  - catalogue.channel_allocation
+  - catalogue.channel_envelope
 - operation: setChannelConnectionConfiguration
   verb: PUT
   path: /channel-connections
@@ -3478,6 +3504,7 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
+  - platform.outbox
 - operation: testChannelConnection
   verb: POST
   path: /channel-connections/{connectionId}/test
@@ -3593,6 +3620,18 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.donation_campaign
+- operation: updateEntitlementTemplate
+  verb: PATCH
+  path: /entitlement-templates/{templateId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.entitlement_template
+  writes:
+  - catalogue.entitlement_template
 - operation: updateEvent
   verb: PATCH
   path: /events/{eventId}

@@ -19,7 +19,7 @@ database. A network boundary between them buys no data isolation.
 - ADR-0028 line 50: *"no schema is written by two services"*.
 - `docs/architecture/data-model.md:19`: *"Each service connects with a role granted access only to its own schema — enforced by Postgres grants"*.
 - `handoff/api-data-lineage.json`: **35 tables are written by more than one service**, and there are **894 cross-schema reads in 493 of 2,608 operations**.
-- The sale path writes across services (SD-002): `addCartLine` writes `catalogue.inventory_hold`; nine operations write `access.entitlement`; `createPayment` writes `ledger.journal_entry`.
+- The sale path writes across services (SD-002): `addCartLine` writes `catalogue.inventory_reservation`; nine operations write `access.entitlement`; `createPayment` writes `ledger.journal_entry`.
 
 Per-service grants would break 493 operations on day one. Without them, the boundary is convention only.
 
@@ -168,4 +168,13 @@ load). It should not share a process with Marketing sends.
 6. [ ] **ARCH-TESTS**: extend `ModuleBoundaryTests` to 17 modules; add a test that no module's SQL names another module's schema. (3 pts)
 7. [ ] **DB-READ-VIEWS**: generate published read views for the 894 cross-schema reads from lineage (a deriver), applied in the migrations. (5 pts)
 8. [ ] **DB-ROLES**: one Postgres role per deployable in MIG-BASELINE; AI read-only. (2 pts)
+   - **12 October 2026 (ADAM CR-002, raised on DB-ROLES; Chinmay chose option A; CHG-R6-020).** The lineage still
+     recorded writes into tables another deployable owns as the caller's own SQL, which these grants refuse. Rule 4
+     now holds for every one: each names its route as `x-ticvai-write-via` on the operation (an event the owning
+     module consumes, or the owner's published operation), copied into the lineage as `writeVia`. The kernel tables
+     granted to every role directly are exactly `platform.outbox` INSERT, `platform.scope` SELECT,
+     `platform.audit_record` INSERT and `platform.idempotency_record` SELECT/INSERT/UPDATE; a write that cannot
+     route yet is a dated exception with a removal release. Both lists are `docs/active/cross-deployable-writes.yaml`;
+     the readable table per write is `handoff/cross-deployable-writes.md`; `tools/check-cross-deployable-writes.py`
+     fails on a write with neither.
 9. [x] The runtime: the starter targeted .NET 8 (`global.json`, `Directory.Build.props`), and Microsoft's support for .NET 8 ends on 10 November 2026, inside Block A. **Decided 30 September: .NET 10 LTS from day one.** The starter now targets `net10.0` with SDK 10.0.100 (`rollForward: latestFeature`); SETUP-HOSTS builds the hosts on it.

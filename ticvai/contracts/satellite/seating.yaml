@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 55
+  x-ticvai-screen-count: 56
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
   x-ticvai-requirements: 112
@@ -720,6 +720,9 @@ paths:
         format: uuid
     patch:
       operationId: editSeatMapStructure
+      x-ticvai-consumed-by:
+        - "P08 BO-954 Venue Canvas"
+        - "P08 BO-956 Rows & Seats"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '12 October 2026: CHG-R6-035 (the Vivaticket comparison of 6 October: seated events are

@@ -762,6 +762,7 @@
     "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1656,7 +1657,7 @@
   }
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -2006,7 +2007,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",
@@ -2662,7 +2664,7 @@
    "dateFrom": {
     "type": "string",
     "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "dateTo": {
     "type": "string",

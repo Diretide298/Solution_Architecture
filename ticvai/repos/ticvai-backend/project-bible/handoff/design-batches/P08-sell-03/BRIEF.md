@@ -1,6 +1,6 @@
 # P08-sell-03 — P08 · Sell (3 of 4)
 
-**10 screens · 27 operations · 41 schemas · 9 permissions**
+**10 screens · 34 operations · 51 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -196,8 +196,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-118` | Campaign & Audience Management | D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
 | `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
 | `BO-120` | Omnichannel Commerce & Journey Configuration | D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
-| `BO-121` | Personalized Offers & Guest Engagement | D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
 | `BO-1190` | Donation Campaigns | B | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
+| `BO-1192` | Entitlement Templates | B–D | 67 | 18 | 8 | 57 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -306,10 +306,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **`BO-120` Omnichannel Commerce & Journey Configuration**
 
 - Recommendation touchpoints are configurable (cart, checkout or post-purchase, per channel), and a presentation/experience preview visually simulates how a recommendation will look to the guest before it is published. *(client request · MoM 21 Sep 2026, 4.6 Personalized Offer Delivery & Omni-Channel Orchestration · DI-961)*
-
-**`BO-121` Personalized Offers & Guest Engagement**
-
-- Recommendation analytics show response rates, drop-offs, successful purchases and conversion per recommendation, broken down by strategy type (AI-based vs rule-based). *(client request · MoM 21 Sep 2026, 4.7 Recommendation Performance Analytics · DI-963)*
 
 **`BO-1190` Donation Campaigns**
 

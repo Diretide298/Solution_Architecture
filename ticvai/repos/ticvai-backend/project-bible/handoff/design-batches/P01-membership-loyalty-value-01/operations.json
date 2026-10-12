@@ -743,6 +743,11 @@
     "required": null
    },
    {
+    "name": "entitlementTemplateId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "segmentTag",
     "in": "query",
     "required": null
@@ -902,7 +907,7 @@
   "path": "/guests/{subjectId}/consents",
   "contract": "marketing-crm",
   "summary": "Record a consent decision",
-  "permission": null,
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "subject",

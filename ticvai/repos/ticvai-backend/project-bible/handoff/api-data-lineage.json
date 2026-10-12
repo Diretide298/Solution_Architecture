@@ -454,7 +454,7 @@
   "verb": "GET",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "reads": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "writes": [],
   "routing": "primary",
@@ -478,11 +478,11 @@
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "routing": "",
   "scope": "venue",
@@ -612,7 +612,7 @@
   "verb": "GET",
   "path": "/inventory-holds",
   "reads": [
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -635,16 +635,16 @@
   "path": "/inventory-holds",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": "",
   "scope": "workstation",
@@ -671,12 +671,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": "",
   "scope": "workstation",
@@ -701,12 +701,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -730,7 +730,7 @@
   "path": "/availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -1151,7 +1151,8 @@
   ],
   "writes": [
    "access.entitlement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -1166,6 +1167,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.statusChanged"
+   }
   ]
  },
  "listOrgUnits": {
@@ -2166,7 +2173,7 @@
   "verb": "POST",
   "path": "/payments",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
@@ -2176,7 +2183,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -2275,7 +2282,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -2343,14 +2350,14 @@
   "verb": "POST",
   "path": "/sync/orders",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price_list",
    "catalogue.variant",
    "orders.sales_order"
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.price_variance",
    "orders.order_line",
    "orders.order_line_discount",
@@ -2477,7 +2484,8 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "workstation",
@@ -2492,6 +2500,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "order.paid"
+   }
   ]
  },
  "exchangeOrderLines": {
@@ -2596,7 +2610,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -2611,6 +2626,12 @@
   ],
   "audience": [
    "guest"
+  ],
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.transferred"
+   }
   ]
  },
  "claimTicketTransfer": {
@@ -2642,7 +2663,13 @@
   "audience": [
    "guest"
   ],
-  "lineageNote": "offered->claimed emits entitlement.transferred"
+  "lineageNote": "offered->claimed emits entitlement.transferred",
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.transferred"
+   }
+  ]
  },
  "getOrderStatement": {
   "contract": "orders",
@@ -6645,7 +6672,7 @@
   ],
   "routing": "",
   "scope": "venue",
-  "perm": null,
+  "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Record a consent decision",
   "source": "path-inferred",
@@ -10021,7 +10048,7 @@
    "fnb.recipe",
    "fnb.recipe_ingredient",
    "fnb.substitution_rule",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -10526,7 +10553,7 @@
   "reads": [
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -10550,12 +10577,12 @@
   "path": "/seat-holds",
   "reads": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -10580,7 +10607,7 @@
   "verb": "GET",
   "path": "/seat-holds/{holdId}",
   "reads": [
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -10603,11 +10630,11 @@
   "path": "/seat-holds/{holdId}/extend",
   "reads": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -10683,11 +10710,11 @@
   "path": "/seat-blocks/{blockId}/allocate",
   "reads": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -10761,12 +10788,12 @@
   "reads": [
    "catalogue.performance",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_price_band"
   ],
   "writes": [],
@@ -10793,7 +10820,7 @@
   "verb": "GET",
   "path": "/inventory-items",
   "reads": [
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -10816,11 +10843,11 @@
   "path": "/inventory-items",
   "reads": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -10842,7 +10869,7 @@
   "verb": "GET",
   "path": "/inventory-items/{itemId}",
   "reads": [
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -10865,11 +10892,11 @@
   "path": "/inventory-items/{itemId}",
   "reads": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -10891,7 +10918,7 @@
   "verb": "GET",
   "path": "/inventory-items/lookup",
   "reads": [
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -10913,10 +10940,10 @@
   "verb": "GET",
   "path": "/stock",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [],
   "routing": "primary",
@@ -10989,7 +11016,7 @@
   "verb": "GET",
   "path": "/stock/valuation",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement",
    "ledger.account"
   ],
@@ -12595,13 +12622,13 @@
   "reads": [
    "cache:idempotency",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "retail.reservation",
    "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "retail.reservation",
    "retail.reservation_line"
   ],
@@ -12935,13 +12962,13 @@
   "path": "/work-orders/{workOrderId}/parts",
   "reads": [
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order"
   ],
   "writes": [
    "cache:idempotency",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order"
   ],
   "routing": "",
@@ -14214,6 +14241,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_filter"
@@ -14234,7 +14262,13 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "reporting.natural_language_query gains semantic_spec; report_column/report_filter dropped (stored inside generated_query jsonb, not rows); ai.knowledge_gap for an unmodelled question is written by the ai service. derive-lineage never updates an existing entry: hand update"
+  "lineageNote": "reporting.natural_language_query gains semantic_spec; report_column/report_filter dropped (stored inside generated_query jsonb, not rows); ai.knowledge_gap for an unmodelled question is written by the ai service. derive-lineage never updates an existing entry: hand update",
+  "writeVia": [
+   {
+    "table": "ai.activity",
+    "event": "reporting.questionAnswered"
+   }
+  ]
  },
  "saveNaturalLanguageQuery": {
   "contract": "reporting",
@@ -14252,6 +14286,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_definition",
@@ -14273,6 +14308,12 @@
   "audience": [
    "staff",
    "partner"
+  ],
+  "writeVia": [
+   {
+    "table": "ai.activity",
+    "event": "reporting.definitionPublished"
+   }
   ]
  },
  "listReleases": {
@@ -16901,7 +16942,13 @@
   "audience": [
    "staff"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): a registered card's credits are wallet movements; wallet.credited through the outbox"
+  "fixNote": "4 October 2026 (CHG-FXC-004): a registered card's credits are wallet movements; wallet.credited through the outbox",
+  "writeVia": [
+   {
+    "table": "games.card",
+    "event": "wallet.credited"
+   }
+  ]
  },
  "transferGameCard": {
   "contract": "games",
@@ -17176,7 +17223,13 @@
   "audience": [
    "staff"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): as loadGameCredits"
+  "fixNote": "4 October 2026 (CHG-FXC-004): as loadGameCredits",
+  "writeVia": [
+   {
+    "table": "games.card",
+    "event": "wallet.credited"
+   }
+  ]
  },
  "getTenantConfig": {
   "contract": "white-label",
@@ -18694,7 +18747,25 @@
    "staff"
   ],
   "audienceNote": "Narrowed 31 August: an approver decides; the requester is not the approver.",
-  "lineageNote": "amend by hand: the approvals outcome handler applies an approved or rejected decision to the subject row, so the state models crediting it (partner-application inReview->approved/rejected, partner-change-request pendingApproval->approved/rejected, partner-agreement pendingApproval->active/terminated, privacy-notice-governance review->approved/draft) have a writer (decided 29 September, writers pass)"
+  "lineageNote": "amend by hand: the approvals outcome handler applies an approved or rejected decision to the subject row, so the state models crediting it (partner-application inReview->approved/rejected, partner-change-request pendingApproval->approved/rejected, partner-agreement pendingApproval->active/terminated, privacy-notice-governance review->approved/draft) have a writer (decided 29 September, writers pass)",
+  "writeVia": [
+   {
+    "table": "control.partner_agreement",
+    "event": "approval.granted"
+   },
+   {
+    "table": "control.partner_application",
+    "event": "approval.granted"
+   },
+   {
+    "table": "control.partner_change_request",
+    "event": "approval.granted"
+   },
+   {
+    "table": "marketing.privacy_notice_governance",
+    "event": "approval.granted"
+   }
+  ]
  },
  "withdrawApprovalRequest": {
   "contract": "approvals",
@@ -19475,7 +19546,7 @@
   "path": "/carts/{cartId}",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19509,7 +19580,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart"
   ],
   "routing": "",
@@ -19577,7 +19648,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart_line"
   ],
   "routing": "",
@@ -19609,7 +19680,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart_line"
   ],
   "routing": "",
@@ -19634,7 +19705,7 @@
   "path": "/carts/{cartId}/extend",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19642,7 +19713,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart"
   ],
   "routing": "",
@@ -19697,7 +19768,7 @@
   "verb": "POST",
   "path": "/carts/{cartId}/checkout",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "orders.cart",
    "orders.cart_line",
@@ -19734,7 +19805,13 @@
    "partner"
   ],
   "lineageNote": "copies cart_line.recommendation_id to order_line.recommendation_id; reads orders.fraud_rule (charge rules) then calls ai scoreTransactionRisk (service call, no table); existing embedded attributes/window entries unchanged",
-  "note": "emits order.created; re-acquires a lapsed hold via catalogue.acquireInventoryHold; converts via catalogue.convertInventoryHold only when fully paid at checkout; marketingConsents recorded through marketing"
+  "note": "emits order.created; re-acquires a lapsed hold via catalogue.acquireInventoryHold; converts via catalogue.convertInventoryHold only when fully paid at checkout; marketingConsents recorded through marketing",
+  "writeVia": [
+   {
+    "table": "marketing.consent_record",
+    "event": "order.created"
+   }
+  ]
  },
  "listAbandonedCarts": {
   "contract": "orders",
@@ -19927,7 +20004,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.waitlist_entry"
   ],
   "routing": "",
@@ -20226,7 +20303,13 @@
   "audience": [
    "staff"
   ],
-  "lineageNote": "partnerId resolves to control.partner (was platform.tenant by convention); partnerName read from control.partner.trading_name; netRates/corporateAllocations/volumeTiers/seasonalRates deprecated and ignored on write (control.partner_rate, partner_rate_volume_band, partner_allocation); scope_path written at tenant scope."
+  "lineageNote": "partnerId resolves to control.partner (was platform.tenant by convention); partnerName read from control.partner.trading_name; netRates/corporateAllocations/volumeTiers/seasonalRates deprecated and ignored on write (control.partner_rate, partner_rate_volume_band, partner_allocation); scope_path written at tenant scope.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "updatePartnerAgreement": {
   "contract": "subscription",
@@ -20294,7 +20377,13 @@
    "staff"
   ],
   "audienceNote": "Narrowed 31 August: a reseller applies through P11, not a guest surface.",
-  "lineageNote": "Creates control.partner (status applicant) and control.partner_application (submitted, stage application) with its first review tasks and the primary contact; approvals.request raised against the application. No longer writes control.partner_agreement (the first agreement is drafted after approval); reads control.partner for the duplicate check. (decided 29 September, writers pass; DM4)"
+  "lineageNote": "Creates control.partner (status applicant) and control.partner_application (submitted, stage application) with its first review tasks and the primary contact; approvals.request raised against the application. No longer writes control.partner_agreement (the first agreement is drafted after approval); reads control.partner for the duplicate check. (decided 29 September, writers pass; DM4)",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "getCommissionStatement": {
   "contract": "subscription",
@@ -21364,7 +21453,8 @@
    "access.face_reenrolment_attempt",
    "cache:idempotency",
    "marketing.consent_record",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -21381,7 +21471,17 @@
    "staff",
    "guest"
   ],
-  "lineageNote": "re-enrolment writes access.face_reenrolment_attempt (updated 201 / pendingReview 202); every enrolment writes access.biometric_audit_event"
+  "lineageNote": "re-enrolment writes access.face_reenrolment_attempt (updated 201 / pendingReview 202); every enrolment writes access.biometric_audit_event",
+  "writeVia": [
+   {
+    "table": "marketing.consent_record",
+    "event": "biometric.enrolmentChanged"
+   },
+   {
+    "table": "pii.subject_biometric",
+    "event": "biometric.enrolmentChanged"
+   }
+  ]
  },
  "getFacePassEnrolment": {
   "contract": "access",
@@ -21417,7 +21517,8 @@
   "writes": [
    "access.biometric_audit_event",
    "cache:idempotency",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -21434,7 +21535,13 @@
    "staff",
    "guest"
   ],
-  "lineageNote": "revocation writes access.biometric_audit_event"
+  "lineageNote": "revocation writes access.biometric_audit_event",
+  "writeVia": [
+   {
+    "table": "pii.subject_biometric",
+    "event": "biometric.enrolmentChanged"
+   }
+  ]
  },
  "reinstateEntitlement": {
   "contract": "catalogue",
@@ -21445,7 +21552,8 @@
   ],
   "writes": [
    "access.entitlement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -21460,6 +21568,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.statusChanged"
+   }
   ]
  },
  "freezeEntitlement": {
@@ -21471,7 +21585,8 @@
   ],
   "writes": [
    "access.entitlement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -21488,7 +21603,13 @@
    "staff"
   ],
   "guestCallable": true,
-  "audienceNote": "Narrowed 31 August: staff freeze a ticket under investigation."
+  "audienceNote": "Narrowed 31 August: staff freeze a ticket under investigation.",
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.statusChanged"
+   }
+  ]
  },
  "cloneProduct": {
   "contract": "catalogue",
@@ -21502,6 +21623,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.product",
+   "catalogue.product_media",
    "catalogue.variant"
   ],
   "routing": "",
@@ -21914,7 +22036,13 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "writeVia": [
+   {
+    "table": "orders.stored_value_authorisation",
+    "operation": "authoriseStoredValue"
+   }
+  ]
  },
  "listMessageTriggers": {
   "contract": "marketing-crm",
@@ -22011,7 +22139,8 @@
    "access.entitlement",
    "cache:idempotency",
    "orders.invitation",
-   "orders.invitation_allowance"
+   "orders.invitation_allowance",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -22026,6 +22155,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "invitation.issued"
+   }
   ]
  },
  "listInvitationAllowances": {
@@ -22733,7 +22868,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [],
   "routing": "replica",
@@ -22761,7 +22896,7 @@
    "cache:idempotency",
    "resources.booking",
    "resources.resource",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.selection_policy"
   ],
   "writes": [
@@ -22815,6 +22950,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "orders.stored_value_authorisation",
+    "operation": "authoriseStoredValue"
+   }
   ]
  },
  "checkInResource": {
@@ -22845,6 +22986,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "orders.stored_value_authorisation",
+    "operation": "captureStoredValue"
+   }
   ]
  },
  "setResourceQualifications": {
@@ -23104,7 +23251,8 @@
   "writes": [
    "cache:idempotency",
    "marketing.consent_record",
-   "payments.token"
+   "payments.token",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -23121,7 +23269,13 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "writeVia": [
+   {
+    "table": "marketing.consent_record",
+    "event": "paymentToken.stored"
+   }
+  ]
  },
  "createPaymentLink": {
   "contract": "orders",
@@ -23152,6 +23306,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "marketing.message_dispatch",
+    "operation": "sendTransactionalMessage"
+   }
   ]
  },
  "listChargebacks": {
@@ -23840,13 +24000,13 @@
    "cache:idempotency",
    "catalogue.price",
    "seating.seat",
-   "seating.seat_hold",
+   "seating.seat_reservation",
    "seating.seating_rules"
   ],
   "writes": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -24139,7 +24299,7 @@
   "verb": "GET",
   "path": "/stock-batches/expiring",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.stock_batch"
   ],
   "writes": [],
@@ -24751,7 +24911,8 @@
   ],
   "writes": [
    "access.entitlement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -24766,6 +24927,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.reissued"
+   }
   ]
  },
  "shareEntitlement": {
@@ -24781,7 +24948,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "identity.delegated_access"
+   "identity.delegated_access",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -24798,7 +24966,13 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.shareChanged"
+   }
+  ]
  },
  "registerDeveloper": {
   "contract": "public-api",
@@ -25697,6 +25871,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "marketing.message_dispatch",
+    "operation": "sendTransactionalMessage"
+   }
   ]
  },
  "listSeededReports": {
@@ -25881,7 +26061,13 @@
    "guest",
    "anonymous"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "writeVia": [
+   {
+    "table": "marketing.message_dispatch",
+    "operation": "sendTransactionalMessage"
+   }
+  ]
  },
  "getPaymentLink": {
   "contract": "orders",
@@ -25930,7 +26116,8 @@
    "orders.payment",
    "orders.payment_link",
    "orders.reservation",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -25947,7 +26134,13 @@
    "guest",
    "anonymous"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "order.paid"
+   }
+  ]
  },
  "resendPaymentLink": {
   "contract": "orders",
@@ -25976,6 +26169,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "marketing.message_dispatch",
+    "operation": "sendTransactionalMessage"
+   }
   ]
  },
  "getWorkstationHealth": {
@@ -26151,7 +26350,7 @@
   "verb": "GET",
   "path": "/serialised-items",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.serialised_item",
    "inventory.stock_batch"
   ],
@@ -26540,6 +26739,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "orders.order_line",
+    "operation": "applyManualDiscount"
+   }
   ]
  },
  "fireCourse": {
@@ -26755,7 +26960,7 @@
   "path": "/stock-counts/{countId}/lines",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement"
   ],
   "writes": [
@@ -26818,7 +27023,6 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "catalogue.product_version",
    "fnb.menu"
   ],
   "routing": "",
@@ -27510,7 +27714,8 @@
   "writes": [
    "cache:idempotency",
    "marketing.guest_profile",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -27525,6 +27730,12 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "pii.subject",
+    "event": "guest.merged"
+   }
   ]
  },
  "addGuestNote": {
@@ -27718,7 +27929,6 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "catalogue.price",
    "fnb.menu_item"
   ],
   "routing": "",
@@ -27739,8 +27949,7 @@
    "store": "cache:resolution",
    "role": "evicts",
    "resolvers": [
-    "menu",
-    "price-list"
+    "menu"
    ],
    "key": "res:{tenantId}:{resolver}:{scopePath}",
    "bump": "INCR resver:{tenantId}:{resolver}",
@@ -27804,7 +28013,7 @@
   "path": "/requisitions/{requisitionId}/lines",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.requisition",
    "inventory.requisition_line"
   ],
@@ -27835,7 +28044,7 @@
   "reads": [
    "cache:idempotency",
    "inventory.daily_count_list",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -27877,14 +28086,14 @@
    "cache:idempotency",
    "catalogue.price",
    "catalogue.product",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "catalogue.price",
    "catalogue.product",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -27905,13 +28114,23 @@
    "role": "evicts",
    "resolvers": [
     "catalogue.product",
-    "inventory.item",
+    "inventory.inventory_item",
     "price-list"
    ],
    "key": "res:{tenantId}:{resolver}:{scopePath}",
    "bump": "INCR resver:{tenantId}:{resolver}",
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
-  }
+  },
+  "writeVia": [
+   {
+    "table": "catalogue.price",
+    "operation": "bulkUpdateCatalogueProducts"
+   },
+   {
+    "table": "catalogue.product",
+    "operation": "bulkUpdateCatalogueProducts"
+   }
+  ]
  },
  "sendBookingConfirmation": {
   "contract": "fnb",
@@ -28066,7 +28285,7 @@
    "fnb.recipe",
    "fnb.recipe_ingredient",
    "fnb.substitution_rule",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "fnb.allergen_verdict"
@@ -28265,7 +28484,7 @@
   "path": "/stock-transfers/{transferId}",
   "reads": [
    "fnb.cold_chain_event",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.transfer",
    "inventory.transfer_line"
   ],
@@ -28886,6 +29105,20 @@
   ],
   "audience": [
    "staff"
+  ],
+  "writeVia": [
+   {
+    "table": "orders.order_line",
+    "operation": "syncOrders"
+   },
+   {
+    "table": "orders.payment",
+    "operation": "syncOrders"
+   },
+   {
+    "table": "orders.sales_order",
+    "operation": "syncOrders"
+   }
   ]
  },
  "decommissionBurstEnvironment": {
@@ -29350,7 +29583,13 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "executes the upgrade: completes orders.upgrade (rule_id -> orders.upgrade_rule, whose credential_treatment and generated_documents apply), issues the superseding access.entitlement, refreshes orders.wallet_pass, logs the change in orders.order_event; IdempotencyKey"
+  "lineageNote": "executes the upgrade: completes orders.upgrade (rule_id -> orders.upgrade_rule, whose credential_treatment and generated_documents apply), issues the superseding access.entitlement, refreshes orders.wallet_pass, logs the change in orders.order_event; IdempotencyKey",
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "operation": "replaceCredential"
+   }
+  ]
  },
  "listBulkGroupAssisted": {
   "contract": "orders",
@@ -29636,7 +29875,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT; limits write control.partner_booking_limit, exception requests/decisions write control.partner_commercial_exception with the decision via approvals.request; overall threshold control.partner_agreement.requires_approval_above_value."
+  "lineageNote": "Idempotent PUT; limits write control.partner_booking_limit, exception requests/decisions write control.partner_commercial_exception with the decision via approvals.request; overall threshold control.partner_agreement.requires_approval_above_value.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "approveCampaignWorkflow": {
   "contract": "promotions",
@@ -29884,7 +30129,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT; validationChecks read the product version and its entitlement, eligibility, usage, household and renewal rows; the action moves subscription.membership_product status/approvalStage (states/membership-product.yaml) and appends subscription.membership_product_history; approval routed through approvals.request; activeMembersAffected from access.entitlement."
+  "lineageNote": "Idempotent PUT; validationChecks read the product version and its entitlement, eligibility, usage, household and renewal rows; the action moves subscription.membership_product status/approvalStage (states/membership-product.yaml) and appends subscription.membership_product_history; approval routed through approvals.request; activeMembersAffected from access.entitlement.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "approveMultiMediaPreview": {
   "contract": "access",
@@ -29953,7 +30204,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT; appends control.partner_status_history and moves control.partner.status (states/partner.yaml), approval-routed changes via approvals.request; suspend/terminate carry to control.partner_agreement.status; impact from control.partner_user, orders.sales_order, control.channel_listing and control.partner_allocation."
+  "lineageNote": "Idempotent PUT; appends control.partner_status_history and moves control.partner.status (states/partner.yaml), approval-routed changes via approvals.request; suspend/terminate carry to control.partner_agreement.status; impact from control.partner_user, orders.sales_order, control.channel_listing and control.partner_allocation.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "approvePricingWorkflowAuthority": {
   "contract": "catalogue",
@@ -31247,7 +31504,7 @@
   "path": "/bundle-availability-forecast",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.sales_order",
    "promotions.bundle",
@@ -31438,7 +31695,7 @@
   "verb": "GET",
   "path": "/buyer-checkout-inventory",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "orders.resale_listing",
@@ -31698,7 +31955,7 @@
   "path": "/capacity-pool-reservation",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle",
    "promotions.bundle_capacity_policy",
    "promotions.bundle_component"
@@ -31718,7 +31975,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Reservations from catalogue.inventory_hold/channel_capacity; capacity source, hard/soft allocation, hold duration, overbooking and waitlist from promotions.bundle_capacity_policy"
+  "lineageNote": "Reservations from catalogue.inventory_reservation/channel_capacity; capacity source, hard/soft allocation, hold duration, overbooking and waitlist from promotions.bundle_capacity_policy"
  },
  "listCapacityReservationInventory": {
   "contract": "orders",
@@ -31726,7 +31983,7 @@
   "path": "/capacity-reservation-inventory",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
@@ -31746,7 +32003,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "commitments = reservation/order lines against catalogue.inventory_hold (expires_at, released_at, force_release_reason) and channel_capacity"
+  "lineageNote": "commitments = reservation/order lines against catalogue.inventory_reservation (expires_at, released_at, force_release_reason) and channel_capacity"
  },
  "listCartTransactionThreshold": {
   "contract": "promotions",
@@ -31859,7 +32116,7 @@
   "path": "/channel",
   "reads": [
    "catalogue.ai_finding",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity"
   ],
   "writes": [],
@@ -31884,10 +32141,10 @@
   "verb": "GET",
   "path": "/channel-allocation-rebalancing",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.event",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -32068,7 +32325,7 @@
   "verb": "GET",
   "path": "/channel-performance-commercial",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.product",
    "catalogue.sales_channel",
@@ -32540,7 +32797,7 @@
   "path": "/component-inventory-availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle_component"
   ],
   "writes": [],
@@ -35179,8 +35436,8 @@
   "path": "/group-customer-organization",
   "reads": [
    "orders.group_booking",
-   "orders.group_customer_organization",
-   "orders.group_customer_organization_contact",
+   "orders.group_customer_organisation",
+   "orders.group_customer_organisation_contact",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.sales_order"
@@ -35207,7 +35464,7 @@
   "verb": "GET",
   "path": "/group-enquiry-opportunity",
   "reads": [
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry"
   ],
   "writes": [],
@@ -35291,7 +35548,7 @@
   "path": "/group-requirement-availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "orders.group_booking",
    "orders.group_enquiry"
@@ -35321,7 +35578,7 @@
    "access.scan_event",
    "orders.discount",
    "orders.group_booking",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_quote",
    "orders.order_line",
@@ -35588,7 +35845,7 @@
   "verb": "GET",
   "path": "/internal-demand-booking",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.event",
    "catalogue.performance",
@@ -35618,9 +35875,9 @@
   "verb": "GET",
   "path": "/inventory-capacity-channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.sales_channel",
    "catalogue.waitlist_entry"
@@ -35640,7 +35897,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DM3: allocation rules are new columns on catalogue.channel_allocation (allocationType, min/max, replenishment, release, waitlist, contractual, frozen) | L2: allocated/sold/held/remaining come from channel_capacity, channel_allocation, inventory_hold (getAvailability neighbour pattern); min/max/replenishment/release rules need catalogue.channel_allocation_rule (missing)"
+  "lineageNote": "DM3: allocation rules are new columns on catalogue.channel_envelope (allocationType, min/max, replenishment, release, waitlist, contractual, frozen) | L2: allocated/sold/held/remaining come from channel_capacity, channel_allocation, inventory_hold (getAvailability neighbour pattern); min/max/replenishment/release rules need catalogue.channel_allocation_rule (missing)"
  },
  "listLearningModelPerformance": {
   "contract": "catalogue",
@@ -36885,7 +37142,7 @@
   "verb": "GET",
   "path": "/order-reservation",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.payment",
    "orders.payment_link",
@@ -38357,7 +38614,7 @@
   "verb": "GET",
   "path": "/product-price-availability",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_sync",
    "catalogue.price",
    "catalogue.product"
@@ -38864,7 +39121,7 @@
   "path": "/real-time-availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle",
    "promotions.bundle_component"
   ],
@@ -38890,10 +39147,10 @@
   "verb": "GET",
   "path": "/real-time-channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.event",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -39519,7 +39776,7 @@
   "verb": "GET",
   "path": "/reservation-confirmation-expiry",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.payment_link",
    "orders.reservation",
    "orders.reservation_line",
@@ -39570,7 +39827,7 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Partner control.partner and allocation source control.partner_allocation with catalogue.performance/product/channel_capacity and control.partner_agreement; hold rows are orders.reservation / catalogue.inventory_hold, reached via their owners' ops."
+  "lineageNote": "Partner control.partner and allocation source control.partner_allocation with catalogue.performance/product/channel_capacity and control.partner_agreement; hold rows are orders.reservation / catalogue.inventory_reservation, reached via their owners' ops."
  },
  "listResidencyNationalityMarket": {
   "contract": "catalogue",
@@ -39826,7 +40083,7 @@
   "verb": "GET",
   "path": "/sale-channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
    "catalogue.price_list",
@@ -41518,7 +41775,7 @@
   "path": "/channel-readiness-validation",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
    "catalogue.channel_sales_rule",
@@ -41816,7 +42073,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT; new control.partner_agreement version with the DM4 term columns (renewal, commitment, target, clauses, payment model), document association as control.partner_document rows, submission via approvals.request; legal entity ledger.legal_entity, currency ledger.fx_rate, partner control.partner."
+  "lineageNote": "Idempotent PUT; new control.partner_agreement version with the DM4 term columns (renewal, commitment, target, clauses, payment model), document association as control.partner_document rows, submission via approvals.request; legal entity ledger.legal_entity, currency ledger.fx_rate, partner control.partner.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "setAmendmentEligibilityPolicy": {
   "contract": "orders",
@@ -42881,7 +43144,7 @@
   "reads": [
    "cache:idempotency",
    "orders.group_booking",
-   "orders.group_customer_organization_contact",
+   "orders.group_customer_organisation_contact",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -42979,7 +43242,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.price",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_quote",
    "orders.group_quote_line"
@@ -43366,7 +43629,7 @@
    "access.entitlement",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.after_sale_policy",
    "orders.after_sale_request",
    "orders.order_line",
@@ -43583,7 +43846,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT; writes control.partner_rate and its control.partner_rate_volume_band rows; agreement default rate on control.partner_agreement, public rate catalogue.price_list, product catalogue.product; below-guardrail rates raise approvals.request."
+  "lineageNote": "Idempotent PUT; writes control.partner_rate and its control.partner_rate_volume_band rows; agreement default rate on control.partner_agreement, public rate catalogue.price_list, product catalogue.product; below-guardrail rates raise approvals.request.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "setPaymentTermBilling": {
   "contract": "subscription",
@@ -43621,7 +43890,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT; billing fields to control.partner_billing_profile at once; paymentModel/creditTermDays amend control.partner_agreement as a new version only after the approvals.request is approved (applied:false + approvalRequestId until then). Billing entity is the partner's own, text (billing_entity_name) — ledger.legal_entity dropped from reads."
+  "lineageNote": "Idempotent PUT; billing fields to control.partner_billing_profile at once; paymentModel/creditTermDays amend control.partner_agreement as a new version only after the approvals.request is approved (applied:false + approvalRequestId until then). Billing entity is the partner's own, text (billing_entity_name) — ledger.legal_entity dropped from reads.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "setPdfPrintablePos": {
   "contract": "access",
@@ -44136,7 +44411,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "saves an orders.reservation_hold_policy row (hold type, scope qualifiers, duration, locked capacity, on-expiry actions, extension rules); the holds themselves stay in catalogue.inventory_hold; IdempotencyKey"
+  "lineageNote": "saves an orders.reservation_hold_policy row (hold type, scope qualifiers, duration, locked capacity, on-expiry actions, extension rules); the holds themselves stay in catalogue.inventory_reservation; IdempotencyKey"
  },
  "setRfidNfc": {
   "contract": "access",
@@ -44921,7 +45196,7 @@
   "verb": "GET",
   "path": "/channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
    "catalogue.channel_incident",
@@ -44954,7 +45229,7 @@
   "path": "/dynamic-bundle",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "promotions.bundle",
    "promotions.bundle_component"
@@ -45011,7 +45286,7 @@
   "path": "/group-sale",
   "reads": [
    "orders.group_booking",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -45188,11 +45463,11 @@
   "path": "/inventory-holds/{inventoryHoldId}",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": null,
   "scope": "workstation",
@@ -45246,11 +45521,11 @@
   "verb": "DELETE",
   "path": "/seat-holds/{holdId}",
   "reads": [
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -45349,10 +45624,10 @@
   "verb": "POST",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
   "reads": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "writes": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "routing": null,
   "scope": "venue",
@@ -45457,8 +45732,8 @@
    "seating.seat",
    "seating.seat_block",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_price_band",
    "seating.seating_rules",
    "seating.section",
@@ -45467,8 +45742,8 @@
   "writes": [
    "cache:idempotency",
    "seating.group_request",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -47964,7 +48239,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -48094,8 +48369,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -48120,7 +48395,7 @@
   "verb": "GET",
   "path": "/seat-recommendation-rules",
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -48145,8 +48420,8 @@
   "reads": [
    "seating.seat",
    "seating.seat_block_item",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -48272,7 +48547,7 @@
   "verb": "GET",
   "path": "/wallet-funding-rules",
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -50190,16 +50465,16 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -51636,7 +51911,7 @@
    "cache:idempotency",
    "seating.group_request",
    "seating.group_request_participant",
-   "seating.seat_hold_item"
+   "seating.seat_reservation_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -52790,10 +53065,10 @@
   "verb": "PUT",
   "path": "/seat-recommendation-rules",
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "routing": null,
   "scope": "venue",
@@ -53047,10 +53322,10 @@
   "verb": "PUT",
   "path": "/wallet-channel-rules",
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "routing": null,
   "scope": "venue",
@@ -53071,10 +53346,10 @@
   "verb": "PUT",
   "path": "/wallet-funding-rules",
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "routing": null,
   "scope": "venue",
@@ -53144,11 +53419,11 @@
   "path": "/wallet-risk-rules",
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "routing": null,
   "scope": "tenant",
@@ -53169,10 +53444,10 @@
   "verb": "PUT",
   "path": "/wallet-transfer-rules",
   "reads": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "writes": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "routing": null,
   "scope": "tenant",
@@ -55785,7 +56060,7 @@
   "verb": "GET",
   "path": "/stock-reservations",
   "reads": [
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [],
   "routing": "replica",
@@ -55855,7 +56130,7 @@
   "verb": "GET",
   "path": "/wallets/{walletId}/holds",
   "reads": [
-   "wallet.hold"
+   "wallet.fund_reservation"
   ],
   "writes": [],
   "routing": "replica",
@@ -56207,7 +56482,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -56223,7 +56499,13 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Reads the venue's faceTagEnrolment profile for consentCapture and deletionTrigger; existing lineage listed no write, the enrolment writes pii.subject_biometric (kind faceTag)"
+  "lineageNote": "Reads the venue's faceTagEnrolment profile for consentCapture and deletionTrigger; existing lineage listed no write, the enrolment writes pii.subject_biometric (kind faceTag)",
+  "writeVia": [
+   {
+    "table": "pii.subject_biometric",
+    "event": "biometric.enrolmentChanged"
+   }
+  ]
  },
  "getBillingStatement": {
   "contract": "orders",
@@ -57189,6 +57471,12 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "writeVia": [
+   {
+    "table": "orders.cart",
+    "operation": "claimCart"
+   }
   ]
  },
  "getBookingFlowConfig": {
@@ -58146,7 +58434,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "identity.delegated_access"
+   "identity.delegated_access",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -58163,7 +58452,13 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "EntitlementShare is a view of the identity.delegated_access row shareEntitlement writes; revoke sets revoked_at/by there and drops the subject from access.entitlement.shared_with_subject_ids (mirror of shareEntitlement)"
+  "lineageNote": "EntitlementShare is a view of the identity.delegated_access row shareEntitlement writes; revoke sets revoked_at/by there and drops the subject from access.entitlement.shared_with_subject_ids (mirror of shareEntitlement)",
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.shareChanged"
+   }
+  ]
  },
  "applyCartPromoCode": {
   "contract": "orders",
@@ -58853,12 +59148,12 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.placed_resource"
   ],
   "writes": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -59147,17 +59442,17 @@
   "reads": [
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.configuration_version_snapshot",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [],
@@ -59207,10 +59502,10 @@
   "verb": "POST",
   "path": "/resource-holds/{holdId}/extend",
   "reads": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -59330,7 +59625,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.map_version",
    "venuemap.placed_resource"
@@ -59445,7 +59740,7 @@
   "verb": "GET",
   "path": "/resource-holds/{holdId}",
   "reads": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -59915,7 +60210,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_requirement",
    "resources.resource_schedule"
   ],
@@ -60445,11 +60740,11 @@
   "path": "/resource-holds/{holdId}",
   "reads": [
    "cache:idempotency",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -60466,7 +60761,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DELETE /resource-holds/{holdId} idempotent; neighbours createResourceHold/getResourceHold on resources.resource_hold"
+  "lineageNote": "DELETE /resource-holds/{holdId} idempotent; neighbours createResourceHold/getResourceHold on resources.resource_reservation"
  },
  "replaceCredential": {
   "contract": "access",
@@ -60631,15 +60926,15 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "routing": null,
@@ -60885,7 +61180,13 @@
    "redis"
   ],
   "lineageNote": "reads the tenant's faceTagBiometric/facePassBiometric period to refuse a longer rule (422); the rule itself has no table (BiometricLifecycleRetentionDeletionInput is request-only), unchanged",
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "writeVia": [
+   {
+    "table": "tenancy.data_retention_setting",
+    "operation": "setDataRetentionSetting"
+   }
+  ]
  },
  "setBrandingLocalizationTemplate": {
   "contract": "access",
@@ -61303,11 +61604,11 @@
   "verb": "PUT",
   "path": "/group-customer-organization",
   "reads": [
-   "orders.group_customer_organization",
-   "orders.group_customer_organization_contact"
+   "orders.group_customer_organisation",
+   "orders.group_customer_organisation_contact"
   ],
   "writes": [
-   "orders.group_customer_organization_contact"
+   "orders.group_customer_organisation_contact"
   ],
   "routing": null,
   "scope": "venue",
@@ -62143,10 +62444,10 @@
   "path": "/wallet-risk-rules/{ruleCode}/status",
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "routing": null,
   "scope": "tenant",
@@ -62632,7 +62933,8 @@
    "access.entitlement"
   ],
   "writes": [
-   "access.entitlement"
+   "access.entitlement",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -62648,7 +62950,13 @@
    "postgres",
    "redis"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "writeVia": [
+   {
+    "table": "access.entitlement",
+    "event": "entitlement.voided"
+   }
+  ]
  },
  "withdrawTransportTimetable": {
   "contract": "transport",
@@ -62740,7 +63048,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Review actions on control.partner_application and its review tasks; startReview moves control.partner applicant->underReview (control.partner_status_history); completeTask of the last task puts the registerPartner approvals.request to the approvers; withdraw archives the partner."
+  "lineageNote": "Review actions on control.partner_application and its review tasks; startReview moves control.partner applicant->underReview (control.partner_status_history); completeTask of the last task puts the registerPartner approvals.request to the approvers; withdraw archives the partner.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "actOnPartnerCase": {
   "contract": "subscription",
@@ -63130,7 +63444,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Creates control.partner_change_request and evaluates it in the same call against the agreement, control.partner_booking_limit, the product and the order; approvals.request when needed. The refund/amendment itself is orders (createRefund/modifyOrder/rescheduleOrder)."
+  "lineageNote": "Creates control.partner_change_request and evaluates it in the same call against the agreement, control.partner_booking_limit, the product and the order; approvals.request when needed. The refund/amendment itself is orders (createRefund/modifyOrder/rescheduleOrder).",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "createResourceCost": {
   "contract": "resources",
@@ -64129,7 +64449,8 @@
    "access.face_reenrolment_attempt",
    "access.security_alert",
    "cache:idempotency",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -64145,7 +64466,13 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "new, writers pass 29 September"
+  "lineageNote": "new, writers pass 29 September",
+  "writeVia": [
+   {
+    "table": "pii.subject_biometric",
+    "event": "biometric.enrolmentChanged"
+   }
+  ]
  },
  "rollbackConfigurationVersion": {
   "contract": "access",
@@ -64991,7 +65318,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Replaces control.partner_allocation rows for the agreement; guaranteed/commitment changes via approvals.request; sold counted from orders.order_line; released units back via catalogue.channel_capacity."
+  "lineageNote": "Replaces control.partner_allocation rows for the agreement; guaranteed/commitment changes via approvals.request; sold counted from orders.order_line; released units back via catalogue.channel_capacity.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "setPartnerCapabilityGrants": {
   "contract": "subscription",
@@ -65060,7 +65393,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Replaces control.partner_commission_rule (+ _tier) for the agreement; routed through approvals.request, not in force until approved; netRate agreements refused."
+  "lineageNote": "Replaces control.partner_commission_rule (+ _tier) for the agreement; routed through approvals.request, not in force until approved; netRate agreements refused.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "setPartnerContact": {
   "contract": "subscription",
@@ -65128,7 +65467,13 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Upserts control.partner_credit_profile for the agreement; enabling credit, temporary limit and loosened thresholds via approvals.request; limit itself stays control.partner_agreement.credit_limit."
+  "lineageNote": "Upserts control.partner_credit_profile for the agreement; enabling credit, temporary limit and loosened thresholds via approvals.request; limit itself stays control.partner_agreement.credit_limit.",
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ]
  },
  "setPartnerDistributionRights": {
   "contract": "subscription",
@@ -67822,7 +68167,7 @@
   "verb": "GET",
   "path": "/inventory-items/{itemId}/kit-definition",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component"
   ],
   "writes": [],
@@ -68102,7 +68447,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.invoice_line",
    "ledger.credit_memo",
    "ledger.credit_memo_line",
    "ledger.tax_invoice",
@@ -71334,7 +71678,7 @@
   "path": "/inventory-items/{itemId}/kit-definition",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component",
    "inventory.movement"
   ],
@@ -71417,7 +71761,7 @@
    "cache:idempotency",
    "payments.token",
    "wallet.auto_reload_setting",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.wallet"
   ],
   "writes": [
@@ -71961,7 +72305,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "venuemap.visit_plan"
@@ -71980,7 +72324,21 @@
    "postgres",
    "redis"
   ],
-  "note": "cart writes are made by the orders service through createCart/addCartLine (service to service), with addCartLine's lease and refusals; venue-map writes only visit_plan (status booked, cart_id)"
+  "note": "cart writes are made by the orders service through createCart/addCartLine (service to service), with addCartLine's lease and refusals; venue-map writes only visit_plan (status booked, cart_id)",
+  "writeVia": [
+   {
+    "table": "catalogue.inventory_reservation",
+    "operation": "acquireInventoryHold"
+   },
+   {
+    "table": "orders.cart",
+    "operation": "createCart"
+   },
+   {
+    "table": "orders.cart_line",
+    "operation": "addCartLine"
+   }
+  ]
  },
  "captureWalletHold": {
   "contract": "wallet",
@@ -71988,13 +72346,13 @@
   "path": "/wallet-holds/{walletHoldId}/capture",
   "reads": [
    "wallet.balance",
-   "wallet.hold"
+   "wallet.fund_reservation"
   ],
   "writes": [
    "platform.idempotency_record",
    "platform.outbox",
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -72019,18 +72377,18 @@
   "path": "/inventory-holds/{inventoryHoldId}/convert",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "platform.outbox",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -72083,14 +72441,14 @@
   "path": "/stock-reservations",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "routing": null,
   "scope": "venue",
@@ -72467,14 +72825,14 @@
   "path": "/wallets/{walletId}/holds",
   "reads": [
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet"
   ],
   "writes": [
    "platform.idempotency_record",
    "platform.outbox",
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -72910,7 +73268,7 @@
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -72941,11 +73299,11 @@
   "path": "/stock-reservations/{stockReservationId}/release",
   "reads": [
    "cache:idempotency",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "routing": null,
   "scope": "venue",
@@ -72969,13 +73327,13 @@
   "path": "/wallet-holds/{walletHoldId}/release",
   "reads": [
    "wallet.balance",
-   "wallet.hold"
+   "wallet.fund_reservation"
   ],
   "writes": [
    "platform.idempotency_record",
    "platform.outbox",
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -73197,7 +73555,8 @@
    "control.tenant_domain"
   ],
   "writes": [
-   "control.tenant_domain"
+   "control.tenant_domain",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "tenant",
@@ -73212,6 +73571,12 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "writeVia": [
+   {
+    "table": "control.tenant_domain",
+    "event": "tenantDomain.mapped"
+   }
   ]
  },
  "setWorkOrderPriorityPolicy": {
@@ -76396,7 +76761,7 @@
   "path": "/wallet-risk-rules",
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [],
   "routing": "replica",
@@ -76998,6 +77363,163 @@
    "staff"
   ],
   "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "editSeatMapStructure": {
+  "contract": "seating",
+  "verb": "PATCH",
+  "path": "/seat-maps/{seatMapId}/structure",
+  "reads": [
+   "cache:idempotency",
+   "seating.seat_map"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "seating.seat_map",
+   "seating.section",
+   "seating.seat"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Build a seat map by hand",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "notifyPerformanceHolders": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/performance-cancellation-notices",
+  "reads": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Tell every holder of a cancelled performance",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAccessAreaCapacity": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/access-areas/{areaId}/capacity",
+  "reads": [
+   "cache:idempotency",
+   "access.access_area"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "access.access_area",
+   "access.configuration_change"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the capacity of a venue, park or area",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "archiveEntitlementTemplate": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/entitlement-templates/{templateId}/archive",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [
+   "catalogue.entitlement_template"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Archive an entitlement template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getEntitlementTemplate": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/entitlement-templates/{templateId}",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Read an entitlement template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateEntitlementTemplate": {
+  "contract": "catalogue",
+  "verb": "PATCH",
+  "path": "/entitlement-templates/{templateId}",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [
+   "catalogue.entitlement_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Update an entitlement template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
   "stores": [
    "postgres",
    "redis"

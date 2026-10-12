@@ -432,6 +432,9 @@ paths:
         - "P08 BO-097 Check Out & Check In"
         - "P08 BO-907 Guest & Resource Assignment"
         - "P08 BO-937 Resource Collection, Handover & Return"
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: authoriseStoredValue
       summary: Hand it over, with a deposit against it
       description: '7.6. **A rental leaves with a guest, and the deposit is held against the object rather
         than the order** — which is why `orders` could not carry this: an order completes and a rental
@@ -527,6 +530,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
         - "P08 BO-937 Resource Collection, Handover & Return"
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: captureStoredValue
       summary: Take it back, and settle the deposit
       description: '**Releases the hold, or captures part of it against damage.** Partial capture is the
         normal case for a damaged item and the reason two-phase spend was worth building.
@@ -3835,7 +3841,7 @@ components:
           format: uuid
           nullable: true
     ResourceHold:
-      x-ticvai-persistence: resources.resource_hold
+      x-ticvai-persistence: resources.resource_reservation
       type: object
       description: '**A guest''s pick on the map, held while they pay** (decided 29 September, rev 3
         REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted

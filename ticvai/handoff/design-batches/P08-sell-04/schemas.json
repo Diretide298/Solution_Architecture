@@ -54,6 +54,152 @@
    }
   }
  },
+ "Campaign": {
+  "x-ticvai-persistence": "marketing.campaign",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateCampaignRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "status",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "budgetCap": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "budgetSpent": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "readOnly": true,
+      "description": "BL-169. **A campaign could spend without limit** — following the promotions `budgetCap` precedent. **Sending stops at the cap rather than overspending and reporting it**, because a marketing budget discovered after it was exceeded is a budget nobody set.\n"
+     },
+     "status": {
+      "$ref": "#/components/schemas/CampaignStatus"
+     },
+     "isPaused": {
+      "type": "boolean"
+     },
+     "createdByPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "launchedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "sentCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "description": "**How many messages went out**, counted from `marketing.message_dispatch` at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. Test sends are not dispatches of the campaign and are not counted.\n"
+     }
+    }
+   }
+  ]
+ },
+ "CampaignContent": {
+  "x-ticvai-persistence": "none — embedded in campaign",
+  "type": "object",
+  "required": [
+   "templateId"
+  ],
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectOverride": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "mergeDefaults": {
+    "type": "object",
+    "description": "Fallback values for the template's `mergeFields`, by name, used where a guest has no value.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "promotionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Offer carried by the campaign. Coupon codes are issued from it."
+   }
+  }
+ },
+ "CampaignKind": {
+  "type": "string",
+  "enum": [
+   "oneOff",
+   "scheduled",
+   "triggered",
+   "recurring"
+  ]
+ },
+ "CampaignStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "scheduled",
+   "sending",
+   "paused",
+   "completed",
+   "stopped",
+   "failed"
+  ]
+ },
+ "CampaignTrigger": {
+  "x-ticvai-persistence": "none — embedded in campaign",
+  "type": "object",
+  "properties": {
+   "event": {
+    "type": "string",
+    "enum": [
+     "bookingConfirmed",
+     "visitCompleted",
+     "membershipExpiring",
+     "birthday",
+     "abandonedCart",
+     "firstVisit",
+     "inactivity",
+     "entitlementExpiring"
+    ],
+    "description": "`entitlementExpiring` (29 September, build pass, group G2; 5.5.30) fires on `entitlement.expiringSoon`: a ticket or pass the guest still holds comes within its template's `expiryNoticeDays` of `validTo`. The notice period is set on the template, so `delayHours` shifts the send within it rather than setting it. An entitlement belonging to a membership is left to `membershipExpiring`, so a member is not told twice."
+   },
+   "delayHours": {
+    "type": "integer"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   }
+  }
+ },
  "CatalogueState": {
   "x-ticvai-persistence": "none — computed from workstation bundle_version",
   "type": "object",
@@ -161,6 +307,229 @@
    }
   }
  },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "CreateCampaignRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "kind",
+   "channel",
+   "segmentId",
+   "content"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CampaignKind"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "segmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "content": {
+    "$ref": "#/components/schemas/CampaignContent"
+   },
+   "trigger": {
+    "$ref": "#/components/schemas/CampaignTrigger"
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "consentPurpose": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ConsentPurpose"
+     }
+    ],
+    "default": "marketing"
+   },
+   "sendWindow": {
+    "type": "object",
+    "description": "Hours during which sending is permitted. A promotional message at 3am is a complaint waiting to happen.\n",
+    "properties": {
+     "startTime": {
+      "type": "string"
+     },
+     "endTime": {
+      "type": "string"
+     },
+     "timeZone": {
+      "type": "string"
+     }
+    }
+   },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "`optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives for them, inside `sendWindow` (29 September, build pass, group G2; 22.3.19). `fixed` is the behaviour before. Falls back to `scheduledFor` per recipient where there is no suggestion or AI is off."
+   },
+   "optimiseChannel": {
+    "type": "boolean",
+    "default": false,
+    "description": "With `sendTimeMode` `optimised`, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). Off keeps `channel`."
+   },
+   "variants": {
+    "type": "array",
+    "maxItems": 5,
+    "nullable": true,
+    "description": "**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2; 22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of `marketing.campaign_variant`. Null or empty is a single-content campaign.",
+    "items": {
+     "$ref": "#/components/schemas/MarketingCampaignVariant"
+    }
+   },
+   "abTest": {
+    "type": "object",
+    "nullable": true,
+    "description": "How the variants are tested. Required when `variants` has two or more.",
+    "properties": {
+     "testPercent": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 100,
+      "default": 20,
+      "description": "Share of the audience the variants are tested on; 100 splits everyone and picks no winner."
+     },
+     "successMetric": {
+      "type": "string",
+      "enum": [
+       "openRate",
+       "clickRate",
+       "conversionRate",
+       "attributedRevenue"
+      ],
+      "default": "clickRate"
+     },
+     "decideAfterHours": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 168,
+      "default": 4
+     },
+     "winnerRule": {
+      "type": "string",
+      "enum": [
+       "automatic",
+       "manual"
+      ],
+      "default": "automatic"
+     },
+     "minimumSamplePerVariant": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 500,
+      "description": "Below this many sends per variant no winner is declared automatically; a person picks."
+     },
+     "winningVariantId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "Set by the automatic rule, or by a person through `updateCampaign`."
+     }
+    }
+   }
+  }
+ },
+ "CreateSegmentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "criteria"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "match": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "criteria": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   },
+   "excludeSegmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ruleGroups": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.",
+    "items": {
+     "$ref": "#/components/schemas/SegmentRuleGroup"
+    }
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The segment is evaluated for sends only from this time."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who answers for the segment; defaults to its creator."
+   },
+   "requiresApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where true, a campaign may use the segment only after an `approvals` request on it is approved."
+   }
+  }
+ },
  "DeploymentProfile": {
   "type": "string",
   "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
@@ -259,6 +628,87 @@
   "default": "bookable",
   "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
  },
+ "MarketingCampaignVariant": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.campaign_variant",
+  "description": "One content or subject variant of a campaign, for an A/B test (22.1.17; 29 September, build pass, group G2, from group G1's handoff). Written with its campaign by `createCampaign` and `updateCampaign`.",
+  "required": [
+   "label"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.campaign"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 20,
+    "description": "A, B, C..."
+   },
+   "subjectOverride": {
+    "type": "object",
+    "nullable": true,
+    "description": "Subject line by locale.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A different template for this variant; null uses the campaign's `content.templateId`."
+   },
+   "splitPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Share of the test group; null splits evenly."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "aiDraft"
+    ],
+    "default": "manual"
+   },
+   "aiDecisionRecordId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`."
+   },
+   "isWinner": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005), the campaign's."
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -279,7 +729,7 @@
   }
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -629,7 +1079,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",
@@ -1250,6 +1701,40 @@
    "mixed"
   ]
  },
+ "Segment": {
+  "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateSegmentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "lastEvaluatedSize": {
+      "type": "integer",
+      "nullable": true
+     },
+     "lastEvaluatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
  "ShopAndDrop": {
   "type": "object",
   "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
@@ -1518,6 +2003,7 @@
     "description": "**Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout, `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.\n"
    },
    "cashDrawerLimit": {
+    "x-ticvai-column": "deposit_box_limit_amount",
     "oneOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"

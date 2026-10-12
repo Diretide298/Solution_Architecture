@@ -9,7 +9,7 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2790
+  operations: 2796
   contracts: 33
   tables: 1133
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
@@ -27,10 +27,10 @@ scale:
   services: 17
   platforms: 16
   apps: 13
-  screens: 2451
+  screens: 2453
   flows: 291
   stateModels: 207
-  events: 77
+  events: 87
   decisions: 71
   requirements: 3184
   buildPercent: 0
@@ -51,7 +51,7 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2596
+  operations: 2601
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
@@ -265,7 +265,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 1661
+  screens: 1663
   modules:
   - access
   - accreditation
@@ -518,18 +518,18 @@ services:
     workers: []
 stores:
 - store: postgres
-  operations: 2776
+  operations: 2782
   usedBy:
   - service: CatalogueService
-    operations: 447
+    operations: 451
   - service: OrderService
     operations: 299
   - service: VenueOpsService
     operations: 291
   - service: MarketingService
-    operations: 277
+    operations: 278
   - service: AccessService
-    operations: 257
+    operations: 258
   - service: PlatformService
     operations: 228
   - service: TenancyService
@@ -557,14 +557,14 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 2259
+  operations: 2265
   usedBy:
   - service: CatalogueService
-    operations: 392
+    operations: 396
   - service: MarketingService
-    operations: 245
+    operations: 246
   - service: AccessService
-    operations: 243
+    operations: 244
   - service: OrderService
     operations: 223
   - service: VenueOpsService
@@ -685,7 +685,7 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2790 operations across 28 contracts — the join
+  holds: 2796 operations across 28 contracts — the join
 - layer: backend
   holds: 1133 tables in 26 schemas, 910 relationships
 - layer: domain

@@ -220,15 +220,15 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 518,
-  "setup": 239,
-  "allOperations": 2790
+  "core": 520,
+  "setup": 240,
+  "allOperations": 2796
  },
  "services": {
   "AccessService": {
    "core": 13,
    "setup": 22,
-   "total": 257
+   "total": 258
   },
   "AiService": {
    "core": 41,
@@ -236,9 +236,9 @@
    "total": 144
   },
   "CatalogueService": {
-   "core": 37,
-   "setup": 34,
-   "total": 447
+   "core": 39,
+   "setup": 35,
+   "total": 451
   },
   "FnbService": {
    "core": 57,
@@ -263,7 +263,7 @@
   "MarketingService": {
    "core": 54,
    "setup": 21,
-   "total": 277
+   "total": 278
   },
   "OrderService": {
    "core": 88,
@@ -795,7 +795,7 @@
    "platforms": [],
    "screens": [],
    "enables": [
-    "inventory.item"
+    "inventory.inventory_item"
    ]
   },
   "cancelFnbOrder": {
@@ -1248,7 +1248,7 @@
    "platforms": [],
    "screens": [],
    "enables": [
-    "seating.seat_hold_item"
+    "seating.seat_reservation_item"
    ]
   },
   "convertReservation": {
@@ -1838,7 +1838,7 @@
     "BO-105"
    ],
    "enables": [
-    "inventory.item"
+    "inventory.inventory_item"
    ]
   },
   "createInvitationCampaign": {
@@ -2025,7 +2025,6 @@
    "path": "/orders",
    "perm": "ORDER_CREATE",
    "platforms": [
-    "MOB",
     "POS"
    ],
    "screens": [
@@ -2033,7 +2032,6 @@
     "BO-026",
     "BO-047",
     "EMP-034",
-    "GST-009",
     "POS-002",
     "POS-004",
     "POS-005",
@@ -3122,6 +3120,22 @@
     "CMS-015"
    ],
    "enables": []
+  },
+  "editSeatMapStructure": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "PATCH",
+   "path": "/seat-maps/{seatMapId}/structure",
+   "perm": "CAPACITY_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-954",
+    "BO-956"
+   ],
+   "enables": [
+    "seating.seat"
+   ]
   },
   "enrolFacePass": {
    "part": "core",
@@ -6220,6 +6234,23 @@
    ],
    "enables": []
   },
+  "joinWaitlist": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/waitlist-entries",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-007",
+    "WEB-006"
+   ],
+   "enables": []
+  },
   "launchCampaign": {
    "part": "setup",
    "service": "MarketingService",
@@ -6267,6 +6298,23 @@
     "EMP-056",
     "GST-070",
     "WEB-036"
+   ],
+   "enables": []
+  },
+  "leaveWaitlist": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "DELETE",
+   "path": "/waitlist-entries/{entryId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-007",
+    "WEB-006"
    ],
    "enables": []
   },
@@ -9604,7 +9652,7 @@
    "contract": "marketing-crm",
    "verb": "POST",
    "path": "/guests/{subjectId}/consents",
-   "perm": null,
+   "perm": "GUEST_MANAGE",
    "platforms": [
     "MOB",
     "POS",
@@ -10418,7 +10466,7 @@
     "BO-1162"
    ],
    "enables": [
-    "wallet.funding_rules",
+    "wallet.funding_rule",
     "wallet.refund_policy"
    ]
   },
@@ -12286,7 +12334,7 @@
     "BO-1041"
    ],
    "enables": [
-    "seating.recommendation_rules"
+    "seating.recommendation_rule"
    ]
   },
   "setSegregationRules": {
@@ -12690,7 +12738,7 @@
     "BO-418"
    ],
    "enables": [
-    "wallet.funding_rules"
+    "wallet.funding_rule"
    ]
   },
   "setWalletRefundPolicy": {
@@ -13344,7 +13392,7 @@
     "BO-081"
    ],
    "enables": [
-    "inventory.item"
+    "inventory.inventory_item"
    ]
   },
   "updateLoyaltyProgramme": {
@@ -14180,9 +14228,6 @@
    "replaceResourceAllocation",
    "setResourceBookingProgress",
    "updateResourceBooking"
-  ],
-  "seating.seat": [
-   "assignSeats"
   ],
   "wallet.gift_card": [
    "activateGiftCard",

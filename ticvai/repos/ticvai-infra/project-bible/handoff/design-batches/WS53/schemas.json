@@ -1702,6 +1702,7 @@
     "readOnly": true
    },
    "promotionId": {
+    "x-ticvai-references": "promotions.promotion",
     "type": "string",
     "format": "uuid",
     "readOnly": true,

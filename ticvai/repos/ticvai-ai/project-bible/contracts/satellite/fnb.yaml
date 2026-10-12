@@ -3186,6 +3186,9 @@ paths:
       operationId: compItem
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
+      x-ticvai-write-via:
+      - table: orders.order_line
+        operation: applyManualDiscount
       summary: Take a line off the bill, with a reason and a name
       description: 'Board 4. **A comp is not a discount.** A discount is a price decision; a comp is a
         service recovery, it comes out of a different budget, and **a venue that cannot tell them apart
@@ -9149,7 +9152,8 @@ components:
         forDate:
           type: string
           format: date
-          description: The trading day this prep list is for, in the Region's time zone.
+          description: The trading day this prep list is for, in the Region's time zone; a business date, closing at
+            the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032).
         status:
           type: string
           enum:

@@ -429,6 +429,20 @@
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
        "operation": "addCartLine",
        "notes": "Adds the chosen time and quantities to the cart (`addCartLine`), which takes the hold server-side; the guest never sees the word hold or a form. Choosing a session adds nothing by itself (DI-1107)."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Join the waitlist",
+       "operation": "joinWaitlist",
+       "notes": "**Only on a sold-out time** (`getAvailability` `remaining` 0; sold, held and leased units at capacity, audit R101); never on a time with places left, which `joinWaitlist` refuses `409`. Collects the party size and how to be told; joining reserves nothing, and an offer from BO-017 (`offerWaitlistCapacity`) brings the guest back here to buy. The approved guest build's sold-out \"Join the waitlist\" (holds a returned place for 15 minutes) lands here, not on the status page (CHG-SGU-022; 12 October 2026, CHG-R6-037).",
+       "provenance": "contract catalogue.yaml POST /waitlist-entries (12 October 2026, CHG-R6-037)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Leave the waitlist",
+       "operation": "leaveWaitlist",
+       "notes": "Shown instead of Join once the guest is on this time's waitlist (CHG-R6-037).",
+       "provenance": "contract catalogue.yaml DELETE /waitlist-entries/{entryId} (12 October 2026, CHG-R6-037)"
       }
      ]
     },
@@ -570,6 +584,18 @@
     ]
    },
    {
+    "operationId": "joinWaitlist",
+    "contract": "catalogue",
+    "purpose": "Join the waitlist of a sold-out time (CHG-R6-037)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "leaveWaitlist",
+    "contract": "catalogue",
+    "purpose": "Leave it (CHG-R6-037)",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "getPublishedBookingFlow",
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
@@ -608,6 +634,12 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "entryId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `joinWaitlist`."
     }
    ],
    "preloaded": [

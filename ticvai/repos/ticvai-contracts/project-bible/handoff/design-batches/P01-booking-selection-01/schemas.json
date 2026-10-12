@@ -888,6 +888,7 @@
     }
    },
    "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -938,6 +939,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
     "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
@@ -2203,7 +2206,7 @@
   }
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -2659,7 +2662,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",
@@ -2994,7 +2998,7 @@
   }
  },
  "ResourceHold": {
-  "x-ticvai-persistence": "resources.resource_hold",
+  "x-ticvai-persistence": "resources.resource_reservation",
   "type": "object",
   "description": "**A guest's pick on the map, held while they pay** (decided 29 September, rev 3 REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted by the order rather than released. States in `states/resource-hold.yaml`.\n",
   "required": [
@@ -3249,7 +3253,7 @@
   }
  },
  "SeatHold": {
-  "x-ticvai-persistence": "seating.seat_hold",
+  "x-ticvai-persistence": "seating.seat_reservation",
   "type": "object",
   "required": [
    "id",
@@ -3965,6 +3969,85 @@
     }
    }
   }
+ },
+ "WaitlistEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.waitlist_entry",
+  "required": [
+   "performanceId",
+   "partySize"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "contactPoint": {
+    "type": "string",
+    "description": "**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WaitlistStatus"
+     }
+    ],
+    "readOnly": true,
+    "description": "Set by the server. `joinWaitlist` does not take it; a new entry is `waiting`."
+   },
+   "position": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "First in, first offered. Shown to the guest, because not knowing is worse than waiting."
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "offerExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The offer moves on when this passes.** Notifying everyone at once produces a race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.\n"
+   },
+   "joinedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WaitlistStatus": {
+  "type": "string",
+  "enum": [
+   "waiting",
+   "offered",
+   "converted",
+   "expired",
+   "left"
+  ]
  },
  "Wishlist": {
   "type": "object",

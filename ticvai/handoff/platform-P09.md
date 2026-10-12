@@ -9,12 +9,12 @@
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 104 |
+| Operations with no screen | 102 |
 | Waves | wave1 28 · wave2 13 · wave3 170 |
 
 ## Gaps
 
-### 104 operations with no screen here
+### 102 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -50,7 +50,6 @@
 | `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
@@ -60,7 +59,8 @@
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
-| … | | | 64 more |
+| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
+| … | | | 62 more |
 
 ### 8 modules split across waves
 

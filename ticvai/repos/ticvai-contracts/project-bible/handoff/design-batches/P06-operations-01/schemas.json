@@ -328,7 +328,8 @@
     "$ref": "#/components/schemas/CashMovementKind"
    },
    "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "movement_amount"
    },
    "denominations": {
     "$ref": "#/components/schemas/DenominationCount",
@@ -443,7 +444,7 @@
  },
  "DenyReason": {
   "type": "string",
-  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
+  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n\n**`capacityReached` is \"Venue full\"** (12 October 2026, CHG-R6-036): an entry-direction scan is denied when the current count of the access point's area, or of any area above it up to the venue (entries minus exits plus `operationalAdjustment`), is at or above that area's `capacity`, set with `setAccessAreaCapacity`. An area whose capacity is null never denies for capacity; an exit is never denied for it.\n",
   "enum": [
    "notFound",
    "notYetValid",
@@ -868,7 +869,7 @@
  },
  "InventoryStockReservation": {
   "type": "object",
-  "x-ticvai-persistence": "inventory.stock_reservation",
+  "x-ticvai-persistence": "inventory.stock_earmark",
   "description": "**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.",
   "required": [
    "itemId",
@@ -885,10 +886,12 @@
     "format": "uuid"
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -1489,6 +1492,12 @@
    "openedAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "businessDate": {
+    "type": "string",
+    "format": "date",
+    "readOnly": true,
+    "description": "**The business day the shift belongs to** (12 October 2026, CHG-R6-032): the venue-local date of `openedAt` taken against the venue's `businessDayCutoff` (tenancy `VenueSettings`, inheriting the tenant default, default 00:00). Set once when the shift opens and never moved, so a shift opened at 23:00 and closed at 01:00 stays on the day it opened. The daily reconciliation (BO-043) lists the shifts of one business date, and the period close's `noOpenShifts` check reads it (finance).\n"
    },
    "recordedAt": {
     "type": "string",

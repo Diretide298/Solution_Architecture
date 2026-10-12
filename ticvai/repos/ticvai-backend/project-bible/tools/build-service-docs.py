@@ -583,6 +583,19 @@ def read_ddl() -> dict[str, dict]:
         t["policy_label"] = POLICY_LABEL.get(t.get("policy", ""), "none")
         # ADR-0056 (amends ADR-0044): release 1 partitions by month, and the SQL says which tables.
         t["partitioned"] = bool(t.get("partition_by"))
+    # **A table renamed after the baseline froze goes by its new name** (12 October 2026, CHG-R6-054). The frozen r1
+    # SQL still creates it under the old name while the lineage names the new one (CHG-R6-010; derive-schema-history.py
+    # RENAMES), so it fell between the two: no task built it, and seating.seat_block, in Block A only through
+    # seat_hold's key, dropped to Block C. The table and every key into it take the new name.
+    import importlib.util as _iu
+    _sp = _iu.spec_from_file_location("derive_schema_history", ROOT / "tools" / "derive-schema-history.py")
+    _dsh = _iu.module_from_spec(_sp)
+    _sp.loader.exec_module(_dsh)
+    ren = {r["from"]: r["to"] for r in _dsh.RENAMES if r["from"] in tables and r["to"] not in tables}
+    for a, b in ren.items():
+        tables[b] = tables.pop(a)
+    for t in tables.values():
+        t["fks"] = {ren.get(x, x) for x in t["fks"]}
     return tables
 
 
@@ -812,6 +825,82 @@ def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset
             notes.append(f"{t} -> {k}: the same work is already ticket #{mp.get(k)}")
     assert len(set(final.values())) == len(final), "key reconciliation gave two tasks one key"
     return final, notes
+
+
+# **A pushed task keeps its operations** (12 October 2026, CHG-R6-052). The reconciliation above keeps a task's KEY on
+# the work it was pushed for, but the operations were still cut into tasks of four in alphabetical order, so a new
+# operation shifted every one after it into the next task: on the regrouping of the shift tasks, openShift moved from
+# SVC-ORDER-SHIFT-3 to SVC-ORDER-SHIFT-4, resumeShift to -5 and suspendShift to -6, and the three pushed sub-tasks had
+# to be closed as duplicates (#32646, #30864, #32650; op-release.json `retire`). So a group is now cut around what is
+# pushed: every operation with a pushed sub-task stays in that task, and only the operations nobody has pushed are cut
+# into new tasks of four. tools/check-key-stability.py fails on a pushed sub-task whose operation is under another task.
+OP_ID = re.compile(r"^[a-z][A-Za-z0-9]+$")
+
+
+def pinned_ops(mp: dict) -> dict:
+    """operation -> the pushed task its sub-task sits under. Where an operation was pushed under two tasks (the older
+    sub-task closed as a duplicate of the newer), the newer one -- the highest OpenProject id -- holds it."""
+    best = {}
+    for k, v in mp.items():
+        head, _, op = k.partition("#")
+        if not op or not OP_ID.match(op):
+            continue
+        ident = key_identity(head)
+        if not ident or ident[0] != "ops":
+            continue
+        rank = v if isinstance(v, int) else -1
+        if op not in best or rank > best[op][0]:
+            best[op] = (rank, head)
+    return {o: h for o, (_, h) in best.items()}
+
+
+def _key_num(k: str) -> int:
+    m = re.search(r"-(\d+)$", k)
+    return int(m.group(1)) if m else 0
+
+
+def stable_chunks(gl, pinned: dict, stem: str, reserved: set, avoid=frozenset(), size: int = 4,
+                  closed=frozenset(), pushed_work=None, legacy=None):
+    """Cut one group's operations into tasks: [(key, [operations])]. Operations pushed under a task of this stem stay
+    together under that key (unless another planned task already holds its number); operations pushed under another
+    family or prefix stay together under a number of their own, which the key reconciliation writes as the pushed key;
+    the rest, in their given order, form new tasks of `size` under numbers in neither `reserved` (keys planned in this
+    run; updated with the numbers used) nor `avoid` (keys pushed for other work). A task op-retire.py closes
+    (`closed`) holds its operations only while they are exactly its pushed work (`pushed_work`, CHG-R4-010: then it is
+    the same ticket); otherwise its work went elsewhere on purpose and its operations are cut as new.
+
+    **Where nothing would move, nothing changes**: when cutting `gl` into plain chunks of `size` gives exactly these
+    groups (every plan since r1), the chunks keep the keys `legacy(n)` gives them, the keys the generator always gave,
+    so the reconciliation and everything keyed before it see the plan they always saw."""
+    held, new = defaultdict(list), []
+    for o in gl:
+        p = pinned.get(o)
+        (held[p] if p else new).append(o)
+    for p in [p for p in held if p in closed and set(held[p]) != (pushed_work or {}).get(p)]:
+        gone = set(held.pop(p))
+        new = [o for o in gl if o in gone or o in set(new)]
+    used = set(reserved)
+
+    def fresh():
+        n = 1
+        while n in used or n in avoid:
+            n += 1
+        return n
+
+    out = []
+    for p in sorted(held, key=lambda p: (p.rsplit("-", 1)[0] != stem, _key_num(p), p)):
+        n = _key_num(p) if p.rsplit("-", 1)[0] == stem and _key_num(p) not in used else fresh()
+        used.add(n)
+        out.append((f"{stem}-{n}", held[p]))
+    for i in range(0, len(new), size):
+        n = fresh()
+        used.add(n)
+        out.append((f"{stem}-{n}", new[i:i + size]))
+    plain = [list(gl[i:i + size]) for i in range(0, len(gl), size)]
+    if legacy and sorted(map(sorted, plain)) == sorted(sorted(p) for _, p in out):
+        out = list(zip(legacy(len(plain)), plain))
+    reserved |= {_key_num(k) for k, _ in out}
+    return out
 
 
 def closed_keys() -> frozenset:
@@ -1389,10 +1478,42 @@ def main() -> int:
                                            decided["screensNotBuilt"])
     print(f"screens given no build task (merged, listed or binding a held operation): {len(held_screen)}")
     ai_ops = {o: k for o, k in decided["aiEngineOperations"].items() if o in ops}
+    # a pushed task keeps its operations (CHG-R6-052): which task each pushed operation is under, and the task numbers
+    # pushed per key stem (a new task avoids them)
+    pushed_map = json.loads((OUT / "pms-map.json").read_text(encoding="utf-8")) if (OUT / "pms-map.json").exists() else {}
+    pin, closed_now, pushed_work = pinned_ops(pushed_map), closed_keys(), pushed_items(pushed_map)
+    pushed_nums = defaultdict(set)
+    for k_ in pushed_map:
+        if "#" not in k_ and OPS_KEY.fullmatch(k_):
+            pushed_nums[k_.rsplit("-", 1)[0]].add(_key_num(k_))
+    # **A pushed operation stays under its pushed task when its first consumer moves** (12 October 2026, CHG-R6-054).
+    # A spec change can give an operation a first consumer in another app-module, or put it in the first-release slice
+    # or a Venue Management wave, while the rest of its pushed task stays in a later app-module: cut where it now sits,
+    # the operation left its pushed sub-task (11 such on the r4 gate). The task keeps its parent: an operation whose
+    # pushed task was a later app-module's task of Block A in the plan this run replaces (`prior_rows`), and whose
+    # task-mates are planned outside this cut, is left to that task (held_elsewhere); the later blocks then put it with
+    # its task-mates (rehome below).
+    _prior = OUT / "tasks.csv"
+    prior_rows = {r["key"]: r for r in csv.DictReader(_prior.open(encoding="utf-8"))} if _prior.exists() else {}
+    mates = defaultdict(set)                              # pushed task -> its operations still to be planned
+    for o_, p_ in pin.items():
+        if o_ in ops and not ops[o_]["provisional"] and o_ not in ai_ops and p_ not in closed_now:
+            mates[p_].add(o_)
+
+    held_out = set()                                       # operations left to their pushed task (below)
+
+    def held_elsewhere(o, here) -> bool:
+        p_ = pin.get(o)
+        r_ = prior_rows.get(p_) or {}
+        out_ = bool(p_ in mates and r_.get("block") == "A" and str(r_.get("parent", "")).startswith("AM-")
+                    and mates[p_] - set(here))
+        if out_:
+            held_out.add(o)
+        return out_
     for n, olist in sorted(by_service.items()):
         groups = defaultdict(list)
         for o in olist:
-            if o in ai_ops:
+            if o in ai_ops or held_elsewhere(o, slice_ops):
                 continue
             # a slice operation the contract marks a stub, provisional or deprecated is not put on a build ticket
             # either (CHG-FXP-003: SVC-MARKETING-MARKETING-2 built getMarketingSubscription, a proposal)
@@ -1400,10 +1521,10 @@ def main() -> int:
                 continue
             groups[ops[o]["tag"]].append(o)
         for g, gl in sorted(groups.items()):
-            gl = sorted(gl)
-            for i in range(0, len(gl), 4):
-                part = gl[i:i + 4]
-                tk = f"{svc_key[n]}-{slug(g).upper()}-{i // 4 + 1}"
+            stem = f"{svc_key[n]}-{slug(g).upper()}"
+            for tk, part in stable_chunks(sorted(gl), pin, stem, set(), pushed_nums[stem],
+                                          closed=closed_now, pushed_work=pushed_work,
+                                          legacy=lambda c, stem=stem: [f"{stem}-{i + 1}" for i in range(c)]):
                 pts = points_of(sum(op_raw(o) for o in part))
                 for o in part:
                     op_task[o] = tk
@@ -1679,12 +1800,13 @@ def main() -> int:
              "Only the setup operations each screen hosts are in the first release; the rest of the screen "
              "follows later.", 1, platform="Back Office / Admin", pts=sum(sizes.values()), area="SETUP")
         for sid in sorted(setup_screens, key=lambda x: (min(wave[o] for o in setup_screens[x]),
-                                                         deps_step({op_task[o] for o in setup_screens[x]}), x)):
+                                                         deps_step({op_task[o] for o in setup_screens[x]
+                                                                    if o in op_task}), x)):
             s = screens[sid]
             so = sorted(setup_screens[sid])
             task(f"APP-SETUP-{sid}", "APP-SETUP", "Task", f"{sid} {s['name']} ({setup_scope(s, so)})",
                  "In the slice: " + ", ".join(so), min(wave[o] for o in so),
-                 platform=s["_platform"].get("shortName", ""), depends={op_task[o] for o in so},
+                 platform=s["_platform"].get("shortName", ""), depends={op_task[o] for o in so if o in op_task},
                  pts=sizes[sid], area="SETUP", assignee=assign("SETUP", sizes[sid]))
     # --- Venue Management, full stack (team.json "venueManagement"): the back-office screens of the named
     # waves whose operations are all agreed (not provisional) and specified (have lineage), minus the ones
@@ -1749,15 +1871,18 @@ def main() -> int:
         vm_op_task = {}
         groups_vm = defaultdict(list)
         for o in new_ops:
+            if held_elsewhere(o, set(new_ops) | set(op_task)):
+                continue                      # its pushed task is a later app-module's (CHG-R6-054)
             groups_vm[(lineage[o]["service"], ops[o]["tag"])].append(o)
         for n in sorted({n for n, _ in groups_vm}):
             task(f"VM-BE-{re.sub(r'Service$', '', n).upper()}", "VM", "Feature",
                  f"Venue Management backend: {n}", f"Additive to {n}; its owner builds or reviews it.", 2,
                  service=n, area="VM")
         for (n, g), gl in sorted(groups_vm.items(), key=lambda x: (x[0][0], x[0][1])):
-            for i in range(0, len(gl), 4):
-                part = gl[i:i + 4]
-                k = f"VM-{re.sub(r'Service$', '', n).upper()}-{slug(g).upper()}-{i // 4 + 1}"
+            stem = f"VM-{re.sub(r'Service$', '', n).upper()}-{slug(g).upper()}"
+            for k, part in stable_chunks(gl, pin, stem, set(), pushed_nums[stem],
+                                         closed=closed_now, pushed_work=pushed_work,
+                                         legacy=lambda c, stem=stem: [f"{stem}-{i + 1}" for i in range(c)]):
                 pts = points_of(sum(op_raw(o) for o in part))
                 deps = {vm_mig.get(t) or table_mig.get(t) for o in part for kk in ("reads", "writes")
                         for t in lineage[o].get(kk) or []} - {None}
@@ -1966,6 +2091,10 @@ def main() -> int:
 
     for k in list(by_key) + [k for k in kmap_early if "#" not in k]:
         note_family(k)
+    later_reserved = defaultdict(set)                       # key stem -> numbers planned so far (CHG-R6-052)
+    for k in by_key:
+        if OPS_KEY.fullmatch(k) and not SCREEN_KEY.fullmatch(k):
+            later_reserved[k.rsplit("-", 1)[0]].add(_key_num(k))
     planned_ops = set(op_task) | set(vm_op_task)
     setup_sizes = {sid: points_of(1 + 0.6 * len(v)) for sid, v in setup_screens.items()}
     # **Block A completes all the functionality of its apps** (Chinmay, 1 October): Guest Web, Guest App, POS and
@@ -2248,6 +2377,33 @@ def main() -> int:
             m_ = op_module[o]
             k = home.get((m_, "P08")) or home.get((m_, "*")) or add_am(m_, "API", None, 1)
         am_ops[k].append(o)
+    # **The pushed task keeps its parent, and follows the earliest block its operations need** (CHG-R6-054): the
+    # operations of one pushed task that landed in different app-modules all go to one of them, in the earliest block
+    # any of them needs; within that block, to the task's parent in the plan this run replaces when it is there, else to
+    # the first of them in build order. So listSegregationRules (ADM-340 moved to Block A, CHG-R6-042) takes
+    # SVC-IDENTITY-IDENTITY-7 into Block A with it, instead of leaving its pushed sub-task behind.
+    spread = defaultdict(set)
+    for k_, ol_ in am_ops.items():
+        for o_ in ol_:
+            if pin.get(o_) and pin[o_] not in closed_now:
+                spread[pin[o_]].add(k_)
+    for p_, ks_ in sorted(spread.items()):
+        if len(ks_) < 2:
+            continue
+        def blk(k_):
+            return am_info[k_]["block"] or "~"          # a later block is set by the scheduler: after A
+        first = min(blk(k_) for k_ in ks_)
+        pp_ = (prior_rows.get(p_) or {}).get("parent")
+        to_ = (pp_ if pp_ in am_info and blk(pp_) == first
+               else min((k_ for k_ in ks_ if blk(k_) == first), key=lambda x: am_info[x]["order"]))
+        for k_ in ks_ - {to_}:
+            moving = [o_ for o_ in am_ops[k_] if pin.get(o_) == p_]
+            am_ops[k_] = [o_ for o_ in am_ops[k_] if pin.get(o_) != p_]
+            am_ops[to_].extend(moving)
+        print(f"pushed task kept whole: {p_} -> {to_} ({', '.join(sorted(k_ for k_ in ks_ if k_ != to_))} gave its "
+              "operations back)")
+    for k_ in [k_ for k_, ol_ in am_ops.items() if not ol_]:
+        del am_ops[k_]
 
     # migrations, then back end, app-module by app-module in build order (the first that needs a table creates it)
     def fresh_mig_key(schema):
@@ -2295,13 +2451,20 @@ def main() -> int:
         for (n, g), gl in sorted(groups_.items()):
             gl = sorted(gl)
             fam = f"{re.sub(r'Service$', '', n).upper()}-{slug(g).upper()}"
-            for i in range(0, len(gl), 4):
-                part = gl[i:i + 4]
-                num = 1
-                while num in fam_used[fam]:
-                    num += 1
-                fam_used[fam].add(num)
-                tk = f"SVC-{fam}-{num}"
+            # a pushed task keeps its operations (CHG-R6-052); a new task takes a number nobody planned or pushed
+            def next_free(c, taken=set(fam_used[fam]), fam=fam):
+                out_ = []
+                for _ in range(c):
+                    num = 1
+                    while num in taken:
+                        num += 1
+                    taken.add(num)
+                    out_.append(f"SVC-{fam}-{num}")
+                return out_
+
+            for tk, part in stable_chunks(gl, pin, f"SVC-{fam}", later_reserved[f"SVC-{fam}"], fam_used[fam],
+                                          closed=closed_now, pushed_work=pushed_work, legacy=next_free):
+                fam_used[fam].add(_key_num(tk))
                 deps = {mig_of.get(t) for o in part for kk in ("reads", "writes")
                         for t in (lineage.get(o) or {}).get(kk) or []} - {None}
                 task(tk, k, "Task", f"{n}: " + ", ".join(part),
@@ -2312,6 +2475,17 @@ def main() -> int:
                      depends=deps or {"MIG-BASELINE"})
                 for o in part:
                     later_op_task[o] = tk
+    # A screen task planned before the later blocks waits on the pushed task that now builds an operation of its that
+    # was left to that task (CHG-R6-054): GST-007 and WEB-006 wait on SVC-CATALOGUE-CATALOGUE-7 for joinWaitlist.
+    if held_out:
+        for t_ in tasks:
+            ident_ = key_identity(t_["key"]) if t_["type"] == "Task" else None
+            sid_ = ident_[1] if ident_ and ident_[0] == "screen" else None
+            if not sid_ or sid_ not in screens:
+                continue
+            more = {later_op_task[o] for o in screen_op_ids(screens[sid_]) & held_out if o in later_op_task}
+            if more - set(t_["dependsOn"].split()):
+                t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | more))
     # the screens, each waiting on the tasks that build its operations (soft: built against the mock server)
     for key, sid, k, kind, pts in later_items:
         if kind == "ticketed":

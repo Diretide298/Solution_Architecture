@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 277 operations, 132 tables
+title: MarketingService — 278 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**277 operations and 132 tables — the biggest thing in the package, and probably two services
+why: '**278 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,8 +13,8 @@ why: '**277 operations and 132 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 277
-  inAFlow: 102
+  operations: 278
+  inAFlow: 103
   percent: 37%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
@@ -26,7 +26,7 @@ schemas:
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 277
+  count: 278
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -1435,7 +1435,15 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 4
-    writes: 3
+    writes: 4
+  - operation: notifyPerformanceHolders
+    verb: POST
+    path: /performance-cancellation-notices
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
   - operation: pauseCampaign
     verb: POST
     path: /campaigns/{campaignId}/pause
@@ -1480,7 +1488,7 @@ operationsByContract:
     verb: POST
     path: /guests/{subjectId}/consents
     scope: venue
-    permission: null
+    permission: GUEST_MANAGE
     offline: false
     reads: 3
     writes: 4
@@ -2289,6 +2297,7 @@ tables:
   - matchLostItem
   - mergeGuestProfiles
   - mergeGuests
+  - notifyPerformanceHolders
   - pauseCampaign
   - previewSegment
   - raiseMyCase
@@ -2369,6 +2378,7 @@ tables:
   - matchLostItem
   - mergeGuestProfiles
   - mergeGuests
+  - notifyPerformanceHolders
   - pauseCampaign
   - previewSegment
   - raiseMyCase
@@ -2979,7 +2989,7 @@ tables:
 - table: marketing.legal_hold
   columns: 16
   store: postgres
-  parent: wallet.hold
+  parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null
@@ -3438,7 +3448,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 4
+  operations: 5
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3449,6 +3459,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: handoverToAgent
+    tables:
+    - platform.outbox
+  - operation: mergeGuests
     tables:
     - platform.outbox
   - operation: recordCheckoutConsents
@@ -3560,6 +3573,7 @@ screens:
 - P08:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
 - P08:ADM-680 Customer Recommendation Profile
 - P08:BO-008 Product Detail & Variants
+- P08:BO-023 Refunds & Exchanges
 - P08:BO-073 Lost & Found Register
 - P08:BO-107 Guests & Marketing
 - P08:BO-118 Campaign & Audience Management
@@ -3743,6 +3757,7 @@ flows:
 - F01 Guest buys a ticket online
 - F02 Guest buys seated tickets
 - F05 Agent resolves a guest complaint
+- F09 Event is cancelled and refunded
 - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - 'F134 Customer Service board 1: Customer Service Command Center'
 - 'F135 Customer Service board 2: Contact Center Operations Command Center'

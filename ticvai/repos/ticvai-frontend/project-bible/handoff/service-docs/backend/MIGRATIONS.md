@@ -11,7 +11,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | Order | File | Task | Database | Schema | Tables | Columns | References | Assignee | Points |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | `V0001__baseline.sql` | MIG-BASELINE | both | (baseline) | 0 | 0 |  | Hrushikant Patkar | 3 |
-| 1 | `V0002__control.sql` | MIG-CONTROL | control | control | 21 | 325 |  | Hrushikant Patkar | 8 |
+| 1 | `V0002__control.sql` | MIG-CONTROL | control | control | 19 | 301 |  | Hrushikant Patkar | 8 |
 | 2 | `V0003__kernel.sql` | MIG-KERNEL | tenant | kernel | 1 | 3 |  | Hrushikant Patkar | 1 |
 | 3 | `V0004__tenancy.sql` | MIG-TENANCY | tenant | tenancy | 1 | 12 |  | Hrushikant Patkar | 1 |
 | 4 | `V0005__subscription.sql` | MIG-SUBSCRIPTION | tenant | subscription | 5 | 52 | platform | Hrushikant Patkar | 3 |
@@ -25,18 +25,18 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 12 | `V0013__assets.sql` | MIG-ASSETS | tenant | assets | 7 | 74 | identity, platform | Hrushikant Patkar | 5 |
 | 13 | `V0014__ai.sql` | MIG-AI | tenant | ai | 49 | 714 | assets, identity, pii, platform | Hrushikant Patkar | 8 |
 | 14 | `V0015__resources.sql` | MIG-RESOURCES | tenant | resources | 7 | 89 | identity, orders, pii, platform | Hrushikant Patkar | 5 |
-| 15 | `V0016__whitelabel.sql` | MIG-WHITELABEL | tenant | whitelabel | 29 | 267 | identity, platform, promotions | Hrushikant Patkar | 8 |
-| 16 | `V0017__platform.sql` | MIG-PLATFORM | tenant | platform | 17 | 204 | access, approvals, identity, inventory, ledger | Hrushikant Patkar | 8 |
+| 15 | `V0016__whitelabel.sql` | MIG-WHITELABEL | tenant | whitelabel | 29 | 271 | identity, platform, promotions | Hrushikant Patkar | 8 |
+| 16 | `V0017__platform.sql` | MIG-PLATFORM | tenant | platform | 17 | 205 | access, approvals, identity, inventory, ledger | Hrushikant Patkar | 8 |
 | 17 | `V0018__workforce.sql` | MIG-WORKFORCE | tenant | workforce | 3 | 39 | access, identity, platform | Hrushikant Patkar | 2 |
-| 18 | `V0019__seating.sql` | MIG-SEATING | tenant | seating | 10 | 82 | catalogue, identity, pii, platform | Hrushikant Patkar | 5 |
+| 18 | `V0019__seating.sql` | MIG-SEATING | tenant | seating | 11 | 89 | assets, catalogue, identity, pii, platform | Hrushikant Patkar | 5 |
 | 19 | `V0020__maintenance.sql` | MIG-MAINTENANCE | tenant | maintenance | 6 | 148 | access, identity, inventory, platform | Hrushikant Patkar | 5 |
 | 20 | `V0021__wallet.sql` | MIG-WALLET | tenant | wallet | 22 | 204 | identity, orders, pii, platform | Hrushikant Patkar | 8 |
-| 21 | `V0022__catalogue.sql` | MIG-CATALOGUE | tenant | catalogue | 22 | 313 | access, identity, ledger, platform, seating | Hrushikant Patkar | 8 |
+| 21 | `V0022__catalogue.sql` | MIG-CATALOGUE | tenant | catalogue | 23 | 325 | access, identity, ledger, pii, platform, seating | Hrushikant Patkar | 8 |
 | 22 | `V0023__ledger.sql` | MIG-LEDGER | tenant | ledger | 18 | 271 | catalogue, identity, orders, platform | Hrushikant Patkar | 8 |
 | 23 | `V0024__inventory.sql` | MIG-INVENTORY | tenant | inventory | 12 | 172 | identity, ledger, platform | Hrushikant Patkar | 8 |
 | 24 | `V0025__promotions.sql` | MIG-PROMOTIONS | tenant | promotions | 16 | 182 | ledger, orders, pii, platform | Hrushikant Patkar | 8 |
-| 25 | `V0026__orders.sql` | MIG-ORDERS | tenant | orders | 39 | 474 | access, catalogue, identity, ledger, pii, platform, promotions | Hrushikant Patkar | 8 |
-| 26 | `V0027__access.sql` | MIG-ACCESS | tenant | access | 19 | 324 | catalogue, identity, orders, pii, platform | Hrushikant Patkar | 8 |
+| 25 | `V0026__orders.sql` | MIG-ORDERS | tenant | orders | 39 | 476 | access, catalogue, identity, ledger, pii, platform, promotions | Hrushikant Patkar | 8 |
+| 26 | `V0027__access.sql` | MIG-ACCESS | tenant | access | 19 | 325 | catalogue, identity, orders, pii, platform | Hrushikant Patkar | 8 |
 | 27 | `V0028__marketing.sql` | MIG-MARKETING | tenant | marketing | 55 | 672 | ai, catalogue, identity, ledger, orders, pii, platform | Hrushikant Patkar | 8 |
 | 28 | `V0029__fnb.sql` | MIG-FNB | tenant | fnb | 41 | 397 | access, catalogue, identity, inventory, orders, pii, platform, seating | Hrushikant Patkar | 8 |
 | 29 | `V0030__payments.sql` | MIG-PAYMENTS | tenant | payments | 12 | 141 | marketing, orders, pii | Hrushikant Patkar | 8 |
@@ -57,8 +57,6 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CONTROL | `control.developer_account` | 8 | none |  | 3 | 2 | used by the first release |
 | MIG-CONTROL | `control.developer_member` | 7 | none |  | 1 | 1 | used by the first release |
 | MIG-CONTROL | `control.integration_listing` | 12 | none |  | 3 | 1 | used by the first release |
-| MIG-CONTROL | `control.invoice` | 14 | none |  | 0 | 0 | referenced by control.invoice_line |
-| MIG-CONTROL | `control.invoice_line` | 10 | none |  | 0 | 1 | used by the first release |
 | MIG-CONTROL | `control.licence_add_on` | 7 | none |  | 4 | 1 | used by the first release |
 | MIG-CONTROL | `control.licence_add_on_limit` | 6 | none |  | 0 | 1 | used by the first release |
 | MIG-CONTROL | `control.outbox_relay` | 6 | none |  | 0 | 0 | kernel machinery: the relay lease per tenant database (ADR-0058; PLATFORM-OUTBOX) |
@@ -195,9 +193,9 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-RESOURCES | `resources.booking` | 16 | through its owner |  | 4 | 0 | used by the first release |
 | MIG-RESOURCES | `resources.resource` | 17 | scope_path |  | 8 | 4 | used by the first release |
 | MIG-RESOURCES | `resources.resource_block` | 8 | scope_path |  | 6 | 2 | used by the first release |
-| MIG-RESOURCES | `resources.resource_hold` | 15 | scope_path |  | 7 | 3 | used by the first release |
 | MIG-RESOURCES | `resources.resource_package` | 13 | scope_path |  | 2 | 2 | used by the first release |
 | MIG-RESOURCES | `resources.resource_requirement` | 12 | scope_path |  | 4 | 3 | used by the first release |
+| MIG-RESOURCES | `resources.resource_reservation` | 15 | scope_path |  | 7 | 3 | used by the first release |
 | MIG-RESOURCES | `resources.resource_schedule` | 8 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.analytics_provider` | 13 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.app_build` | 15 | scope_path |  | 3 | 1 | used by the first release |
@@ -226,7 +224,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-WHITELABEL | `whitelabel.publish_review_policy` | 5 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.site_package` | 9 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.site_setup_progress` | 7 | scope_path |  | 2 | 1 | used by the first release |
-| MIG-WHITELABEL | `whitelabel.store_account` | 11 | scope_path |  | 3 | 1 | used by the first release |
+| MIG-WHITELABEL | `whitelabel.store_account` | 15 | scope_path |  | 3 | 1 | used by the first release |
 | MIG-WHITELABEL | `whitelabel.tenant_config` | 27 | tenant root (one tenant per database; no tenant_id by design) |  | 24 | 12 | used by the first release |
 | MIG-PLATFORM | `platform.audit_record` | 8 | tenant root (one tenant per database; no tenant_id by design) | yes | 0 | 4 | used by the first release |
 | MIG-PLATFORM | `platform.denomination` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 1 | used by the first release |
@@ -235,30 +233,31 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.dsar_request` | 7 | through its owner |  | 0 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.guest_link` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.guest_profile |
 | MIG-PLATFORM | `platform.idempotency_record` | 11 | scope_path |  | 0 | 6 | used by the first release |
-| MIG-PLATFORM | `platform.outbox` | 15 | scope_path | yes | 0 | 47 | used by the first release |
+| MIG-PLATFORM | `platform.outbox` | 15 | scope_path | yes | 0 | 58 | used by the first release |
 | MIG-PLATFORM | `platform.outlet` | 16 | venue_id |  | 10 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.region_settings` | 19 | tenant root (one tenant per database; no tenant_id by design) |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board` | 6 | venue_id |  | 4 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_page` | 4 | through its owner |  | 1 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_tile` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 9 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.message_template |
-| MIG-PLATFORM | `platform.venue_settings` | 31 | venue_id |  | 5 | 2 | used by the first release |
+| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.consent_purpose |
+| MIG-PLATFORM | `platform.venue_settings` | 32 | venue_id |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 20 | scope_path |  | 7 | 1 | used by the first release |
 | MIG-WORKFORCE | `workforce.attendance` | 15 | venue_id |  | 1 | 1 | used by the first release |
 | MIG-WORKFORCE | `workforce.attendance_amendment` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-WORKFORCE | `workforce.rota_assignment` | 17 | venue_id |  | 4 | 2 | used by the first release |
 | MIG-SEATING | `seating.accessible` | 5 | scope_path |  | 2 | 1 | used by the first release |
-| MIG-SEATING | `seating.recommendation_rules` | 6 | scope_path |  | 2 | 1 | used by the first release |
-| MIG-SEATING | `seating.seat` | 11 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 0 | used by the first release |
-| MIG-SEATING | `seating.seat_block` | 10 | scope_path |  | 0 | 0 | referenced by seating.seat_hold |
+| MIG-SEATING | `seating.recommendation_rule` | 6 | scope_path |  | 2 | 1 | used by the first release |
+| MIG-SEATING | `seating.seat` | 11 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 1 | used by the first release |
+| MIG-SEATING | `seating.seat_block` | 10 | scope_path |  | 0 | 0 | referenced by seating.seat_reservation |
 | MIG-SEATING | `seating.seat_block_item` | 4 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-SEATING | `seating.seat_category` | 7 | venue_id |  | 4 | 1 | used by the first release |
-| MIG-SEATING | `seating.seat_hold` | 12 | through its owner |  | 6 | 4 | used by the first release |
-| MIG-SEATING | `seating.seat_hold_item` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-SEATING | `seating.seat_map` | 12 | venue_id |  | 0 | 0 | referenced by seating.seat |
+| MIG-SEATING | `seating.seat_map` | 12 | venue_id |  | 1 | 1 | used by the first release |
 | MIG-SEATING | `seating.seat_price_band` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 3 | 2 | used by the first release |
-| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by queue.queue |
+| MIG-SEATING | `seating.seat_reservation` | 12 | through its owner |  | 6 | 4 | used by the first release |
+| MIG-SEATING | `seating.seat_reservation_item` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
+| MIG-SEATING | `seating.section` | 7 | scope_path |  | 0 | 1 | used by the first release |
+| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.incident` | 28 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection` | 14 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection_template` | 9 | venue_id |  | 2 | 1 | used by the first release |
@@ -268,27 +267,27 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-WALLET | `wallet.authentication_policy` | 2 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.auto_reload_setting` | 11 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-WALLET | `wallet.balance` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 4 | 2 | used by the first release |
-| MIG-WALLET | `wallet.channel_rules` | 10 | scope_path |  | 1 | 1 | used by the first release |
+| MIG-WALLET | `wallet.channel_rule` | 10 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.configuration_version` | 6 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-WALLET | `wallet.configuration_version_snapshot` | 6 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.consumption_policy` | 7 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.credit_lot` | 12 | scope_path |  | 5 | 2 | used by the first release |
 | MIG-WALLET | `wallet.credit_type` | 15 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.exit_settlement` | 13 | scope_path |  | 1 | 1 | used by the first release |
-| MIG-WALLET | `wallet.funding_rules` | 11 | scope_path |  | 3 | 2 | used by the first release |
+| MIG-WALLET | `wallet.fund_reservation` | 12 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by wallet.wallet_transaction |
+| MIG-WALLET | `wallet.funding_rule` | 11 | scope_path |  | 3 | 2 | used by the first release |
 | MIG-WALLET | `wallet.gift_card` | 11 | subject |  | 1 | 0 | used by the first release |
-| MIG-WALLET | `wallet.hold` | 12 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by wallet.wallet_transaction |
 | MIG-WALLET | `wallet.integration_mapping` | 9 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.reconciliation_source` | 2 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.refund_policy` | 8 | scope_path |  | 4 | 2 | used by the first release |
-| MIG-WALLET | `wallet.risk_rules` | 2 | scope_path |  | 1 | 1 | used by the first release |
-| MIG-WALLET | `wallet.transfer_rules` | 9 | scope_path |  | 1 | 1 | used by the first release |
+| MIG-WALLET | `wallet.risk_rule_set` | 2 | scope_path |  | 1 | 1 | used by the first release |
+| MIG-WALLET | `wallet.transfer_rule` | 9 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-WALLET | `wallet.wallet` | 9 | subject |  | 8 | 4 | used by the first release |
 | MIG-WALLET | `wallet.wallet_transaction` | 12 | venue_id |  | 2 | 4 | used by the first release |
 | MIG-WALLET | `wallet.wallet_type` | 25 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.alternative_code` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 1 | used by the first release |
-| MIG-CATALOGUE | `catalogue.channel_allocation` | 19 | through its owner |  | 2 | 2 | used by the first release |
-| MIG-CATALOGUE | `catalogue.channel_capacity` | 12 | through its owner |  | 11 | 5 | used by the first release |
+| MIG-CATALOGUE | `catalogue.channel_capacity` | 12 | through its owner |  | 12 | 5 | used by the first release |
+| MIG-CATALOGUE | `catalogue.channel_envelope` | 19 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-CATALOGUE | `catalogue.entitlement_template` | 32 | scope_path |  | 8 | 2 | used by the first release |
 | MIG-CATALOGUE | `catalogue.event` | 10 | scope_path |  | 9 | 4 | used by the first release |
 | MIG-CATALOGUE | `catalogue.event_capacity_profile` | 12 | scope_path |  | 2 | 1 | used by the first release |
@@ -297,19 +296,20 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.event_schedule` | 6 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.group_package` | 11 | scope_path |  | 4 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.import_job` | 25 | scope_path |  | 1 | 1 | used by the first release |
-| MIG-CATALOGUE | `catalogue.inventory_hold` | 18 | through its owner |  | 9 | 10 | used by the first release |
-| MIG-CATALOGUE | `catalogue.performance` | 12 | through its owner |  | 13 | 4 | used by the first release |
+| MIG-CATALOGUE | `catalogue.inventory_reservation` | 18 | through its owner |  | 9 | 10 | used by the first release |
+| MIG-CATALOGUE | `catalogue.performance` | 12 | through its owner |  | 14 | 4 | used by the first release |
 | MIG-CATALOGUE | `catalogue.price` | 5 | through its owner |  | 2 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.price_list` | 28 | venue_id |  | 9 | 5 | used by the first release |
 | MIG-CATALOGUE | `catalogue.product` | 44 | scope_path |  | 31 | 4 | used by the first release |
 | MIG-CATALOGUE | `catalogue.product_category` | 12 | scope_path |  | 6 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.product_eligibility_rule` | 15 | scope_path |  | 8 | 1 | used by the first release |
-| MIG-CATALOGUE | `catalogue.product_media` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 5 | 1 | used by the first release |
-| MIG-CATALOGUE | `catalogue.product_version` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 2 | used by the first release |
+| MIG-CATALOGUE | `catalogue.product_media` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 5 | 2 | used by the first release |
+| MIG-CATALOGUE | `catalogue.product_version` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.published_bundle` | 10 | venue_id |  | 3 | 1 | used by the first release |
 | MIG-CATALOGUE | `catalogue.variant` | 9 | through its owner |  | 10 | 3 | used by the first release |
+| MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-LEDGER | `ledger.account` | 15 | through its owner |  | 0 | 0 | referenced by inventory.supplier |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by orders.invitation |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by ledger.posting |
 | MIG-LEDGER | `ledger.credit_memo` | 30 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | through its owner |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
@@ -328,7 +328,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-LEDGER | `ledger.tax_invoice_template` | 18 | scope_path |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.goods_receipt` | 11 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | through its owner |  | 2 | 2 | used by the first release |
-| MIG-INVENTORY | `inventory.item` | 26 | venue_id |  | 6 | 3 | used by the first release |
+| MIG-INVENTORY | `inventory.inventory_item` | 26 | venue_id |  | 6 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.kit_component` | 6 | scope_path |  | 3 | 1 | used by the first release |
 | MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by inventory.stock_batch |
 | MIG-INVENTORY | `inventory.movement` | 17 | through its owner |  | 4 | 3 | used by the first release |
@@ -336,8 +336,8 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 2 | 0 | used by the first release |
-| MIG-INVENTORY | `inventory.stock_reservation` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by maintenance.asset |
+| MIG-INVENTORY | `inventory.stock_earmark` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
+| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-PROMOTIONS | `promotions.allocation_component` | 9 | venue_id |  | 3 | 2 | used by the first release |
 | MIG-PROMOTIONS | `promotions.allocation_split` | 4 | through its owner |  | 0 | 0 | referenced by promotions.allocation_component |
 | MIG-PROMOTIONS | `promotions.bundle` | 20 | venue_id |  | 5 | 2 | used by the first release |
@@ -363,8 +363,8 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-ORDERS | `orders.deposit_box_opening_denomination` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-ORDERS | `orders.fraud_rule` | 12 | scope_path |  | 3 | 0 | used by the first release |
 | MIG-ORDERS | `orders.group_booking` | 21 | through its owner |  | 4 | 1 | used by the first release |
-| MIG-ORDERS | `orders.group_customer_organization` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_customer_organization_contact |
-| MIG-ORDERS | `orders.group_customer_organization_contact` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_visit_plan |
+| MIG-ORDERS | `orders.group_customer_organisation` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_customer_organisation_contact |
+| MIG-ORDERS | `orders.group_customer_organisation_contact` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_visit_plan |
 | MIG-ORDERS | `orders.group_participant` | 7 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-ORDERS | `orders.group_participant_list` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_participant |
 | MIG-ORDERS | `orders.group_visit_plan` | 27 | scope_path |  | 2 | 1 | used by the first release |
@@ -376,7 +376,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-ORDERS | `orders.order_line_eligibility` | 7 | through its owner |  | 12 | 1 | used by the first release |
 | MIG-ORDERS | `orders.payment` | 18 | through its owner |  | 26 | 17 | used by the first release |
 | MIG-ORDERS | `orders.payment_link` | 14 | scope_path |  | 2 | 1 | used by the first release |
-| MIG-ORDERS | `orders.pos_shift` | 30 | scope_path |  | 12 | 10 | used by the first release |
+| MIG-ORDERS | `orders.pos_shift` | 31 | scope_path |  | 12 | 10 | used by the first release |
 | MIG-ORDERS | `orders.pos_shift_approval` | 6 | through its owner |  | 12 | 1 | used by the first release |
 | MIG-ORDERS | `orders.pos_shift_incident` | 6 | through its owner |  | 12 | 2 | used by the first release |
 | MIG-ORDERS | `orders.refund` | 20 | through its owner |  | 4 | 3 | used by the first release |
@@ -385,7 +385,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-ORDERS | `orders.resale_listing` | 16 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-ORDERS | `orders.reservation` | 7 | venue_id |  | 7 | 4 | used by the first release |
 | MIG-ORDERS | `orders.reservation_line` | 14 | through its owner |  | 4 | 1 | used by the first release |
-| MIG-ORDERS | `orders.sales_order` | 25 | scope_path |  | 32 | 16 | used by the first release |
+| MIG-ORDERS | `orders.sales_order` | 26 | scope_path |  | 32 | 16 | used by the first release |
 | MIG-ORDERS | `orders.stored_value_authorisation` | 9 | scope_path |  | 0 | 1 | used by the first release |
 | MIG-ORDERS | `orders.ticket_template` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 5 | 4 | used by the first release |
 | MIG-ORDERS | `orders.ticket_template_channel` | 3 | tenant root (one tenant per database; no tenant_id by design) |  | 4 | 3 | used by the first release |
@@ -404,7 +404,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-ACCESS | `access.credential_policy` | 32 | scope_path |  | 4 | 3 | used by the first release |
 | MIG-ACCESS | `access.device_binding` | 15 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-ACCESS | `access.device_placement` | 18 | scope_path |  | 1 | 1 | used by the first release |
-| MIG-ACCESS | `access.entitlement` | 30 | scope_path |  | 19 | 7 | used by the first release |
+| MIG-ACCESS | `access.entitlement` | 31 | scope_path |  | 19 | 7 | used by the first release |
 | MIG-ACCESS | `access.entry_rule_point` | 5 | through its owner |  | 1 | 1 | used by the first release |
 | MIG-ACCESS | `access.face_reenrolment_attempt` | 15 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-ACCESS | `access.gate_mode_change` | 13 | scope_path |  | 2 | 1 | used by the first release |
@@ -627,14 +627,14 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1085 | `V1085__control.sql` | MIG-CONTROL-5 | control | control | 2 | control.release, control.rollout |
 | 1086 | `V1086__sync.sql` | MIG-SYNC-2 | tenant | sync | 2 | sync.cell_connection, sync.cross_cell_request |
 | 1087 | `V1087__platform.sql` | MIG-PLATFORM-4 | tenant | platform | 1 | platform.dead_letter |
-| 1088 | `V1088__catalogue.sql` | VM-MIG-CATALOGUE | tenant | catalogue | 3 | catalogue.donation_campaign, catalogue.performance_template, catalogue.waitlist_entry |
+| 1088 | `V1088__catalogue.sql` | VM-MIG-CATALOGUE | tenant | catalogue | 2 | catalogue.donation_campaign, catalogue.performance_template |
 | 1089 | `V1089__subscription.sql` | MIG-SUBSCRIPTION-4 | tenant | subscription | 2 | subscription.licensing_model, subscription.vsi_assessment |
-| 1090 | `V1090__control.sql` | MIG-CONTROL-7 | control | control | 20 | control.burst_environment, control.cell_cluster, control.partner_application_review_task, control.partner_capability_grant, control.partner_case, control.partner_commission_line, control.partner_commission_rule, control.partner_commission_rule_tier, control.partner_contact, control.partner_credit_profile, control.partner_distribution_right, control.partner_document, control.partner_rate, control.partner_reconciliation_exception, control.partner_scope_assignment, control.partner_security, control.partner_settlement_batch, control.tenant_migration, control.tenant_migration_plan, control.usage_record |
+| 1090 | `V1090__control.sql` | MIG-CONTROL-7 | control | control | 21 | control.burst_environment, control.cell_cluster, control.invoice, control.partner_application_review_task, control.partner_capability_grant, control.partner_case, control.partner_commission_line, control.partner_commission_rule, control.partner_commission_rule_tier, control.partner_contact, control.partner_credit_profile, control.partner_distribution_right, control.partner_document, control.partner_rate, control.partner_reconciliation_exception, control.partner_scope_assignment, control.partner_security, control.partner_settlement_batch, control.tenant_migration, control.tenant_migration_plan, control.usage_record |
 | 1091 | `V1091__catalogue.sql` | MIG-CATALOGUE-2 | tenant | catalogue | 2 | catalogue.membership_programme, catalogue.plan_benefit |
 | 1092 | `V1092__control.sql` | MIG-CONTROL-8 | control | control | 2 | control.cell_instance, control.cell_job |
 | 1094 | `V1094__subscription.sql` | MIG-SUBSCRIPTION-5 | tenant | subscription | 3 | subscription.capacity_pack, subscription.enforcement_policy, subscription.vsi_model |
 | 1095 | `V1095__subscription.sql` | MIG-SUBSCRIPTION-6 | tenant | subscription | 1 | subscription.trial_config |
-| 1098 | `V1098__control.sql` | MIG-CONTROL-9 | control | control | 2 | control.credit_note, control.credit_note_line |
+| 1098 | `V1098__control.sql` | MIG-CONTROL-9 | control | control | 3 | control.credit_note, control.credit_note_line, control.invoice_line |
 | 1099 | `V1099__approvals.sql` | MIG-APPROVALS-6 | tenant | approvals | 12 | approvals.approved_action_execution, approvals.automation, approvals.business_rule, approvals.control_policy, approvals.decision_record, approvals.decision_table, approvals.decision_table_row, approvals.workflow_exception, approvals.workflow_instance, approvals.workflow_intervention, approvals.workflow_step_execution, approvals.workflow_trigger |
 | 1100 | `V1100__seating.sql` | MIG-SEATING-2 | tenant | seating | 1 | seating.hold_pool |
 | 1103 | `V1103__approvals.sql` | MIG-APPROVALS-7 | tenant | approvals | 2 | approvals.evidence_package, approvals.signature |
@@ -644,7 +644,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1108 | `V1108__control.sql` | MIG-CONTROL-11 | control | control | 1 | control.api_anomaly |
 | 1109 | `V1109__assets.sql` | MIG-ASSETS-2 | tenant | assets | 6 | assets.audit, assets.distribution_channel, assets.rendition, assets.share, assets.tag, assets.taxonomy |
 | 1110 | `V1110__assets.sql` | MIG-ASSETS-3 | tenant | assets | 1 | assets.approval |
-| 1111 | `V1111__seating.sql` | MIG-SEATING-3 | tenant | seating | 2 | seating.seating_rules, seating.section |
+| 1111 | `V1111__seating.sql` | MIG-SEATING-3 | tenant | seating | 2 | seating.seating_rules, seating.section_row |
 | 1112 | `V1112__pricing.sql` | MIG-PRICING-2 | tenant | pricing | 3 | pricing.dynamic_price_action, pricing.dynamic_price_condition, pricing.dynamic_price_rule |
 | 1113 | `V1113__catalogue.sql` | MIG-CATALOGUE-4 | tenant | catalogue | 5 | catalogue.package_pricing, catalogue.price_assignment, catalogue.rate, catalogue.rollback_action, catalogue.variant_dimension |
 | 1114 | `V1114__promotions.sql` | MIG-PROMOTIONS-2 | tenant | promotions | 4 | promotions.campaign, promotions.campaign_budget, promotions.stacking_rule, promotions.voucher_batch |
@@ -708,7 +708,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1199 | `V1199__whitelabel.sql` | MIG-WHITELABEL-2 | tenant | whitelabel | 5 | whitelabel.kiosk_assignment, whitelabel.kiosk_config, whitelabel.kiosk_config_attract_slide, whitelabel.kiosk_config_start_tile, whitelabel.kiosk_config_version |
 | 1200 | `V1200__promotions.sql` | MIG-PROMOTIONS-8 | tenant | promotions | 2 | promotions.bundle_capacity_policy, promotions.promotion_conflict |
 | 1201 | `V1201__promotions.sql` | MIG-PROMOTIONS-9 | tenant | promotions | 4 | promotions.product_relationship, promotions.recommendation_experiment, promotions.recommendation_strategy, promotions.recommendation_suppression |
-| 1202 | `V1202__seating.sql` | MIG-SEATING-7 | tenant | seating | 4 | seating.group_request, seating.group_request_participant, seating.reassignment, seating.section_row |
+| 1202 | `V1202__seating.sql` | MIG-SEATING-7 | tenant | seating | 3 | seating.group_request, seating.group_request_participant, seating.reassignment |
 | 1203 | `V1203__seating.sql` | MIG-SEATING-8 | tenant | seating | 3 | seating.import_job, seating.seat_map_template, seating.zone |
 | 1204 | `V1204__orders.sql` | MIG-ORDERS-14 | tenant | orders | 2 | orders.upgrade, orders.upgrade_rule |
 | 1205 | `V1205__orders.sql` | MIG-ORDERS-15 | tenant | orders | 2 | orders.payment_allocation_rule, orders.payment_tip |

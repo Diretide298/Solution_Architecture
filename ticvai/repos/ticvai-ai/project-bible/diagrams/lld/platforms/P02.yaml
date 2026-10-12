@@ -43,11 +43,11 @@ modulesUsed:
   screens: 2
 servicesCalled:
 - service: OrderService
-  operationCalls: 71
+  operationCalls: 70
 - service: MarketingService
   operationCalls: 62
 - service: CatalogueService
-  operationCalls: 56
+  operationCalls: 58
 - service: VenueOpsService
   operationCalls: 55
 - service: IdentityService
@@ -343,6 +343,8 @@ screens:
   - getAvailability
   - getCart
   - getPublishedBookingFlow
+  - joinWaitlist
+  - leaveWaitlist
   - listPerformances
   - listProductCategories
   - listProducts
@@ -412,7 +414,6 @@ screens:
   density: comfortable
   operations:
   - checkoutCart
-  - createOrder
   - createPayment
   - getCart
   - getPaymentLink

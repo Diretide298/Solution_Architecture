@@ -1,0 +1,51 @@
+# whitelabel.passCertificateExpiring v1 — published by whitelabel
+# Checked by tools/check-states.py.
+
+name: whitelabel.passCertificateExpiring
+version: 1
+publisher: whitelabel
+description: A brand's Apple Wallet Pass Type ID certificate expires within 30 days.
+aggregate: storeAccount
+emittedWhen: The daily certificate run finds an Apple StoreAccount whose passCertificateExpiresAt is 30 days away or
+  less; once per store account and expiry, and again each day once it is 7 days away or less
+payload:
+- field: storeAccountId
+  type: uuid
+- field: tenantId
+  type: uuid
+- field: passTypeIdentifier
+  type: string
+- field: passCertificateExpiresAt
+  type: timestamp
+- field: daysRemaining
+  type: integer
+- field: scopePath
+  type: string
+- field: raisedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Tell the tenant admin, the holder of TENANT_CONFIGURE at the tenant, by staff notification and email, that
+    the brand's Apple passes stop signing on the date and that the certificate is renewed in the client's own Apple
+    Developer account and sent again on CMS-104. **The critical consumer**, as for ai.ceilingApproaching
+  idempotencyKey: storeAccountId + passCertificateExpiresAt + daysRemaining
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: platform-ops
+  purpose: Raise an alert to TICVAI operations for the tenant, so a certificate the client has not renewed is chased
+    before Apple passes fail
+  idempotencyKey: storeAccountId + passCertificateExpiresAt + daysRemaining
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: '**Added 12 October 2026 (CHG-R6-033).** Chinmay, 12 October: the client owns the Apple Wallet pass
+  certificate. The Pass Type ID certificate sits in the client''s Apple Developer account, one per brand for white
+  label; the platform stores it in Key Vault (`StoreAccount.passCertificateSecretRef`) and warns 30 days before it
+  expires, to the tenant admin and to our operations. A pass certificate lasts about a year, so without this the
+  failure surfaces a year after launch as passes that will not issue or update (the Vivaticket comparison of 6
+  October filed it as a launch defect).
+
+
+  No state model emits this: an approaching expiry is a date passing, not a state change, the same shape as
+  `entitlement.expiringSoon`. The daily run in white-label reads `whitelabel.store_account` and writes
+  `platform.outbox`.'

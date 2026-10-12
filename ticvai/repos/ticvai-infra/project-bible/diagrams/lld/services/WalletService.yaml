@@ -708,7 +708,7 @@ tables:
   writtenBy:
   - wallet
   foreignWriters: null
-- table: wallet.channel_rules
+- table: wallet.channel_rule
   columns: 10
   store: postgres
   parent: null
@@ -778,7 +778,14 @@ tables:
   writtenBy:
   - wallet
   foreignWriters: null
-- table: wallet.funding_rules
+- table: wallet.fund_reservation
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.funding_rule
   columns: 11
   store: postgres
   parent: wallet.wallet_type
@@ -793,13 +800,6 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.gift_card_product
-  columns: 12
-  store: postgres
-  parent: null
-  writtenBy:
-  - wallet
-  foreignWriters: null
-- table: wallet.hold
   columns: 12
   store: postgres
   parent: null
@@ -837,11 +837,11 @@ tables:
 - table: wallet.risk_rule
   columns: 12
   store: postgres
-  parent: wallet.risk_rules
+  parent: wallet.risk_rule_set
   writtenBy:
   - wallet
   foreignWriters: null
-- table: wallet.risk_rules
+- table: wallet.risk_rule_set
   columns: 2
   store: postgres
   parent: null
@@ -862,7 +862,7 @@ tables:
   writtenBy:
   - wallet
   foreignWriters: null
-- table: wallet.transfer_rules
+- table: wallet.transfer_rule
   columns: 9
   store: postgres
   parent: null

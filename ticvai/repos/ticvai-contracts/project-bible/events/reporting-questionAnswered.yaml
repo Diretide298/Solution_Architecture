@@ -1,0 +1,58 @@
+# reporting.questionAnswered v1 — published by reporting
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: reporting.questionAnswered
+version: 1
+publisher: reporting
+description: A natural-language reporting question was answered through the semantic layer.
+aggregate: naturalLanguageQuery
+emittedWhen: askReportingQuestion returns an answer
+emittedBy:
+- askReportingQuestion
+payload:
+- field: queryId
+  type: uuid
+  notes: The reporting.natural_language_query row
+- field: conversationId
+  type: uuid
+  required: false
+- field: principalId
+  type: uuid
+- field: providerId
+  type: uuid
+  notes: The ai.provider the question resolved to
+- field: model
+  type: string
+- field: prompt
+  type: string
+  notes: As sent to the provider, after the ai.policy masking list (the masked text, never the raw question)
+- field: response
+  type: string
+- field: inputTokens
+  type: integer
+- field: outputTokens
+  type: integer
+- field: cost
+  type: number
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Write the ai.activity audit row for the question (prompt, response, model, tokens and cost), the same trail
+    as the assistant (8.3.55 to 8.3.57); the ai schema is the AI's (ADR-0020)
+  writes:
+  - ai.activity
+  idempotencyKey: queryId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 7 days after publication. The ai.activity row is the record
+notes: '**Added 12 October 2026 (ADAM CR-002, CHG-R6-020).** askReportingQuestion runs in ReportingService, in
+  `operations`; ai.activity is the AI''s, in `ticvai-ai`. The DB-ROLES grants refuse the direct INSERT, so the audit
+  row reaches its owner as this event (ADR-0055 rule 4, ADR-0057).
+
+
+  No state model emits this: an answer is not a status.'

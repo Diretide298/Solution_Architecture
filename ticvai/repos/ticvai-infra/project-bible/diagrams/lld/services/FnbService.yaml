@@ -48,7 +48,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 4
-    writes: 4
+    writes: 3
   - operation: attachModifierGroup
     verb: PUT
     path: /menu-items/{menuItemId}/modifier-groups
@@ -720,7 +720,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 5
-    writes: 4
+    writes: 3
   - operation: quoteWaitTime
     verb: POST
     path: /waitlist/{entryId}/quote
@@ -1302,7 +1302,6 @@ tables:
       role: evicts
       resolvers: &id001
       - menu
-      - price-list
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
@@ -1989,20 +1988,6 @@ writesOutside:
   - operation: setKitchenTicketStatus
     tables:
     - platform.outbox
-- service: CatalogueService
-  operations: 2
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event CatalogueService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: applyMenuActions
-    tables:
-    - catalogue.price
-  - operation: publishMenu
-    tables:
-    - catalogue.product_version
 - service: OrderService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

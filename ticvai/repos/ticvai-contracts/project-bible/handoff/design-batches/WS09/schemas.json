@@ -699,7 +699,7 @@
  },
  "DenyReason": {
   "type": "string",
-  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
+  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n\n**`capacityReached` is \"Venue full\"** (12 October 2026, CHG-R6-036): an entry-direction scan is denied when the current count of the access point's area, or of any area above it up to the venue (entries minus exits plus `operationalAdjustment`), is at or above that area's `capacity`, set with `setAccessAreaCapacity`. An area whose capacity is null never denies for capacity; an exit is never denied for it.\n",
   "enum": [
    "notFound",
    "notYetValid",

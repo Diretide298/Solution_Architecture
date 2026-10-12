@@ -59,7 +59,7 @@ operations:
   - venuemap.visit_plan_item
   writes:
   - cache:idempotency
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - orders.cart
   - orders.cart_line
   - venuemap.visit_plan

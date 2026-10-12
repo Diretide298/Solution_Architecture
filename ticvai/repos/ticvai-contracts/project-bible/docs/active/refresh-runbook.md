@@ -34,6 +34,7 @@ making a failure cheap and the gate trustworthy. None of it changes what a step 
 | `bash tools/refresh-safe.sh --changed <paths>` | Only the steps downstream of the paths; checks in full |
 | `bash tools/refresh-safe.sh --resume` | After a failed run: skip the steps it completed (never merges) |
 | `bash tools/refresh-safe.sh --jobs 1` | The checks one at a time (the original loop); default is 4 |
+| `bash tools/refresh-safe.sh --parallel 4` | The derive steps too: independent steps 4 at a time, by the manifest's reads and writes; a step it cannot vouch for runs alone. Prints the waves and the expected time first (`python tools/refresh-manifest.py schedule --jobs 4 --times <steps.tsv>` prints them without running). Default 1, one after another (CHG-R6-050) |
 | `bash tools/refresh-safe.sh --quiet` | Print step banners, failures and the verdict only |
 
 Exit codes: 0 pass · 1 refresh or checks failed · 2 usage · 3 uncommitted authored changes · 4 merge refused

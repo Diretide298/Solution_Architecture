@@ -30,5 +30,14 @@ consumers:
   idempotencyKey: walletTransactionId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: games
+  purpose: Keep games.card's credit and points balance in step with the wallet when loadGameCredits or
+    adjustGameCard moved a game card (kind gameCreditLoad or adjustment). WalletService runs in commerce and the
+    games schema is VenueOpsService's, in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+  writes:
+  - games.card
+  idempotencyKey: walletTransactionId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication
 notes: No state model emits this.

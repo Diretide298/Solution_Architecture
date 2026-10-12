@@ -256,7 +256,7 @@
    "endsNextDay": {
     "type": "boolean",
     "default": false,
-    "description": "**A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`, `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to` must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be earlier than or equal to `from`, so a window never spans more than 24 hours.\n"
+    "description": "**A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`, `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to` must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be earlier than or equal to `from`, so a window never spans more than 24 hours. **Friday's trading day is the business day, closing at the venue's `businessDayCutoff`** (12 October 2026, CHG-R6-032): it keeps the window whole only when the cut-off is at or after the window's `to` (01:00 or later here). At the default 00:00 a sale at 00:30 falls on Saturday's business date, so a venue whose windows run past midnight sets its cut-off to cover them.\n"
    }
   }
  },

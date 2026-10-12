@@ -808,7 +808,7 @@
   ]
  },
  "ChannelAllocation": {
-  "x-ticvai-persistence": "catalogue.channel_allocation",
+  "x-ticvai-persistence": "catalogue.channel_envelope",
   "type": "object",
   "required": [
    "channel",
@@ -854,6 +854,7 @@
     "description": "The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3)."
    },
    "allocationType": {
+    "x-ticvai-column": "envelope_type",
     "type": "string",
     "enum": [
      "sharedPool",
@@ -1507,6 +1508,7 @@
     "type": "string"
    },
    "campaignId": {
+    "x-ticvai-references": "promotions.coupon_campaign",
     "type": "string",
     "format": "uuid"
    },
@@ -3055,7 +3057,8 @@
    },
    "productId": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.product"
    },
    "kind": {
     "type": "string",
@@ -4069,6 +4072,7 @@
     "format": "uuid"
    },
    "amount": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "taxCodeId": {
@@ -4448,7 +4452,7 @@
   }
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -4834,7 +4838,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",
@@ -5351,6 +5356,7 @@
     "readOnly": true
    },
    "promotionId": {
+    "x-ticvai-references": "promotions.promotion",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -5447,7 +5453,7 @@
    "dateFrom": {
     "type": "string",
     "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "dateTo": {
     "type": "string",

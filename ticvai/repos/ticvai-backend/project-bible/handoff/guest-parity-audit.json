@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "screens": {
   "P01": 50,
   "P02": 77
@@ -12,7 +12,7 @@
   "appOnly": 6
  },
  "severity": {
-  "high": 29,
+  "high": 28,
   "medium": 165,
   "low": 222,
   "info": 3
@@ -120,7 +120,7 @@
    "severity": "high",
    "dimension": "operations",
    "where": "app only",
-   "detail": "bindCredentialDevice, claimTicketTransfer, createOrder, enrolFacePass, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listTicketTransfers, registerGuestDevice, reserveMerchandise, setVisitReminder",
+   "detail": "bindCredentialDevice, claimTicketTransfer, enrolFacePass, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listTicketTransfers, registerGuestDevice, reserveMerchandise, setVisitReminder",
    "fix": ""
   },
   {
@@ -135,13 +135,6 @@
    "dimension": "operations",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
    "detail": "the web calls extendSeatHold and the app cannot call it anywhere",
-   "fix": ""
-  },
-  {
-   "severity": "high",
-   "dimension": "operations",
-   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "the app calls createOrder and the web cannot call it anywhere",
    "fix": ""
   },
   {
@@ -568,7 +561,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web opens with ['cartId', 'eventId', 'performanceId', 'venueId'], app with ['cartId', 'eventId', 'venueId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'entryId', 'eventId', 'performanceId', 'venueId'], app with ['cartId', 'entryId', 'eventId', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -1716,7 +1709,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web only ['detailPanel', 'primaryButton'], app only — (11 vs 10 components)",
+   "detail": "web only ['detailPanel', 'primaryButton'], app only — (13 vs 12 components)",
    "fix": ""
   },
   {
@@ -1883,7 +1876,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:1160",
+   "where": "contracts/spine/catalogue.yaml:1166",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },

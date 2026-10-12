@@ -328,7 +328,7 @@ operations:
   - payments.provider_event
   writes:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - ledger.journal_entry
   - ledger.journal_line
   - orders.order_event

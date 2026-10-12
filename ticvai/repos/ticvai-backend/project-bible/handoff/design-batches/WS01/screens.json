@@ -308,6 +308,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createOrgUnit"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set capacity",
+       "operation": "setAccessAreaCapacity",
+       "notes": "On the selected venue or park row: capacity (empty for no limit), the warning, high and critical bands, and an operator count adjustment with its reason. **Without a capacity the scanner's \"Venue full\" never fires** (`capacityReached`); BO-255 links here for it (DEC-263).",
+       "provenance": "contract access.yaml PUT /access-areas/{areaId}/capacity (12 October 2026, CHG-R6-036)"
       }
      ]
     }
@@ -353,6 +360,16 @@
     "invalidates": [
      "listOrgUnits"
     ]
+   },
+   {
+    "operationId": "setAccessAreaCapacity",
+    "contract": "access",
+    "purpose": "Set the venue's or a park's capacity and occupancy bands: what makes the gate's \"Venue full\" (`capacityReached`) fire and what BO-255 measures against (12 October 2026, CHG-R6-036; DEC-263)",
+    "trigger": "onAction",
+    "provenance": "12 October 2026 (CHG-R6-036)",
+    "invalidates": [
+     "listVenueParkAccess"
+    ]
    }
   ],
   "entryState": {
@@ -365,6 +382,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrgUnits` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "areaId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (12 October 2026, CHG-R6-036): `setAccessAreaCapacity` takes the id of the venue or park row the user selects in the list (`listVenueParkAccess`); an edge that holds one only pre-selects it."
     }
    ]
   },
@@ -375,6 +398,28 @@
    "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-145"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetAccessAreaCapacity",
+    "component": "modal",
+    "trigger": "Set capacity",
+    "body": "**Collects what `setAccessAreaCapacity` sends for the selected venue or park** (12 October 2026, CHG-R6-036): capacity (empty for no limit, so the gate never denies for capacity), the warning, high and critical bands in percent of capacity, and an operator count adjustment with its reason (required when the adjustment changes). Dismissing sends nothing; the structure behind is unchanged.",
+    "confirm": {
+     "label": "Save capacity",
+     "operation": "setAccessAreaCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "capacity",
+      "occupancyThresholds",
+      "operationalAdjustment",
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-areas/{areaId}/capacity (CHG-R6-036)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

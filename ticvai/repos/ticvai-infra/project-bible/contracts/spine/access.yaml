@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 247
+  x-ticvai-screen-count: 248
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -396,6 +396,13 @@ paths:
         and one step either side for clock drift. `rotate=true` replaces the seed, so a stolen phone''s
         codes stop verifying once gates have the new one.
 
+
+        **The format follows the entitlement''s `credentialFormat`** (MOM-0330; CHG-R6-031). `platformSignedQr`
+        is the behaviour above. `staticQr` returns the signed `payload` with `rotation` null, so the same code can be
+        printed or sent in a partner''s batch. `rfidCard` returns nothing to display as a code: `payload` and
+        `mediaCode` are the card or wristband serial once one is bound at collection, and the app shows the
+        ticket as collect-at-venue.
+
         '
       tags:
       - access
@@ -423,6 +430,11 @@ paths:
                 properties:
                   mediaCode:
                     type: string
+                  credentialFormat:
+                    allOf:
+                    - $ref: '#/components/schemas/TicketCredentialFormat'
+                    description: The entitlement's `credentialFormat`; `platformSignedQr` where it is null
+                      (CHG-R6-031).
                   payload:
                     type: string
                   expiresAt:
@@ -560,6 +572,9 @@ paths:
       operationId: enrolFaceTag
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-audience:
       - staff
       x-ticvai-make-or-break: 'May a Face Tag be captured on a notice alone, with no affirmative act by the guest
@@ -828,6 +843,11 @@ paths:
       operationId: enrolFacePass
       x-ticvai-consumed-by:
         - "P02 GST-069 Face Pass"
+      x-ticvai-write-via:
+      - table: marketing.consent_record
+        event: biometric.enrolmentChanged
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1099,6 +1119,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1317,6 +1340,13 @@ paths:
         screen. **A failure is retried, then dead-lettered, and a dead-lettered issuance pages** (the guest paid
         and holds nothing); it is replayed, not compensated.
 
+
+        **It resolves each entitlement''s `credentialFormat` once, at issue** (MoM 2 Sep 2026 §4.7, MOM-0330;
+        CHG-R6-031): the product''s `AccessVerificationMethodPolicy.credentialFormatOverride`, else the
+        `ticketCredentialFormat` of the sales channel profile the order came through (`channelProfileId`, catalogue
+        `SalesChannelProfile`: a partner''s or reseller''s channel), else `platformSignedQr`, the platform''s signed
+        QR. A `staticQr` entitlement gets no rotation seed; an `rfidCard` one gets no QR payload.
+
         '
       tags:
       - validation
@@ -1343,6 +1373,13 @@ paths:
                 eventId:
                   type: string
                   description: The `order.paid` event id, for the consumer's inbox record.
+                channelProfileId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The sales channel profile (catalogue `SalesChannelProfile.id`) the order came through,
+                    from `order.paid`; null for the venue's own channels. Its `ticketCredentialFormat` is read here
+                    (CHG-R6-031).
                 lines:
                   type: array
                   minItems: 1
@@ -3646,7 +3683,8 @@ paths:
         `access.media_template.design` (jsonb) on the row `templateId` names, with `designer` `pdfPrintablePos` and
         `media_type` from `outputFormat`; a save appends an `access.configuration_change` with the before and after. The GET
         reads that row and returns `design` in the write's shape.
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission-note: 'Was ACCESS_POINT_CONFIGURE. A ticket media design is set up beside the ticket templates it reads for (listTicketTemplates PRODUCT_VIEW, create/update/clone/import PRODUCT_CONFIGURE on BO-344), so the designer takes the product permission: a product manager who can create a template can design its artwork. Reader-side RFID/NFC (setRfidNfcCard, BO-349) stays ACCESS_POINT_CONFIGURE. Approved breaking change BC-034 (docs/active/breaking-changes.yaml): Chinmay, 12 October 2026, "Approve (Recommended)"; CHG-R6-030.'
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -3696,7 +3734,8 @@ paths:
         reads that row and returns `design` in the write's shape.
       tags:
       - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-note: 'Was ACCESS_POINT_CONFIGURE. A ticket media design is set up beside the ticket templates it saves for (listTicketTemplates PRODUCT_VIEW, create/update/clone/import PRODUCT_CONFIGURE on BO-344), so the designer takes the product permission: a product manager who can create a template can design its artwork. Reader-side RFID/NFC (setRfidNfcCard, BO-349) stays ACCESS_POINT_CONFIGURE. Approved breaking change BC-035 (docs/active/breaking-changes.yaml): Chinmay, 12 October 2026, "Approve (Recommended)"; CHG-R6-030.'
       x-ticvai-scope-level: venue
       x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before and
         after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September, writers
@@ -3757,7 +3796,8 @@ paths:
         '
       tags:
       - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-note: 'Was ACCESS_POINT_CONFIGURE. A ticket media design is set up beside the ticket templates it saves for (listTicketTemplates PRODUCT_VIEW, create/update/clone/import PRODUCT_CONFIGURE on BO-344), so the designer takes the product permission: a product manager who can create a template can design its artwork. Reader-side RFID/NFC (setRfidNfcCard, BO-349) stays ACCESS_POINT_CONFIGURE. Approved breaking change BC-036 (docs/active/breaking-changes.yaml): Chinmay, 12 October 2026, "Approve (Recommended)"; CHG-R6-030.'
       x-ticvai-scope-level: venue
       x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before and
         after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September, writers
@@ -3816,7 +3856,8 @@ paths:
         '
       tags:
       - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-note: 'Was ACCESS_POINT_CONFIGURE. A ticket media design is set up beside the ticket templates it saves for (listTicketTemplates PRODUCT_VIEW, create/update/clone/import PRODUCT_CONFIGURE on BO-344), so the designer takes the product permission: a product manager who can create a template can design its artwork. Reader-side RFID/NFC (setRfidNfcCard, BO-349) stays ACCESS_POINT_CONFIGURE. Approved breaking change BC-037 (docs/active/breaking-changes.yaml): Chinmay, 12 October 2026, "Approve (Recommended)"; CHG-R6-030.'
       x-ticvai-scope-level: venue
       x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before and
         after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September, writers
@@ -5052,6 +5093,102 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a tenant's venues, parks and sites, defined by hand
+  /access-areas/{areaId}/capacity:
+    parameters:
+    - name: areaId
+      in: path
+      required: true
+      description: '`access.access_area.id` of the venue, park, zone or area row (`listVenueParkAccess`).'
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setAccessAreaCapacity
+      x-ticvai-consumed-by:
+        - "P08 BO-145 Venue & Park Access Structure"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '12 October 2026: CHG-R6-036 (the Vivaticket comparison of 6 October found the scanner''s
+        "Venue full" denial, `capacityReached`, with nothing that sets a venue''s capacity; DEC-263 had BO-255 link
+        to a capacity configuration that did not exist)'
+      summary: Set the capacity of a venue, park or area
+      description: '**The write behind "Venue full"** (12 October 2026, CHG-R6-036). `validateAccess` denies an
+        entry with `capacityReached` when the area is full, and `listLiveVenueOccupancy` (BO-255) shows occupancy
+        against `capacity`, but only a zone''s capacity could be written (`setAccessAreaZone`); the venue and park
+        rows of `access.access_area` had no write, so the denial could never fire and the occupancy bands had no
+        denominator.
+
+
+        **PUT semantics on one area''s capacity fields only**: `capacity` (null: no limit, the gate never denies
+        for capacity), `occupancyThresholds` (the warning, high and critical bands BO-255 colours) and
+        `operationalAdjustment` (the operator''s correction to entries minus exits, with a required `reason`).
+        Every other field of the area is untouched. Appends one `access.configuration_change` row (before and
+        after) in the same transaction. A capacity below the current count is accepted: entries are refused
+        until enough guests leave, which is the point.'
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                capacity:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  description: The most people inside the area at once; null for no limit.
+                occupancyThresholds:
+                  type: object
+                  nullable: true
+                  properties:
+                    warningPercent:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+                    highPercent:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+                    criticalPercent:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+                operationalAdjustment:
+                  type: integer
+                  description: Added to entries minus exits for the current count.
+                reason:
+                  type: string
+                  maxLength: 200
+                  description: Required when `operationalAdjustment` changes; refused 400 without it.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: The area, with its capacity as set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessAccessArea'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-area-zone:
     put:
       operationId: setAccessAreaZone
@@ -8230,6 +8367,9 @@ paths:
       operationId: setBiometricLifecycleRetention
       x-ticvai-consumed-by:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
+      x-ticvai-write-via:
+      - table: tenancy.data_retention_setting
+        operation: setDataRetentionSetting
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -15799,6 +15939,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listFaceChangeEnrollment reads (pack ''Access
@@ -16218,6 +16361,21 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
+    TicketCredentialFormat:
+      type: string
+      enum:
+      - platformSignedQr
+      - staticQr
+      - rfidCard
+      description: '**The credential a ticket is issued with** (MoM 2 Sep 2026 §4.7, MOM-0330: VIP invitations and
+        B2B/reseller tickets "may need to fall back to a standard QR code or RFID card", with "a per-product override
+        to disable dynamic QR for specific ticket types"; 12 October 2026, CHG-R6-031). `platformSignedQr` is the
+        default: the platform''s own signed QR as the event issues it, rotating where the event sells dynamic QR
+        (`getEntitlementCredential` `rotation`). `staticQr` is the platform''s signed QR issued once and never
+        rotated, for a ticket that leaves the app (a reseller''s batch, a printed invitation): dynamic QR is off for
+        it even in a fully dynamic event. `rfidCard` issues no QR; the ticket is collected as an RFID card or
+        wristband and bound then (`AccessCredentialBinding`). A partner''s own barcode symbology is not issued by
+        the platform: tickets a partner issues itself are imported and validated (BO-181), not this.'
     AccessDynamicPolicyEffectiveness:
       type: object
       x-ticvai-persistence: none — computed from access.scan_event (dynamicPolicyId, dynamicPolicyResult and override
@@ -19076,6 +19234,15 @@ components:
             - guestService
             - other
           description: Reason vocabulary for a method change after lock
+        credentialFormatOverride:
+          allOf:
+          - $ref: '#/components/schemas/TicketCredentialFormat'
+          nullable: true
+          description: '**The per-product override of MOM-0330** (MoM 2 Sep 2026 §4.7; CHG-R6-031): a product whose
+            tickets must not carry dynamic QR (a VIP invitation, a B2B or reseller ticket type) sets `staticQr` or
+            `rfidCard`, even inside a fully dynamic event. Null: the product takes its sales channel''s
+            `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform''s signed QR.
+            Wins over the channel when `issueOrderEntitlements` resolves the format.'
         scopePath:
           type: string
           description: ltree of the owning scope node
@@ -24407,6 +24574,14 @@ components:
             without reissuing**, because a guest whose wristband broke should not need a new ticket.
 
             '
+        credentialFormat:
+          allOf:
+          - $ref: '#/components/schemas/TicketCredentialFormat'
+          nullable: true
+          description: 'The credential this entitlement was issued with, resolved once at issue by
+            `issueOrderEntitlements`: the product''s `credentialFormatOverride`, else the sales channel''s
+            `ticketCredentialFormat`, else `platformSignedQr` (MOM-0330; CHG-R6-031). Null on an entitlement issued
+            before 12 October 2026, which is `platformSignedQr`.'
         status:
           $ref: ../spine/orders.yaml#/components/schemas/EntitlementStatus
         statusNote:
@@ -25463,6 +25638,13 @@ components:
       type: string
       description: 'Enumerated so the client can render an appropriate operator prompt. A gate operator
         facing a queue needs a reason and a next action, not a boolean.
+
+
+        **`capacityReached` is "Venue full"** (12 October 2026, CHG-R6-036): an entry-direction scan is denied
+        when the current count of the access point''s area, or of any area above it up to the venue (entries
+        minus exits plus `operationalAdjustment`), is at or above that area''s `capacity`, set with
+        `setAccessAreaCapacity`. An area whose capacity is null never denies for capacity; an exit is never
+        denied for it.
 
         '
       enum:

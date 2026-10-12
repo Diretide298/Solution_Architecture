@@ -49,6 +49,8 @@ consumers:
   purpose: Record the marketing opt-ins ticked at checkout as consent records, bound to the order and the verified
     contact, attached to the profile on match (18 September minutes M18-15, added 30 September)
   operation: marketing-crm.recordCheckoutConsents
+  writes:
+  - marketing.consent_record
   idempotencyKey: orderId + channel + purpose
   onFailure: retryThenDeadLetter
   isCritical: true

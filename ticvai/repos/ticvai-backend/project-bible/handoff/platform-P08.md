@@ -4,17 +4,17 @@
 
 | | |
 |---|---|
-| Screens | 1661 |
-| Operations | 1881 |
+| Screens | 1663 |
+| Operations | 1889 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 189 |
-| Waves | wave1 140 · wave2 58 · wave3 1463 |
+| Operations with no screen | 186 |
+| Waves | wave1 141 · wave2 58 · wave3 1464 |
 
 ## Gaps
 
-### 189 operations with no screen here
+### 186 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -58,9 +58,9 @@
 | `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
-| … | | | 149 more |
+| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
+| … | | | 146 more |
 
 ### 14 modules split across waves
 
@@ -90,11 +90,11 @@
 | Rentals | 199 | 1, 3 |
 | Orders & Money | 157 | 1, 2, 3 |
 | Engagement & Support | 120 | 1, 3 |
-| Sell | 111 | 1, 2, 3 |
+| Sell | 112 | 1, 2, 3 |
 | Games & Rides | 98 | 1, 3 |
 | Platform | 79 | 1, 3 |
 | Venue Operations | 45 | 1, 2, 3 |
-| Setup & Go-Live | 21 | 3 |
+| Setup & Go-Live | 22 | 3 |
 | Catalogue | 20 | 3 |
 | Stock & Supply | 16 | 1, 2 |
 | People & Access Rights | 12 | 1, 2, 3 |
@@ -408,7 +408,7 @@
 | `ADM-337` | Routing Simulator & Conflict Detection | Platform | 3 | 2 | yes |
 | `ADM-338` | AI Routing Advisor & Matrix Optimization | Platform | 3 | 1 | yes |
 | `ADM-339` | Governance & Compliance Command Center | Platform | 3 | 2 | yes |
-| `ADM-340` | Segregation of Duties Policy Manager | Platform | 3 | 1 | yes |
+| `ADM-340` | Segregation of Duties Policy Manager | Platform | 1 | 2 | yes |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | Platform | 3 | 2 | yes |
 | `ADM-342` | Authentication & MFA Policy Manager | Platform | 1 | 7 | yes |
 | `ADM-343` | Sensitive Action Confirmation | Platform | 3 | 2 | yes |
@@ -598,7 +598,7 @@
 | `BO-020` | F&B Order Management | Food & Beverage | 1 | 9 | yes |
 | `BO-021` | Order Search | Food & Beverage | 1 | 3 | yes |
 | `BO-022` | Order Detail | Orders & Money | 1 | 19 | yes |
-| `BO-023` | Refunds & Exchanges | Orders & Money | 1 | 16 | yes |
+| `BO-023` | Refunds & Exchanges | Orders & Money | 1 | 17 | yes |
 | `BO-024` | Payment Exceptions | Orders & Money | 1 | 6 | yes |
 | `BO-025` | Chargebacks & Disputes | Orders & Money | 2 | 10 | yes |
 | `BO-026` | Group Bookings | Orders & Money | 2 | 17 | yes |
@@ -886,6 +886,8 @@
 | `BO-1189` | Transport Network Import | Transport | 1 | 5 | yes |
 | `BO-119` | Cross-Sell, Upsell & Recommendation Rules | Sell | 2 | 4 | yes |
 | `BO-1190` | Donation Campaigns | Sell | 2 | 3 | yes |
+| `BO-1191` | Organisation | Setup & Go-Live | 3 | 4 | yes |
+| `BO-1192` | Entitlement Templates | Sell | 3 | 7 | yes |
 | `BO-120` | Omnichannel Commerce & Journey Configuration | Sell | 2 | 2 | yes |
 | `BO-121` | Personalized Offers & Guest Engagement | Sell | 2 | 2 | yes |
 | `BO-122` | POS Experience Dashboard | Sell | 2 | 1 | yes |
@@ -910,7 +912,7 @@
 | `BO-142` | Store Rules, Controls & Permissions | Sell | 2 | 2 | yes |
 | `BO-143` | Retail Global Settings & Controls | Sell | 2 | 4 | yes |
 | `BO-144` | Access Control Command Center | Access & Venue | 3 | 1 | yes |
-| `BO-145` | Venue & Park Access Structure | Access & Venue | 3 | 4 | yes |
+| `BO-145` | Venue & Park Access Structure | Access & Venue | 3 | 5 | yes |
 | `BO-146` | Access Area & Zone Builder | Access & Venue | 3 | 1 | yes |
 | `BO-147` | Attraction Access Configuration | Access & Venue | 3 | 2 | yes |
 | `BO-148` | Access Point Directory | Access & Venue | 3 | 3 | yes |
@@ -1716,9 +1718,9 @@
 | `BO-951` | Resource Integration & System Health Center | Rentals | 3 | 1 | yes |
 | `BO-952` | Executive Resource Intelligence & AI Improvement Center | Rentals | 3 | 1 | yes |
 | `BO-953` | Seat Map Command Center | Access & Venue | 3 | 2 | yes |
-| `BO-954` | Venue Canvas | Access & Venue | 3 | 3 | yes |
+| `BO-954` | Venue Canvas | Access & Venue | 3 | 4 | yes |
 | `BO-955` | Sections & Zones | Access & Venue | 3 | 5 | yes |
-| `BO-956` | Rows & Seats | Access & Venue | 3 | 2 | yes |
+| `BO-956` | Rows & Seats | Access & Venue | 3 | 3 | yes |
 | `BO-957` | Standing Zones | Access & Venue | 3 | 2 | yes |
 | `BO-958` | Suites & Boxes | Access & Venue | 3 | 2 | yes |
 | `BO-959` | Stage & Focal Point | Access & Venue | 3 | 3 | yes |

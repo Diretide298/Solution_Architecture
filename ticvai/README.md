@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**2790 operations · 1129 tables · 2451 screens · 207 state models · 77 events · 98 flows · 70 ADRs**
+**2796 operations · 1129 tables · 2453 screens · 207 state models · 87 events · 98 flows · 70 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -17,7 +17,7 @@ provenance and what each one rules out — including the six that were wrong fir
 |---|---|
 | **`COVERAGE.md`** | What is here and what is not, against the whole build |
 | **`conflict-status.md`** | Every conflict and its state, one line each |
-| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 218 boards, 2451 screens. Open in a browser |
+| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 218 boards, 2453 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
 | **`handoff/TICVAI_Schema_Reference.xlsx`** | 1129 tables, 3,911 columns, nine sheets |
@@ -28,10 +28,10 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **2790 operations** across 25 files — 267 spine, 470 satellite |
+| `contracts/` | **2796 operations** across 25 files — 267 spine, 470 satellite |
 | `screens/` | 364 definitions across 16 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
-| `states/` · `events/` | 207 state models · 77 events, cross-checked |
+| `states/` · `events/` | 207 state models · 87 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | 144 registers738 indexes and workbooks — the derived layer |
 | `docs/` | Architecture, 70 ADRs, the conflict register |
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **2790 operations, 1129 tables and 2451 screens are specified and none of it
+A design package. **2796 operations, 1129 tables and 2453 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

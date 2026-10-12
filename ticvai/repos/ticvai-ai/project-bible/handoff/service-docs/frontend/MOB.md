@@ -30,9 +30,9 @@
 | [GST-004](#gst-004-item-detail) | Item Detail | Discovery & Browse | 1 | 7 |
 | [GST-005](#gst-005-what-s-on) | What's On | Discovery & Browse | 1 | 2 |
 | [GST-006](#gst-006-item-detail-event-exhibition) | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 |
-| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 9 |
+| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 11 |
 | [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 6 |
-| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
+| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 8 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 5 |
 | [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 1 | 8 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
@@ -486,6 +486,7 @@
 | eventId | deepLink |
 | cartId | session |
 | venueId | session |
+| entryId | navigation |
 
 **Operations**
 
@@ -499,6 +500,8 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen time to the cart (the lease is taken server-side) | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
+| `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join the waitlist of a sold-out time (CHG-R6-037) | `None` |
+| `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Leave it (CHG-R6-037) | `None` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
@@ -609,7 +612,6 @@
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask the provider what actually happened | `ORDER_CREATE` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
-| `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Turn the checked-out cart into an order | `ORDER_CREATE` |
 | `getPaymentLink` | [OrderService](../backend/OrderService.md#getpaymentlink) | onLoad | Open a payment link sent to this guest | `ORDER_VIEW` |
 | `payByLink` | [OrderService](../backend/OrderService.md#paybylink) | onAction | Pay a booking somebody else made | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
@@ -2038,7 +2040,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | A consent toggle changed: recorded at once with source guestApp and the notice version | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | A consent toggle changed: recorded at once with source guestApp and the notice version | `GUEST_MANAGE` |
 | `updateMyProfile` | [MarketingService](../backend/MarketingService.md#updatemyprofile) | onAction | Change name, contact and preferences | `GUEST_VIEW` |
 | `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | The guest's own details, read by session | `GUEST_VIEW` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent position the toggles change | `GUEST_VIEW` |
@@ -3134,7 +3136,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `GUEST_MANAGE` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | Configured consent purposes | `GUEST_VIEW` |
 | `getMarketingSubscription` | [MarketingService](../backend/MarketingService.md#getmarketingsubscription) | onLoad | What this guest has opted into | `MARKETING_VIEW` |
 | `setMarketingSubscription` | [MarketingService](../backend/MarketingService.md#setmarketingsubscription) | onAction | Change it | `MARKETING_VIEW` |
@@ -3187,7 +3189,7 @@
 | `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each SDK and tracker the app uses | `None` |
 | `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My tracking decisions so far | `None` |
 | `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw tracking preferences | `None` |
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Withdraw or give a consent from the privacy page: withdrawal as easy as granting | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Withdraw or give a consent from the privacy page: withdrawal as easy as granting | `GUEST_MANAGE` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 
 **States**

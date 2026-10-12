@@ -26,6 +26,11 @@ payload:
   notes: How many people this reaches — sizes the refund run before it starts
 - field: cancelledAt
   type: timestamp
+- field: guestMessage
+  type: object
+  required: false
+  notes: Optional (12 October 2026, CHG-R6-038). The message staff wrote in cancelPerformance's dialog, by language
+    code; what marketing.notifyPerformanceHolders sends, else reason
 consumers:
 - context: orders
   purpose: Refund every holder (F09). **The critical consumer** — a cancellation that does not refund
@@ -44,8 +49,10 @@ consumers:
   onFailure: retry
   isCritical: false
 - context: marketing
-  purpose: Tell the guests, once, in their own language
-  idempotencyKey: performanceId
+  purpose: Tell the guests, once, in their own language (one transactional message per holder, sourceRef the
+    performance; CHG-R6-038)
+  operation: marketing-crm.notifyPerformanceHolders
+  idempotencyKey: performanceId + subjectId
   onFailure: retry
   isCritical: false
 - context: reporting

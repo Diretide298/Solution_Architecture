@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 85 |
+| Operations with no screen | 83 |
 | Waves | wave1 4 · wave3 24 |
 
 ## Gaps
 
-### 85 operations with no screen here
+### 83 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -47,7 +47,6 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
@@ -60,7 +59,8 @@
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
 | `getWaiverTesting` | marketing-crm | GET | Checklist, rule simulation and approval record of a waiver version |
 | `issueReward` | marketing-crm | POST | Issue a reward to a guest |
-| … | | | 45 more |
+| `listGuestExtraFields` | marketing-crm | GET | Venue-defined guest fields and their options |
+| … | | | 43 more |
 
 ### 2 modules split across waves
 

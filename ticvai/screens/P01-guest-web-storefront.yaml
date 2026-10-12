@@ -1517,9 +1517,9 @@ screens:
       - kind: secondaryButton
         label: Join the waitlist
         operation: joinWaitlist
-        notes: '**Only on a sold-out time** (`getAvailability` `remaining` 0; sold, held and leased units at
-          capacity, audit R101); never on a time with places left, which `joinWaitlist` refuses `409`. Collects
-          the party size and how to be told; joining reserves nothing, and an offer from BO-017
+        notes: '**Only on a sold-out time** (`getAvailability` `remaining` 0; sold, held and leased units
+          at capacity, audit R101); never on a time with places left, which `joinWaitlist` refuses `409`.
+          Collects the party size and how to be told; joining reserves nothing, and an offer from BO-017
           (`offerWaitlistCapacity`) brings the guest back here to buy. The approved guest build''s sold-out
           "Join the waitlist" (holds a returned place for 15 minutes) lands here, not on the status page
           (CHG-SGU-022; 12 October 2026, CHG-R6-037).'
@@ -1693,6 +1693,10 @@ screens:
       from: WEB-004
     - name: venueId
       from: session
+    - name: entryId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `joinWaitlist`.'
     preloaded:
     - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
       getPublishedTenantConfig (WEB-001, GST-001, KSK-002)

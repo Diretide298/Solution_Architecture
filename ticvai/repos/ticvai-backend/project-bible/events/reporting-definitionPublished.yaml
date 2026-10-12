@@ -7,6 +7,8 @@ publisher: reporting
 description: A report definition is available to run.
 aggregate: reportDefinition
 emittedWhen: Definition created or amended
+emittedBy:
+- saveNaturalLanguageQuery
 payload:
 - field: definitionId
   type: uuid
@@ -23,7 +25,11 @@ payload:
   type: timestamp
 consumers:
 - context: ai
-  purpose: Index so a report can be found by what it answers
+  purpose: Index so a report can be found by what it answers, and, for a definition saved from a
+    natural-language answer (saveNaturalLanguageQuery), mark that answer's ai.activity row as saved. Reporting
+    runs in operations and the ai schema is the AI's (ADR-0020; ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+  writes:
+  - ai.activity
   idempotencyKey: definitionId + publishedAt
   onFailure: retry
   isCritical: false

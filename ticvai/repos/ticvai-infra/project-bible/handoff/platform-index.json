@@ -5,11 +5,11 @@
   "operator": "guest",
   "counts": {
    "screens": 50,
-   "operations": 213,
+   "operations": 215,
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 16
+   "operationsWithNoScreen": 14
   },
   "waves": {
    "wave1": 50
@@ -21,11 +21,11 @@
   "operator": "guest",
   "counts": {
    "screens": 77,
-   "operations": 218,
+   "operations": 219,
    "contracts": 19,
    "modules": 17,
    "undrawn": 0,
-   "operationsWithNoScreen": 16
+   "operationsWithNoScreen": 14
   },
   "waves": {
    "wave1": 77
@@ -41,7 +41,7 @@
    "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 153
+   "operationsWithNoScreen": 150
   },
   "waves": {
    "wave1": 32
@@ -57,7 +57,7 @@
    "contracts": 7,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 11
+   "operationsWithNoScreen": 9
   },
   "waves": {
    "wave1": 2,
@@ -74,7 +74,7 @@
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 139
+   "operationsWithNoScreen": 136
   },
   "waves": {
    "wave1": 30,
@@ -92,7 +92,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 43
+   "operationsWithNoScreen": 42
   },
   "waves": {
    "wave1": 11
@@ -103,17 +103,17 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 1661,
-   "operations": 1881,
+   "screens": 1663,
+   "operations": 1889,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,
-   "operationsWithNoScreen": 189
+   "operationsWithNoScreen": 186
   },
   "waves": {
-   "wave1": 140,
+   "wave1": 141,
    "wave2": 58,
-   "wave3": 1463
+   "wave3": 1464
   }
  },
  "P09": {
@@ -126,7 +126,7 @@
    "contracts": 15,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 104
+   "operationsWithNoScreen": 102
   },
   "waves": {
    "wave1": 28,
@@ -178,7 +178,7 @@
    "contracts": 8,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 85
+   "operationsWithNoScreen": 83
   },
   "waves": {
    "wave1": 4,
@@ -195,7 +195,7 @@
    "contracts": 8,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 98
+   "operationsWithNoScreen": 95
   },
   "waves": {
    "wave1": 26,
@@ -246,7 +246,7 @@
    "contracts": 10,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 118
+   "operationsWithNoScreen": 115
   },
   "waves": {
    "wave1": 4,

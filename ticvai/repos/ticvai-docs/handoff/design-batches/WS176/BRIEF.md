@@ -158,8 +158,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1061` | Platform Command Center | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1062` | Tenant & Brand Context | A | 82 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1063` | Venue-Specific Configuration | B | 85 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
+| `BO-1062` | Tenant & Brand Context | A | 84 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1063` | Venue-Specific Configuration | B | 86 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
 | `BO-1064` | Naming, Numbering & Localization | C | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1065` | Currency, Timezone & Channels | A | 47 | 17 | 6 | 0 | 0 | 4 | — | notStarted (—) |
 | `BO-1066` | Roles, Permissions & Masking | B | 92 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |

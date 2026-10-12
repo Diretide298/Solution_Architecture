@@ -2022,7 +2022,7 @@
 | `identifyGuest` | [MarketingService](../backend/MarketingService.md#identifyguest) | onAction | Attach that guest to the sale | `GUEST_VIEW` |
 | `getGuestLoyalty` | [MarketingService](../backend/MarketingService.md#getguestloyalty) | onAction | The identified guest's points and tier | `GUEST_VIEW` |
 | `topUpWallet` | [WalletService](../backend/WalletService.md#topupwallet) | onAction | Top up the guest's wallet (AED 50 to 1 | `WALLET_OPERATE` |
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record the consent the guest gives in person at the till, recorded by the agent (GUEST_MANAGE; CHG-CSA-045) | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record the consent the guest gives in person at the till, recorded by the agent (GUEST_MANAGE; CHG-CSA-045) | `GUEST_MANAGE` |
 
 **States**
 

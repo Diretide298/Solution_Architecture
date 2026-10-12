@@ -421,7 +421,7 @@ writesOutside:
     - inventory.movement
   - operation: reserveMerchandise
     tables:
-    - inventory.stock_reservation
+    - inventory.stock_earmark
 screens:
 - P01:WEB-033 Shop
 - P01:WEB-042 Retail & Shop and Drop

@@ -369,6 +369,7 @@
     "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
+    "x-ticvai-column": "payment_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "changeAmount": {
@@ -527,6 +528,7 @@
     "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
+    "x-ticvai-column": "refunded_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "appliedPercentage": {

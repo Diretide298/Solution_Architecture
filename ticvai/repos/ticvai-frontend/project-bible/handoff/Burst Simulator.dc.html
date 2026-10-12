@@ -2073,10 +2073,10 @@ class Component extends DCLogic {
           tip: 'What is not settled is the artefacts. ADR-0038 decides the shape and implements none of it: no CREATE DATABASE, no PARTITION BY venue_id that ADR-0005 has been owed since 12 August, and control moves out of the tenant template into its own home under ADR-0039 — 25 schemas, not 26. This board draws the decision; the DDL still draws the old one.',
         },
         {
-          name: 'seating.seat_hold modelled as one row a performance',
+          name: 'seating.seat_reservation modelled as one row a performance',
           ref: 'the package calls it “a temporary claim on a seat”',
           colour: 'var(--amber)',
-          note: `Both contended rows are modelled as a single serialisation point, which is right for catalogue.inventory_hold — a claim on a performance's stock. It is probably wrong for seat_hold: a claim on a seat means one row per seat, and ${fmt(sum.seats)} seats is ${fmt(sum.seats)} independent locks, at which point the contention disappears structurally. If it really is per performance that is a data-model defect rather than a capacity problem.`,
+          note: `Both contended rows are modelled as a single serialisation point, which is right for catalogue.inventory_reservation — a claim on a performance's stock. It is probably wrong for seat_hold: a claim on a seat means one row per seat, and ${fmt(sum.seats)} seats is ${fmt(sum.seats)} independent locks, at which point the contention disappears structurally. If it really is per performance that is a data-model defect rather than a capacity problem.`,
           tip: 'burst-scope.json marks seat_hold contended, so the model follows it rather than overruling the package on a guess — but the table note describes a per-seat claim, and the two cannot both be true. Worth resolving before the lease ceiling is quoted, because it changes which of the two rows is actually the wall.',
         },
         {

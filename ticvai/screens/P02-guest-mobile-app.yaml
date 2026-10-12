@@ -1907,9 +1907,9 @@ screens:
       - kind: secondaryButton
         label: Join the waitlist
         operation: joinWaitlist
-        notes: '**Only on a sold-out time** (`getAvailability` `remaining` 0; sold, held and leased units at
-          capacity, audit R101); never on a time with places left, which `joinWaitlist` refuses `409`. Collects
-          the party size and how to be told; joining reserves nothing, and an offer from BO-017
+        notes: '**Only on a sold-out time** (`getAvailability` `remaining` 0; sold, held and leased units
+          at capacity, audit R101); never on a time with places left, which `joinWaitlist` refuses `409`.
+          Collects the party size and how to be told; joining reserves nothing, and an offer from BO-017
           (`offerWaitlistCapacity`) brings the guest back here to buy. The approved guest build''s sold-out
           "Join the waitlist" (holds a returned place for 15 minutes) lands here, not on the status page
           (CHG-SGU-022; 12 October 2026, CHG-R6-037).'
@@ -1991,6 +1991,10 @@ screens:
       from: session
     - name: venueId
       from: session
+    - name: entryId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `joinWaitlist`.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -2486,8 +2490,8 @@ screens:
       - kind: banner
         label: Order
         operation: checkoutCart
-        notes: The order number once `checkoutCart` has answered, shown above the payment. `checkoutCart` is the
-          one way a guest order is created (Chinmay, 12 October 2026, CHG-R6-045).
+        notes: The order number once `checkoutCart` has answered, shown above the payment. `checkoutCart`
+          is the one way a guest order is created (Chinmay, 12 October 2026, CHG-R6-045).
         provenance: decided by Chinmay, 12 October 2026 (CHG-R6-045); was createOrder (GFIX-3)
       - kind: banner
         label: Checking your payment
@@ -2507,8 +2511,8 @@ screens:
         label: Pay
         operation: createPayment
         notes: 'One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick and the opt-in), which
-          creates the order, and takes the payment (`createPayment`). The provider token comes
-          from the gateway, never a form.'
+          creates the order, and takes the payment (`createPayment`). The provider token comes from the
+          gateway, never a form.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
     loading: The review payment, read by `getCart`.
@@ -2606,9 +2610,10 @@ screens:
   gaps:
   - operation: createOrder
     removed: true
-    why: '`checkoutCart` turns the cart into the order (contracts/spine/orders.yaml), so `createOrder` made a second
-      one; it is the till''s and the partner''s way to enter an order, never a guest''s. The web twin (WEB-011,
-      WEB-012) never called it, and flows F01, F02 and F50 use `checkoutCart` and `createPayment` only.'
+    why: '`checkoutCart` turns the cart into the order (contracts/spine/orders.yaml), so `createOrder`
+      made a second one; it is the till''s and the partner''s way to enter an order, never a guest''s.
+      The web twin (WEB-011, WEB-012) never called it, and flows F01, F02 and F50 use `checkoutCart` and
+      `createPayment` only.'
     source: decided by Chinmay, 12 October 2026 (CHG-R6-045)
   - operation: transferOrderTickets
     removed: true

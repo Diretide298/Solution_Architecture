@@ -804,6 +804,7 @@
     "format": "uuid"
    },
    "amount": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "taxCodeId": {

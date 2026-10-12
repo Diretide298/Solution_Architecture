@@ -522,7 +522,8 @@
     "$ref": "#/components/schemas/CashMovementKind"
    },
    "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "movement_amount"
    },
    "denominations": {
     "$ref": "#/components/schemas/DenominationCount",
@@ -674,6 +675,8 @@
     "$ref": "#/components/schemas/BookedWindow"
    },
    "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
     "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
@@ -688,6 +691,7 @@
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1337,6 +1341,7 @@
     }
    },
    "withdrawnTotal": {
+    "x-ticvai-column": "withdrawn_amount",
     "allOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1380,7 +1385,8 @@
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "variance": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "x-ticvai-column": "variance_amount"
       },
       "baseEquivalent": {
        "allOf": [
@@ -1394,13 +1400,16 @@
     }
    },
    "expectedTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "expected_amount"
    },
    "countedTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "counted_amount"
    },
    "variance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "variance_amount"
    },
    "closedByPrincipalId": {
     "type": "string",
@@ -1559,6 +1568,7 @@
     "readOnly": true
    },
    "creditMemoNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
@@ -1958,6 +1968,7 @@
     "readOnly": true
    },
    "invoiceNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
@@ -2214,6 +2225,7 @@
     "type": "number"
    },
    "unitPrice": {
+    "x-ticvai-column": "unit_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "discountAmount": {
@@ -2645,6 +2657,125 @@
    }
   }
  },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MessageDispatch": {
+  "x-ticvai-append-only": "queuedAt",
+  "x-ticvai-persistence": "marketing.message_dispatch",
+  "type": "object",
+  "required": [
+   "id",
+   "subjectId",
+   "channel",
+   "status",
+   "queuedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "messageTriggerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"
+   },
+   "campaignVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "marketing.campaign_variant",
+    "description": "The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content campaign or a triggered message."
+   },
+   "plannedSendAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent at the scheduled time."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "sent",
+     "delivered",
+     "opened",
+     "clicked",
+     "bounced",
+     "failed",
+     "suppressed"
+    ]
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "queuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isTest": {
+    "type": "boolean",
+    "default": false,
+    "description": "A `testSendCampaign` message. Excluded from `CampaignPerformance` and `Campaign.sentCount`."
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "From the provider's engagement events. `CampaignPerformance.opened` counts these."
+   },
+   "clickedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "complainedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "unsubscribedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "ModifyOrderRequest": {
   "type": "object",
   "required": [
@@ -2928,6 +3059,7 @@
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
@@ -2939,6 +3071,13 @@
      }
     ],
     "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "channelProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The named sales channel the order came through** (catalogue `SalesChannelProfile.id`), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. Null for the venue's own channels (POS, kiosk, web, app). Carried on `order.paid` so ticket issuing (`issueOrderEntitlements`) reads the channel's `ticketCredentialFormat` (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026, CHG-R6-031)."
    },
    "venueId": {
     "type": "string",
@@ -3695,6 +3834,7 @@
     "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
+    "x-ticvai-column": "payment_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "changeAmount": {
@@ -3920,6 +4060,7 @@
     "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
+    "x-ticvai-column": "refunded_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "appliedPercentage": {
@@ -4495,7 +4636,7 @@
    "dateFrom": {
     "type": "string",
     "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "dateTo": {
     "type": "string",
@@ -4891,6 +5032,12 @@
    "openedAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "businessDate": {
+    "type": "string",
+    "format": "date",
+    "readOnly": true,
+    "description": "**The business day the shift belongs to** (12 October 2026, CHG-R6-032): the venue-local date of `openedAt` taken against the venue's `businessDayCutoff` (tenancy `VenueSettings`, inheriting the tenant default, default 00:00). Set once when the shift opens and never moved, so a shift opened at 23:00 and closed at 01:00 stays on the day it opened. The daily reconciliation (BO-043) lists the shifts of one business date, and the period close's `noOpenShifts` check reads it (finance).\n"
    },
    "recordedAt": {
     "type": "string",
@@ -5425,6 +5572,7 @@
     "description": "**Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout, `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.\n"
    },
    "cashDrawerLimit": {
+    "x-ticvai-column": "deposit_box_limit_amount",
     "oneOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"

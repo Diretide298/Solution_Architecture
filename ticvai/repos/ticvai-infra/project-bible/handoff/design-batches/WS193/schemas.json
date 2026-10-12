@@ -708,6 +708,7 @@
     }
    },
    "amount": {
+    "x-ticvai-column": "disputed_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "description": {
@@ -838,7 +839,7 @@
  },
  "WalletRiskRules": {
   "type": "object",
-  "x-ticvai-persistence": "wallet.risk_rules + wallet.risk_rule",
+  "x-ticvai-persistence": "wallet.risk_rule_set + wallet.risk_rule",
   "description": "Boards 8.2 to 8.7. **A risk rule with no action is a report.**",
   "properties": {
    "rules": {

@@ -1,9 +1,9 @@
 {
  "generatedBy": "tools/list-undrawn.py",
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "basedOn": {
-  "boardIndex": "2026-10-07",
-  "packageScreens": 2451
+  "boardIndex": "2026-10-13",
+  "packageScreens": 2453
  },
  "note": "Screens with no `clientPack` or `claudeDesign` frame. **Wave is the schedule** \u2014 the Wave 1 and 2 rows are the tranche worth starting; Wave 3 is most of the total and none of the urgency.",
  "counts": {
@@ -88,8 +88,8 @@
    "surface": "staffFacing",
    "runtime": "reactWeb",
    "offlineCapable": false,
-   "screens": 1661,
-   "drawn": 1661,
+   "screens": 1663,
+   "drawn": 1663,
    "undrawn": 0,
    "undrawnByWave": {}
   },

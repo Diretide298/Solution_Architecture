@@ -175,6 +175,14 @@
  },
  "Seat": {
   "x-ticvai-persistence": "seating.seat",
+  "x-ticvai-unique-together": [
+   [
+    "seat_map_id",
+    "sectionCode",
+    "rowLabel",
+    "seatNumber"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -470,7 +478,8 @@
     "format": "uuid"
    },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "type": "string"
@@ -540,7 +549,7 @@
   }
  },
  "SeatHold": {
-  "x-ticvai-persistence": "seating.seat_hold",
+  "x-ticvai-persistence": "seating.seat_reservation",
   "type": "object",
   "required": [
    "id",
@@ -762,6 +771,12 @@
  },
  "SeatPriceBand": {
   "x-ticvai-persistence": "seating.seat_price_band",
+  "x-ticvai-unique-together": [
+   [
+    "seatCategoryId",
+    "code"
+   ]
+  ],
   "type": "object",
   "description": "One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n",
   "required": [
@@ -796,6 +811,7 @@
     "pattern": "^#[0-9A-Fa-f]{6}$"
    },
    "amount": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "channel": {

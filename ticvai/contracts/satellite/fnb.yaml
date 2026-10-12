@@ -3184,11 +3184,11 @@ paths:
         format: uuid
     post:
       operationId: compItem
+      x-ticvai-consumed-by:
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-write-via:
       - table: orders.order_line
         operation: applyManualDiscount
-      x-ticvai-consumed-by:
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Take a line off the bill, with a reason and a name
       description: 'Board 4. **A comp is not a discount.** A discount is a price decision; a comp is a
         service recovery, it comes out of a different budget, and **a venue that cannot tell them apart

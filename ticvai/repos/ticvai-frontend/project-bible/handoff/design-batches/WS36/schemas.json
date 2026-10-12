@@ -411,7 +411,7 @@
  "FeeApplicabilityChargingRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Fee Applicability & Charging Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "product": {
@@ -1100,6 +1100,7 @@
     "description": "SHA-256 of the document as sent, so a resend can be shown to be the same document."
    },
    "providerMessageId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "nullable": true
    },
@@ -1190,6 +1191,7 @@
     "description": "A reference to the secret in the vault; the secret is never stored here."
    },
    "participantId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "maxLength": 100,
     "nullable": true,

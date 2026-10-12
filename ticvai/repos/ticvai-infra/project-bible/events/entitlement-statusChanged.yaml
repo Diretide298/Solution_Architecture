@@ -7,6 +7,10 @@ publisher: catalogue
 description: An entitlement was frozen, suspended, reinstated or had its validity moved by a renewal.
 aggregate: entitlement
 emittedWhen: freezeEntitlement, suspendEntitlement or reinstateEntitlement succeeds, or a membership renewal (orders renewMembership) extends the entitlement's validity
+emittedBy:
+- freezeEntitlement
+- suspendEntitlement
+- reinstateEntitlement
 payload:
 - field: entitlementId
   type: uuid
@@ -41,7 +45,11 @@ consumers:
   onFailure: retryThenDeadLetter
   isCritical: false
 - context: access
-  purpose: Refresh the offline validation bundle, so a frozen or suspended pass stops admitting at a gate without a network
+  purpose: Set the frozen or suspended flag and the validity on access.entitlement, which Access owns, and refresh
+    the offline validation bundle, so a frozen or suspended pass stops admitting at a gate without a network.
+    Catalogue runs in commerce and cannot write the access schema (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+  writes:
+  - access.entitlement
   idempotencyKey: entitlementId + changedAt
   onFailure: retryThenDeadLetter
   isCritical: true

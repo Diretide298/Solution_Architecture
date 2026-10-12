@@ -644,7 +644,7 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `ledger.credit_memo`, `ledger.credit_memo_line`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `orders.refund` |
-| Writes | `cache:idempotency`, `control.invoice_line`, `ledger.credit_memo`, `ledger.credit_memo_line`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `platform.audit_record`, `platform.outbox` |
+| Writes | `cache:idempotency`, `ledger.credit_memo`, `ledger.credit_memo_line`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `platform.audit_record`, `platform.outbox` |
 | Called by | BO-022, BO-023, POS-011 |
 
 **Parameters**
@@ -1583,7 +1583,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | order_line_id | uuid | no |  |
 | description | text | yes |  |
 | quantity | numeric | yes |  |
-| unit_price | numeric(18,4) | no |  |
+| unit_amount | numeric(18,4) | no |  |
 | discount_amount | numeric(18,4) | no |  |
 | net_amount | numeric(18,4) | yes |  |
 | tax_code_id | uuid | no |  |

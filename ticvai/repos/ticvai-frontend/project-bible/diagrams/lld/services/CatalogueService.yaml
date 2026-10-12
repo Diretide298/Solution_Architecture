@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 447 operations, 138 tables
+title: CatalogueService — 451 operations, 138 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -16,9 +16,9 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 447
+  operations: 451
   inAFlow: 240
-  percent: 54%
+  percent: 53%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -44,7 +44,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 249
+  count: 252
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -78,6 +78,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: archiveEntitlementTemplate
+    verb: POST
+    path: /entitlement-templates/{templateId}/archive
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: assessProductChange
     verb: POST
     path: /products/{productId}/change-impact
@@ -149,7 +157,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: commitCatalogueImport
     verb: POST
     path: /products/import/{jobId}/commit
@@ -301,7 +309,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 2
+    writes: 3
   - operation: getAvailability
     verb: GET
     path: /availability
@@ -333,6 +341,14 @@ operationsByContract:
     permission: PRICE_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getEntitlementTemplate
+    verb: GET
+    path: /entitlement-templates/{templateId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getEvent
     verb: GET
@@ -1381,7 +1397,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 2
+    writes: 3
   - operation: relinquishChannelAllocation
     verb: POST
     path: /channel-capacities/{channelCapacityId}/channel-allocations/release
@@ -1941,7 +1957,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: testChannelConnection
     verb: POST
     path: /channel-connections/{connectionId}/test
@@ -1998,6 +2014,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: updateEntitlementTemplate
+    verb: PATCH
+    path: /entitlement-templates/{templateId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updateEvent
     verb: PATCH
     path: /events/{eventId}
@@ -3186,7 +3210,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: seating
-  count: 55
+  count: 56
   operations:
   - operation: allocateBlockedSeats
     verb: POST
@@ -3300,6 +3324,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: editSeatMapStructure
+    verb: PATCH
+    path: /seat-maps/{seatMapId}/structure
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 4
   - operation: extendSeatHold
     verb: POST
     path: /seat-holds/{holdId}/extend
@@ -3688,6 +3720,7 @@ tables:
   - decidePricingChangeRequest
   - decidePricingRecommendation
   - deleteUpsellRule
+  - editSeatMapStructure
   - endPromotion
   - evaluatePromotions
   - extendSeatHold
@@ -3838,6 +3871,7 @@ tables:
   - decidePricingChangeRequest
   - decidePricingRecommendation
   - deleteUpsellRule
+  - editSeatMapStructure
   - endPromotion
   - evaluatePromotions
   - extendSeatHold
@@ -4041,13 +4075,6 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
-- table: catalogue.channel_allocation
-  columns: 19
-  store: postgres
-  parent: null
-  writtenBy:
-  - catalogue
-  foreignWriters: null
 - table: catalogue.channel_capacity
   columns: 12
   store: postgres
@@ -4061,6 +4088,13 @@ tables:
   - payments
 - table: catalogue.channel_connection
   columns: 23
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.channel_envelope
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -4219,7 +4253,7 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
-- table: catalogue.inventory_hold
+- table: catalogue.inventory_reservation
   columns: 18
   store: postgres
   parent: null
@@ -4308,10 +4342,8 @@ tables:
   parent: null
   writtenBy:
   - catalogue
-  - fnb
   - inventory
   foreignWriters:
-  - fnb
   - inventory
 - table: catalogue.price_assignment
   columns: 26
@@ -4456,9 +4488,9 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product_media
-  columns: 6
+  columns: 7
   store: postgres
-  parent: maintenance.asset
+  parent: catalogue.product
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -4468,9 +4500,7 @@ tables:
   parent: catalogue.product
   writtenBy:
   - catalogue
-  - fnb
-  foreignWriters:
-  - fnb
+  foreignWriters: null
 - table: catalogue.published_bundle
   columns: 10
   store: postgres
@@ -4499,7 +4529,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.sales_channel
-  columns: 45
+  columns: 46
   store: postgres
   parent: null
   writtenBy:
@@ -4853,7 +4883,7 @@ tables:
   writtenBy:
   - seating
   foreignWriters: null
-- table: seating.recommendation_rules
+- table: seating.recommendation_rule
   columns: 6
   store: postgres
   parent: seating.seat_map
@@ -4887,22 +4917,6 @@ tables:
   writtenBy:
   - seating
   foreignWriters: null
-- table: seating.seat_hold
-  columns: 12
-  store: postgres
-  parent: null
-  writtenBy:
-  - catalogue
-  - seating
-  foreignWriters: null
-- table: seating.seat_hold_item
-  columns: 5
-  store: postgres
-  parent: seating.seat_hold
-  writtenBy:
-  - catalogue
-  - seating
-  foreignWriters: null
 - table: seating.seat_map
   columns: 12
   store: postgres
@@ -4922,6 +4936,22 @@ tables:
   store: postgres
   parent: null
   writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_reservation
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  - seating
+  foreignWriters: null
+- table: seating.seat_reservation_item
+  columns: 5
+  store: postgres
+  parent: seating.seat
+  writtenBy:
+  - catalogue
   - seating
   foreignWriters: null
 - table: seating.seat_rules
@@ -4978,7 +5008,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 26
+  operations: 29
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -5018,6 +5048,9 @@ writesOutside:
   - operation: endPromotion
     tables:
     - platform.outbox
+  - operation: freezeEntitlement
+    tables:
+    - platform.outbox
   - operation: pausePromotion
     tables:
     - platform.outbox
@@ -5028,6 +5061,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: publishSeatMap
+    tables:
+    - platform.outbox
+  - operation: reinstateEntitlement
     tables:
     - platform.outbox
   - operation: relinquishSeatBlock
@@ -5055,6 +5091,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: submitPricingChangeRequest
+    tables:
+    - platform.outbox
+  - operation: suspendEntitlement
     tables:
     - platform.outbox
   - operation: transitionProductLifecycle
@@ -5476,6 +5515,7 @@ screens:
 - P08:BO-1187 Transport Departure Board
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
 - P08:BO-1190 Donation Campaigns
+- P08:BO-1192 Entitlement Templates
 - P08:BO-125 Product & Category Button Configuration
 - P08:BO-161 Guest, Companion & Eligibility Rules
 - P08:BO-268 Group Package & Experience Builder

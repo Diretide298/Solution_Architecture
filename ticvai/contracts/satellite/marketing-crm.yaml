@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 234
+  x-ticvai-screen-count: 235
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -724,12 +724,12 @@ paths:
   /guests/merge:
     post:
       operationId: mergeGuests
-      x-ticvai-write-via:
-      - table: pii.subject
-        event: guest.merged
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-746 Duplicate Review & Merge"
+      x-ticvai-write-via:
+      - table: pii.subject
+        event: guest.merged
       summary: Two records, one person
       description: 'Board 4G. **Always a person''s decision, never the platform''s** — `matchGuest` proposes
         and this acts.
@@ -2381,6 +2381,8 @@ paths:
   /message-dispatches:
     get:
       operationId: listMessageDispatches
+      x-ticvai-consumed-by:
+        - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2773,15 +2775,15 @@ paths:
   /loyalty/redemptions:
     post:
       operationId: redeemLoyaltyPoints
-      x-ticvai-write-via:
-      - table: orders.stored_value_authorisation
-        operation: authoriseStoredValue
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-071 Payment Methods"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: authoriseStoredValue
       security:
       - guestAuth: []
       - bearerAuth: []

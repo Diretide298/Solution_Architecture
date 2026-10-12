@@ -275,7 +275,7 @@
   ]
  },
  "ChannelAllocation": {
-  "x-ticvai-persistence": "catalogue.channel_allocation",
+  "x-ticvai-persistence": "catalogue.channel_envelope",
   "type": "object",
   "required": [
    "channel",
@@ -321,6 +321,7 @@
     "description": "The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3)."
    },
    "allocationType": {
+    "x-ticvai-column": "envelope_type",
     "type": "string",
     "enum": [
      "sharedPool",

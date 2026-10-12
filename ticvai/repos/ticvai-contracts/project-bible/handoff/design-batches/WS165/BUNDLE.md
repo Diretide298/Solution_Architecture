@@ -1,6 +1,6 @@
 # WS165 — Seat Management Venue Mapping Reference v1.0 board 1
 
-**10 screens · 14 operations · 20 schemas · 3 permissions**
+**10 screens · 15 operations · 20 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -107,9 +107,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-953` | Seat Map Command Center | C | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
-| `BO-954` | Venue Canvas | C | 0 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
+| `BO-954` | Venue Canvas | C | 35 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
 | `BO-955` | Sections & Zones | C | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `BO-956` | Rows & Seats | C | 0 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
+| `BO-956` | Rows & Seats | C | 35 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
 | `BO-957` | Standing Zones | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-958` | Suites & Boxes | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-959` | Stage & Focal Point | C | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-953, BO-954, BO-956, BO-957, BO-958, BO-959, BO-960, BO-961 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-953, BO-957, BO-958, BO-959, BO-960, BO-961 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -299,7 +299,49 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Add sections, rows and seats** (modal, opened by *Add sections, rows and seats*; *Apply to the map* calls `editSeatMapStructure`, *Cancel* sends nothing)
+
+**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction, start and end point, a curve radius for a curved row, a category), single seats (section, row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Add sections `addSections` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Code `addSections[].code` | text field | required | — | max length 20 | — | — | `editSeatMapStructure` body |
+| Name `addSections[].name` | text field | required | — | max length 100 | — | — | `editSeatMapStructure` body |
+| Boundary `addSections[].boundary` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addSections[].boundary[].x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addSections[].boundary[].y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Add rows `addRows` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Section code `addRows[].sectionCode` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Label `addRows[].label` | text field | required | — | max length 10 | — | — | `editSeatMapStructure` body |
+| Seat count `addRows[].seatCount` | number field | required | — | min 1; max 500 | — | — | `editSeatMapStructure` body |
+| First seat number `addRows[].firstSeatNumber` | number field | optional | 1 | min 0 | — | — | `editSeatMapStructure` body |
+| Numbering direction `addRows[].numberingDirection` | segmented control | optional | Left to right | Left to right · Right to left | — | — | `editSeatMapStructure` body |
+| Start `addRows[].start` | group | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addRows[].start.x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addRows[].start.y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| End `addRows[].end` | group | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addRows[].end.x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addRows[].end.y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Curve radius `addRows[].curveRadius` | number field | optional | — | — | — | Null or absent for a straight row. | `editSeatMapStructure` body |
+| Category `addRows[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `editSeatMapStructure` body |
+| Add seats `addSeats` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Section code `addSeats[].sectionCode` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Row label `addSeats[].rowLabel` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Seat number `addSeats[].seatNumber` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Position `addSeats[].position` | group | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addSeats[].position.x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addSeats[].position.y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Category `addSeats[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `editSeatMapStructure` body |
+| Attribute `addSeats[].attribute` | select | optional | — | Standard · Accessible · Companion · Obstructed view · Restricted legroom · Premium · House seat · Buffer · Aisle · End of row · Extra legroom · Power outlet … | — | BL-168. Extended from eight values on 18 August. | `editSeatMapStructure` body |
+| Remove seats `removeSeatIds` | multi-picker: choose remove seats | optional | — | — | — | — | `editSeatMapStructure` body |
+| Relabel `relabel` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Seat `relabel[].seatId` | picker: choose a seat | required | — | — | shows names, sends the id | — | `editSeatMapStructure` body |
+| Section code `relabel[].sectionCode` | text field | optional | — | — | — | — | `editSeatMapStructure` body |
+| Row label `relabel[].rowLabel` | text field | optional | — | — | — | — | `editSeatMapStructure` body |
+| Seat number `relabel[].seatNumber` | text field | optional | — | — | — | — | `editSeatMapStructure` body |
+
+Errors to draw in the form: 409 A label is already taken in the map, or a removal touches a published map
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -317,6 +359,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Create seat map (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Add sections, rows and seats (secondary button) | `editSeatMapStructure` PATCH `/seat-maps/{seatMapId}/structure` | inline | inline | 409 A label is already taken in the map, or a removal touches a published map | opens modal first |
 
 **Where the user goes next**
 
@@ -332,7 +375,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the venue canvas are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Structural change attempted on a published map |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A label is already taken in the map, or a removal touches a published map; 409 Structural change attempted on a published map |
 
 #### Sample data for the mock-up
 
@@ -352,6 +395,7 @@ map:
 - `getSeatMap` → `PRODUCT_VIEW` (read) · staff
 - `createSeatMap` → `CAPACITY_CONFIGURE` (configure) · staff
 - `updateSeatMap` → `CAPACITY_CONFIGURE` (configure) · staff
+- `editSeatMapStructure` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -388,10 +432,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-954?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create seat map, Cancel.
+- [ ] Every action is wired with its success and its failure: Create seat map, Cancel, Add sections, rows and seats.
 - [ ] Every transition is wired: `BO-953`.
 - [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -560,7 +604,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Generate, renumber or remove rows and seats** (modal, opened by *Generate, renumber or remove rows and seats*; *Apply to the map* calls `editSeatMapStructure`, *Cancel* sends nothing)
+
+**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction, start and end point, a curve radius for a curved row, a category), single seats (section, row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Add sections `addSections` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Code `addSections[].code` | text field | required | — | max length 20 | — | — | `editSeatMapStructure` body |
+| Name `addSections[].name` | text field | required | — | max length 100 | — | — | `editSeatMapStructure` body |
+| Boundary `addSections[].boundary` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addSections[].boundary[].x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addSections[].boundary[].y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Add rows `addRows` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Section code `addRows[].sectionCode` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Label `addRows[].label` | text field | required | — | max length 10 | — | — | `editSeatMapStructure` body |
+| Seat count `addRows[].seatCount` | number field | required | — | min 1; max 500 | — | — | `editSeatMapStructure` body |
+| First seat number `addRows[].firstSeatNumber` | number field | optional | 1 | min 0 | — | — | `editSeatMapStructure` body |
+| Numbering direction `addRows[].numberingDirection` | segmented control | optional | Left to right | Left to right · Right to left | — | — | `editSeatMapStructure` body |
+| Start `addRows[].start` | group | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addRows[].start.x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addRows[].start.y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| End `addRows[].end` | group | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addRows[].end.x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addRows[].end.y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Curve radius `addRows[].curveRadius` | number field | optional | — | — | — | Null or absent for a straight row. | `editSeatMapStructure` body |
+| Category `addRows[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `editSeatMapStructure` body |
+| Add seats `addSeats` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Section code `addSeats[].sectionCode` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Row label `addSeats[].rowLabel` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Seat number `addSeats[].seatNumber` | text field | required | — | — | — | — | `editSeatMapStructure` body |
+| Position `addSeats[].position` | group | optional | — | — | — | — | `editSeatMapStructure` body |
+| X `addSeats[].position.x` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Y `addSeats[].position.y` | number field | required | — | — | — | — | `editSeatMapStructure` body |
+| Category `addSeats[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `editSeatMapStructure` body |
+| Attribute `addSeats[].attribute` | select | optional | — | Standard · Accessible · Companion · Obstructed view · Restricted legroom · Premium · House seat · Buffer · Aisle · End of row · Extra legroom · Power outlet … | — | BL-168. Extended from eight values on 18 August. | `editSeatMapStructure` body |
+| Remove seats `removeSeatIds` | multi-picker: choose remove seats | optional | — | — | — | — | `editSeatMapStructure` body |
+| Relabel `relabel` | repeatable rows | optional | — | — | — | — | `editSeatMapStructure` body |
+| Seat `relabel[].seatId` | picker: choose a seat | required | — | — | shows names, sends the id | — | `editSeatMapStructure` body |
+| Section code `relabel[].sectionCode` | text field | optional | — | — | — | — | `editSeatMapStructure` body |
+| Row label `relabel[].rowLabel` | text field | optional | — | — | — | — | `editSeatMapStructure` body |
+| Seat number `relabel[].seatNumber` | text field | optional | — | — | — | — | `editSeatMapStructure` body |
+
+Errors to draw in the form: 409 A label is already taken in the map, or a removal touches a published map
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -578,6 +664,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save seats (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Generate, renumber or remove rows and seats (secondary button) | `editSeatMapStructure` PATCH `/seat-maps/{seatMapId}/structure` | inline | inline | 409 A label is already taken in the map, or a removal touches a published map | opens modal first |
 
 **Where the user goes next**
 
@@ -593,7 +680,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rows seats are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Map is published and the change is structural |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A label is already taken in the map, or a removal touches a published map; 409 Map is published and the change is structural |
 
 #### Sample data for the mock-up
 
@@ -610,6 +697,7 @@ bulk:
 
 - `listSeats` → `PRODUCT_VIEW` (read) · staff
 - `updateSeats` → `CAPACITY_CONFIGURE` (configure) · staff
+- `editSeatMapStructure` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -656,10 +744,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-956?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save seats, Cancel.
+- [ ] Every action is wired with its success and its failure: Save seats, Cancel, Generate, renumber or remove rows and ….
 - [ ] Every transition is wired: `BO-953`.
 - [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1590,6 +1678,7 @@ Method, path, parameters, request and response for every operation these screens
 "createSeatMap": {"method":"POST","path":"/seat-maps","contract":"seating","summary":"Create a seat map","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"CreateSeatMapRequest","responds":"SeatMap"},
 "createSeatMapTemplate": {"method":"POST","path":"/seat-map-templates","contract":"seating","summary":"Save a map as a reusable template","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SeatMapTemplate"},
 "createUpload": {"method":"POST","path":"/media/uploads","contract":"assets","summary":"Request a signed upload URL","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"UploadTicket"},
+"editSeatMapStructure": {"method":"PATCH","path":"/seat-maps/{seatMapId}/structure","contract":"seating","summary":"Build a seat map by hand","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getSeatMap": {"method":"GET","path":"/seat-maps/{seatMapId}","contract":"seating","summary":"Read a seat map with its structure","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatMap"},
 "listSeatMapTemplates": {"method":"GET","path":"/seat-map-templates","contract":"seating","summary":"List reusable layout templates","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[],"requestBody":null,"responds":"SeatMapTemplate"},
 "listSeatMaps": {"method":"GET","path":"/seat-maps","contract":"seating","summary":"List seat maps","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1618,7 +1707,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
-"Seat": {"x-ticvai-persistence":"seating.seat","type":"object","required":["id","sectionCode","rowLabel","seatNumber","attribute"],"properties":{"id":{"type":"string","format":"uuid","description":"**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"},"sectionCode":{"type":"string"},"rowLabel":{"type":"string"},"seatNumber":{"type":"string"},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"companionSeatIds":{"type":"array","items":{"type":"string"},"description":"Present on accessible seats. Sold together, released together."},"isActive":{"type":"boolean"}}},
+"Seat": {"x-ticvai-persistence":"seating.seat","x-ticvai-unique-together":[["seat_map_id","sectionCode","rowLabel","seatNumber"]],"type":"object","required":["id","sectionCode","rowLabel","seatNumber","attribute"],"properties":{"id":{"type":"string","format":"uuid","description":"**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"},"sectionCode":{"type":"string"},"rowLabel":{"type":"string"},"seatNumber":{"type":"string"},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"companionSeatIds":{"type":"array","items":{"type":"string"},"description":"Present on accessible seats. Sold together, released together."},"isActive":{"type":"boolean"}}},
 "SeatAttribute": {"type":"string","description":"BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n","enum":["standard","accessible","companion","obstructedView","restrictedLegroom","premium","houseSeat","buffer","aisle","endOfRow","extraLegroom","powerOutlet","tableService","shaded","covered","nearExit","nearAccessibleWc","wheelchairTransfer","limitedRecline","sofa","beanbag"]},
 "SeatMap": {"x-ticvai-persistence":"seating.seat_map","allOf":[{"$ref":"#/components/schemas/SeatMapSummary"},{"type":"object","required":["sections"],"properties":{"description":{"type":"string","nullable":true},"viewBox":{"type":"object","description":"Coordinate space for rendering. Absent when there is no geometry.","nullable":true,"properties":{"width":{"type":"number"},"height":{"type":"number"}}},"stagePosition":{"$ref":"#/components/schemas/Point"},"sections":{"type":"array","items":{"$ref":"#/components/schemas/Section"}},"isActive":{"type":"boolean"}}}]},
 "SeatMapStatus": {"type":"string","enum":["draft","validated","published","archived"]},

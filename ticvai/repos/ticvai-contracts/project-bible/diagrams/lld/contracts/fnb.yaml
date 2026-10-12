@@ -59,7 +59,6 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
-  - catalogue.price
   - fnb.menu_item
 - operation: attachModifierGroup
   verb: PUT
@@ -421,7 +420,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
   - inventory.movement
   writes:
   - cache:idempotency
@@ -1257,7 +1256,6 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
-  - catalogue.product_version
   - fnb.menu
 - operation: quoteWaitTime
   verb: POST
@@ -1769,7 +1767,7 @@ operations:
   - fnb.recipe
   - fnb.recipe_ingredient
   - fnb.substitution_rule
-  - inventory.item
+  - inventory.inventory_item
   writes:
   - cache:idempotency
   - fnb.allergen_verdict
@@ -2051,6 +2049,6 @@ operations:
   - fnb.recipe
   - fnb.recipe_ingredient
   - fnb.substitution_rule
-  - inventory.item
+  - inventory.inventory_item
   writes:
   - fnb.allergen_verdict

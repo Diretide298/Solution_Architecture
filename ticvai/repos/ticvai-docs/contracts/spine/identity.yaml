@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 80
+  x-ticvai-screen-count: 81
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -142,6 +142,9 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-010 Booking Confirmation"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-write-via:
+      - table: marketing.message_dispatch
+        operation: sendTransactionalMessage
       security:
       - guestAuth: []
       - {}
@@ -564,6 +567,8 @@ paths:
   /segregation-rules:
     get:
       operationId: listSegregationRules
+      x-ticvai-consumed-by:
+        - "P08 ADM-340 Segregation of Duties Policy Manager"
       summary: Read the conflicting-permission rules back
       description: 'BL-110, 3.3.31. **`setSegregationRules` was a PUT with no GET**, so the screen
         named above manages rules it cannot load — and nobody could audit a tenant''s controls

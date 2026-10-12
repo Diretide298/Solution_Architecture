@@ -250,7 +250,8 @@
     "format": "uuid"
    },
    "balance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "balance_amount"
    },
    "credits": {
     "type": "array",

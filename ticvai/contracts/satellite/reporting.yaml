@@ -1661,9 +1661,6 @@ paths:
   /reports/ask:
     post:
       operationId: askReportingQuestion
-      x-ticvai-write-via:
-      - table: ai.activity
-        event: reporting.questionAnswered
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P06 EMP-020 AI assistant — answer"
@@ -1680,6 +1677,9 @@ paths:
         - "P16 ANL-019 AI Management Insights"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
         - "P16 ANL-056 Root-Cause Analysis Explorer"
+      x-ticvai-write-via:
+      - table: ai.activity
+        event: reporting.questionAnswered
       x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
@@ -1797,9 +1797,6 @@ paths:
         type: string
     post:
       operationId: saveNaturalLanguageQuery
-      x-ticvai-write-via:
-      - table: ai.activity
-        event: reporting.definitionPublished
       x-ticvai-consumed-by:
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
@@ -1808,6 +1805,9 @@ paths:
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
+      x-ticvai-write-via:
+      - table: ai.activity
+        event: reporting.definitionPublished
       x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff

@@ -818,7 +818,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 
 Executes against the **reporting replica**, never the primary.
 Small results return inline. Anything beyond the inline threshold returns `202` with an execution to poll — a synchronous response containing a year of scan events is a timeout waiting to happen. **The threshold is `VenueSettings.reporting.inlineRunRowLimit`**, a venue setting with a tenant default (decided 28 September, audit R094): a run whose estimated rows exceed it, or whose definition's `estimatedCost` is `high`, is queued. **Proposed default 5,000 rows, client to correct (audit R094).**
-**Dates (decided 28 September, audit R158).** With no `dateFrom` or `dateTo` the run covers today in the venue's time zone, and a range longer than the definition's `maxDateRangeDays` (366 when the definition sets none) is a 400.
+**Dates (decided 28 September, audit R158).** With no `dateFrom` or `dateTo` the run covers today in the venue's time zone, and a range longer than the definition's `maxDateRangeDays` (366 when the definition sets none) is a 400. **A day is a business day** (12 October 2026, CHG-R6-032): `dateFrom`, `dateTo` and today are business dates, each closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00, the calendar day), so a daily report counts a 01:30 sale on the day it traded.
 Scope is applied from the caller's resolved permissions. Parameters narrow; they never widen.
 
 |  |  |
@@ -902,7 +902,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.kpi_definition`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter`, `reporting.semantic_model` |
-| Writes | `ai.activity`, `cache:idempotency`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter` |
+| Writes | `ai.activity`, `cache:idempotency`, `platform.outbox`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter` |
 | Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-593, EMP-020, KIT-010, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
@@ -1006,7 +1006,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Writes | `ai.activity`, `cache:idempotency`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
+| Writes | `ai.activity`, `cache:idempotency`, `platform.outbox`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
 
 **Parameters**

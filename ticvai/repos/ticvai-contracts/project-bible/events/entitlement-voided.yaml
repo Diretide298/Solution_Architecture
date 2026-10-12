@@ -1,0 +1,45 @@
+# entitlement.voided v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: entitlement.voided
+version: 1
+publisher: orders
+description: One ticket was voided before settlement, within the same shift. The entitlement is cancelled
+  (cancellationKind voided) and stops admitting.
+aggregate: entitlement
+emittedWhen: Entitlement issued to cancelled by voidEntitlement (states/entitlement-status.yaml)
+emittedBy:
+- voidEntitlement
+payload:
+- field: entitlementId
+  type: uuid
+- field: orderId
+  type: uuid
+  notes: The order the voided line belongs to
+- field: orderLineId
+  type: uuid
+- field: reason
+  type: string
+  required: false
+- field: voidedByPrincipalId
+  type: uuid
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: access
+  purpose: Set access.entitlement to cancelled with cancellationKind voided, which Access owns, and drop it from the
+    offline validation bundle so the voided ticket stops admitting at a gate without a network
+  writes:
+  - access.entitlement
+  idempotencyKey: entitlementId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: '**Added 12 October 2026 (ADAM CR-002, CHG-R6-020).** voidEntitlement runs in OrderService, in the
+  `commerce` deployable, and access.entitlement is in the `access` schema, owned by AccessService in the `access`
+  deployable. The DB-ROLES grants refuse the direct UPDATE, so the void reaches the owner as this event (ADR-0055
+  rule 4, ADR-0057). The state model names it on the issued -> cancelled transition.'

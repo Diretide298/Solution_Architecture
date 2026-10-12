@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 231
+  x-ticvai-screen-count: 237
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -926,6 +926,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       summary: Lift a suspension
       description: '1.1.100. **`suspendEntitlement` had no inverse**, so a membership suspended for a
         chargeback that was later resolved stayed suspended.
@@ -990,6 +993,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1438,6 +1444,8 @@ paths:
     post:
       operationId: joinWaitlist
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Performance Selection"
+        - "P02 GST-007 Select Date & Time"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1503,6 +1511,8 @@ paths:
     delete:
       operationId: leaveWaitlist
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Performance Selection"
+        - "P02 GST-007 Select Date & Time"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1611,6 +1621,7 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-048 Retail Products"
         - "P08 BO-094 Map Editor & Publish"
+        - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
@@ -1693,6 +1704,15 @@ paths:
           below it** in the tree, so a tile for *Guided tours* also lists what sits under its subcategories.
           Guest-callable (decided 29 September, rev 3 REV3-16). A `categoryId` that names no category of the
           venue is a `400`.
+        schema:
+          type: string
+          format: uuid
+      - name: entitlementTemplateId
+        in: query
+        description: '**Products using this template** (client feedback of 6 October 2026, N32; CHG-R6-040): only
+          products whose `entitlementTemplateId` is this one. The Entitlement templates screen (BO-1192) lists them
+          under each template, and `archiveEntitlementTemplate` is refused while any of them is not retired. A
+          guest caller gets the same filter over what it may see.'
         schema:
           type: string
           format: uuid
@@ -3904,7 +3924,7 @@ paths:
 
 
         **The order''s seat holds convert in the same call** (3 October 2026, CHG-R1S-010): each held seat of
-        the order moves to `sold` (`seating.seat_hold`, `seating.seat_hold_item`) and `seat.sold` is written to
+        the order moves to `sold` (`seating.seat_reservation`, `seating.seat_reservation_item`) and `seat.sold` is written to
         the outbox once per seat. Seating belongs to this service, so the seat event is published here and not
         by the order service that called it.
 
@@ -4824,6 +4844,7 @@ paths:
       summary: Cancel a performance
       description: |-
         Stops sales, notifies every holder, and queues a bulk refund for approval. The refund is **not** issued automatically — a cancellation of any size is a financial event someone signs off.
+        **How every holder is notified** (12 October 2026, CHG-R6-038): `performance.cancelled` carries the `guestMessage` written here, and its marketing consumer `notifyPerformanceHolders` (marketing-crm) sends one transactional message per holder in their language, with `sourceRef` the performance; BO-023 reads them back with `listMessageDispatches` (F09 step 5).
         Returns the exposure before committing so the person cancelling sees what it costs.
         **A supervisor's step-up on the same device, not an approval request**, as for a shift reopen (proposed by the coordinator, client to confirm (audit R144): the decision did not name this act). A real run carries `supervisorStepUp`; the rule is `SupervisorStepUp` in `common.yaml`: the PIN is checked against the principal, who must hold `PERFORMANCE_CONFIGURE` at this venue, and a failure is a `403` with nothing written. A dry run needs none. The bulk refund it queues still goes for approval as a refund.
 
@@ -4979,6 +5000,7 @@ paths:
       operationId: listEntitlementTemplates
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+        - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
@@ -5011,6 +5033,7 @@ paths:
       operationId: createEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+        - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
       - staff
@@ -5054,6 +5077,9 @@ paths:
       operationId: suspendEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       x-ticvai-audience:
       - staff
       summary: Suspend or reinstate an entitlement
@@ -14495,6 +14521,171 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /entitlement-templates/{templateId}:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Read an entitlement template
+      description: '**One template, whole** (client feedback of 6 October 2026, N32; CHG-R6-040): the Entitlement
+        templates screen (BO-1192) opens a template from its list and shows every rule it grants: what it admits,
+        the validity kind and offsets, re-entry, transfer, limits and blackout dates. Until now a template could
+        be listed and created, never read back alone, so nothing could edit one safely. An archived template
+        (`isActive` false) is still returned.
+
+        '
+      tags:
+      - entitlement
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    patch:
+      operationId: updateEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-config-scope: venue
+      summary: Update an entitlement template
+      description: '**Edit the rules a template grants** (client feedback of 6 October 2026, N32; CHG-R6-040).
+        Only the fields sent change; `code` is fixed once created. **A change applies to entitlements issued from
+        now on**; one already issued keeps the rules it was issued with, so a guest holding a pass is never
+        re-ruled after paying. Blackout dates have their own operation (`setEntitlementTemplateBlackoutDates`),
+        which also reaches entitlements already issued. An archived template is refused `409 template-archived`.
+
+        '
+      tags:
+      - entitlement
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEntitlementTemplateRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The template, updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`template-archived`: the template is archived and can no longer change.'
+          x-ticvai-problem-types:
+          - template-archived
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /entitlement-templates/{templateId}/archive:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: archiveEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-audience:
+      - staff
+      summary: Archive an entitlement template
+      description: '**Retires a template** (client feedback of 6 October 2026, N32; CHG-R6-040): `isActive`
+        becomes false, the template is no longer offered when a product is created or edited, and archiving is
+        final (a new rule set is a new template). **Refused `409 template-in-use` while a product that is not
+        retired still grants it**; the screen lists those products with `listProducts?entitlementTemplateId=`, so
+        the user moves them to another template first. Entitlements already issued from it keep their rules and
+        still admit.
+
+        '
+      tags:
+      - entitlement
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: The template, archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`template-in-use`: a product that is not retired still grants this template.'
+          x-ticvai-problem-types:
+          - template-in-use
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlement-templates/{templateId}/blackout-dates:
     parameters:
     - name: templateId
@@ -14505,6 +14696,8 @@ paths:
         format: uuid
     put:
       operationId: setEntitlementTemplateBlackoutDates
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
       x-ticvai-audience:
         - staff
       x-ticvai-config-scope: venue
@@ -19620,6 +19813,96 @@ components:
             '
         notificationsQueued:
           type: integer
+    UpdateEntitlementTemplateRequest:
+      type: object
+      minProperties: 1
+      description: '**What `updateEntitlementTemplate` may change** (CHG-R6-040). Each field means what it means on
+        `EntitlementTemplate`; only the fields sent change. `code` is not here: it is fixed once created. Blackout
+        dates are set with `setEntitlementTemplateBlackoutDates`, and archiving with `archiveEntitlementTemplate`.'
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        validityKind:
+          type: string
+          enum:
+          - singleUse
+          - dated
+          - dateRange
+          - rolling
+          - unlimited
+          - countLimited
+        validFromOffsetDays:
+          type: integer
+          nullable: true
+        validForDays:
+          type: integer
+          nullable: true
+        daysOfWeek:
+          type: array
+          nullable: true
+          items:
+            type: string
+            enum:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+        expiryAnchor:
+          type: string
+          nullable: true
+          enum:
+          - offsetDays
+          - endOfMonth
+          - endOfQuarter
+          - endOfYear
+          - fixedDate
+          - seasonEnd
+        expiryDate:
+          type: string
+          format: date
+          nullable: true
+        expiryNoticeDays:
+          type: integer
+          minimum: 1
+          maximum: 180
+          nullable: true
+        validTimeWindows:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              from:
+                type: string
+              to:
+                type: string
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+        fastTrackTier:
+          type: string
+          nullable: true
+          enum:
+          - none
+          - priority
+          - express
+          - unlimited
+        entriesAllowed:
+          type: integer
+          nullable: true
+        reentryAllowed:
+          type: boolean
+        isTransferable:
+          type: boolean
+        isNameBound:
+          type: boolean
     EntitlementTemplate:
       x-ticvai-persistence: catalogue.entitlement_template
       type: object
@@ -20150,6 +20433,7 @@ components:
         productId:
           type: string
           readOnly: true
+          x-ticvai-references: catalogue.product
         minAgeYears:
           type: integer
           minimum: 0
@@ -20312,6 +20596,7 @@ components:
         productId:
           type: string
           readOnly: true
+          x-ticvai-references: catalogue.product
         kind:
           type: string
           enum:
@@ -20356,7 +20641,8 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     Product:
-      x-ticvai-persistence: catalogue.product
+      # `media[]` is the rows of catalogue.product_media, which carries product_id (CHG-R6-005).
+      x-ticvai-persistence: catalogue.product + catalogue.product_media
       type: object
       required:
       - id
@@ -21049,6 +21335,7 @@ components:
           type: string
           format: uuid
           description: A `MediaAsset` of `assets.yaml`, in status `ready`.
+          x-ticvai-references: assets.media_asset
         kind:
           type: string
           enum:
@@ -21345,6 +21632,7 @@ components:
           type: string
           format: uuid
         amount:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxCodeId:
           type: string
@@ -21761,7 +22049,7 @@ components:
           type: integer
           minimum: 0
     ChannelAllocation:
-      x-ticvai-persistence: catalogue.channel_allocation
+      x-ticvai-persistence: catalogue.channel_envelope
       type: object
       required:
       - channel
@@ -21807,6 +22095,7 @@ components:
           description: >-
             The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3).
         allocationType:
+          x-ticvai-column: envelope_type
           type: string
           enum:
           - sharedPool
@@ -22247,7 +22536,7 @@ components:
           type: string
           format: date-time
     InventoryHold:
-      x-ticvai-persistence: catalogue.inventory_hold
+      x-ticvai-persistence: catalogue.inventory_reservation
       type: object
       required:
       - id
@@ -23267,7 +23556,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Publication & Activation Scheduler submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
@@ -25843,6 +26132,23 @@ components:
               - bulkCsvExport
           description: Fulfillment Methods (pack p.15-16; bulkCsvExport is the pre-generated ticket batch for
             partners that do not integrate, MoM 31 Aug §4.3)
+        ticketCredentialFormat:
+          type: string
+          nullable: true
+          enum:
+          - platformSignedQr
+          - staticQr
+          - rfidCard
+          - null
+          description: '**The ticket credential this channel''s tickets carry** (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026,
+            CHG-R6-031). `platformSignedQr`, the default and what null means, is the platform''s own signed QR as the
+            event issues it (rotating where the event sells dynamic QR, GST-055). `staticQr` is the platform''s
+            signed QR issued once and never rotated, the minutes'' "standard QR code" for a ticket that leaves the
+            app (a reseller''s batch, a printed invitation). `rfidCard` issues no QR: the ticket is collected as an
+            RFID card or wristband. A product''s own override (access `AccessVerificationMethodPolicy.credentialFormatOverride`)
+            wins over this; `issueOrderEntitlements` resolves the two when it issues. Same values as access
+            `TicketCredentialFormat`. Saved on the channel''s own row, `SalesChannelProfile.ticketCredentialFormat`
+            (`catalogue.sales_channel`), for the channel `channelId` names.'
     ChannelPublicationReadinessAiValidationView:
       type: object
       x-ticvai-drafted-shape: true
@@ -29803,7 +30109,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Fee Applicability & Charging Rule Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
@@ -31365,7 +31671,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Pricing Approval Workflow & Authority Matrix submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
@@ -33824,7 +34130,8 @@ components:
           nullable: true
         date:
           type: string
-          description: Business date
+          description: Business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default
+            00:00; CHG-R6-032)
           format: date
         refunds:
           type: integer
@@ -35524,7 +35831,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What A/B Pricing Experiment Studio submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
@@ -37957,6 +38264,22 @@ components:
             - voucher
             - apiTicketDelivery
             - bulkCsvExport
+        ticketCredentialFormat:
+          type: string
+          nullable: true
+          enum:
+          - platformSignedQr
+          - staticQr
+          - rfidCard
+          - null
+          description: '**The ticket credential this channel''s tickets carry** (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026,
+            CHG-R6-031). `platformSignedQr`, the default and what null means, is the platform''s own signed QR as the
+            event issues it (rotating where the event sells dynamic QR, GST-055). `staticQr` is the platform''s
+            signed QR issued once and never rotated, the minutes'' "standard QR code" for a ticket that leaves the
+            app (a reseller''s batch, a printed invitation). `rfidCard` issues no QR: the ticket is collected as an
+            RFID card or wristband. A product''s own override (access `AccessVerificationMethodPolicy.credentialFormatOverride`)
+            wins over this; `issueOrderEntitlements` resolves the two when it issues. Same values as access
+            `TicketCredentialFormat`.'
         partnerOwner:
           type: string
           maxLength: 200

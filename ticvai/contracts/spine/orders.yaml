@@ -711,12 +711,12 @@ paths:
         type: string
     post:
       operationId: payByLink
-      x-ticvai-write-via:
-      - table: access.entitlement
-        event: order.paid
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: order.paid
       security:
       - guestAuth: []
       - {}
@@ -807,11 +807,11 @@ paths:
         format: uuid
     post:
       operationId: resendPaymentLink
+      x-ticvai-consumed-by:
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       x-ticvai-write-via:
       - table: marketing.message_dispatch
         operation: sendTransactionalMessage
-      x-ticvai-consumed-by:
-        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       summary: Send it again, and retire the old one
       description: '**A resend supersedes.** Two live links against one order is two guests paying for
         one booking, and the second payment is a refund somebody has to make.
@@ -1175,11 +1175,11 @@ paths:
         format: uuid
     post:
       operationId: reissueEntitlement
+      x-ticvai-consumed-by:
+        - "P04 POS-026 Receipt & Reprint"
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.reissued
-      x-ticvai-consumed-by:
-        - "P04 POS-026 Receipt & Reprint"
       summary: Zero-value reissue of an expired entitlement for a later date
       description: 'BL-084. **A goodwill act with no money in it**, and treating it as a refund plus a
         sale puts two transactions through the ledger for a gesture that moved nothing.
@@ -1256,12 +1256,12 @@ paths:
         format: uuid
     post:
       operationId: shareEntitlement
-      x-ticvai-write-via:
-      - table: access.entitlement
-        event: entitlement.shareChanged
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-072 Share & Group Booking"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.shareChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2226,12 +2226,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: storePaymentToken
-      x-ticvai-write-via:
-      - table: marketing.consent_record
-        event: paymentToken.stored
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+      x-ticvai-write-via:
+      - table: marketing.consent_record
+        event: paymentToken.stored
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2309,11 +2309,11 @@ paths:
   /payment-links:
     post:
       operationId: createPaymentLink
+      x-ticvai-consumed-by:
+        - "P08 ADM-592 Payment Link Builder & Configuration"
       x-ticvai-write-via:
       - table: marketing.message_dispatch
         operation: sendTransactionalMessage
-      x-ticvai-consumed-by:
-        - "P08 ADM-592 Payment Link Builder & Configuration"
       summary: Send a guest a link to pay later
       description: 'BL-072. **A booking taken at POS cannot currently be paid later by the guest**, so
         a phone booking either takes a card over the phone or is not taken.
@@ -3363,9 +3363,6 @@ paths:
         format: uuid
     post:
       operationId: checkoutCart
-      x-ticvai-write-via:
-      - table: marketing.consent_record
-        event: order.created
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-012 Checkout — Payment"
@@ -3375,6 +3372,9 @@ paths:
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-write-via:
+      - table: marketing.consent_record
+        event: order.created
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **The sale path end to end** (system-design review SD-023 and SD-026, 29 September). Checkout keeps the
@@ -6068,13 +6068,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: appendEntitlementToMedia
-      x-ticvai-write-via:
-      - table: access.entitlement
-        event: order.paid
       x-ticvai-consumed-by:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: order.paid
       x-ticvai-audience:
       - staff
       summary: Add something to a ticket the guest already holds
@@ -6472,9 +6472,6 @@ paths:
         format: uuid
     post:
       operationId: transferOrderTickets
-      x-ticvai-write-via:
-      - table: access.entitlement
-        event: entitlement.transferred
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P01 WEB-030 Ticket Transfer"
@@ -6482,6 +6479,9 @@ paths:
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-045 Ticket Delivery & Sharing"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.transferred
       x-ticvai-audience:
       - guest
       summary: Transfer tickets to another guest
@@ -6574,11 +6574,11 @@ paths:
         format: uuid
     post:
       operationId: claimTicketTransfer
+      x-ticvai-consumed-by:
+        - "P02 GST-014 Ticket Transfer"
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.transferred
-      x-ticvai-consumed-by:
-        - "P02 GST-014 Ticket Transfer"
       x-ticvai-audience:
       - guest
       summary: Claim transferred tickets
@@ -7683,11 +7683,11 @@ paths:
   /upgrade-credential-regeneration:
     post:
       operationId: createUpgradeCredentialRegeneration
+      x-ticvai-consumed-by:
+        - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-write-via:
       - table: access.entitlement
         operation: replaceCredential
-      x-ticvai-consumed-by:
-        - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.18; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 non-field properties removed; enums credentialTreatment, availableChannels, generatedDocuments)'
@@ -13298,11 +13298,11 @@ paths:
         format: uuid
     post:
       operationId: voidEntitlement
+      x-ticvai-consumed-by:
+        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.voided
-      x-ticvai-consumed-by:
-        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       summary: Void a single ticket
       description: '**`voidOrder` voids the whole order; this voids one ticket on it** (decided 29
         September, readiness close-out). The same rule applies: only before settlement and only

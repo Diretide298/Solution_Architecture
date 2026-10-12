@@ -5894,33 +5894,30 @@ flows:
       - invalidWindow
       - 403 delegating authority not held
       - 409 refusedReason
-      source: ADM-243
+      source: BO-087 (the ADM-243 section)
     processing:
-    - input: step 10 on ADM-243
+    - input: step 10 on BO-087 (the ADM-243 section)
       operations:
-      - approvals#listApprovalDelegations (not Block A)
+      - approvals#listApprovalDelegations
       - approvals#createApprovalDelegation
       does: >-
         Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than
         replace it.
     outputs:
-    - output: ADM-243 Roles, Authority, Delegation & Approval Limits
+    - output: BO-087 Approval Delegations (with the ADM-243 section)
       states:
-        loading: The roles authority delegation configuration as saved.
-        error: Could not load. Names which read failed and leaves the roles authority delegation untouched.
-        emptyFirstRun: >-
-          No roles authority delegation configured yet. Carries the create action and says what the platform does in the meantime.
+        loading: The approval delegations list.
+        error: Could not load. Names which read failed and leaves the approval delegations untouched.
+        emptyFirstRun: No approval delegations yet. Offers Create approval delegation (`createApprovalDelegation`).
         emptyNoAccess: >-
-          Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support
-          with the wrong question.
+          Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires to show this screen, and
+          names that permission. Never an empty table.
       failure_branches:
-      - what_goes_wrong: error state on ADM-243
-        user_sees: Could not load. Names which read failed and leaves the roles authority delegation untouched.
+      - what_goes_wrong: error state on BO-087
+        user_sees: Could not load. Names which read failed and leaves the approval delegations untouched.
         recovery: Retry; nothing entered is lost (derived)
-      - what_goes_wrong: emptyNoAccess state on ADM-243
-        user_sees: >-
-          Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support
-          with the wrong question.
+      - what_goes_wrong: emptyNoAccess state on BO-087
+        user_sees: Shown when the caller lacks `APPROVAL_VIEW`, and names that permission.
         recovery: Ask an administrator for the permission the state names (derived)
     failure_branches:
     - at_step: 1
@@ -5951,14 +5948,15 @@ flows:
         owner, effective date and status;
     - frame: 2
       flowStep: 10
-      screen: ADM-243 Roles, Authority, Delegation & Approval Limits
+      screen: BO-087 Approval Delegations
       block: A
+      note: ADM-243 was merged into BO-087 as a section of it (CHG-MOV-002); the frame is drawn on BO-087 (CHG-R6-046).
       sees: >-
         Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than
         replace it.
-      does: Works in Roles, Authority, Delegation & Approval Limits
+      does: Works in the Roles, Authority, Delegation & Approval Limits section of Approval Delegations
       calls:
-      - approvals#listApprovalDelegations (not Block A)
+      - approvals#listApprovalDelegations
       - approvals#createApprovalDelegation
       result: >-
         Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than

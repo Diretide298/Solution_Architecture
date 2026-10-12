@@ -714,6 +714,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: order.paid
       security:
       - guestAuth: []
       - {}
@@ -806,6 +809,9 @@ paths:
       operationId: resendPaymentLink
       x-ticvai-consumed-by:
         - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
+      x-ticvai-write-via:
+      - table: marketing.message_dispatch
+        operation: sendTransactionalMessage
       summary: Send it again, and retire the old one
       description: '**A resend supersedes.** Two live links against one order is two guests paying for
         one booking, and the second payment is a refund somebody has to make.
@@ -1171,6 +1177,9 @@ paths:
       operationId: reissueEntitlement
       x-ticvai-consumed-by:
         - "P04 POS-026 Receipt & Reprint"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.reissued
       summary: Zero-value reissue of an expired entitlement for a later date
       description: 'BL-084. **A goodwill act with no money in it**, and treating it as a refund plus a
         sale puts two transactions through the ledger for a gesture that moved nothing.
@@ -1250,6 +1259,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-072 Share & Group Booking"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.shareChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1331,6 +1343,9 @@ paths:
         format: uuid
     post:
       operationId: revokeEntitlementShare
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.shareChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1388,6 +1403,12 @@ paths:
         that it updates — a changed gate, a cancelled performance, a time that moved.
 
         **A pass that cannot be pushed to is a screenshot with better rounding.**
+
+
+        **An Apple pass is signed with the brand''s own Pass Type ID certificate** (Chinmay, 12 October 2026: the
+        client owns it, one per brand; CHG-R6-033), read from Key Vault through white-label
+        `StoreAccount.passCertificateSecretRef`, never a TICVAI certificate. Its expiry is
+        `StoreAccount.passCertificateExpiresAt`, warned 30 days ahead by `whitelabel.passCertificateExpiring`.
 
         '
       tags:
@@ -2208,6 +2229,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+      x-ticvai-write-via:
+      - table: marketing.consent_record
+        event: paymentToken.stored
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2287,6 +2311,9 @@ paths:
       operationId: createPaymentLink
       x-ticvai-consumed-by:
         - "P08 ADM-592 Payment Link Builder & Configuration"
+      x-ticvai-write-via:
+      - table: marketing.message_dispatch
+        operation: sendTransactionalMessage
       summary: Send a guest a link to pay later
       description: 'BL-072. **A booking taken at POS cannot currently be paid later by the guest**, so
         a phone booking either takes a card over the phone or is not taken.
@@ -2369,6 +2396,9 @@ paths:
   /invitations:
     post:
       operationId: issueInvitation
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: invitation.issued
       summary: Issue a complimentary entitlement, with no payment expected
       description: |-
         8.1.3 to 8.1.5. **A complimentary ticket is not a 100% discount** — a discount runs through the order path and produces a zero-value sale; an invitation never enters it. **No payment is expected, so nothing waits for one.**
@@ -3342,6 +3372,9 @@ paths:
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-write-via:
+      - table: marketing.consent_record
+        event: order.created
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **The sale path end to end** (system-design review SD-023 and SD-026, 29 September). Checkout keeps the
@@ -3972,7 +4005,6 @@ paths:
     post:
       operationId: createOrder
       x-ticvai-consumed-by:
-        - "P02 GST-009 Review & Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -6040,6 +6072,9 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: order.paid
       x-ticvai-audience:
       - staff
       summary: Add something to a ticket the guest already holds
@@ -6444,6 +6479,9 @@ paths:
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-045 Ticket Delivery & Sharing"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.transferred
       x-ticvai-audience:
       - guest
       summary: Transfer tickets to another guest
@@ -6538,6 +6576,9 @@ paths:
       operationId: claimTicketTransfer
       x-ticvai-consumed-by:
         - "P02 GST-014 Ticket Transfer"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.transferred
       x-ticvai-audience:
       - guest
       summary: Claim transferred tickets
@@ -7644,6 +7685,9 @@ paths:
       operationId: createUpgradeCredentialRegeneration
       x-ticvai-consumed-by:
         - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        operation: replaceCredential
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.18; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 non-field properties removed; enums credentialTreatment, availableChannels, generatedDocuments)'
@@ -13256,6 +13300,9 @@ paths:
       operationId: voidEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.voided
       summary: Void a single ticket
       description: '**`voidOrder` voids the whole order; this voids one ticket on it** (decided 29
         September, readiness close-out). The same rule applies: only before settlement and only
@@ -14881,7 +14928,7 @@ components:
           - partner
           - manualEntry
         organisationId:
-          x-ticvai-references: orders.group_customer_organization
+          x-ticvai-references: orders.group_customer_organisation
           type: string
           format: uuid
           nullable: true
@@ -15038,7 +15085,7 @@ components:
               nullable: true
     GroupCustomerOrganizationView:
       type: object
-      x-ticvai-persistence: orders.group_customer_organization + orders.group_customer_organization_contact
+      x-ticvai-persistence: orders.group_customer_organisation + orders.group_customer_organisation_contact
       description: '**The organisation a group buys under.** Saved by `setGroupCustomerOrganization`
         (decided 29 September, readiness close-out); `listGroupCustomerOrganization` is the
         screen''s projection over these.
@@ -15189,6 +15236,7 @@ components:
       - participants
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -15375,16 +15423,16 @@ components:
           format: uuid
           description: The opportunity (`orders.group_enquiry`) this quote answers.
         organisationId:
-          x-ticvai-references: orders.group_customer_organization
+          x-ticvai-references: orders.group_customer_organisation
           type: string
           format: uuid
           nullable: true
         contactId:
-          x-ticvai-references: orders.group_customer_organization_contact
+          x-ticvai-references: orders.group_customer_organisation_contact
           type: string
           format: uuid
           nullable: true
-          description: A contact of the organisation (`orders.group_customer_organization_contact`).
+          description: A contact of the organisation (`orders.group_customer_organisation_contact`).
         salesOwnerPrincipalId:
           type: string
           format: uuid
@@ -15677,7 +15725,7 @@ components:
           maxLength: 500
           nullable: true
         contactId:
-          x-ticvai-references: orders.group_customer_organization_contact
+          x-ticvai-references: orders.group_customer_organisation_contact
           type: string
           format: uuid
           nullable: true
@@ -17224,6 +17272,9 @@ components:
         voidSameBusinessDayOnly:
           type: boolean
           default: true
+          description: A void is allowed only on the sale's own business day, which closes at the venue's
+            `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032), not at midnight when the
+            venue's day runs later.
         voidBeforeSettlementOnly:
           type: boolean
           default: true
@@ -17478,6 +17529,7 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         reservationId:
@@ -17766,7 +17818,7 @@ components:
       description: '**How long a hold lasts, what it locks, whether it may be extended, and what
         happens when it expires**, per hold type and scope (DM5, 29 September: data model for the
         agreed operations; written by `setReservationHoldPolicy`; MoM 1 Sep 4.11-4.12). The holds
-        themselves stay in `catalogue.inventory_hold`; this is the rule that sets their
+        themselves stay in `catalogue.inventory_reservation`; this is the rule that sets their
         `expiresAt`. Narrowest match wins.'
       required:
       - id
@@ -21216,6 +21268,8 @@ components:
         bookedWindow:
           $ref: '#/components/schemas/BookedWindow'
         inventoryHoldId:
+          x-ticvai-column: inventory_reservation_id
+          x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
           description: Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
@@ -21232,6 +21286,7 @@ components:
             POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder`
             refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`).
         resourceHoldId:
+          x-ticvai-column: resource_reservation_id
           type: string
           format: uuid
           nullable: true
@@ -21455,6 +21510,7 @@ components:
             type: string
             format: uuid
         resourceHoldId:
+          x-ticvai-column: resource_reservation_id
           type: string
           format: uuid
           nullable: true
@@ -21514,6 +21570,8 @@ components:
         lineTotal:
           $ref: ../shared/common.yaml#/components/schemas/Money
         inventoryHoldId:
+          x-ticvai-column: inventory_reservation_id
+          x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
           description: 'The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id
@@ -21925,6 +21983,7 @@ components:
           format: uuid
           description: The client UUIDv7 from `CreateOrderRequest.id`.
         orderNumber:
+          x-ticvai-unique: tenant
           type: string
           readOnly: true
           description: 'The number a guest reads and a cashier types. **Server-assigned: the venue prefix and
@@ -21942,6 +22001,16 @@ components:
             self-service adoption figures the operator will ask for within a month of launch.
 
             '
+        channelProfileId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The named sales channel the order came through** (catalogue `SalesChannelProfile.id`), set
+            by the server from the caller: a partner user''s or reseller''s channel, an API key''s channel. Null for
+            the venue''s own channels (POS, kiosk, web, app). Carried on `order.paid` so ticket issuing
+            (`issueOrderEntitlements`) reads the channel''s `ticketCredentialFormat` (MoM 2 Sep 2026 §4.7, MOM-0330;
+            12 October 2026, CHG-R6-031).'
         venueId:
           type: string
           format: uuid
@@ -22399,6 +22468,7 @@ components:
           readOnly: true
           description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001).
         amount:
+          x-ticvai-column: refunded_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPercentage:
           type: number
@@ -22571,6 +22641,7 @@ components:
 
             '
         amount:
+          x-ticvai-column: payment_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         changeAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money

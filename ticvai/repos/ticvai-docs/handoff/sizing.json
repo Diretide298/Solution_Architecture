@@ -100,14 +100,14 @@
      },
      "MarketingService": {
       "share": 9.5,
-      "rpsAtLoad": 36.3,
+      "rpsAtLoad": 36.4,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.045,
+      "utilisationAtSteady": 0.046,
       "scaleOutAt": 240,
       "stepAddsAt": 260,
       "drivenBy": "survivability floor"
@@ -184,7 +184,7 @@
      },
      "LedgerService": {
       "share": 2.6,
-      "rpsAtLoad": 10.1,
+      "rpsAtLoad": 10.0,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -307,8 +307,8 @@
        "TenancyService",
        "WalletService"
       ],
-      "share": 48.7,
-      "rpsAtLoad": 186.1,
+      "share": 48.6,
+      "rpsAtLoad": 186.0,
       "impliedByLoad": 1,
       "floor": 3,
       "steadyState": 3,
@@ -338,7 +338,7 @@
        "WhiteLabelService"
       ],
       "share": 34.5,
-      "rpsAtLoad": 131.9,
+      "rpsAtLoad": 132.0,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
@@ -385,7 +385,7 @@
     "services": {
      "CatalogueService": {
       "share": 23.2,
-      "rpsAtLoad": 526.7,
+      "rpsAtLoad": 526.4,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
@@ -399,7 +399,7 @@
      },
      "OrderService": {
       "share": 15.8,
-      "rpsAtLoad": 357.4,
+      "rpsAtLoad": 357.2,
       "rpsPerReplica": 250,
       "impliedByLoad": 3,
       "floor": 2,
@@ -413,7 +413,7 @@
      },
      "AccessService": {
       "share": 15.6,
-      "rpsAtLoad": 352.7,
+      "rpsAtLoad": 352.5,
       "rpsPerReplica": 800,
       "impliedByLoad": 1,
       "floor": 2,
@@ -427,21 +427,21 @@
      },
      "MarketingService": {
       "share": 9.5,
-      "rpsAtLoad": 214.9,
+      "rpsAtLoad": 215.9,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.269,
+      "utilisationAtSteady": 0.27,
       "scaleOutAt": 240,
       "stepAddsAt": 260,
       "drivenBy": "survivability floor"
      },
      "PlatformService": {
       "share": 7.0,
-      "rpsAtLoad": 157.7,
+      "rpsAtLoad": 157.6,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
@@ -455,7 +455,7 @@
      },
      "FnbService": {
       "share": 5.3,
-      "rpsAtLoad": 120.3,
+      "rpsAtLoad": 120.2,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -469,7 +469,7 @@
      },
      "VenueOpsService": {
       "share": 4.5,
-      "rpsAtLoad": 102.8,
+      "rpsAtLoad": 102.7,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -483,7 +483,7 @@
      },
      "TenancyService": {
       "share": 4.5,
-      "rpsAtLoad": 102.8,
+      "rpsAtLoad": 102.7,
       "rpsPerReplica": 500,
       "impliedByLoad": 1,
       "floor": 2,
@@ -497,7 +497,7 @@
      },
      "InventoryService": {
       "share": 3.1,
-      "rpsAtLoad": 70.1,
+      "rpsAtLoad": 70.0,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -511,7 +511,7 @@
      },
      "LedgerService": {
       "share": 2.6,
-      "rpsAtLoad": 59.6,
+      "rpsAtLoad": 59.5,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -525,7 +525,7 @@
      },
      "IdentityService": {
       "share": 2.3,
-      "rpsAtLoad": 52.6,
+      "rpsAtLoad": 52.5,
       "rpsPerReplica": 600,
       "impliedByLoad": 1,
       "floor": 2,
@@ -634,8 +634,8 @@
        "TenancyService",
        "WalletService"
       ],
-      "share": 48.7,
-      "rpsAtLoad": 1102.4,
+      "share": 48.6,
+      "rpsAtLoad": 1101.9,
       "impliedByLoad": 6,
       "floor": 3,
       "steadyState": 6,
@@ -646,7 +646,7 @@
        "AccessService"
       ],
       "share": 15.6,
-      "rpsAtLoad": 352.7,
+      "rpsAtLoad": 352.5,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
@@ -665,7 +665,7 @@
        "WhiteLabelService"
       ],
       "share": 34.5,
-      "rpsAtLoad": 781.3,
+      "rpsAtLoad": 782.0,
       "impliedByLoad": 4,
       "floor": 2,
       "steadyState": 4,
@@ -712,7 +712,7 @@
     "services": {
      "CatalogueService": {
       "share": 23.2,
-      "rpsAtLoad": 1635.8,
+      "rpsAtLoad": 1634.9,
       "rpsPerReplica": 400,
       "impliedByLoad": 7,
       "floor": 2,
@@ -726,7 +726,7 @@
      },
      "OrderService": {
       "share": 15.8,
-      "rpsAtLoad": 1109.9,
+      "rpsAtLoad": 1109.3,
       "rpsPerReplica": 250,
       "impliedByLoad": 8,
       "floor": 2,
@@ -740,7 +740,7 @@
      },
      "AccessService": {
       "share": 15.6,
-      "rpsAtLoad": 1095.4,
+      "rpsAtLoad": 1094.8,
       "rpsPerReplica": 800,
       "impliedByLoad": 3,
       "floor": 2,
@@ -754,21 +754,21 @@
      },
      "MarketingService": {
       "share": 9.5,
-      "rpsAtLoad": 667.4,
+      "rpsAtLoad": 670.7,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.556,
+      "utilisationAtSteady": 0.559,
       "scaleOutAt": 240,
       "stepAddsAt": 260,
       "drivenBy": "load"
      },
      "PlatformService": {
       "share": 7.0,
-      "rpsAtLoad": 489.6,
+      "rpsAtLoad": 489.4,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
@@ -782,7 +782,7 @@
      },
      "FnbService": {
       "share": 5.3,
-      "rpsAtLoad": 373.6,
+      "rpsAtLoad": 373.4,
       "rpsPerReplica": 300,
       "impliedByLoad": 3,
       "floor": 2,
@@ -796,7 +796,7 @@
      },
      "VenueOpsService": {
       "share": 4.5,
-      "rpsAtLoad": 319.2,
+      "rpsAtLoad": 319.0,
       "rpsPerReplica": 300,
       "impliedByLoad": 2,
       "floor": 2,
@@ -810,7 +810,7 @@
      },
      "TenancyService": {
       "share": 4.5,
-      "rpsAtLoad": 319.2,
+      "rpsAtLoad": 319.0,
       "rpsPerReplica": 500,
       "impliedByLoad": 2,
       "floor": 2,
@@ -824,7 +824,7 @@
      },
      "InventoryService": {
       "share": 3.1,
-      "rpsAtLoad": 217.6,
+      "rpsAtLoad": 217.5,
       "rpsPerReplica": 300,
       "impliedByLoad": 2,
       "floor": 2,
@@ -838,7 +838,7 @@
      },
      "LedgerService": {
       "share": 2.6,
-      "rpsAtLoad": 185.0,
+      "rpsAtLoad": 184.9,
       "rpsPerReplica": 300,
       "impliedByLoad": 2,
       "floor": 2,
@@ -852,7 +852,7 @@
      },
      "IdentityService": {
       "share": 2.3,
-      "rpsAtLoad": 163.2,
+      "rpsAtLoad": 163.1,
       "rpsPerReplica": 600,
       "impliedByLoad": 1,
       "floor": 2,
@@ -866,7 +866,7 @@
      },
      "WhiteLabelService": {
       "share": 2.2,
-      "rpsAtLoad": 156.0,
+      "rpsAtLoad": 155.9,
       "rpsPerReplica": 500,
       "impliedByLoad": 1,
       "floor": 2,
@@ -894,7 +894,7 @@
      },
      "AiService": {
       "share": 1.3,
-      "rpsAtLoad": 90.7,
+      "rpsAtLoad": 90.6,
       "rpsPerReplica": 100,
       "impliedByLoad": 2,
       "floor": 2,
@@ -908,7 +908,7 @@
      },
      "RetailService": {
       "share": 1.3,
-      "rpsAtLoad": 90.7,
+      "rpsAtLoad": 90.6,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -961,8 +961,8 @@
        "TenancyService",
        "WalletService"
       ],
-      "share": 48.7,
-      "rpsAtLoad": 3423.9,
+      "share": 48.6,
+      "rpsAtLoad": 3422.1,
       "impliedByLoad": 17,
       "floor": 3,
       "steadyState": 17,
@@ -973,7 +973,7 @@
        "AccessService"
       ],
       "share": 15.6,
-      "rpsAtLoad": 1095.4,
+      "rpsAtLoad": 1094.8,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
@@ -992,7 +992,7 @@
        "WhiteLabelService"
       ],
       "share": 34.5,
-      "rpsAtLoad": 2426.5,
+      "rpsAtLoad": 2428.8,
       "impliedByLoad": 12,
       "floor": 2,
       "steadyState": 12,
@@ -1003,7 +1003,7 @@
        "AiService"
       ],
       "share": 1.3,
-      "rpsAtLoad": 90.7,
+      "rpsAtLoad": 90.6,
       "impliedByLoad": 2,
       "floor": 4,
       "steadyState": 4,

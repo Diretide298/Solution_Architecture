@@ -1,4 +1,23 @@
 {
+ "archiveEntitlementTemplate": {
+  "method": "POST",
+  "path": "/entitlement-templates/{templateId}/archive",
+  "contract": "catalogue",
+  "summary": "Archive an entitlement template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "EntitlementTemplate"
+ },
  "commitCatalogueImport": {
   "method": "POST",
   "path": "/products/import/{jobId}/commit",
@@ -55,6 +74,25 @@
   ],
   "requestBody": "DonationCampaign",
   "responds": "DonationCampaign"
+ },
+ "createEntitlementTemplate": {
+  "method": "POST",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "Create an entitlement template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EntitlementTemplate",
+  "responds": "EntitlementTemplate"
  },
  "createJourney": {
   "method": "POST",
@@ -164,6 +202,19 @@
   "requestBody": null,
   "responds": "CatalogueImportJob"
  },
+ "getEntitlementTemplate": {
+  "method": "GET",
+  "path": "/entitlement-templates/{templateId}",
+  "contract": "catalogue",
+  "summary": "Read an entitlement template",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementTemplate"
+ },
  "importProductCatalogue": {
   "method": "POST",
   "path": "/products/import",
@@ -254,6 +305,19 @@
   "requestBody": null,
   "responds": "DonationCampaign"
  },
+ "listEntitlementTemplates": {
+  "method": "GET",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "List entitlement templates",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementTemplate"
+ },
  "listJourneys": {
   "method": "GET",
   "path": "/journeys",
@@ -334,6 +398,65 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ProductCategoryNode"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entitlementTemplateId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSaleBoards": {
   "method": "GET",
@@ -538,6 +661,25 @@
   "requestBody": "RunReportRequest",
   "responds": "ReportResult"
  },
+ "setEntitlementTemplateBlackoutDates": {
+  "method": "PUT",
+  "path": "/entitlement-templates/{templateId}/blackout-dates",
+  "contract": "catalogue",
+  "summary": "Set the dates a product's entitlement does not admit",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "EntitlementTemplate"
+ },
  "setProductCategories": {
   "method": "PUT",
   "path": "/product-categories",
@@ -575,6 +717,25 @@
   ],
   "requestBody": "DonationCampaign",
   "responds": "DonationCampaign"
+ },
+ "updateEntitlementTemplate": {
+  "method": "PATCH",
+  "path": "/entitlement-templates/{templateId}",
+  "contract": "catalogue",
+  "summary": "Update an entitlement template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateEntitlementTemplateRequest",
+  "responds": "EntitlementTemplate"
  },
  "updateMerchandise": {
   "method": "PATCH",

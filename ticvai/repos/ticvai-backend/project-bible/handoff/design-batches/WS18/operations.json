@@ -136,6 +136,19 @@
   "requestBody": null,
   "responds": "MfaMethod"
  },
+ "listSegregationRules": {
+  "method": "GET",
+  "path": "/segregation-rules",
+  "contract": "identity",
+  "summary": "Read the conflicting-permission rules back",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SegregationRule"
+ },
  "listStepUpPolicies": {
   "method": "GET",
   "path": "/step-up-policies",

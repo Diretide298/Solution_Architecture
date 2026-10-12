@@ -1703,6 +1703,9 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: bookVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
       x-ticvai-write-via:
       - table: catalogue.inventory_reservation
         operation: acquireInventoryHold
@@ -1710,9 +1713,6 @@ paths:
         operation: createCart
       - table: orders.cart_line
         operation: addCartLine
-      x-ticvai-consumed-by:
-        - "P01 WEB-050 Plan Your Visit"
-        - "P02 GST-053 Your Plan"
       security:
       - guestAuth: []
       x-ticvai-agreed: '29 September: MOB-6 ("Book this plan" to GST-041); shape follows addCartLine, whose rules it applies line by line'

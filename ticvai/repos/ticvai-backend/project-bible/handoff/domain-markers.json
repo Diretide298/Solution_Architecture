@@ -428,6 +428,9 @@
  "event:reporting.definitionPublished": [
   "ai:consumes"
  ],
+ "event:reporting.questionAnswered": [
+  "ai:consumes"
+ ],
  "event:retail.merchandisePublished": [
   "ai:consumes"
  ],

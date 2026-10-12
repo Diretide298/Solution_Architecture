@@ -361,6 +361,7 @@
     }
    },
    "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -411,6 +412,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
     "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
@@ -2156,6 +2159,7 @@
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
@@ -2167,6 +2171,13 @@
      }
     ],
     "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "channelProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The named sales channel the order came through** (catalogue `SalesChannelProfile.id`), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. Null for the venue's own channels (POS, kiosk, web, app). Carried on `order.paid` so ticket issuing (`issueOrderEntitlements`) reads the channel's `ticketCredentialFormat` (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026, CHG-R6-031)."
    },
    "venueId": {
     "type": "string",
@@ -2544,6 +2555,7 @@
     "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
+    "x-ticvai-column": "payment_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "changeAmount": {

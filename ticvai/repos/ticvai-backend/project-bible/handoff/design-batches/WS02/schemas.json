@@ -1393,7 +1393,8 @@
    },
    "productId": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.product"
    },
    "minAgeYears": {
     "type": "integer",

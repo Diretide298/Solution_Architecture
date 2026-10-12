@@ -43,12 +43,33 @@ UNMAPPED = "no existing table"
 SCOPE = {"venue", "region", "brand", "country", "scope", "org_unit", "tenant_scope"}
 
 
+def declared(name: str) -> list:
+    """`RENAMES` or `COLUMN_RENAMES` from tools/derive-schema-history.py, read without running it."""
+    import ast
+    try:
+        tree = ast.parse((g.ROOT / "tools" / "derive-schema-history.py").read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):
+        return []
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == name for t in node.targets):
+            return ast.literal_eval(node.value)
+    return []
+
+
 def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-parameter-columns", RULES)
     lin = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
     cols = {t: {c.get("column") for c in v} for t, v in (ref.get("cols") or {}).items()}
+    # **A renamed table still answers to the wire's name for it** (CHG-R6-010, 12 October 2026): CR-011 renamed
+    # tables and columns on the database side only, so `getSeatHold` keeps `holdId` for `seating.seat_reservation`.
+    # The old names a declared rename retired (tools/derive-schema-history.py) count as the table's and column's.
+    aka: dict = {}
+    for r in declared("RENAMES"):
+        aka.setdefault(r["to"], set()).add(str(r["from"]).split(".", 1)[-1])
+    for r in declared("COLUMN_RENAMES"):
+        cols.setdefault(r["table"], set()).add(r["from"])
     for stem, _rel, doc in g.contracts():
         for path, item in ((doc or {}).get("paths") or {}).items():
             for verb, op in (item or {}).items():
@@ -88,6 +109,8 @@ def main() -> int:
                     if any(col in cols.get(t, ()) or col + "s" in cols.get(t, ()) for t in tables):
                         continue
                     if any(base in t.split(".", 1)[1] or t.split(".", 1)[1] in base for t in tables):
+                        continue
+                    if any(base in o or o in base for t in tables for o in aka.get(t, ())):
                         continue
                     guard.add("P-PARAM-NO-COLUMN", f"{oid}.{n}",
                               f"{stem}.{oid} takes {n} and none of {', '.join(sorted(tables))} has {col}")

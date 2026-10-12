@@ -211,6 +211,14 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
             if isinstance(part, dict) and part.get("$ref"):
                 ref = part["$ref"]
                 break
+    # **A one-member `oneOf` is that member** (CHG-R6-011, ADAM CR-011, 12 October 2026). `cashDrawerLimit` on
+    # `VenueSettings` and `Workstation` is `oneOf: [Money]` (an `allOf` would make check-contract-compat read
+    # Money's required fields as new required request fields), and fell through to `text`: a money column
+    # typed text. It is the `Money` it names, so `numeric(18,4)` like every other.
+    if not ref and isinstance(spec.get("oneOf"), list) and len(spec["oneOf"]) == 1:
+        part = spec["oneOf"][0]
+        if isinstance(part, dict) and part.get("$ref"):
+            ref = part["$ref"]
     if ref:
         name = ref.rsplit("/", 1)[-1]
         if name in persisted:
@@ -432,16 +440,17 @@ def required_of(body, schemas: dict | None = None, _seen=None) -> set:
     return out
 
 
-def _declared_renames() -> list[dict]:
-    """The table renames declared in derive-schema-history.py (`RENAMES`), read from its source
-    so importing it cannot run anything. Empty if the file cannot be read."""
+def _declared_renames(name: str = "RENAMES") -> list[dict]:
+    """The table renames declared in derive-schema-history.py (`RENAMES`), or its column renames
+    (`COLUMN_RENAMES`), read from its source so importing it cannot run anything. Empty if the file
+    cannot be read."""
     import ast
     try:
         tree = ast.parse((ROOT / "tools" / "derive-schema-history.py").read_text(encoding="utf-8"))
     except (OSError, SyntaxError):
         return []
     for node in tree.body:
-        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "RENAMES"
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == name
                                                 for t in node.targets):
             return ast.literal_eval(node.value)
     return []
@@ -530,6 +539,23 @@ def main() -> int:
         for r in json.loads(graph_path.read_text(encoding="utf-8")).get("rels", []):
             if r.get("to"):
                 edges[(r["frm"], r["col"])] = r
+    # **A declared rename reaches the graph's edges too** (CHG-R6-010, 12 October 2026). The graph is rebuilt
+    # after this runs (refresh.sh: derive-schema, then derive-relationships), so on the run that renames a table
+    # or a column it still holds the old names. Read as they are, its edges re-create the old column beside the
+    # renamed one (`orders.order_line.inventory_hold_id -> catalogue.inventory_hold` next to
+    # `inventory_reservation_id`), as a relationship-graph column that is then kept for good. An edge from or to a
+    # renamed table is read under the new name, and an edge on a renamed column is dropped: the contract's column
+    # carries the link from the next graph on.
+    _tmap = {r["from"]: r["to"] for r in _declared_renames()}
+    _cgone = {(r["table"], r["from"]) for r in _declared_renames("COLUMN_RENAMES")}
+    if _tmap or _cgone:
+        _moved = {}
+        for (_f, _c), _r in edges.items():
+            _f2 = _tmap.get(_f, _f)
+            if (_f2, _c) in _cgone:
+                continue
+            _moved[(_f2, _c)] = dict(_r, frm=_f2, to=_tmap.get(_r["to"], _r["to"]))
+        edges = _moved
 
     ref_path = HANDOFF / "schema-reference.json"
     S = json.loads(ref_path.read_text(encoding="utf-8"))
@@ -949,6 +975,48 @@ def main() -> int:
             # nowhere. The other 594 are declared and should be enforced by the database.
             "enforced": "yes" if e.get("how") == "declared" else "no",
         })
+
+    # **The contract's own declaration wins over the graph's label** (CHG-R6-015, 12 October 2026). The graph
+    # above is last run's: refresh.sh runs this before derive-relationships, so a key a contract has just declared
+    # with `x-ticvai-references` (CR-007 to CR-013) came out as last run's `convention` on the first refresh and as
+    # `declared` only on the second, and a renamed key lost its target altogether. The declaration is read here
+    # too: a table name sets the target, declared and enforced; `none` says the field is not a key at all.
+    def _xref_of(src: str):
+        bits = src.split(".", 2)
+        if len(bits) != 3:
+            return None
+        body = all_schemas.get(bits[1])
+        if not isinstance(body, dict):
+            return None
+        path = bits[2]
+        if "[]." in path:
+            arr, leaf = path.split("[].", 1)
+            aspec = properties_of(body, all_schemas).get(arr) or {}
+            items = aspec.get("items") or {} if isinstance(aspec, dict) else {}
+            if isinstance(items, dict) and items.get("$ref"):
+                items = all_schemas.get(items["$ref"].rsplit("/", 1)[-1]) or {}
+            spec = properties_of(items, all_schemas).get(leaf) if isinstance(items, dict) else None
+        else:
+            spec = properties_of(body, all_schemas).get(path)
+        v = spec.get("x-ticvai-references") if isinstance(spec, dict) else None
+        return v.strip() if isinstance(v, str) and v.strip() else None
+
+    _xrefs = 0
+    for _t, _row in existing.items():
+        for _c in _row:
+            _v = _xref_of(str(_c.get("source", "")))
+            if not _v:
+                continue
+            if _v.lower() == "none":
+                for _k in ("references", "referenceKind", "referenceHow", "enforced"):
+                    _c.pop(_k, None)
+            elif _v in existing:
+                _c.update({"references": _v, "referenceKind": "foreignKey", "referenceHow": "declared",
+                           "enforced": "yes"})
+            else:
+                continue
+            _xrefs += 1
+    print(f"  contract-declared references read from x-ticvai-references: {_xrefs}")
 
     def _from_contract(c) -> bool:
         return str(c.get("source", "")).count(".") >= 2 and not str(c.get("source", "")).startswith(

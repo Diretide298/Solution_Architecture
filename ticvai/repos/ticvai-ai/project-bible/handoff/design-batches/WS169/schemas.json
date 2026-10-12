@@ -317,7 +317,7 @@
   }
  },
  "SeatHold": {
-  "x-ticvai-persistence": "seating.seat_hold",
+  "x-ticvai-persistence": "seating.seat_reservation",
   "type": "object",
   "required": [
    "id",

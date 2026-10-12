@@ -737,6 +737,13 @@
        "label": "Confirm",
        "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Cancel notices sent",
+       "operation": "listMessageDispatches",
+       "notes": "For a cancelled performance, the notices `notifyPerformanceHolders` sent (`sourceRef` = the performance id): delivered, failed and suppressed, guest by guest, so the refunds desk can confirm the guests were told before they travel (F09 step 5). Shown when the refunds are for a cancelled performance.",
+       "provenance": "contract marketing-crm.yaml GET /message-dispatches (12 October 2026, CHG-R6-038)"
       }
      ]
     },
@@ -1157,6 +1164,13 @@
     "purpose": "Refund every order against a cancelled performance",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listMessageDispatches",
+    "contract": "marketing-crm",
+    "purpose": "The cancel notices sent for a cancelled performance (sourceRef = performanceId): delivered, failed and suppressed, so F09 step 5 can confirm the guests were told",
+    "trigger": "onAction",
+    "provenance": "12 October 2026 (CHG-R6-038)"
    }
   ],
   "entryState": {

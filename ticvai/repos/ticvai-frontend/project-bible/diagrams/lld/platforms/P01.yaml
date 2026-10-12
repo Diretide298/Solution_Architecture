@@ -47,7 +47,7 @@ servicesCalled:
 - service: OrderService
   operationCalls: 56
 - service: CatalogueService
-  operationCalls: 44
+  operationCalls: 46
 - service: VenueOpsService
   operationCalls: 39
 - service: IdentityService
@@ -283,6 +283,8 @@ screens:
   - getCart
   - getPerformance
   - getPublishedBookingFlow
+  - joinWaitlist
+  - leaveWaitlist
   - listPerformances
   - recordConsentAnswers
   states:

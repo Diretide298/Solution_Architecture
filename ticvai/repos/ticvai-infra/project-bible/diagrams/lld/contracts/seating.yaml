@@ -1,5 +1,5 @@
 id: LLD-seating
-title: seating — 55 operations
+title: seating — 56 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -16,10 +16,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - seating.seat_hold
+  - seating.seat_reservation
   writes:
   - cache:idempotency
-  - seating.seat_hold
+  - seating.seat_reservation
 - operation: allocateGroupSeats
   verb: POST
   path: /group-seat-requests/{requestId}/allocate
@@ -34,17 +34,17 @@ operations:
   - seating.seat
   - seating.seat_block
   - seating.seat_category
-  - seating.seat_hold
-  - seating.seat_hold_item
   - seating.seat_price_band
+  - seating.seat_reservation
+  - seating.seat_reservation_item
   - seating.seating_rules
   - seating.section
   - seating.section_row
   writes:
   - cache:idempotency
   - seating.group_request
-  - seating.seat_hold
-  - seating.seat_hold_item
+  - seating.seat_reservation
+  - seating.seat_reservation_item
 - operation: assignSeats
   verb: POST
   path: /performances/{performanceId}/assign-seats
@@ -57,12 +57,12 @@ operations:
   - cache:idempotency
   - catalogue.price
   - seating.seat
-  - seating.seat_hold
+  - seating.seat_reservation
   - seating.seating_rules
   writes:
   - cache:idempotency
   - seating.seat
-  - seating.seat_hold
+  - seating.seat_reservation
 - operation: cloneSeatMap
   verb: POST
   path: /seat-maps/{seatMapId}/clone
@@ -162,11 +162,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - seating.seat_hold
+  - seating.seat_reservation
   writes:
   - cache:idempotency
   - platform.outbox
-  - seating.seat_hold
+  - seating.seat_reservation
 - operation: createSeatHoldPool
   verb: POST
   path: /seat-hold-pools
@@ -222,6 +222,22 @@ operations:
   - seating.seat_map
   - seating.section
   writes: []
+- operation: editSeatMapStructure
+  verb: PATCH
+  path: /seat-maps/{seatMapId}/structure
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  writes:
+  - cache:idempotency
+  - seating.seat
+  - seating.seat_map
+  - seating.section
 - operation: extendSeatHold
   verb: POST
   path: /seat-holds/{holdId}/extend
@@ -232,10 +248,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - seating.seat_hold
+  - seating.seat_reservation
   writes:
   - cache:idempotency
-  - seating.seat_hold
+  - seating.seat_reservation
 - operation: getAccessibleSeating
   verb: GET
   path: /accessible-seating
@@ -270,7 +286,7 @@ operations:
   reads:
   - seating.seat
   - seating.seat_category
-  - seating.seat_hold
+  - seating.seat_reservation
   writes: []
 - operation: getSeatHold
   verb: GET
@@ -281,7 +297,7 @@ operations:
   - staff
   offline: false
   reads:
-  - seating.seat_hold
+  - seating.seat_reservation
   writes: []
 - operation: getSeatInventory
   verb: GET
@@ -297,8 +313,8 @@ operations:
   - seating.seat_block
   - seating.seat_block_item
   - seating.seat_category
-  - seating.seat_hold
-  - seating.seat_hold_item
+  - seating.seat_reservation
+  - seating.seat_reservation_item
   - seating.seat_rules
   writes: []
 - operation: getSeatMap
@@ -333,7 +349,7 @@ operations:
   - staff
   offline: false
   reads:
-  - seating.recommendation_rules
+  - seating.recommendation_rule
   writes: []
 - operation: getSeatReconciliation
   verb: GET
@@ -346,8 +362,8 @@ operations:
   reads:
   - seating.seat
   - seating.seat_block_item
-  - seating.seat_hold
-  - seating.seat_hold_item
+  - seating.seat_reservation
+  - seating.seat_reservation_item
   writes: []
 - operation: getSeatRules
   verb: GET
@@ -546,13 +562,13 @@ operations:
   reads:
   - catalogue.performance
   - seating.accessible
-  - seating.recommendation_rules
+  - seating.recommendation_rule
   - seating.seat
   - seating.seat_block_item
   - seating.seat_category
-  - seating.seat_hold
-  - seating.seat_hold_item
   - seating.seat_price_band
+  - seating.seat_reservation
+  - seating.seat_reservation_item
   writes: []
 - operation: releaseSeatHoldPool
   verb: POST
@@ -592,10 +608,10 @@ operations:
   - staff
   offline: false
   reads:
-  - seating.seat_hold
+  - seating.seat_reservation
   writes:
   - platform.outbox
-  - seating.seat_hold
+  - seating.seat_reservation
 - operation: setAccessibleSeating
   verb: PUT
   path: /accessible-seating
@@ -620,7 +636,7 @@ operations:
   - cache:idempotency
   - seating.group_request
   - seating.group_request_participant
-  - seating.seat_hold_item
+  - seating.seat_reservation_item
   writes:
   - cache:idempotency
   - seating.group_request_participant
@@ -661,9 +677,9 @@ operations:
   - staff
   offline: false
   reads:
-  - seating.recommendation_rules
+  - seating.recommendation_rule
   writes:
-  - seating.recommendation_rules
+  - seating.recommendation_rule
 - operation: setSeatRules
   verb: PUT
   path: /seat-rules

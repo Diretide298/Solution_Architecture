@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 235
+  x-ticvai-screen-count: 237
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -923,12 +923,12 @@ paths:
         format: uuid
     post:
       operationId: reinstateEntitlement
-      x-ticvai-write-via:
-      - table: access.entitlement
-        event: entitlement.statusChanged
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       summary: Lift a suspension
       description: '1.1.100. **`suspendEntitlement` had no inverse**, so a membership suspended for a
         chargeback that was later resolved stayed suspended.
@@ -990,12 +990,12 @@ paths:
         format: uuid
     post:
       operationId: freezeEntitlement
-      x-ticvai-write-via:
-      - table: access.entitlement
-        event: entitlement.statusChanged
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1443,6 +1443,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: joinWaitlist
+      x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Performance Selection"
+        - "P02 GST-007 Select Date & Time"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1507,6 +1510,9 @@ paths:
         format: uuid
     delete:
       operationId: leaveWaitlist
+      x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Performance Selection"
+        - "P02 GST-007 Select Date & Time"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5069,11 +5075,11 @@ paths:
         format: uuid
     post:
       operationId: suspendEntitlement
+      x-ticvai-consumed-by:
+        - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.statusChanged
-      x-ticvai-consumed-by:
-        - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-audience:
       - staff
       summary: Suspend or reinstate an entitlement

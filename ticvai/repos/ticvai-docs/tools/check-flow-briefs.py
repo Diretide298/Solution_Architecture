@@ -40,6 +40,9 @@ import sys
 
 import yaml
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ticket_done import MERGED_NOTE  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REQUIRED = ['title', 'process', 'trigger', 'actors', 'inputs', 'processing', 'outputs', 'steps',
             'motion', 'decisions', 'sources', 'open']
@@ -53,6 +56,9 @@ OP_RE = re.compile(r'\b([a-z][a-z0-9-]*)#([a-z][A-Za-z0-9]*)\b')
 STEP_OP_KEYS = ('operation', 'operations', 'calls')
 STEP_OP_TOKEN = re.compile(r'^[a-z][a-z0-9-]*#[a-z][A-Za-z0-9]*$')
 PARENS = re.compile(r'\([^()]*\)')
+# screen -> the screen it was merged into (its notes lead with "**Merged into X**", tools/ticket_done.py MERGED_NOTE).
+# A Block A frame drawn on a merged screen names a screen no Block A task builds (F164 on ADM-243, N10; CHG-R6-046).
+MERGED = {}
 
 
 def step_op_problems(value):
@@ -85,6 +91,9 @@ def package():
         for s in (load_yaml(f) or {}).get('screens') or []:
             if isinstance(s, dict) and s.get('id'):
                 screens.add(s['id'])
+                m = MERGED_NOTE.search(str(s.get('notes') or ''))
+                if m:
+                    MERGED[s['id']] = m.group(1)
     ops = {}
     for f in glob.glob(os.path.join(ROOT, 'contracts', '*', '*.yaml')):
         name = os.path.splitext(os.path.basename(f))[0]
@@ -202,6 +211,11 @@ def check_flow(fid, fl, screens, ops, flows, err, warn):
             err(f'{fid}: steps[{i}] has no screen')
         elif len(st) < 3:
             err(f'{fid}: steps[{i}] says too little (screen plus what is seen, done and the result)')
+        if isinstance(st, dict) and str(st.get('block') or '') == 'A':
+            sm = SCREEN_RE.match(str(st.get('screen') or ''))
+            if sm and sm.group(1) in MERGED:
+                err(f'{fid}: steps[{i}] is a Block A frame on {sm.group(1)}, which is merged into '
+                    f'{MERGED[sm.group(1)]} and has no Block A task of its own; draw it on {MERGED[sm.group(1)]}')
         if isinstance(st, dict):
             for k in STEP_OP_KEYS:
                 if k in st:

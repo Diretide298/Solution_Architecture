@@ -221,7 +221,7 @@ stores — the viewer flags it and it should be listed.
 **5. Change B — the product split** (Catalogue keeps ticket and parking; F&B and Retail own theirs;
 all three through OrderService) is **not started**. It needs three decisions first: where
 `giftCard` / `rental` / `addOn` go, whether F&B and Retail need a lease
-(`catalogue.inventory_hold`), and whether `searchCatalogue` still spans all three.
+(`catalogue.inventory_reservation`), and whether `searchCatalogue` still spans all three.
 
 **6. The Modules sheet says `control` has 41 tables; the DDL creates 50.** The `Tables` column is
 read from `handoff/modules.json`, which is hand-maintained, while `Written` beside it is counted

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 35 of 257 |
+| Operations in the slice | 35 of 258 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -266,7 +266,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.biometric_profile`, `access.face_reenrolment_attempt`, `cache:idempotency`, `marketing.consent_record`, `pii.subject`, `pii.subject_biometric` |
-| Writes | `access.biometric_audit_event`, `access.face_reenrolment_attempt`, `cache:idempotency`, `marketing.consent_record`, `pii.subject_biometric` |
+| Writes | `access.biometric_audit_event`, `access.face_reenrolment_attempt`, `cache:idempotency`, `marketing.consent_record`, `pii.subject_biometric`, `platform.outbox` |
 | Called by | GST-069 |
 
 **Parameters**
@@ -344,7 +344,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.biometric_profile`, `cache:idempotency`, `pii.subject_biometric` |
-| Writes | `cache:idempotency`, `pii.subject_biometric` |
+| Writes | `cache:idempotency`, `pii.subject_biometric`, `platform.outbox` |
 | Called by | POS-005 |
 
 **Parameters**
@@ -440,6 +440,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | venueId | string (uuid) |  |  |
 | scopePath | string |  |  |
 | mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| credentialFormat | object |  | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… (nullable) |
 | status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
 | statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
 | validFrom | string (date-time) | yes |  |
@@ -480,6 +481,8 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the same entitlement, and the old one stops scanning.
 **The code rotates offline too** (decided 28 September, audit R230). While online the app fetches `rotation`, a time-based seed: the secret, the time step, the digits and the algorithm, valid from `validFrom` to `validTo`. The app derives the current rotating code on the device from the seed and the clock, with no signal, and shows it with a countdown to the next step (GST-013, GST-055, WEB-018; no screenshot blocking on web, audit R077 (c)). **Gates verify the code offline against the same seed**, which they hold in their offline package, accepting the current step and one step either side for clock drift. `rotate=true` replaces the seed, so a stolen phone's codes stop verifying once gates have the new one.
 
+**The format follows the entitlement's `credentialFormat`** (MOM-0330; CHG-R6-031). `platformSignedQr` is the behaviour above. `staticQr` returns the signed `payload` with `rotation` null, so the same code can be printed or sent in a partner's batch. `rfidCard` returns nothing to display as a code: `payload` and `mediaCode` are the card or wristband serial once one is bound at collection, and the app shows the ticket as collect-at-venue.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -505,6 +508,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | mediaCode | string |  |  |
+| credentialFormat | object |  | The entitlement's credentialFormat; platformSignedQr where it is null (CHG-R6-031). |
 | payload | string |  |  |
 | expiresAt | string (date-time) |  | (nullable) |
 | rotation | object |  | The time-based seed the rotating code is derived from (audit R230). (nullable) |
@@ -656,6 +660,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].venueId | string (uuid) |  |  |
 | items[].scopePath | string |  |  |
 | items[].mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| items[].credentialFormat | object |  | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… (nullable) |
 | items[].status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
 | items[].statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
 | items[].validFrom | string (date-time) | yes |  |
@@ -735,6 +740,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].venueId | string (uuid) |  |  |
 | items[].scopePath | string |  |  |
 | items[].mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| items[].credentialFormat | object |  | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… (nullable) |
 | items[].status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
 | items[].statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
 | items[].validFrom | string (date-time) | yes |  |
@@ -848,7 +854,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `pii.subject_biometric` |
-| Writes | `access.biometric_audit_event`, `cache:idempotency`, `pii.subject_biometric` |
+| Writes | `access.biometric_audit_event`, `cache:idempotency`, `pii.subject_biometric`, `platform.outbox` |
 | Called by | GST-069, WEB-024 |
 
 **Parameters**
@@ -2818,6 +2824,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | no |  |
 | scope_path | text | no |  |
 | media_code | text | no | What is scanned — a QR payload, a wristband serial, a card number. |
+| credential_format | text | no | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… |
 | status | text | yes |  |
 | status_note | text | no | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. |
 | valid_from | timestamptz | yes |  |
@@ -2971,11 +2978,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-222 operations, added to this service in later releases without changing any of the above.
+223 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `getFaceReenrolmentImages`, `getHardwareModelCertification`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `listVisualAccessRules`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHardwareModelCertification`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
+| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `getFaceReenrolmentImages`, `getHardwareModelCertification`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `listVisualAccessRules`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaCapacity`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHardwareModelCertification`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | general | `getBiometricVerificationProfile`, `getBleBeaconGeofence`, `getFacePassEnrollmentConfiguration`, `getPdfPrintablePos`, `getVirtualTicketIdentity` |

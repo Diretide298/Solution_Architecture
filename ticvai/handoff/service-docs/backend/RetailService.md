@@ -19,7 +19,7 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 
 | Service | Tables it reads |
 |---|---|
-| [InventoryService](InventoryService.md) | `inventory.kit_component`, `inventory.movement`, `inventory.stock_reservation` |
+| [InventoryService](InventoryService.md) | `inventory.kit_component`, `inventory.movement`, `inventory.stock_earmark` |
 
 ## Operations in the first release
 
@@ -308,8 +308,8 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `inventory.movement`, `inventory.stock_reservation`, `retail.reservation`, `retail.reservation_line` |
-| Writes | `cache:idempotency`, `inventory.stock_reservation`, `retail.reservation`, `retail.reservation_line` |
+| Reads | `cache:idempotency`, `inventory.movement`, `inventory.stock_earmark`, `retail.reservation`, `retail.reservation_line` |
+| Writes | `cache:idempotency`, `inventory.stock_earmark`, `retail.reservation`, `retail.reservation_line` |
 | Called by | EMP-068, GST-026, KSK-017, POS-012 |
 | State model | Merchandise reservation ([states/merchandise-reservation.yaml](../../../states/merchandise-reservation.yaml)): created as `reserved` |
 

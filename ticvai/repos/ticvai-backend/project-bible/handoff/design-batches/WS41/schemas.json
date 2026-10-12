@@ -1134,6 +1134,7 @@
     "description": "The accountable team or person."
    },
    "dataControllerApplicableOrganization": {
+    "x-ticvai-column": "data_controller_applicable_organisation",
     "type": "string",
     "maxLength": 200,
     "nullable": true,

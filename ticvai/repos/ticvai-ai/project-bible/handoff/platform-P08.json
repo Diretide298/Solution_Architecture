@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 1661,
-  "operations": 1881,
+  "screens": 1663,
+  "operations": 1889,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 189
+  "operationsWithNoScreen": 186
  },
  "waves": {
-  "wave1": 140,
+  "wave1": 141,
   "wave2": 58,
-  "wave3": 1463
+  "wave3": 1464
  },
  "modules": [
   {
@@ -67,7 +67,7 @@
   },
   {
    "module": "Sell",
-   "screens": 111,
+   "screens": 112,
    "waves": [
     1,
     2,
@@ -101,7 +101,7 @@
   },
   {
    "module": "Setup & Go-Live",
-   "screens": 21,
+   "screens": 22,
    "waves": [
     3
    ]
@@ -179,11 +179,11 @@
  "contracts": [
   {
    "contract": "access",
-   "operations": 237
+   "operations": 238
   },
   {
    "contract": "catalogue",
-   "operations": 223
+   "operations": 227
   },
   {
    "contract": "orders",
@@ -191,7 +191,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 141
+   "operations": 142
   },
   {
    "contract": "promotions",
@@ -210,11 +210,11 @@
    "operations": 61
   },
   {
-   "contract": "resources",
+   "contract": "ai",
    "operations": 56
   },
   {
-   "contract": "ai",
+   "contract": "resources",
    "operations": 56
   },
   {
@@ -223,7 +223,7 @@
   },
   {
    "contract": "seating",
-   "operations": 52
+   "operations": 53
   },
   {
    "contract": "approvals",
@@ -246,19 +246,19 @@
    "operations": 44
   },
   {
-   "contract": "maintenance",
-   "operations": 41
-  },
-  {
    "contract": "workforce",
    "operations": 41
   },
   {
-   "contract": "rental",
-   "operations": 40
+   "contract": "identity",
+   "operations": 41
   },
   {
-   "contract": "identity",
+   "contract": "maintenance",
+   "operations": 41
+  },
+  {
+   "contract": "rental",
    "operations": 40
   },
   {
@@ -2998,9 +2998,9 @@
    "id": "ADM-340",
    "name": "Segregation of Duties Policy Manager",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/segregation-of-duties-policy-manager-adm-340",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4710,7 +4710,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/refunds-exchanges",
-   "operations": 16,
+   "operations": 17,
    "drawn": true
   },
   {
@@ -7297,6 +7297,24 @@
    "drawn": true
   },
   {
+   "id": "BO-1191",
+   "name": "Organisation",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup/organisation",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-1192",
+   "name": "Entitlement Templates",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/entitlement-templates",
+   "operations": 7,
+   "drawn": true
+  },
+  {
    "id": "BO-120",
    "name": "Omnichannel Commerce & Journey Configuration",
    "module": "Sell",
@@ -7518,7 +7536,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/venue-park-access-structure-bo-145",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -14772,7 +14790,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/venue-canvas-bo-954",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -14790,7 +14808,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/rows-seats-bo-956",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -15484,12 +15502,6 @@
     "summary": "Extend a lease TTL"
    },
    {
-    "operation": "setEntitlementTemplateBlackoutDates",
-    "contract": "catalogue",
-    "verb": "PUT",
-    "summary": "Set the dates a product's entitlement does not admit"
-   },
-   {
     "operation": "setEventChangeTreatmentPolicy",
     "contract": "catalogue",
     "verb": "PUT",
@@ -15676,12 +15688,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listSegregationRules",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the conflicting-permission rules back"
-   },
-   {
     "operation": "listSegregationViolations",
     "contract": "identity",
     "verb": "GET",
@@ -15788,12 +15794,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "The ledger behind a points balance"
-   },
-   {
-    "operation": "listMessageDispatches",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Messages sent, and whether they arrived"
    },
    {
     "operation": "listRewardAssignments",

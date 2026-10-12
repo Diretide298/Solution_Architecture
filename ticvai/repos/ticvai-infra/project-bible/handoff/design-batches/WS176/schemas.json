@@ -969,7 +969,8 @@
    "parentId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-references": "platform.scope"
    },
    "path": {
     "type": "string",
@@ -1852,6 +1853,13 @@
     "default": 6,
     "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
+   "businessDayCutoff": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "default": "00:00",
+    "description": "**When the venue's business day closes** (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default 00:00; CHG-R6-032). A local wall-clock time `HH:MM` in the region's time zone. **The business date of an instant is the venue-local date of that instant minus the cut-off**: at 00:00 it is the calendar date; at 06:00 a sale at 01:30 on Saturday belongs to Friday. Every business day the package names is this one: a shift's business date and its close (shift `Shift.businessDate`, `closeShift`), the venue-day of the daily reconciliation (finance `getUnifiedReconciliation`, a settlement's trading day), the date revenue is posted on (`postOrderRevenue`), \"today\" in the daily reports (reporting `runReport`, `getKpiValues`, `getServiceSummary`), the same-business-day void (orders `AfterSalePolicy.voidSameBusinessDayOnly`) and the wallet's end-of-business-day reconciliation. A change applies from the next business day, never to a day already open, so no day is cut twice. Null inherits the tenant default (`setVenueSettingsDefaults`), and the tenant default's null is 00:00. Not `calendarDayStartHour`, which only draws calendars (DEC-039 stands for that field).\n"
+   },
    "currencyCode": {
     "type": "string",
     "pattern": "^[A-Z]{3}$",
@@ -2203,6 +2211,7 @@
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).** The client's policy of 6 October 2026 (tracker answer T10.1, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-019): the tolerance is configurable, a difference within it closes only with a reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager approval (OVERSHORT_ACCEPT).\n"
    },
    "cashDrawerLimit": {
+    "x-ticvai-column": "deposit_box_limit_amount",
     "oneOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"

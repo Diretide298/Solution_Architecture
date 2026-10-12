@@ -79,7 +79,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 7
-    writes: 5
+    writes: 6
   - operation: applyCartPromoCode
     verb: POST
     path: /carts/{cartId}/promo-codes
@@ -551,7 +551,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 5
-    writes: 4
+    writes: 5
   - operation: issueWalletPass
     verb: POST
     path: /wallet-passes
@@ -1303,7 +1303,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 5
-    writes: 6
+    writes: 7
   - operation: previewProductTickets
     verb: GET
     path: /products/{productId}/ticket-previews
@@ -1375,7 +1375,7 @@ operationsByContract:
     permission: ORDER_EXCHANGE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: releaseResaleSettlementHold
     verb: POST
     path: /resale-settlements/{resaleSettlementId}/release
@@ -1479,7 +1479,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: setAfterSaleFinancial
     verb: PUT
     path: /after-sale-financial
@@ -1735,7 +1735,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 4
-    writes: 3
+    writes: 4
   - operation: simulateRefund
     verb: POST
     path: /orders/{orderId}/refund-simulation
@@ -1759,7 +1759,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 4
-    writes: 3
+    writes: 4
   - operation: syncOrders
     verb: POST
     path: /sync/orders
@@ -1775,7 +1775,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: updateCartLine
     verb: PATCH
     path: /carts/{cartId}/lines/{lineId}
@@ -1807,7 +1807,7 @@ operationsByContract:
     permission: ORDER_VOID
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: voidOrder
     verb: POST
     path: /orders/{orderId}/voids
@@ -2892,16 +2892,16 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
-- table: orders.group_customer_organization
+- table: orders.group_customer_organisation
   columns: 6
   store: postgres
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: orders.group_customer_organization_contact
+- table: orders.group_customer_organisation_contact
   columns: 6
   store: postgres
-  parent: orders.group_customer_organization
+  parent: orders.group_customer_organisation
   writtenBy:
   - orders
   foreignWriters: null
@@ -3128,7 +3128,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.pos_shift
-  columns: 30
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -3248,7 +3248,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.sales_order
-  columns: 25
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -3589,7 +3589,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 28
+  operations: 37
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3602,6 +3602,9 @@ writesOutside:
   - operation: addCartLine
     tables:
     - platform.idempotency_record
+  - operation: appendEntitlementToMedia
+    tables:
+    - platform.outbox
   - operation: approveShiftClose
     tables:
     - platform.outbox
@@ -3650,7 +3653,13 @@ writesOutside:
   - operation: inquirePaymentStatus
     tables:
     - platform.outbox
+  - operation: issueInvitation
+    tables:
+    - platform.outbox
   - operation: mergeOrders
+    tables:
+    - platform.outbox
+  - operation: payByLink
     tables:
     - platform.outbox
   - operation: receivePaymentProviderWebhook
@@ -3666,21 +3675,39 @@ writesOutside:
   - operation: recordPaymentTerminalCertification
     tables:
     - platform.audit_record
+  - operation: reissueEntitlement
+    tables:
+    - platform.outbox
   - operation: releaseResaleSettlementHold
     tables:
     - platform.outbox
   - operation: respondToChargeback
     tables:
     - platform.outbox
+  - operation: revokeEntitlementShare
+    tables:
+    - platform.outbox
   - operation: setDenominations
     tables:
     - platform.denomination
+  - operation: shareEntitlement
+    tables:
+    - platform.outbox
+  - operation: storePaymentToken
+    tables:
+    - platform.outbox
   - operation: submitShiftCount
     tables:
     - platform.outbox
   - operation: syncOrders
     tables:
     - platform.idempotency_record
+    - platform.outbox
+  - operation: transferOrderTickets
+    tables:
+    - platform.outbox
+  - operation: voidEntitlement
+    tables:
     - platform.outbox
   - operation: voidOrder
     tables:
@@ -3786,11 +3813,11 @@ writesOutside:
   writes:
   - operation: abandonCart
     tables:
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: capturePayment
     tables:
     - catalogue.channel_capacity
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: convertReservation
     tables:
     - promotions.promotion_evaluation_trace
@@ -3800,24 +3827,24 @@ writesOutside:
   - operation: createPayment
     tables:
     - catalogue.channel_capacity
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: extendCart
     tables:
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: receivePaymentProviderWebhook
     tables:
     - catalogue.channel_capacity
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: removeCartLine
     tables:
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: syncOrders
     tables:
     - catalogue.channel_capacity
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
   - operation: updateCartLine
     tables:
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
 - service: MarketingService
   operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

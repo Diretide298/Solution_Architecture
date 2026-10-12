@@ -96,13 +96,21 @@ def contract_declarations(tables: set) -> tuple[dict, bool]:
                     persisted[sname] = t.split("+")[0].strip()
 
     def xref(spec) -> str | None:
-        """`x-ticvai-references` names a schema (`assets.MediaAsset`) or a table."""
+        """`x-ticvai-references` names a schema (`assets.MediaAsset`) or a table, or is `none`.
+
+        **`none` says the field is a plain value, not a key** (CHG-R6-016, ADAM CR-013, 12 October 2026):
+        `ledger.einvoice_transmission.provider_message_id` is the e-invoicing provider's own message id and
+        resolved by name to `ai.message`; `ledger.einvoicing_provider.participant_id` is a Peppol-style
+        participant identifier and resolved to `rental.participant`. A name rule cannot see that, so the
+        contract says it, and no convention or precedent edge is made for the column."""
         if not isinstance(spec, dict):
             return None
         v = spec.get("x-ticvai-references")
         if not isinstance(v, str) or not v.strip():
             return None
         v = v.strip()
+        if v.lower() == "none":
+            return "none"
         if v in tables:
             return v
         return persisted.get(v.rsplit(".", 1)[-1])
@@ -272,6 +280,9 @@ def main() -> int:
                 declared, only = decl_by_prop.get(src.split(".", 1)[1]) or (None, None)
                 if declared and only and name != only:
                     declared = None
+                if declared == "none":
+                    decided[(table, name)] = "plain"   # x-ticvai-references: none (CHG-R6-016)
+                    continue
                 if declared:
                     add_fk(table, name, declared, "declared", req)
                     declared_edges.append((table, name, declared))

@@ -112,5 +112,306 @@
     "decided": "10 September 2026"
    }
   }
+ },
+ {
+  "id": "BO-1191",
+  "name": "Organisation",
+  "permission": "SCOPE_VIEW",
+  "module": "Setup & Go-Live",
+  "requiresModule": "core",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/setup/organisation",
+   "component": "apps/venue-management-web/src/routes/setup/Organisation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100",
+    "BO-064"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-064"
+   ],
+   "inferred": false,
+   "notes": "Reached from BO-100 Venue Home (Setup) and from BO-064 Zones & Areas, which keeps zones and areas and links here for departments (client feedback of 6 October 2026, N32; CHG-R6-040).",
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+     "back": true
+    },
+    {
+     "to": "BO-064",
+     "trigger": "Zones & Areas",
+     "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+     "carries": [
+      "orgUnitId"
+     ]
+    }
+   ]
+  },
+  "notes": "**Created 12 October 2026 (CHG-R6-040) from the client's feedback of 6 October** (\"some of the basic setup is not there such as Departments, Sub Departments ... and it's confusing\"; design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no organisation tree: departments existed only through the Create org unit button of BO-064 Zones & Areas and the wave-3 BO-145, and the tree itself is ADM-006, in the console. **This screen is the venue's department, sub-department and outlet tree**, on the org units the package already has (`listOrgUnits`, `createOrgUnit`, `getOrgUnit`, `updateOrgUnit`); every \"choose a department\" field (outlets, BO-055 Rota & Scheduling, products) reads the same tree. **Archive is deactivate**: `updateOrgUnit` with `isActive` false, which makes every permission query at or beneath the unit resolve to deny and deletes nothing. Block B (Chinmay's decision on N32).",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listOrgUnits` reads the tree and `getOrgUnit` reads one unit of it — list, select, act",
+  "purpose": "Keep the venue's departments, sub-departments and outlets as one tree that every department picker reads.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Level",
+       "operation": "listOrgUnits",
+       "bindsTo": "OrgUnit.level",
+       "notes": "Sends `?level=` to `listOrgUnits`. Offers Department, Sub-department and Outlet; the levels above the venue are the console's (ADM-006).",
+       "provenance": "contract tenancy.yaml GET /org-units"
+      },
+      {
+       "kind": "toggle",
+       "label": "Show archived",
+       "operation": "listOrgUnits",
+       "notes": "Sends `?includeInactive=` to `listOrgUnits`. Off by default, so an archived unit leaves the tree and the pickers.",
+       "provenance": "contract tenancy.yaml GET /org-units"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "treeNav",
+       "label": "Departments, sub-departments and outlets",
+       "bindsTo": "OrgUnit",
+       "columns": [
+        "OrgUnit.level",
+        "OrgUnit.code",
+        "OrgUnit.name",
+        "OrgUnit.isActive",
+        "OrgUnit.childCount"
+       ],
+       "operation": "listOrgUnits",
+       "notes": "`listOrgUnits` with `?under=` the venue's path, so the tree starts at the venue the session holds. Each node shows its level, name and how many units sit directly under it (`childCount`). Cursor-paged: a large venue loads the next page as the tree is scrolled.",
+       "provenance": "contract tenancy.yaml GET /org-units"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected unit",
+       "bindsTo": "OrgUnit",
+       "columns": [
+        "OrgUnit.level",
+        "OrgUnit.code",
+        "OrgUnit.name",
+        "OrgUnit.path",
+        "OrgUnit.isActive",
+        "OrgUnit.childCount"
+       ],
+       "operation": "getOrgUnit",
+       "provenance": "contract tenancy.yaml GET /org-units/{orgUnitId}"
+      },
+      {
+       "kind": "cardList",
+       "label": "Units under it",
+       "bindsTo": "OrgUnit",
+       "columns": [
+        "OrgUnit.level",
+        "OrgUnit.name",
+        "OrgUnit.isActive"
+       ],
+       "operation": "listOrgUnits",
+       "notes": "`listOrgUnits` with `?under=` the selected unit's path.",
+       "provenance": "contract tenancy.yaml GET /org-units"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add a unit",
+       "operation": "createOrgUnit",
+       "notes": "Adds a department under the venue, a sub-department under a department, or an outlet under either; the selected unit is the parent.",
+       "provenance": "contract tenancy.yaml POST /org-units"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rename unit",
+       "operation": "updateOrgUnit",
+       "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive unit",
+       "operation": "updateOrgUnit",
+       "notes": "Sends `isActive` false. **Everything at or beneath the unit is denied from then on**; nothing is deleted, and Show archived brings it back to restore (`isActive` true).",
+       "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue's tree, read by `listOrgUnits` under the venue's path.",
+   "error": "Could not load. Names which read failed and leaves the tree untouched.",
+   "emptyFirstRun": "No departments yet. Offers Add a unit (`createOrgUnit`) with Department chosen; the department pickers on BO-055 and the outlet and product screens show nothing to choose until one exists.",
+   "emptyNoResults": "Nothing matches the Level or Show archived filter and the tree is still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this screen, and names that permission. **Never an empty tree.** A caller who can see the screen but lacks `SCOPE_MANAGE` (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename unit and Archive unit disabled, naming that permission.",
+   "validation": "`400` on a code that is not lower-case letters, digits and underscores, or a level that cannot sit under the selected parent; `409` on a code already used under that parent. Marked on the field."
+  },
+  "apis": [
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The tree under the venue, and the units under the selected one",
+    "trigger": "onLoad",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)"
+   },
+   {
+    "operationId": "getOrgUnit",
+    "contract": "tenancy",
+    "purpose": "The selected unit",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)"
+   },
+   {
+    "operationId": "createOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Add a department, sub-department or outlet",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "invalidates": [
+     "listOrgUnits"
+    ]
+   },
+   {
+    "operationId": "updateOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Rename, archive or restore a unit",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "invalidates": [
+     "listOrgUnits"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orgUnitId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the screen shows the venue's tree and the user picks a unit; an edge that holds one (BO-064) may carry it to open on that unit."
+    }
+   ],
+   "coldEntry": "Resolves the tenant and venue from the session, never from the link; a unit the session cannot see is said to be out of reach, not silently dropped."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1191"
+  },
+  "overlays": [
+   {
+    "id": "formCreateOrgUnit",
+    "component": "modal",
+    "trigger": "Add a unit",
+    "body": "**Collects what `createOrgUnit` sends before it is called.** Required: `level` (Department, Sub-department or Outlet), `code` (lower-case, fixed once created), `name`. `parentId` is the selected unit, never typed. Dismissing sends nothing; the tree behind is unchanged.",
+    "bindsTo": "CreateScopeNodeRequest",
+    "confirm": {
+     "label": "Add unit",
+     "operation": "createOrgUnit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "level",
+      "code",
+      "name"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /org-units"
+   },
+   {
+    "id": "formUpdateOrgUnit",
+    "component": "modal",
+    "trigger": "Rename unit",
+    "body": "**Collects what `updateOrgUnit` sends before it is called.** Optional: `name`. The code and the place in the tree do not change. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Save unit",
+     "operation": "updateOrgUnit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+   },
+   {
+    "id": "confirmArchiveOrgUnit",
+    "component": "modal",
+    "trigger": "Archive unit",
+    "body": "**Archive *Food & Beverage* and the 4 units under it?** Staff granted at or beneath it lose that access until it is restored; nothing is deleted. `updateOrgUnit` with `isActive` false.",
+    "confirm": {
+     "label": "Archive unit",
+     "operation": "updateOrgUnit"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Move is not in the contract.** A unit's code is the last segment of its ltree path and is fixed once created, and no operation re-parents a unit; the client's \"add, edit, move and archive\" gets add, rename and archive. Moving a department is archive and re-create until an operation exists (CHG-R6-040).",
+    "source": "contracts/spine/tenancy.yaml#createOrgUnit | design-r1/COMMAND.md ADDED 6 Oct"
+   },
+   {
+    "operation": null,
+    "why": "**The counts under each node are only the child count.** `OrgUnit` carries `childCount`; the outlets, staff and products under a unit (asked for in the wireframe intent) have no read that counts them by unit (CHG-R6-040).",
+    "source": "contracts/spine/tenancy.yaml#OrgUnit | design-r1/COMMAND.md ADDED 6 Oct"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
  }
 ]

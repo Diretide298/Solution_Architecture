@@ -371,6 +371,11 @@ paths:
   /products/bulk:
     post:
       operationId: bulkUpdateProducts
+      x-ticvai-write-via:
+      - table: catalogue.price
+        operation: bulkUpdateCatalogueProducts
+      - table: catalogue.product
+        operation: bulkUpdateCatalogueProducts
       deprecated: true
       x-ticvai-superseded-by: 'bulkUpdateCatalogueProducts'
       summary: Change many products at once, with a preview
@@ -3553,10 +3558,12 @@ components:
       - quantity
       properties:
         kitItemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
           readOnly: true
         componentItemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         quantity:
@@ -3572,7 +3579,7 @@ components:
           description: '**The partition key** (ADR-0005). Written at the kit item''s venue scope.'
     InventoryStockReservation:
       type: object
-      x-ticvai-persistence: inventory.stock_reservation
+      x-ticvai-persistence: inventory.stock_earmark
       description: '**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.'
       required:
       - itemId
@@ -3587,9 +3594,11 @@ components:
           type: string
           format: uuid
         itemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         quantity:
@@ -3733,6 +3742,7 @@ components:
           type: string
           format: uuid
         itemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         locationId:
@@ -3800,6 +3810,7 @@ components:
           type: string
           format: uuid
         itemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         batchId:
@@ -3814,6 +3825,7 @@ components:
 
             '
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         status:
@@ -3922,6 +3934,7 @@ components:
       - costingMethod
       properties:
         sku:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         barcode:
@@ -3974,7 +3987,7 @@ components:
           type: integer
           nullable: true
     InventoryItem:
-      x-ticvai-persistence: inventory.item
+      x-ticvai-persistence: inventory.inventory_item
       allOf:
       - $ref: '#/components/schemas/CreateInventoryItemRequest'
       - type: object
@@ -4000,6 +4013,7 @@ components:
           averageCost:
             $ref: ../shared/common.yaml#/components/schemas/Money
           lastPurchasePrice:
+            x-ticvai-column: last_purchase_cost_amount
             $ref: ../shared/common.yaml#/components/schemas/Money
           isBelowReorderPoint:
             type: boolean
@@ -4012,7 +4026,7 @@ components:
       x-ticvai-persistence: inventory.daily_count_list
       type: object
       description: '**The items counted every day at one location** (`setDailyCount`, 4 October 2026, CHG-FXC-003: the
-        write had only `inventory.item` to land in, which has no column for any of it). One row per venue and location
+        write had only `inventory.inventory_item` to land in, which has no column for any of it). One row per venue and location
         (`locationId` null is the venue-wide list); `setDailyCount` replaces it.'
       required:
       - itemIds
@@ -4196,6 +4210,7 @@ components:
           type: string
           format: uuid
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         kind:
@@ -4651,6 +4666,7 @@ components:
           format: uuid
           nullable: true
         costCenterId:
+          x-ticvai-references: ledger.cost_center
           type: string
           format: uuid
           nullable: true
@@ -4698,6 +4714,7 @@ components:
               estimatedCost:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         estimatedTotal:
+          x-ticvai-column: estimated_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         raisedByPrincipalId:
           type: string
@@ -4840,6 +4857,7 @@ components:
           type: string
           nullable: true
         minimumOrderValue:
+          x-ticvai-column: minimum_order_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         scopePath:
           type: string
@@ -5167,6 +5185,7 @@ components:
         status:
           $ref: '#/components/schemas/PurchaseOrderStatus'
         deliverToLocationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
           nullable: true
@@ -5350,6 +5369,7 @@ components:
           type: string
           format: uuid
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         deliveryNoteReference:

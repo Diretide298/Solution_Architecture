@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-423` | License & Entitlement Activation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-424` | Module Activation & Dependency Validation | A | 9 | 18 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
 | `ADM-425` | Venue Template Application | B | 6 | 13 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-426` | Initial Configuration & Regional Defaults | B | 114 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
+| `ADM-426` | Initial Configuration & Regional Defaults | B | 115 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
 | `ADM-427` | Provisioning Validation & Exception Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

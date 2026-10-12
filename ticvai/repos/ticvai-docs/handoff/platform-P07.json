@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 43
+  "operationsWithNoScreen": 42
  },
  "waves": {
   "wave1": 11
@@ -43,11 +43,11 @@
    "operations": 2
   },
   {
-   "contract": "orders",
+   "contract": "accreditation",
    "operations": 1
   },
   {
-   "contract": "accreditation",
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -303,12 +303,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "The module tree permissions are grouped under"
-   },
-   {
-    "operation": "listSegregationRules",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the conflicting-permission rules back"
    },
    {
     "operation": "listSegregationViolations",

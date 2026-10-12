@@ -499,7 +499,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -774,6 +774,8 @@
    "listPerformances",
    "getCart",
    "recordConsentAnswers",
+   "joinWaitlist",
+   "leaveWaitlist",
    "getPublishedBookingFlow"
   ],
   "services": [
@@ -787,13 +789,15 @@
    "redis"
   ],
   "reads": [
+   "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.variant",
+   "catalogue.waitlist_entry",
    "marketing.booking_consent_record",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -805,6 +809,8 @@
    "whitelabel.config_version"
   ],
   "writes": [
+   "cache:idempotency",
+   "catalogue.waitlist_entry",
    "marketing.booking_consent_record",
    "orders.cart",
    "orders.cart_line",
@@ -948,13 +954,13 @@
    "catalogue.product",
    "catalogue.product_category",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
    "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
@@ -962,7 +968,7 @@
   "writes": [
    "cache:idempotency",
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -1326,7 +1332,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.product",
@@ -1348,14 +1354,14 @@
    "promotions.coupon_code",
    "promotions.promotion",
    "promotions.promotion_rule",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
@@ -1498,7 +1504,7 @@
    "cache:idempotency",
    "cache:resolution",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.product",
    "catalogue.product_category",
    "marketing.booking_consent_record",
@@ -1511,7 +1517,7 @@
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion",
-   "seating.seat_hold",
+   "seating.seat_reservation",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
@@ -1522,7 +1528,7 @@
    "marketing.booking_consent_record",
    "marketing.guest_profile",
    "pii.subject",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -1632,7 +1638,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.product",
    "catalogue.product_category",
    "ledger.fx_rate",
@@ -1653,7 +1659,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "marketing.consent_record",
@@ -1930,7 +1936,8 @@
    "orders.payment",
    "orders.payment_link",
    "orders.reservation",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -2442,7 +2449,8 @@
    "cache:idempotency",
    "identity.delegated_access",
    "orders.ticket_transfer",
-   "orders.wallet_pass"
+   "orders.wallet_pass",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -2887,7 +2895,7 @@
    "wallet.balance",
    "wallet.credit_lot",
    "wallet.exit_settlement",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.gift_card",
    "wallet.refund_policy",
    "wallet.wallet",
@@ -3890,7 +3898,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [
    "cache:idempotency",
@@ -4055,7 +4063,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.variant",
    "ledger.fx_rate",
@@ -4075,7 +4083,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "marketing.consent_record",
@@ -5268,7 +5276,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.map_version",
    "venuemap.path",
@@ -5280,7 +5288,7 @@
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -5390,8 +5398,8 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
    "resources.resource_requirement",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "whitelabel.guided_choice_answer"
   ],
@@ -5626,7 +5634,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "venuemap.visit_plan",
@@ -6513,7 +6521,7 @@
   "reads": [
    "assets.media_asset",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -6797,6 +6805,8 @@
    "addCartLine",
    "getCart",
    "recordConsentAnswers",
+   "joinWaitlist",
+   "leaveWaitlist",
    "getPublishedBookingFlow"
   ],
   "services": [
@@ -6810,14 +6820,16 @@
    "redis"
   ],
   "reads": [
+   "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
    "catalogue.variant",
+   "catalogue.waitlist_entry",
    "marketing.booking_consent_record",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -6830,6 +6842,8 @@
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
+   "cache:idempotency",
+   "catalogue.waitlist_entry",
    "marketing.booking_consent_record",
    "orders.cart",
    "orders.cart_line",
@@ -7119,7 +7133,6 @@
    "inquirePaymentStatus",
    "checkoutCart",
    "getCart",
-   "createOrder",
    "getPaymentLink",
    "payByLink",
    "getPublishedBookingFlow",
@@ -7136,7 +7149,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.product",
    "catalogue.product_category",
    "ledger.fx_rate",
@@ -7164,7 +7177,7 @@
    "access.entitlement",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "marketing.consent_record",
@@ -7179,8 +7192,7 @@
    "orders.sales_order",
    "payments.payment_attempt",
    "platform.idempotency_record",
-   "platform.outbox",
-   "promotions.promotion_evaluation_trace"
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -7410,7 +7422,7 @@
    "wallet.balance",
    "wallet.credit_lot",
    "wallet.exit_settlement",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.refund_policy",
    "wallet.wallet",
    "wallet.wallet_transaction"
@@ -7507,7 +7519,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -7605,7 +7618,8 @@
    "access.device_binding",
    "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -8806,7 +8820,7 @@
    "catalogue.performance",
    "catalogue.variant",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -8817,7 +8831,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record",
@@ -9418,7 +9432,7 @@
    "cache:answer",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.variant",
    "fnb.delivery_location",
@@ -10465,7 +10479,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -10484,14 +10498,14 @@
    "promotions.coupon_campaign",
    "promotions.coupon_code",
    "promotions.promotion",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
@@ -10949,7 +10963,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -11127,7 +11142,7 @@
    "cache:rec-candidates",
    "cache:rec-features",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.variant",
    "marketing.consent_question",
@@ -11226,18 +11241,18 @@
    "catalogue.product",
    "catalogue.product_category",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
-   "seating.seat_price_band"
+   "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -11355,7 +11370,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -11652,7 +11667,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -11676,7 +11691,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "venuemap.visit_plan",
@@ -12214,7 +12229,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.map_version",
    "venuemap.placed_resource"
@@ -12979,7 +12994,8 @@
    "access.face_reenrolment_attempt",
    "cache:idempotency",
    "marketing.consent_record",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -13285,6 +13301,7 @@
    "marketing.loyalty_position",
    "orders.stored_value_authorisation",
    "payments.token",
+   "platform.outbox",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
@@ -13419,7 +13436,8 @@
    "identity.delegated_access",
    "marketing.invitation",
    "orders.group_booking",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -13685,7 +13703,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.map_version",
    "venuemap.path",
@@ -13697,7 +13715,7 @@
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -13805,8 +13823,8 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
    "resources.resource_requirement",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "whitelabel.guided_choice_answer"
   ],
@@ -14665,7 +14683,7 @@
    "catalogue.alternative_code",
    "catalogue.channel_capacity",
    "catalogue.entitlement_template",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.product",
@@ -14712,7 +14730,7 @@
    "approvals.request",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "games.card",
    "inventory.movement",
    "ledger.journal_entry",
@@ -15442,9 +15460,9 @@
   "reads": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.channel_envelope",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -15456,9 +15474,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.channel_envelope",
+   "catalogue.inventory_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -15572,7 +15590,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "ledger.fx_rate",
    "orders.order_line",
@@ -15583,12 +15601,12 @@
    "payments.provider_connection",
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -15599,7 +15617,7 @@
    "platform.idempotency_record",
    "platform.outbox",
    "promotions.promotion_evaluation_trace",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -15775,7 +15793,7 @@
   "reads": [
    "access.biometric_profile",
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "inventory.kit_component",
    "ledger.fx_rate",
    "marketing.loyalty_position",
@@ -15795,7 +15813,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "inventory.movement",
    "ledger.journal_entry",
    "ledger.journal_line",
@@ -16806,6 +16824,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.execution",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -17012,7 +17031,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.entitlement_template",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -17174,7 +17193,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component",
    "inventory.serialised_item",
    "inventory.stock_batch",
@@ -17196,7 +17215,6 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.invoice_line",
    "inventory.movement",
    "ledger.credit_memo",
    "ledger.credit_memo_line",
@@ -17397,7 +17415,7 @@
    "fnb.delivery_location_outlet",
    "fnb.service_order",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "orders.order_line",
    "orders.pos_shift",
    "orders.pos_shift_approval",
@@ -17411,7 +17429,7 @@
   "writes": [
    "cache:idempotency",
    "fnb.service_order",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "retail.reservation",
    "retail.reservation_line",
    "retail.shop_and_drop"
@@ -17536,7 +17554,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price_list",
    "catalogue.variant",
    "orders.order_line",
@@ -17549,7 +17567,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.price_variance",
    "orders.order_event",
    "orders.order_line",
@@ -20439,7 +20457,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.variant"
   ],
@@ -20501,7 +20519,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.variant",
    "marketing.consent_question",
@@ -20563,7 +20581,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -20659,7 +20677,7 @@
    "redis"
   ],
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
@@ -20669,7 +20687,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -21215,7 +21233,7 @@
    "cache:answer",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
@@ -21442,7 +21460,7 @@
    "catalogue.performance",
    "catalogue.variant",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -21453,7 +21471,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record",
@@ -23175,10 +23193,10 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order",
    "maintenance.work_order_attachment"
   ],
@@ -23186,7 +23204,7 @@
    "cache:idempotency",
    "inventory.movement",
    "inventory.requisition",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order",
    "maintenance.work_order_attachment",
    "platform.outbox"
@@ -23415,7 +23433,7 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.asset",
    "maintenance.priority_scoring_model",
    "maintenance.work_order",
@@ -23425,7 +23443,7 @@
    "cache:idempotency",
    "inventory.movement",
    "inventory.requisition",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order",
    "maintenance.work_order_attachment",
    "platform.outbox"
@@ -24011,6 +24029,7 @@
    "ai.proposed_action",
    "cache:answer",
    "cache:idempotency",
+   "platform.outbox",
    "qdrant:knowledge",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -24422,11 +24441,11 @@
    "redis"
   ],
   "reads": [
-   "catalogue.channel_allocation",
-   "catalogue.channel_capacity"
+   "catalogue.channel_capacity",
+   "catalogue.channel_envelope"
   ],
   "writes": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -24843,7 +24862,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
@@ -24853,7 +24872,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -24989,7 +25008,8 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -27896,7 +27916,8 @@
    "cache:idempotency",
    "marketing.guest_note",
    "marketing.guest_profile",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -28266,7 +28287,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "fnb.bill_split",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
@@ -28286,7 +28307,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "fnb.bill_split",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
@@ -28581,10 +28602,10 @@
    "accreditation.validity",
    "cache:idempotency",
    "identity.principal",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "reporting.alert",
    "reporting.alert_rule",
    "reporting.dashboard",
@@ -28639,10 +28660,10 @@
    "postgres"
   ],
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "platform.outlet",
    "retail.merchandise"
   ],
@@ -28700,7 +28721,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.requisition",
    "inventory.requisition_line"
   ],
@@ -28793,7 +28814,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.cold_chain_event",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.transfer",
    "inventory.transfer_line"
@@ -28890,7 +28911,7 @@
    "fnb.cold_chain_event",
    "inventory.goods_receipt",
    "inventory.goods_receipt_line",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.purchase_order",
    "inventory.purchase_order_line",
    "inventory.transfer",
@@ -29047,7 +29068,7 @@
    "inventory.count",
    "inventory.count_line",
    "inventory.daily_count_list",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement"
   ],
   "writes": [
@@ -29327,10 +29348,10 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "platform.scope",
    "retail.reservation",
    "retail.reservation_line"
@@ -29338,7 +29359,7 @@
   "writes": [
    "cache:idempotency",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "retail.reservation",
    "retail.reservation_line"
   ],
@@ -29403,7 +29424,7 @@
    "postgres"
   ],
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.serialised_item",
    "inventory.stock_batch",
    "retail.merchandise"
@@ -34188,6 +34209,42 @@
      ]
     },
     "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
+   },
+   {
+    "id": "formCloneProduct",
+    "component": "modal",
+    "trigger": "Clone product",
+    "body": "**Collects what `cloneProduct` sends before it is called.** Required: `code` (a new code; a code in use is refused), `name`. Optional: `includeVariants`. The copy is a new draft. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Clone product",
+     "operation": "cloneProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "includeVariants"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/clone"
+   },
+   {
+    "id": "formRestoreProductVersion",
+    "component": "modal",
+    "trigger": "Restore this version",
+    "body": "**Collects what `restoreProductVersion` sends before it is called.** Required: `note`, why this version is put back. The version is the row picked in Versions. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Restore this version",
+     "operation": "restoreProductVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/versions/{version}/restore"
    }
   ]
  },
@@ -34973,7 +35030,8 @@
   "exits": [
    "BO-007",
    "BO-008",
-   "BO-009"
+   "BO-009",
+   "BO-1192"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -35001,6 +35059,14 @@
     "to": "BO-009",
     "trigger": "Pricing Rules",
     "provenance": "derived \u2014 BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+   },
+   {
+    "to": "BO-1192",
+    "trigger": "Entitlement Templates",
+    "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)",
+    "carries": [
+     "templateId"
+    ]
    }
   ],
   "machine": null,
@@ -35176,8 +35242,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.price",
    "catalogue.price_list",
    "catalogue.product",
@@ -35193,8 +35259,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.published_bundle",
    "control.channel_listing"
   ],
@@ -35548,13 +35614,13 @@
    "catalogue.product",
    "catalogue.product_category",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
-   "seating.seat_price_band"
+   "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -35842,16 +35908,16 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.performance",
    "catalogue.waitlist_entry"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.channel_envelope",
+   "catalogue.inventory_reservation",
    "catalogue.waitlist_entry"
   ],
   "storedProcedures": [],
@@ -35984,12 +36050,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -36069,13 +36135,13 @@
    "catalogue.product",
    "catalogue.product_category",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
    "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "venuemap.path",
    "venuemap.point"
   ],
@@ -36560,7 +36626,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.invoice_line",
    "ledger.credit_memo",
    "ledger.credit_memo_line",
    "ledger.journal_entry",
@@ -36820,10 +36885,12 @@
    "issueCreditMemo",
    "listCreditMemos",
    "getTaxDocumentRendition",
-   "createBulkRefund"
+   "createBulkRefund",
+   "listMessageDispatches"
   ],
   "services": [
    "LedgerService",
+   "MarketingService",
    "OrderService"
   ],
   "stores": [
@@ -36839,6 +36906,7 @@
    "ledger.tax_invoice",
    "ledger.tax_invoice_line",
    "ledger.tax_invoice_template",
+   "marketing.message_dispatch",
    "orders.fraud_rule",
    "orders.order_line",
    "orders.order_line_discount",
@@ -36853,7 +36921,6 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.invoice_line",
    "ledger.credit_memo",
    "ledger.credit_memo_line",
    "ledger.journal_entry",
@@ -37102,7 +37169,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.deposit",
    "ledger.journal_entry",
    "ledger.journal_line",
@@ -37733,7 +37800,8 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -37925,6 +37993,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.execution",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -38656,7 +38725,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price",
    "catalogue.price_list",
    "catalogue.product",
@@ -38674,7 +38743,7 @@
    "cache:idempotency",
    "cache:resolution",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.published_bundle",
    "ledger.price_variance",
    "orders.order_line",
@@ -39736,15 +39805,13 @@
    "fnb.recipe_ingredient",
    "fnb.substitution_rule",
    "identity.principal",
-   "inventory.item",
+   "inventory.inventory_item",
    "platform.outlet"
   ],
   "writes": [
    "approvals.request",
    "cache:idempotency",
    "cache:resolution",
-   "catalogue.price",
-   "catalogue.product_version",
    "fnb.allergen_verdict",
    "fnb.menu",
    "fnb.menu_item",
@@ -40365,7 +40432,7 @@
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
    "catalogue.variant",
-   "inventory.item",
+   "inventory.inventory_item",
    "platform.outlet",
    "retail.merchandise",
    "whitelabel.guided_choice_answer"
@@ -40483,10 +40550,10 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "inventory.transfer",
    "inventory.transfer_line",
    "ledger.account"
@@ -40630,10 +40697,10 @@
    "postgres"
   ],
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "ledger.account"
   ],
   "writes": [],
@@ -41488,6 +41555,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.execution",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -41734,6 +41802,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.execution",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -42512,12 +42581,23 @@
   "wave": 1,
   "offline": false,
   "specified": true,
-  "exits": [],
+  "exits": [
+   "BO-1191"
+  ],
   "pattern": "listDetail",
   "entryFrom": [
    "BO-108"
   ],
-  "transitions": [],
+  "transitions": [
+   {
+    "to": "BO-1191",
+    "trigger": "Organisation",
+    "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)",
+    "carries": [
+     "orgUnitId"
+    ]
+   }
+  ],
   "machine": null,
   "states": {
    "loading": "The zones areas list.",
@@ -42732,7 +42812,7 @@
     "id": "formSetVenueSettings",
     "component": "modal",
     "trigger": "Save venue settings",
-    "body": "**Collects what `setVenueSettings` sends before it is called, in sections, not property names.** Nothing in the body is required. **Day and hours**: calendar day start, support hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`, `id`, `venueId` (3 October 2026, CHG-SPF-001). **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
+    "body": "**Collects what `setVenueSettings` sends before it is called, in sections, not property names.** Nothing in the body is required. **Day and hours**: calendar day start, business day cut-off (`businessDayCutoff`, when the venue's business day closes; empty inherits the tenant default, 00:00; CHG-R6-032), support hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`, `id`, `venueId` (3 October 2026, CHG-SPF-001). **setVenueSettings replaces the whole settings row** (PUT; an omitted property returns to its default). The save sends the VenueSettings that getVenueSettings returned, with only this screen's group changed; nothing else is reset (CHG-FXS-003).",
     "bindsTo": "VenueSettings",
     "confirm": {
      "label": "Save venue settings",
@@ -44314,7 +44394,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.quotation",
    "inventory.quotation_line",
@@ -44474,7 +44554,7 @@
    "cache:idempotency",
    "inventory.count",
    "inventory.count_line",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement"
   ],
   "writes": [
@@ -44703,7 +44783,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.cold_chain_event",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.transfer",
    "inventory.transfer_line"
   ],
@@ -44852,7 +44932,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component",
    "inventory.location",
    "inventory.movement"
@@ -44860,7 +44940,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component",
    "inventory.location"
   ],
@@ -45007,7 +45087,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement"
   ],
@@ -45651,12 +45731,15 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-238",
    "BO-084",
    "BO-085",
    "BO-086"
   ],
   "pattern": "listDetail",
-  "entryFrom": [],
+  "entryFrom": [
+   "ADM-238"
+  ],
   "transitions": [
    {
     "to": "BO-084",
@@ -45667,6 +45750,11 @@
     "to": "BO-085",
     "trigger": "Approval Request",
     "provenance": "derived \u2014 BO-085 declares entryState.params requestId and BO-087 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
+   },
+   {
+    "to": "ADM-238",
+    "trigger": "Returns to the board's landing screen",
+    "provenance": "flow F164 step 10\u219211"
    }
   ],
   "machine": null,
@@ -46703,7 +46791,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.selection_policy"
   ],
   "writes": [
@@ -47285,7 +47373,9 @@
    "ADM-340",
    "ADM-606",
    "BO-1018",
-   "BO-1034"
+   "BO-1034",
+   "BO-1191",
+   "BO-954"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -48294,6 +48384,16 @@
     "to": "BO-1034",
     "trigger": "Opens Best Seat Recommendations",
     "provenance": "CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A, CHG-RONEP-007); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-954",
+    "trigger": "Opens Venue Canvas",
+    "provenance": "CHG-R6-047: the section home links to the Block A seat-map screen it leads to (lever A, CHG-RONEP-007); its command centre BO-953 is not in Block A"
+   },
+   {
+    "to": "BO-1191",
+    "trigger": "Organisation",
+    "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
    }
   ],
   "machine": null,
@@ -48624,7 +48724,8 @@
    "ADM-570",
    "ADM-603",
    "BO-696",
-   "BO-485"
+   "BO-485",
+   "BO-1192"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -48833,6 +48934,11 @@
     "to": "BO-696",
     "trigger": "Opens Event Duplication & Clone Configuration",
     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1192",
+    "trigger": "Entitlement Templates",
+    "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
    }
   ],
   "machine": null,
@@ -49246,13 +49352,13 @@
    "accreditation.holder",
    "accreditation.validity",
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "reporting.kpi_definition",
    "reporting.kpi_target"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -50106,7 +50212,7 @@
    "fnb.recipe",
    "fnb.recipe_ingredient",
    "fnb.substitution_rule",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -50427,7 +50533,7 @@
    "postgres"
   ],
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.serialised_item",
    "inventory.stock_batch",
    "retail.merchandise"
@@ -52083,7 +52189,7 @@
    "postgres"
   ],
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price_list",
    "catalogue.variant",
    "orders.sales_order",
@@ -52091,7 +52197,7 @@
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.price_variance",
    "orders.order_line",
    "orders.order_line_discount",
@@ -53287,7 +53393,8 @@
    "listVenueParkAccess",
    "listOrgUnits",
    "createOrgUnit",
-   "updateOrgUnit"
+   "updateOrgUnit",
+   "setAccessAreaCapacity"
   ],
   "services": [
    "AccessService",
@@ -53304,6 +53411,8 @@
    "platform.scope"
   ],
   "writes": [
+   "access.access_area",
+   "access.configuration_change",
    "cache:idempotency",
    "cache:resolution",
    "platform.scope"
@@ -53335,7 +53444,28 @@
    "emptyNoResults": "The filter narrowed it and the venue park access are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetAccessAreaCapacity",
+    "component": "modal",
+    "trigger": "Set capacity",
+    "body": "**Collects what `setAccessAreaCapacity` sends for the selected venue or park** (12 October 2026, CHG-R6-036): capacity (empty for no limit, so the gate never denies for capacity), the warning, high and critical bands in percent of capacity, and an operator count adjustment with its reason (required when the adjustment changes). Dismissing sends nothing; the structure behind is unchanged.",
+    "confirm": {
+     "label": "Save capacity",
+     "operation": "setAccessAreaCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "capacity",
+      "occupancyThresholds",
+      "operationalAdjustment",
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-areas/{areaId}/capacity (CHG-R6-036)"
+   }
+  ]
  },
  "BO-146": {
   "name": "Access Area & Zone Builder",
@@ -55719,7 +55849,7 @@
     "id": "formSetVerificationMethodPolicy",
     "component": "modal",
     "trigger": "Save verification method policy",
-    "body": "**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`, `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`. Optional: `reasonCodes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`, `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`. Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as \"Ticket credential for this product\" (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "AccessVerificationMethodPolicy",
     "confirm": {
      "label": "Save verification method policy",
@@ -55734,7 +55864,8 @@
       "lockOnFirstSuccessfulAccess",
       "changeAfterLock",
       "scopePath",
-      "reasonCodes"
+      "reasonCodes",
+      "credentialFormatOverride"
      ]
     },
     "provenance": "contract access.yaml PUT /verification-method-policies"
@@ -56588,7 +56719,8 @@
    "access.face_reenrolment_attempt",
    "access.security_alert",
    "cache:idempotency",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -60951,7 +61083,8 @@
    "access.security_alert",
    "access.security_investigation",
    "cache:idempotency",
-   "pii.subject_biometric"
+   "pii.subject_biometric",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -62007,7 +62140,7 @@
    "access.scan_event",
    "orders.discount",
    "orders.group_booking",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -62127,7 +62260,7 @@
    "redis"
   ],
   "reads": [
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry"
   ],
   "writes": [
@@ -62181,14 +62314,14 @@
   ],
   "reads": [
    "orders.group_booking",
-   "orders.group_customer_organization",
-   "orders.group_customer_organization_contact",
+   "orders.group_customer_organisation",
+   "orders.group_customer_organisation_contact",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.sales_order"
   ],
   "writes": [
-   "orders.group_customer_organization_contact"
+   "orders.group_customer_organisation_contact"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -62238,7 +62371,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "orders.group_booking",
    "orders.group_enquiry"
@@ -62353,7 +62486,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.price",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_quote",
    "orders.group_quote_line"
@@ -62584,7 +62717,7 @@
   "reads": [
    "cache:idempotency",
    "orders.group_booking",
-   "orders.group_customer_organization_contact",
+   "orders.group_customer_organisation_contact",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -63284,7 +63417,7 @@
    "access.scan_event",
    "orders.discount",
    "orders.group_booking",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -64480,7 +64613,8 @@
   ],
   "writes": [
    "access.entitlement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -64687,7 +64821,8 @@
    "access.entitlement",
    "approvals.request",
    "cache:idempotency",
-   "orders.member_exception"
+   "orders.member_exception",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -64841,7 +64976,7 @@
    "redis"
   ],
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.payment",
    "orders.payment_link",
@@ -65288,7 +65423,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
@@ -65341,7 +65476,7 @@
    "redis"
   ],
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.payment_link",
    "orders.reservation",
    "orders.reservation_line",
@@ -67764,7 +67899,7 @@
    "loading": "The pdf printable pos configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the pdf printable pos untouched.",
    "emptyFirstRun": "No design saved for this media template yet: the designer opens on the defaults; Save design creates it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to show this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design disabled, naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE until 12 October 2026, BC-034/BC-035, CHG-R6-030). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "overlays": []
  },
@@ -67821,7 +67956,7 @@
    "loading": "The apple wallet pass configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the apple wallet pass untouched.",
    "emptyFirstRun": "No apple wallet pass configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "overlays": []
  },
@@ -67878,7 +68013,7 @@
    "loading": "The google wallet pass configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the google wallet pass untouched.",
    "emptyFirstRun": "No google wallet pass configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "overlays": []
  },
@@ -72458,7 +72593,7 @@
    "wallet.balance",
    "wallet.credit_lot",
    "wallet.exit_settlement",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.refund_policy",
    "wallet.wallet"
   ],
@@ -72523,10 +72658,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -72575,10 +72710,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -74571,10 +74706,10 @@
    "cache:idempotency",
    "games.prize",
    "games.prize_cost",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [
    "cache:idempotency",
@@ -74638,10 +74773,10 @@
    "games.pricing",
    "games.pricing_exception",
    "games.reader",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [
    "cache:idempotency",
@@ -78046,10 +78181,10 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "inventory.transfer",
    "inventory.transfer_line"
   ],
@@ -78382,10 +78517,10 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "inventory.transfer",
    "inventory.transfer_line"
   ],
@@ -78723,7 +78858,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "maintenance.asset",
    "promotions.bundle",
    "promotions.bundle_component",
@@ -78789,7 +78924,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -82459,16 +82594,16 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order"
   ],
   "writes": [
    "cache:idempotency",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order"
   ],
   "storedProcedures": [],
@@ -83284,6 +83419,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_filter"
@@ -93047,7 +93183,8 @@
    "cache:idempotency",
    "marketing.duplicate_candidate",
    "marketing.guest_profile",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -100394,7 +100531,7 @@
    "resources.qualification",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [
    "cache:idempotency",
@@ -100849,7 +100986,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type",
    "resources.selection_policy"
@@ -100978,7 +101115,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -101038,7 +101175,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule"
   ],
   "writes": [
@@ -101176,7 +101313,7 @@
    "cache:idempotency",
    "resources.booking",
    "resources.resource",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.selection_policy"
   ],
   "writes": [
@@ -101234,7 +101371,7 @@
    "cache:idempotency",
    "resources.booking",
    "resources.resource",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.selection_policy"
   ],
   "writes": [
@@ -101375,8 +101512,8 @@
    "resources.resource_block",
    "resources.resource_category",
    "resources.resource_dependency",
-   "resources.resource_hold",
    "resources.resource_requirement",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -101437,7 +101574,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -104384,7 +104521,7 @@
    "catalogue.space",
    "resources.booking",
    "resources.resource",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.selection_policy"
   ],
   "writes": [
@@ -104766,7 +104903,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -105755,7 +105892,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -106997,7 +107134,8 @@
   "operations": [
    "getSeatMap",
    "createSeatMap",
-   "updateSeatMap"
+   "updateSeatMap",
+   "editSeatMapStructure"
   ],
   "services": [
    "CatalogueService"
@@ -107013,6 +107151,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "seating.seat",
    "seating.seat_map",
    "seating.section",
    "seating.section_row"
@@ -107026,7 +107165,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-953"
+   "BO-953",
+   "BO-100"
   ],
   "transitions": [
    {
@@ -107044,7 +107184,29 @@
    "emptyNoResults": "The filter narrowed it and the venue canvas are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formEditSeatMapStructure",
+    "component": "modal",
+    "trigger": "Add sections, rows and seats",
+    "body": "**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction, start and end point, a curve radius for a curved row, a category), single seats (section, row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.",
+    "confirm": {
+     "label": "Apply to the map",
+     "operation": "editSeatMapStructure"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "addSections",
+      "addRows",
+      "addSeats",
+      "removeSeatIds",
+      "relabel"
+     ]
+    },
+    "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)"
+   }
+  ]
  },
  "BO-955": {
   "name": "Sections & Zones",
@@ -107125,7 +107287,8 @@
   "route": "/access-venue/rows-seats-bo-956",
   "operations": [
    "listSeats",
-   "updateSeats"
+   "updateSeats",
+   "editSeatMapStructure"
   ],
   "services": [
    "CatalogueService"
@@ -107141,7 +107304,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "seating.seat_map"
+   "seating.seat",
+   "seating.seat_map",
+   "seating.section"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -107170,7 +107335,29 @@
    "emptyNoResults": "The filter narrowed it and the rows seats are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formEditSeatMapStructure",
+    "component": "modal",
+    "trigger": "Generate, renumber or remove rows and seats",
+    "body": "**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction, start and end point, a curve radius for a curved row, a category), single seats (section, row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.",
+    "confirm": {
+     "label": "Apply to the map",
+     "operation": "editSeatMapStructure"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "addSections",
+      "addRows",
+      "addSeats",
+      "removeSeatIds",
+      "relabel"
+     ]
+    },
+    "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)"
+   }
+  ]
  },
  "BO-957": {
   "name": "Standing Zones",
@@ -108910,8 +109097,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -109024,8 +109211,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -109134,7 +109321,7 @@
   "reads": [
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109185,7 +109372,7 @@
   ],
   "reads": [
    "seating.seat_block",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109240,8 +109427,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -109298,8 +109485,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -109463,8 +109650,8 @@
   "reads": [
    "seating.seat",
    "seating.seat_block_item",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109627,12 +109814,12 @@
    "cache:idempotency",
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -109689,13 +109876,13 @@
    "catalogue.price",
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold",
+   "seating.seat_reservation",
    "seating.seating_rules"
   ],
   "writes": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -109748,7 +109935,7 @@
   "reads": [
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109806,8 +109993,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -109900,11 +110087,11 @@
    "redis"
   ],
   "reads": [
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -109957,7 +110144,7 @@
    "seating.accessible",
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -110012,13 +110199,13 @@
   "reads": [
    "catalogue.performance",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
-   "seating.seat_price_band"
+   "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -110073,13 +110260,13 @@
   "reads": [
    "catalogue.performance",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
-   "seating.seat_price_band"
+   "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -111532,9 +111719,9 @@
    "seating.seat",
    "seating.seat_block",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
    "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seating_rules",
    "seating.section",
    "seating.section_row"
@@ -111542,8 +111729,8 @@
   "writes": [
    "cache:idempotency",
    "seating.group_request",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -111598,9 +111785,9 @@
    "seating.seat",
    "seating.seat_block",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
    "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seating_rules",
    "seating.section",
    "seating.section_row"
@@ -111608,8 +111795,8 @@
   "writes": [
    "cache:idempotency",
    "seating.group_request",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -111662,7 +111849,7 @@
    "cache:idempotency",
    "seating.group_request",
    "seating.group_request_participant",
-   "seating.seat_hold_item"
+   "seating.seat_reservation_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -111938,7 +112125,7 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -112049,10 +112236,10 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -112103,10 +112290,10 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -112156,10 +112343,10 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -112209,10 +112396,10 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -112263,10 +112450,10 @@
   ],
   "reads": [
    "seating.accessible",
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -112317,13 +112504,13 @@
   "reads": [
    "catalogue.performance",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
-   "seating.seat_price_band"
+   "seating.seat_price_band",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -112377,7 +112564,7 @@
    "seating.reassignment",
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "seating.reassignment"
@@ -112430,10 +112617,10 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -112482,7 +112669,7 @@
    "redis"
   ],
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -113538,8 +113725,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [
@@ -115670,16 +115857,16 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -115734,7 +115921,7 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.wallet_transaction"
   ],
   "writes": [],
@@ -115846,11 +116033,11 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.wallet_type"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -115900,10 +116087,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -115952,10 +116139,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -116004,10 +116191,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -116056,10 +116243,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -116108,10 +116295,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -116223,10 +116410,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -116881,18 +117068,18 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_eligibility",
    "wallet.credit_lot",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet",
    "wallet.wallet_type"
   ],
@@ -118172,16 +118359,16 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -118330,10 +118517,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118381,10 +118568,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118432,10 +118619,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118534,10 +118721,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118588,11 +118775,11 @@
   ],
   "reads": [
    "wallet.authentication_policy",
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
    "wallet.authentication_policy",
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118640,10 +118827,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118694,10 +118881,10 @@
   ],
   "reads": [
    "payments.terminal",
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118927,10 +119114,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "writes": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -118978,10 +119165,10 @@
    "postgres"
   ],
   "reads": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "writes": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119499,11 +119686,11 @@
   ],
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119606,11 +119793,11 @@
   ],
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119659,11 +119846,11 @@
   ],
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119712,11 +119899,11 @@
   ],
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119818,11 +120005,11 @@
   ],
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119873,12 +120060,12 @@
   "reads": [
    "wallet.restriction",
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.restriction",
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -120051,18 +120238,18 @@
    "platform.scope",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.configuration_version_snapshot",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
    "wallet.risk_rule",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -120070,17 +120257,17 @@
    "platform.audit_read",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.configuration_version_snapshot",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "storedProcedures": [],
@@ -120757,16 +120944,16 @@
    "platform.outbox",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -120930,11 +121117,11 @@
    "redis"
   ],
   "reads": [
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.integration_mapping"
   ],
   "writes": [
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.integration_mapping"
   ],
   "storedProcedures": [],
@@ -120991,13 +121178,13 @@
    "control.api_client",
    "control.webhook_subscription",
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "cache:idempotency",
    "control.webhook_subscription",
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -121252,16 +121439,16 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -121329,16 +121516,16 @@
    "identity.principal",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -122249,6 +122436,273 @@
      "label": "Cancel"
     },
     "provenance": "contract catalogue.yaml POST /donation-campaigns"
+   }
+  ]
+ },
+ "BO-1191": {
+  "name": "Organisation",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/setup/organisation",
+  "operations": [
+   "listOrgUnits",
+   "getOrgUnit",
+   "createOrgUnit",
+   "updateOrgUnit"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "cache:resolution",
+   "platform.scope"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "platform.scope"
+  ],
+  "storedProcedures": [],
+  "wave": 3,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-100",
+   "BO-064"
+  ],
+  "pattern": "listDetail",
+  "entryFrom": [
+   "BO-100",
+   "BO-064"
+  ],
+  "transitions": [
+   {
+    "to": "BO-100",
+    "trigger": "Back to Venue Home",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "back": true
+   },
+   {
+    "to": "BO-064",
+    "trigger": "Zones & Areas",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "carries": [
+     "orgUnitId"
+    ]
+   }
+  ],
+  "machine": null,
+  "states": {
+   "loading": "The venue's tree, read by `listOrgUnits` under the venue's path.",
+   "error": "Could not load. Names which read failed and leaves the tree untouched.",
+   "emptyFirstRun": "No departments yet. Offers Add a unit (`createOrgUnit`) with Department chosen; the department pickers on BO-055 and the outlet and product screens show nothing to choose until one exists.",
+   "emptyNoResults": "Nothing matches the Level or Show archived filter and the tree is still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this screen, and names that permission. **Never an empty tree.** A caller who can see the screen but lacks `SCOPE_MANAGE` (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename unit and Archive unit disabled, naming that permission.",
+   "validation": "`400` on a code that is not lower-case letters, digits and underscores, or a level that cannot sit under the selected parent; `409` on a code already used under that parent. Marked on the field."
+  },
+  "overlays": [
+   {
+    "id": "formCreateOrgUnit",
+    "component": "modal",
+    "trigger": "Add a unit",
+    "body": "**Collects what `createOrgUnit` sends before it is called.** Required: `level` (Department, Sub-department or Outlet), `code` (lower-case, fixed once created), `name`. `parentId` is the selected unit, never typed. Dismissing sends nothing; the tree behind is unchanged.",
+    "bindsTo": "CreateScopeNodeRequest",
+    "confirm": {
+     "label": "Add unit",
+     "operation": "createOrgUnit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "level",
+      "code",
+      "name"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /org-units"
+   },
+   {
+    "id": "formUpdateOrgUnit",
+    "component": "modal",
+    "trigger": "Rename unit",
+    "body": "**Collects what `updateOrgUnit` sends before it is called.** Optional: `name`. The code and the place in the tree do not change. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Save unit",
+     "operation": "updateOrgUnit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+   },
+   {
+    "id": "confirmArchiveOrgUnit",
+    "component": "modal",
+    "trigger": "Archive unit",
+    "body": "**Archive *Food & Beverage* and the 4 units under it?** Staff granted at or beneath it lose that access until it is restored; nothing is deleted. `updateOrgUnit` with `isActive` false.",
+    "confirm": {
+     "label": "Archive unit",
+     "operation": "updateOrgUnit"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+   }
+  ]
+ },
+ "BO-1192": {
+  "name": "Entitlement Templates",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/sell/entitlement-templates",
+  "operations": [
+   "listEntitlementTemplates",
+   "getEntitlementTemplate",
+   "listProducts",
+   "createEntitlementTemplate",
+   "updateEntitlementTemplate",
+   "setEntitlementTemplateBlackoutDates",
+   "archiveEntitlementTemplate"
+  ],
+  "services": [
+   "CatalogueService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "catalogue.entitlement_template",
+   "catalogue.product",
+   "catalogue.product_category",
+   "catalogue.product_eligibility_rule",
+   "catalogue.product_media",
+   "whitelabel.guided_choice_answer"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.entitlement_template"
+  ],
+  "storedProcedures": [],
+  "wave": 3,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-102",
+   "BO-012"
+  ],
+  "pattern": "listDetail",
+  "entryFrom": [
+   "BO-102",
+   "BO-012"
+  ],
+  "transitions": [
+   {
+    "to": "BO-102",
+    "trigger": "Back to Sell",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "back": true
+   },
+   {
+    "to": "BO-012",
+    "trigger": "Membership Products",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "carries": [
+     "productId"
+    ]
+   }
+  ],
+  "machine": null,
+  "states": {
+   "loading": "The venue's entitlement templates, read by `listEntitlementTemplates`.",
+   "error": "Could not load. Names which read failed and leaves the templates untouched.",
+   "emptyFirstRun": "No entitlement templates yet. Offers New template (`createEntitlementTemplate`); a product created before one exists grants nothing at the gate.",
+   "emptyNoResults": "Show archived is off and every template is archived. Offers to show them.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listEntitlementTemplates` requires to show this screen, and names that permission. **Never an empty table.** A caller who can see the screen but lacks `PRODUCT_CONFIGURE` sees New template, Edit template, Set blackout dates and Archive template disabled, naming that permission.",
+   "validation": "`400` on a missing code, name or validity kind, or offsets that do not fit the kind; marked on the step and field it belongs to.",
+   "conflict": "`409 template-in-use` on Archive names the products still granting it, from Products using this template; `409 template-archived` on Save says the template was archived meanwhile and reloads it."
+  },
+  "overlays": [
+   {
+    "id": "formCreateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "New template",
+    "body": "**Numbered steps, each with its own fields, then a check** (the builder pattern, design-r1/COMMAND.md ADDED 6 Oct): 1 What it admits (`code`, `name`, `description`, `fastTrackTier`); 2 Validity (`validityKind`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `validTimeWindows`, `expiryAnchor`, `expiryDate`, `expiryNoticeDays`); 3 Re-entry (`reentryAllowed`); 4 Transfer (`isTransferable`, `isNameBound`); 5 Limits (`entriesAllowed`, `purchaseEligibility`); 6 Blackout dates (`blackoutDates`); 7 Check: the rules read back in words before `createEntitlementTemplate` is called. Required: `code`, `name`, `validityKind`. Dismissing sends nothing. Not asked, because the server sets it (readOnly in the contract): `id`.",
+    "bindsTo": "EntitlementTemplate",
+    "confirm": {
+     "label": "Create template",
+     "operation": "createEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "validityKind"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates"
+   },
+   {
+    "id": "formUpdateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Edit template",
+    "body": "**The same steps as New template, opened on the template's values**, without the code (fixed once created) and without blackout dates (Set blackout dates). Only what changed is sent to `updateEntitlementTemplate`. Says before saving that the change applies to entitlements issued from now on.",
+    "bindsTo": "UpdateEntitlementTemplateRequest",
+    "confirm": {
+     "label": "Save template",
+     "operation": "updateEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract catalogue.yaml PATCH /entitlement-templates/{templateId}"
+   },
+   {
+    "id": "formSetEntitlementTemplateBlackoutDates",
+    "component": "modal",
+    "trigger": "Set blackout dates",
+    "body": "**Collects what `setEntitlementTemplateBlackoutDates` sends.** Required: `blackoutDates`, the whole list (an empty list clears it). Optional: `reason`. Says that issued entitlements apply it at their next validation and a date already admitted on is not undone.",
+    "confirm": {
+     "label": "Save blackout dates",
+     "operation": "setEntitlementTemplateBlackoutDates"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "blackoutDates",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /entitlement-templates/{templateId}/blackout-dates"
+   },
+   {
+    "id": "confirmArchiveEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Archive template",
+    "body": "**Archive *Annual Pass \u2014 Adult*?** No new product can use it, and archiving is final. Passes already sold keep their rules and still admit. Optional: `reason`. `archiveEntitlementTemplate`.",
+    "confirm": {
+     "label": "Archive template",
+     "operation": "archiveEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates/{templateId}/archive"
    }
   ]
  },
@@ -126072,8 +126526,8 @@
    "redis"
   ],
   "reads": [
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.product",
@@ -132120,7 +132574,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price",
    "orders.order_line",
    "promotions.bundle",
@@ -132244,8 +132698,8 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
-   "inventory.item",
+   "catalogue.inventory_reservation",
+   "inventory.inventory_item",
    "inventory.kit_component",
    "promotions.bundle_component"
   ],
@@ -132353,7 +132807,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle",
    "promotions.bundle_capacity_policy",
    "promotions.bundle_component"
@@ -132531,7 +132985,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle",
    "promotions.bundle_component"
   ],
@@ -132660,7 +133114,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.sales_order",
    "promotions.bundle",
@@ -132717,7 +133171,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price",
    "orders.order_line",
    "promotions.bundle",
@@ -135268,11 +135722,13 @@
    "ADM-246",
    "ADM-247",
    "BO-086",
+   "BO-087",
    "BO-100"
   ],
   "pattern": "commandCentre",
   "entryFrom": [
    "BO-086",
+   "BO-087",
    "BO-100"
   ],
   "transitions": [
@@ -135340,6 +135796,12 @@
     "to": "BO-086",
     "trigger": "Works in Approval Matrix & Multi-Level Approval Configuration",
     "provenance": "flow F164 step 7\u21928",
+    "operation": "listRuleWorkflow"
+   },
+   {
+    "to": "BO-087",
+    "trigger": "Works in Approval Delegations, where Roles, Authority, Delegation & Approval Limits (ADM-243) renders as a\u2026",
+    "provenance": "flow F164 step 9\u219210",
     "operation": "listRuleWorkflow"
    }
   ],
@@ -136634,9 +137096,9 @@
    "redis"
   ],
   "reads": [
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
+   "catalogue.channel_envelope",
    "catalogue.channel_sales_rule",
    "catalogue.event",
    "catalogue.performance",
@@ -136950,9 +137412,9 @@
    "redis"
   ],
   "reads": [
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.channel_envelope",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.sales_channel",
    "catalogue.waitlist_entry"
@@ -137337,9 +137799,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
+   "catalogue.channel_envelope",
    "catalogue.channel_sales_rule",
    "catalogue.price_assignment",
    "catalogue.price_list",
@@ -137393,9 +137855,9 @@
   ],
   "reads": [
    "catalogue.ai_finding",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
+   "catalogue.channel_envelope",
    "catalogue.channel_incident",
    "catalogue.channel_sync",
    "catalogue.price_list",
@@ -137624,8 +138086,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_connection",
+   "catalogue.channel_envelope",
    "catalogue.channel_sync",
    "catalogue.price",
    "catalogue.product",
@@ -137708,10 +138170,10 @@
    "redis"
   ],
   "reads": [
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.event",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "promotions.bundle",
    "promotions.bundle_component"
@@ -137766,15 +138228,15 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.event",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -137918,8 +138380,8 @@
    "redis"
   ],
   "reads": [
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "catalogue.product",
    "catalogue.sales_channel",
    "orders.sales_order"
@@ -138079,9 +138541,9 @@
   "reads": [
    "cache:idempotency",
    "catalogue.ai_finding",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
+   "catalogue.channel_envelope",
    "catalogue.channel_incident",
    "catalogue.channel_sync",
    "catalogue.price_list",
@@ -139961,7 +140423,7 @@
    "redis"
   ],
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "orders.resale_listing",
@@ -151364,6 +151826,7 @@
   "app": "venue-management-web",
   "route": "/platform/segregation-of-duties-policy-manager-adm-340",
   "operations": [
+   "listSegregationRules",
    "setSegregationRules"
   ],
   "services": [
@@ -151383,7 +151846,7 @@
    "identity.segregation_rule"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -151404,10 +151867,10 @@
   ],
   "machine": null,
   "states": {
-   "loading": "The segregation duties policy configuration as saved.",
+   "loading": "The segregation rules as saved, read by `listSegregationRules`.",
    "error": "Could not load. Names which read failed and leaves the segregation duties policy untouched.",
    "emptyFirstRun": "No segregation duties policy configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE` sees Save segregation rules disabled, naming it."
   },
   "overlays": [
    {
@@ -175433,8 +175896,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
+   "catalogue.channel_envelope",
    "ledger.posting",
    "orders.order_line",
    "orders.order_line_discount",
@@ -175445,7 +175908,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -175619,7 +176082,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -175918,13 +176381,13 @@
    "cache:idempotency",
    "seating.seat_block",
    "seating.seat_block_item",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
    "seating.seat_block",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -176042,7 +176505,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
@@ -176062,7 +176525,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
@@ -176304,7 +176767,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
@@ -176314,7 +176777,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -176967,6 +177430,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.execution",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -180676,6 +181140,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.execution",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -190653,7 +191118,7 @@
     "id": "formSetStoreAccounts",
     "component": "modal",
     "trigger": "Save store accounts and listing",
-    "body": "**Collects what `setStoreAccounts` sends**: per store, `accountHolderName`, `developerAccountId`, `appIdentifier`, `dunsNumber` (Apple, nine digits), optional `apiCredentialSecretRef` and the `listing` (name, subtitle, description and keywords in every tenant language, category, support and privacy links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. Dismissing sends nothing.",
+    "body": "**Collects what `setStoreAccounts` sends**: per store, `accountHolderName`, `developerAccountId`, `appIdentifier`, `dunsNumber` (Apple, nine digits), optional `apiCredentialSecretRef` and the `listing` (name, subtitle, description and keywords in every tenant language, category, support and privacy links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. **Apple Wallet** (Apple entry, optional): `passTypeIdentifier` and the Pass Type ID certificate (`passCertificateSecretRef`, a .p12 and its password uploaded once to Key Vault) from the client's own Apple Developer account, one per brand; the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate for another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033). Dismissing sends nothing.",
     "bindsTo": "StoreAccount",
     "confirm": {
      "label": "Save",
@@ -192642,6 +193107,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.dashboard_view",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -193348,7 +193814,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement",
    "ledger.account",
    "reporting.dashboard",
@@ -193471,7 +193937,7 @@
    "cache:rec-candidates",
    "fnb.production_plan",
    "inventory.count",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement",
    "inventory.stock_batch",
    "marketing.attribution_touch",
@@ -193734,6 +194200,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.dashboard_view",
    "reporting.natural_language_query",
    "reporting.report_column",
@@ -193848,6 +194315,7 @@
    "ai.decision_record",
    "ai.proposed_action",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.alert",
    "reporting.alert_rule",
    "reporting.execution",
@@ -194606,6 +195074,7 @@
    "ai.anomaly_detector",
    "ai.insight",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_filter"
@@ -196949,6 +197418,7 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_definition",
@@ -197200,6 +197670,7 @@
    "ai.activity",
    "ai.insight",
    "cache:idempotency",
+   "platform.outbox",
    "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_filter"

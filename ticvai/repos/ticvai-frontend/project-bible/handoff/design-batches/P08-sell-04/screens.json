@@ -1,5 +1,216 @@
 [
  {
+  "id": "BO-121",
+  "name": "Personalized Offers & Guest Engagement",
+  "module": "Sell",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/personalized-offers-guest-engagement",
+   "component": "apps/venue-management-web/src/routes/sell/PersonalizedOffersGuestEngagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-121 holds none of them. The edge carries nothing: BO-121 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 5.dc.html#ret-5f"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSegments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Personalized Offers & Guest Engagement — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listSegments",
+       "notes": "Sends `?search=` to `listSegments`.",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every segment",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.match",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search personalized offers",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected segment",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.venueId",
+        "Segment.match",
+        "Segment.criteria",
+        "Segment.excludeSegmentIds",
+        "Segment.id",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create campaign",
+       "operation": "createCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The personalized offers guest list.",
+   "error": "Could not load. Names which read failed and leaves the personalized offers guest untouched.",
+   "emptyFirstRun": "No personalized offers guest yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on search and the personalized offers guest are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`."
+  },
+  "apis": [
+   {
+    "operationId": "listSegments",
+    "contract": "marketing-crm",
+    "purpose": "List segments",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Create a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSegments"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "Segment.name",
+    "Segment.description",
+    "Segment.venueId",
+    "Segment.match",
+    "Segment.criteria"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-121",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
   "id": "BO-122",
   "name": "POS Experience Dashboard",
   "module": "Sell",

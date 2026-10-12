@@ -140,7 +140,7 @@
  "BundleCapacityPolicy": {
   "x-ticvai-persistence": "promotions.bundle_capacity_policy",
   "type": "object",
-  "description": "How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).",
+  "description": "How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_reservation`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).",
   "required": [
    "id",
    "bundleId",
@@ -617,11 +617,13 @@
   ],
   "properties": {
    "kitItemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid",
     "readOnly": true
    },
    "componentItemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },

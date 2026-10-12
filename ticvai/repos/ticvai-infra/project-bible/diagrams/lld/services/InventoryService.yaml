@@ -587,7 +587,7 @@ tables:
       role: evicts
       resolvers: &id001
       - catalogue.product
-      - inventory.item
+      - inventory.inventory_item
       - price-list
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
@@ -699,7 +699,7 @@ tables:
   writtenBy:
   - inventory
   foreignWriters: null
-- table: inventory.item
+- table: inventory.inventory_item
   columns: 26
   store: postgres
   parent: null
@@ -789,13 +789,7 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: inventory.stock_level
-  columns: 2
-  store: derived
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: inventory.stock_reservation
+- table: inventory.stock_earmark
   columns: 10
   store: postgres
   parent: null
@@ -806,6 +800,12 @@ tables:
   foreignWriters:
   - maintenance
   - retail
+- table: inventory.stock_level
+  columns: 2
+  store: derived
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: inventory.supplier
   columns: 16
   store: postgres

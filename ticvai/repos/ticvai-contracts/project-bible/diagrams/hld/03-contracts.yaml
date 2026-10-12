@@ -17,12 +17,12 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 277
+  operations: 278
   holds: null
   service: MarketingService
   verbs:
     GET: 133
-    POST: 75
+    POST: 76
     PUT: 60
     PATCH: 7
     DELETE: 2
@@ -32,12 +32,12 @@ contracts:
   ref: diagrams/lld/contracts/marketing-crm.yaml
 - contract: access
   tier: spine
-  operations: 257
+  operations: 258
   holds: null
   service: AccessService
   verbs:
     GET: 134
-    PUT: 81
+    PUT: 82
     POST: 32
     DELETE: 8
     PATCH: 2
@@ -46,19 +46,20 @@ contracts:
   events:
   - access-rejected
   - access-validated
+  - biometric-enrolmentChanged
   - entitlement-expiringSoon
   - entitlement-issued
   ref: diagrams/lld/contracts/access.yaml
 - contract: catalogue
   tier: spine
-  operations: 249
+  operations: 252
   holds: null
   service: CatalogueService
   verbs:
-    GET: 128
+    GET: 129
     PUT: 64
-    POST: 47
-    PATCH: 8
+    POST: 48
+    PATCH: 9
     DELETE: 2
   guestCallable: 22
   offlineCapable: 10
@@ -84,6 +85,10 @@ contracts:
   offlineCapable: 13
   events:
   - cart-abandoned
+  - entitlement-reissued
+  - entitlement-shareChanged
+  - entitlement-voided
+  - invitation-issued
   - order-cancelled
   - order-chargebackRecorded
   - order-completed
@@ -92,6 +97,7 @@ contracts:
   - order-paid
   - order-refunded
   - payment-captured
+  - paymentToken-stored
   - sync-rejectionRaised
   ref: diagrams/lld/contracts/orders.yaml
 - contract: subscription
@@ -298,17 +304,18 @@ contracts:
   - device-firmwareRolloutCompleted
   - device-statusChanged
   - device-tamperDetected
+  - tenantDomain-mapped
   ref: diagrams/lld/contracts/tenancy.yaml
 - contract: seating
   tier: satellite
-  operations: 55
+  operations: 56
   holds: null
   service: CatalogueService
   verbs:
     POST: 22
     GET: 21
     PUT: 7
-    PATCH: 3
+    PATCH: 4
     DELETE: 2
   guestCallable: 3
   offlineCapable: 2
@@ -334,6 +341,7 @@ contracts:
   offlineCapable: 0
   events:
   - reporting-definitionPublished
+  - reporting-questionAnswered
   ref: diagrams/lld/contracts/reporting.yaml
 - contract: payments
   tier: satellite

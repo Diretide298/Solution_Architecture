@@ -1,6 +1,6 @@
 # P08-setup-go-live-01 — P08 · Setup & Go-Live
 
-**1 screens · 1 operations · 4 schemas · 1 permissions**
+**2 screens · 5 operations · 6 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_TENANT_VIEW, SCOPE_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -97,6 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-594` | Environment Ready & Handoff to AI Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1191` | Organisation | B–D | 10 | 14 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -224,6 +225,195 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ---
 
+### `BO-1191` Organisation
+
+**Keep the venue's departments, sub-departments and outlets as one tree that every department picker reads.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Setup & Go-Live · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `SCOPE_MANAGE`, `SCOPE_VIEW` (1 configure, 1 read) |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): `listOrgUnits` reads the tree and `getOrgUnit` reads one unit of it — list, select, act |
+| Offline | online only |
+| Opens with | `orgUnitId` (navigation) · cold entry: Resolves the tenant and venue from the session, never from the link; a unit the session cannot see is said to be out of reach, not silently dropped. |
+| Route | `/setup/organisation` |
+
+**What the spec says about it.** **Created 12 October 2026 (CHG-R6-040) from the client's feedback of 6 October** ("some of the basic setup is not there such as Departments, Sub Departments ... and it's confusing"; design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no organisation tree: departments existed only through the Create org unit button of BO-064 Zones & Areas and the wave-3 BO-145, and the tree itself is ADM-006, in the console. **This screen is the venue's department, sub-department and outlet tree**, on the org units the package already has (`listOrgUnits`, `createOrgUnit`, `getOrgUnit`, `updateOrgUnit`); every "choose a department" field (outlets, BO-055 Rota & Scheduling, products) reads the same tree. **Archive is deactivate**: `updateOrgUnit` with `isActive` false, which makes every permission query at or beneath the unit resolve to deny and deletes nothing. Block B (Chinmay's decision on N32).
+
+**Known gaps.** **Move is not in the contract.** A unit's code is the last segment of its ltree path and is fixed once created, and no operation re-parents a unit; the client's "add, edit, move and archive" gets … **The counts under each node are only the child count.** `OrgUnit` carries `childCount`; the outlets, staff and products under a unit (asked for in the wireframe intent) have no read that counts them …
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Level | select | optional | — | Tenant · Brand · Region · Venue · Department · Sub department · Workstation · Outlet; Modelling a restaurant as a department would put it in the staffing tree, which is why the two cannot be collapsed (CF-138, ADR-0018). | — | Sends `?level=` to `listOrgUnits`. Offers Department, Sub-department and Outlet; the levels above the venue are the console's (ADM-006). | `listOrgUnits` ?level |
+| Show archived | toggle | optional | off | — | — | Sends `?includeInactive=` to `listOrgUnits`. Off by default, so an archived unit leaves the tree and the pickers. | `listOrgUnits` ?includeInactive |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Under | text field | — | — | `listOrgUnits` ?under |
+
+**Form: Add a unit** (modal, opened by *Add a unit*; *Add unit* calls `createOrgUnit`, *Cancel* sends nothing)
+
+**Collects what `createOrgUnit` sends before it is called.** Required: `level` (Department, Sub-department or Outlet), `code` (lower-case, fixed once created), `name`. `parentId` is the selected unit, never typed. Dismissing sends nothing; the tree behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Level `level` | select | required | — | Tenant · Brand · Region · Venue · Department · Sub department · Workstation · Outlet; Modelling a restaurant as a department would put it in the staffing tree, which is why the two cannot be collapsed (CF-138, ADR-0018). | — | Seven organisational levels, confirmed binding (ADR-0011), plus `outlet`. Region owns currency, decimal scale, time zone and fiscal year, inherited by every venue beneath and not … | `createOrgUnit` body |
+| Parent `parentId` | picker: choose a parent | required | — | — | shows names, sends the id | Required for every level except tenant, which the cell creates at provisioning. | `createOrgUnit` body |
+| Code `code` | text field | required | — | max length 64; pattern `^[a-z0-9_]+$` | — | Becomes the final ltree segment. Immutable once created. | `createOrgUnit` body |
+| Name `name` | text field | required | — | max length 200 | — | — | `createOrgUnit` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.
+
+**Form: Rename unit** (modal, opened by *Rename unit*; *Save unit* calls `updateOrgUnit`, *Cancel* sends nothing)
+
+**Collects what `updateOrgUnit` sends before it is called.** Optional: `name`. The code and the place in the tree do not change. Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateOrgUnit` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `updateOrgUnit` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.
+
+**Form: Archive unit** (modal, opened by *Archive unit*; *Archive unit* calls `updateOrgUnit`, *Keep it* sends nothing)
+
+**Archive *Food & Beverage* and the 4 units under it?** Staff granted at or beneath it lose that access until it is restored; nothing is deleted. `updateOrgUnit` with `isActive` false.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateOrgUnit` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `updateOrgUnit` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Departments, sub-departments and outlets** (tree nav, from `listOrgUnits`): `listOrgUnits` with `?under=` the venue's path, so the tree starts at the venue the session holds. Each node shows its level, name and how many units sit directly under it (`childCount`). Cursor-paged: a large venue loads the next page as the tree is scrolled.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Level | chip: Tenant, Brand, Region, Venue, Department, Sub department… | Seven organisational levels, confirmed binding (ADR-0011), plus `outlet`. Region owns currency, decimal scale, time zone and fiscal year … |
+| Code | text | — |
+| Name | text | — |
+| Is active | yes / no (icon or chip) | False causes every permission query at or beneath this node to resolve to DENY. |
+| Child count | 1,234 | — |
+
+**The selected unit** (detail panel, from `getOrgUnit`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Level | chip: Tenant, Brand, Region, Venue, Department, Sub department… | Seven organisational levels, confirmed binding (ADR-0011), plus `outlet`. Region owns currency, decimal scale, time zone and fiscal year … |
+| Code | text | — |
+| Name | text | — |
+| Path | text | Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`. |
+| Is active | yes / no (icon or chip) | False causes every permission query at or beneath this node to resolve to DENY. |
+| Child count | 1,234 | — |
+
+**Units under it** (card list, from `listOrgUnits`): `listOrgUnits` with `?under=` the selected unit's path.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Level | chip: Tenant, Brand, Region, Venue, Department, Sub department… | Seven organisational levels, confirmed binding (ADR-0011), plus `outlet`. Region owns currency, decimal scale, time zone and fiscal year … |
+| Name | text | — |
+| Is active | yes / no (icon or chip) | False causes every permission query at or beneath this node to resolve to DENY. |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Add a unit (primary button) | `createOrgUnit` POST `/org-units` | CreateScopeNodeRequest | OrgUnit | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. | opens modal first |
+| Rename unit (secondary button) | `updateOrgUnit` PATCH `/org-units/{orgUnitId}` | inline | OrgUnit | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
+| Archive unit (destructive button) | `updateOrgUnit` PATCH `/org-units/{orgUnitId}` | inline | OrgUnit | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
+
+**Data it reads**: `listOrgUnits` (onLoad, The tree under the venue, and the units under the selected …)
+
+**Where the user goes next**
+
+- → `BO-100` Venue Home: *Back to Venue Home*
+- → `BO-064` Zones & Areas: *Zones & Areas*; carries `orgUnitId`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The venue's tree, read by `listOrgUnits` under the venue's path. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the tree untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No departments yet. Offers Add a unit (`createOrgUnit`) with Department chosen; the department pickers on BO-055 and the outlet and product screens show nothing to choose until one exists. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing matches the Level or Show archived filter and the tree is still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this screen, and names that permission. **Never an empty tree.** A caller who can see the screen but lacks `SCOPE_MANAGE` (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename unit and Archive unit disabled, naming that permission. |
+| Validation (`?state=validation`) | `400` on a code that is not lower-case letters, digits and underscores, or a level that cannot sit under the selected parent; `409` on a code already used under that parent. Marked on the field. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. |
+
+#### Permissions
+
+- `listOrgUnits` → `SCOPE_VIEW` (read) · staff
+- `getOrgUnit` → `SCOPE_VIEW` (read) · staff
+- `createOrgUnit` → `SCOPE_MANAGE` (configure) · staff
+- `updateOrgUnit` → `SCOPE_MANAGE` (configure) · staff
+
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this screen, and names that permission. **Never an empty tree.** A caller who can see the screen but lacks `SCOPE_MANAGE` (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename unit and Archive unit disabled, naming that permission.
+
+Screen guard: `SCOPE_VIEW`
+
+#### Requirements it meets
+
+17 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 3.3.41 | Venue-Specific Policies - System shall support venue-specific access policies. | Admission and Access | CONTRACTED | `listOrgUnits` |
+| 3.3.43 | Policy Inheritance - System shall support inheritance of policies across organizational structures. | Admission and Access | CONTRACTED | `listOrgUnits` |
+| 7.1.13 | The system shall support permission assignment at company, department, venue, park, attraction, facility, event, sales channel, POS terminal, and product levels. | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.27 | The system shall support management of companies, business units, departments, parks, venues, attractions, facilities, cost centers, and reporting structures. | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.37 | Allow administrators to restrict access by venue, park, facility, attraction, sales channel, POS terminal, country, region, IP address and network range. Policies should support allow/deny logic and … | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.52 | Support policies spanning multiple parks, venues, attractions, departments and business units while maintaining centralized governance. | F&B POS | CONTRACTED | `listOrgUnits` |
+| 7.1.14 | The system shall isolate users, permissions, configurations, and data between tenants. Users shall only access data belonging to their assigned tenant unless explicitly authorized. | F&B POS | CONTRACTED | `getOrgUnit` |
+| 7.1.53 | Allow separate authorization policies for each tenant in a multi-tenant environment without impacting other tenants. | F&B POS | CONTRACTED | `getOrgUnit` |
+| 7.3.1 | The sales system shall be able to manage the data transactions for Multi Tenants Sites | F&B POS | CONTRACTED | `getOrgUnit` |
+| 13.1.46 | Multi-Tenant API Access - System shall support tenant-specific API access. | Developer & API Management | CONTRACTED | `getOrgUnit` |
+| 13.2.11 | Data Isolation - Sandbox data shall be isolated from production. | Developer & API Management | CONTRACTED | `getOrgUnit` |
+| 15.5.1 | Tenant-Specific Inventory - System shall support tenant-specific inventory. | Inventory Management | CONTRACTED | `getOrgUnit` |
+| … 5 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-1191` · status **notStarted** · provenance generated
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-1191?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, validation, offline.
+- [ ] Every action is wired with its success and its failure: Add a unit, Rename unit, Archive unit.
+- [ ] Every transition is wired: `BO-100`, `BO-064`.
+- [ ] Every gated control is gated: `SCOPE_MANAGE`, `SCOPE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
 
 
 ## Reference designs and the trackers for this platform
@@ -320,7 +510,11 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"}
+"createOrgUnit": {"method":"POST","path":"/org-units","contract":"tenancy","summary":"Create a scope node","permission":"SCOPE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"brand","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateScopeNodeRequest","responds":"OrgUnit"},
+"getOrgUnit": {"method":"GET","path":"/org-units/{orgUnitId}","contract":"tenancy","summary":"Read a scope node","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"OrgUnit"},
+"listOrgUnits": {"method":"GET","path":"/org-units","contract":"tenancy","summary":"List scope nodes visible to the session","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"under","in":"query","required":null},{"name":"level","in":"query","required":null},{"name":"includeInactive","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"updateOrgUnit": {"method":"PATCH","path":"/org-units/{orgUnitId}","contract":"tenancy","summary":"Rename or deactivate a scope node","permission":"SCOPE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"brand","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"OrgUnit"}
 }
 ```
 
@@ -330,6 +524,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"CreateScopeNodeRequest": {"type":"object","required":["level","parentId","code","name"],"properties":{"level":{"$ref":"#/components/schemas/tenancy::ScopeLevel"},"parentId":{"type":"string","format":"uuid","description":"Required for every level except tenant, which the cell creates at provisioning."},"code":{"type":"string","maxLength":64,"pattern":"^[a-z0-9_]+$","description":"Becomes the final ltree segment. Immutable once created."},"name":{"type":"string","maxLength":200}}},
+"OrgUnit": {"x-ticvai-persistence":"platform.scope","type":"object","required":["id","level","path","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"level":{"$ref":"#/components/schemas/tenancy::ScopeLevel"},"parentId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"platform.scope"},"path":{"type":"string","description":"Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.","pattern":"^[a-z0-9_]+(\\.[a-z0-9_]+)*$"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"isActive":{"type":"boolean","description":"False causes every permission query at or beneath this node to resolve to DENY.\n"},"childCount":{"type":"integer","minimum":0}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
 "Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},

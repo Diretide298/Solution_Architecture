@@ -520,6 +520,7 @@
     }
    },
    "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -570,6 +571,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
     "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
@@ -1008,7 +1011,7 @@
   ]
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -1358,7 +1361,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",

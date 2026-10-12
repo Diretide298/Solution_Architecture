@@ -210,7 +210,7 @@
   "name": "Segregation of Duties Policy Manager",
   "module": "Platform",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -260,6 +260,20 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Rules in force",
+       "bindsTo": "SegregationRule",
+       "columns": [
+        "SegregationRule.name",
+        "SegregationRule.permissionA",
+        "SegregationRule.permissionB",
+        "SegregationRule.severity"
+       ],
+       "operation": "listSegregationRules",
+       "notes": "The tenant's rules as saved, read on load (12 October 2026, CHG-R6-042). Save segregation rules sends the whole list (`setSegregationRules` is a PUT), so the form opens on these rows and a rule left out is removed.",
+       "provenance": "contract identity.yaml GET /segregation-rules"
+      },
+      {
        "kind": "multiSelect",
        "label": "Roles that may not be held together",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 51 §Price Configuration User",
@@ -282,12 +296,19 @@
    ]
   },
   "states": {
-   "loading": "The segregation duties policy configuration as saved.",
+   "loading": "The segregation rules as saved, read by `listSegregationRules`.",
    "error": "Could not load. Names which read failed and leaves the segregation duties policy untouched.",
    "emptyFirstRun": "No segregation duties policy configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE` sees Save segregation rules disabled, naming it."
   },
   "apis": [
+   {
+    "operationId": "listSegregationRules",
+    "contract": "identity",
+    "purpose": "The rules in force, read before the whole list is replaced",
+    "trigger": "onLoad",
+    "provenance": "r1 gate rule READ, 12 October 2026 (CHG-R6-042)"
+   },
    {
     "operationId": "setSegregationRules",
     "contract": "identity",

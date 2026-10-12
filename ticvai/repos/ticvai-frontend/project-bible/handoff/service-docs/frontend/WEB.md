@@ -29,7 +29,7 @@
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
 | [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 7 |
-| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 8 |
+| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 10 |
 | [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 6 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 1 | 5 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 1 | 3 |
@@ -370,6 +370,7 @@
 | cartId | navigation |
 | eventId | WEB-004 |
 | venueId | session |
+| entryId | navigation |
 
 **Operations**
 
@@ -382,6 +383,8 @@
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The times of the event for the picked date or range, filtered by `language` | `PRODUCT_VIEW` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
+| `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join the waitlist of a sold-out time (CHG-R6-037) | `None` |
+| `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Leave it (CHG-R6-037) | `None` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
@@ -1103,7 +1106,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `updateMyProfile` | [MarketingService](../backend/MarketingService.md#updatemyprofile) | onAction | A guest correcting their own details | `GUEST_VIEW` |
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `GUEST_MANAGE` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 | `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Send a verification link, or consume one | `GUEST_VIEW` |
 | `updateGuestPreferences` | [MarketingService](../backend/MarketingService.md#updateguestpreferences) | onAction | Change contact and consent preferences | `GUEST_MANAGE` |
@@ -1315,7 +1318,7 @@
 |---|---|---|---|---|
 | `getWishlist` | [MarketingService](../backend/MarketingService.md#getwishlist) | onLoad | Read a guest's saved items | `None` |
 | `listGuestDevices` | [MarketingService](../backend/MarketingService.md#listguestdevices) | onLoad | A guest's registered devices | `None` |
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `GUEST_MANAGE` |
 | `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Revoke a device registration | `None` |
 | `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Ask for the account to be deleted | `None` |
 | `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Export everything held about this guest | `GUEST_VIEW_PII` |
@@ -1471,7 +1474,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | from page inventory | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | from page inventory | `GUEST_MANAGE` |
 | `getMarketingSubscription` | [MarketingService](../backend/MarketingService.md#getmarketingsubscription) | onLoad | What this guest has opted into | `MARKETING_VIEW` |
 | `setMarketingSubscription` | [MarketingService](../backend/MarketingService.md#setmarketingsubscription) | onAction | Subscribe or unsubscribe | `MARKETING_VIEW` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent per channel (signed in) | `GUEST_VIEW` |

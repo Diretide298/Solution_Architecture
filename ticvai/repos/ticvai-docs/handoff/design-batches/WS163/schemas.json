@@ -486,7 +486,8 @@
    },
    "attendanceRecordId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "workforce.attendance"
    },
    "amendedByPrincipalId": {
     "type": "string",

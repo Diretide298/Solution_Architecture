@@ -2618,8 +2618,8 @@ screens:
       - kind: secondaryButton
         label: Check the impact
         operation: assessProductChange
-        notes: Sends the unsaved product edit to `assessProductChange` before Save product and shows what it would
-          touch (Change impact, below). Nothing is written.
+        notes: Sends the unsaved product edit to `assessProductChange` before Save product and shows what
+          it would touch (Change impact, below). Nothing is written.
         provenance: contract catalogue.yaml POST /products/{productId}/change-impact
       - kind: secondaryButton
         label: Clone product
@@ -2887,8 +2887,9 @@ screens:
   - id: formCloneProduct
     component: modal
     trigger: Clone product
-    body: '**Collects what `cloneProduct` sends before it is called.** Required: `code` (a new code; a code in use
-      is refused), `name`. Optional: `includeVariants`. The copy is a new draft. Dismissing sends nothing.'
+    body: '**Collects what `cloneProduct` sends before it is called.** Required: `code` (a new code; a
+      code in use is refused), `name`. Optional: `includeVariants`. The copy is a new draft. Dismissing
+      sends nothing.'
     confirm:
       label: Clone product
       operation: cloneProduct
@@ -2902,8 +2903,8 @@ screens:
   - id: formRestoreProductVersion
     component: modal
     trigger: Restore this version
-    body: '**Collects what `restoreProductVersion` sends before it is called.** Required: `note`, why this
-      version is put back. The version is the row picked in Versions. Dismissing sends nothing.'
+    body: '**Collects what `restoreProductVersion` sends before it is called.** Required: `note`, why
+      this version is put back. The version is the row picked in Versions. Dismissing sends nothing.'
     confirm:
       label: Restore this version
       operation: restoreProductVersion
@@ -4400,7 +4401,9 @@ screens:
         and BO-009 opens on its own'
     - to: BO-1192
       trigger: Entitlement Templates
-      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
+      provenance: 'decided 12 October 2026, Chinmay: the client''s feedback of 6 October, N32 (CHG-R6-040)'
+      carries:
+      - templateId
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -7887,9 +7890,10 @@ screens:
       - kind: dataTable
         label: Cancel notices sent
         operation: listMessageDispatches
-        notes: 'For a cancelled performance, the notices `notifyPerformanceHolders` sent (`sourceRef` = the
-          performance id): delivered, failed and suppressed, guest by guest, so the refunds desk can confirm the
-          guests were told before they travel (F09 step 5). Shown when the refunds are for a cancelled performance.'
+        notes: 'For a cancelled performance, the notices `notifyPerformanceHolders` sent (`sourceRef`
+          = the performance id): delivered, failed and suppressed, guest by guest, so the refunds desk
+          can confirm the guests were told before they travel (F09 step 5). Shown when the refunds are
+          for a cancelled performance.'
         provenance: contract marketing-crm.yaml GET /message-dispatches (12 October 2026, CHG-R6-038)
     - name: contextPanel
       slot: selection
@@ -8221,8 +8225,8 @@ screens:
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
   - operationId: listMessageDispatches
     contract: marketing-crm
-    purpose: 'The cancel notices sent for a cancelled performance (sourceRef = performanceId): delivered, failed
-      and suppressed, so F09 step 5 can confirm the guests were told'
+    purpose: 'The cancel notices sent for a cancelled performance (sourceRef = performanceId): delivered,
+      failed and suppressed, so F09 step 5 can confirm the guests were told'
     trigger: onAction
     provenance: 12 October 2026 (CHG-R6-038)
   entryState:
@@ -18818,7 +18822,9 @@ screens:
     transitions:
     - to: BO-1191
       trigger: Organisation
-      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
+      provenance: 'decided 12 October 2026, Chinmay: the client''s feedback of 6 October, N32 (CHG-R6-040)'
+      carries:
+      - orgUnitId
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Direction is
@@ -19324,14 +19330,13 @@ screens:
     component: modal
     trigger: Save venue settings
     body: '**Collects what `setVenueSettings` sends before it is called, in sections, not property names.**
-      Nothing in the body is required. **Day and hours**: calendar day start, business day cut-off
-      (`businessDayCutoff`, when the venue''s business day closes; empty inherits the tenant default, 00:00;
-      CHG-R6-032), support hours, quiet hours.
-      **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer
-      limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart
-      lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp
-      escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form,
-      minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency
+      Nothing in the body is required. **Day and hours**: calendar day start, business day cut-off (`businessDayCutoff`,
+      when the venue''s business day closes; empty inherits the tenant default, 00:00; CHG-R6-032), support
+      hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001),
+      cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and
+      resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall
+      window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent
+      form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency
       code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged.
       Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`,
       `id`, `venueId` (3 October 2026, CHG-SPF-001). **setVenueSettings replaces the whole settings row**
@@ -24475,6 +24480,7 @@ screens:
     status: notStarted
   navigation:
     exitTo:
+    - ADM-238
     - BO-084
     - BO-085
     - BO-086
@@ -24490,6 +24496,11 @@ screens:
       provenance: 'derived — BO-085 declares entryState.params requestId and BO-087 holds none of them.
         The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens
         on its own'
+    - to: ADM-238
+      trigger: Returns to the board's landing screen
+      provenance: flow F164 step 10→11
+    entryFrom:
+    - ADM-238
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
 
@@ -28037,11 +28048,11 @@ screens:
         A, CHG-RONEP-007); its command centre is not in Block A'
     - to: BO-954
       trigger: Opens Venue Canvas
-      provenance: 'CHG-R6-047: the section home links to the Block A seat-map screen it leads to (lever A,
-        CHG-RONEP-007); its command centre BO-953 is not in Block A'
+      provenance: 'CHG-R6-047: the section home links to the Block A seat-map screen it leads to (lever
+        A, CHG-RONEP-007); its command centre BO-953 is not in Block A'
     - to: BO-1191
       trigger: Organisation
-      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
+      provenance: 'decided 12 October 2026, Chinmay: the client''s feedback of 6 October, N32 (CHG-R6-040)'
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
@@ -28788,7 +28799,7 @@ screens:
         3 October 2026); its command centre is not in Block A'
     - to: BO-1192
       trigger: Entitlement Templates
-      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
+      provenance: 'decided 12 October 2026, Chinmay: the client''s feedback of 6 October, N32 (CHG-R6-040)'
   notes: Section landing. **14 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -36789,9 +36800,9 @@ screens:
       - kind: secondaryButton
         label: Set capacity
         operation: setAccessAreaCapacity
-        notes: 'On the selected venue or park row: capacity (empty for no limit), the warning, high and critical
-          bands, and an operator count adjustment with its reason. **Without a capacity the scanner''s "Venue
-          full" never fires** (`capacityReached`); BO-255 links here for it (DEC-263).'
+        notes: 'On the selected venue or park row: capacity (empty for no limit), the warning, high and
+          critical bands, and an operator count adjustment with its reason. **Without a capacity the scanner''s
+          "Venue full" never fires** (`capacityReached`); BO-255 links here for it (DEC-263).'
         provenance: contract access.yaml PUT /access-areas/{areaId}/capacity (12 October 2026, CHG-R6-036)
   states:
     loading: The venue park access list.
@@ -36828,8 +36839,8 @@ screens:
     - listOrgUnits
   - operationId: setAccessAreaCapacity
     contract: access
-    purpose: 'Set the venue''s or a park''s capacity and occupancy bands: what makes the gate''s "Venue full"
-      (`capacityReached`) fire and what BO-255 measures against (12 October 2026, CHG-R6-036; DEC-263)'
+    purpose: 'Set the venue''s or a park''s capacity and occupancy bands: what makes the gate''s "Venue
+      full" (`capacityReached`) fire and what BO-255 measures against (12 October 2026, CHG-R6-036; DEC-263)'
     trigger: onAction
     provenance: 12 October 2026 (CHG-R6-036)
     invalidates:
@@ -36846,8 +36857,9 @@ screens:
     - name: areaId
       from: navigation
       optional: true
-      notes: 'Optional (12 October 2026, CHG-R6-036): `setAccessAreaCapacity` takes the id of the venue or park row
-        the user selects in the list (`listVenueParkAccess`); an edge that holds one only pre-selects it.'
+      notes: 'Optional (12 October 2026, CHG-R6-036): `setAccessAreaCapacity` takes the id of the venue
+        or park row the user selects in the list (`listVenueParkAccess`); an edge that holds one only
+        pre-selects it.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -36861,10 +36873,10 @@ screens:
   - id: formSetAccessAreaCapacity
     component: modal
     trigger: Set capacity
-    body: '**Collects what `setAccessAreaCapacity` sends for the selected venue or park** (12 October 2026,
-      CHG-R6-036): capacity (empty for no limit, so the gate never denies for capacity), the warning, high and
-      critical bands in percent of capacity, and an operator count adjustment with its reason (required when
-      the adjustment changes). Dismissing sends nothing; the structure behind is unchanged.'
+    body: '**Collects what `setAccessAreaCapacity` sends for the selected venue or park** (12 October
+      2026, CHG-R6-036): capacity (empty for no limit, so the gate never denies for capacity), the warning,
+      high and critical bands in percent of capacity, and an operator count adjustment with its reason
+      (required when the adjustment changes). Dismissing sends nothing; the structure behind is unchanged.'
     confirm:
       label: Save capacity
       operation: setAccessAreaCapacity
@@ -40973,9 +40985,9 @@ screens:
     body: '**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`,
       `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`.
       Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as "Ticket credential for this product"
-      (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP
-      invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing
-      sends nothing; the screen behind is unchanged.'
+      (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off
+      a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031).
+      Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AccessVerificationMethodPolicy
     confirm:
       label: Save verification method policy
@@ -63430,9 +63442,9 @@ screens:
     error: Could not load. Names which read failed and leaves the pdf printable pos untouched.
     emptyFirstRun: 'No design saved for this media template yet: the designer opens on the defaults; Save
       design creates it.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to show
-      this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design disabled,
-      naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to
+      show this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design
+      disabled, naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE
       until 12 October 2026, BC-034/BC-035, CHG-R6-030). **Never an empty table** — that reads as *there
       is no data* and sends somebody to support with the wrong question.
   apis:
@@ -63599,10 +63611,10 @@ screens:
     error: Could not load. Names which read failed and leaves the apple wallet pass untouched.
     emptyFirstRun: No apple wallet pass configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires, and names
-      that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE
-      until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and
-      sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires,
+      and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE
+      until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question.
   apis:
   - operationId: setAppleWalletPass
     contract: access
@@ -63743,10 +63755,10 @@ screens:
     error: Could not load. Names which read failed and leaves the google wallet pass untouched.
     emptyFirstRun: No google wallet pass configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires, and names
-      that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE
-      until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and
-      sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires,
+      and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE
+      until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question.
   apis:
   - operationId: setGoogleWalletPass
     contract: access
@@ -132139,8 +132151,8 @@ screens:
       - kind: secondaryButton
         label: Add sections, rows and seats
         operation: editSeatMapStructure
-        notes: Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21 Aug 2026;
-          CHG-R6-035).
+        notes: Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21
+          Aug 2026; CHG-R6-035).
         provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (12 October 2026, CHG-R6-035)
   states:
     loading: The venue canvas list.
@@ -132196,11 +132208,12 @@ screens:
   - id: formEditSeatMapStructure
     component: modal
     trigger: Add sections, rows and seats
-    body: '**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code,
-      name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction,
-      start and end point, a curve radius for a curved row, a category), single seats (section, row, number,
-      position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft
-      maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.'
+    body: '**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add
+      (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering
+      direction, start and end point, a curve radius for a curved row, a category), single seats (section,
+      row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form
+      sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing;
+      the canvas is unchanged.'
     confirm:
       label: Apply to the map
       operation: editSeatMapStructure
@@ -132422,8 +132435,8 @@ screens:
       - kind: secondaryButton
         label: Generate, renumber or remove rows and seats
         operation: editSeatMapStructure
-        notes: Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21 Aug 2026;
-          CHG-R6-035).
+        notes: Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21
+          Aug 2026; CHG-R6-035).
         provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (12 October 2026, CHG-R6-035)
   states:
     loading: The rows seats list.
@@ -132447,7 +132460,8 @@ screens:
   - operationId: editSeatMapStructure
     contract: seating
     purpose: 'Generate, add, remove, renumber and relabel rows and seats on a draft map (12 October 2026,
-      CHG-R6-035): `updateSeats` cannot, it changes only the category, attribute and status of existing seats'
+      CHG-R6-035): `updateSeats` cannot, it changes only the category, attribute and status of existing
+      seats'
     trigger: onAction
     provenance: 12 October 2026 (CHG-R6-035)
     invalidates:
@@ -132472,11 +132486,12 @@ screens:
   - id: formEditSeatMapStructure
     component: modal
     trigger: Generate, renumber or remove rows and seats
-    body: '**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code,
-      name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction,
-      start and end point, a curve radius for a curved row, a category), single seats (section, row, number,
-      position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft
-      maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.'
+    body: '**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add
+      (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering
+      direction, start and end point, a curve radius for a curved row, a category), single seats (section,
+      row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form
+      sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing;
+      the canvas is unchanged.'
     confirm:
       label: Apply to the map
       operation: editSeatMapStructure
@@ -144125,9 +144140,9 @@ screens:
         label: Business day closes at (HH:MM)
         bindsTo: VenueSettings.businessDayCutoff
         operation: setVenueSettingsDefaults
-        notes: 'The tenant default every venue inherits; 00:00 (midnight) unless changed. Moves the business
-          date of shifts, the daily reconciliation, revenue postings and the daily reports, from the next business
-          day; not the calendar views, which follow the hour above.'
+        notes: The tenant default every venue inherits; 00:00 (midnight) unless changed. Moves the business
+          date of shifts, the daily reconciliation, revenue postings and the daily reports, from the next
+          business day; not the calendar views, which follow the hour above.
         provenance: contract tenancy.yaml VenueSettings.businessDayCutoff (Chinmay, 6 October 2026; CHG-R6-032)
       - kind: secondaryButton
         label: Save venue setting defaults
@@ -162274,8 +162289,8 @@ screens:
     - BO-100
     - BO-064
     inferred: false
-    notes: 'Reached from BO-100 Venue Home (Setup) and from BO-064 Zones & Areas, which keeps zones and areas
-      and links here for departments (client feedback of 6 October 2026, N32; CHG-R6-040).'
+    notes: Reached from BO-100 Venue Home (Setup) and from BO-064 Zones & Areas, which keeps zones and
+      areas and links here for departments (client feedback of 6 October 2026, N32; CHG-R6-040).
     transitions:
     - to: BO-100
       trigger: Back to Venue Home
@@ -162284,18 +162299,21 @@ screens:
     - to: BO-064
       trigger: Zones & Areas
       provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
-  notes: '**Created 12 October 2026 (CHG-R6-040) from the client''s feedback of 6 October** ("some of the
-    basic setup is not there such as Departments, Sub Departments ... and it''s confusing";
-    design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no organisation tree: departments existed only
-    through the Create org unit button of BO-064 Zones & Areas and the wave-3 BO-145, and the tree itself is
-    ADM-006, in the console. **This screen is the venue''s department, sub-department and outlet tree**, on
-    the org units the package already has (`listOrgUnits`, `createOrgUnit`, `getOrgUnit`, `updateOrgUnit`);
-    every "choose a department" field (outlets, BO-055 Rota & Scheduling, products) reads the same tree.
-    **Archive is deactivate**: `updateOrgUnit` with `isActive` false, which makes every permission query at or
-    beneath the unit resolve to deny and deletes nothing. Block B (Chinmay''s decision on N32).'
+      carries:
+      - orgUnitId
+  notes: '**Created 12 October 2026 (CHG-R6-040) from the client''s feedback of 6 October** ("some of
+    the basic setup is not there such as Departments, Sub Departments ... and it''s confusing"; design-r1/COMMAND.md,
+    ADDED 6 Oct). Venue Management had no organisation tree: departments existed only through the Create
+    org unit button of BO-064 Zones & Areas and the wave-3 BO-145, and the tree itself is ADM-006, in
+    the console. **This screen is the venue''s department, sub-department and outlet tree**, on the org
+    units the package already has (`listOrgUnits`, `createOrgUnit`, `getOrgUnit`, `updateOrgUnit`); every
+    "choose a department" field (outlets, BO-055 Rota & Scheduling, products) reads the same tree. **Archive
+    is deactivate**: `updateOrgUnit` with `isActive` false, which makes every permission query at or beneath
+    the unit resolve to deny and deletes nothing. Block B (Chinmay''s decision on N32).'
   density: compact
   pattern: listDetail
-  patternReason: '`listOrgUnits` reads the tree and `getOrgUnit` reads one unit of it — list, select, act'
+  patternReason: '`listOrgUnits` reads the tree and `getOrgUnit` reads one unit of it — list, select,
+    act'
   purpose: Keep the venue's departments, sub-departments and outlets as one tree that every department
     picker reads.
   layout:
@@ -162308,14 +162326,14 @@ screens:
         label: Level
         operation: listOrgUnits
         bindsTo: OrgUnit.level
-        notes: Sends `?level=` to `listOrgUnits`. Offers Department, Sub-department and Outlet; the levels above
-          the venue are the console's (ADM-006).
+        notes: Sends `?level=` to `listOrgUnits`. Offers Department, Sub-department and Outlet; the levels
+          above the venue are the console's (ADM-006).
         provenance: contract tenancy.yaml GET /org-units
       - kind: toggle
         label: Show archived
         operation: listOrgUnits
-        notes: Sends `?includeInactive=` to `listOrgUnits`. Off by default, so an archived unit leaves the
-          tree and the pickers.
+        notes: Sends `?includeInactive=` to `listOrgUnits`. Off by default, so an archived unit leaves
+          the tree and the pickers.
         provenance: contract tenancy.yaml GET /org-units
     - name: contentBody
       slot: collection
@@ -162381,16 +162399,18 @@ screens:
   states:
     loading: The venue's tree, read by `listOrgUnits` under the venue's path.
     error: Could not load. Names which read failed and leaves the tree untouched.
-    emptyFirstRun: No departments yet. Offers Add a unit (`createOrgUnit`) with Department chosen; the department
-      pickers on BO-055 and the outlet and product screens show nothing to choose until one exists.
-    emptyNoResults: Nothing matches the Level or Show archived filter and the tree is still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this screen,
-      and names that permission. **Never an empty tree.** A caller who can see the screen but lacks `SCOPE_MANAGE`
-      (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename unit and Archive unit disabled,
-      naming that permission.'
-    validation: '`400` on a code that is not lower-case letters, digits and underscores, or a level that cannot
-      sit under the selected parent; `409` on a code already used under that parent. Marked on the field.'
+    emptyFirstRun: No departments yet. Offers Add a unit (`createOrgUnit`) with Department chosen; the
+      department pickers on BO-055 and the outlet and product screens show nothing to choose until one
+      exists.
+    emptyNoResults: Nothing matches the Level or Show archived filter and the tree is still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this
+      screen, and names that permission. **Never an empty tree.** A caller who can see the screen but
+      lacks `SCOPE_MANAGE` (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename
+      unit and Archive unit disabled, naming that permission.
+    validation: '`400` on a code that is not lower-case letters, digits and underscores, or a level that
+      cannot sit under the selected parent; `409` on a code already used under that parent. Marked on
+      the field.'
   apis:
   - operationId: listOrgUnits
     contract: tenancy
@@ -162421,10 +162441,10 @@ screens:
     - name: orgUnitId
       from: navigation
       optional: true
-      notes: Opened without it, the screen shows the venue's tree and the user picks a unit; an edge that holds
-        one (BO-064) may carry it to open on that unit.
-    coldEntry: Resolves the tenant and venue from the session, never from the link; a unit the session cannot
-      see is said to be out of reach, not silently dropped.
+      notes: Opened without it, the screen shows the venue's tree and the user picks a unit; an edge that
+        holds one (BO-064) may carry it to open on that unit.
+    coldEntry: Resolves the tenant and venue from the session, never from the link; a unit the session
+      cannot see is said to be out of reach, not silently dropped.
   wireframe:
     status: notStarted
     provenance: generated
@@ -162433,9 +162453,9 @@ screens:
   - id: formCreateOrgUnit
     component: modal
     trigger: Add a unit
-    body: '**Collects what `createOrgUnit` sends before it is called.** Required: `level` (Department, Sub-department
-      or Outlet), `code` (lower-case, fixed once created), `name`. `parentId` is the selected unit, never typed.
-      Dismissing sends nothing; the tree behind is unchanged.'
+    body: '**Collects what `createOrgUnit` sends before it is called.** Required: `level` (Department,
+      Sub-department or Outlet), `code` (lower-case, fixed once created), `name`. `parentId` is the selected
+      unit, never typed. Dismissing sends nothing; the tree behind is unchanged.'
     bindsTo: CreateScopeNodeRequest
     confirm:
       label: Add unit
@@ -162450,8 +162470,8 @@ screens:
   - id: formUpdateOrgUnit
     component: modal
     trigger: Rename unit
-    body: '**Collects what `updateOrgUnit` sends before it is called.** Optional: `name`. The code and the place
-      in the tree do not change. Dismissing sends nothing.'
+    body: '**Collects what `updateOrgUnit` sends before it is called.** Optional: `name`. The code and
+      the place in the tree do not change. Dismissing sends nothing.'
     confirm:
       label: Save unit
       operation: updateOrgUnit
@@ -162463,8 +162483,8 @@ screens:
   - id: confirmArchiveOrgUnit
     component: modal
     trigger: Archive unit
-    body: '**Archive *Food & Beverage* and the 4 units under it?** Staff granted at or beneath it lose that access
-      until it is restored; nothing is deleted. `updateOrgUnit` with `isActive` false.'
+    body: '**Archive *Food & Beverage* and the 4 units under it?** Staff granted at or beneath it lose
+      that access until it is restored; nothing is deleted. `updateOrgUnit` with `isActive` false.'
     confirm:
       label: Archive unit
       operation: updateOrgUnit
@@ -162473,14 +162493,15 @@ screens:
     provenance: contract tenancy.yaml PATCH /org-units/{orgUnitId}
   gaps:
   - operation: null
-    why: '**Move is not in the contract.** A unit''s code is the last segment of its ltree path and is fixed once
-      created, and no operation re-parents a unit; the client''s "add, edit, move and archive" gets add, rename and
-      archive. Moving a department is archive and re-create until an operation exists (CHG-R6-040).'
+    why: '**Move is not in the contract.** A unit''s code is the last segment of its ltree path and is
+      fixed once created, and no operation re-parents a unit; the client''s "add, edit, move and archive"
+      gets add, rename and archive. Moving a department is archive and re-create until an operation exists
+      (CHG-R6-040).'
     source: contracts/spine/tenancy.yaml#createOrgUnit | design-r1/COMMAND.md ADDED 6 Oct
   - operation: null
-    why: '**The counts under each node are only the child count.** `OrgUnit` carries `childCount`; the outlets,
-      staff and products under a unit (asked for in the wireframe intent) have no read that counts them by unit
-      (CHG-R6-040).'
+    why: '**The counts under each node are only the child count.** `OrgUnit` carries `childCount`; the
+      outlets, staff and products under a unit (asked for in the wireframe intent) have no read that counts
+      them by unit (CHG-R6-040).'
     source: contracts/spine/tenancy.yaml#OrgUnit | design-r1/COMMAND.md ADDED 6 Oct
 - id: BO-1192
   name: Entitlement Templates
@@ -162501,8 +162522,8 @@ screens:
     - BO-102
     - BO-012
     inferred: false
-    notes: 'Reached from BO-102 Sell (Ticketing) and from BO-012 Membership Products, which links here for the
-      templates its memberships grant (client feedback of 6 October 2026, N32; CHG-R6-040).'
+    notes: Reached from BO-102 Sell (Ticketing) and from BO-012 Membership Products, which links here
+      for the templates its memberships grant (client feedback of 6 October 2026, N32; CHG-R6-040).
     transitions:
     - to: BO-102
       trigger: Back to Sell
@@ -162511,21 +162532,23 @@ screens:
     - to: BO-012
       trigger: Membership Products
       provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
-  notes: '**Created 12 October 2026 (CHG-R6-040) from the client''s feedback of 6 October** ("entitlement for the
-    tickets ... it''s confusing"; design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no list of ticket
-    entitlements: templates were created only from BO-012 Membership Products and the wave-3 membership builders
-    BO-288 and BO-289. **This screen is that list first**, with the products that use each template, and the
-    template opened whole: what it admits, validity (kind and offsets), re-entry, transfer, limits and blackout
-    dates. `getEntitlementTemplate`, `updateEntitlementTemplate`, `archiveEntitlementTemplate` and the
-    `entitlementTemplateId` filter on `listProducts` were added for it (CHG-R6-040). **An edit applies to
-    entitlements issued from then on**; a pass already sold keeps its rules, except blackout dates, which reach
-    issued entitlements at their next validation. Block B (Chinmay''s decision on N32).'
+      carries:
+      - productId
+  notes: '**Created 12 October 2026 (CHG-R6-040) from the client''s feedback of 6 October** ("entitlement
+    for the tickets ... it''s confusing"; design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no
+    list of ticket entitlements: templates were created only from BO-012 Membership Products and the wave-3
+    membership builders BO-288 and BO-289. **This screen is that list first**, with the products that
+    use each template, and the template opened whole: what it admits, validity (kind and offsets), re-entry,
+    transfer, limits and blackout dates. `getEntitlementTemplate`, `updateEntitlementTemplate`, `archiveEntitlementTemplate`
+    and the `entitlementTemplateId` filter on `listProducts` were added for it (CHG-R6-040). **An edit
+    applies to entitlements issued from then on**; a pass already sold keeps its rules, except blackout
+    dates, which reach issued entitlements at their next validation. Block B (Chinmay''s decision on N32).'
   density: compact
   pattern: listDetail
-  patternReason: '`listEntitlementTemplates` reads the population and `getEntitlementTemplate` reads one of
-    them — list, select, act'
-  purpose: List the rights the venue's tickets and passes grant, see which products use each, and create, edit
-    or retire one.
+  patternReason: '`listEntitlementTemplates` reads the population and `getEntitlementTemplate` reads one
+    of them — list, select, act'
+  purpose: List the rights the venue's tickets and passes grant, see which products use each, and create,
+    edit or retire one.
   layout:
     template: split
     regions:
@@ -162577,8 +162600,8 @@ screens:
         - Product.kind
         - Product.lifecycleState
         operation: listProducts
-        notes: Sends `?entitlementTemplateId=` the selected template to `listProducts` (CHG-R6-040). Each row opens
-          the product (BO-012 for a membership).
+        notes: Sends `?entitlementTemplateId=` the selected template to `listProducts` (CHG-R6-040). Each
+          row opens the product (BO-012 for a membership).
         provenance: contract catalogue.yaml GET /products
     - name: actionBar
       slot: rowActions
@@ -162598,23 +162621,24 @@ screens:
       - kind: destructiveButton
         label: Archive template
         operation: archiveEntitlementTemplate
-        notes: Disabled, naming the products, while Products using this template lists one that is not retired
-          (`409 template-in-use`).
+        notes: Disabled, naming the products, while Products using this template lists one that is not
+          retired (`409 template-in-use`).
         provenance: contract catalogue.yaml POST /entitlement-templates/{templateId}/archive
   states:
     loading: The venue's entitlement templates, read by `listEntitlementTemplates`.
     error: Could not load. Names which read failed and leaves the templates untouched.
-    emptyFirstRun: No entitlement templates yet. Offers New template (`createEntitlementTemplate`); a product
-      created before one exists grants nothing at the gate.
+    emptyFirstRun: No entitlement templates yet. Offers New template (`createEntitlementTemplate`); a
+      product created before one exists grants nothing at the gate.
     emptyNoResults: Show archived is off and every template is archived. Offers to show them.
-    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listEntitlementTemplates` requires to show
-      this screen, and names that permission. **Never an empty table.** A caller who can see the screen but lacks
-      `PRODUCT_CONFIGURE` sees New template, Edit template, Set blackout dates and Archive template disabled, naming
-      that permission.'
-    validation: '`400` on a missing code, name or validity kind, or offsets that do not fit the kind; marked on
-      the step and field it belongs to.'
-    conflict: '`409 template-in-use` on Archive names the products still granting it, from Products using this
-      template; `409 template-archived` on Save says the template was archived meanwhile and reloads it.'
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listEntitlementTemplates` requires
+      to show this screen, and names that permission. **Never an empty table.** A caller who can see the
+      screen but lacks `PRODUCT_CONFIGURE` sees New template, Edit template, Set blackout dates and Archive
+      template disabled, naming that permission.
+    validation: '`400` on a missing code, name or validity kind, or offsets that do not fit the kind;
+      marked on the step and field it belongs to.'
+    conflict: '`409 template-in-use` on Archive names the products still granting it, from Products using
+      this template; `409 template-archived` on Save says the template was archived meanwhile and reloads
+      it.'
   apis:
   - operationId: listEntitlementTemplates
     contract: catalogue
@@ -162664,10 +162688,10 @@ screens:
     - name: templateId
       from: navigation
       optional: true
-      notes: Opened without it, the screen lists the templates with `listEntitlementTemplates` and the user picks
-        one; an edge that holds one may carry it to open on that template.
-    coldEntry: Resolves the tenant and venue from the session; a template that is gone is said to be gone, and
-      the list is shown.
+      notes: Opened without it, the screen lists the templates with `listEntitlementTemplates` and the
+        user picks one; an edge that holds one may carry it to open on that template.
+    coldEntry: Resolves the tenant and venue from the session; a template that is gone is said to be gone,
+      and the list is shown.
   wireframe:
     status: notStarted
     provenance: generated
@@ -162679,10 +162703,11 @@ screens:
     body: '**Numbered steps, each with its own fields, then a check** (the builder pattern, design-r1/COMMAND.md
       ADDED 6 Oct): 1 What it admits (`code`, `name`, `description`, `fastTrackTier`); 2 Validity (`validityKind`,
       `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `validTimeWindows`, `expiryAnchor`, `expiryDate`,
-      `expiryNoticeDays`); 3 Re-entry (`reentryAllowed`); 4 Transfer (`isTransferable`, `isNameBound`); 5 Limits
-      (`entriesAllowed`, `purchaseEligibility`); 6 Blackout dates (`blackoutDates`); 7 Check: the rules read back in
-      words before `createEntitlementTemplate` is called. Required: `code`, `name`, `validityKind`. Dismissing sends nothing. Not asked, because the server sets it
-      (readOnly in the contract): `id`.'
+      `expiryNoticeDays`); 3 Re-entry (`reentryAllowed`); 4 Transfer (`isTransferable`, `isNameBound`);
+      5 Limits (`entriesAllowed`, `purchaseEligibility`); 6 Blackout dates (`blackoutDates`); 7 Check:
+      the rules read back in words before `createEntitlementTemplate` is called. Required: `code`, `name`,
+      `validityKind`. Dismissing sends nothing. Not asked, because the server sets it (readOnly in the
+      contract): `id`.'
     bindsTo: EntitlementTemplate
     confirm:
       label: Create template
@@ -162697,9 +162722,9 @@ screens:
   - id: formUpdateEntitlementTemplate
     component: modal
     trigger: Edit template
-    body: '**The same steps as New template, opened on the template''s values**, without the code (fixed once
-      created) and without blackout dates (Set blackout dates). Only what changed is sent to
-      `updateEntitlementTemplate`. Says before saving that the change applies to entitlements issued from now on.'
+    body: '**The same steps as New template, opened on the template''s values**, without the code (fixed
+      once created) and without blackout dates (Set blackout dates). Only what changed is sent to `updateEntitlementTemplate`.
+      Says before saving that the change applies to entitlements issued from now on.'
     bindsTo: UpdateEntitlementTemplateRequest
     confirm:
       label: Save template
@@ -162710,9 +162735,9 @@ screens:
   - id: formSetEntitlementTemplateBlackoutDates
     component: modal
     trigger: Set blackout dates
-    body: '**Collects what `setEntitlementTemplateBlackoutDates` sends.** Required: `blackoutDates`, the whole list
-      (an empty list clears it). Optional: `reason`. Says that issued entitlements apply it at their next
-      validation and a date already admitted on is not undone.'
+    body: '**Collects what `setEntitlementTemplateBlackoutDates` sends.** Required: `blackoutDates`, the
+      whole list (an empty list clears it). Optional: `reason`. Says that issued entitlements apply it
+      at their next validation and a date already admitted on is not undone.'
     confirm:
       label: Save blackout dates
       operation: setEntitlementTemplateBlackoutDates
@@ -162725,8 +162750,8 @@ screens:
   - id: confirmArchiveEntitlementTemplate
     component: modal
     trigger: Archive template
-    body: '**Archive *Annual Pass — Adult*?** No new product can use it, and archiving is final. Passes already sold
-      keep their rules and still admit. Optional: `reason`. `archiveEntitlementTemplate`.'
+    body: '**Archive *Annual Pass — Adult*?** No new product can use it, and archiving is final. Passes
+      already sold keep their rules and still admit. Optional: `reason`. `archiveEntitlementTemplate`.'
     confirm:
       label: Archive template
       operation: archiveEntitlementTemplate
@@ -162735,14 +162760,14 @@ screens:
     provenance: contract catalogue.yaml POST /entitlement-templates/{templateId}/archive
   gaps:
   - operation: null
-    why: '**No versions or publish step for a template.** The builder pattern ends in check, publish and versions;
-      a template has no draft state or version history in the contract, so a save is live for what is issued from
-      then on and the screen shows no version list (CHG-R6-040).'
+    why: '**No versions or publish step for a template.** The builder pattern ends in check, publish and
+      versions; a template has no draft state or version history in the contract, so a save is live for
+      what is issued from then on and the screen shows no version list (CHG-R6-040).'
     source: contracts/spine/catalogue.yaml#EntitlementTemplate | design-r1/COMMAND.md ADDED 6 Oct
   - operation: null
     why: '**The ticket creator''s Entitlement step is not drawn here.** `createProduct` already takes
-      `entitlementTemplateId`; a step on the product screens (BO-007, BO-008) that picks or creates a template is a
-      change to those started tickets and waits for its own delta (CHG-R6-040).'
+      `entitlementTemplateId`; a step on the product screens (BO-007, BO-008) that picks or creates a
+      template is a change to those started tickets and waits for its own delta (CHG-R6-040).'
     source: contracts/spine/catalogue.yaml#CreateProductRequest | design-r1/COMMAND.md ADDED 6 Oct
 - id: ADM-048
   name: Commercial Pricing Command Center
@@ -187996,6 +188021,7 @@ screens:
   navigation:
     entryFrom:
     - BO-086
+    - BO-087
     - BO-100
     exitTo:
     - ADM-239
@@ -188008,6 +188034,7 @@ screens:
     - ADM-246
     - ADM-247
     - BO-086
+    - BO-087
     - BO-100
     inferred: false
     notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
@@ -188058,6 +188085,11 @@ screens:
     - to: BO-086
       trigger: Works in Approval Matrix & Multi-Level Approval Configuration
       provenance: flow F164 step 7→8
+      operation: listRuleWorkflow
+    - to: BO-087
+      trigger: Works in Approval Delegations, where Roles, Authority, Delegation & Approval Limits (ADM-243)
+        renders as a…
+      provenance: flow F164 step 9→10
       operation: listRuleWorkflow
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
@@ -192062,8 +192094,8 @@ screens:
         operation: setChannelFeePayment
         notes: 'Platform signed QR (the default), Static signed QR, RFID card. **A partner''s or reseller''s
           channel can issue its tickets without dynamic QR** (MoM 2 Sep 2026 §4.7, MOM-0330): ticket issuing
-          (`issueOrderEntitlements`) reads it for every order sold through this channel, after the product''s own
-          override on BO-177.'
+          (`issueOrderEntitlements`) reads it for every order sold through this channel, after the product''s
+          own override on BO-177.'
         provenance: contract catalogue.yaml ChannelFeesPaymentFulfillmentConfigurationInput.ticketCredentialFormat
           (12 October 2026, CHG-R6-031)
     - name: actionBar
@@ -219064,9 +219096,9 @@ screens:
         - SegregationRule.permissionB
         - SegregationRule.severity
         operation: listSegregationRules
-        notes: 'The tenant''s rules as saved, read on load (12 October 2026, CHG-R6-042). Save segregation rules
-          sends the whole list (`setSegregationRules` is a PUT), so the form opens on these rows and a rule left
-          out is removed.'
+        notes: The tenant's rules as saved, read on load (12 October 2026, CHG-R6-042). Save segregation
+          rules sends the whole list (`setSegregationRules` is a PUT), so the form opens on these rows
+          and a rule left out is removed.
         provenance: contract identity.yaml GET /segregation-rules
       - kind: multiSelect
         label: Roles that may not be held together
@@ -219085,16 +219117,16 @@ screens:
     error: Could not load. Names which read failed and leaves the segregation duties policy untouched.
     emptyFirstRun: No segregation duties policy configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires to
-      show this screen, and names that permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE` sees Save
-      segregation rules disabled, naming it.
+    emptyNoAccess: Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE`
+      sees Save segregation rules disabled, naming it.
   apis:
   - operationId: listSegregationRules
     contract: identity
     purpose: The rules in force, read before the whole list is replaced
     trigger: onLoad
-    provenance: 'r1 gate rule READ, 12 October 2026 (CHG-R6-042)'
+    provenance: r1 gate rule READ, 12 October 2026 (CHG-R6-042)
   - operationId: setSegregationRules
     contract: identity
     purpose: Which roles may not be held together

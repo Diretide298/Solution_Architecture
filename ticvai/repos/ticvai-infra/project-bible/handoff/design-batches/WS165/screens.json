@@ -189,7 +189,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-953"
+    "BO-953",
+    "BO-100"
    ],
    "exitTo": [
     "BO-953"
@@ -244,6 +245,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createSeatMap"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add sections, rows and seats",
+       "operation": "editSeatMapStructure",
+       "notes": "Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21 Aug 2026; CHG-R6-035).",
+       "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (12 October 2026, CHG-R6-035)"
       }
      ]
     }
@@ -281,6 +289,16 @@
      "getSeatMap",
      "listSeatMaps"
     ]
+   },
+   {
+    "operationId": "editSeatMapStructure",
+    "contract": "seating",
+    "purpose": "Draw sections, rows and seats on a draft map by hand: the manual building MoM 21 Aug promised beside import (12 October 2026, CHG-R6-035)",
+    "trigger": "onAction",
+    "provenance": "12 October 2026 (CHG-R6-035)",
+    "invalidates": [
+     "getSeatMap"
+    ]
    }
   ],
   "wireframe": {
@@ -299,6 +317,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formEditSeatMapStructure",
+    "component": "modal",
+    "trigger": "Add sections, rows and seats",
+    "body": "**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction, start and end point, a curve radius for a curved row, a category), single seats (section, row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.",
+    "confirm": {
+     "label": "Apply to the map",
+     "operation": "editSeatMapStructure"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "addSections",
+      "addRows",
+      "addSeats",
+      "removeSeatIds",
+      "relabel"
+     ]
+    },
+    "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -580,6 +621,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateSeats"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Generate, renumber or remove rows and seats",
+       "operation": "editSeatMapStructure",
+       "notes": "Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21 Aug 2026; CHG-R6-035).",
+       "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (12 October 2026, CHG-R6-035)"
       }
      ]
     }
@@ -602,8 +650,18 @@
    {
     "operationId": "updateSeats",
     "contract": "seating",
-    "purpose": "Renumber, move or relabel",
+    "purpose": "Category, attribute and status across a selection of seats",
     "trigger": "onAction",
+    "invalidates": [
+     "listSeats"
+    ]
+   },
+   {
+    "operationId": "editSeatMapStructure",
+    "contract": "seating",
+    "purpose": "Generate, add, remove, renumber and relabel rows and seats on a draft map (12 October 2026, CHG-R6-035): `updateSeats` cannot, it changes only the category, attribute and status of existing seats",
+    "trigger": "onAction",
+    "provenance": "12 October 2026 (CHG-R6-035)",
     "invalidates": [
      "listSeats"
     ]
@@ -625,6 +683,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formEditSeatMapStructure",
+    "component": "modal",
+    "trigger": "Generate, renumber or remove rows and seats",
+    "body": "**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code, name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction, start and end point, a curve radius for a curved row, a category), single seats (section, row, number, position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.",
+    "confirm": {
+     "label": "Apply to the map",
+     "operation": "editSeatMapStructure"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "addSections",
+      "addRows",
+      "addSeats",
+      "removeSeatIds",
+      "relabel"
+     ]
+    },
+    "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

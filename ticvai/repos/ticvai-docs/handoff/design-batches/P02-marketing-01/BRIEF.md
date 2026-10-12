@@ -1,6 +1,6 @@
 # P02-marketing-01 — P02 · Marketing
 
-**1 screens · 5 operations · 9 schemas · 2 permissions**
+**1 screens · 5 operations · 9 schemas · 3 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `GUEST_VIEW, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **1 of these operations work offline**: listConsentPurposes
   — and the rest do not. A surface that looks the same online and off is lying.

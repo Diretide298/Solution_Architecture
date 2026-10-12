@@ -1,6 +1,6 @@
 # P02-marketing-01 — P02 · Marketing
 
-**1 screens · 5 operations · 9 schemas · 2 permissions**
+**1 screens · 5 operations · 9 schemas · 3 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `GUEST_VIEW, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **1 of these operations work offline**: listConsentPurposes
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -252,7 +252,7 @@ lists:
 
 #### Permissions
 
-- `recordConsent` → no permission · guest, staff
+- `recordConsent` → `GUEST_MANAGE` (configure) · guest, staff
 - `listConsentPurposes` → `GUEST_VIEW` (read) · staff, guest
 - `getMarketingSubscription` → `MARKETING_VIEW` (read) · guest
 - `setMarketingSubscription` → `MARKETING_VIEW` (read) · guest
@@ -516,7 +516,7 @@ Method, path, parameters, request and response for every operation these screens
 "getGuestConsents": {"method":"GET","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Read a guest's consent state","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ConsentState"},
 "getMarketingSubscription": {"method":"GET","path":"/marketing-subscriptions","contract":"marketing-crm","summary":"What this guest has opted into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MarketingSubscription"},
 "listConsentPurposes": {"method":"GET","path":"/consent-purposes","contract":"marketing-crm","summary":"Configured consent purposes","permission":"GUEST_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
+"recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
 "setMarketingSubscription": {"method":"PUT","path":"/marketing-subscriptions","contract":"marketing-crm","summary":"Subscribe or unsubscribe","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingSubscription","responds":"MarketingSubscription"}
 }
 ```

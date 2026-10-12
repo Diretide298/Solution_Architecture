@@ -1,6 +1,6 @@
 # Guest web and guest app — parity audit
 
-**Derived.** `python3 tools/audit-guest-parity.py`, 2026-10-08. Reads only.
+**Derived.** `python3 tools/audit-guest-parity.py`, 2026-10-13. Reads only.
 
 **The rule, decided 12 September 2026: guest web (P01) and guest app (P02) are identical.** Every difference below either has a reason recorded against it or is a defect waiting for a decision. Which web screen is which app screen is `screens/_guest-pairs.yaml`.
 
@@ -8,14 +8,14 @@
 |---|---|
 | Screens | P01 50 · P02 77 |
 | Capability groups | 56 — appOnly 6 · folded 3 · paired 46 · webOnly 1 |
-| Operations | web 213 · app 218 · shared 204 |
-| Findings | high 29 · medium 165 · low 222 · info 3 |
+| Operations | web 215 · app 219 · shared 206 |
+| Findings | high 28 · medium 165 · low 222 · info 3 |
 
 ## By dimension
 
 | Dimension | high | medium | low | info |
 |---|---|---|---|---|
-| operations | 15 | 39 |  | 1 |
+| operations | 14 | 39 |  | 1 |
 | licence | 10 |  |  |  |
 | coverage | 2 | 4 | 2 | 2 |
 | frontend manifest | 2 | 1 |  |  |
@@ -56,7 +56,7 @@
 - **density** — compact on the web, comfortable on the app: the input, not the product
 - **routes and component paths** — each shell's own codebase
 
-## High — 29
+## High — 28
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -74,10 +74,9 @@
 | licence | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | web requires ['marketing'], app requires ['core'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | web requires ['queue'], app requires ['queue', 'seating'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
-| operations | app only | bindCredentialDevice, claimTicketTransfer, createOrder, enrolFacePass, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listTicketTransfers, registerGuestDevice, reserveMerchandise, setVisitReminder |  |
+| operations | app only | bindCredentialDevice, claimTicketTransfer, enrolFacePass, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listTicketTransfers, registerGuestDevice, reserveMerchandise, setVisitReminder |  |
 | operations | cart (WEB-010 ↔ GST-041) | the web calls createCart, evaluatePromotions and the app cannot call it anywhere |  |
 | operations | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | the web calls extendSeatHold and the app cannot call it anywhere |  |
-| operations | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | the app calls createOrder and the web cannot call it anywhere |  |
 | operations | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | the app calls listCatalogueBundles and the web cannot call it anywhere |  |
 | operations | memberships (WEB-022/WEB-023 ↔ GST-015) | the app calls grantDelegation and the web cannot call it anywhere |  |
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the web calls getWaiverStatus and the app cannot call it anywhere |  |
@@ -143,7 +142,7 @@
 | entry parameters | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web opens with ['conversationId', 'messageId', 'outletId'], app with ['cartId', 'conversationId', 'messageId', 'orderId', 'outletId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | cart (WEB-010 ↔ GST-041) | web opens with ['cartId', 'code', 'holdId', 'lineId', 'performanceId', 'venueId'], app with ['cartId', 'holdId', 'lineId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | web opens with ['cartId', 'holdId', 'orderId', 'paymentId', 'subjectId', 'token', 'venueId'], app with ['cartId', 'orderId', 'paymentId', 'token', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
-| entry parameters | date-and-session (WEB-006 ↔ GST-007) | web opens with ['cartId', 'eventId', 'performanceId', 'venueId'], app with ['cartId', 'eventId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | date-and-session (WEB-006 ↔ GST-007) | web opens with ['cartId', 'entryId', 'eventId', 'performanceId', 'venueId'], app with ['cartId', 'entryId', 'eventId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | detail (WEB-004 ↔ GST-004/GST-006) | web opens with ['eventId', 'productId'], app with ['bundleId', 'eventId', 'mapId', 'performanceId', 'productId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | fnb-order (WEB-036 ↔ GST-024) | web opens with ['cartId', 'entryId', 'orderId', 'outletId', 'reservationId', 'venueId'], app with ['orderId', 'outletId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | help-and-cases (WEB-025 ↔ GST-068) | web opens with ['caseId'], app with ['caseId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
@@ -312,7 +311,7 @@
 | components | cart (WEB-010 ↔ GST-041) | web only ['banner'], app only — (13 vs 12 components) |  |
 | components | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | web only ['cartPanel', 'secondaryButton', 'textField'], app only — (23 vs 11 components) |  |
 | components | confirmation (WEB-013 ↔ GST-010) | web only ['banner'], app only — (9 vs 7 components) |  |
-| components | date-and-session (WEB-006 ↔ GST-007) | web only ['detailPanel', 'primaryButton'], app only — (11 vs 10 components) |  |
+| components | date-and-session (WEB-006 ↔ GST-007) | web only ['detailPanel', 'primaryButton'], app only — (13 vs 12 components) |  |
 | components | detail (WEB-004 ↔ GST-004/GST-006) | web only ['banner', 'datePicker', 'primaryButton'], app only ['seatMap'] (11 vs 13 components) |  |
 | components | fnb-order (WEB-036 ↔ GST-024) | web only ['destructiveButton', 'secondaryButton'], app only — (15 vs 10 components) |  |
 | components | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | web only —, app only ['primaryButton', 'secondaryButton'] (6 vs 9 components) |  |
@@ -336,7 +335,7 @@
 | components | wishlist (WEB-009 ↔ GST-020) | web only ['confirmDialog'], app only — (5 vs 4 components) |  |
 | coverage | refunds-and-resale | GST-067 Refunds & Resale has no web screen; its operations are on WEB-019, WEB-030 | draw the screen on the other shell, or record the fold as the decision |
 | coverage | share-and-group-booking | GST-072 Share & Group Booking has no web screen; its operations are on WEB-017, WEB-018, WEB-031, WEB-043 | draw the screen on the other shell, or record the fold as the decision |
-| documents | contracts/spine/catalogue.yaml:1160 | "browses by category and cannot search" — GST-063 Search exists since 17 August | rewrite to the 12 September rule |
+| documents | contracts/spine/catalogue.yaml:1166 | "browses by category and cannot search" — GST-063 Search exists since 17 August | rewrite to the 12 September rule |
 | documents | docs/active/design-plan.md:267 | "guest-app surfaces are not" — P02 is offlineCapable: true | rewrite to the 12 September rule |
 | documents | docs/registers/conflicts.md:145 | "stay app-only by design" — CF-93 predates WEB-036–046 and the 10 September decision | rewrite to the 12 September rule |
 | layout split | add-ons (WEB-008 ↔ GST-048/GST-056) | 1 screen(s) on the web, 2 on the app: Add-ons & Upsell ↔ Upsell / Cross-Sell; Bundle Package | fine if deliberate; a builder should know it is one capability |

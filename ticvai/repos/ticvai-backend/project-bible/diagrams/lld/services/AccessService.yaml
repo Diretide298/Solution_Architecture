@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 257 operations, 78 tables
+title: AccessService — 258 operations, 78 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: access
@@ -10,7 +10,7 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 257
+  operations: 258
   inAFlow: 157
   percent: 61%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 257
+  count: 258
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -168,7 +168,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 6
-    writes: 5
+    writes: 6
   - operation: enrolFaceTag
     verb: POST
     path: /face-tag/enrolments
@@ -176,7 +176,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: getAccessPoint
     verb: GET
     path: /access-points/{accessPointId}
@@ -1368,7 +1368,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 2
-    writes: 5
+    writes: 6
   - operation: revokeFacePass
     verb: DELETE
     path: /face-pass/enrolments/{enrolmentId}
@@ -1376,7 +1376,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: rollbackAccessPolicy
     verb: POST
     path: /dynamic-access-policy/{policyId}/rollback
@@ -1388,6 +1388,14 @@ operationsByContract:
   - operation: rollbackConfigurationVersion
     verb: POST
     path: /configuration-versions/{versionId}/rollback
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setAccessAreaCapacity
+    verb: PUT
+    path: /access-areas/{areaId}/capacity
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -2129,6 +2137,7 @@ tables:
   - revokeFacePass
   - rollbackAccessPolicy
   - rollbackConfigurationVersion
+  - setAccessAreaCapacity
   - setAccessAreaZone
   - setAccessAttributeCatalog
   - setAccessGraphicalMap
@@ -2245,6 +2254,7 @@ tables:
   - revokeFacePass
   - rollbackAccessPolicy
   - rollbackConfigurationVersion
+  - setAccessAreaCapacity
   - setAccessAreaZone
   - setAccessAttributeCatalog
   - setAccessGraphicalMap
@@ -2582,7 +2592,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: access.entitlement
-  columns: 30
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -2865,7 +2875,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.verification_method_policy
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -2887,6 +2897,39 @@ readsFrom:
 - service: MarketingService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 8
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: enrolFacePass
+    tables:
+    - platform.outbox
+  - operation: enrolFaceTag
+    tables:
+    - platform.outbox
+  - operation: issueOrderEntitlements
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
+  - operation: reviewFaceReenrolment
+    tables:
+    - platform.outbox
+  - operation: revokeFacePass
+    tables:
+    - platform.outbox
+  - operation: setBiometricLifecycleRetention
+    tables:
+    - tenancy.data_retention_setting
+  - operation: syncScans
+    tables:
+    - platform.outbox
+  - operation: validateAccess
+    tables:
+    - platform.outbox
 - service: IdentityService
   operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -2907,27 +2950,6 @@ writesOutside:
   - operation: revokeFacePass
     tables:
     - pii.subject_biometric
-- service: TenancyService
-  operations: 4
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: issueOrderEntitlements
-    tables:
-    - platform.idempotency_record
-    - platform.outbox
-  - operation: setBiometricLifecycleRetention
-    tables:
-    - tenancy.data_retention_setting
-  - operation: syncScans
-    tables:
-    - platform.outbox
-  - operation: validateAccess
-    tables:
-    - platform.outbox
 - service: CrossRegionService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

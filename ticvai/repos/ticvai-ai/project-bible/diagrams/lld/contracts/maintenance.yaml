@@ -373,12 +373,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   - maintenance.work_order
   writes:
   - cache:idempotency
   - inventory.movement
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   - maintenance.work_order
 - operation: recordWorkOrderTime
   verb: POST

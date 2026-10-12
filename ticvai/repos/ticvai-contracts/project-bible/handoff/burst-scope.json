@@ -6,7 +6,7 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2790,
+  "ofTotalOperations": 2796,
   "tables": 62,
   "ofTotalTables": 1129
  },
@@ -17,7 +17,7 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2758,
+    "operations": 2764,
     "tables": 1129,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
@@ -227,7 +227,7 @@
   {
    "table": "orders.sales_order",
    "schema": "orders",
-   "columns": 25,
+   "columns": 26,
    "burstOperations": 6,
    "written": true,
    "contention": null,
@@ -269,9 +269,20 @@
    "note": "**A tender against an order**, with the rate it converted at fixed on the row (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken"
   },
   {
+   "table": "platform.outbox",
+   "schema": "platform",
+   "columns": 15,
+   "burstOperations": 5,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys; references `catalogue.event`, `p"
+  },
+  {
    "table": "access.entitlement",
    "schema": "access",
-   "columns": 30,
+   "columns": 31,
    "burstOperations": 4,
    "written": true,
    "contention": null,
@@ -280,7 +291,7 @@
    "note": "**What a guest actually holds** — found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **fiv"
   },
   {
-   "table": "catalogue.inventory_hold",
+   "table": "catalogue.inventory_reservation",
    "schema": "catalogue",
    "columns": 18,
    "burstOperations": 4,
@@ -319,17 +330,6 @@
    "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
   },
   {
-   "table": "platform.outbox",
-   "schema": "platform",
-   "columns": 15,
-   "burstOperations": 4,
-   "written": true,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys; references `catalogue.event`, `p"
-  },
-  {
    "table": "catalogue.event",
    "schema": "catalogue",
    "columns": 10,
@@ -343,7 +343,7 @@
   {
    "table": "catalogue.product_media",
    "schema": "catalogue",
-   "columns": 6,
+   "columns": 7,
    "burstOperations": 3,
    "written": false,
    "contention": null,
@@ -396,7 +396,7 @@
    "note": "**A rule that changes a price**, with eligibility and a budget. Evaluated at the basket rather than stored on a product"
   },
   {
-   "table": "seating.seat_hold",
+   "table": "seating.seat_reservation",
    "schema": "seating",
    "columns": 12,
    "burstOperations": 3,
@@ -668,7 +668,7 @@
    "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 36 operations read it an"
   },
   {
-   "table": "catalogue.channel_allocation",
+   "table": "catalogue.channel_envelope",
    "schema": "catalogue",
    "columns": 19,
    "burstOperations": 1,
@@ -931,7 +931,7 @@
    "callsPerBuyer": 6,
    "reads": [
     "catalogue.channel_capacity",
-    "catalogue.inventory_hold",
+    "catalogue.inventory_reservation",
     "catalogue.performance"
    ],
    "writes": [],
@@ -946,7 +946,7 @@
    "callsPerBuyer": 4,
    "reads": [
     "catalogue.channel_capacity",
-    "catalogue.inventory_hold",
+    "catalogue.inventory_reservation",
     "marketing.consent_question",
     "marketing.consent_question_version",
     "orders.cart",
@@ -978,15 +978,15 @@
    "contract": "catalogue",
    "callsPerBuyer": 3,
    "reads": [
-    "catalogue.channel_allocation",
+    "catalogue.channel_envelope",
     "catalogue.channel_capacity",
-    "catalogue.inventory_hold",
+    "catalogue.inventory_reservation",
     "platform.workstation"
    ],
    "writes": [
-    "catalogue.channel_allocation",
+    "catalogue.channel_envelope",
     "catalogue.channel_capacity",
-    "catalogue.inventory_hold"
+    "catalogue.inventory_reservation"
    ],
    "lock": "FOR UPDATE SKIP LOCKED"
   },
@@ -1038,11 +1038,11 @@
    "contract": "seating",
    "callsPerBuyer": 2,
    "reads": [
-    "seating.seat_hold"
+    "seating.seat_reservation"
    ],
    "writes": [
     "platform.outbox",
-    "seating.seat_hold"
+    "seating.seat_reservation"
    ],
    "lock": "FOR UPDATE"
   },
@@ -1138,7 +1138,8 @@
     "access.entitlement",
     "orders.order_line",
     "orders.payment",
-    "orders.sales_order"
+    "orders.sales_order",
+    "platform.outbox"
    ],
    "lock": null
   },
@@ -1216,7 +1217,7 @@
    "contract": "orders",
    "callsPerBuyer": 1,
    "reads": [
-    "catalogue.inventory_hold",
+    "catalogue.inventory_reservation",
     "ledger.fx_rate",
     "orders.order_line",
     "orders.payment",
@@ -1225,7 +1226,7 @@
    ],
    "writes": [
     "catalogue.channel_capacity",
-    "catalogue.inventory_hold",
+    "catalogue.inventory_reservation",
     "ledger.journal_entry",
     "ledger.journal_line",
     "orders.order_event",
@@ -1354,7 +1355,7 @@
    "reads": [
     "seating.seat",
     "seating.seat_category",
-    "seating.seat_hold"
+    "seating.seat_reservation"
    ],
    "writes": [],
    "lock": null
@@ -1367,7 +1368,7 @@
    "contract": "seating",
    "callsPerBuyer": 1,
    "reads": [
-    "seating.seat_hold"
+    "seating.seat_reservation"
    ],
    "writes": [],
    "lock": null

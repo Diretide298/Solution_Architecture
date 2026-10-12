@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-102` | Site Builder | A | 20 | 15 | 6 | 2 | 7 | 6 | configures | notStarted (generated) |
 | `CMS-103` | Booking Flows | A | 78 | 29 | 6 | 18 | 27 | 6 | configures | notStarted (generated) |
-| `CMS-104` | App Build & Store Publishing | A | 22 | 35 | 6 | 17 | 6 | 6 | configures | notStarted (generated) |
+| `CMS-104` | App Build & Store Publishing | A | 24 | 35 | 6 | 17 | 6 | 6 | configures | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

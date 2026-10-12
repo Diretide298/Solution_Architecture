@@ -179,6 +179,9 @@ paths:
   /guest-broadcast:
     post:
       operationId: broadcastToGuests
+      x-ticvai-write-via:
+      - table: marketing.message_dispatch
+        operation: sendTransactionalMessage
       summary: Venue-wide notice to every guest on site
       description: >
         BL-020. **`publishAnnouncement` carries an emergency kind and is staff-facing.** A venue-wide
@@ -3804,7 +3807,7 @@ components:
       required: [id, attendanceRecordId, amendedByPrincipalId, amendedAt, occurredAtBefore, occurredAtAfter, reason]
       properties:
         id: { type: string, format: uuid }
-        attendanceRecordId: { type: string, format: uuid }
+        attendanceRecordId: { type: string, format: uuid, x-ticvai-references: workforce.attendance }
         amendedByPrincipalId: { type: string, format: uuid }
         amendedAt: { type: string, format: date-time }
         occurredAtBefore:

@@ -63,6 +63,15 @@
     },
     "description": "Reason vocabulary for a method change after lock"
    },
+   "credentialFormatOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TicketCredentialFormat"
+     }
+    ],
+    "nullable": true,
+    "description": "**The per-product override of MOM-0330** (MoM 2 Sep 2026 §4.7; CHG-R6-031): a product whose tickets must not carry dynamic QR (a VIP invitation, a B2B or reseller ticket type) sets `staticQr` or `rfidCard`, even inside a fully dynamic event. Null: the product takes its sales channel's `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform's signed QR. Wins over the channel when `issueOrderEntitlements` resolves the format."
+   },
    "scopePath": {
     "type": "string",
     "description": "ltree of the owning scope node"
@@ -1047,6 +1056,15 @@
    "venueId",
    "name"
   ]
+ },
+ "TicketCredentialFormat": {
+  "type": "string",
+  "enum": [
+   "platformSignedQr",
+   "staticQr",
+   "rfidCard"
+  ],
+  "description": "**The credential a ticket is issued with** (MoM 2 Sep 2026 §4.7, MOM-0330: VIP invitations and B2B/reseller tickets \"may need to fall back to a standard QR code or RFID card\", with \"a per-product override to disable dynamic QR for specific ticket types\"; 12 October 2026, CHG-R6-031). `platformSignedQr` is the default: the platform's own signed QR as the event issues it, rotating where the event sells dynamic QR (`getEntitlementCredential` `rotation`). `staticQr` is the platform's signed QR issued once and never rotated, for a ticket that leaves the app (a reseller's batch, a printed invitation): dynamic QR is off for it even in a fully dynamic event. `rfidCard` issues no QR; the ticket is collected as an RFID card or wristband and bound then (`AccessCredentialBinding`). A partner's own barcode symbology is not issued by the platform: tickets a partner issues itself are imported and validated (BO-181), not this."
  },
  "VerificationMethodSelectionLockingView": {
   "type": "object",

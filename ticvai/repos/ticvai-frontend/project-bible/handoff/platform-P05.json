@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 11
+  "operationsWithNoScreen": 9
  },
  "waves": {
   "wave1": 2,
@@ -48,15 +48,15 @@
    "operations": 3
   },
   {
+   "contract": "white-label",
+   "operations": 3
+  },
+  {
    "contract": "retail",
    "operations": 3
   },
   {
    "contract": "catalogue",
-   "operations": 3
-  },
-  {
-   "contract": "white-label",
    "operations": 3
   },
   {
@@ -230,18 +230,6 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
    },
    {
     "operation": "listGuestMemberships",

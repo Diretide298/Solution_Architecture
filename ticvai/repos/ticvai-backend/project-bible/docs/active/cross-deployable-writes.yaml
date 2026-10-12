@@ -1,0 +1,218 @@
+# Cross-deployable writes: the kernel grants and the dated exceptions. AUTHORED: a person writes every entry.
+#
+# DB-ROLES (docs/active/block-a-extra-tasks.json) gives each deployable's PostgreSQL role DML only on the schemas
+# its own modules own (handoff/service-decomposition.json, ADR-0055). A write into another deployable's schema made
+# with the caller's own SQL is therefore refused at runtime. ADR-0055 rule 4 says how it travels instead: by event
+# (ADR-0057, events/) consumed by the owning module, or by a call to the owner's published HTTP operation. The
+# operation states its route as `x-ticvai-write-via` in its contract, and tools/derive-lineage.py copies it into
+# handoff/api-data-lineage.json as `writeVia` (ADAM CR-002, decided by Chinmay on 12 October 2026, CHG-R6-020).
+#
+# This file holds the two things that are not routed:
+#
+#   kernel       the shared-kernel tables every host needs, granted to every deployable role directly. Exactly
+#                these four; tools/check-cross-deployable-writes.py fails on any other entry or privilege.
+#   exceptions   writes that cannot route yet, each with its reason, the date it was added and the release that
+#                removes it. The check fails on an unrouted write that is not here, on an entry here for a write
+#                that is not cross-deployable or that is also routed, and on an entry whose removal release has
+#                been tagged.
+#
+#   id               XDW-001, XDW-002, ... never reused
+#   operation        the operationId that writes
+#   table            the table it writes, <schema>.<table>
+#   kind             misplaced-table (the table sits in a schema another deployable owns, and its writer is its real
+#                    owner: the lead decides between moving it and a table-level grant) or owner-operation-missing
+#                    (the owner publishes no operation to call, and an event would carry personal data)
+#   reason           why it cannot route yet, and what removes it
+#   added            the date the entry was added
+#   removal_release  the release that removes it (r<N>); until then DB-ROLES grants the writer's role DML on this
+#                    one table
+#
+# The readable table for the backend developer is handoff/cross-deployable-writes.md, written by
+# `python tools/check-cross-deployable-writes.py --write`.
+
+kernel:
+- table: platform.outbox
+  privileges: [INSERT]
+  why: 'Every host writes the events it emits in the same transaction as the change they report (ADR-0033, ADR-0058).'
+- table: platform.scope
+  privileges: [SELECT]
+  why: 'Every host resolves the caller''s scope and its row-level security reads it (ADR-0005). Read only: a write to
+    platform.scope from another deployable is not exempt.'
+- table: platform.audit_record
+  privileges: [INSERT]
+  why: 'Every operation that audits itself appends its audit row in its own transaction (CHG-R6-002).'
+- table: platform.idempotency_record
+  privileges: [SELECT, INSERT, UPDATE]
+  why: 'Every host claims, completes and replays an Idempotency-Key in the transaction of the write it guards.'
+
+exceptions:
+- id: XDW-001
+  operation: consumeCrossRegionEntitlement
+  table: platform.cross_region_entitlement
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-002
+  operation: propagateCrossRegionEntitlement
+  table: platform.cross_region_entitlement
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-003
+  operation: reconcileRedemptions
+  table: platform.cross_region_entitlement
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-004
+  operation: revokeCrossRegionEntitlement
+  table: platform.cross_region_entitlement
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-005
+  operation: authoriseWalletSpend
+  table: platform.wallet_authorisation
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-006
+  operation: captureWalletAuthorisation
+  table: platform.wallet_authorisation
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-007
+  operation: relinquishWalletAuthorisation
+  table: platform.wallet_authorisation
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-008
+  operation: setWalletAllocationPolicy
+  table: platform.wallet_authorisation
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-009
+  operation: createGuestLink
+  table: platform.guest_link
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-010
+  operation: revokeGuestLink
+  table: platform.guest_link
+  kind: misplaced-table
+  reason: 'CrossRegionService''s own record (schema-reference source cross-region.*), kept in the platform schema, which
+    TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer
+    is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService''s
+    schema; a forward migration) and a table-level grant to the operations role.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-011
+  operation: createDsarRequest
+  table: platform.dsar_request
+  kind: misplaced-table
+  reason: 'CrossRegionService''s DSAR record (source cross-region.DsarRequest) in the platform schema; Identity (commerce)
+    also raises one from deleteGuestAccount and exportSubjectData. No commerce operation raises a cross-cell DSAR
+    for CrossRegion to call. Removed with the platform-schema decision above, or when Identity publishes an
+    operation that raises a DSAR and createDsarRequest calls it.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-012
+  operation: replayDeadLetter
+  table: platform.dead_letter
+  kind: misplaced-table
+  reason: 'PlatformService''s dead-letter record (source platform-ops.DeadLetter) in the platform schema; the relay in
+    workers writes it, and replayDeadLetter in operations marks the replay. No commerce operation touches it.
+    Removed with the platform-schema decision above (the table moving to control or a table-level grant to the
+    operations role).'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-013
+  operation: syncOrders
+  table: sync.rejection
+  kind: misplaced-table
+  reason: 'OrderService''s offline-replay rejection (source orders.SyncRejection) kept in the sync schema, which
+    CrossRegionService owns in operations. syncOrders and resolveSyncRejection (commerce) and syncScans (access)
+    write it; CrossRegion has no operation for it. Removed when the table moves into orders (a forward migration) or
+    the lead grants it table by table.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-014
+  operation: resolveSyncRejection
+  table: sync.rejection
+  kind: misplaced-table
+  reason: 'OrderService''s offline-replay rejection (source orders.SyncRejection) kept in the sync schema, which
+    CrossRegionService owns in operations. syncOrders and resolveSyncRejection (commerce) and syncScans (access)
+    write it; CrossRegion has no operation for it. Removed when the table moves into orders (a forward migration) or
+    the lead grants it table by table.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-015
+  operation: syncScans
+  table: sync.rejection
+  kind: misplaced-table
+  reason: 'OrderService''s offline-replay rejection (source orders.SyncRejection) kept in the sync schema, which
+    CrossRegionService owns in operations. syncOrders and resolveSyncRejection (commerce) and syncScans (access)
+    write it; CrossRegion has no operation for it. Removed when the table moves into orders (a forward migration) or
+    the lead grants it table by table.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-016
+  operation: recordDeviceConsent
+  table: pii.consent_identifier
+  kind: owner-operation-missing
+  reason: 'MarketingService''s consent-capture record (source marketing-crm.ConsentCaptureIdentifier) kept in the pii
+    schema. Its columns are the visitor''s IP address and user agent, which an event would copy into
+    platform.outbox, and Identity publishes no operation that stores one. Removed when Identity publishes that
+    operation and recordDeviceConsent calls it.'
+  added: '2026-10-12'
+  removal_release: r5
+- id: XDW-017
+  operation: updateMyProfile
+  table: pii.subject
+  kind: owner-operation-missing
+  reason: 'A guest correcting their own name and contact details writes pii.subject, which Identity owns in commerce. The
+    values are personal data, which an event would copy into platform.outbox, and Identity publishes no operation
+    that updates a guest subject''s details. Removed when Identity publishes that operation and updateMyProfile
+    calls it.'
+  added: '2026-10-12'
+  removal_release: r5

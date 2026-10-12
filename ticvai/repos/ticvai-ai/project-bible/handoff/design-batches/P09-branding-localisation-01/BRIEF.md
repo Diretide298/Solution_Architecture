@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-016` | White-Label Branding Management | A | 54 | 50 | 7 | 20 | 0 | 6 | configures | notStarted (generated) |
 | `ADM-017` | Domain & Certificate Management | A | 9 | 27 | 7 | 1 | 1 | 0 | configures | notStarted (generated) |
 | `ADM-018` | Interface Languages | A | 8 | 27 | 7 | 9 | 2 | 6 | configures | notStarted (generated) |
-| `ADM-019` | Global Configuration & Defaults | B | 85 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-019` | Global Configuration & Defaults | B | 86 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

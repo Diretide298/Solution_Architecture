@@ -1,0 +1,48 @@
+# invitation.issued v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: invitation.issued
+version: 1
+publisher: orders
+description: A complimentary invitation was issued against an allowance, with no payment expected. Its
+  entitlements are to be issued.
+aggregate: invitation
+emittedWhen: issueInvitation succeeds
+emittedBy:
+- issueInvitation
+payload:
+- field: invitationId
+  type: uuid
+- field: allowanceId
+  type: uuid
+  required: false
+- field: guestSubjectId
+  type: uuid
+  required: false
+- field: lines
+  type: array
+  notes: 'Each line: lineId (uuid), productId, performanceId (optional), quantity, entitlementIds (UUIDv7,
+    allocated by OrderService so a redelivery issues the same entitlements once)'
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: access
+  purpose: Issue the complimentary entitlements on access.entitlement, which Access owns, as it issues a paid order's
+    against order.paid
+  writes:
+  - access.entitlement
+  idempotencyKey: invitationId + lineId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: '**Added 12 October 2026 (ADAM CR-002, CHG-R6-020).** issueInvitation runs in OrderService, in `commerce`,
+  and an invitation is not paid, so order.paid never covers it; access.entitlement is AccessService''s, in
+  `access`. The DB-ROLES grants refuse the direct INSERT, so the issue reaches the owner as this event (ADR-0055
+  rule 4, ADR-0057).
+
+
+  No state model emits this: the invitation is created issued.'

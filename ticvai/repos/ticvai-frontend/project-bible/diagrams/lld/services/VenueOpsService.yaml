@@ -3326,13 +3326,6 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
-- table: resources.resource_hold
-  columns: 15
-  store: postgres
-  parent: null
-  writtenBy:
-  - resources
-  foreignWriters: null
 - table: resources.resource_package
   columns: 13
   store: postgres
@@ -3358,6 +3351,13 @@ tables:
   columns: 12
   store: postgres
   parent: resources.resource
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_reservation
+  columns: 15
+  store: postgres
+  parent: null
   writtenBy:
   - resources
   foreignWriters: null
@@ -3579,7 +3579,7 @@ writesOutside:
   - operation: recordWorkOrderParts
     tables:
     - inventory.movement
-    - inventory.stock_reservation
+    - inventory.stock_earmark
 - service: TenancyService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3604,7 +3604,7 @@ writesOutside:
   writes:
   - operation: bookVisitPlan
     tables:
-    - catalogue.inventory_hold
+    - catalogue.inventory_reservation
 - service: CrossRegionService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

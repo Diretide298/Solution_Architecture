@@ -26,7 +26,7 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.entitlement`, `access.scan_event` |
-| [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_hold`, `catalogue.performance`, `catalogue.price_list`, `catalogue.product`, `catalogue.variant`, `promotions.coupon_campaign`, `promotions.coupon_code`, `promotions.promotion` |
+| [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_reservation`, `catalogue.performance`, `catalogue.price_list`, `catalogue.product`, `catalogue.variant`, `promotions.coupon_campaign`, `promotions.coupon_code`, `promotions.promotion` |
 | [CrossRegionService](CrossRegionService.md) | `sync.rejection` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject` |
 | [LedgerService](LedgerService.md) | `ledger.fx_rate`, `ledger.posting`, `ledger.tax_invoice_line` |
@@ -55,7 +55,7 @@
 | order | [`appendEntitlementToMedia`](#appendentitlementtomedia) | POST | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, EMP-036, POS-010 |
 | order | [`applyManualDiscount`](#applymanualdiscount) | POST | `/orders/{orderId}/discounts` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-034, POS-002 … |
 | order | [`claimTicketTransfer`](#claimtickettransfer) | POST | `/ticket-transfers/{transferId}/claim` | core | 1 | GST-014 |
-| order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002 … |
+| order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-004 … |
 | order | [`exchangeOrderLines`](#exchangeorderlines) | POST | `/orders/{orderId}/exchanges` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034 … |
 | order | [`getMediaEntitlements`](#getmediaentitlements) | GET | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, EMP-036, POS-010 |
 | order | [`getOrder`](#getorder) | GET | `/orders/{orderId}` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305 … |
@@ -154,7 +154,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.cart` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart` |
+| Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart` |
 | Called by | GST-041, WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `abandoned`, `expiring` -> `abandoned` |
 
@@ -491,7 +491,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.inventory_hold`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `catalogue.inventory_reservation`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `marketing.consent_record`, `orders.cart`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-012, WEB-033 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
@@ -525,6 +525,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -930,8 +931,8 @@ Offered once, typically, and the interface should say it is the last extension r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart` |
+| Reads | `cache:idempotency`, `catalogue.inventory_reservation`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart` |
 | Called by | GST-041, WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active` |
 
@@ -1055,7 +1056,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
+| Reads | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
 | Called by | GST-007, GST-009, GST-032, GST-041, GST-048, GST-053, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
 
@@ -1176,7 +1177,7 @@ Releases its lease immediately.
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart_line` |
+| Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart_line` |
 | Called by | GST-041, PTR-010, WEB-010 |
 
 **Parameters**
@@ -1297,7 +1298,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.channel_capacity`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart_line` |
+| Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart_line` |
 | Called by | GST-041, PTR-010, WEB-010 |
 
 **Parameters**
@@ -1768,7 +1769,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-027, EMP-036, POS-010 |
 
 **Parameters**
@@ -1799,6 +1800,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
+| order.channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
 | order.status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -1970,6 +1972,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -2192,7 +2195,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Guest callable | True |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox`, `promotions.promotion_evaluation_trace` |
-| Called by | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015 |
+| Called by | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
 **Parameters**
@@ -2247,6 +2250,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -2581,6 +2585,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -2918,6 +2923,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -3255,6 +3261,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
+| order.channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
 | order.status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -3534,6 +3541,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
+| order.channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
 | order.status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -3725,7 +3733,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
-| Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
+| Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer`, `platform.outbox` |
 | Called by | GST-012, GST-013, GST-014, GST-045, WEB-018, WEB-030 |
 | State model | Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `surrendered`<br/>Ticket transfer ([states/ticket-transfer.yaml](../../../states/ticket-transfer.yaml)): moves `offered` -> `cancelled` |
 
@@ -3816,6 +3824,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -4474,6 +4483,8 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF is that it updates — a changed gate, a cancelled performance, a time that moved.
 **A pass that cannot be pushed to is a screenshot with better rounding.**
 
+**An Apple pass is signed with the brand's own Pass Type ID certificate** (Chinmay, 12 October 2026: the client owns it, one per brand; CHG-R6-033), read from Key Vault through white-label `StoreAccount.passCertificateSecretRef`, never a TICVAI certificate. Its expiry is `StoreAccount.passCertificateExpiresAt`, warned 30 days ahead by `whitelabel.passCertificateExpiring`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -4634,6 +4645,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | items[].orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | items[].channel | object | yes | Where it came from. |
+| items[].channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | items[].venueId | string (uuid) | yes |  |
 | items[].scopePath | string | yes |  |
 | items[].status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -4804,7 +4816,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.provider` |
-| Writes | `access.entitlement`, `cache:idempotency`, `orders.payment`, `orders.payment_link`, `orders.reservation`, `orders.sales_order` |
+| Writes | `access.entitlement`, `cache:idempotency`, `orders.payment`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `platform.outbox` |
 | Called by | GST-009, WEB-014 |
 
 **Parameters**
@@ -4966,7 +4978,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `catalogue.product` |
-| Writes | `access.entitlement`, `cache:idempotency` |
+| Writes | `access.entitlement`, `cache:idempotency`, `platform.outbox` |
 | Called by | POS-026 |
 
 **Parameters**
@@ -5203,7 +5215,7 @@ Governed by `EntitlementTemplate.canShareMedia`, which already exists and had no
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `access.entitlement`, `cache:idempotency`, `catalogue.entitlement_template`, `identity.delegated_access` |
-| Writes | `access.entitlement`, `cache:idempotency`, `identity.delegated_access` |
+| Writes | `access.entitlement`, `cache:idempotency`, `identity.delegated_access`, `platform.outbox` |
 | Called by | GST-072, WEB-018 |
 
 **Parameters**
@@ -5258,7 +5270,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.consent_record`, `payments.provider`, `payments.token` |
-| Writes | `cache:idempotency`, `marketing.consent_record`, `payments.token` |
+| Writes | `cache:idempotency`, `marketing.consent_record`, `payments.token`, `platform.outbox` |
 | Called by | GST-071, WEB-021 |
 
 **Parameters**
@@ -5467,7 +5479,7 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ledger.fx_rate`, `orders.payment`, `payments.provider_connection` |
-| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | BO-024, EMP-035, POS-005, PTR-012 |
 | State model | Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `authorised` -> `captured` |
 
@@ -5555,8 +5567,8 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Offline | yes |
 | Conflict policy | append |
 | Guest callable | True |
-| Reads | `catalogue.inventory_hold`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
-| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
+| Reads | `catalogue.inventory_reservation`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
@@ -6459,6 +6471,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
+| channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
@@ -7015,6 +7028,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -7272,6 +7286,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -7301,6 +7316,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 **`POST /shifts/{shiftId}/close`**: Blind close-out
 
 The operator submits a counted denomination breakdown. The expected figure is not returned before submission — that is what makes the count blind.
+**The shift closes on its own business date** (`Shift.businessDate`, from the venue's `businessDayCutoff`, default 00:00; CHG-R6-032), whatever the clock says at close, so the Z-report and the daily reconciliation count it on the day it traded.
 The response carries the variance. Where it exceeds the configured threshold, the shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
 **The threshold is the venue setting `shiftVarianceThreshold`, with a tenant default**, an absolute amount either way, over or short (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 20.00 per shift.**
 **`acceptShiftVariance` is the one way past that threshold** (decided 28 September, audit R080 (e)): a supervisor accepts the variance on the till. The close is not held for a PIN before this call, and no approval request is raised for it.
@@ -7412,6 +7428,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | shift.varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | shift.heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | shift.openedAt | string (date-time) | yes |  |
+| shift.businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | shift.recordedAt | string (date-time) |  | When the device recorded the open. |
 | shift.suspendedAt | string (date-time) |  | (nullable) |
 | shift.suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -7537,6 +7554,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -7745,6 +7763,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -7971,6 +7990,7 @@ That separation is what makes a variance attributable to a person rather than to
 | status | query |  | ShiftStatus: enum (pendingApproval, open, suspended, pendingVariance, pendingClosure, closed, autoClosed) |  |
 | openedFrom | query |  | string (date-time) |  |
 | openedTo | query |  | string (date-time) |  |
+| businessDate | query |  | string (date) | The shifts of one business date (Shift.businessDate, closing at the venue's businessDayCutoff; CHG-R6-032), as the daily reconciliation asks for them. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -8028,6 +8048,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | items[].heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | items[].openedAt | string (date-time) | yes |  |
+| items[].businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | items[].recordedAt | string (date-time) |  | When the device recorded the open. |
 | items[].suspendedAt | string (date-time) |  | (nullable) |
 | items[].suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -8158,6 +8179,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -8330,6 +8352,7 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -8446,6 +8469,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -8556,6 +8580,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -8871,6 +8896,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | varianceReasonRequired | boolean |  | Computed, not stored (CHG-R4-019): true while the shift is pendingClosure because its count differs from the expected figure within the threshold and no cashierReason is recorded. (read-only) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
+| businessDate | string (date) |  | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… (read-only) |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
 | suspendedAt | string (date-time) |  | (nullable) |
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
@@ -9093,8 +9119,8 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `catalogue.inventory_hold`, `catalogue.price_list`, `catalogue.variant`, `orders.sales_order` |
-| Writes | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.price_variance`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox`, `sync.rejection` |
+| Reads | `catalogue.inventory_reservation`, `catalogue.price_list`, `catalogue.variant`, `orders.sales_order` |
+| Writes | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.price_variance`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox`, `sync.rejection` |
 | Called by | BO-037, BO-132, POS-013 |
 
 **Parameters**
@@ -9220,7 +9246,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | table_reservation_id | uuid | no | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. |
 | seat_ids | text[] | no |  |
-| resource_hold_id | uuid | no | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). |
+| resource_reservation_id | uuid | no | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). |
 | attributes | jsonb | no |  |
 | parent_line_id | uuid | no | The line this add-on is attached to, from AddCartLineRequest.parentLineId. |
 | override_price | numeric(18,4) | no |  |
@@ -9228,7 +9254,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | fee_kind | text | no | A fee is a line, not an adjustment. |
 | unit_price | numeric(18,4) | no |  |
 | line_total | numeric(18,4) | no |  |
-| inventory_hold_id | text | no | The capacity held for this line — a catalogue.InventoryHold.id, typed as that id is. |
+| inventory_reservation_id | text | no | The capacity held for this line — a catalogue.InventoryHold.id, typed as that id is. |
 | lease_expires_at | timestamptz | no | Shown to the guest. |
 | is_available | boolean | no | Re-checked on every read. |
 | cart_id | uuid | yes | Points at orders.cart. |
@@ -9255,7 +9281,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Client-generated UUIDv7. |
 | kind | text | yes |  |
-| amount | numeric(18,4) | yes |  |
+| movement_amount | numeric(18,4) | yes |  |
 | reference | text | no | Safe drop reference or bag number. |
 | reason | text | no |  |
 | recorded_at | timestamptz | yes |  |
@@ -9279,10 +9305,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | shift_id | uuid | no | The shift trading from this box. |
 | status | text | no |  |
 | opening_float | numeric(18,4) | yes |  |
-| withdrawn_total | numeric(18,4) | no | Reduces the expected close figure. |
-| expected_total | numeric(18,4) | no |  |
-| counted_total | numeric(18,4) | no |  |
-| variance | numeric(18,4) | no |  |
+| withdrawn_amount | numeric(18,4) | no | Reduces the expected close figure. |
+| expected_amount | numeric(18,4) | no |  |
+| counted_amount | numeric(18,4) | no |  |
+| variance_amount | numeric(18,4) | no |  |
 | closed_by_principal_id | uuid | no | Flagged where it is not the holder. |
 | allocated_at | timestamptz | no | When the device recorded the allocation. |
 | closed_at | timestamptz | no |  |
@@ -9295,7 +9321,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | currency | text | yes | Stored, because it is the one thing that is not the region's. |
 | expected_amount | numeric(18,4) | no | The sum of tenders taken in this currency during the shift. |
 | counted_amount | numeric(18,4) | yes |  |
-| variance | numeric(18,4) | no |  |
+| variance_amount | numeric(18,4) | no |  |
 | base_equivalent | numeric(18,4) | no | At the rates on the payments, not today's. |
 | id | uuid | yes | Synthesised key. |
 
@@ -9439,9 +9465,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
-| inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
+| inventory_reservation_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
 | seat_ids | text[] | no | Seated products only, as seating.Seat.id. |
-| resource_hold_id | uuid | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
+| resource_reservation_id | uuid | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
 | attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
@@ -9492,7 +9518,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | fx_rate | numeric(18,6) | no | The rate applied, stored on the payment rather than looked up later (CF-37). |
 | fx_rate_source | text | no | 4.2.8. |
 | change_currency | text | no | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. |
-| amount | numeric(18,4) | yes |  |
+| payment_amount | numeric(18,4) | yes |  |
 | change_amount | numeric(18,4) | no |  |
 | status | text | yes |  |
 | provider_name | text | no |  |
@@ -9544,6 +9570,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | variance_amount | numeric(18,4) | no | Counted minus expected, as ShiftCloseResult.variance. |
 | held_lease_count | integer | no | Inventory leases currently held by this workstation. |
 | opened_at | timestamptz | yes |  |
+| business_date | date | no | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… |
 | recorded_at | timestamptz | no | When the device recorded the open. |
 | suspended_at | timestamptz | no |  |
 | suspend_reason | text | no | The reason given to suspendShift. |
@@ -9592,7 +9619,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | fx_variance | numeric(18,4) | no | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | tender_currency | text | no | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). |
 | tender_amount | numeric(18,4) | no | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). |
-| amount | numeric(18,4) | yes |  |
+| refunded_amount | numeric(18,4) | yes |  |
 | applied_percentage | numeric | no | From the venue's time bands, or an approver override. |
 | status | text | yes |  |
 | reason | text | no |  |
@@ -9669,9 +9696,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
-| inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
+| inventory_reservation_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
 | seat_ids | text[] | no | Seated products only, as seating.Seat.id. |
-| resource_hold_id | uuid | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
+| resource_reservation_id | uuid | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
 | attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
@@ -9685,6 +9712,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order_number | text | no | The number a guest reads and a cashier types. |
 | channel | text | yes | Where it came from. |
+| channel_profile_id | uuid | no | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. |
 | venue_id | uuid | yes |  |
 | scope_path | text | yes |  |
 | status | text | yes |  |

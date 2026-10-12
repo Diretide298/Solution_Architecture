@@ -1981,6 +1981,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
+| businessDayCutoff | string |  | When the venue's business day closes (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default… (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 00:00; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -2087,6 +2088,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
+| businessDayCutoff | string |  | When the venue's business day closes (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default… (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 00:00; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -2229,6 +2231,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
+| businessDayCutoff | string |  | When the venue's business day closes (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default… (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 00:00; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -2335,6 +2338,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
+| businessDayCutoff | string |  | When the venue's business day closes (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default… (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 00:00; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -3366,6 +3370,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Added 20 August. |
 | venue_id | uuid | no | From the path of setVenueSettings. |
 | calendar_day_start_hour | integer | no | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… |
+| business_day_cutoff | text | no | When the venue's business day closes (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default… |
 | currency_code | text | no | readOnly is the freeze. |
 | currency_scale | integer | no | Scale travels with currency (ADR-0008), and so does the freeze. |
 | support_hours | jsonb | no | CF-100. |
@@ -3383,7 +3388,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reschedule_cutoff_hours | integer | no | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). |
 | reservation_max_extensions | integer | no | How many times orders.extendReservation may extend one reservation. |
 | shift_variance_threshold | numeric(18,4) | no | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. |
-| cash_drawer_limit | text | no | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… |
+| deposit_box_limit_amount | numeric(18,4) | no | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… |
 | catalogue | jsonb | no |  |
 | inventory | jsonb | no |  |
 | seating | jsonb | no |  |
@@ -3409,7 +3414,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes |  |
 | sale_board | jsonb | yes | Determines which front end loads. |
 | sale_board_source | text | no | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… |
-| cash_drawer_limit | text | no | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). |
+| deposit_box_limit_amount | numeric(18,4) | no | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). |
 | access_point_id | uuid | no | Inherited from the workstation, never selected by the operator. |
 | time_zone | text | yes |  |
 | deployment_profile | text | no |  |

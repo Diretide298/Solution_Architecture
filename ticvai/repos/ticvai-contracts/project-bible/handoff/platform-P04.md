@@ -9,12 +9,12 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 153 |
+| Operations with no screen | 150 |
 | Waves | wave1 32 |
 
 ## Gaps
 
-### 153 operations with no screen here
+### 150 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -49,7 +49,6 @@
 | `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
@@ -60,7 +59,8 @@
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
-| … | | | 113 more |
+| `setFxProvider` | finance | PUT | Which provider serves which purpose |
+| … | | | 110 more |
 
 ## Modules
 

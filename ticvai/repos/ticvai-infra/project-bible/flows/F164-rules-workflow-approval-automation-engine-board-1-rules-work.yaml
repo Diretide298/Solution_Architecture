@@ -73,8 +73,9 @@ steps:
   - listRuleWorkflow
   outcome: Ready for the next screen on this board
 - step: 10
-  screen: ADM-243
-  action: Works in Roles, Authority, Delegation & Approval Limits
+  screen: BO-087
+  action: Works in Approval Delegations, where Roles, Authority, Delegation & Approval Limits (ADM-243) renders as a
+    section since its merge (CHG-MOV-002; repointed 12 October 2026, CHG-R6-046)
   operations:
   - listApprovalDelegations
   - createApprovalDelegation

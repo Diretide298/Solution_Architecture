@@ -9,7 +9,7 @@
 | **Operations** | 146 |
 | **Schemas** | 125 |
 | **States** | 42 |
-| **Events** | 47 |
+| **Events** | 48 |
 | **Tables** | 138 |
 | **Screens** | 194 |
 | **Flows** | 11 |
@@ -245,7 +245,7 @@
 | `chargeback.yaml` | orders | `Chargeback.status` | `order.chargebackRecorded` |
 | `content.yaml` | white-label | `ContentStatus` | `whitelabel.contentPublished` |
 | `conversation.yaml` | marketing-crm | `ConversationState` | `conversation.handedOver` |
-| `entitlement-status.yaml` | orders | `EntitlementStatus` | `access.validated` |
+| `entitlement-status.yaml` | orders | `EntitlementStatus` | `access.validated`, `entitlement.voided` |
 | `media.yaml` | assets | `MediaStatus` | `assets.documentIndexed` |
 | `order.yaml` | orders | `OrderStatus` | `order.cancelled`, `order.completed`, `order.paid`, `order.refunded` |
 | `payment.yaml` | orders | `Payment.status` | `order.paid` |
@@ -289,7 +289,7 @@
 | `device.statusChanged` | consumes | tenancy | no |
 | `entitlement.expiringSoon` | consumes | access | no |
 | `entitlement.issued` | consumes | access | yes |
-| `entitlement.transferred` | consumes | catalogue | no |
+| `entitlement.transferred` | consumes | catalogue | yes |
 | `fnb.menuPublished` | consumes | fnb | yes |
 | `identity.credentialResetRequested` | consumes | identity | no |
 | `identity.loginRecorded` | consumes | identity | no |
@@ -307,6 +307,7 @@
 | `performance.cancelled` | consumes | catalogue | yes |
 | `promotions.recommendationStrategyPublished` | consumes | promotions | no |
 | `reporting.definitionPublished` | consumes | reporting | yes |
+| `reporting.questionAnswered` | consumes | reporting | yes |
 | `retail.merchandisePublished` | consumes | retail | yes |
 | `seat.sold` | consumes | seating | yes |
 | `shift.closed` | consumes | shift | yes |

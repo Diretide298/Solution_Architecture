@@ -323,6 +323,7 @@
     "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid",
     "nullable": true,

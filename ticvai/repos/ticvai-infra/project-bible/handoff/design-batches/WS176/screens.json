@@ -274,6 +274,14 @@
        "provenance": "contract tenancy.yaml VenueSettings.calendarDayStartHour (defined 4 October 2026, CHG-FXS-001)"
       },
       {
+       "kind": "textField",
+       "label": "Business day closes at (HH:MM)",
+       "bindsTo": "VenueSettings.businessDayCutoff",
+       "operation": "setVenueSettingsDefaults",
+       "notes": "The tenant default every venue inherits; 00:00 (midnight) unless changed. Moves the business date of shifts, the daily reconciliation, revenue postings and the daily reports, from the next business day; not the calendar views, which follow the hour above.",
+       "provenance": "contract tenancy.yaml VenueSettings.businessDayCutoff (Chinmay, 6 October 2026; CHG-R6-032)"
+      },
+      {
        "kind": "secondaryButton",
        "label": "Save venue setting defaults",
        "operation": "setVenueSettingsDefaults",

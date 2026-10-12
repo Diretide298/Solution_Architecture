@@ -1,6 +1,6 @@
 # P08-setup-go-live-01 — P08 · Setup & Go-Live
 
-**1 screens · 1 operations · 4 schemas · 1 permissions**
+**2 screens · 5 operations · 6 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_TENANT_VIEW, SCOPE_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -97,6 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-594` | Environment Ready & Handoff to AI Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1191` | Organisation | B–D | 10 | 14 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

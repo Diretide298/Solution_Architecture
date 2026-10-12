@@ -32,6 +32,8 @@
     "$ref": "#/components/schemas/BookedWindow"
    },
    "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
     "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
@@ -46,6 +48,7 @@
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -377,6 +380,7 @@
     "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
+    "x-ticvai-column": "payment_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "changeAmount": {

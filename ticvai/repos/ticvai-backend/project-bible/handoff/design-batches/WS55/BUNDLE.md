@@ -218,6 +218,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-246` Workflow Testing, Simulation & Impact Analysis: *Works in Workflow Testing, Simulation & Impact Analysis*; calls `listRuleWorkflow`
 - → `ADM-247` Versioning, Governance, Approval & Publication: *Works in Versioning, Governance, Approval & Publication*; calls `listRuleWorkflow`
 - → `BO-086` Approval Matrix: *Works in Approval Matrix & Multi-Level Approval Configuration*; calls `listRuleWorkflow`
+- → `BO-087` Approval Delegations: *Works in Approval Delegations, where Roles, Authority, Delegation & Approval Limits (ADM-243) renders as a…*; calls `listRuleWorkflow`
 
 #### States
 
@@ -306,7 +307,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-238?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `ADM-239`, `ADM-240`, `ADM-241`, `ADM-242`, `ADM-243`, `ADM-244`, `ADM-245`, `ADM-246`, `ADM-247`, `BO-086`.
+- [ ] Every transition is wired: `BO-100`, `ADM-239`, `ADM-240`, `ADM-241`, `ADM-242`, `ADM-243`, `ADM-244`, `ADM-245`, `ADM-246`, `ADM-247`, `BO-086`, `BO-087`.
 - [ ] Every gated control is gated: `APPROVAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -817,7 +818,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 1 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 configure, 1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define by; Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -979,7 +980,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-243` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-243`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 1
-- Flow F164 *Rules Workflow Approval Automation Engine board 1: Rules & Workflow Command …*, step 10: Works in Roles, Authority, Delegation & Approval Limits → Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than replace it.
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design

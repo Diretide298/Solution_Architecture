@@ -41,6 +41,7 @@ operations:
   writes:
   - ai.activity
   - cache:idempotency
+  - platform.outbox
   - reporting.natural_language_query
   - reporting.report_column
   - reporting.report_filter
@@ -588,6 +589,7 @@ operations:
   writes:
   - ai.activity
   - cache:idempotency
+  - platform.outbox
   - reporting.natural_language_query
   - reporting.report_column
   - reporting.report_definition

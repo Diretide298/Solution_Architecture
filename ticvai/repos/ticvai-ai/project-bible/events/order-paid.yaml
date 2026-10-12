@@ -16,6 +16,9 @@ emittedBy:
 # A pending payment resolved by inquiry captures the order as the webhook would (states/payment.yaml:
 # pendingConfirmation -> captured by inquirePaymentStatus; CHG-R1S-009, found by check-write-lineage W-EMITS).
 - orders.inquirePaymentStatus
+# A payment link paid, and an add-on to media a guest holds, pay an order too (ADAM CR-002, CHG-R6-020).
+- orders.payByLink
+- orders.appendEntitlementToMedia
 payload:
 - field: orderId
   type: uuid
@@ -27,6 +30,10 @@ payload:
 - field: channel
   type: string
   notes: pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice
+- field: channelProfileId
+  type: uuid
+  notes: Optional (12 October 2026, CHG-R6-031). The order's named sales channel (Order.channelProfileId); null
+    for the venue's own channels. access.issueOrderEntitlements reads its ticketCredentialFormat (MOM-0330)
 - field: total
   type: Money
 - field: lines
@@ -42,6 +49,8 @@ consumers:
   purpose: Issue entitlements against the paid lines. AccessService owns access.entitlement, so it issues
     (system-design review SD-026, 29 September; was catalogue)
   operation: access.issueOrderEntitlements
+  writes:
+  - access.entitlement
   idempotencyKey: orderId + lineId
   onFailure: retryThenDeadLetter
   isCritical: true

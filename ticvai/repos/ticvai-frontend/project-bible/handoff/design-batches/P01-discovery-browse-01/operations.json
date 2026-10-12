@@ -386,6 +386,11 @@
     "required": null
    },
    {
+    "name": "entitlementTemplateId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "segmentTag",
     "in": "query",
     "required": null

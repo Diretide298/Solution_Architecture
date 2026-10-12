@@ -47,13 +47,13 @@ operations:
   - cache:idempotency
   - catalogue.price
   - catalogue.product
-  - inventory.item
+  - inventory.inventory_item
   writes:
   - cache:idempotency
   - cache:resolution
   - catalogue.price
   - catalogue.product
-  - inventory.item
+  - inventory.inventory_item
 - operation: cancelPurchaseOrder
   verb: POST
   path: /purchase-orders/{purchaseOrderId}/cancel
@@ -168,10 +168,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
   writes:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
 - operation: createPurchaseOrder
   verb: POST
   path: /purchase-orders
@@ -242,13 +242,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
   - inventory.location
   - inventory.movement
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   writes:
   - cache:idempotency
-  - inventory.stock_reservation
+  - inventory.stock_earmark
 - operation: createStockTransfer
   verb: POST
   path: /stock-transfers
@@ -315,7 +315,7 @@ operations:
   - staff
   offline: true
   reads:
-  - inventory.item
+  - inventory.inventory_item
   writes: []
 - operation: getInventoryKitDefinition
   verb: GET
@@ -326,7 +326,7 @@ operations:
   - staff
   offline: false
   reads:
-  - inventory.item
+  - inventory.inventory_item
   - inventory.kit_component
   writes: []
 - operation: getPurchaseOrder
@@ -350,10 +350,10 @@ operations:
   - staff
   offline: true
   reads:
-  - inventory.item
+  - inventory.inventory_item
   - inventory.location
   - inventory.movement
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   writes: []
 - operation: getStockTransfer
   verb: GET
@@ -365,7 +365,7 @@ operations:
   offline: true
   reads:
   - fnb.cold_chain_event
-  - inventory.item
+  - inventory.inventory_item
   - inventory.transfer
   - inventory.transfer_line
   writes: []
@@ -378,7 +378,7 @@ operations:
   - staff
   offline: false
   reads:
-  - inventory.item
+  - inventory.inventory_item
   - inventory.movement
   - ledger.account
   writes: []
@@ -402,7 +402,7 @@ operations:
   - staff
   offline: true
   reads:
-  - inventory.item
+  - inventory.inventory_item
   - inventory.stock_batch
   writes: []
 - operation: listGoodsReceipts
@@ -426,7 +426,7 @@ operations:
   - staff
   offline: true
   reads:
-  - inventory.item
+  - inventory.inventory_item
   writes: []
 - operation: listPurchaseOrders
   verb: GET
@@ -461,7 +461,7 @@ operations:
   - staff
   offline: true
   reads:
-  - inventory.item
+  - inventory.inventory_item
   - inventory.serialised_item
   - inventory.stock_batch
   writes: []
@@ -520,7 +520,7 @@ operations:
   - staff
   offline: false
   reads:
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   writes: []
 - operation: listStockTransfers
   verb: GET
@@ -567,7 +567,7 @@ operations:
   - staff
   offline: true
   reads:
-  - inventory.item
+  - inventory.inventory_item
   writes: []
 - operation: postStockCount
   verb: POST
@@ -673,10 +673,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   writes:
   - cache:idempotency
-  - inventory.stock_reservation
+  - inventory.stock_earmark
 - operation: returnRequisition
   verb: POST
   path: /requisitions/{requisitionId}/return
@@ -718,7 +718,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.daily_count_list
-  - inventory.item
+  - inventory.inventory_item
   writes:
   - cache:idempotency
   - cache:resolution
@@ -733,7 +733,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
   - inventory.kit_component
   - inventory.movement
   writes:
@@ -781,10 +781,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
   writes:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
 - operation: updateRequisitionLines
   verb: PUT
   path: /requisitions/{requisitionId}/lines
@@ -795,7 +795,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - inventory.item
+  - inventory.inventory_item
   - inventory.requisition
   - inventory.requisition_line
   writes:

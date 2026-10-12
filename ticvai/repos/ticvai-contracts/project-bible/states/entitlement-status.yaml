@@ -50,6 +50,8 @@ transitions:
   trigger: operation
   guard: One ticket voided before settlement, within the same shift (decided 29 September, readiness
     close-out). After settlement it is a refund, because the money has moved
+  emits:
+  - entitlement.voided
 - from: issued
   to: cancelled
   operation: createRefund

@@ -111,6 +111,7 @@
     "readOnly": true
    },
    "creditMemoNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
@@ -365,6 +366,7 @@
     "description": "SHA-256 of the document as sent, so a resend can be shown to be the same document."
    },
    "providerMessageId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "nullable": true
    },
@@ -450,6 +452,7 @@
     "readOnly": true
    },
    "invoiceNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
@@ -706,6 +709,7 @@
     "type": "number"
    },
    "unitPrice": {
+    "x-ticvai-column": "unit_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "discountAmount": {

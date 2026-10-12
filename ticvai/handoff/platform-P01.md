@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 50 |
-| Operations | 213 |
+| Operations | 215 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 16 |
+| Operations with no screen | 14 |
 | Waves | wave1 50 |
 
 ## Gaps
 
-### 16 operations with no screen here
+### 14 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -22,8 +22,6 @@
 |---|---|---|---|
 | `createParkingEntitlement` | access | POST | A guest bought parking |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
@@ -65,7 +63,7 @@
 | `WEB-003` | Search Results | Discovery & Browse | 1 | 2 | yes |
 | `WEB-004` | Attraction Details | Discovery & Browse | 1 | 5 | yes |
 | `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 7 | yes |
-| `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 8 | yes |
+| `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 10 | yes |
 | `WEB-007` | Interactive Seat Selection | Booking & Selection | 1 | 6 | yes |
 | `WEB-008` | Add-ons & Upsell | Booking & Selection | 1 | 5 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 1 | 3 | yes |

@@ -81,12 +81,12 @@ operations:
   offline: false
   reads:
   - wallet.balance
-  - wallet.hold
+  - wallet.fund_reservation
   writes:
   - platform.idempotency_record
   - platform.outbox
   - wallet.balance
-  - wallet.hold
+  - wallet.fund_reservation
   - wallet.wallet_transaction
 - operation: closeWallet
   verb: POST
@@ -165,17 +165,17 @@ operations:
   reads:
   - wallet.accounting_mapping
   - wallet.authentication_policy
-  - wallet.channel_rules
+  - wallet.channel_rule
   - wallet.configuration_version
   - wallet.configuration_version_snapshot
   - wallet.consumption_policy
   - wallet.credit_type
-  - wallet.funding_rules
+  - wallet.funding_rule
   - wallet.integration_mapping
   - wallet.reconciliation_source
   - wallet.refund_policy
-  - wallet.risk_rules
-  - wallet.transfer_rules
+  - wallet.risk_rule_set
+  - wallet.transfer_rule
   - wallet.wallet_type
   writes: []
 - operation: expireCreditLots
@@ -283,7 +283,7 @@ operations:
   - staff
   offline: false
   reads:
-  - wallet.funding_rules
+  - wallet.funding_rule
   writes: []
 - operation: getWalletLiability
   verb: GET
@@ -353,7 +353,7 @@ operations:
   offline: false
   reads:
   - wallet.risk_rule
-  - wallet.risk_rules
+  - wallet.risk_rule_set
   writes: []
 - operation: holdWalletFunds
   verb: POST
@@ -366,13 +366,13 @@ operations:
   offline: false
   reads:
   - wallet.balance
-  - wallet.hold
+  - wallet.fund_reservation
   - wallet.wallet
   writes:
   - platform.idempotency_record
   - platform.outbox
   - wallet.balance
-  - wallet.hold
+  - wallet.fund_reservation
   - wallet.wallet_transaction
 - operation: issueGiftCard
   verb: POST
@@ -476,7 +476,7 @@ operations:
   - staff
   offline: false
   reads:
-  - wallet.hold
+  - wallet.fund_reservation
   writes: []
 - operation: listWalletTransactions
   verb: GET
@@ -535,16 +535,16 @@ operations:
   - cache:idempotency
   - wallet.accounting_mapping
   - wallet.authentication_policy
-  - wallet.channel_rules
+  - wallet.channel_rule
   - wallet.configuration_version
   - wallet.consumption_policy
   - wallet.credit_type
-  - wallet.funding_rules
+  - wallet.funding_rule
   - wallet.integration_mapping
   - wallet.reconciliation_source
   - wallet.refund_policy
-  - wallet.risk_rules
-  - wallet.transfer_rules
+  - wallet.risk_rule_set
+  - wallet.transfer_rule
   - wallet.wallet_type
   writes:
   - cache:idempotency
@@ -603,12 +603,12 @@ operations:
   offline: false
   reads:
   - wallet.balance
-  - wallet.hold
+  - wallet.fund_reservation
   writes:
   - platform.idempotency_record
   - platform.outbox
   - wallet.balance
-  - wallet.hold
+  - wallet.fund_reservation
   - wallet.wallet_transaction
 - operation: resolveWalletDispute
   verb: POST
@@ -638,15 +638,15 @@ operations:
   - cache:idempotency
   - wallet.accounting_mapping
   - wallet.authentication_policy
-  - wallet.channel_rules
+  - wallet.channel_rule
   - wallet.consumption_policy
   - wallet.credit_type
-  - wallet.funding_rules
+  - wallet.funding_rule
   - wallet.integration_mapping
   - wallet.reconciliation_source
   - wallet.refund_policy
-  - wallet.risk_rules
-  - wallet.transfer_rules
+  - wallet.risk_rule_set
+  - wallet.transfer_rule
   - wallet.wallet_type
 - operation: reverseWalletFunding
   verb: POST
@@ -746,7 +746,7 @@ operations:
   - cache:idempotency
   - payments.token
   - wallet.auto_reload_setting
-  - wallet.funding_rules
+  - wallet.funding_rule
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -761,9 +761,9 @@ operations:
   - staff
   offline: false
   reads:
-  - wallet.channel_rules
+  - wallet.channel_rule
   writes:
-  - wallet.channel_rules
+  - wallet.channel_rule
 - operation: setWalletFundingRules
   verb: PUT
   path: /wallet-funding-rules
@@ -773,9 +773,9 @@ operations:
   - staff
   offline: false
   reads:
-  - wallet.funding_rules
+  - wallet.funding_rule
   writes:
-  - wallet.funding_rules
+  - wallet.funding_rule
 - operation: setWalletIntegrationMapping
   verb: PUT
   path: /wallet-integration-mappings
@@ -834,9 +834,9 @@ operations:
   offline: false
   reads:
   - wallet.risk_rule
-  - wallet.risk_rules
+  - wallet.risk_rule_set
   writes:
-  - wallet.risk_rules
+  - wallet.risk_rule_set
 - operation: setWalletRiskRules
   verb: PUT
   path: /wallet-risk-rules
@@ -847,10 +847,10 @@ operations:
   offline: false
   reads:
   - wallet.risk_rule
-  - wallet.risk_rules
+  - wallet.risk_rule_set
   writes:
   - wallet.risk_rule
-  - wallet.risk_rules
+  - wallet.risk_rule_set
 - operation: setWalletTransferRules
   verb: PUT
   path: /wallet-transfer-rules
@@ -860,9 +860,9 @@ operations:
   - staff
   offline: false
   reads:
-  - wallet.transfer_rules
+  - wallet.transfer_rule
   writes:
-  - wallet.transfer_rules
+  - wallet.transfer_rule
 - operation: settleWalletAtExit
   verb: POST
   path: /wallets/{walletId}/exit-settlement

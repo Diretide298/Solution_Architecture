@@ -299,12 +299,12 @@ operations:
   reads:
   - cache:idempotency
   - inventory.movement
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   - retail.reservation
   - retail.reservation_line
   writes:
   - cache:idempotency
-  - inventory.stock_reservation
+  - inventory.stock_earmark
   - retail.reservation
   - retail.reservation_line
 - operation: setReturnPolicy

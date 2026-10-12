@@ -2676,7 +2676,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| kind | pii.subject_kind | yes | guest, employee, contact or applicant |
+| kind | text | yes | guest, employee, contact or applicant |
 | display_name | text |  | What to call this person. |
 | given_name | text |  |  |
 | family_name | text |  |  |
@@ -2695,7 +2695,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | subject_id | uuid | yes | Parent. |
-| kind | pii.contact_kind | yes | email, mobile, phone, whatsapp or postal |
+| kind | text | yes | email, mobile, phone, whatsapp or postal |
 | value | text | yes |  |
 | value_normalised | text | yes | Lowercased email, E.164 mobile. |
 | value_hash | text | yes | Deterministic hash. |

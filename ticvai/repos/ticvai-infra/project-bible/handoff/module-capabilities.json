@@ -4,7 +4,7 @@
  "modules": {
   "access": {
    "title": "3 — Admission and Access",
-   "capabilityCount": 20,
+   "capabilityCount": 22,
    "unguardedOperations": 6,
    "capabilities": [
     {
@@ -34,7 +34,7 @@
      "key": "ACCESS_POINT_CONFIGURE",
      "label": null,
      "group": "Access control",
-     "operationCount": 93,
+     "operationCount": 90,
      "operations": [
       "addBlacklistEntry",
       "approveMultiMediaPreview",
@@ -214,6 +214,30 @@
      "operations": [
       "listParkingFacilities",
       "setParkingFacility"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 3,
+     "operations": [
+      "setAppleWalletPass",
+      "setGoogleWalletPass",
+      "setPdfPrintablePos"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "getPdfPrintablePos"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -863,14 +887,14 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 64,
+     "operationCount": 66,
      "operations": [
       "approvePricingWorkflowAuthority",
       "approveReviewDecision",
       "approveWorkflow",
+      "archiveEntitlementTemplate",
       "assessProductChange",
-      "bulkChangePrices",
-      "bulkUpdateCatalogueProducts"
+      "bulkChangePrices"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -879,14 +903,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 117,
+     "operationCount": 118,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
       "getCatalogueImportJob",
       "getChannelAllocations",
-      "getEvent",
-      "getGroupPackageDefinition"
+      "getEntitlementTemplate",
+      "getEvent"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1898,7 +1922,7 @@
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
      "group": "Guest engagement",
-     "operationCount": 43,
+     "operationCount": 44,
      "operations": [
       "actOnWaiverRequirements",
       "addGuestNote",
@@ -3183,7 +3207,7 @@
      "key": "CAPACITY_CONFIGURE",
      "label": "envelopes and allocation",
      "group": "Catalogue",
-     "operationCount": 31,
+     "operationCount": 32,
      "operations": [
       "cloneSeatMap",
       "commitImportJob",

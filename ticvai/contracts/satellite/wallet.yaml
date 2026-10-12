@@ -2506,11 +2506,11 @@ paths:
         type: string
     post:
       operationId: loadGameCredits
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
       x-ticvai-write-via:
       - table: games.card
         event: wallet.credited
-      x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
         locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,

@@ -104,9 +104,13 @@
   "note": "Both from Monday 5 October 2026 (Chinmay, 30 September); no third AI engineer. They carry the AI engine tasks in docs/active/block-a-extra-tasks.json; the AI endpoints and screens are developers' tickets like any other module. Every AI function is built inside the six months, baseline first. 1 October: the AI engine needs about 50 AI-engineer weeks against 35; its tasks past 2 April are created unassigned (Chinmay: more developers are coming)."
  },
  "pace": {
-  "Surendra": 0.6
+  "Surendra": 0.6,
+  "Pranay Shinde": 1.17,
+  "Tanmay Dukhande": 1.17,
+  "Deep Khanvilkar": 1.17,
+  "Hrushikant Patkar": 1.17
  },
- "paceNote": "Share of a full developer's pace, used when screens are shared out. Surendra is full stack and junior (29 September): about 60%, on Venue Management from week 1.",
+ "paceNote": "Share of a full developer's pace, used when screens are shared out. Surendra is full stack and junior (29 September): about 60%, on Venue Management from week 1. 13 October 2026 (Chinmay, CHG-R6-057: \"we can up the per day tasks for backend devs\"): the four back-end developers, Hrushikant Patkar, Pranay Shinde, Tanmay Dukhande and Deep Khanvilkar, run at 1.17, 7 tasks a day where the plan gives 6, so Pallavi Sawant's back end (CHG-R6-056) lands without moving a block: A1 last work 25 November, A2 2 December, B 16 December, C 29 December. Measured against 1.0 (A1 3 December), 1.17 for Pranay, Tanmay and Deep only (A2 8 December: Hrushikant's kiosk tasks) and 1.25 for all four.",
  "helperShare": {
   "Deep Khanvilkar": 0.55
  },

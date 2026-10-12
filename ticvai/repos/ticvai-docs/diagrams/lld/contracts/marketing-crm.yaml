@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 277 operations
+title: marketing-crm — 278 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -2385,6 +2385,21 @@ operations:
   - cache:idempotency
   - marketing.guest_profile
   - pii.subject
+  - platform.outbox
+- operation: notifyPerformanceHolders
+  verb: POST
+  path: /performance-cancellation-notices
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.message_dispatch
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
 - operation: pauseCampaign
   verb: POST
   path: /campaigns/{campaignId}/pause
@@ -2466,7 +2481,7 @@ operations:
   verb: POST
   path: /guests/{subjectId}/consents
   scope: venue
-  permission: null
+  permission: GUEST_MANAGE
   audience:
   - guest
   offline: false

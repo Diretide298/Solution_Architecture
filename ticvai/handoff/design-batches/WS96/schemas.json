@@ -544,7 +544,7 @@
  },
  "InventoryStockReservation": {
   "type": "object",
-  "x-ticvai-persistence": "inventory.stock_reservation",
+  "x-ticvai-persistence": "inventory.stock_earmark",
   "description": "**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.",
   "required": [
    "itemId",
@@ -561,10 +561,12 @@
     "format": "uuid"
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },

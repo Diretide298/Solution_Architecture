@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 75 of 277 |
+| Operations in the slice | 75 of 278 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -1124,10 +1124,11 @@ Current position per purpose and channel, with the version of the notice consent
 **Append-only.** A change of mind is a new record, never an edit — the history of what a guest agreed to and when is the evidence that matters if it is ever questioned.
 Every record captures the notice version, the channel, the purpose, the source and the timestamp.
 **Two callers, two rules.** A guest recording their own consent uses a guest token and may only act on their own subject. An agent recording on a guest's behalf uses a staff token, requires `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured by proxy has to be attributable. **The staff audience is declared** (contract gap CHG-WIR-007, POS-027; CHG-CSA-045): the till records the consent of a guest enrolled at the counter with source `agentRecorded`. Creating the guest's profile at the till is identity's (`registerGuest`, spine).
+**`GUEST_MANAGE` is declared** (Chinmay, 12 October 2026, approved breaking change BC-040, CHG-R6-044): a staff caller needs it to record a guest's consent, as the rule above always said; a guest caller still records their own with no permission (`x-ticvai-self-scoped: subject`), as `getGuestConsents` reads it.
 
 |  |  |
 |---|---|
-| Permission | `None` |
+| Permission | `GUEST_MANAGE` |
 | Scope level | subject |
 | Part of slice | core |
 | Wave | 1 |
@@ -6064,7 +6065,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-202 operations, added to this service in later releases without changing any of the above.
+203 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6077,5 +6078,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
 | marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
-| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
+| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

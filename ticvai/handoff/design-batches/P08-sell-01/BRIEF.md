@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-007` | Product Directory | A | 101 | 41 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
-| `BO-008` | Product Detail & Variants | A | 45 | 39 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
+| `BO-008` | Product Detail & Variants | A | 76 | 48 | 6 | 44 | 22 | 3 | — | notStarted (generated) |
 | `BO-009` | Pricing Rules | A | 57 | 21 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
 | `BO-010` | Promotions & Coupons | A | 165 | 39 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
 | `BO-011` | Packages & Bundles | A | 69 | 56 | 6 | 11 | 4 | 0 | — | notStarted (generated) |

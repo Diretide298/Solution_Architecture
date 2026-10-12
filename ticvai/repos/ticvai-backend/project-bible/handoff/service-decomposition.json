@@ -108,7 +108,7 @@
     "promotions",
     "seating"
    ],
-   "operations": 447,
+   "operations": 451,
    "tables": 138,
    "why": "**What is sold, at what price, in which seat.** Promotions and seating are folded in because both are pricing and availability against the same product — a promotion that cannot see a price list and a seat that cannot see a product are two round trips on the hot path of every sale. **`pricing` joined it on 20 September**, which closes decision 5 of the schema merge — it took all three `pricing` tables and said the schema needed an owner, and that stayed open because the tables had no operations and a service is inferred from the contract that declares them. The operations were written into `catalogue.yaml`, beside the price lists and products a dynamic rule adjusts: a rule that reads `catalogue.price_list` and `catalogue.product` to compute a price belongs on the side of the boundary those live on, or every evaluation is a cross-service call on the sale path.",
    "scale": "Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).",
@@ -124,7 +124,7 @@
     "VenueOpsService": 1
    },
    "writesOutside": {
-    "TenancyService": 26,
+    "TenancyService": 29,
     "AccessService": 3
    },
    "flowCoverage": {
@@ -163,7 +163,7 @@
     "WalletService": 1
    },
    "writesOutside": {
-    "TenancyService": 28,
+    "TenancyService": 37,
     "LedgerService": 12,
     "AccessService": 10,
     "CatalogueService": 10,
@@ -189,7 +189,7 @@
    "schemas": [
     "access"
    ],
-   "operations": 257,
+   "operations": 258,
    "tables": 77,
    "why": "**The gate.** Validating an entitlement is a sub-300ms decision made forty times a minute per lane, and it must work when the network does not.",
    "scale": "Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than replayed** precisely because the gate cannot afford the arithmetic.",
@@ -204,8 +204,8 @@
     "MarketingService": 1
    },
    "writesOutside": {
+    "TenancyService": 8,
     "IdentityService": 4,
-    "TenancyService": 4,
     "CrossRegionService": 1,
     "MarketingService": 1
    },
@@ -240,8 +240,7 @@
    },
    "writesOutside": {
     "TenancyService": 9,
-    "OrderService": 1,
-    "PlatformService": 1
+    "OrderService": 1
    },
    "flowCoverage": {
     "operations": 54,
@@ -308,7 +307,6 @@
     "InventoryService": 5,
     "MarketingService": 4,
     "TenancyService": 4,
-    "CatalogueService": 2,
     "OrderService": 1
    },
    "flowCoverage": {
@@ -357,7 +355,7 @@
    "schemas": [
     "marketing"
    ],
-   "operations": 277,
+   "operations": 278,
    "tables": 132,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",
@@ -373,7 +371,7 @@
     "WhiteLabelService": 1
    },
    "writesOutside": {
-    "TenancyService": 4,
+    "TenancyService": 5,
     "IdentityService": 3,
     "OrderService": 2,
     "PlatformService": 2
@@ -572,7 +570,8 @@
     "TenancyService": 1
    },
    "writesOutside": {
-    "AiService": 2
+    "AiService": 2,
+    "TenancyService": 2
    },
    "flowCoverage": {
     "operations": 29,

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 234
+  x-ticvai-screen-count: 235
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -603,6 +603,9 @@ paths:
   /guest-checkout/profile-match/decision:
     post:
       operationId: decideGuestCheckoutMatch
+      x-ticvai-write-via:
+      - table: orders.cart
+        operation: claimCart
       summary: Use the existing profile or keep this booking separate
       deprecated: true
       description: '**Retired from checkout, 28 September (decided 28 September, audit R120 (b)).** The guest
@@ -724,6 +727,9 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-746 Duplicate Review & Merge"
+      x-ticvai-write-via:
+      - table: pii.subject
+        event: guest.merged
       summary: Two records, one person
       description: 'Board 4G. **Always a person''s decision, never the platform''s** — `matchGuest` proposes
         and this acts.
@@ -2375,6 +2381,8 @@ paths:
   /message-dispatches:
     get:
       operationId: listMessageDispatches
+      x-ticvai-consumed-by:
+        - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2773,6 +2781,9 @@ paths:
         - "P02 GST-071 Payment Methods"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: authoriseStoredValue
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3986,10 +3997,14 @@ paths:
         CHG-CSA-045): the till records the consent of a guest enrolled at the counter with source
         `agentRecorded`. Creating the guest''s profile at the till is identity''s (`registerGuest`, spine).
 
+        **`GUEST_MANAGE` is declared** (Chinmay, 12 October 2026, approved breaking change BC-040, CHG-R6-044): a
+        staff caller needs it to record a guest''s consent, as the rule above always said; a guest caller still
+        records their own with no permission (`x-ticvai-self-scoped: subject`), as `getGuestConsents` reads it.
+
         '
       tags:
       - consent
-      x-ticvai-permission: null
+      x-ticvai-permission: GUEST_MANAGE
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
       x-ticvai-config-scope-note: '26 August: **`subject` — the guest''s own setting, not the venue''s.**
@@ -4124,6 +4139,102 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsentRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /performance-cancellation-notices:
+    post:
+      operationId: notifyPerformanceHolders
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '12 October 2026: CHG-R6-038 (the Vivaticket comparison of 6 October found the cancel notice
+        promised by cancelPerformance and F09 step 5 with nothing that sends it); the performance.cancelled consumer,
+        shaped as recordCheckoutConsents'
+      summary: Tell every holder of a cancelled performance
+      description: '**The `performance.cancelled` consumer that sends the cancel notice** (12 October 2026,
+        CHG-R6-038). `cancelPerformance` says it "notifies every holder", F09 step 5 confirms the guests were told,
+        and the event named a marketing consumer, "Tell the guests, once, in their own language", but no operation
+        consumed it and nothing sent the message. Modelled as an operation so it has lineage and a ticket.
+
+
+        **Who is told.** Every guest holding an entitlement for `performanceId` when it was cancelled: the
+        holders are read from access (the entitlements of the performance, the same set the access consumer
+        voids), one message per guest (`subjectId`), not per ticket. A holder with no guest record (a counter sale
+        with no contact) has nobody to tell and is counted, not skipped silently.
+
+
+        **What is sent.** One transactional dispatch per guest, written as `sendTransactionalMessage` writes it,
+        with the system template `performanceCancelled` in the guest''s language, `sourceRef` the performance id
+        (so `listMessageDispatches` on BO-023 shows who was told, F09 step 5), and the staff''s `guestMessage` from
+        the cancel dialog in that language, else `reason`. Transactional: sent under contract performance, not
+        marketing consent, and still respecting the suppression list.
+
+
+        **Idempotent on performance id + subject id**: a redelivered `performance.cancelled` finds the dispatches
+        already written and returns them. Invoked by the event relay, never by a screen. Not critical by design
+        (the event''s notes): a refund never waits for the notice.'
+      tags:
+      - message
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - performance.cancelled
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - performanceId
+              - reason
+              properties:
+                eventId:
+                  type: string
+                  description: The `performance.cancelled` event id, for the consumer's inbox record.
+                performanceId:
+                  type: string
+                  format: uuid
+                reason:
+                  type: string
+                  description: The event's `reason`, sent where no `guestMessage` was written.
+                guestMessage:
+                  type: object
+                  nullable: true
+                  description: The message staff wrote in the cancel dialog (BO-015), by language code.
+                  additionalProperties:
+                    type: string
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The notice run for the performance, now or already done.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - performanceId
+                - dispatched
+                - noContact
+                properties:
+                  performanceId:
+                    type: string
+                    format: uuid
+                  dispatched:
+                    type: integer
+                    description: Guests a dispatch was written for.
+                  noContact:
+                    type: integer
+                    description: Holders with no guest record to tell.
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/consents/history:
@@ -26272,6 +26383,7 @@ components:
           nullable: true
           description: The accountable team or person.
         dataControllerApplicableOrganization:
+          x-ticvai-column: data_controller_applicable_organisation
           type: string
           maxLength: 200
           nullable: true

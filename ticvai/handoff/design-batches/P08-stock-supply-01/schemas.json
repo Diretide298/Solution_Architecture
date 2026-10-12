@@ -175,6 +175,7 @@
   ],
   "properties": {
    "sku": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -495,6 +496,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -608,6 +610,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -686,7 +689,7 @@
   }
  },
  "InventoryItem": {
-  "x-ticvai-persistence": "inventory.item",
+  "x-ticvai-persistence": "inventory.inventory_item",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateInventoryItemRequest"
@@ -721,6 +724,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "lastPurchasePrice": {
+      "x-ticvai-column": "last_purchase_cost_amount",
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "isBelowReorderPoint": {
@@ -747,11 +751,13 @@
   ],
   "properties": {
    "kitItemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid",
     "readOnly": true
    },
    "componentItemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
@@ -1039,6 +1045,7 @@
     "$ref": "#/components/schemas/PurchaseOrderStatus"
    },
    "deliverToLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1342,6 +1349,7 @@
     "nullable": true
    },
    "costCenterId": {
+    "x-ticvai-references": "ledger.cost_center",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1403,6 +1411,7 @@
     }
    },
    "estimatedTotal": {
+    "x-ticvai-column": "estimated_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "raisedByPrincipalId": {
@@ -2065,6 +2074,7 @@
     "nullable": true
    },
    "minimumOrderValue": {
+    "x-ticvai-column": "minimum_order_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "scopePath": {

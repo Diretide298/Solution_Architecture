@@ -49,13 +49,13 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `inventory.item` non-empty |
+| Part of slice | setup, makes `inventory.inventory_item` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Status | **Deprecated**: superseded; do not build |
-| Reads | `cache:idempotency`, `catalogue.price`, `catalogue.product`, `inventory.item` |
-| Writes | `cache:idempotency`, `cache:resolution`, `catalogue.price`, `catalogue.product`, `inventory.item` |
+| Reads | `cache:idempotency`, `catalogue.price`, `catalogue.product`, `inventory.inventory_item` |
+| Writes | `cache:idempotency`, `cache:resolution`, `catalogue.price`, `catalogue.product`, `inventory.inventory_item` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -107,7 +107,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `inventory.item`, `inventory.serialised_item`, `inventory.stock_batch` |
+| Reads | `inventory.inventory_item`, `inventory.serialised_item`, `inventory.stock_batch` |
 | Writes | - |
 | Called by | BO-114, EMP-069, POS-011 |
 
@@ -157,12 +157,12 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `inventory.item` non-empty |
+| Part of slice | setup, makes `inventory.inventory_item` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `inventory.item` |
-| Writes | `cache:idempotency`, `inventory.item` |
+| Reads | `cache:idempotency`, `inventory.inventory_item` |
+| Writes | `cache:idempotency`, `inventory.inventory_item` |
 | Called by | BO-081, BO-105 |
 
 **Parameters**
@@ -253,7 +253,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `inventory.item`, `inventory.kit_component`, `inventory.movement` |
+| Reads | `cache:idempotency`, `inventory.inventory_item`, `inventory.kit_component`, `inventory.movement` |
 | Writes | `cache:idempotency`, `cache:resolution`, `inventory.kit_component` |
 | Called by | BO-081 |
 
@@ -305,12 +305,12 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, changes rows of `inventory.item` that another operation creates |
+| Part of slice | setup, changes rows of `inventory.inventory_item` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `inventory.item` |
-| Writes | `cache:idempotency`, `inventory.item` |
+| Reads | `cache:idempotency`, `inventory.inventory_item` |
+| Writes | `cache:idempotency`, `inventory.inventory_item` |
 | Called by | BO-081 |
 
 **Parameters**
@@ -580,7 +580,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | unit_cost | numeric(18,4) | no |  |
 | id | uuid | yes | Synthesised key. |
 
-### `inventory.item`
+### `inventory.inventory_item`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -606,7 +606,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | in_transit | numeric | no |  |
 | available | numeric | no | On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171). |
 | average_cost | numeric(18,4) | no |  |
-| last_purchase_price | numeric(18,4) | no |  |
+| last_purchase_cost_amount | numeric(18,4) | no |  |
 | is_below_reorder_point | boolean | no |  |
 | has_movements | boolean | no | True locks costing method and base unit. |
 | is_active | boolean | yes |  |

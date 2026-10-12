@@ -20,6 +20,7 @@
   "navigation": {
    "entryFrom": [
     "BO-086",
+    "BO-087",
     "BO-100"
    ],
    "exitTo": [
@@ -33,6 +34,7 @@
     "ADM-246",
     "ADM-247",
     "BO-086",
+    "BO-087",
     "BO-100"
    ],
    "inferred": false,
@@ -102,6 +104,12 @@
      "to": "BO-086",
      "trigger": "Works in Approval Matrix & Multi-Level Approval Configuration",
      "provenance": "flow F164 step 7→8",
+     "operation": "listRuleWorkflow"
+    },
+    {
+     "to": "BO-087",
+     "trigger": "Works in Approval Delegations, where Roles, Authority, Delegation & Approval Limits (ADM-243) renders as a…",
+     "provenance": "flow F164 step 9→10",
      "operation": "listRuleWorkflow"
     }
    ]

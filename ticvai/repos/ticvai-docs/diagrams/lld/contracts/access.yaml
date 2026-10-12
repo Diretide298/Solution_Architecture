@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 257 operations
+title: access — 258 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -289,6 +289,7 @@ operations:
   - cache:idempotency
   - marketing.consent_record
   - pii.subject_biometric
+  - platform.outbox
 - operation: enrolFaceTag
   verb: POST
   path: /face-tag/enrolments
@@ -304,6 +305,7 @@ operations:
   writes:
   - cache:idempotency
   - pii.subject_biometric
+  - platform.outbox
 - operation: getAccessPoint
   verb: GET
   path: /access-points/{accessPointId}
@@ -2266,6 +2268,7 @@ operations:
   - access.security_alert
   - cache:idempotency
   - pii.subject_biometric
+  - platform.outbox
 - operation: revokeFacePass
   verb: DELETE
   path: /face-pass/enrolments/{enrolmentId}
@@ -2282,6 +2285,7 @@ operations:
   - access.biometric_audit_event
   - cache:idempotency
   - pii.subject_biometric
+  - platform.outbox
 - operation: rollbackAccessPolicy
   verb: POST
   path: /dynamic-access-policy/{policyId}/rollback
@@ -2313,6 +2317,21 @@ operations:
   writes:
   - access.configuration_change
   - access.configuration_version
+  - cache:idempotency
+- operation: setAccessAreaCapacity
+  verb: PUT
+  path: /access-areas/{areaId}/capacity
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_area
+  - cache:idempotency
+  writes:
+  - access.access_area
+  - access.configuration_change
   - cache:idempotency
 - operation: setAccessAreaZone
   verb: PUT

@@ -171,7 +171,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-059` | Sales Reports | D | 76 | 20 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
 | `BO-061` | Scheduled Reports | D | 26 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 | `BO-062` | Venue Profile | C | 9 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-065` | Venue Configuration | A | 98 | 22 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `BO-065` | Venue Configuration | A | 99 | 22 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
 | `BO-074` | Chart of Accounts | A | 35 | 26 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

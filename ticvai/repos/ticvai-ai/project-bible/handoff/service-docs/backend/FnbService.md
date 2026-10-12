@@ -21,7 +21,7 @@
 |---|---|
 | [AiService](AiService.md) | `ai.suggestion` |
 | [IdentityService](IdentityService.md) | `identity.principal` |
-| [InventoryService](InventoryService.md) | `inventory.goods_receipt`, `inventory.item`, `inventory.movement` |
+| [InventoryService](InventoryService.md) | `inventory.goods_receipt`, `inventory.inventory_item`, `inventory.movement` |
 | [OrderService](OrderService.md) | `orders.payment` |
 | [TenancyService](TenancyService.md) | `platform.outlet`, `platform.scope` |
 
@@ -473,7 +473,7 @@ Board 2M. **Demand forecast through recipes to quantities per item and per stati
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | outletId | string (uuid) |  |  |
-| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone. |
+| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
 | status | enum (draft, released, superseded, cancelled) | yes |  |
 | basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
 | lines | array of object | yes |  |
@@ -490,7 +490,7 @@ Board 2M. **Demand forecast through recipes to quantities per item and per stati
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | outletId | string (uuid) |  |  |
-| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone. |
+| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
 | status | enum (draft, released, superseded, cancelled) | yes |  |
 | basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
 | lines | array of object | yes |  |
@@ -1916,7 +1916,7 @@ Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft
 | Config scope | outlet |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.menu`, `fnb.menu_item`, `fnb.menu_section`, `fnb.menu_version` |
-| Writes | `cache:idempotency`, `cache:resolution`, `catalogue.product_version`, `fnb.menu` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.menu` |
 | Called by | BO-045 |
 
 **Parameters**
@@ -2226,7 +2226,7 @@ The label matters: planned quantities against the forecast are what make a model
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | outletId | string (uuid) |  |  |
-| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone. |
+| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
 | status | enum (draft, released, superseded, cancelled) | yes |  |
 | basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
 | lines | array of object | yes |  |
@@ -5146,7 +5146,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.menu_item`, `fnb.modifier_group`, `fnb.recipe`, `fnb.recipe_ingredient`, `fnb.substitution_rule`, `inventory.item` |
+| Reads | `cache:idempotency`, `fnb.menu_item`, `fnb.modifier_group`, `fnb.recipe`, `fnb.recipe_ingredient`, `fnb.substitution_rule`, `inventory.inventory_item` |
 | Writes | `cache:idempotency`, `fnb.allergen_verdict`, `fnb.menu_item`, `fnb.recipe`, `fnb.recipe_ingredient` |
 | Called by | BO-111 |
 
@@ -6365,7 +6365,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | outlet_id | uuid | no |  |
-| for_date | date | yes | The trading day this prep list is for, in the Region's time zone. |
+| for_date | date | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
 | status | text | yes |  |
 | based_on_suggestion_id | uuid | no | The forecast it started from. |
 | released_run_ids | text[] | no |  |

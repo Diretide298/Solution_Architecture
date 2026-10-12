@@ -46,6 +46,25 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
+- context: subscription
+  purpose: Apply the rejection to the partner record it was about (agreement, application, change request).
+    decideApprovalRequest runs in commerce and the partner tables are in the control database, which
+    PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+  writes:
+  - control.partner_agreement
+  - control.partner_application
+  - control.partner_change_request
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: marketing
+  purpose: Apply the rejection to the privacy-notice governance record it was about; the marketing schema is
+    MarketingService's, in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+  writes:
+  - marketing.privacy_notice_governance
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: Critical on the owning contract because **a rejected refund left in `pendingApproval` is a refund
   that neither happens nor fails**, and the guest is told nothing.

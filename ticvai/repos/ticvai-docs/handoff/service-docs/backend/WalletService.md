@@ -330,7 +330,7 @@ through `platform.outbox` in the same transaction, and the ledger posts `gameCre
 | Config scope | subject |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `payments.token`, `wallet.auto_reload_setting`, `wallet.funding_rules`, `wallet.wallet` |
+| Reads | `cache:idempotency`, `payments.token`, `wallet.auto_reload_setting`, `wallet.funding_rule`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `cache:resolution`, `wallet.auto_reload_setting` |
 | Called by | BO-416, GST-011, WEB-021 |
 
@@ -683,7 +683,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rules`, `wallet.configuration_version`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rules`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rules`, `wallet.transfer_rules`, `wallet.wallet_type` |
+| Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rule`, `wallet.configuration_version`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rule`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rule_set`, `wallet.transfer_rule`, `wallet.wallet_type` |
 | Writes | `cache:idempotency`, `wallet.configuration_version`, `wallet.configuration_version_snapshot` |
 | Called by | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180, BO-1181 |
 
@@ -732,13 +732,13 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 |---|---|
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `wallet.funding_rules`, `wallet.refund_policy` non-empty |
+| Part of slice | setup, makes `wallet.funding_rule`, `wallet.refund_policy` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `wallet.configuration_version`, `wallet.configuration_version_snapshot` |
-| Writes | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rules`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rules`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rules`, `wallet.transfer_rules`, `wallet.wallet_type` |
+| Writes | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rule`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rule`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rule_set`, `wallet.transfer_rule`, `wallet.wallet_type` |
 | Called by | BO-1162 |
 
 **Parameters**
@@ -788,13 +788,13 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 |---|---|
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `wallet.funding_rules` non-empty |
+| Part of slice | setup, makes `wallet.funding_rule` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `wallet.funding_rules` |
-| Writes | `wallet.funding_rules` |
+| Reads | `wallet.funding_rule` |
+| Writes | `wallet.funding_rule` |
 | Called by | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 |
 
 **Parameters**
@@ -1143,7 +1143,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | updated_at | timestamptz | yes |  |
 | id | uuid | yes | Synthesised key. |
 
-### `wallet.channel_rules`
+### `wallet.channel_rule`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -1237,7 +1237,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | wallet_id | uuid | yes |  |
 | action | text | yes |  |
 | method | text | no |  |
-| amount | numeric(18,4) | yes |  |
+| settled_amount | numeric(18,4) | yes |  |
 | balance_before | numeric(18,4) | no |  |
 | payment_id | uuid | no |  |
 | refund_id | uuid | no |  |
@@ -1247,7 +1247,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | settled_at | timestamptz | yes |  |
 | scope_path | text | no |  |
 
-### `wallet.funding_rules`
+### `wallet.funding_rule`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -1269,8 +1269,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | card_code | text | yes |  |
 | kind | text | no |  |
-| face_value | numeric(18,4) | yes |  |
-| balance | numeric(18,4) | yes |  |
+| face_value_amount | numeric(18,4) | yes |  |
+| balance_amount | numeric(18,4) | yes |  |
 | status | text | yes |  |
 | blocked_reason | text | no |  |
 | issued_at | timestamptz | yes |  |
@@ -1313,14 +1313,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
-### `wallet.risk_rules`
+### `wallet.risk_rule_set`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
-### `wallet.transfer_rules`
+### `wallet.transfer_rule`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -1340,7 +1340,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Added 20 August. |
 | subject_id | uuid | yes |  |
-| balance | numeric(18,4) | yes |  |
+| balance_amount | numeric(18,4) | yes |  |
 | bonus_balance | numeric(18,4) | no | Promotional value. |
 | currency | text | yes |  |
 | status | text | yes |  |
@@ -1354,9 +1354,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | text | yes |  |
 | wallet_id | uuid | no | The wallet this movement is on (SD-027, 29 September). |
-| wallet_hold_id | uuid | no | The hold a spend settled, where it came through holdWalletFunds. |
+| fund_reservation_id | uuid | no | The hold a spend settled, where it came through holdWalletFunds. |
 | kind | text | yes |  |
-| amount | numeric(18,4) | yes |  |
+| transaction_amount | numeric(18,4) | yes |  |
 | balance_after | numeric(18,4) | yes |  |
 | order_id | uuid | no |  |
 | venue_id | uuid | no |  |

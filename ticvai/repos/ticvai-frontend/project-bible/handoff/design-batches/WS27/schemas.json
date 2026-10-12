@@ -596,7 +596,7 @@
  },
  "GroupCustomerOrganizationView": {
   "type": "object",
-  "x-ticvai-persistence": "orders.group_customer_organization + orders.group_customer_organization_contact",
+  "x-ticvai-persistence": "orders.group_customer_organisation + orders.group_customer_organisation_contact",
   "description": "**The organisation a group buys under.** Saved by `setGroupCustomerOrganization` (decided 29 September, readiness close-out); `listGroupCustomerOrganization` is the screen's projection over these.\n",
   "required": [
    "id",
@@ -1146,7 +1146,7 @@
     ]
    },
    "organisationId": {
-    "x-ticvai-references": "orders.group_customer_organization",
+    "x-ticvai-references": "orders.group_customer_organisation",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1259,7 +1259,8 @@
    },
    "productId": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.product"
    },
    "kind": {
     "type": "string",

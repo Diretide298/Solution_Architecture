@@ -428,6 +428,15 @@ paths:
         - "P08 BO-377 Approve & Sensitive Action Confirmation"
         - "P08 BO-378 Reject / Return / Request Information"
         - "P08 BO-940 Manager Mobile Approval Center"
+      x-ticvai-write-via:
+      - table: control.partner_agreement
+        event: approval.granted
+      - table: control.partner_application
+        event: approval.granted
+      - table: control.partner_change_request
+        event: approval.granted
+      - table: marketing.privacy_notice_governance
+        event: approval.granted
       x-ticvai-audience:
       - staff
       - public

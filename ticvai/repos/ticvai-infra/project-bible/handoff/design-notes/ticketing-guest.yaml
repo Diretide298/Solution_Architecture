@@ -2348,7 +2348,8 @@ screens:
         source: screens/P02-guest-mobile-app.yaml#GST-010 navigation
         status: fixed
         by: CHG-SGU-020
-      - what: '"Set a password" (linkGuestCheckout) is drawn but not declared.'
+      - what: The prototype's account offer on the confirmation (linkGuestCheckout) is drawn but not declared; the screen offers "Create an account" (passwordless).
+        note: Reworded 12 October 2026 (CHG-R6-041) so the correction no longer names the prototype's password offer as something to draw.
         why: Declare the operation or drop the action.
         source: screens/P02-guest-mobile-app.yaml#GST-010 wireframe.prototype.differences
         status: fixed

@@ -293,10 +293,22 @@ def validate(entries: list[tuple[str, dict]], schema: dict, ctx) -> tuple[list[s
                     errs.append(f"{where}: reverses {rev} less than 48 hours after it was decided")
         if e.get("status") == "closed" and not re.match(r"^r\d+$", str(e.get("release_tag") or "")):
             errs.append(f"{where}: a closed plan change names the release that carried it (release_tag r<N>)")
+    # **A batch shared by parallel agents is numbered in blocks** (12 October 2026, CHG-R6-051): the lead hands
+    # each agent of one batch its own block of ids (R6: the lead from 001, an agent 050-059, another the next ten),
+    # so two branches never collide on merge. With `id_blocks: {<batch>: <size>}` in changes/schema.yaml the rule is
+    # "no gap inside a block": each block used runs from its first id (001 for the first block) without a gap.
+    blocks = schema.get("id_blocks") or {}
     for b, ns in sorted(batches.items()):
         ns = sorted(ns)
-        if ns != list(range(1, len(ns) + 1)):
-            errs.append(f"{b}: ids are not 001..{len(ns):03d} without gaps (have {', '.join(f'{n:03d}' for n in ns)})")
+        size = int(blocks.get(b.split("-", 1)[1], 0) or 0)
+        groups = {}
+        for n in ns:
+            groups.setdefault(n // size if size else 0, []).append(n)
+        for g, gs in sorted(groups.items()):
+            first = max(1, g * size) if size else 1
+            if gs != list(range(first, first + len(gs))):
+                errs.append(f"{b}: ids are not {first:03d}..{first + len(gs) - 1:03d} without gaps (have "
+                            f"{', '.join(f'{n:03d}' for n in gs)})" + (f" in the block from {first:03d}" if size else ""))
     return errs, warns
 
 
@@ -420,6 +432,16 @@ def self_test(schema: dict) -> list[tuple[str, bool, str]]:
     case("a second batch numbered from 001 passes",
          [(f, good), ("CHG-ABC-001-x.yaml", dict(good, id="CHG-ABC-001"))], True)
     case("a gap in a batch fails", [(f, good), ("CHG-TST-003-x.yaml", dict(good, id="CHG-TST-003"))], False, "without gaps")
+    blocked = dict(schema, id_blocks={"TST": 10})
+    e50 = [(f"CHG-TST-0{n}-x.yaml", dict(good, id=f"CHG-TST-0{n}")) for n in (50, 51)]
+    errs_, _ = validate([(f, good)] + e50, blocked, ctx)
+    out.append(("an agent's block (050, 051) beside the first passes with id_blocks", not errs_, "; ".join(errs_[:2])))
+    errs_, _ = validate([(f, good), ("CHG-TST-052-x.yaml", dict(good, id="CHG-TST-052"))], blocked, ctx)
+    out.append(("a gap inside a block still fails with id_blocks", any("without gaps" in e for e in errs_),
+                "; ".join(errs_[:2]) or "no error"))
+    errs_, _ = validate([(f, good)] + e50, schema, ctx)
+    out.append(("a block without id_blocks for its batch fails", any("without gaps" in e for e in errs_),
+                "; ".join(errs_[:2]) or "no error"))
     case("a duplicate id fails", [(f, good), ("CHG-TST-001-y.yaml", good)], False, "also")
     case("a bad id fails", [("CHG-1-x.yaml", dict(good, id="CHG-1"))], False, "does not match")
     case("a file name that is not the id fails", [("CHG-TST-001.yaml", good)], False, "file name")

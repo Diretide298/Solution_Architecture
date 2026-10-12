@@ -1391,7 +1391,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.store_account
-  columns: 11
+  columns: 15
   store: postgres
   parent: null
   writtenBy:

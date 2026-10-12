@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 85
+  "operationsWithNoScreen": 83
  },
  "waves": {
   "wave1": 4,
@@ -82,15 +82,15 @@
    "operations": 2
   },
   {
-   "contract": "orders",
-   "operations": 1
-  },
-  {
    "contract": "finance",
    "operations": 1
   },
   {
    "contract": "white-label",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -513,12 +513,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listSegregationRules",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the conflicting-permission rules back"
-   },
-   {
     "operation": "listSegregationViolations",
     "contract": "identity",
     "verb": "GET",
@@ -607,12 +601,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "The ledger behind a points balance"
-   },
-   {
-    "operation": "listMessageDispatches",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Messages sent, and whether they arrived"
    },
    {
     "operation": "listRewardAssignments",

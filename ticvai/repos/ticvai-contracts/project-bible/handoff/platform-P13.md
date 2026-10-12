@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 98 |
+| Operations with no screen | 95 |
 | Waves | wave1 26 · wave3 78 |
 
 ## Gaps
 
-### 98 operations with no screen here
+### 95 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,7 +40,6 @@
 | `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
@@ -54,13 +53,14 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
 | `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
-| … | | | 58 more |
+| `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
+| `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
+| … | | | 55 more |
 
 ### 1 modules split across waves
 

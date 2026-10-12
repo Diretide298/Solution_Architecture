@@ -1,4 +1,75 @@
 {
+ "createOrgUnit": {
+  "method": "POST",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "Create a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateScopeNodeRequest",
+  "responds": "OrgUnit"
+ },
+ "getOrgUnit": {
+  "method": "GET",
+  "path": "/org-units/{orgUnitId}",
+  "contract": "tenancy",
+  "summary": "Read a scope node",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrgUnit"
+ },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listTenants": {
   "method": "GET",
   "path": "/tenants",
@@ -32,5 +103,24 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "updateOrgUnit": {
+  "method": "PATCH",
+  "path": "/org-units/{orgUnitId}",
+  "contract": "tenancy",
+  "summary": "Rename or deactivate a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrgUnit"
  }
 }

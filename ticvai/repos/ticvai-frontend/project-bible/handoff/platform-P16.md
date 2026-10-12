@@ -9,12 +9,12 @@
 | Contracts | 10 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 118 |
+| Operations with no screen | 115 |
 | Waves | wave1 4 · wave3 67 |
 
 ## Gaps
 
-### 118 operations with no screen here
+### 115 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,7 +40,6 @@
 | `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
@@ -60,7 +59,8 @@
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
-| … | | | 78 more |
+| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
+| … | | | 75 more |
 
 ### 1 modules split across waves
 

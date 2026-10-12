@@ -210,6 +210,12 @@ App Manager access — Apple Guideline 4.2.6 rejects template apps submitted by 
 
 **D-U-N-S registration has lead time. Start it before it is on the critical path.**
 
+**Apple Wallet pass certificate: the client's** (Chinmay, 12 October 2026; CHG-R6-033). The Pass Type ID
+certificate is created in the client's own Apple Developer account, one per brand. The platform keeps it in Key
+Vault (white-label `StoreAccount.passTypeIdentifier`, `passCertificateSecretRef`, `passCertificateExpiresAt`, sent
+on CMS-104) and warns 30 days before it expires, to the tenant admin and to TICVAI operations
+(`whitelabel.passCertificateExpiring`). Renewal is the client's act in its Apple account.
+
 ## 12. Region placement and branded publishing as priced tiers
 
 **Decision · Qossai**

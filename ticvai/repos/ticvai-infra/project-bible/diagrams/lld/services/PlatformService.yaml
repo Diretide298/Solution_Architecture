@@ -2318,10 +2318,8 @@ tables:
   store: postgres
   parent: control.invoice
   writtenBy:
-  - finance
   - subscription
-  foreignWriters:
-  - finance
+  foreignWriters: null
 - table: control.licence_add_on
   columns: 7
   store: postgres

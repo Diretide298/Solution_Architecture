@@ -1,6 +1,6 @@
 # WS18 — Approval Workflows and Governance board 6
 
-**10 screens · 16 operations · 16 schemas · 5 permissions**
+**10 screens · 17 operations · 16 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `APPROVAL_CONFIGURE, APPROVAL_VIEW, ROLE_MANAGE, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_VIEW, PERMISSION_VIEW, ROLE_MANAGE, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-339` | Governance & Compliance Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-340` | Segregation of Duties Policy Manager | A | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-340` | Segregation of Duties Policy Manager | A | 9 | 4 | 5 | 6 | 1 | 0 | — | notStarted (—) |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | B | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 33 | 6 | 11 | 2 | 0 | — | notStarted (—) |
 | `ADM-343` | Sensitive Action Confirmation | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |

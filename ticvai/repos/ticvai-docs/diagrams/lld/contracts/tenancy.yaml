@@ -655,6 +655,7 @@ operations:
   - control.tenant_domain
   writes:
   - control.tenant_domain
+  - platform.outbox
 - operation: setVenueSettings
   verb: PUT
   path: /venues/{venueId}/settings

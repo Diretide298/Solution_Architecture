@@ -1732,217 +1732,6 @@
   }
  },
  {
-  "id": "BO-121",
-  "name": "Personalized Offers & Guest Engagement",
-  "module": "Sell",
-  "requiresModule": "marketing",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/personalized-offers-guest-engagement",
-   "component": "apps/venue-management-web/src/routes/sell/PersonalizedOffersGuestEngagementList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-121 holds none of them. The edge carries nothing: BO-121 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
-  "density": "compact",
-  "boardFrames": [
-   "Retail Board 5.dc.html#ret-5f"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listSegments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Personalized Offers & Guest Engagement — from the client design board, 20 August.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search",
-       "operation": "listSegments",
-       "notes": "Sends `?search=` to `listSegments`.",
-       "provenance": "contract marketing-crm.yaml GET /segments"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every segment",
-       "bindsTo": "Segment",
-       "columns": [
-        "Segment.name",
-        "Segment.description",
-        "Segment.match",
-        "Segment.lastEvaluatedSize",
-        "Segment.lastEvaluatedAt"
-       ],
-       "operation": "listSegments",
-       "provenance": "contract marketing-crm.yaml GET /segments"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search personalized offers",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected segment",
-       "bindsTo": "Segment",
-       "columns": [
-        "Segment.name",
-        "Segment.description",
-        "Segment.venueId",
-        "Segment.match",
-        "Segment.criteria",
-        "Segment.excludeSegmentIds",
-        "Segment.id",
-        "Segment.lastEvaluatedSize",
-        "Segment.lastEvaluatedAt"
-       ],
-       "operation": "listSegments",
-       "provenance": "contract marketing-crm.yaml GET /segments"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create campaign",
-       "operation": "createCampaign",
-       "provenance": "contract marketing-crm.yaml POST /campaigns"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The personalized offers guest list.",
-   "error": "Could not load. Names which read failed and leaves the personalized offers guest untouched.",
-   "emptyFirstRun": "No personalized offers guest yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on search and the personalized offers guest are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`."
-  },
-  "apis": [
-   {
-    "operationId": "listSegments",
-    "contract": "marketing-crm",
-    "purpose": "List segments",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Create a campaign",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSegments"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "Segment.name",
-    "Segment.description",
-    "Segment.venueId",
-    "Segment.match",
-    "Segment.criteria"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-121",
-   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
-   "source": "Claude Design Retail pack, 24 August",
-   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
-  "overlays": [
-   {
-    "id": "formCreateCampaign",
-    "component": "modal",
-    "trigger": "Create campaign",
-    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCampaignRequest",
-    "confirm": {
-     "label": "Create campaign",
-     "operation": "createCampaign"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "kind",
-      "channel",
-      "segmentId",
-      "content",
-      "venueId",
-      "trigger",
-      "scheduledFor",
-      "consentPurpose",
-      "sendWindow"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /campaigns"
-   }
-  ],
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "BO-1190",
   "name": "Donation Campaigns",
   "module": "Sell",
@@ -2136,6 +1925,350 @@
      "label": "Cancel"
     },
     "provenance": "contract catalogue.yaml POST /donation-campaigns"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1192",
+  "name": "Entitlement Templates",
+  "permission": "PRODUCT_VIEW",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/entitlement-templates",
+   "component": "apps/venue-management-web/src/routes/sell/EntitlementTemplates.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102",
+    "BO-012"
+   ],
+   "exitTo": [
+    "BO-102",
+    "BO-012"
+   ],
+   "inferred": false,
+   "notes": "Reached from BO-102 Sell (Ticketing) and from BO-012 Membership Products, which links here for the templates its memberships grant (client feedback of 6 October 2026, N32; CHG-R6-040).",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Back to Sell",
+     "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+     "back": true
+    },
+    {
+     "to": "BO-012",
+     "trigger": "Membership Products",
+     "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+     "carries": [
+      "productId"
+     ]
+    }
+   ]
+  },
+  "notes": "**Created 12 October 2026 (CHG-R6-040) from the client's feedback of 6 October** (\"entitlement for the tickets ... it's confusing\"; design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no list of ticket entitlements: templates were created only from BO-012 Membership Products and the wave-3 membership builders BO-288 and BO-289. **This screen is that list first**, with the products that use each template, and the template opened whole: what it admits, validity (kind and offsets), re-entry, transfer, limits and blackout dates. `getEntitlementTemplate`, `updateEntitlementTemplate`, `archiveEntitlementTemplate` and the `entitlementTemplateId` filter on `listProducts` were added for it (CHG-R6-040). **An edit applies to entitlements issued from then on**; a pass already sold keeps its rules, except blackout dates, which reach issued entitlements at their next validation. Block B (Chinmay's decision on N32).",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listEntitlementTemplates` reads the population and `getEntitlementTemplate` reads one of them — list, select, act",
+  "purpose": "List the rights the venue's tickets and passes grant, see which products use each, and create, edit or retire one.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "toggle",
+       "label": "Show archived",
+       "notes": "Filters the loaded list on `isActive`; off by default.",
+       "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every entitlement template",
+       "bindsTo": "EntitlementTemplate",
+       "columns": [
+        "EntitlementTemplate.code",
+        "EntitlementTemplate.name",
+        "EntitlementTemplate.validityKind",
+        "EntitlementTemplate.entriesAllowed",
+        "EntitlementTemplate.reentryAllowed",
+        "EntitlementTemplate.isActive"
+       ],
+       "operation": "listEntitlementTemplates",
+       "provenance": "contract catalogue.yaml GET /entitlement-templates"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected template",
+       "bindsTo": "EntitlementTemplate",
+       "columns": [
+        "EntitlementTemplate.name",
+        "EntitlementTemplate.description",
+        "EntitlementTemplate.validityKind",
+        "EntitlementTemplate.validFromOffsetDays",
+        "EntitlementTemplate.validForDays",
+        "EntitlementTemplate.reentryAllowed",
+        "EntitlementTemplate.isTransferable",
+        "EntitlementTemplate.blackoutDates"
+       ],
+       "operation": "getEntitlementTemplate",
+       "provenance": "contract catalogue.yaml GET /entitlement-templates/{templateId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Products using this template",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.code",
+        "Product.name",
+        "Product.kind",
+        "Product.lifecycleState"
+       ],
+       "operation": "listProducts",
+       "notes": "Sends `?entitlementTemplateId=` the selected template to `listProducts` (CHG-R6-040). Each row opens the product (BO-012 for a membership).",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "New template",
+       "operation": "createEntitlementTemplate",
+       "provenance": "contract catalogue.yaml POST /entitlement-templates"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Edit template",
+       "operation": "updateEntitlementTemplate",
+       "provenance": "contract catalogue.yaml PATCH /entitlement-templates/{templateId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set blackout dates",
+       "operation": "setEntitlementTemplateBlackoutDates",
+       "provenance": "contract catalogue.yaml PUT /entitlement-templates/{templateId}/blackout-dates"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive template",
+       "operation": "archiveEntitlementTemplate",
+       "notes": "Disabled, naming the products, while Products using this template lists one that is not retired (`409 template-in-use`).",
+       "provenance": "contract catalogue.yaml POST /entitlement-templates/{templateId}/archive"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue's entitlement templates, read by `listEntitlementTemplates`.",
+   "error": "Could not load. Names which read failed and leaves the templates untouched.",
+   "emptyFirstRun": "No entitlement templates yet. Offers New template (`createEntitlementTemplate`); a product created before one exists grants nothing at the gate.",
+   "emptyNoResults": "Show archived is off and every template is archived. Offers to show them.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listEntitlementTemplates` requires to show this screen, and names that permission. **Never an empty table.** A caller who can see the screen but lacks `PRODUCT_CONFIGURE` sees New template, Edit template, Set blackout dates and Archive template disabled, naming that permission.",
+   "validation": "`400` on a missing code, name or validity kind, or offsets that do not fit the kind; marked on the step and field it belongs to.",
+   "conflict": "`409 template-in-use` on Archive names the products still granting it, from Products using this template; `409 template-archived` on Save says the template was archived meanwhile and reloads it."
+  },
+  "apis": [
+   {
+    "operationId": "listEntitlementTemplates",
+    "contract": "catalogue",
+    "purpose": "Every template the venue has",
+    "trigger": "onLoad",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)"
+   },
+   {
+    "operationId": "getEntitlementTemplate",
+    "contract": "catalogue",
+    "purpose": "The selected template, whole",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The products that use the selected template",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)"
+   },
+   {
+    "operationId": "createEntitlementTemplate",
+    "contract": "catalogue",
+    "purpose": "Create a template, step by step",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "invalidates": [
+     "listEntitlementTemplates"
+    ]
+   },
+   {
+    "operationId": "updateEntitlementTemplate",
+    "contract": "catalogue",
+    "purpose": "Edit a template's rules for what is issued from now on",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "invalidates": [
+     "listEntitlementTemplates"
+    ]
+   },
+   {
+    "operationId": "setEntitlementTemplateBlackoutDates",
+    "contract": "catalogue",
+    "purpose": "Replace the dates the template does not admit",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "invalidates": [
+     "listEntitlementTemplates"
+    ]
+   },
+   {
+    "operationId": "archiveEntitlementTemplate",
+    "contract": "catalogue",
+    "purpose": "Retire a template no product still grants",
+    "trigger": "onAction",
+    "provenance": "decided 12 October 2026, Chinmay (CHG-R6-040)",
+    "invalidates": [
+     "listEntitlementTemplates"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Opened without it, the screen lists the templates with `listEntitlementTemplates` and the user picks one; an edge that holds one may carry it to open on that template."
+    }
+   ],
+   "coldEntry": "Resolves the tenant and venue from the session; a template that is gone is said to be gone, and the list is shown."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1192"
+  },
+  "overlays": [
+   {
+    "id": "formCreateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "New template",
+    "body": "**Numbered steps, each with its own fields, then a check** (the builder pattern, design-r1/COMMAND.md ADDED 6 Oct): 1 What it admits (`code`, `name`, `description`, `fastTrackTier`); 2 Validity (`validityKind`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `validTimeWindows`, `expiryAnchor`, `expiryDate`, `expiryNoticeDays`); 3 Re-entry (`reentryAllowed`); 4 Transfer (`isTransferable`, `isNameBound`); 5 Limits (`entriesAllowed`, `purchaseEligibility`); 6 Blackout dates (`blackoutDates`); 7 Check: the rules read back in words before `createEntitlementTemplate` is called. Required: `code`, `name`, `validityKind`. Dismissing sends nothing. Not asked, because the server sets it (readOnly in the contract): `id`.",
+    "bindsTo": "EntitlementTemplate",
+    "confirm": {
+     "label": "Create template",
+     "operation": "createEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "validityKind"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates"
+   },
+   {
+    "id": "formUpdateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Edit template",
+    "body": "**The same steps as New template, opened on the template's values**, without the code (fixed once created) and without blackout dates (Set blackout dates). Only what changed is sent to `updateEntitlementTemplate`. Says before saving that the change applies to entitlements issued from now on.",
+    "bindsTo": "UpdateEntitlementTemplateRequest",
+    "confirm": {
+     "label": "Save template",
+     "operation": "updateEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract catalogue.yaml PATCH /entitlement-templates/{templateId}"
+   },
+   {
+    "id": "formSetEntitlementTemplateBlackoutDates",
+    "component": "modal",
+    "trigger": "Set blackout dates",
+    "body": "**Collects what `setEntitlementTemplateBlackoutDates` sends.** Required: `blackoutDates`, the whole list (an empty list clears it). Optional: `reason`. Says that issued entitlements apply it at their next validation and a date already admitted on is not undone.",
+    "confirm": {
+     "label": "Save blackout dates",
+     "operation": "setEntitlementTemplateBlackoutDates"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "blackoutDates",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /entitlement-templates/{templateId}/blackout-dates"
+   },
+   {
+    "id": "confirmArchiveEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Archive template",
+    "body": "**Archive *Annual Pass — Adult*?** No new product can use it, and archiving is final. Passes already sold keep their rules and still admit. Optional: `reason`. `archiveEntitlementTemplate`.",
+    "confirm": {
+     "label": "Archive template",
+     "operation": "archiveEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates/{templateId}/archive"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**No versions or publish step for a template.** The builder pattern ends in check, publish and versions; a template has no draft state or version history in the contract, so a save is live for what is issued from then on and the screen shows no version list (CHG-R6-040).",
+    "source": "contracts/spine/catalogue.yaml#EntitlementTemplate | design-r1/COMMAND.md ADDED 6 Oct"
+   },
+   {
+    "operation": null,
+    "why": "**The ticket creator's Entitlement step is not drawn here.** `createProduct` already takes `entitlementTemplateId`; a step on the product screens (BO-007, BO-008) that picks or creates a template is a change to those started tickets and waits for its own delta (CHG-R6-040).",
+    "source": "contracts/spine/catalogue.yaml#CreateProductRequest | design-r1/COMMAND.md ADDED 6 Oct"
    }
   ],
   "_platform": {

@@ -781,7 +781,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | Block D · task VM-BO-748 |
-| Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `TENANT_CONFIGURE` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -872,7 +872,7 @@ evidence:
 
 #### Permissions
 
-- `recordConsent` → no permission · guest, staff
+- `recordConsent` → `GUEST_MANAGE` (configure) · guest, staff
 - `listPolicies` → `TENANT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -921,7 +921,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every state opens from `#BO-748?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-744`.
-- [ ] Every gated control is gated: `TENANT_CONFIGURE`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `TENANT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1699,7 +1699,7 @@ Method, path, parameters, request and response for every operation these screens
 "listPrivacyCompliance": {"method":"GET","path":"/privacy-compliance","contract":"marketing-crm","summary":"Privacy Analytics & AI Compliance Intelligence","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"brandId","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"consentPurpose","in":"query","required":false},{"name":"segmentId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"policyVersion","in":"query","required":false},{"name":"language","in":"query","required":false}],"requestBody":null,"responds":"PrivacyAnalyticsAiComplianceIntelligenceView"},
 "listPrivacyEvidenceCompliance": {"method":"GET","path":"/privacy-evidence-compliance","contract":"marketing-crm","summary":"Privacy Audit, Evidence & Compliance Reporting","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"action","in":"query","required":false},{"name":"report","in":"query","required":false},{"name":"subjectId","in":"query","required":false},{"name":"requestId","in":"query","required":false},{"name":"actorPrincipalId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "mergeGuests": {"method":"POST","path":"/guests/merge","contract":"marketing-crm","summary":"Two records, one person","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MergeResult"},
-"recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
+"recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
 "recordPrivacyIncident": {"method":"POST","path":"/privacy-incidents","contract":"marketing-crm","summary":"Log a personal-data breach and start the clock","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PrivacyIncident","responds":"PrivacyIncident"},
 "runDataRetention": {"method":"POST","path":"/retention-runs","contract":"marketing-crm","summary":"Preview or execute a retention pass","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RetentionRunResult"},
 "setCommunicationPreferenceMarketing": {"method":"PUT","path":"/communication-preference-marketing","contract":"marketing-crm","summary":"Communication Preference & Marketing Permission Configuration","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CommunicationPreferenceMarketingPermissionConfiguratInput","responds":"CommunicationPreferenceMarketingPermissionConfiguratView"},

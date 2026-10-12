@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 207 state models and 77 events
+title: 207 state models and 87 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -3435,6 +3435,8 @@ events:
     level.
 - event: assets-documentIndexed
   description: Text was extracted from an uploaded document and is ready to embed.
+- event: biometric-enrolmentChanged
+  description: A Face Pass or Face Tag enrolment was made, re-enrolled after review, or removed.
 - event: cart-abandoned
   description: A cart lapsed without checking out.
 - event: catalogue-productPublished
@@ -3464,17 +3466,28 @@ events:
   description: A ticket or pass a guest still holds expires within its template's notice period.
 - event: entitlement-issued
   description: A right to admission, a meal, a locker or a rental now exists.
+- event: entitlement-reissued
+  description: An expired entitlement was reissued at zero value for a later date. The old one is superseded
+    (cancellationKind superseded) and a new one is valid for the new date.
+- event: entitlement-shareChanged
+  description: A holder let somebody else use an entitlement without giving it away, or took that share
+    back.
 - event: entitlement-statusChanged
   description: An entitlement was frozen, suspended, reinstated or had its validity moved by a renewal.
 - event: entitlement-transferred
   description: An entitlement changed holder — a guest's transfer was claimed, or a resale completed.
     The same entitlement, a new owner.
+- event: entitlement-voided
+  description: One ticket was voided before settlement, within the same shift. The entitlement is cancelled
+    (cancellationKind voided) and stops admitting.
 - event: fnb-kitchenTicketCreated
   description: A kitchen ticket exists for a preparation station, from a till sale or a guest order.
 - event: fnb-menuPublished
   description: A menu is live at an outlet.
 - event: fnb-orderReady
   description: Food is ready to hand over.
+- event: guest-merged
+  description: Two guest records were found to be one person and merged into a survivor.
 - event: identity-credentialResetRequested
   description: Somebody asked for a password or PIN to be reset — a guest asked for a reset code, or
     a supervisor reset a member of staff's credential.
@@ -3485,6 +3498,9 @@ events:
   description: A purchase order is fully received.
 - event: inventoryHold-expired
   description: An active inventory hold passed its expiry and its units went back to remaining.
+- event: invitation-issued
+  description: A complimentary invitation was issued against an allowance, with no payment expected.
+    Its entitlements are to be issued.
 - event: ledger-journalPosted
   description: A journal entry has been posted and is now immutable.
 - event: ledger-periodClosed
@@ -3522,6 +3538,8 @@ events:
   description: Money was taken against an order, by a till, the guest web, or a provider webhook confirming
     a 3-D Secure or terminal payment. One event per captured payment, whether or not the order is now
     paid in full.
+- event: paymentToken-stored
+  description: A guest saved a payment method for future use, and consented to its storage.
 - event: performance-cancelled
   description: A performance was cancelled and everyone holding a ticket must be made whole.
 - event: promotions-recommendationStrategyPublished
@@ -3529,6 +3547,8 @@ events:
     while live, or the product relationships or suppressions it ranks with were set.
 - event: reporting-definitionPublished
   description: A report definition is available to run.
+- event: reporting-questionAnswered
+  description: A natural-language reporting question was answered through the semantic layer.
 - event: retail-merchandisePublished
   description: Merchandise is on sale.
 - event: seat-blocked
@@ -3552,9 +3572,13 @@ events:
   description: An entry replayed by an offline device was refused on its merits and quarantined.
 - event: tenant-suspended
   description: A tenant has been suspended, in one of three modes.
+- event: tenantDomain-mapped
+  description: A hostname was routed to a tenant, re-routed, or released.
 - event: wallet-credited
   description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
 - event: wallet-debited
   description: Money left a wallet's available balance, held for a spend or captured.
 - event: whitelabel-contentPublished
   description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.
+- event: whitelabel-passCertificateExpiring
+  description: A brand's Apple Wallet Pass Type ID certificate expires within 30 days.

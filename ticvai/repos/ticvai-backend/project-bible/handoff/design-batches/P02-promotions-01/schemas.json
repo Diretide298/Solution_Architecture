@@ -12,6 +12,7 @@
     "type": "string"
    },
    "campaignId": {
+    "x-ticvai-references": "promotions.coupon_campaign",
     "type": "string",
     "format": "uuid"
    },

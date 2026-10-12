@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 32,
@@ -15,7 +15,7 @@
   "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 153
+  "operationsWithNoScreen": 150
  },
  "waves": {
   "wave1": 32
@@ -80,15 +80,11 @@
    "operations": 7
   },
   {
-   "contract": "promotions",
-   "operations": 5
-  },
-  {
    "contract": "marketing-crm",
    "operations": 5
   },
   {
-   "contract": "reporting",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -96,15 +92,19 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 4
+   "contract": "reporting",
+   "operations": 5
   },
   {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "workforce",
+   "contract": "approvals",
+   "operations": 4
+  },
+  {
+   "contract": "wallet",
    "operations": 2
   },
   {
@@ -112,15 +112,15 @@
    "operations": 2
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "inventory",
+   "contract": "games",
    "operations": 1
   },
   {
-   "contract": "games",
+   "contract": "inventory",
    "operations": 1
   }
  ],
@@ -591,12 +591,6 @@
     "summary": "Extend a lease TTL"
    },
    {
-    "operation": "setEntitlementTemplateBlackoutDates",
-    "contract": "catalogue",
-    "verb": "PUT",
-    "summary": "Set the dates a product's entitlement does not admit"
-   },
-   {
     "operation": "setEventChangeTreatmentPolicy",
     "contract": "catalogue",
     "verb": "PUT",
@@ -783,12 +777,6 @@
     "summary": "The module tree permissions are grouped under"
    },
    {
-    "operation": "listSegregationRules",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the conflicting-permission rules back"
-   },
-   {
     "operation": "listSegregationViolations",
     "contract": "identity",
     "verb": "GET",
@@ -895,12 +883,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "The ledger behind a points balance"
-   },
-   {
-    "operation": "listMessageDispatches",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Messages sent, and whether they arrived"
    },
    {
     "operation": "listRewardAssignments",

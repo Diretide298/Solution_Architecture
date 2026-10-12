@@ -146,6 +146,20 @@ DECIDED = [
     # "Create an account" (email, code, verify), never "Set a password" (4 October 2026, CHG-R11-002).
     ("CHG-R11-002", "WEB-013", "passwordless", "linkGuestCheckout"),
     ("CHG-R11-002", "GST-010", "passwordless", "linkGuestCheckout"),
+    # Venue Management keeps its organisation tree and its entitlement templates list (client feedback of 6 October,
+    # N32; Chinmay, 12 October 2026, CHG-R6-040): the two screens and the reads and writes they were made for.
+    ("CHG-R6-040", "BO-1191", "with", "listOrgUnits"),
+    ("CHG-R6-040", "BO-1191", "with", "createOrgUnit"),
+    ("CHG-R6-040", "BO-1191", "with", "updateOrgUnit"),
+    ("CHG-R6-040", "BO-1192", "with", "listEntitlementTemplates"),
+    ("CHG-R6-040", "BO-1192", "with", "getEntitlementTemplate"),
+    ("CHG-R6-040", "BO-1192", "with", "updateEntitlementTemplate"),
+    ("CHG-R6-040", "BO-1192", "with", "archiveEntitlementTemplate"),
+    ("CHG-R6-040", "BO-1192", "with", "listProducts"),
+    # ADM-340 reads the segregation rules it replaces (r1 gate READ; CHG-R6-042)
+    ("CHG-R6-042", "ADM-340", "with", "listSegregationRules"),
+    # checkoutCart is the one way a guest order is created (Chinmay, 12 October 2026, CHG-R6-045)
+    ("CHG-R6-045", "GST-009", "without", "createOrder"),
 ]
 # READ outside Block A: 545 on 3 October (430 screens with no read, 115 edits with no read back), found
 # by the rule that fixed the 47 in Block A (CHG-R1S-004); 574 once the same day's lineage fix (CHG-R1S-005)
@@ -211,7 +225,9 @@ def decided(S) -> list:
             # and its design notes (CHG-R4-007, 6 October: GST-010's notes still offered "Set a password" from the
             # prototype after CHG-R11-002): no action or output of the screen's design notes sets a password
             for note in _design_notes().get(sid, []):
-                for part in ("actions", "outputs", "inputs"):
+                # and its corrections (CHG-R6-041, 12 October: a fixed correction still quoted "Set a password", and
+                # the design batch prints fixed corrections as "Fixed on main ... draw what it says")
+                for part in ("actions", "outputs", "inputs", "corrections"):
                     for item in note.get(part) or []:
                         txt = " ".join(str(v) for k, v in (item or {}).items() if k != "source").lower()
                         if "set a password" in txt or "password field" in txt.replace("no password field", ""):

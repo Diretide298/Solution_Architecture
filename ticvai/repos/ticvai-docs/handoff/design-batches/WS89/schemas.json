@@ -394,6 +394,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },

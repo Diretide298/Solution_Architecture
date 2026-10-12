@@ -403,7 +403,6 @@ operations:
   - orders.refund
   writes:
   - cache:idempotency
-  - control.invoice_line
   - ledger.credit_memo
   - ledger.credit_memo_line
   - ledger.tax_invoice

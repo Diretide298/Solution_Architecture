@@ -207,6 +207,10 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
 | accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. (nullable) |
 | accounts[].hasApiCredential | boolean |  | (read-only) |
+| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
+| accounts[].passCertificateSecretRef | string |  | The Pass Type ID certificate (its .p12 and password), from the client's Apple Developer account, sent once and kept in Key Vault; this is its reference, as apiCredentialSecretRef is. (nullable) |
+| accounts[].hasPassCertificate | boolean |  | (read-only) |
+| accounts[].passCertificateExpiresAt | string (date-time) |  | When the pass certificate expires, read from the certificate when it is stored (CHG-R6-033). (read-only; nullable) |
 | accounts[].listing | object |  | The store listing. |
 | accounts[].listing.appName | LocalisedText |  | Keyed by ISO 639-1 code. |
 | accounts[].listing.subtitle | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -387,6 +391,10 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
 | accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. (nullable) |
 | accounts[].hasApiCredential | boolean |  | (read-only) |
+| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
+| accounts[].passCertificateSecretRef | string |  | The Pass Type ID certificate (its .p12 and password), from the client's Apple Developer account, sent once and kept in Key Vault; this is its reference, as apiCredentialSecretRef is. (nullable) |
+| accounts[].hasPassCertificate | boolean |  | (read-only) |
+| accounts[].passCertificateExpiresAt | string (date-time) |  | When the pass certificate expires, read from the certificate when it is stored (CHG-R6-033). (read-only; nullable) |
 | accounts[].listing | object |  | The store listing. |
 | accounts[].listing.appName | LocalisedText |  | Keyed by ISO 639-1 code. |
 | accounts[].listing.subtitle | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -412,6 +420,10 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
 | accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. (nullable) |
 | accounts[].hasApiCredential | boolean |  | (read-only) |
+| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
+| accounts[].passCertificateSecretRef | string |  | The Pass Type ID certificate (its .p12 and password), from the client's Apple Developer account, sent once and kept in Key Vault; this is its reference, as apiCredentialSecretRef is. (nullable) |
+| accounts[].hasPassCertificate | boolean |  | (read-only) |
+| accounts[].passCertificateExpiresAt | string (date-time) |  | When the pass certificate expires, read from the certificate when it is stored (CHG-R6-033). (read-only; nullable) |
 | accounts[].listing | object |  | The store listing. |
 | accounts[].listing.appName | LocalisedText |  | Keyed by ISO 639-1 code. |
 | accounts[].listing.subtitle | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -6605,6 +6617,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | app_identifier | text | yes | The bundle id (Apple) or application id (Google) the app is signed with. |
 | api_credential_secret_ref | text | no | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. |
 | has_api_credential | boolean | no |  |
+| pass_type_identifier | text | no | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). |
+| pass_certificate_secret_ref | text | no | The Pass Type ID certificate (its .p12 and password), from the client's Apple Developer account, sent once and kept in Key Vault; this is its reference, as apiCredentialSecretRef is. |
+| has_pass_certificate | boolean | no |  |
+| pass_certificate_expires_at | timestamptz | no | When the pass certificate expires, read from the certificate when it is stored (CHG-R6-033). |
 | listing | jsonb | no | The store listing. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | updated_at | timestamptz | no |  |

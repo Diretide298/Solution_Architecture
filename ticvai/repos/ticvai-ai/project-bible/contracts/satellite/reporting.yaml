@@ -815,7 +815,10 @@ paths:
 
         **Dates (decided 28 September, audit R158).** With no `dateFrom` or `dateTo` the run covers today
         in the venue''s time zone, and a range longer than the definition''s `maxDateRangeDays` (366 when
-        the definition sets none) is a 400.
+        the definition sets none) is a 400. **A day is a business day** (12 October 2026, CHG-R6-032):
+        `dateFrom`, `dateTo` and today are business dates, each closing at the venue''s `businessDayCutoff`
+        (tenancy `VenueSettings`, default 00:00, the calendar day), so a daily report counts a 01:30 sale on
+        the day it traded.
 
         Scope is applied from the caller''s resolved permissions. Parameters narrow; they never widen.
 
@@ -1674,6 +1677,9 @@ paths:
         - "P16 ANL-019 AI Management Insights"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
         - "P16 ANL-056 Root-Cause Analysis Explorer"
+      x-ticvai-write-via:
+      - table: ai.activity
+        event: reporting.questionAnswered
       x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
@@ -1799,6 +1805,9 @@ paths:
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
+      x-ticvai-write-via:
+      - table: ai.activity
+        event: reporting.definitionPublished
       x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
@@ -2125,7 +2134,8 @@ paths:
         are seeded at provisioning for every tenant, so a hub can ask for them by code without knowing
         an id: `takings`, the money taken in the period less the money paid back (currency; defined in
         `ReportingSystemKpi`, CHG-FIN-010), and `admissions`, admitted in-direction scans in the period
-        (count, from `access.scan_event`). With no `period`, the period is today in the venue''s time zone.
+        (count, from `access.scan_event`). With no `period`, the period is today in the venue''s time zone:
+        the venue''s business day (closing at its `businessDayCutoff`, tenancy `VenueSettings`, default 00:00; CHG-R6-032).
         The back-office hubs and the Queue Monitor read their takings and admissions tiles here.
         **Takings is not revenue** and never feeds a Gross sales, Net revenue, Recognised revenue or
         Deferred revenue tile (CHG-FIN-002).
@@ -2269,7 +2279,8 @@ paths:
       parameters:
       - name: date
         in: query
-        description: The service day, in the venue's time zone; today where absent.
+        description: The service day, a business date closing at the venue's `businessDayCutoff` (tenancy
+          `VenueSettings`, default 00:00; CHG-R6-032), in the venue's time zone; today where absent.
         schema:
           type: string
           format: date
@@ -3878,6 +3889,7 @@ components:
           description: The till shift (`orders.pos_shift`) the reading belongs to, where it was taken
             for a workstation with a shift open. Null otherwise. `listAlerts` filters on it.
         itemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
           nullable: true
@@ -4552,7 +4564,8 @@ components:
           type: string
           format: date
           description: Defaults to today in the venue's time zone when not sent (decided 28 September,
-            audit R158).
+            audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`,
+            default 00:00; CHG-R6-032).
         dateTo:
           type: string
           format: date

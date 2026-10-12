@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 77 |
-| Operations | 218 |
+| Operations | 219 |
 | Contracts | 19 |
 | Modules | 17 |
 | Undrawn | 0 |
-| Operations with no screen | 16 |
+| Operations with no screen | 14 |
 | Waves | wave1 77 |
 
 ## Gaps
 
-### 16 operations with no screen here
+### 14 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -22,8 +22,6 @@
 |---|---|---|---|
 | `createParkingEntitlement` | access | POST | A guest bought parking |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
@@ -69,9 +67,9 @@
 | `GST-004` | Item Detail | Discovery & Browse | 1 | 7 | yes |
 | `GST-005` | What's On | Discovery & Browse | 1 | 2 | yes |
 | `GST-006` | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 | yes |
-| `GST-007` | Select Date & Time | Booking & Selection | 1 | 9 | yes |
+| `GST-007` | Select Date & Time | Booking & Selection | 1 | 11 | yes |
 | `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 6 | yes |
-| `GST-009` | Review & Payment | Cart & Checkout | 1 | 9 | yes |
+| `GST-009` | Review & Payment | Cart & Checkout | 1 | 8 | yes |
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 5 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 1 | 8 | yes |
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 6 | yes |

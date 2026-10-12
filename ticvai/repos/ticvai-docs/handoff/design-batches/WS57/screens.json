@@ -1814,6 +1814,14 @@
        "kind": "selectField",
        "label": "Collection",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 14 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket credential",
+       "bindsTo": "ChannelFeesPaymentFulfillmentConfigurationInput.ticketCredentialFormat",
+       "operation": "setChannelFeePayment",
+       "notes": "Platform signed QR (the default), Static signed QR, RFID card. **A partner's or reseller's channel can issue its tickets without dynamic QR** (MoM 2 Sep 2026 §4.7, MOM-0330): ticket issuing (`issueOrderEntitlements`) reads it for every order sold through this channel, after the product's own override on BO-177.",
+       "provenance": "contract catalogue.yaml ChannelFeesPaymentFulfillmentConfigurationInput.ticketCredentialFormat (12 October 2026, CHG-R6-031)"
       }
      ]
     },

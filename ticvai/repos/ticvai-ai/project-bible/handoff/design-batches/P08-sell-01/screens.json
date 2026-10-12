@@ -816,6 +816,26 @@
        "operation": "updateProductVariant",
        "notes": "**The words and codes on one variant**: its name, the description a guest reads behind the (i) on a ticket-type row (at most 300 characters per language, decided 29 September, rev 3 23SEP-6), its barcode, and whether it is the default. The combination of values and the SKU come from the attributes and are not edited here. A retired variant is refused `409`.",
        "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check the impact",
+       "operation": "assessProductChange",
+       "notes": "Sends the unsaved product edit to `assessProductChange` before Save product and shows what it would touch (Change impact, below). Nothing is written.",
+       "provenance": "contract catalogue.yaml POST /products/{productId}/change-impact"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Clone product",
+       "operation": "cloneProduct",
+       "provenance": "contract catalogue.yaml POST /products/{productId}/clone"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Restore this version",
+       "operation": "restoreProductVersion",
+       "notes": "On the row picked in Versions; the current version is never offered.",
+       "provenance": "contract catalogue.yaml POST /products/{productId}/versions/{version}/restore"
       }
      ]
     },
@@ -823,6 +843,34 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
+      {
+       "kind": "dataTable",
+       "label": "Versions",
+       "bindsTo": "ProductVersion",
+       "columns": [
+        "ProductVersion.version",
+        "ProductVersion.publishedAt",
+        "ProductVersion.note",
+        "ProductVersion.isCurrent"
+       ],
+       "operation": "listProductVersions",
+       "notes": "What this product used to be, newest first; the row Restore this version puts back.",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/versions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Change impact",
+       "bindsTo": "ProductChangeImpact",
+       "columns": [
+        "ProductChangeImpact.entitlementsIssued",
+        "ProductChangeImpact.ordersAffected",
+        "ProductChangeImpact.futurePerformances",
+        "ProductChangeImpact.openCarts",
+        "ProductChangeImpact.blockedBy"
+       ],
+       "operation": "assessProductChange",
+       "provenance": "contract catalogue.yaml POST /products/{productId}/change-impact"
+      },
       {
        "kind": "selectField",
        "label": "Booking flow",
@@ -1097,6 +1145,42 @@
      ]
     },
     "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
+   },
+   {
+    "id": "formCloneProduct",
+    "component": "modal",
+    "trigger": "Clone product",
+    "body": "**Collects what `cloneProduct` sends before it is called.** Required: `code` (a new code; a code in use is refused), `name`. Optional: `includeVariants`. The copy is a new draft. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Clone product",
+     "operation": "cloneProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "includeVariants"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/clone"
+   },
+   {
+    "id": "formRestoreProductVersion",
+    "component": "modal",
+    "trigger": "Restore this version",
+    "body": "**Collects what `restoreProductVersion` sends before it is called.** Required: `note`, why this version is put back. The version is the row picked in Versions. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Restore this version",
+     "operation": "restoreProductVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/versions/{version}/restore"
    }
   ],
   "gaps": [
@@ -2980,7 +3064,8 @@
    "exitTo": [
     "BO-007",
     "BO-008",
-    "BO-009"
+    "BO-009",
+    "BO-1192"
    ],
    "inferred": true,
    "entryFrom": [
@@ -3008,6 +3093,14 @@
      "to": "BO-009",
      "trigger": "Pricing Rules",
      "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+    },
+    {
+     "to": "BO-1192",
+     "trigger": "Entitlement Templates",
+     "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },

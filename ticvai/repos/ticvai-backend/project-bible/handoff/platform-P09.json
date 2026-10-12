@@ -7,7 +7,7 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 211,
@@ -15,7 +15,7 @@
   "contracts": 15,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 104
+  "operationsWithNoScreen": 102
  },
  "waves": {
   "wave1": 28,
@@ -175,7 +175,7 @@
    "operations": 2
   },
   {
-   "contract": "payments",
+   "contract": "catalogue",
    "operations": 1
   },
   {
@@ -183,7 +183,7 @@
    "operations": 1
   },
   {
-   "contract": "catalogue",
+   "contract": "payments",
    "operations": 1
   }
  ],
@@ -2271,12 +2271,6 @@
     "summary": "Extend a lease TTL"
    },
    {
-    "operation": "setEntitlementTemplateBlackoutDates",
-    "contract": "catalogue",
-    "verb": "PUT",
-    "summary": "Set the dates a product's entitlement does not admit"
-   },
-   {
     "operation": "setEventChangeTreatmentPolicy",
     "contract": "catalogue",
     "verb": "PUT",
@@ -2401,12 +2395,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "The module tree permissions are grouped under"
-   },
-   {
-    "operation": "listSegregationRules",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the conflicting-permission rules back"
    },
    {
     "operation": "listSegregationViolations",

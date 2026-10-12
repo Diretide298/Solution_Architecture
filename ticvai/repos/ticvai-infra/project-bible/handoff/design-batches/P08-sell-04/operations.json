@@ -1,4 +1,23 @@
 {
+ "createCampaign": {
+  "method": "POST",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Create a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCampaignRequest",
+  "responds": "Campaign"
+ },
  "createSaleBoard": {
   "method": "POST",
   "path": "/sale-boards",
@@ -198,6 +217,11 @@
     "required": null
    },
    {
+    "name": "entitlementTemplateId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "segmentTag",
     "in": "query",
     "required": null
@@ -244,6 +268,35 @@
   ],
   "requestBody": null,
   "responds": "SaleBoard"
+ },
+ "listSegments": {
+  "method": "GET",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listStoreRules": {
   "method": "GET",

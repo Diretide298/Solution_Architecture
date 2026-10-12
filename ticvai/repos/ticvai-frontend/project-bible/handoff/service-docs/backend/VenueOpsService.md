@@ -2510,8 +2510,8 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
 | Guest callable | True |
-| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `venuemap.map`, `venuemap.placed_resource` |
-| Writes | `resources.resource_hold` |
+| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation`, `venuemap.map`, `venuemap.placed_resource` |
+| Writes | `resources.resource_reservation` |
 | Called by | GST-074, WEB-047 |
 | State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): created as `held` |
 
@@ -2679,8 +2679,8 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `resources.resource_hold` |
-| Writes | `resources.resource_hold` |
+| Reads | `resources.resource_reservation` |
+| Writes | `resources.resource_reservation` |
 | Called by | GST-074, WEB-047 |
 
 **Parameters**
@@ -2741,7 +2741,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Guest callable | True |
-| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `venuemap.map`, `venuemap.map_version`, `venuemap.placed_resource` |
+| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation`, `venuemap.map`, `venuemap.map_version`, `venuemap.placed_resource` |
 | Writes | - |
 | Called by | GST-058, GST-074, WEB-047 |
 
@@ -2810,7 +2810,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold` |
+| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation` |
 | Writes | - |
 | Called by | BO-096, BO-857, BO-866, WEB-031 |
 
@@ -2858,7 +2858,7 @@ The countdown's source of truth, as `seating.getSeatHold`.
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Guest callable | True |
-| Reads | `resources.resource_hold` |
+| Reads | `resources.resource_reservation` |
 | Writes | - |
 | Called by | GST-041, GST-074, WEB-010, WEB-047 |
 
@@ -2917,7 +2917,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `resources.resource_requirement`, `resources.resource_schedule` |
+| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation`, `resources.resource_requirement`, `resources.resource_schedule` |
 | Writes | - |
 | Called by | GST-075, WEB-048 |
 
@@ -2997,8 +2997,8 @@ The guest picked another cabana or left the map. The resource is free at once.
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `resources.resource_hold` |
-| Writes | `cache:idempotency`, `resources.resource_hold` |
+| Reads | `cache:idempotency`, `resources.resource_reservation` |
+| Writes | `cache:idempotency`, `resources.resource_reservation` |
 | Called by | GST-074, WEB-047 |
 | State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `released` |
 
@@ -5357,7 +5357,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `orders.cart`, `orders.cart_line`, `promotions.bundle`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line`, `venuemap.visit_plan` |
+| Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart`, `orders.cart_line`, `venuemap.visit_plan` |
 | Called by | GST-053, WEB-050 |
 
 **Parameters**
@@ -6251,26 +6251,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | created_by | uuid | no |  |
 | scope_path | text | no |  |
 
-### `resources.resource_hold`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| map_id | uuid | yes |  |
-| resource_ids | text[] | yes |  |
-| valid_from | timestamptz | yes |  |
-| valid_to | timestamptz | yes |  |
-| party_size | integer | no |  |
-| status | text | yes |  |
-| gross_amount | numeric(18,4) | no |  |
-| held_by_principal_id | uuid | no |  |
-| subject_id | uuid | no |  |
-| order_id | uuid | no | Set when the order converts it. |
-| extension_count | integer | no |  |
-| created_at | timestamptz | yes |  |
-| expires_at | timestamptz | yes |  |
-| scope_path | text | no | The partition key (ADR-0005), written at venue scope. |
-
 ### `resources.resource_package`
 
 | Column | Type | Required | Notes |
@@ -6305,6 +6285,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | package_id | uuid | no | The package this requirement is a component of (4 October 2026, CHG-FXC-003). |
 | product_id | uuid | no | The experience product this requirement belongs to (setExperienceResourceRequirements). |
+
+### `resources.resource_reservation`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| map_id | uuid | yes |  |
+| resource_ids | text[] | yes |  |
+| valid_from | timestamptz | yes |  |
+| valid_to | timestamptz | yes |  |
+| party_size | integer | no |  |
+| status | text | yes |  |
+| gross_amount | numeric(18,4) | no |  |
+| held_by_principal_id | uuid | no |  |
+| subject_id | uuid | no |  |
+| order_id | uuid | no | Set when the order converts it. |
+| extension_count | integer | no |  |
+| created_at | timestamptz | yes |  |
+| expires_at | timestamptz | yes |  |
+| scope_path | text | no | The partition key (ADR-0005), written at venue scope. |
 
 ### `resources.resource_schedule`
 

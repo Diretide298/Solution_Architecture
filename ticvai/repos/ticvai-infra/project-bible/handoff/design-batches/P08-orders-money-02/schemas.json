@@ -17,6 +17,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -75,6 +76,7 @@
     "type": "boolean"
    },
    "balance": {
+    "x-ticvai-column": "balance_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    }
   }
@@ -480,7 +482,8 @@
     "$ref": "#/components/schemas/CashMovementKind"
    },
    "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "movement_amount"
    },
    "denominations": {
     "$ref": "#/components/schemas/DenominationCount",
@@ -514,6 +517,7 @@
   ],
   "properties": {
    "sku": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -671,6 +675,8 @@
     "$ref": "#/components/schemas/BookedWindow"
    },
    "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
     "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
@@ -685,6 +691,7 @@
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1187,6 +1194,7 @@
     }
    },
    "withdrawnTotal": {
+    "x-ticvai-column": "withdrawn_amount",
     "allOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1230,7 +1238,8 @@
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "variance": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "x-ticvai-column": "variance_amount"
       },
       "baseEquivalent": {
        "allOf": [
@@ -1244,13 +1253,16 @@
     }
    },
    "expectedTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "expected_amount"
    },
    "countedTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "counted_amount"
    },
    "variance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "variance_amount"
    },
    "closedByPrincipalId": {
     "type": "string",
@@ -1564,7 +1576,7 @@
   }
  },
  "InventoryItem": {
-  "x-ticvai-persistence": "inventory.item",
+  "x-ticvai-persistence": "inventory.inventory_item",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateInventoryItemRequest"
@@ -1599,6 +1611,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "lastPurchasePrice": {
+      "x-ticvai-column": "last_purchase_cost_amount",
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "isBelowReorderPoint": {
@@ -2013,7 +2026,7 @@
    "endsNextDay": {
     "type": "boolean",
     "default": false,
-    "description": "**A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`, `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to` must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be earlier than or equal to `from`, so a window never spans more than 24 hours.\n"
+    "description": "**A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`, `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to` must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be earlier than or equal to `from`, so a window never spans more than 24 hours. **Friday's trading day is the business day, closing at the venue's `businessDayCutoff`** (12 October 2026, CHG-R6-032): it keeps the window whole only when the cut-off is at or after the window's `to` (01:00 or later here). At the default 00:00 a sale at 00:30 falls on Saturday's business date, so a venue whose windows run past midnight sets its cut-off to cover them.\n"
    }
   }
  },
@@ -2042,6 +2055,7 @@
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
     "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
@@ -2053,6 +2067,13 @@
      }
     ],
     "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "channelProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The named sales channel the order came through** (catalogue `SalesChannelProfile.id`), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. Null for the venue's own channels (POS, kiosk, web, app). Carried on `order.paid` so ticket issuing (`issueOrderEntitlements`) reads the channel's `ticketCredentialFormat` (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026, CHG-R6-031)."
    },
    "venueId": {
     "type": "string",
@@ -2879,6 +2900,7 @@
     "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
+    "x-ticvai-column": "payment_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "changeAmount": {
@@ -3017,7 +3039,7 @@
   }
  },
  "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+  "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
   "type": "object",
   "required": [
    "id",
@@ -3473,7 +3495,8 @@
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`.",
+    "x-ticvai-references": "assets.media_asset"
    },
    "kind": {
     "type": "string",
@@ -3695,6 +3718,7 @@
     "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
+    "x-ticvai-column": "refunded_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "appliedPercentage": {
@@ -4400,7 +4424,7 @@
    "dateFrom": {
     "type": "string",
     "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "dateTo": {
     "type": "string",
@@ -4788,6 +4812,12 @@
     "type": "string",
     "format": "date-time"
    },
+   "businessDate": {
+    "type": "string",
+    "format": "date",
+    "readOnly": true,
+    "description": "**The business day the shift belongs to** (12 October 2026, CHG-R6-032): the venue-local date of `openedAt` taken against the venue's `businessDayCutoff` (tenancy `VenueSettings`, inheriting the tenant default, default 00:00). Set once when the shift opens and never moved, so a shift opened at 23:00 and closed at 01:00 stays on the day it opened. The daily reconciliation (BO-043) lists the shifts of one business date, and the period close's `noOpenShifts` check reads it (finance).\n"
+   },
    "recordedAt": {
     "type": "string",
     "format": "date-time",
@@ -5158,6 +5188,13 @@
     "default": 6,
     "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
+   "businessDayCutoff": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "default": "00:00",
+    "description": "**When the venue's business day closes** (Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a change request to make the cut-off configurable, default 00:00; CHG-R6-032). A local wall-clock time `HH:MM` in the region's time zone. **The business date of an instant is the venue-local date of that instant minus the cut-off**: at 00:00 it is the calendar date; at 06:00 a sale at 01:30 on Saturday belongs to Friday. Every business day the package names is this one: a shift's business date and its close (shift `Shift.businessDate`, `closeShift`), the venue-day of the daily reconciliation (finance `getUnifiedReconciliation`, a settlement's trading day), the date revenue is posted on (`postOrderRevenue`), \"today\" in the daily reports (reporting `runReport`, `getKpiValues`, `getServiceSummary`), the same-business-day void (orders `AfterSalePolicy.voidSameBusinessDayOnly`) and the wallet's end-of-business-day reconciliation. A change applies from the next business day, never to a day already open, so no day is cut twice. Null inherits the tenant default (`setVenueSettingsDefaults`), and the tenant default's null is 00:00. Not `calendarDayStartHour`, which only draws calendars (DEC-039 stands for that field).\n"
+   },
    "currencyCode": {
     "type": "string",
     "pattern": "^[A-Z]{3}$",
@@ -5509,6 +5546,7 @@
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).** The client's policy of 6 October 2026 (tracker answer T10.1, `sources/client/2026-10-06-tracker-answers.md`; CHG-R4-019): the tolerance is configurable, a difference within it closes only with a reason (`shift.giveShiftVarianceReason`), and beyond it needs supervisor or manager approval (OVERSHORT_ACCEPT).\n"
    },
    "cashDrawerLimit": {
+    "x-ticvai-column": "deposit_box_limit_amount",
     "oneOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"

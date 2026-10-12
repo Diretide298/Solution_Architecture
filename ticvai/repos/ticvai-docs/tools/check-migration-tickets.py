@@ -55,6 +55,19 @@ FIRST, FORWARD_FIRST = (2, 99), 1000
 CREATE = re.compile(r'CREATE TABLE IF NOT EXISTS ([a-z_]+)\."?([a-z_0-9]+)"? \(')
 
 
+def _renames() -> list:
+    """`RENAMES` from tools/derive-schema-history.py, read without running it."""
+    import ast
+    try:
+        tree = ast.parse((g.ROOT / "tools" / "derive-schema-history.py").read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):
+        return []
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "RENAMES" for t in node.targets):
+            return ast.literal_eval(node.value)
+    return []
+
+
 def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-migration-tickets", RULES)
@@ -134,6 +147,10 @@ def main() -> int:
             if p.name.startswith(("000", "001", "002")):
                 continue                                   # the baseline's own: MIG-BASELINE
             tables |= {f"{a}.{b}" for a, b in CREATE.findall(p.read_text(encoding="utf-8"))}
+    # A table renamed after r1 is created under its old name by the frozen SQL; its migration ticket and MIGRATIONS.md
+    # name the new one (derive-schema-history.py RENAMES; 12 October 2026, CHG-R6-055).
+    renamed = {r["from"]: r["to"] for r in _renames() if r["from"] in tables and r["to"] not in tables}
+    tables = {renamed.get(t, t) for t in tables}
     on_ticket = set()
     for r in migs.values():
         m = re.search(r"Tables: (.+?)\. Source", r["description"] or "")

@@ -872,7 +872,7 @@
    "loading": "The pdf printable pos configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the pdf printable pos untouched.",
    "emptyFirstRun": "No design saved for this media template yet: the designer opens on the defaults; Save design creates it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to show this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design disabled, naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE until 12 October 2026, BC-034/BC-035, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1118,7 +1118,7 @@
    "loading": "The apple wallet pass configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the apple wallet pass untouched.",
    "emptyFirstRun": "No apple wallet pass configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1340,7 +1340,7 @@
    "loading": "The google wallet pass configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the google wallet pass untouched.",
    "emptyFirstRun": "No google wallet pass configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {

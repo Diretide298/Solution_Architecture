@@ -1813,7 +1813,8 @@
     "ADM-570",
     "ADM-603",
     "BO-696",
-    "BO-485"
+    "BO-485",
+    "BO-1192"
    ],
    "transitions": [
     {
@@ -2018,6 +2019,11 @@
      "to": "BO-696",
      "trigger": "Opens Event Duplication & Clone Configuration",
      "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-1192",
+     "trigger": "Entitlement Templates",
+     "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
     }
    ]
   },

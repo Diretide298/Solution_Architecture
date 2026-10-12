@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-07",
+ "generated": "2026-10-13",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -25,7 +25,7 @@
  },
  "counts": {
   "batches": 306,
-  "screens": 2451,
+  "screens": 2453,
   "framesOnDisk": 159,
   "byStatus": {
    "pending": 267,
@@ -34,7 +34,7 @@
    "locked": 5
   },
   "screensByStatus": {
-   "pending": 2292,
+   "pending": 2294,
    "partial": 0,
    "drawn": 134,
    "locked": 25
@@ -1016,8 +1016,8 @@
     "BO-118",
     "BO-119",
     "BO-1190",
-    "BO-120",
-    "BO-121"
+    "BO-1192",
+    "BO-120"
    ],
    "drawable": 9,
    "thin": 1,
@@ -1030,9 +1030,10 @@
    "label": "P08 · Setup & Go-Live",
    "platform": "P08",
    "screens": [
+    "BO-1191",
     "BO-594"
    ],
-   "drawable": 0,
+   "drawable": 1,
    "thin": 1,
    "frames": 0,
    "status": "pending"
@@ -1638,6 +1639,7 @@
    "label": "P08 · Sell (4 of 4)",
    "platform": "P08",
    "screens": [
+    "BO-121",
     "BO-122",
     "BO-123",
     "BO-124",
@@ -1646,7 +1648,7 @@
     "BO-142",
     "BO-143"
    ],
-   "drawable": 5,
+   "drawable": 6,
    "thin": 2,
    "frames": 0,
    "status": "pending"
@@ -4336,6 +4338,28 @@
    "status": "pending"
   },
   {
+   "id": "WS165",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-953",
+    "BO-954",
+    "BO-955",
+    "BO-956",
+    "BO-957",
+    "BO-958",
+    "BO-959",
+    "BO-960",
+    "BO-961",
+    "BO-962"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS167",
    "kind": "workshop",
    "label": "Seat Management Venue Mapping Reference v1.0 board 3",
@@ -4460,6 +4484,28 @@
     "SGN-017"
    ],
    "drawable": 0,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS01",
+   "kind": "workshop",
+   "label": "Access Control board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-144",
+    "BO-145",
+    "BO-146",
+    "BO-147",
+    "BO-148",
+    "BO-149",
+    "BO-150",
+    "BO-151",
+    "BO-152",
+    "BO-153"
+   ],
+   "drawable": 3,
    "thin": 7,
    "frames": 0,
    "status": "pending"
@@ -4792,28 +4838,6 @@
    "status": "pending"
   },
   {
-   "id": "WS01",
-   "kind": "workshop",
-   "label": "Access Control board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-144",
-    "BO-145",
-    "BO-146",
-    "BO-147",
-    "BO-148",
-    "BO-149",
-    "BO-150",
-    "BO-151",
-    "BO-152",
-    "BO-153"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS13",
    "kind": "workshop",
    "label": "Approval Workflows and Governance board 1",
@@ -5048,28 +5072,6 @@
     "BO-930",
     "BO-931",
     "BO-932"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS165",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-953",
-    "BO-954",
-    "BO-955",
-    "BO-956",
-    "BO-957",
-    "BO-958",
-    "BO-959",
-    "BO-960",
-    "BO-961",
-    "BO-962"
    ],
    "drawable": 2,
    "thin": 8,

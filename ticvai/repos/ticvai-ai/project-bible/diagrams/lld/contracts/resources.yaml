@@ -33,7 +33,7 @@ operations:
   - cache:idempotency
   - resources.booking
   - resources.resource
-  - resources.resource_hold
+  - resources.resource_reservation
   - resources.selection_policy
   writes:
   - cache:idempotency
@@ -176,11 +176,11 @@ operations:
   - resources.booking
   - resources.resource
   - resources.resource_block
-  - resources.resource_hold
+  - resources.resource_reservation
   - venuemap.map
   - venuemap.placed_resource
   writes:
-  - resources.resource_hold
+  - resources.resource_reservation
 - operation: createResourcePackage
   verb: POST
   path: /resource-packages
@@ -232,9 +232,9 @@ operations:
   - guest
   offline: false
   reads:
-  - resources.resource_hold
+  - resources.resource_reservation
   writes:
-  - resources.resource_hold
+  - resources.resource_reservation
 - operation: getExperienceResourceRequirements
   verb: GET
   path: /experiences/{experienceId}/resource-requirements
@@ -260,7 +260,7 @@ operations:
   - resources.booking
   - resources.resource
   - resources.resource_block
-  - resources.resource_hold
+  - resources.resource_reservation
   - venuemap.map
   - venuemap.map_version
   - venuemap.placed_resource
@@ -325,7 +325,7 @@ operations:
   - resources.booking
   - resources.resource
   - resources.resource_block
-  - resources.resource_hold
+  - resources.resource_reservation
   writes: []
 - operation: getResourceBooking
   verb: GET
@@ -352,7 +352,7 @@ operations:
   - resources.resource
   - resources.resource_block
   - resources.resource_category
-  - resources.resource_hold
+  - resources.resource_reservation
   - resources.resource_schedule
   - resources.resource_type
   writes: []
@@ -404,7 +404,7 @@ operations:
   - guest
   offline: false
   reads:
-  - resources.resource_hold
+  - resources.resource_reservation
   writes: []
 - operation: getResourceQualifications
   verb: GET
@@ -458,8 +458,8 @@ operations:
   - resources.booking
   - resources.resource
   - resources.resource_block
-  - resources.resource_hold
   - resources.resource_requirement
+  - resources.resource_reservation
   - resources.resource_schedule
   writes: []
 - operation: listResourceAttributes
@@ -589,10 +589,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - resources.resource_hold
+  - resources.resource_reservation
   writes:
   - cache:idempotency
-  - resources.resource_hold
+  - resources.resource_reservation
 - operation: reorderPerformanceManifest
   verb: PUT
   path: /performances/{performanceId}/manifest

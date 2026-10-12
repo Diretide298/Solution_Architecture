@@ -663,17 +663,19 @@
     "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
    },
    "walletHoldId": {
+    "x-ticvai-column": "fund_reservation_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "x-ticvai-references": "wallet.hold",
+    "x-ticvai-references": "wallet.fund_reservation",
     "description": "The hold a spend settled, where it came through `holdWalletFunds`."
    },
    "kind": {
     "$ref": "#/components/schemas/WalletTransactionKind"
    },
    "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "transaction_amount"
    },
    "balanceAfter": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"

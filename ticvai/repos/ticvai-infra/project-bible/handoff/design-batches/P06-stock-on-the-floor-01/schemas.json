@@ -63,6 +63,7 @@
     "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -294,6 +295,7 @@
     "format": "uuid"
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
@@ -515,6 +517,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -604,7 +607,7 @@
  "DailyCountList": {
   "x-ticvai-persistence": "inventory.daily_count_list",
   "type": "object",
-  "description": "**The items counted every day at one location** (`setDailyCount`, 4 October 2026, CHG-FXC-003: the write had only `inventory.item` to land in, which has no column for any of it). One row per venue and location (`locationId` null is the venue-wide list); `setDailyCount` replaces it.",
+  "description": "**The items counted every day at one location** (`setDailyCount`, 4 October 2026, CHG-FXC-003: the write had only `inventory.inventory_item` to land in, which has no column for any of it). One row per venue and location (`locationId` null is the venue-wide list); `setDailyCount` replaces it.",
   "required": [
    "itemIds",
    "postsAdjustment"
@@ -751,6 +754,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -1348,6 +1352,7 @@
     "$ref": "#/components/schemas/PurchaseOrderStatus"
    },
    "deliverToLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1575,6 +1580,7 @@
     "nullable": true
    },
    "costCenterId": {
+    "x-ticvai-references": "ledger.cost_center",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1636,6 +1642,7 @@
     }
    },
    "estimatedTotal": {
+    "x-ticvai-column": "estimated_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "raisedByPrincipalId": {
@@ -1774,6 +1781,7 @@
     "format": "uuid"
    },
    "itemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
@@ -1788,6 +1796,7 @@
     "description": "**Unique within the item, not globally.** Two manufacturers reuse serial numbers and a global constraint would refuse the second one.\n"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },

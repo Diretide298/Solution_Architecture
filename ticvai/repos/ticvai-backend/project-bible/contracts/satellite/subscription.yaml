@@ -609,6 +609,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerAgreement
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       summary: Agree commercial terms with a partner
@@ -692,6 +695,9 @@ paths:
   /partner-registrations:
     post:
       operationId: registerPartner
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       security: []
       x-ticvai-agreed: '29 September: system-design review SD-056 (an anonymous write needs a challenge and a rate limit)'
       x-ticvai-audience:
@@ -3289,6 +3295,13 @@ paths:
   /burst-environments/{burstEnvironmentId}/reconcile:
     post:
       operationId: reconcileBurstEnvironment
+      x-ticvai-write-via:
+      - table: orders.order_line
+        operation: syncOrders
+      - table: orders.payment
+        operation: syncOrders
+      - table: orders.sales_order
+        operation: syncOrders
       summary: Move the orders into the permanent platform
       description: '**The open half of CF-162, and the reason an environment cannot simply be deleted.**
 
@@ -4051,6 +4064,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.17-18 (13.1.10
@@ -5781,6 +5797,9 @@ paths:
       operationId: approvePartnerStatuLifecycle
       x-ticvai-consumed-by:
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -6048,6 +6067,9 @@ paths:
         - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
         - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       security:
       - bearerAuth: []
@@ -6104,6 +6126,9 @@ paths:
       operationId: setPartnerRateNet
       x-ticvai-consumed-by:
         - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -6404,6 +6429,9 @@ paths:
       operationId: setPaymentTermBilling
       x-ticvai-consumed-by:
         - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -6542,6 +6570,9 @@ paths:
       operationId: approveBookingLimitCommercial
       x-ticvai-consumed-by:
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -8554,6 +8585,9 @@ paths:
       operationId: actOnPartnerApplicationReview
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -8866,6 +8900,9 @@ paths:
       operationId: setPartnerCommissionRules
       x-ticvai-consumed-by:
         - "P08 PTR-035 Commission, Margin & Incentive Management"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_commission_rule and its tiers had no
@@ -8952,6 +8989,9 @@ paths:
       operationId: setPartnerCreditProfile
       x-ticvai-consumed-by:
         - "P08 PTR-036 Credit Limit & Exposure Management"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_credit_profile had no writer; listCreditLimitExposure
@@ -9090,6 +9130,9 @@ paths:
       operationId: setPartnerAllocations
       x-ticvai-consumed-by:
         - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_allocation had no writer; listCommercialAllocationQuota
@@ -9163,6 +9206,9 @@ paths:
       operationId: createPartnerChangeRequest
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner

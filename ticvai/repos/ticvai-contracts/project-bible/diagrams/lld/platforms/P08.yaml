@@ -1,5 +1,5 @@
 id: LLD-P08
-title: P08 Venue Management — Back Office — 1661 screens
+title: P08 Venue Management — Back Office — 1663 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,11 +20,11 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 364
+  screens: 365
 - module: marketing
   screens: 284
 - module: ticketing
-  screens: 260
+  screens: 261
 - module: resources
   screens: 204
 - module: access
@@ -57,17 +57,17 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 821
+  operationCalls: 830
 - service: VenueOpsService
   operationCalls: 531
 - service: TenancyService
-  operationCalls: 492
+  operationCalls: 496
 - service: OrderService
   operationCalls: 423
 - service: AccessService
-  operationCalls: 297
+  operationCalls: 298
 - service: MarketingService
-  operationCalls: 236
+  operationCalls: 237
 - service: WalletService
   operationCalls: 222
 - service: AiService
@@ -83,15 +83,15 @@ servicesCalled:
 - service: InventoryService
   operationCalls: 82
 - service: IdentityService
-  operationCalls: 65
+  operationCalls: 66
 - service: WhiteLabelService
   operationCalls: 24
 - service: RetailService
   operationCalls: 17
 coverage:
-  screens: 1661
+  screens: 1663
   inAFlow: 1562
-  drawn: 1661
+  drawn: 1663
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -545,6 +545,7 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-1192
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-012
   inFlows: null
@@ -890,6 +891,7 @@ screens:
   - getTaxDocumentRendition
   - issueCreditMemo
   - listCreditMemos
+  - listMessageDispatches
   - listOrderRefunds
   - listOrders
   - modifyOrder
@@ -2158,7 +2160,8 @@ screens:
   entryParams:
   - accessPointId<-deepLink
   - orgUnitId<-deepLink
-  goesTo: []
+  goesTo:
+  - BO-1191
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-064
   inFlows: null
@@ -2888,7 +2891,8 @@ screens:
   - BO-086
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-087
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: BO-088
   name: Approval Analytics
   module: People & Access Rights
@@ -3354,6 +3358,7 @@ screens:
   - BO-1153
   - BO-1163
   - BO-1173
+  - BO-1191
   - BO-144
   - BO-154
   - BO-164
@@ -3443,6 +3448,7 @@ screens:
   - BO-933
   - BO-943
   - BO-953
+  - BO-954
   - BO-963
   - BO-973
   - BO-983
@@ -3560,6 +3566,7 @@ screens:
   - BO-118
   - BO-119
   - BO-1190
+  - BO-1192
   - BO-120
   - BO-121
   - BO-122
@@ -4814,6 +4821,7 @@ screens:
   - createOrgUnit
   - listOrgUnits
   - listVenueParkAccess
+  - setAccessAreaCapacity
   - updateOrgUnit
   states:
   - emptyFirstRun
@@ -4824,6 +4832,7 @@ screens:
   offlineState: false
   entryParams:
   - orgUnitId<-navigation
+  - areaId<-navigation
   goesTo:
   - BO-144
   boardFrames: null
@@ -24320,6 +24329,7 @@ screens:
   density: compact
   operations:
   - createSeatMap
+  - editSeatMapStructure
   - getSeatMap
   - updateSeatMap
   states:
@@ -24372,6 +24382,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - editSeatMapStructure
   - listSeats
   - updateSeats
   states:
@@ -30142,6 +30153,64 @@ screens:
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-1190
   inFlows: null
+- screen: BO-1191
+  name: Organisation
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - createOrgUnit
+  - getOrgUnit
+  - listOrgUnits
+  - updateOrgUnit
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - validation
+  offlineState: false
+  entryParams:
+  - orgUnitId<-navigation
+  goesTo:
+  - BO-064
+  - BO-100
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-1191
+  inFlows: null
+- screen: BO-1192
+  name: Entitlement Templates
+  module: Sell
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - archiveEntitlementTemplate
+  - createEntitlementTemplate
+  - getEntitlementTemplate
+  - listEntitlementTemplates
+  - listProducts
+  - setEntitlementTemplateBlackoutDates
+  - updateEntitlementTemplate
+  states:
+  - conflict
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - validation
+  offlineState: false
+  entryParams:
+  - templateId<-navigation
+  goesTo:
+  - BO-012
+  - BO-102
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-1192
+  inFlows: null
 - screen: ADM-048
   name: Commercial Pricing Command Center
   module: Commercial
@@ -34715,8 +34784,7 @@ screens:
   - BO-087
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#adm-243
-  inFlows:
-  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
+  inFlows: null
 - screen: ADM-244
   name: SLA, Escalation, Reminder & Timeout Rules
   module: Platform
@@ -40539,9 +40607,10 @@ screens:
   name: Segregation of Duties Policy Manager
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - listSegregationRules
   - setSegregationRules
   states:
   - emptyFirstRun

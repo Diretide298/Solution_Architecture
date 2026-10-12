@@ -1081,6 +1081,11 @@
     "required": null
    },
    {
+    "name": "entitlementTemplateId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "segmentTag",
     "in": "query",
     "required": null
@@ -1293,6 +1298,11 @@
     "name": "openedTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "businessDate",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,

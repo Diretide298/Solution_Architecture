@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-263` | Channel Sales Schedule & Availability Windows | B | 46 | 140 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-264` | Customer & Eligibility Rules by Channel | B | 51 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-265` | Channel Sales Rules, Limits & Restrictions | B | 63 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | B | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-267` | Channel Publication, Readiness & AI Validation | B | 1 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

@@ -807,7 +807,7 @@
    "dateFrom": {
     "type": "string",
     "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "dateTo": {
     "type": "string",
@@ -823,6 +823,14 @@
  },
  "Seat": {
   "x-ticvai-persistence": "seating.seat",
+  "x-ticvai-unique-together": [
+   [
+    "seat_map_id",
+    "sectionCode",
+    "rowLabel",
+    "seatNumber"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -921,7 +929,8 @@
     "format": "uuid"
    },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "type": "string"
@@ -1105,6 +1114,12 @@
  },
  "SeatPriceBand": {
   "x-ticvai-persistence": "seating.seat_price_band",
+  "x-ticvai-unique-together": [
+   [
+    "seatCategoryId",
+    "code"
+   ]
+  ],
   "type": "object",
   "description": "One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n",
   "required": [
@@ -1139,6 +1154,7 @@
     "pattern": "^#[0-9A-Fa-f]{6}$"
    },
    "amount": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "channel": {

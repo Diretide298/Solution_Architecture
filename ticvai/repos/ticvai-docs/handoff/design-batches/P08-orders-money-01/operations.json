@@ -753,6 +753,50 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMessageDispatches": {
+  "method": "GET",
+  "path": "/message-dispatches",
+  "contract": "marketing-crm",
+  "summary": "Messages sent, and whether they arrived",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sourceRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "campaignId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOrderRefunds": {
   "method": "GET",
   "path": "/orders/{orderId}/refunds",
@@ -991,6 +1035,11 @@
     "name": "openedTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "businessDate",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,

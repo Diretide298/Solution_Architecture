@@ -598,7 +598,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
 | Block | Block A · ticket #28380 (VM-BO-346) |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -721,7 +721,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Loading (`?state=loading`) | The pdf printable pos configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pdf printable pos untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No design saved for this media template yet: the designer opens on the defaults; Save design creates it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to show this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design disabled, naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE until 12 October 2026, BC-034/BC-035, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -749,10 +749,10 @@ templates:
 
 #### Permissions
 
-- `setPdfPrintablePos` → `ACCESS_POINT_CONFIGURE` (configure) · staff
-- `getPdfPrintablePos` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `setPdfPrintablePos` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getPdfPrintablePos` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to show this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design disabled, naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE until 12 October 2026, BC-034/BC-035, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -785,7 +785,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-346?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save design.
 - [ ] Every transition is wired: `BO-344`.
-- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -800,7 +800,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
 | Block | Block C · task VM-BO-347 |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Pass Configuration; Configure the appropriate; Configure/reference) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -892,7 +892,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Loading (`?state=loading`) | The apple wallet pass configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the apple wallet pass untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No apple wallet pass configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -924,9 +924,9 @@ pass:
 
 #### Permissions
 
-- `setAppleWalletPass` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `setAppleWalletPass` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -964,7 +964,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every state opens from `#BO-347?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `BO-344`.
-- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -982,7 +982,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
 | Block | Block C · task VM-BO-348 |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure supported; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1062,7 +1062,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Loading (`?state=loading`) | The google wallet pass configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the google wallet pass untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No google wallet pass configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1092,9 +1092,9 @@ pass:
 
 #### Permissions
 
-- `setGoogleWalletPass` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `setGoogleWalletPass` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires, and names that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -1132,7 +1132,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every state opens from `#BO-348?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Event time change, Venue change, Ticket status change, Relevant ticket information changes.
 - [ ] Every transition is wired: `BO-344`.
-- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -2072,19 +2072,19 @@ Method, path, parameters, request and response for every operation these screens
 "archiveMediaTemplate": {"method":"POST","path":"/media-templates/{templateId}/archive","contract":"access","summary":"Archive a media template","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccessMediaTemplate"},
 "cloneTicketTemplate": {"method":"POST","path":"/ticket-templates/{templateId}/clone","contract":"orders","summary":"Create a ticket template from an existing one","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloneTicketTemplateInput","responds":"TicketTemplate"},
 "createTicketTemplate": {"method":"POST","path":"/ticket-templates","contract":"orders","summary":"Create a ticket template","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateRequest","responds":"TicketTemplate"},
-"getPdfPrintablePos": {"method":"GET","path":"/pdf-printable-pos","contract":"access","summary":"The printable ticket design as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"templateId","in":"query","required":false}],"requestBody":null,"responds":"PdfPrintablePosTicketDesignerView"},
+"getPdfPrintablePos": {"method":"GET","path":"/pdf-printable-pos","contract":"access","summary":"The printable ticket design as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"templateId","in":"query","required":false}],"requestBody":null,"responds":"PdfPrintablePosTicketDesignerView"},
 "importTicketTemplate": {"method":"POST","path":"/ticket-templates/imports","contract":"orders","summary":"Import a ticket template definition","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateImportInput","responds":"TicketTemplate"},
 "listBrandingLocalizationTemplate": {"method":"GET","path":"/branding-localization-template","contract":"access","summary":"Branding, Localization & Template Inheritance","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BrandingLocalizationTemplateInheritanceView"},
 "listMediaDesign": {"method":"GET","path":"/media-design","contract":"access","summary":"Media Design Studio Command Center","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mediaType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"brand","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listTicketTemplates": {"method":"GET","path":"/ticket-templates","contract":"orders","summary":"The ticket templates a venue issues from","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mediaType","in":"query","required":false},{"name":"includeInactive","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "printTicketProof": {"method":"POST","path":"/ticket-templates/{templateId}/proof","contract":"orders","summary":"Print a sample without selling anything","permission":"ORDER_REPRINT","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"TicketProof"},
-"setAppleWalletPass": {"method":"PUT","path":"/apple-wallet-pass","contract":"access","summary":"Apple Wallet Pass Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AppleWalletPassDesignerInput","responds":"AppleWalletPassDesignerView"},
+"setAppleWalletPass": {"method":"PUT","path":"/apple-wallet-pass","contract":"access","summary":"Apple Wallet Pass Designer","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AppleWalletPassDesignerInput","responds":"AppleWalletPassDesignerView"},
 "setBrandingLocalizationTemplate": {"method":"PUT","path":"/branding-localization-template","contract":"access","summary":"Save branding and languages for a level","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BrandingLocalizationTemplateInheritanceInput","responds":"BrandingLocalizationTemplateInheritanceView"},
 "setDigitalBarcodeTicket": {"method":"PUT","path":"/digital-barcode-ticket","contract":"access","summary":"Digital QR & Barcode Ticket Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DigitalQrBarcodeTicketDesignerInput","responds":"DigitalQrBarcodeTicketDesignerView"},
 "setDigitalCardMembership": {"method":"PUT","path":"/digital-card-membership","contract":"access","summary":"Digital Card, Membership & Wearable Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DigitalCardMembershipWearableDesignerInput","responds":"DigitalCardMembershipWearableDesignerView"},
 "setDynamicFieldData": {"method":"PUT","path":"/dynamic-field-data","contract":"access","summary":"Dynamic Fields, Data Mapping & Content Builder","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DynamicFieldsDataMappingContentBuilderInput","responds":"DynamicFieldsDataMappingContentBuilderView"},
-"setGoogleWalletPass": {"method":"PUT","path":"/google-wallet-pass","contract":"access","summary":"Google Wallet Pass Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GoogleWalletPassDesignerInput","responds":"GoogleWalletPassDesignerView"},
-"setPdfPrintablePos": {"method":"PUT","path":"/pdf-printable-pos","contract":"access","summary":"PDF, Printable & POS Ticket Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PdfPrintablePosTicketDesignerInput","responds":"PdfPrintablePosTicketDesignerView"},
+"setGoogleWalletPass": {"method":"PUT","path":"/google-wallet-pass","contract":"access","summary":"Google Wallet Pass Designer","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GoogleWalletPassDesignerInput","responds":"GoogleWalletPassDesignerView"},
+"setPdfPrintablePos": {"method":"PUT","path":"/pdf-printable-pos","contract":"access","summary":"PDF, Printable & POS Ticket Designer","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PdfPrintablePosTicketDesignerInput","responds":"PdfPrintablePosTicketDesignerView"},
 "setRfidNfcCard": {"method":"PUT","path":"/rfid-nfc-card","contract":"access","summary":"RFID, NFC, Card & Wristband Media Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RfidNfcCardWristbandMediaDesignerInput","responds":"RfidNfcCardWristbandMediaDesignerView"},
 "updateTicketTemplate": {"method":"PATCH","path":"/ticket-templates/{templateId}","contract":"orders","summary":"Change or retire a ticket template","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateRequest","responds":"TicketTemplate"}
 }

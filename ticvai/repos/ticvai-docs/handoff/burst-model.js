@@ -297,10 +297,10 @@ export const RATE_PER_HOUR = 11.76;
  * it out entirely pretends a sale only touches two rows.
  */
 export const CONTENDED = [
-  { table: 'catalogue.inventory_hold', op: 'acquireInventoryHold', lock: 'FOR UPDATE SKIP LOCKED',
+  { table: 'catalogue.inventory_reservation', op: 'acquireInventoryHold', lock: 'FOR UPDATE SKIP LOCKED',
     cpb: 3, kind: 'convergent', flagged: true,
     note: 'A short-lived claim on contended stock while somebody decides. CF-115 settled that contended inventory is leased rather than reserved. One row a performance, and the wall.' },
-  { table: 'seating.seat_hold', op: 'createSeatHold', lock: 'FOR UPDATE',
+  { table: 'seating.seat_reservation', op: 'createSeatHold', lock: 'FOR UPDATE',
     cpb: 2, kind: 'convergent', flagged: true,
     note: 'A temporary claim on a seat. Expires, which is what stops two channels selling it. Flagged contended by the package — though its own note describes a per-seat claim, which would be many rows rather than one.' },
   { table: 'catalogue.channel_capacity', op: 'acquireInventoryHold', lock: 'decrement',

@@ -75,25 +75,6 @@
   "requestBody": null,
   "responds": "CartMergeResult"
  },
- "createOrder": {
-  "method": "POST",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "Create an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateOrderRequest",
-  "responds": "Order"
- },
  "createPayment": {
   "method": "POST",
   "path": "/payments",

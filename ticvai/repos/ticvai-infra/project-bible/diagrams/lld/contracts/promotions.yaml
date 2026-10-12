@@ -548,7 +548,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - orders.order_line
   - orders.sales_order
   - promotions.bundle
@@ -752,7 +752,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - promotions.bundle
   - promotions.bundle_capacity_policy
   - promotions.bundle_component
@@ -826,7 +826,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - promotions.bundle_component
   writes: []
 - operation: listConflict
@@ -988,7 +988,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - orders.order_line
   - promotions.bundle
   - promotions.bundle_component
@@ -1346,7 +1346,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
-  - catalogue.inventory_hold
+  - catalogue.inventory_reservation
   - promotions.bundle
   - promotions.bundle_component
   writes: []

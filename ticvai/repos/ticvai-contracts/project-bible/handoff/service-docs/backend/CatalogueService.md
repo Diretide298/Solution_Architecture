@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 71 of 447 |
+| Operations in the slice | 74 of 451 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -41,6 +41,8 @@
 | catalogue | [`cloneProduct`](#cloneproduct) | POST | `/products/{productId}/clone` | setup | 1 | BO-008 |
 | catalogue | [`commitCatalogueImport`](#commitcatalogueimport) | POST | `/products/import/{jobId}/commit` | setup | 1 | BO-117 |
 | catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 1 | GST-015, WEB-022, WEB-023 |
+| catalogue | [`joinWaitlist`](#joinwaitlist) | POST | `/waitlist-entries` | core | 1 | GST-007, WEB-006 |
+| catalogue | [`leaveWaitlist`](#leavewaitlist) | DELETE | `/waitlist-entries/{entryId}` | core | 1 | GST-007, WEB-006 |
 | catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002 … |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-002, WEB-003 |
 | catalogue | [`setProductCategories`](#setproductcategories) | PUT | `/product-categories` | core | 1 | BO-115, CMS-103 |
@@ -98,6 +100,7 @@
 | promotion | [`updatePromotion`](#updatepromotion) | PATCH | `/promotions/{promotionId}` | setup | 1 | BO-010 |
 | promotions | [`setPromotionVariants`](#setpromotionvariants) | PUT | `/promotions/{promotionId}/variants` | setup | 1 | ADM-226, BO-010 |
 | recommendation | [`recommendSeats`](#recommendseats) | POST | `/performances/{performanceId}/seat-recommendations` | core | 1 | BO-015, BO-019, BO-1001, BO-1002, BO-1039, GST-049 … |
+| seatMap | [`editSeatMapStructure`](#editseatmapstructure) | PATCH | `/seat-maps/{seatMapId}/structure` | setup | 1 | BO-954, BO-956 |
 | seating | [`setAccessibleSeating`](#setaccessibleseating) | PUT | `/accessible-seating` | setup | 1 | BO-1018, BO-1019, BO-1020 |
 | seating | [`setSeatRecommendationRules`](#setseatrecommendationrules) | PUT | `/seat-recommendation-rules` | setup | 1 | BO-1034, BO-1035, BO-1036, BO-1037, BO-1038, BO-1041 |
 
@@ -121,7 +124,7 @@ Every seat with its current state — available, held, sold, blocked or buffered
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Guest callable | True |
-| Reads | `seating.seat`, `seating.seat_category`, `seating.seat_hold` |
+| Reads | `seating.seat`, `seating.seat_category`, `seating.seat_reservation` |
 | Writes | - |
 | Called by | BO-015, BO-019, BO-1000, BO-1001, BO-1002, BO-1039, BO-1040, BO-986, BO-994, BO-995, BO-996, GST-049, POS-004, WEB-007 |
 
@@ -714,7 +717,7 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Guest callable | True |
-| Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `catalogue.performance` |
+| Reads | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `catalogue.performance` |
 | Writes | - |
 | Called by | GST-004, GST-007, GST-050, KSK-004, KSK-005, KSK-015, POS-003, PTR-007, WEB-004, WEB-006 |
 
@@ -837,7 +840,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
-| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.variant` |
+| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
 | Called by | BO-008 |
 | State model | Product ([states/product.yaml](../../../states/product.yaml)): created as `draft` |
 
@@ -1028,6 +1031,104 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Memberships |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### joinWaitlist
+
+**`POST /waitlist-entries`**: Ask to be told if capacity frees up
+
+1.1.25, 4.9.17. **Offered only where the performance is genuinely sold out** — a waitlist on something available is a worse experience than selling it.
+**Sold out counts held seats and live leases as sold** (decided 28 September, audit R101). A performance is sold out when sold units, seats on hold and units under an unexpired lease together reach its capacity; the oversell allowance does not reopen it. (A "session" in the design is a Performance, audit R165.)
+**Joining reserves nothing.** The guest is told when capacity appears and buys like anyone else, because holding capacity for a waitlist is the same as not releasing it.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.waitlist_entry` |
+| Writes | `cache:idempotency`, `catalogue.waitlist_entry` |
+| Called by | GST-007, WEB-006 |
+| State model | Waitlist entry ([states/waitlist-entry.yaml](../../../states/waitlist-entry.yaml)): created as `waiting` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `WaitlistEntry`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| performanceId | string (uuid) | yes |  |
+| variantId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| contactPoint | string |  | Where the offer goes. |
+| partySize | integer | yes | (min 1) |
+| status | object |  | Set by the server. (read-only) |
+| position | integer |  | First in, first offered. (read-only) |
+| offeredAt | string (date-time) |  | (read-only; nullable) |
+| offerExpiresAt | string (date-time) |  | The offer moves on when this passes. (read-only; nullable) |
+| joinedAt | string (date-time) |  | (read-only) |
+
+**Response**: `WaitlistEntry`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| performanceId | string (uuid) | yes |  |
+| variantId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| contactPoint | string |  | Where the offer goes. |
+| partySize | integer | yes | (min 1) |
+| status | object |  | Set by the server. (read-only) |
+| position | integer |  | First in, first offered. (read-only) |
+| offeredAt | string (date-time) |  | (read-only; nullable) |
+| offerExpiresAt | string (date-time) |  | The offer moves on when this passes. (read-only; nullable) |
+| joinedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Joined |
+| 409 |  | The performance is not sold out (sold, held and leased units are below capacity, audit R101). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### leaveWaitlist
+
+**`DELETE /waitlist-entries/{entryId}`**: Stop waiting
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.waitlist_entry` |
+| Writes | `cache:idempotency`, `catalogue.waitlist_entry` |
+| Called by | GST-007, WEB-006 |
+| State model | Waitlist entry ([states/waitlist-entry.yaml](../../../states/waitlist-entry.yaml)): moves `offered` -> `left`, `waiting` -> `left` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| entryId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Left |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listProductCategories
@@ -2655,8 +2756,8 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `seating.seat_hold` |
-| Writes | `cache:idempotency`, `platform.outbox`, `seating.seat_hold` |
+| Reads | `cache:idempotency`, `seating.seat_reservation` |
+| Writes | `cache:idempotency`, `platform.outbox`, `seating.seat_reservation` |
 | Called by | BO-994, GST-049, POS-004, WEB-007 |
 | State model | Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): created as `held`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `available` -> `held` |
 
@@ -2722,8 +2823,8 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `seating.seat_hold` |
-| Writes | `cache:idempotency`, `seating.seat_hold` |
+| Reads | `cache:idempotency`, `seating.seat_reservation` |
+| Writes | `cache:idempotency`, `seating.seat_reservation` |
 | Called by | WEB-011 |
 
 **Parameters**
@@ -2773,7 +2874,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `seating.seat_hold` |
+| Reads | `seating.seat_reservation` |
 | Writes | - |
 | Called by | BO-987, BO-999, POS-004 |
 
@@ -2827,8 +2928,8 @@ Releases buffered neighbours alongside the held seats.
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `seating.seat_hold` |
-| Writes | `platform.outbox`, `seating.seat_hold` |
+| Reads | `seating.seat_reservation` |
+| Writes | `platform.outbox`, `seating.seat_reservation` |
 | Called by | BO-999, GST-049, POS-004, WEB-007 |
 | State model | Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `released`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `available` |
 
@@ -2870,8 +2971,8 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusiveSkipLocked |
-| Reads | `cache:idempotency`, `catalogue.channel_allocation`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `platform.workstation` |
-| Writes | `cache:idempotency`, `catalogue.channel_allocation`, `catalogue.channel_capacity`, `catalogue.inventory_hold` |
+| Reads | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `platform.workstation` |
+| Writes | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation` |
 | Called by | POS-003 |
 | State model | Inventory lease ([states/lease.yaml](../../../states/lease.yaml)): created as `active` |
 
@@ -2933,19 +3034,19 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 **Called by the order service inside the order transaction when the order is paid** (`orders.checkoutCart`, `orders.createPayment`; decided 29 September, SD-023). Moves the hold's `grantedUnits` less anything already reported consumed from `leased` to `sold` on its `catalogue.channel_capacity` row, sets the hold `converted` with the order id, and stops the expiry sweeper from ever returning those units. **Idempotent on `orderId`**: converting a hold already converted for the same order answers `200` with the hold as it is.
 **A hold that is no longer `active` is refused `409`** (`hold-not-active`): it expired, was released or force-released, or was converted for another order, so its units may already be sold to someone else. The order service then re-acquires with `acquireInventoryHold` before taking the payment; it never sells against a hold it does not hold. No screen calls this operation.
 
-**The order's seat holds convert in the same call** (3 October 2026, CHG-R1S-010): each held seat of the order moves to `sold` (`seating.seat_hold`, `seating.seat_hold_item`) and `seat.sold` is written to the outbox once per seat. Seating belongs to this service, so the seat event is published here and not by the order service that called it.
+**The order's seat holds convert in the same call** (3 October 2026, CHG-R1S-010): each held seat of the order moves to `sold` (`seating.seat_reservation`, `seating.seat_reservation_item`) and `seat.sold` is written to the outbox once per seat. Seating belongs to this service, so the seat event is published here and not by the order service that called it.
 
 |  |  |
 |---|---|
 | Permission | `None` |
 | Scope level | venue |
-| Part of slice | setup, makes `seating.seat_hold_item` non-empty |
+| Part of slice | setup, makes `seating.seat_reservation_item` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
-| Reads | `cache:idempotency`, `catalogue.channel_allocation`, `catalogue.channel_capacity`, `catalogue.inventory_hold` |
-| Writes | `cache:idempotency`, `catalogue.channel_allocation`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `platform.outbox`, `seating.seat_hold`, `seating.seat_hold_item` |
+| Reads | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation` |
+| Writes | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `platform.outbox`, `seating.seat_reservation`, `seating.seat_reservation_item` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 | State model | Inventory lease ([states/lease.yaml](../../../states/lease.yaml)): moves `active` -> `converted`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold` |
 
@@ -3011,7 +3112,7 @@ Back-office monitoring. Surfaces stranded leases — capacity held by a terminal
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `catalogue.inventory_hold` |
+| Reads | `catalogue.inventory_reservation` |
 | Writes | - |
 | Called by | BO-018, POS-003 |
 
@@ -3814,6 +3915,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | kind | query |  | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) |  |
 | isSellable | query |  | boolean |  |
 | categoryId | query |  | string (uuid) | Only products filed under this category (Product.categoryId) or any category below it in the tree, so a tile for *Guided tours* also lists what sits under its subcategories. |
+| entitlementTemplateId | query |  | string (uuid) | Products using this template (client feedback of 6 October 2026, N32; CHG-R6-040): only products whose entitlementTemplateId is this one. |
 | segmentTag | query |  | string | Only products carrying this tag in segmentTags, or a tag below it (level matches level/beginner; level/beginner matches only itself). |
 | guidedAnswerIds | query |  | array of string (uuid) | Help me choose answers, as filters (decided 29 September, W4). |
 | pageSize | query |  | integer |  |
@@ -5068,7 +5170,7 @@ Returns contiguous groups where the party requires them — a family of four spl
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `catalogue.performance`, `seating.accessible`, `seating.recommendation_rules`, `seating.seat`, `seating.seat_block_item`, `seating.seat_category`, `seating.seat_hold`, `seating.seat_hold_item`, `seating.seat_price_band` |
+| Reads | `catalogue.performance`, `seating.accessible`, `seating.recommendation_rule`, `seating.seat`, `seating.seat_block_item`, `seating.seat_category`, `seating.seat_reservation`, `seating.seat_reservation_item`, `seating.seat_price_band` |
 | Writes | - |
 | Called by | BO-015, BO-019, BO-1001, BO-1002, BO-1039, GST-049, WEB-007 |
 
@@ -5115,6 +5217,94 @@ Returns contiguous groups where the party requires them — a family of four spl
 |---|---|---|
 | 200 |  | Recommendations, best first |
 | 404 |  | No selection satisfies the constraints |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
+## Group: seatMap
+
+### editSeatMapStructure
+
+**`PATCH /seat-maps/{seatMapId}/structure`**: Build a seat map by hand
+
+**The manual seat map building the minutes promised** (MoM 21 Aug 2026; 12 October 2026, CHG-R6-035). BO-954 Venue Canvas and BO-956 Rows & Seats draw sections, rows and seats, but `createSeatMap` names an empty map, `updateSeatMap` saves its name and views and `updateSeats` changes only the category, attribute and status of seats that already exist: a venue with no drawing or manifest to import could not build a map at all. This adds, removes and renumbers the structure of a **draft** map.
+
+**One request, applied in order**: `addSections`, then `addRows` (a row of `seatCount` seats laid out straight or on a curve and numbered from `firstSeatNumber` in `numberingDirection`), then `addSeats` (single seats, for a box or an irregular row), then `removeSeatIds`, then `relabel` (a section code, a row label or a seat number changed). A label already taken in the map, or a removal of a seat on a published map, is refused `409` with the conflicting labels; nothing is applied. **Accepts `Prefer: validate-only`**, as `updateSeats` does, for the AI executor's plan validation (`proposeSeatMapChanges`, kind `numbering`).
+
+|  |  |
+|---|---|
+| Permission | `CAPACITY_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `seating.seat` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `seating.seat_map` |
+| Writes | `cache:idempotency`, `seating.seat_map`, `seating.section`, `seating.seat` |
+| Called by | BO-954, BO-956 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| seatMapId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| addSections | array of object |  |  |
+| addSections[].code | string | yes | (max length 20) |
+| addSections[].name | string | yes | (max length 100) |
+| addSections[].boundary | array of Point |  |  |
+| addSections[].boundary[].x | number | yes |  |
+| addSections[].boundary[].y | number | yes |  |
+| addRows | array of object |  |  |
+| addRows[].sectionCode | string | yes |  |
+| addRows[].label | string | yes | (max length 10) |
+| addRows[].seatCount | integer | yes | (min 1; max 500) |
+| addRows[].firstSeatNumber | integer |  | (min 0; default 1) |
+| addRows[].numberingDirection | enum (leftToRight, rightToLeft) |  | (default leftToRight) |
+| addRows[].start | Point |  |  |
+| addRows[].start.x | number | yes |  |
+| addRows[].start.y | number | yes |  |
+| addRows[].end | Point |  |  |
+| addRows[].end.x | number | yes |  |
+| addRows[].end.y | number | yes |  |
+| addRows[].curveRadius | number |  | Null or absent for a straight row. (nullable) |
+| addRows[].categoryId | string (uuid) |  | (nullable) |
+| addSeats | array of object |  |  |
+| addSeats[].sectionCode | string | yes |  |
+| addSeats[].rowLabel | string | yes |  |
+| addSeats[].seatNumber | string | yes |  |
+| addSeats[].position | Point |  |  |
+| addSeats[].position.x | number | yes |  |
+| addSeats[].position.y | number | yes |  |
+| addSeats[].categoryId | string (uuid) |  | (nullable) |
+| addSeats[].attribute | SeatAttribute: enum (standard, accessible, companion, obstructedView, restrictedLegroom, premium, houseSeat, buffer, …) |  | BL-168. |
+| removeSeatIds | array of string (uuid) |  |  |
+| relabel | array of object |  |  |
+| relabel[].seatId | string (uuid) | yes |  |
+| relabel[].sectionCode | string |  |  |
+| relabel[].rowLabel | string |  |  |
+| relabel[].seatNumber | string |  |  |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| sectionsAdded | integer |  |  |
+| seatsAdded | integer |  |  |
+| seatsRemoved | integer |  |  |
+| seatsRelabelled | integer |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Applied, or would be applied (validate-only) |
+| 409 |  | A label is already taken in the map, or a removal touches a published map |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -5190,12 +5380,12 @@ Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (
 |---|---|
 | Permission | `CAPACITY_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `seating.recommendation_rules` non-empty |
+| Part of slice | setup, makes `seating.recommendation_rule` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
-| Reads | `seating.recommendation_rules` |
-| Writes | `seating.recommendation_rules` |
+| Reads | `seating.recommendation_rule` |
+| Writes | `seating.recommendation_rule` |
 | Called by | BO-1034, BO-1035, BO-1036, BO-1037, BO-1038, BO-1041 |
 
 **Parameters**
@@ -5259,30 +5449,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Synthesised key. |
 | product_id | uuid | no | Points at catalogue.product. |
 
-### `catalogue.channel_allocation`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes | Added 20 August. |
-| channel | text | yes |  |
-| allocated_units | integer | yes |  |
-| sold_units | integer | no |  |
-| leased_units | integer | no | Held by terminals on this channel but not yet sold. |
-| remaining_units | integer | no |  |
-| release_at | timestamptz | no | Unsold units return to the general pool at this time. |
-| sales_channel_id | uuid | no | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). |
-| allocation_type | text | no | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. |
-| minimum_units | integer | no |  |
-| maximum_units | integer | no |  |
-| replenishment_rule | jsonb | no | {sourceChannelId, trigger, thresholdUnits, sharePercent, units}. |
-| waitlist_behavior | text | no |  |
-| release_threshold_units | integer | no |  |
-| release_hours_before_event | integer | no | Alternative to releaseAt, relative to the performance start. |
-| contractual_units | integer | no | Units a partner agreement guarantees; rebalancing never goes below it. |
-| minimum_guaranteed_units | integer | no |  |
-| is_frozen | boolean | no | Excluded from rebalancing. |
-| envelope_id | uuid | yes | Points at catalogue.channel_capacity. |
-
 ### `catalogue.channel_capacity`
 
 | Column | Type | Required | Notes |
@@ -5299,6 +5465,30 @@ Every table this service owns that the slice reads or writes, with its columns a
 | remaining | integer | yes | What can still be held. |
 | has_channel_allocations | boolean | no | True where capacity is divided across channels. |
 | is_seated | boolean | yes | Seated envelopes cannot be leased and are blocked offline. |
+
+### `catalogue.channel_envelope`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Added 20 August. |
+| channel | text | yes |  |
+| allocated_units | integer | yes |  |
+| sold_units | integer | no |  |
+| leased_units | integer | no | Held by terminals on this channel but not yet sold. |
+| remaining_units | integer | no |  |
+| release_at | timestamptz | no | Unsold units return to the general pool at this time. |
+| sales_channel_id | uuid | no | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). |
+| envelope_type | text | no | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. |
+| minimum_units | integer | no |  |
+| maximum_units | integer | no |  |
+| replenishment_rule | jsonb | no | {sourceChannelId, trigger, thresholdUnits, sharePercent, units}. |
+| waitlist_behavior | text | no |  |
+| release_threshold_units | integer | no |  |
+| release_hours_before_event | integer | no | Alternative to releaseAt, relative to the performance start. |
+| contractual_units | integer | no | Units a partner agreement guarantees; rebalancing never goes below it. |
+| minimum_guaranteed_units | integer | no |  |
+| is_frozen | boolean | no | Excluded from rebalancing. |
+| envelope_id | uuid | yes | Points at catalogue.channel_capacity. |
 
 ### `catalogue.entitlement_template`
 
@@ -5406,7 +5596,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| product_id | text | no |  |
+| product_id | uuid | no |  |
 | kind | text | yes |  |
 | max_participants | integer | yes | Pupils or children, e.g. |
 | duration_minutes | integer | yes |  |
@@ -5447,7 +5637,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | created_at | timestamptz | no |  |
 | completed_at | timestamptz | no |  |
 
-### `catalogue.inventory_hold`
+### `catalogue.inventory_reservation`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -5494,7 +5684,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Added 20 August. |
 | price_list_id | uuid | yes |  |
 | variant_id | uuid | yes |  |
-| amount | numeric(18,4) | yes |  |
+| list_price | numeric(18,4) | yes |  |
 | tax_code_id | uuid | no |  |
 
 ### `catalogue.price_list`
@@ -5601,7 +5791,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| product_id | text | no |  |
+| product_id | uuid | no |  |
 | min_age_years | integer | no |  |
 | max_age_years | integer | no |  |
 | min_height_cm | integer | no |  |
@@ -5620,6 +5810,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| product_id | uuid | yes | The parent row. |
 | asset_id | uuid | yes | A MediaAsset of assets.yaml, in status ready. |
 | kind | text | yes |  |
 | is_primary | boolean | yes | The item *Read more* opens on and a listing shows. |
@@ -5669,6 +5860,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_default | boolean | no | Taken from their variant tables. |
 | is_active | boolean | yes | False when retired. |
 | description | jsonb | no | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). |
+
+### `catalogue.waitlist_entry`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| performance_id | uuid | yes |  |
+| variant_id | uuid | no |  |
+| subject_id | uuid | no |  |
+| contact_point | text | no | Where the offer goes. |
+| party_size | integer | yes |  |
+| status | text | no | Set by the server. |
+| position | integer | no | First in, first offered. |
+| offered_at | timestamptz | no |  |
+| offer_expires_at | timestamptz | no | The offer moves on when this passes. |
+| joined_at | timestamptz | no |  |
 
 ### `promotions.allocation_component`
 
@@ -5933,7 +6140,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
-### `seating.recommendation_rules`
+### `seating.recommendation_rule`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -5981,7 +6188,39 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rank | integer | yes | Ordering for best-seat assignment. |
 | seat_count | integer | no |  |
 
-### `seating.seat_hold`
+### `seating.seat_map`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| name | text | yes |  |
+| venue_id | uuid | yes |  |
+| status | text | yes |  |
+| seat_count | integer | yes |  |
+| section_count | integer | no |  |
+| has_geometry | boolean | no | False when only a manifest has been imported. |
+| published_at | timestamptz | no |  |
+| description | text | no |  |
+| view_box | jsonb | no | Coordinate space for rendering. |
+| stage_position | jsonb | no |  |
+| is_active | boolean | no |  |
+
+### `seating.seat_price_band`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| seat_category_id | uuid | no |  |
+| code | text | yes | Unique within the category. |
+| display_label | text | yes |  |
+| display_colour | text | no |  |
+| list_price | numeric(18,4) | yes |  |
+| channel | text | no | Null means every channel. |
+| customer_segment_id | uuid | no | A marketing-crm customer segment; null means everyone. |
+| effective_from | timestamptz | yes |  |
+| effective_to | timestamptz | no | Null means open-ended. |
+
+### `seating.seat_reservation`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -5998,34 +6237,31 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expires_at | timestamptz | yes |  |
 | block_id | uuid | no | Points at seating.seat_block. |
 
-### `seating.seat_hold_item`
+### `seating.seat_reservation_item`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| hold_id | uuid | yes |  |
+| seat_reservation_id | text | yes |  |
 | seat_id | uuid | yes |  |
-| held_price | numeric | no |  |
+| gross_amount | numeric | no |  |
 | created_at | timestamptz | yes |  |
 
-### `seating.seat_price_band`
+### `seating.section`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes |  |
-| seat_category_id | uuid | no |  |
-| code | text | yes | Unique within the category. |
-| display_label | text | yes |  |
-| display_colour | text | no |  |
-| amount | numeric(18,4) | yes |  |
-| channel | text | no | Null means every channel. |
-| customer_segment_id | uuid | no | A marketing-crm customer segment; null means everyone. |
-| effective_from | timestamptz | yes |  |
-| effective_to | timestamptz | no | Null means open-ended. |
+| code | text | yes |  |
+| name | text | yes |  |
+| row_count | integer | yes |  |
+| seat_count | integer | yes |  |
+| view_asset_id | uuid | no | The view of the stage from this section, as a photo, uploaded through assets like any other media (decided 29 September, rev 3 23SEP-14). |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
 
 ## Not in the first release
 
-376 operations, added to this service in later releases without changing any of the above.
+377 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6033,11 +6269,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | block | `allocateBlockedSeats`, `createSeatBlock`, `listSeatBlocks`, `relinquishSeatBlock` |
 | bundle | `listBundleCapacityPolicies`, `listBundlePartnerProductMappings`, `listBundles`, `reportBundleApplied`, `setBundleCapacityPolicy`, `setBundlePartnerProductMappings` |
 | capacity | `createChannelCapacity`, `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` |
-| catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `joinWaitlist`, `leaveWaitlist`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelConnectionConfiguration`, `setChannelSalesRule`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setDynamicPriceRule`, `setDynamicPricingGuardrailPolicy`, `setFeeDefinition`, `setMarketPricingConfiguration`, `setMembershipBenefit`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPlanBenefits`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setPriceLadderMatrix`, `setProductLinks`, `setSignalRegistryPolicy`, `testChannelConnection`, `transitionDynamicPricingStrategy`, `updateChannelIncident`, `updateDonationCampaign` |
+| catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelConnectionConfiguration`, `setChannelSalesRule`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setDynamicPriceRule`, `setDynamicPricingGuardrailPolicy`, `setFeeDefinition`, `setMarketPricingConfiguration`, `setMembershipBenefit`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPlanBenefits`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setPriceLadderMatrix`, `setProductLinks`, `setSignalRegistryPolicy`, `testChannelConnection`, `transitionDynamicPricingStrategy`, `updateChannelIncident`, `updateDonationCampaign` |
 | category | `listSeatCategories` |
 | coupon | `assignCoupon`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
 | drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createChannelProfile`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listTaxProfiles`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishChannelAvailability`, `publishChannelReadinessValidation`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setChannelFeePayment`, `setChannelPricingCommercial`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductCatalogue`, `setProductContextOwnership`, `setProductServicePrice`, `setPromotionStackingRule`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
-| entitlement | `listEntitlementTemplates`, `suspendEntitlement` |
+| entitlement | `archiveEntitlementTemplate`, `getEntitlementTemplate`, `listEntitlementTemplates`, `suspendEntitlement`, `updateEntitlementTemplate` |
 | event | `cancelPerformance`, `getEvent`, `getWaitingRoomStatus`, `setWaitingRoomSetting` |
 | events | `assignPerformanceMedia`, `estimateEventResourceCost`, `getEventChangeTreatmentPolicy`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventChangeTreatmentPolicy`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
 | general | `getPackagePricingDefinition`, `getProductAttributes`, `getTaxProfileJurisdiction` |

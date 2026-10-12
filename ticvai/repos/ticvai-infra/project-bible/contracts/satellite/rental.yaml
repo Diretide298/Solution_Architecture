@@ -2359,6 +2359,7 @@ components:
           format: uuid
           nullable: true
         stockReservationId:
+          x-ticvai-column: stock_earmark_id
           type: string
           format: uuid
           nullable: true

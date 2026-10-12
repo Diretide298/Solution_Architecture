@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 14 operations · 18 schemas · 2 permissions**
+**10 screens · 14 operations · 19 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -100,7 +100,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-174` | Media & Credential Command Center | C | 2 | 240 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-175` | Media Type & Technology Library | C | 19 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-176` | Virtual Credential & Media Association | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-177` | Verification Method Selection & Locking | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-177` | Verification Method Selection & Locking | C | 8 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-178` | Media Issuance & Encoding Profile | C | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-179` | Media Swap & Replacement | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-180` | RFID & NFC Configuration | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |

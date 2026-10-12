@@ -103,7 +103,7 @@ WHAT = {
         "**How much of a performance each sales channel may sell.** Two hundred seats with eighty "
         "to the web, eighty to the box office and forty held back. Renamed from `envelope`, which "
         "was unguessable."),
-    "catalogue.inventory_hold": (
+    "catalogue.inventory_reservation": (
         "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is "
         "held, not sold — CF-115 settled that contended inventory is leased rather than reserved, "
         "and the hold expires on its own. Renamed from `lease`, which read as a rental agreement."),
@@ -162,7 +162,7 @@ WHAT = {
         "**A line in the chart of accounts**, denominated in its own currency. One of four tables "
         "that genuinely differ from their region — a group consolidating across jurisdictions "
         "holds accounts in several."),
-    "inventory.item": (
+    "inventory.inventory_item": (
         "**Something a venue stocks**, distinct from something it sells. A bottle of syrup is an "
         "item and never a product; a t-shirt is both, joined through `retail.merchandise`."),
     "maintenance.asset": (
@@ -339,7 +339,7 @@ WHAT = {
     "orders.cash_movement": "**Cash in or out of a drawer** — a float, a pickup, a drop, a payout. Denominated, and the audit trail behind a shift variance.",
     "catalogue.price": "**What something costs on one price list.** A change here never rewrites what somebody already paid.",
     "catalogue.price_list": "**A named set of prices for a region and channel.** Region-scoped, because currency is (ADR-0018).",
-    "catalogue.channel_allocation": "**How much of a capacity each channel may sell.** Web cannot consume the counter\u2019s share.",
+    "catalogue.channel_envelope": "**How much of a capacity each channel may sell.** Web cannot consume the counter\u2019s share.",
     "catalogue.published_bundle": "**A catalogue snapshot a till can trade from offline** (ADR-0013). Published, versioned, and the reason a counter works with no network.",
     "catalogue.alternative_code": "**Another way to name the same product** — a barcode, a supplier code, a legacy id.",
     "access.scan_event": "**Every presentation of a credential, admitted or not.** The highest-volume table in the platform.",
@@ -388,7 +388,7 @@ WHAT = {
     "promotions.bundle": "**Several products sold as one**, with the components priced by allocation.",
     "promotions.upsell_rule": "**What to offer alongside what**, and where it may appear.",
     "seating.seat": "**One seat, addressable and holdable.** 396 rows in the sample manifest is one amphitheatre.",
-    "seating.seat_hold": "**A temporary claim on a seat.** Expires, which is what stops two channels selling it.",
+    "seating.seat_reservation": "**A temporary claim on a seat.** Expires, which is what stops two channels selling it.",
     "seating.seat_block": "**Seats withheld from sale** \u2014 house seats, accessibility, production hold.",
     "seating.section_row": "**A row within a section**, carrying its own numbering scheme.",
     "games.card": "**An arcade card holding credits.** The credit ledger is its history.",

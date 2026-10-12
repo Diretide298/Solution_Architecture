@@ -1,6 +1,6 @@
 # WS165 — Seat Management Venue Mapping Reference v1.0 board 1
 
-**10 screens · 14 operations · 20 schemas · 3 permissions**
+**10 screens · 15 operations · 20 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -107,9 +107,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-953` | Seat Map Command Center | C | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
-| `BO-954` | Venue Canvas | C | 0 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
+| `BO-954` | Venue Canvas | C | 35 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
 | `BO-955` | Sections & Zones | C | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `BO-956` | Rows & Seats | C | 0 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
+| `BO-956` | Rows & Seats | C | 35 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
 | `BO-957` | Standing Zones | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-958` | Suites & Boxes | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-959` | Stage & Focal Point | C | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-953, BO-954, BO-956, BO-957, BO-958, BO-959, BO-960, BO-961 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-953, BO-957, BO-958, BO-959, BO-960, BO-961 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

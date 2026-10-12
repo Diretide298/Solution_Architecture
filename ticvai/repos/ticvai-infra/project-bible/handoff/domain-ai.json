@@ -1628,7 +1628,8 @@
     "access.validated"
    ],
    "emits": [
-    "access.validated"
+    "access.validated",
+    "entitlement.voided"
    ]
   },
   {
@@ -1986,7 +1987,7 @@
    "name": "entitlement.transferred",
    "publisher": "catalogue",
    "role": "consumes",
-   "critical": false
+   "critical": true
   },
   {
    "name": "fnb.menuPublished",
@@ -2086,6 +2087,12 @@
   },
   {
    "name": "reporting.definitionPublished",
+   "publisher": "reporting",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "reporting.questionAnswered",
    "publisher": "reporting",
    "role": "consumes",
    "critical": true
@@ -5441,7 +5448,7 @@
   "operations": 146,
   "schemas": 125,
   "states": 42,
-  "events": 47,
+  "events": 48,
   "tables": 138,
   "screens": 194,
   "flows": 11,

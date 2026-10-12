@@ -1,4 +1,198 @@
 {
+ "AccessAccessArea": {
+  "type": "object",
+  "x-ticvai-persistence": "access.access_area",
+  "description": "One place in the physical access hierarchy of a venue: the venue itself, a park, zone, attraction or controlled area, with its parent, capacity, requirements and default policies. Merges access.access_area and access.occupancy_area (the occupancy hierarchy is the same tree; capacity, count adjustment and status-band thresholds sit on the area) (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "entityType",
+   "name",
+   "code",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Owning venue; null only on the row that is a venue itself"
+   },
+   "parentAreaId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Park, zone or area this one sits under; null at the top of the tree"
+   },
+   "entityType": {
+    "type": "string",
+    "enum": [
+     "venue",
+     "park",
+     "building",
+     "eventSpace",
+     "waterpark",
+     "themePark",
+     "museum",
+     "arena",
+     "stadium",
+     "exhibition",
+     "temporaryVenue",
+     "zone",
+     "attraction",
+     "controlledArea"
+    ],
+    "description": "What kind of place this is. The first eleven are the venue-level kinds of listVenueParkAccess; zone, attraction and controlledArea are the levels below (setAccessAreaZone, listLiveVenueOccupancy)"
+   },
+   "zoneType": {
+    "type": "string",
+    "enum": [
+     "public",
+     "ticketed",
+     "vip",
+     "staff",
+     "backOfHouse",
+     "attraction",
+     "restricted",
+     "fastPass",
+     "event",
+     "temporary"
+    ],
+    "nullable": true,
+    "description": "Kind of zone, set by setAccessAreaZone; null for non-zone rows"
+   },
+   "name": {
+    "type": "string"
+   },
+   "code": {
+    "type": "string"
+   },
+   "timeZone": {
+    "type": "string",
+    "nullable": true,
+    "description": "IANA time zone, e.g. Asia/Dubai"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "nullable": true,
+    "description": "Operating calendar the area follows"
+   },
+   "operatingSchedule": {
+    "type": "string",
+    "nullable": true
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "securityClassification": {
+    "type": "string",
+    "nullable": true,
+    "description": "The venue's label for the zone's classification level, renamable per venue (for example \"Staff only\" for `restricted`). The level itself is `securityClassificationLevel` (DEC-227; CHG-CSP-025)."
+   },
+   "securityClassificationLevel": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "public",
+     "restricted",
+     "secure",
+     "critical"
+    ],
+    "description": "**The zone's security classification: Public, Restricted, Secure or Critical, the labels renamable by the venue** (decided 2 October 2026, Chinmay, batch 6 set 9, BO-146: \"Public / Restricted / Secure / Critical (renamable)\"; DEC-227; CHG-CSP-025). A controlled level so rules and reports compare zones across venues; the venue's own wording is `securityClassification`. Null on a non-zone row."
+   },
+   "entryRequirements": {
+    "type": "string",
+    "nullable": true
+   },
+   "exitRequirements": {
+    "type": "string",
+    "nullable": true
+   },
+   "allowedCredentialClasses": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Credential classes admitted to the area"
+   },
+   "accessControlEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "defaultEntryPolicy": {
+    "type": "string",
+    "nullable": true
+   },
+   "defaultExitPolicy": {
+    "type": "string",
+    "nullable": true
+   },
+   "defaultCredentialRules": {
+    "type": "string",
+    "nullable": true
+   },
+   "offlinePolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Offline policy the area inherits (access.offline_policy)"
+   },
+   "emergencyBehavior": {
+    "type": "string",
+    "nullable": true
+   },
+   "supportMultiParkEnvironments": {
+    "type": "boolean",
+    "default": false
+   },
+   "operationalAdjustment": {
+    "type": "integer",
+    "default": 0,
+    "description": "Operator count adjustment added to entries minus exits for the current count"
+   },
+   "occupancyThresholds": {
+    "type": "object",
+    "properties": {
+     "warningPercent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "highPercent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "criticalPercent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     }
+    },
+    "nullable": true,
+    "description": "Percent-of-capacity thresholds that set the occupancy status band"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessAccessPointGroup": {
   "type": "object",
   "x-ticvai-persistence": "access.access_point_group",
@@ -1355,7 +1549,8 @@
    "parentId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-references": "platform.scope"
    },
    "path": {
     "type": "string",

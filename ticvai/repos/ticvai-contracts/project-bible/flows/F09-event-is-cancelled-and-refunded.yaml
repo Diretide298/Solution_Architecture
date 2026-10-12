@@ -51,9 +51,10 @@ steps:
 - step: 5
   screen: BO-023
   action: Confirms guests were notified
-  operations: []
+  operations:
+  - listMessageDispatches
   outcome: Told before they travel, not after
-  note: '**Repointed 2 October (CHG-WIR-001, CHG-WIR-004).** This step read listCampaigns on BO-005 Queue Monitor; a cancellation notice is transactional, not a campaign. No operation lists message dispatches yet (open contract gap CHG-WIR-004), so the step has no read until one exists.'
+  note: '**Repointed 2 October (CHG-WIR-001, CHG-WIR-004).** This step read listCampaigns on BO-005 Queue Monitor; a cancellation notice is transactional, not a campaign. **12 October 2026 (CHG-R6-038):** the notice is sent by marketing.notifyPerformanceHolders, the performance.cancelled consumer, one message per holder with `sourceRef` the performance; this step reads them back with listMessageDispatches (sourceRef = the performance id) on BO-023.'
 branches:
 - at: 2
   condition: Performance is part of a bundle

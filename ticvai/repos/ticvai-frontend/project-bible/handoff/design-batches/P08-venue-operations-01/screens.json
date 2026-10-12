@@ -2197,9 +2197,22 @@
    "status": "notStarted"
   },
   "navigation": {
+   "exitTo": [
+    "BO-1191"
+   ],
    "inferred": true,
    "entryFrom": [
     "BO-108"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1191",
+     "trigger": "Organisation",
+     "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)",
+     "carries": [
+      "orgUnitId"
+     ]
+    }
    ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Direction is set only here (decided 28 September, audit R221)** — `createAccessPoint` and `updateAccessPoint` carry an access point's fixed direction; `setTurnstileMode` sets the operating mode (with an optional turnstile mode) and never the direction. The scanner shows direction read-only.",
@@ -3574,7 +3587,9 @@
     "ADM-340",
     "ADM-606",
     "BO-1018",
-    "BO-1034"
+    "BO-1034",
+    "BO-1191",
+    "BO-954"
    ],
    "entryFrom": [
     "BO-108",
@@ -4582,6 +4597,16 @@
      "to": "BO-1034",
      "trigger": "Opens Best Seat Recommendations",
      "provenance": "CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A, CHG-RONEP-007); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-954",
+     "trigger": "Opens Venue Canvas",
+     "provenance": "CHG-R6-047: the section home links to the Block A seat-map screen it leads to (lever A, CHG-RONEP-007); its command centre BO-953 is not in Block A"
+    },
+    {
+     "to": "BO-1191",
+     "trigger": "Organisation",
+     "provenance": "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
     }
    ]
   },

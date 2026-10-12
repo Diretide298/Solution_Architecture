@@ -87,7 +87,7 @@ part of a ticket sale and are not deployed.**
 ```
 catalogue.product · variant · performance · channel_capacity · price_list · inventory_hold
 orders.cart · cart_line · sales_order · order_line · payment
-seating.seat_hold · promotions.promotion
+seating.seat_reservation · promotions.promotion
 ledger.fx_rate · journal_entry · posting · platform.workstation
 ```
 

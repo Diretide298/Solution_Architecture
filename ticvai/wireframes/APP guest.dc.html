@@ -264,7 +264,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; checkBookingEligibility · getAvailability · addCartLine · getPerformance +4</div>
+          <div><b>OPERATIONS</b> &middot; checkBookingEligibility · getAvailability · addCartLine · getPerformance +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation, cartId&larr;navigation, eventId&larr;WEB-004</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Selects seats on the map</i> <span class="car">eventId · performanceId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart and may enter a promotion c</i> <span class="car">cartId</span><br><a href="#web-015">WEB-015</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId</span></div>
@@ -1325,7 +1325,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; checkBookingEligibility · listPerformances · getAvailability · listProductCategories +5</div>
+          <div><b>OPERATIONS</b> &middot; checkBookingEligibility · listPerformances · getAvailability · listProductCategories +7</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink, cartId&larr;session, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-008">GST-008</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#gst-046">GST-046</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId</span><br><a href="#gst-049">GST-049</a>  &mdash; <i>Picks a time on a seated event (inline step)</i> <span class="car">performanceId · eventId</span></div>
@@ -2390,7 +2390,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createPayment · inquirePaymentStatus · checkoutCart · getCart +5</div>
+          <div><b>OPERATIONS</b> &middot; createPayment · inquirePaymentStatus · checkoutCart · getCart +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, orderId&larr;deepLink, paymentId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-010">GST-010</a>  &mdash; <i>Paid: the booking confirmation</i> <span class="car">orderId</span><br><a href="#gst-028">GST-028</a>  &mdash; <i>It is confirmed with a facility</i> <span class="car">orderId</span></div>

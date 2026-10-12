@@ -82,7 +82,7 @@ somebody could get wrong.
 line.** ADR-0036 itemised them for the burst cell: three connection pools instead of one, a
 cross-service read over the network **inside the lease lock**, slower provisioning. Per tenant, a
 purchase never leaves its database — `acquireInventoryHold` reads `catalogue.performance` and
-writes `catalogue.inventory_hold` in the same transaction it always did — and the pools are per
+writes `catalogue.inventory_reservation` in the same transaction it always did — and the pools are per
 tenant, which is a capacity question rather than a correctness one.
 
 **And the operational cost the package objected to changes shape.** Sixteen databases to migrate,

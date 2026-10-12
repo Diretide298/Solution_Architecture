@@ -1,6 +1,6 @@
 # WS18 — Approval Workflows and Governance board 6
 
-**10 screens · 16 operations · 16 schemas · 5 permissions**
+**10 screens · 17 operations · 16 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `APPROVAL_CONFIGURE, APPROVAL_VIEW, ROLE_MANAGE, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_VIEW, PERMISSION_VIEW, ROLE_MANAGE, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-339` | Governance & Compliance Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-340` | Segregation of Duties Policy Manager | A | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-340` | Segregation of Duties Policy Manager | A | 9 | 4 | 5 | 6 | 1 | 0 | — | notStarted (—) |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | B | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 33 | 6 | 11 | 2 | 0 | — | notStarted (—) |
 | `ADM-343` | Sensitive Action Confirmation | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
@@ -272,9 +272,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Platform · wave 3 · needs the `core` module |
+| Module | Platform · wave 1 · needs the `core` module |
 | Block | Block A · ticket #27935 (APP-SETUP-ADM-340) |
-| Who uses it | venue staff holding `ROLE_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PERMISSION_VIEW`, `ROLE_MANAGE` (1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Price Configuration User) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -318,11 +318,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Rules in force** (data table, from `listSegregationRules`): The tenant's rules as saved, read on load (12 October 2026, CHG-R6-042). Save segregation rules sends the whole list (`setSegregationRules` is a PUT), so the form opens on these rows and a rule left out is removed.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Permission a | text | — |
+| Permission b | text | — |
+| Severity | chip: Block, Require approval, Warn | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save segregation rules (primary button) | `setSegregationRules` PUT `/segregation-rules` | inline | SegregationRule[] | — | opens modal first |
+
+**Data it reads**: `listSegregationRules` (onLoad, The rules in force, read before the whole list is replaced)
 
 **Where the user goes next**
 
@@ -332,10 +345,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The segregation duties policy configuration as saved. |
+| Loading (`?state=loading`) | The segregation rules as saved, read by `listSegregationRules`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the segregation duties policy untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No segregation duties policy configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE` sees Save segregation rules disabled, naming it. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -355,13 +368,23 @@ rules:
 
 #### Permissions
 
+- `listSegregationRules` → `PERMISSION_VIEW` (read) · staff
 - `setSegregationRules` → `ROLE_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE` sees Save segregation rules disabled, naming it.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 7.1.23 | The system shall prevent conflicting permission combinations. Example: a user cannot create and approve the same refund, promotion, wallet adjustment, or financial transaction. | F&B POS | CONTRACTED | data `SegregationRule` |
+| 7.1.32 | The system shall identify and manage privileged users such as administrators, finance managers, security officers, and system operators, with enhanced controls and monitoring. | F&B POS | CONTRACTED | data `SegregationRule` |
+| 7.1.33 | The system shall support periodic review of user permissions allowing managers to approve, revoke, or modify access rights. | F&B POS | CONTRACTED | data `SegregationRule` |
+| 7.1.43 | Allow users to delegate permissions to other users with start date, end date, approval workflow, scope limitations and audit logging. | F&B POS | CONTRACTED | data `SegregationRule` |
+| 7.1.48 | Prevent conflicting permissions such as creating and approving refunds, promotions, wallet adjustments or financial transactions by the same user. | F&B POS | CONTRACTED | data `SegregationRule` |
+| 11.1.24 | Segregation of Duties - System shall prevent users from approving their own requests. | Approval Workflows & Governance | CONTRACTED | data `SegregationRule` |
 
 #### Client meeting inputs
 
@@ -385,11 +408,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-340?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save segregation rules.
 - [ ] Every transition is wired: `ADM-339`.
-- [ ] Every gated control is gated: `ROLE_MANAGE`.
+- [ ] Every gated control is gated: `PERMISSION_VIEW`, `ROLE_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1615,6 +1638,7 @@ Method, path, parameters, request and response for every operation these screens
 "listApprovalControlPolicies": {"method":"GET","path":"/approval-control-policies","contract":"approvals","summary":"Segregation of duties, four-eyes and dual control","permission":"APPROVAL_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"ApprovalControlPolicy"},
 "listDataRetentionSettings": {"method":"GET","path":"/data-retention-settings","contract":"tenancy","summary":"How long the tenant keeps each class of data","permission":"TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"dataClass","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMfaMethods": {"method":"GET","path":"/auth/mfa/methods","contract":"identity","summary":"Enrolled MFA methods","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MfaMethod"},
+"listSegregationRules": {"method":"GET","path":"/segregation-rules","contract":"identity","summary":"Read the conflicting-permission rules back","permission":"PERMISSION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"SegregationRule"},
 "listStepUpPolicies": {"method":"GET","path":"/step-up-policies","contract":"approvals","summary":"What needs a second factor here","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"effective","in":"query","required":null}],"requestBody":null,"responds":"StepUpPolicy"},
 "setApprovalControlPolicy": {"method":"PUT","path":"/approval-control-policies","contract":"approvals","summary":"Require a second, independent pair of eyes","permission":"APPROVAL_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalControlPolicy","responds":"ApprovalControlPolicy"},
 "setApprovalRetentionPolicy": {"method":"PUT","path":"/approval-retention","contract":"approvals","summary":"How long decision records are kept, and what survives","permission":"APPROVAL_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalRetentionPolicy","responds":"ApprovalRetentionPolicy"},

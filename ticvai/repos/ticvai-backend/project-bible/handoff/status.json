@@ -1,22 +1,22 @@
 {
  "scope": "platform",
- "generated": "2026-10-08",
+ "generated": "2026-10-13",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2790,
+  "operations": 2796,
   "contracts": 33,
   "tables": 1129,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3192,
+  "relationships": 3193,
   "states": 207,
-  "events": 77,
+  "events": 87,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 70,
-  "screens": 2451,
+  "screens": 2453,
   "platforms": 16,
   "frontends": 13,
   "apps": 5,
@@ -26,22 +26,22 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2756,
-    "total": 2790,
+    "done": 2762,
+    "total": 2796,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2790,
-    "total": 2790,
+    "done": 2796,
+    "total": 2796,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 2451,
-    "total": 2451,
+    "done": 2453,
+    "total": 2453,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -82,8 +82,8 @@
    },
    {
     "name": "Screens with operations",
-    "done": 2387,
-    "total": 2451,
+    "done": 2389,
+    "total": 2453,
     "percent": 97,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
@@ -103,9 +103,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2552,
-    "total": 2790,
-    "percent": 91,
+    "done": 2562,
+    "total": 2796,
+    "percent": 92,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
    {
@@ -176,9 +176,9 @@
   "build": 33
  },
  "waves": {
-  "wave1": 419,
+  "wave1": 420,
   "wave2": 134,
-  "wave3": 1898
+  "wave3": 1899
  },
  "platformBreakdown": [
   {
@@ -235,7 +235,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 1661
+   "screens": 1663
   },
   {
    "code": "P09",
