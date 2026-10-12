@@ -151,8 +151,31 @@ def replaced_note(into: str, into_id, op: str, how: str) -> str:
             "carries, so this ticket is closed.")
 
 
-def build_plan():
-    """(map, [(key, 'defer' | 'merge', comment)], [unexplained keys]). No network: tools/op-review.py reads it too."""
+# **A pushed sub-task whose operation moved to another task on purpose** (12 October 2026, CHG-R6-052): KEY#operation
+# -> the reason. build-service-docs.py keeps a pushed task's operations together, and check-key-stability.py blocks a
+# pushed sub-task whose operation is now under another task; a move somebody decided is named here, and its sub-task is
+# closed as a duplicate of the new one with this reason. Empty: no move has been decided.
+SUBTASK_MOVES: dict = {}
+
+# The notes build_plan works out again at every release (their head; tools/op-release.py refuses a bundle where one of
+# them does not name its release, CHG-R6-053).
+PER_RELEASE_NOTES = ("**Duplicate of #", "**Out of the plan**", "**Not a separate piece of work**")
+
+
+def when(release=None, day=None) -> str:
+    """**A retirement says the release and the day it was decided** (12 October 2026, CHG-R6-053). The sub-task notes
+    below are worked out again at every release, but said "decided 1 October" -- the day the first regrouping was
+    decided -- whatever release retired them. tools/op-release.py passes its release and the day of the commit it is
+    built from; without them (op-review, a dry run of this script) the note names no date rather than a wrong one."""
+    if release and day:
+        return f" (release {release}, decided {day})"
+    return f" (release {release})" if release else ""
+
+
+def build_plan(release=None, day=None):
+    """(map, [(key, 'defer' | 'merge', comment)], [unexplained keys]). No network: tools/op-review.py reads it too.
+    `release` and `day` (e.g. 'r4', '12 October 2026') date the notes of the retirements worked out per release."""
+    at = when(release, day)
     mp = json.loads(MAP.read_text(encoding="utf-8"))
     with open(ROOT / "handoff" / "service-docs" / "tasks.csv", encoding="utf-8") as f:
         planned = {r["key"] for r in csv.DictReader(f)}
@@ -246,7 +269,8 @@ def build_plan():
             covered.add(g)
     # A pushed sub-task whose task is still planned but whose operation or table is no longer under it (the task
     # was split or regrouped, 29-30 September): 128 on 1 October. Its work is either on another planned sub-task
-    # (a duplicate in effect: closed, pointing at that one) or has left the plan (on hold). Decided 1 October.
+    # (a duplicate in effect: closed, pointing at that one) or has left the plan (on hold). Decided 1 October; each
+    # note carries the release that retires it (CHG-R6-053).
     sys.path.insert(0, str(Path(__file__).parent))
     push = __import__("push-openproject")
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
@@ -273,16 +297,20 @@ def build_plan():
                                      "sub-task is on hold and comes back with the refresh after that."))
             continue
         if not re.match(r"^[a-z][A-Za-z0-9]+$", part) and "." not in part:
-            plan.append((k, "merge", f"**Not a separate piece of work** (1 October): `{part}` was a fragment of "
+            plan.append((k, "merge", f"**Not a separate piece of work**{at}: `{part}` was a fragment of "
                                      f"{base}'s title, read as an operation by mistake. {base} itself carries it, "
                                      "so this sub-task is closed."))
             continue
-        if other and other in mp:
-            plan.append((k, "merge", f"**Duplicate of #{mp[other]}** (decided 1 October): `{part}` moved to "
+        if other and other in mp and k in SUBTASK_MOVES:
+            plan.append((k, "merge", f"**Duplicate of #{mp[other]}**{at}: `{part}` moved to "
+                                     f"{other.partition('#')[0]}: {SUBTASK_MOVES[k]}. That sub-task carries it now, so "
+                                     "this one is closed."))
+        elif other and other in mp:
+            plan.append((k, "merge", f"**Duplicate of #{mp[other]}**{at}: `{part}` moved to "
                                      f"{other.partition('#')[0]} when its task was regrouped; that sub-task carries "
                                      "it now, so this one is closed."))
         else:
-            plan.append((k, "defer", f"**Out of the plan** (decided 1 October): `{part}` is no longer part of "
+            plan.append((k, "defer", f"**Out of the plan**{at}: `{part}` is no longer part of "
                                      f"{base}'s work in this release. The sub-task is on hold and comes back if "
                                      "its work is planned again."))
     unexplained = [g for g in gone if g not in covered]

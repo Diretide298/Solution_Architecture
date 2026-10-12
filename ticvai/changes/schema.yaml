@@ -7,6 +7,11 @@ version: 1
 # One file per change: changes/entries/<id>-<slug>.yaml. Ids are allocated per batch (one batch per
 # branch or agent run): CHG-SEED-001, CHG-FIN-001, CHG-WIR-001, CHG-GST-001 ... and run 001, 002, ...
 # with no gap inside a batch. Two branches never share a batch code, so they never collide on merge.
+# A batch several agents work in at once is split into blocks of ids, one block per agent (R6, 12 October 2026: the
+# lead numbers from 001 and hands each agent a block of ten, 050-059 and on), so they never collide on merge; the gap rule holds
+# inside each block (CHG-R6-051).
+id_blocks:
+  R6: 10
 id_pattern: '^CHG-[A-Z][A-Z0-9]{1,5}-\d{3}$'
 slug_pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
 

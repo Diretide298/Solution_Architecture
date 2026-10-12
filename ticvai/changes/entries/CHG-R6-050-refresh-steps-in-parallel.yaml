@@ -1,0 +1,51 @@
+id: CHG-R6-050
+date: '2026-10-12'
+source: developer
+kind: process
+proposed: '2026-10-12'
+summary: 'refresh-safe.sh --parallel N runs the independent refresh steps N at a time, ordered by the read and write
+  sets handoff/refresh-manifest.json records; serial stays the default.'
+decision:
+  what: 'tools/refresh-manifest.py gains schedule() and emit --parallel N: a step waits for every earlier selected step
+    that writes what it reads, writes what it writes, or reads what it writes (34 steps read a later step''s previous
+    output, so the third rule matters); a step the manifest cannot vouch for runs alone (a barrier): unknown to the
+    manifest (build-changelog-index today), low confidence (steps 19, 21, 23, 24, 25), shelling out (derive-mirrors) or
+    reading or writing the whole package. Ready steps start in refresh order, at most N at once, each in its own
+    subshell with the same step runtime (exit code, expected outputs, timing row, resume state, FAILED line); its output
+    is copied into the log whole when it ends. On a failure nothing new starts and the running steps finish. The waves,
+    the barriers and the expected time from an earlier run''s steps.tsv are printed before the run (`refresh-manifest.py
+    schedule` prints them alone). tools/refresh-safe.sh gains --parallel N and --times FILE; --trace refuses --parallel.
+    Serial (--parallel 1) stays the default until a full release run has been compared.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The lead''s r4 tooling list, 12 October 2026: the release check runs refresh.sh''s 65 derive steps one after
+  another (80-115 minutes); --jobs (CHG-RSPD-001, the council of 3 October 23:30) only parallelises the checks.'
+keys_touched:
+  files:
+  - tools/refresh-manifest.py
+  - tools/refresh-safe.sh
+  - docs/active/refresh-runbook.md
+  other:
+  - CHG-RSPD-001
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR; the request is the lead's r4 tooling list of 12 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/refresh-manifest.py::schedule
+status: open
+notes: 'Batch R6, 12 October 2026. Expected on the 7 October full run''s step times: 79.2 minutes serial, 52.7 at
+  --parallel 4 (the critical path, 52.1, is the design chain 26-27-28-31-32-34-35, where link-screens-contracts alone is
+  14 minutes). Measured on 12 October on 87a41a9e, steps 1-18 and 41-52 (--steps; --changed is refused until the manifest is rebuilt), --no-merge --skip-checks: derive 840 s serial, 319 s at --parallel 4 (x2.63; the schedule predicted x2.64). Both runs changed the same 23 files; 12 are byte-identical, 5 workbooks differ only in docProps/core.xml (the save time), and 5 (schema-reference.json, schema-roots.md, relationship-graph.json, TenancyService.yaml, packs-index.json) differ in tie order, which a second serial run also changed: Python''s per-process hash seed, not the parallel run. handoff/refresh-manifest.json predates
+  step 65 (build-changelog-index), so `select` refuses scoped --changed runs until it is rebuilt; --parallel matches
+  steps by command and runs an unknown one alone.'

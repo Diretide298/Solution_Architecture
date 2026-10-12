@@ -1,0 +1,62 @@
+id: CHG-R6-052
+date: '2026-10-12'
+source: developer
+kind: process
+proposed: '2026-10-12'
+summary: 'A pushed task keeps its operations: build-service-docs.py cuts a group''s operations around what is pushed,
+  so a pushed sub-task never moves to another task, and check-key-stability fails on a pushed KEY#operation whose
+  operation is now under another planned task.'
+decision:
+  what: 'tools/build-service-docs.py gains pinned_ops() (each pushed operation -> the task its newest sub-task is under,
+    from pms-map.json) and stable_chunks(), used by all three operation groupings (first release, Venue Management,
+    later app-modules): pushed operations stay with their pushed task, only operations nobody pushed are cut into new
+    tasks of four under numbers nobody planned or pushed; a task op-retire.py closes holds its operations only while
+    they are exactly its pushed work (CHG-R4-010). Where the plain cut in fours already gives the same groups (every
+    plan so far: tasks.csv and plan-tasks.csv come out byte for byte as before) the keys are the ones the generator
+    always gave. tools/check-key-stability.py gains the rule `moved` (a pushed sub-task whose task is still planned,
+    whose operation another planned task now builds) and four self-tests: such a move is blocked, the same move named
+    in op-retire.py SUBTASK_MOVES passes, a new operation sorted into SVC-ORDER-SHIFT cut in plain fours moves pushed
+    operations, and stable_chunks keeps every one with its task. Sub-tasks a release bundle already retires (the
+    committed op-release.json `retire`) pass. tools/op-retire.py gains SUBTASK_MOVES (empty) for a move decided on
+    purpose, whose reason goes into the duplicate note; tools/op-release.py runs the moved rule with its key check.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The lead''s r4 tooling list, 12 October 2026: when the shift tasks were regrouped, openShift moved from
+  SVC-ORDER-SHIFT-3 to SVC-ORDER-SHIFT-4 (resumeShift to -5, suspendShift to -6), and the pushed sub-tasks #32646,
+  #30864 and #32650 had to be closed as duplicates (op-release.json `retire`, first in the r2 bundle, commit
+  44db9a27). CHG-R4-010 kept a pushed task''s key on its work; nothing kept its operations.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  - tools/check-key-stability.py
+  - tools/op-retire.py
+  - tools/op-release.py
+  tickets:
+  - SVC-ORDER-SHIFT-3
+  - SVC-ORDER-SHIFT-4
+  - SVC-ORDER-SHIFT-5
+  other:
+  - CHG-R4-010
+root_class: 'new: regroup-moves-pushed-subtask'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR; the request is the lead's r4 tooling list of 12 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: 'Batch R6, 12 October 2026. No plan change: run on this tree, the generator writes tasks.csv and plan-tasks.csv
+  identical to the generator before it, and no ticket is rewritten. Finding, not fixed here: ops_of in
+  build-service-docs.py is keyed by the natural keys and read after the key reconciliation, so an app-module feature
+  whose task was written under its pushed key leaves that task''s operations out of its "Scope" and "Builds" (and its
+  load); with today''s 463 reconciled keys, e.g. AM-IDENTITY-SECURITY-P06-BLOCK-A says 0 operations although it parents
+  the SSO tasks. Fixing it changes feature descriptions and about 50 feature leads, a plan change for the lead.'
