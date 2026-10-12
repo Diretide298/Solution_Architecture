@@ -1,0 +1,72 @@
+id: CHG-R6-030
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The ticket media designers BO-346 (PDF, printable and POS), BO-347 (Apple Wallet) and BO-348 (Google Wallet)
+  take the product permission the ticket templates on BO-344 use; BO-349 RFID/NFC keeps ACCESS_POINT_CONFIGURE.
+  An approved breaking change against r1 (BC-034..BC-037).'
+decision:
+  what: 'contracts/spine/access.yaml: getPdfPrintablePos x-ticvai-permission ACCESS_POINT_CONFIGURE -> PRODUCT_VIEW;
+    setPdfPrintablePos, setAppleWalletPass and setGoogleWalletPass ACCESS_POINT_CONFIGURE -> PRODUCT_CONFIGURE,
+    each with an x-ticvai-permission-note saying what it was and why. setRfidNfcCard (BO-349) stays
+    ACCESS_POINT_CONFIGURE. docs/active/breaking-changes.yaml: BC-034..BC-037 record the approval ("Approve
+    (Recommended)", Chinmay, 12 October 2026), tag r4, and the producer and consumer tickets
+    (VM-ACCESS-GENERAL-1, VM-ACCESS-ACCESS-1, VM-BO-346, SVC-ACCESS-ACCESS-61/63, VM-BO-347/348 and the two
+    module tests). screens/P08-venue-back-office.yaml: BO-346 emptyNoAccess names PRODUCT_VIEW (and
+    PRODUCT_CONFIGURE for Save design) instead of ACCESS_POINT_CONFIGURE; BO-347 and BO-348 emptyNoAccess name
+    PRODUCT_CONFIGURE. BO-346 has no unbound operation left at HEAD (its get and set are bound; the orders
+    template operations moved to BO-344 in CHG-RFM-014), so nothing more was bound.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The Vivaticket comparison of 6 October listed "Ticket template ops vs BO-346 designer permission" as a defect:
+  the designer is gated on a permission the template operations do not accept (listTicketTemplates PRODUCT_VIEW;
+  create, update, clone and import PRODUCT_CONFIGURE, CHG-RFM-014), so a product manager could create a template
+  and not design it. Chinmay, 12 October 2026: "Approve (Recommended)"; BO-349 RFID/NFC uses ACCESS_POINT;
+  BO-347 and BO-348 get the same treatment as BO-346.'
+keys_touched:
+  screens:
+  - 'BO-346'
+  - 'BO-347'
+  - 'BO-348'
+  - 'BO-349'
+  operations:
+  - 'getPdfPrintablePos'
+  - 'setPdfPrintablePos'
+  - 'setAppleWalletPass'
+  - 'setGoogleWalletPass'
+  files:
+  - 'contracts/spine/access.yaml'
+  - 'docs/active/breaking-changes.yaml'
+  - 'screens/P08-venue-back-office.yaml'
+  - 'tools/check-screen-permissions.py'
+  - 'tools/run-checks.py'
+root_class: 'new: screen-gate-not-its-operations'
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESS-61
+  - SVC-ACCESS-ACCESS-63
+  - VM-BO-347
+  - VM-BO-348
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; Chinmay''s approval of 12 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-screen-permissions.py'
+status: open
+notes: 'Batch R6, 12 October 2026. A breaking change: the producer and consumer tickets move to r4 together
+  (BC-034..037). VM-BO-346, VM-ACCESS-ACCESS-1 and VM-ACCESS-GENERAL-1 are Block A tickets in Sprints 1 and 3
+  and are left out of tickets.unstarted: whether any is started is ADAM''s to say at the release. A started one
+  keeps its tag and gets a comment plus a delta ticket, never a rewrite. tools/check-screen-permissions.py
+  (SP-NOACCESS: a screen''s emptyNoAccess names a permission none of its operations requires; SP-DESIGNER: the
+  five designer permissions as decided) is registered in tools/run-checks.py.
+  docs/active/workshop-pack-write-decisions.md:61 still records the 29 September reading
+  (ACCESS_POINT_CONFIGURE) as history.'

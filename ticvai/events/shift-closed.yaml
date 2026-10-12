@@ -42,6 +42,10 @@ payload:
   notes: Null where within tolerance
 - field: closedAt
   type: timestamp
+- field: businessDate
+  type: date
+  notes: Optional (12 October 2026, CHG-R6-032). Shift.businessDate, the business day the shift belongs to, from
+    the venue's businessDayCutoff (default 00:00); ledger and reporting key the day by it, not by closedAt
 consumers:
 - context: ledger
   purpose: Post the cash position and any variance

@@ -4830,6 +4830,7 @@ paths:
       summary: Cancel a performance
       description: |-
         Stops sales, notifies every holder, and queues a bulk refund for approval. The refund is **not** issued automatically — a cancellation of any size is a financial event someone signs off.
+        **How every holder is notified** (12 October 2026, CHG-R6-038): `performance.cancelled` carries the `guestMessage` written here, and its marketing consumer `notifyPerformanceHolders` (marketing-crm) sends one transactional message per holder in their language, with `sourceRef` the performance; BO-023 reads them back with `listMessageDispatches` (F09 step 5).
         Returns the exposure before committing so the person cancelling sees what it costs.
         **A supervisor's step-up on the same device, not an approval request**, as for a shift reopen (proposed by the coordinator, client to confirm (audit R144): the decision did not name this act). A real run carries `supervisorStepUp`; the rule is `SupervisorStepUp` in `common.yaml`: the PIN is checked against the principal, who must hold `PERFORMANCE_CONFIGURE` at this venue, and a failure is a `403` with nothing written. A dry run needs none. The bulk refund it queues still goes for approval as a refund.
 
@@ -25858,6 +25859,23 @@ components:
               - bulkCsvExport
           description: Fulfillment Methods (pack p.15-16; bulkCsvExport is the pre-generated ticket batch for
             partners that do not integrate, MoM 31 Aug §4.3)
+        ticketCredentialFormat:
+          type: string
+          nullable: true
+          enum:
+          - platformSignedQr
+          - staticQr
+          - rfidCard
+          - null
+          description: '**The ticket credential this channel''s tickets carry** (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026,
+            CHG-R6-031). `platformSignedQr`, the default and what null means, is the platform''s own signed QR as the
+            event issues it (rotating where the event sells dynamic QR, GST-055). `staticQr` is the platform''s
+            signed QR issued once and never rotated, the minutes'' "standard QR code" for a ticket that leaves the
+            app (a reseller''s batch, a printed invitation). `rfidCard` issues no QR: the ticket is collected as an
+            RFID card or wristband. A product''s own override (access `AccessVerificationMethodPolicy.credentialFormatOverride`)
+            wins over this; `issueOrderEntitlements` resolves the two when it issues. Same values as access
+            `TicketCredentialFormat`. Saved on the channel''s own row, `SalesChannelProfile.ticketCredentialFormat`
+            (`catalogue.sales_channel`), for the channel `channelId` names.'
     ChannelPublicationReadinessAiValidationView:
       type: object
       x-ticvai-drafted-shape: true
@@ -33839,7 +33857,8 @@ components:
           nullable: true
         date:
           type: string
-          description: Business date
+          description: Business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default
+            00:00; CHG-R6-032)
           format: date
         refunds:
           type: integer
@@ -37972,6 +37991,22 @@ components:
             - voucher
             - apiTicketDelivery
             - bulkCsvExport
+        ticketCredentialFormat:
+          type: string
+          nullable: true
+          enum:
+          - platformSignedQr
+          - staticQr
+          - rfidCard
+          - null
+          description: '**The ticket credential this channel''s tickets carry** (MoM 2 Sep 2026 §4.7, MOM-0330; 12 October 2026,
+            CHG-R6-031). `platformSignedQr`, the default and what null means, is the platform''s own signed QR as the
+            event issues it (rotating where the event sells dynamic QR, GST-055). `staticQr` is the platform''s
+            signed QR issued once and never rotated, the minutes'' "standard QR code" for a ticket that leaves the
+            app (a reseller''s batch, a printed invitation). `rfidCard` issues no QR: the ticket is collected as an
+            RFID card or wristband. A product''s own override (access `AccessVerificationMethodPolicy.credentialFormatOverride`)
+            wins over this; `issueOrderEntitlements` resolves the two when it issues. Same values as access
+            `TicketCredentialFormat`.'
         partnerOwner:
           type: string
           maxLength: 200

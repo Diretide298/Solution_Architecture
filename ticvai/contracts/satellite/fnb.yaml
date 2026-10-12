@@ -9152,7 +9152,8 @@ components:
         forDate:
           type: string
           format: date
-          description: The trading day this prep list is for, in the Region's time zone.
+          description: The trading day this prep list is for, in the Region's time zone; a business date, closing at
+            the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032).
         status:
           type: string
           enum:

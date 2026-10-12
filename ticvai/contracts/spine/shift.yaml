@@ -148,6 +148,12 @@ paths:
         - name: openedTo
           in: query
           schema: { type: string, format: date-time }
+        - name: businessDate
+          in: query
+          required: false
+          description: The shifts of one business date (`Shift.businessDate`, closing at the venue's
+            `businessDayCutoff`; CHG-R6-032), as the daily reconciliation asks for them.
+          schema: { type: string, format: date }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
@@ -1128,6 +1134,10 @@ paths:
       description: >
         The operator submits a counted denomination breakdown. The expected figure is not
         returned before submission — that is what makes the count blind.
+
+        **The shift closes on its own business date** (`Shift.businessDate`, from the venue's
+        `businessDayCutoff`, default 00:00; CHG-R6-032), whatever the clock says at close, so the
+        Z-report and the daily reconciliation count it on the day it traded.
 
         The response carries the variance. Where it exceeds the configured threshold, the
         shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
@@ -2589,6 +2599,16 @@ components:
             Inventory leases currently held by this workstation. Surfaced so an operator
             closing a shift can see what will be returned.
         openedAt: { type: string, format: date-time }
+        businessDate:
+          type: string
+          format: date
+          readOnly: true
+          description: >
+            **The business day the shift belongs to** (12 October 2026, CHG-R6-032): the venue-local date of
+            `openedAt` taken against the venue's `businessDayCutoff` (tenancy `VenueSettings`, inheriting the
+            tenant default, default 00:00). Set once when the shift opens and never moved, so a shift opened at
+            23:00 and closed at 01:00 stays on the day it opened. The daily reconciliation (BO-043) lists the
+            shifts of one business date, and the period close's `noOpenShifts` check reads it (finance).
         recordedAt:
           type: string
           format: date-time

@@ -4038,6 +4038,8 @@ components:
                 - daily
                 - endOfBusinessDay
                 default: endOfBusinessDay
+                description: '`endOfBusinessDay` runs when the venue''s business day closes, at its
+                  `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032).'
         scopePath:
           type: string
     WalletIntegrationMapping:

@@ -1,0 +1,58 @@
+id: CHG-R6-038
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'A cancelled performance tells its guests: notifyPerformanceHolders (marketing-crm) consumes
+  performance.cancelled and sends one transactional message per holder in their language, with the staff''s
+  guestMessage now carried on the event; BO-023 and F09 step 5 read the dispatches back.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml: POST /performance-cancellation-notices notifyPerformanceHolders
+    (service, x-ticvai-consumes performance.cancelled; holders read from access; one dispatch per guest,
+    template performanceCancelled, sourceRef the performance; idempotent on performance and subject).
+    events/performance-cancelled.yaml: optional guestMessage; the marketing consumer names the operation, keyed
+    on performanceId + subjectId. contracts/spine/catalogue.yaml: cancelPerformance says how every holder is
+    notified. flows/F09-event-is-cancelled-and-refunded.yaml step 5 lists listMessageDispatches.
+    screens/P08-venue-back-office.yaml: BO-023 binds listMessageDispatches.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The Vivaticket comparison of 6 October: a cancelled performance is refunded but never tells the guests.
+  cancelPerformance promised "notifies every holder", F09 step 5 "Confirms guests were notified" with no
+  operation, and performance.cancelled named a marketing consumer that no operation implemented; the
+  guestMessage staff write in BO-015''s dialog was neither stored nor sent. listMessageDispatches existed for
+  F09 step 5 (CHG-WIR-004) and was bound nowhere.'
+keys_touched:
+  operations:
+  - 'notifyPerformanceHolders'
+  - 'cancelPerformance'
+  - 'listMessageDispatches'
+  screens:
+  - 'BO-023'
+  - 'BO-015'
+  flows:
+  - 'F09'
+  files:
+  - 'events/performance-cancelled.yaml'
+  - 'tools/check-promises-kept.py'
+root_class: 'new: promise-without-operation'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; the Vivaticket comparison of 6 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-promises-kept.py'
+status: open
+notes: 'Batch R6, 12 October 2026. cancelPerformance gains no x-ticvai-emits: that extension changing is a breaking
+  change against r1, and the event already names it in emittedBy. **Left open (flagged):** an event-level cancel
+  (setEventLifecycleState to cancelled) still neither refunds nor notifies; it needs a decision on cascading to
+  its performances. The system template performanceCancelled must be seeded with the other system templates.
+  Lineage for the new write comes from derive-lineage at the release refresh.'

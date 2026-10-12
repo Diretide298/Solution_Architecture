@@ -1,0 +1,81 @@
+id: CHG-R6-032
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The business day closes at a configurable cut-off: VenueSettings.businessDayCutoff (per venue, inheriting the
+  tenant default, default 00:00), and every place the package names a business day, business date or trading day
+  refers to it.'
+decision:
+  what: 'contracts/spine/tenancy.yaml: VenueSettings.businessDayCutoff (HH:MM, nullable, default 00:00; the business
+    date of an instant is its venue-local date minus the cut-off; a change applies from the next business day)
+    and the wall-clock header comment; OpeningHoursWindow.endsNextDay says the window stays on one trading day
+    only when the cut-off covers it. contracts/spine/shift.yaml: Shift.businessDate (readOnly, from openedAt),
+    listShifts businessDate filter, closeShift closes on the shift''s business date. events/shift-closed.yaml:
+    optional businessDate. contracts/spine/finance.yaml: header (a business date closes at businessDayCutoff;
+    tax, FX and fiscal-period boundaries stay calendar dates), postOrderRevenue (the revenue date is the
+    business date), getUnifiedReconciliation (venue-day), ingestSettlementFile (trading day), noOpenShifts
+    (Shift.businessDate). contracts/satellite/reporting.yaml: runReport, getKpiValues, getServiceSummary and the
+    dateFrom/dateTo defaults are business dates. contracts/spine/orders.yaml: voidSameBusinessDayOnly.
+    contracts/satellite/wallet.yaml: endOfBusinessDay. contracts/satellite/payments.yaml: expectedSchedule.
+    contracts/satellite/fnb.yaml: ProductionPlan.forDate. contracts/spine/catalogue.yaml: the booking-signal
+    hub''s business date. screens/P08-venue-back-office.yaml: BO-1062 binds the tenant default; BO-065''s
+    settings form names the cut-off. docs/active/configured-limits-proposal.md: row 29.'
+  by: Chinmay
+  date: '2026-10-06'
+why: 'Chinmay, 6 October 2026, from the Vivaticket comparison: the business day closes at 12 midnight, with a CR to
+  make the cut-off configurable, default 00:00. The package defined every day as the region''s calendar day
+  (finance, fnb and workforce headers), Shift had no business date although finance''s noOpenShifts close check
+  needed one, and DEC-039 (docs/registers/decisions-2-october.md, applied in CHG-NOTE-004) had kept
+  calendarDayStartHour display-only, so no setting answered "does a 1am sale count as tonight or tomorrow".'
+keys_touched:
+  schemas:
+  - 'tenancy.VenueSettings'
+  - 'tenancy.OpeningHoursWindow'
+  - 'shift.Shift'
+  - 'orders.AfterSalePolicy'
+  operations:
+  - 'setVenueSettings'
+  - 'setVenueSettingsDefaults'
+  - 'listShifts'
+  - 'closeShift'
+  - 'postOrderRevenue'
+  - 'getUnifiedReconciliation'
+  - 'ingestSettlementFile'
+  - 'runReport'
+  - 'getKpiValues'
+  - 'getServiceSummary'
+  screens:
+  - 'BO-1062'
+  - 'BO-065'
+  files:
+  - 'events/shift-closed.yaml'
+  - 'docs/active/configured-limits-proposal.md'
+  - 'tools/check-promises-kept.py'
+root_class: 'new: decided-setting-without-reader'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; Chinmay''s decision of 6 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-promises-kept.py'
+status: open
+notes: 'Batch R6, 12 October 2026. Additive: at the default 00:00 every business date equals the calendar date, so
+  nothing built so far changes meaning. check-promises-kept PK-BUSINESS-DAY fails any contract description that
+  speaks of a business or trading day without businessDayCutoff (FX bank business days and calendarDayStartHour
+  are listed as other days). **Flagged for the lead:** DEC-197 (CHG-CSP-007) keeps a 23:00-01:00 bar window''s
+  takings on Friday; at the default 00:00 cut-off a 00:30 sale is Saturday''s, so a venue trading past midnight
+  must set its cut-off; nothing refuses a cut-off earlier than a window''s end. DEC-039 stands for
+  calendarDayStartHour. Access "operating day" (lockIdentity endOfDay, operatingDayClose) and retail
+  reservations are opening-hours closes, not the business day, and were left. New columns
+  (platform.venue_settings.business_day_cutoff, orders.pos_shift.business_date) come from derive-schema and
+  derive-ddl at the release refresh.'

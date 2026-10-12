@@ -133,6 +133,11 @@ CHECKS = [
     # 12 October (ADAM CR-002 on DB-ROLES, CHG-R6-020): a write into another deployable's schema goes by event or by
     # the owner's operation (x-ticvai-write-via) or is a dated exception; the kernel grants are exactly the four agreed.
     "check-cross-deployable-writes",
+    # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers
+    # take the product permission (BC-034..BC-037).
+    "check-screen-permissions",
+    # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
+    "check-promises-kept",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

@@ -1000,7 +1000,13 @@ screens:
     The cart shows its own window (`extendCart`: 15 minutes with one 5-minute extension) and a seat hold
     its 8 minutes; the approved build''s 300-second countdown with two extensions is not drawn. The approved
     build''s waitlist for sold-out events, gift-voucher face-value sales and group bundles have no operation
-    on this screen and are left out of the design.'
+    on this screen and are left out of the design.
+
+
+    **No waitlist mode on the till** (12 October 2026, CHG-R6-037; the Vivaticket comparison of 6 October
+    found the approved build''s `waitlistMode` with nothing behind it). The sold-out waitlist is the guest''s:
+    joined on WEB-006 and GST-007 (`joinWaitlist`, guest-only) and offered from BO-017. A cashier facing a
+    sold-out time offers another time; a counter waitlist is built only if the client asks for one.'
   density: touchLarge
   boardFrames:
   - Retail Board 3.dc.html#ret-3b

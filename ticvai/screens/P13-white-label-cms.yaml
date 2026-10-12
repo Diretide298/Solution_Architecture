@@ -15754,7 +15754,10 @@ screens:
         operation: getStoreAccounts
         notes: Apple D-U-N-S number, Apple Developer account, Google Play developer account (**the client's
           to open; we cannot open them for them**), store listing, app icons, a published configuration.
-          Each open item says what to do next.
+          Each open item says what to do next. **The Apple Wallet pass certificate** shows its Pass Type ID
+          and `StoreAccount.passCertificateExpiresAt`, amber from 30 days before expiry (when
+          `whitelabel.passCertificateExpiring` has told the tenant admin and TICVAI operations) and red once
+          expired (CHG-R6-033).
         provenance: contract white-label.yaml GET /tenant-config/store-accounts
       - kind: selectField
         label: Platform
@@ -15914,8 +15917,11 @@ screens:
     body: '**Collects what `setStoreAccounts` sends**: per store, `accountHolderName`, `developerAccountId`,
       `appIdentifier`, `dunsNumber` (Apple, nine digits), optional `apiCredentialSecretRef` and the `listing`
       (name, subtitle, description and keywords in every tenant language, category, support and privacy
-      links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. Dismissing sends
-      nothing.'
+      links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. **Apple Wallet**
+      (Apple entry, optional): `passTypeIdentifier` and the Pass Type ID certificate (`passCertificateSecretRef`,
+      a .p12 and its password uploaded once to Key Vault) from the client''s own Apple Developer account, one
+      per brand; the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate for
+      another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033). Dismissing sends nothing.'
     bindsTo: StoreAccount
     confirm:
       label: Save

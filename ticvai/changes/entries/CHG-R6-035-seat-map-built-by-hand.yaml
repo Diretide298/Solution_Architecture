@@ -1,0 +1,55 @@
+id: CHG-R6-035
+date: '2026-10-12'
+source: mom
+kind: contract
+proposed: '2026-10-12'
+summary: 'A seat map can be built by hand: editSeatMapStructure adds sections, rows and seats to a draft map, removes
+  and renumbers them, bound on BO-954 Venue Canvas and BO-956 Rows & Seats. Before it, a seated event''s map
+  could only come from an import, a clone or a template.'
+decision:
+  what: 'contracts/satellite/seating.yaml: PATCH /seat-maps/{seatMapId}/structure editSeatMapStructure
+    (CAPACITY_CONFIGURE, venue; addSections, addRows with seat count, first number, numbering direction and
+    straight or curved layout, addSeats, removeSeatIds, relabel; 409 on a taken label or a removal on a
+    published map; Prefer validate-only for the AI executor). screens/P08-venue-back-office.yaml: BO-954 and
+    BO-956 bind it; BO-956''s updateSeats purpose no longer claims "renumber, move or relabel", which
+    updateSeats cannot do.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'MoM 21 Aug 2026 (docs/active/seating-contract-19-september.md): "the platform will support both manual seat
+  map building and AI-assisted import". BO-954 and BO-956 draw sections, rows and seats, but createSeatMap names
+  an empty map, updateSeatMap saves names and views and updateSeats changes only category, attribute and status.
+  The Vivaticket comparison of 6 October listed it among the package''s own broken promises (r1 sells seated
+  events).'
+keys_touched:
+  operations:
+  - 'editSeatMapStructure'
+  - 'updateSeats'
+  screens:
+  - 'BO-954'
+  - 'BO-956'
+  files:
+  - 'contracts/satellite/seating.yaml'
+  - 'tools/check-promises-kept.py'
+root_class: 'new: promise-without-operation'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; the Vivaticket comparison of 6 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-promises-kept.py'
+status: open
+notes: 'Batch R6, 12 October 2026. **Choice flagged:** the gap is closed by adding the operation the minutes promised,
+  not by taking seated events out of r1 (the other option the comparison named, waiting on the client).
+  ai.proposeSeatMapChanges (kind numbering) can now plan through it; its plan steps were not changed. Lineage
+  for the new write comes from derive-lineage at the release refresh (check-write-lineage W-NOTABLE until then).
+  client_signoff pending.'

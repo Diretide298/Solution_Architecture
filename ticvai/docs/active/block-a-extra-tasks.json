@@ -669,8 +669,8 @@
    "depends": [
     "EDGE-WAITING-ROOM"
    ],
-   "subject": "Load test the waiting room at 30,000 arrivals in the burst environment",
-   "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures.",
+   "subject": "Load test the waiting room at 50,000 arrivals in the burst environment",
+   "detail": "ADR-0066 item 4 as amended on 6 October (the client's sizing benchmarks, CHG-R4-017), before the first large sale: 50,000 simultaneous arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, the sale behind the room held at 3,000 concurrent B2C users and then stepped above it to show the benchmark is not a limit (docs/active/block-test-strategy.md, Load scenarios), recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 50,000 get a position without a database write, admitted guests buy with commerce p95 inside its target at 3,000 concurrent and above, no cart hold succeeds without a token, and the results are recorded against the sizing figures.",
    "linksNothingBecause": "a load run on a burst environment; its text gives the numbers to record",
    "module": "Foundation & Setup",
    "builds": [

@@ -1,0 +1,60 @@
+id: CHG-R6-033
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The Apple Wallet Pass Type ID certificate is the client''s, one per brand: it is held in Key Vault through the
+  client''s Apple store account (white-label StoreAccount), its expiry is stored, and a daily job warns the
+  tenant admin and TICVAI operations 30 days before it expires (whitelabel.passCertificateExpiring).'
+decision:
+  what: 'contracts/satellite/white-label.yaml: StoreAccount gains passTypeIdentifier, passCertificateSecretRef
+    (writeOnly, Key Vault reference, checked against passTypeIdentifier and developerAccountId),
+    hasPassCertificate and passCertificateExpiresAt (readOnly, read from the certificate).
+    events/whitelabel-passCertificateExpiring.yaml: new event, raised by the daily certificate run from 30 days
+    before expiry (and daily from 7 days), consumed by marketing (tell the tenant admin; critical) and
+    platform-ops (alert TICVAI operations; critical). contracts/spine/orders.yaml: issueWalletPass says an Apple
+    pass is signed with the brand''s certificate from Key Vault, never TICVAI''s.
+    screens/P13-white-label-cms.yaml: CMS-104''s store-account form collects the Pass Type ID and certificate;
+    its checklist shows the expiry, amber from 30 days. docs/active/needs-discussion.md section 11 (the decision
+    that tenants hold their own Apple accounts) records it.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'Chinmay, 12 October 2026: the client owns it; the Pass Type ID certificate sits in the client''s Apple
+  Developer account, one per brand for white-label; the platform stores it in Key Vault and warns 30 days before
+  expiry, to the tenant admin and to our ops. The Vivaticket comparison of 6 October filed the certificate''s
+  storage and expiry warning as a launch defect (a pass certificate lasts about a year). No ADR covers Apple
+  Wallet (ADR-0015 lists wallet passes only as a vendor SDK).'
+keys_touched:
+  schemas:
+  - 'white-label.StoreAccount'
+  operations:
+  - 'setStoreAccounts'
+  - 'getStoreAccounts'
+  - 'issueWalletPass'
+  screens:
+  - 'CMS-104'
+  files:
+  - 'events/whitelabel-passCertificateExpiring.yaml'
+  - 'docs/active/needs-discussion.md'
+  - 'tools/check-promises-kept.py'
+root_class: 'new: decided-setting-without-reader'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; Chinmay''s decision of 12 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-promises-kept.py'
+status: open
+notes: 'Batch R6, 12 October 2026. Placed on StoreAccount because it is already "the client''s accounts, never
+  TICVAI''s" (M24-08) and holds the Apple Team ID the certificate must match; one Apple entry per tenant brand.
+  The 7-day daily repeat is this package''s choice beyond the decided 30 days (flagged). New columns on
+  whitelabel.store_account come from derive-schema and derive-ddl at the release refresh.'

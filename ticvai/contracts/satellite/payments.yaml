@@ -4043,7 +4043,8 @@ components:
           default: daily
           description: How often a file is expected. **Daily by default, one per venue per trading day**
             (decided 28 September, audit R110 (b)), because settlement is reconciled daily per venue
-            (`finance.ingestSettlementFile`).
+            (`finance.ingestSettlementFile`). The trading day closes at the venue's `businessDayCutoff` (tenancy
+            `VenueSettings`, default 00:00; CHG-R6-032).
         expectedByTime:
           type: string
           nullable: true

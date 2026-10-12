@@ -1,0 +1,59 @@
+id: CHG-R6-036
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The scanner''s "Venue full" can fire: setAccessAreaCapacity sets a venue''s, park''s or area''s capacity,
+  occupancy bands and count adjustment, bound on BO-145, and DenyReason says when validateAccess returns
+  capacityReached.'
+decision:
+  what: 'contracts/spine/access.yaml: PUT /access-areas/{areaId}/capacity setAccessAreaCapacity
+    (ACCESS_POINT_CONFIGURE, venue, config change log; capacity null means no limit; operationalAdjustment needs
+    a reason) writing access.access_area. DenyReason''s description: capacityReached is "Venue full", an entry
+    denied when the count of the access point''s area or any area above it up to the venue is at or above its
+    capacity; never an exit. screens/P08-venue-back-office.yaml: BO-145 Venue & Park Access Structure binds it
+    ("Set capacity").'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The Vivaticket comparison of 6 October: "the scanner''s Venue full can never trigger because nothing sets
+  capacity". validateAccess has capacityReached and listLiveVenueOccupancy (BO-255) reads access_area.capacity,
+  but only a zone''s capacity had a write (setAccessAreaZone); the venue and park rows had none, and DEC-263
+  (docs/registers/decisions-2-october.md, applied in CHG-NOTE-008) had BO-255 link to a capacity configuration
+  that did not exist.'
+keys_touched:
+  operations:
+  - 'setAccessAreaCapacity'
+  - 'validateAccess'
+  - 'listLiveVenueOccupancy'
+  schemas:
+  - 'access.DenyReason'
+  - 'access.AccessAccessArea'
+  screens:
+  - 'BO-145'
+  - 'BO-255'
+  tables:
+  - 'access.access_area'
+  files:
+  - 'tools/check-promises-kept.py'
+root_class: 'new: promise-without-operation'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; the Vivaticket comparison of 6 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-promises-kept.py'
+status: open
+notes: 'Batch R6, 12 October 2026. **Choices flagged:** the permission is ACCESS_POINT_CONFIGURE, as setAccessAreaZone
+  writes the same table (CAPACITY_CONFIGURE was the alternative); bound on BO-145, the venue and park structure
+  screen, which BO-255 links to under DEC-263. The capacityReached rule (any area up the tree; exits never
+  denied) is this package''s reading. Lineage for the new write comes from derive-lineage at the release
+  refresh.'

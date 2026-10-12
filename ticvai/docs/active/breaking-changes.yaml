@@ -424,3 +424,54 @@ changes:
     tag: r1
     producer-tickets: [SVC-VENUEOPS-UPLOAD-1]
     consumer-tickets: [AM-DIGITAL-ASSETS-P13]
+
+# BC-034 to BC-037 are one decision (CHG-R6-030): the ticket media designers take the product permission. The
+# ticket-template operations BO-344 binds (listTicketTemplates PRODUCT_VIEW; create, update, clone and import
+# PRODUCT_CONFIGURE) and the designers that draw a template's artwork were gated apart, so a product manager could
+# create a template and not design it (Vivaticket comparison, 6 October: "the designer is gated on a permission the ops
+# don't accept"). Chinmay, 12 October 2026: "Approve (Recommended)". BO-349 (setRfidNfcCard) keeps
+# ACCESS_POINT_CONFIGURE: a reader-side chip profile is access configuration.
+  - id: BC-034
+    contract: access
+    operation: getPdfPrintablePos
+    change: 'x-ticvai-permission changed "ACCESS_POINT_CONFIGURE" -> "PRODUCT_VIEW"'
+    reason: >-
+      BO-346 opens a ticket template's printable design; the template list beside it (listTicketTemplates on BO-344)
+      needs PRODUCT_VIEW, so the read follows it. No additive form exists: an operation's own permission is its meaning
+      (CHG-R6-030).
+    approved-by: 'Chinmay Parab, 12 October 2026 ("Approve (Recommended)")'
+    tag: r4
+    producer-tickets: [VM-ACCESS-GENERAL-1]
+    consumer-tickets: [VM-BO-346, TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A-COMPLETION]
+  - id: BC-035
+    contract: access
+    operation: setPdfPrintablePos
+    change: 'x-ticvai-permission changed "ACCESS_POINT_CONFIGURE" -> "PRODUCT_CONFIGURE"'
+    reason: >-
+      As BC-034: saving a template's printable design is template set-up, which createTicketTemplate and
+      updateTicketTemplate gate on PRODUCT_CONFIGURE (CHG-R6-030).
+    approved-by: 'Chinmay Parab, 12 October 2026 ("Approve (Recommended)")'
+    tag: r4
+    producer-tickets: [VM-ACCESS-ACCESS-1]
+    consumer-tickets: [VM-BO-346, TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A-COMPLETION]
+  - id: BC-036
+    contract: access
+    operation: setAppleWalletPass
+    change: 'x-ticvai-permission changed "ACCESS_POINT_CONFIGURE" -> "PRODUCT_CONFIGURE"'
+    reason: >-
+      BO-347 gets the same treatment as BO-346 (Chinmay, 12 October 2026): the Apple Wallet presentation of a ticket
+      template is designed by whoever sets the template up (CHG-R6-030).
+    approved-by: 'Chinmay Parab, 12 October 2026 ("Approve (Recommended)")'
+    tag: r4
+    producer-tickets: [SVC-ACCESS-ACCESS-61]
+    consumer-tickets: [VM-BO-347, TEST-AM-ADMISSION-ACCESS-P08-7]
+  - id: BC-037
+    contract: access
+    operation: setGoogleWalletPass
+    change: 'x-ticvai-permission changed "ACCESS_POINT_CONFIGURE" -> "PRODUCT_CONFIGURE"'
+    reason: >-
+      BO-348 gets the same treatment as BO-346 (Chinmay, 12 October 2026), as BC-036 (CHG-R6-030).
+    approved-by: 'Chinmay Parab, 12 October 2026 ("Approve (Recommended)")'
+    tag: r4
+    producer-tickets: [SVC-ACCESS-ACCESS-63]
+    consumer-tickets: [VM-BO-348, TEST-AM-ADMISSION-ACCESS-P08-7]
