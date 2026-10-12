@@ -49,6 +49,13 @@ Once everything is green:
   - sets build order and links;
   - retires tickets that left the plan;
   - runs a health check.
+- **OpenProject, a release that creates nothing** (a change-request release): from any workstation,
+  `python3 tools/op-release-api.py --from r<N-1> --to r<N>` (dry run), then `--apply`, with `TICVAI_OP_TOKEN`
+  set. It applies only the tickets that differ between the two bundles, over the REST API, with the same rules
+  (New tickets set, started ones commented, no mail). It refuses, naming the server path, when the release creates
+  tickets, changes links or retires tickets.
+- **Change requests:** settle them and tell their tickets with ADAM's `viewer/api/settle_changes.py
+  decisions.json` (dry run, then `--apply`).
 - **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and `/ticket` shows each developer what changed since their pin.
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.
 

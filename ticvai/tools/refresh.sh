@@ -402,7 +402,7 @@ screen_patterns                                                    # imported by
 ticket_done                                                        # imported by build-service-docs and op-release (one done-when for the plan row and the pointer), no main (3 October, CHG-GTR-002)
 resolution_cache                                                   # imported by derive-lineage, derive-diagrams and check-write-lineage (the cache key a writer bumps), no main (4 October, CHG-FXC-001)
 build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
-push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
+push-openproject op-release op-release-api op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags
 build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn
 fix-audit-contract-screens fix-audit-conventions fix-audit-derived-labels fix-audit-load-triggers fix-audit-op-descriptions fix-audit-stale-graph-refs fix-audit-stale-inventory-questions fix-audit-state-models   # one-off audit fixes, already applied

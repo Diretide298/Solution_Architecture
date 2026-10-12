@@ -1,0 +1,46 @@
+id: CHG-R6-007
+date: '2026-10-12'
+source: cr
+kind: process
+proposed: '2026-10-12'
+summary: A release that creates no ticket reaches OpenProject over its REST API from any workstation
+  (tools/op-release-api.py), and change requests are settled in ADAM and told to their tickets in one run
+  (viewer/api/settle_changes.py), instead of the server-side rails path for every release.
+decision:
+  what: 'tools/op-release-api.py --from r<N-1> --to r<N> compares the two committed bundles and applies only the
+    tickets that differ, with op-release.rb''s rules: New tickets get assignee, accountable, sprint version, title and
+    pointer description; started tickets get one "Plan update (release rN)" comment and the pointer comment once;
+    Priority_No. only where the ticket''s type has the field (Task and Feature, not Sub Task); no mail unless --notify.
+    It refuses and names op-release-server.sh when the release creates tickets, changes links or retires tickets.
+    docs/active/release-runbook.md section 6 gains both routes; tools/refresh.sh lists op-release-api with the other
+    distribution tools.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'Chinmay, 12 October 2026, settling the developers'' first change requests (ADAM CR-001 to CR-012; settle_changes.py
+  is ADAM commit 70f142c9): "if we can use API for both ?" and
+  "we should have this functionality for both adam and PMS to push CRs fixes quickly through the api".'
+keys_touched:
+  files:
+  - tools/op-release-api.py
+  - tools/refresh.sh
+  - docs/active/release-runbook.md
+root_class: 'new: release-path-weight'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: none (a lead's process decision, not a package defect)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: none
+  reason: 'Distribution tooling, not package content: nothing a check over the package could catch. Verified 12 October against OpenProject at r3: --from r2 --to r3 found all 2,457 changed tickets already right,
+    0 failed, so the API path reads exactly what op-release.rb writes.'
+status: open
+notes: 'Batch R6, 12 October 2026. Eight tickets at a time (--jobs): the r2 -> r3 comparison read 2,457 tickets in
+  under six minutes.'
