@@ -558,6 +558,9 @@ paths:
   /face-tag/enrolments:
     post:
       operationId: enrolFaceTag
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
       x-ticvai-audience:
@@ -826,6 +829,11 @@ paths:
   /face-pass/enrolments:
     post:
       operationId: enrolFacePass
+      x-ticvai-write-via:
+      - table: marketing.consent_record
+        event: biometric.enrolmentChanged
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-consumed-by:
         - "P02 GST-069 Face Pass"
       security:
@@ -1096,6 +1104,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeFacePass
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
@@ -8228,6 +8239,9 @@ paths:
       x-ticvai-bounded: retention rules per biometric data category, defined by hand
     put:
       operationId: setBiometricLifecycleRetention
+      x-ticvai-write-via:
+      - table: tenancy.data_retention_setting
+        operation: setDataRetentionSetting
       x-ticvai-consumed-by:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-audience:
@@ -15796,6 +15810,9 @@ paths:
         format: uuid
     post:
       operationId: reviewFaceReenrolment
+      x-ticvai-write-via:
+      - table: pii.subject_biometric
+        event: biometric.enrolmentChanged
       x-ticvai-consumed-by:
         - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"

@@ -1,0 +1,151 @@
+id: CHG-R6-020
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'Every write into a table another deployable owns now names the route ADR-0055 rule 4 gives it: an event the
+  owning module consumes, or the owner''s published operation, stated as x-ticvai-write-via on the operation and
+  copied into the lineage as writeVia. 78 cross-deployable writes by 69 operations: 29 by event, 32 by the owner''s
+  operation, 17 on a dated exception list. The kernel grants are exactly the four agreed, and a new check fails on a
+  write with neither a route nor an exception.'
+decision:
+  what: 'Option A, which ADR-0055 rule 4 already decides. Every cross-deployable write goes by event (ADR-0057,
+    consumed by the owning module, which performs the write) or by a call to the owner''s published HTTP operation;
+    within one deployable rule 3 stands. The route is `x-ticvai-write-via: [{table, event | operation}]` on the
+    operation in its contract (52 operations in 15 contracts), and tools/derive-lineage.py copies it into
+    handoff/api-data-lineage.json as `writeVia`. Nine events are added (entitlement.voided, entitlement.reissued,
+    entitlement.shareChanged, invitation.issued, paymentToken.stored, biometric.enrolmentChanged, guest.merged,
+    reporting.questionAnswered, tenantDomain.mapped) and eight extended additively (order.paid, order.created,
+    entitlement.statusChanged, entitlement.transferred, approval.granted, approval.rejected, wallet.credited,
+    reporting.definitionPublished): new emitters in emittedBy and consumers that name the owner''s tables under a new
+    optional `writes` key (events/_schema.yaml). The kernel tables every role is granted directly are exactly
+    platform.outbox INSERT, platform.scope SELECT, platform.audit_record INSERT and platform.idempotency_record
+    SELECT/INSERT/UPDATE; they and the 17 writes that cannot route yet (each with its reason, added date and removal
+    release r5) are docs/active/cross-deployable-writes.yaml. The readable table per write for the backend developer
+    is handoff/cross-deployable-writes.md, written by the check with --write; ADR-0055 action item 8 points to both.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-002, raised by the backend developer on ticket #27655 (DB-ROLES): DB-ROLES grants each deployable''s
+  role DML only on the schemas its own modules own (ADR-0055, handoff/service-decomposition.json), and the lineage
+  still recorded 81 writes by 72 operations into another deployable''s tables as the caller''s own SQL, every one of
+  which PostgreSQL refuses at runtime. Chinmay chose option A on 12 October 2026, the route ADR-0055 rule 4 already
+  states. Three of the 81 were not real writes and are corrected in CHG-R6-021.'
+keys_touched:
+  operations:
+  - appendEntitlementToMedia
+  - payByLink
+  - claimTicketTransfer
+  - transferOrderTickets
+  - freezeEntitlement
+  - suspendEntitlement
+  - reinstateEntitlement
+  - voidEntitlement
+  - reissueEntitlement
+  - shareEntitlement
+  - revokeEntitlementShare
+  - issueInvitation
+  - createUpgradeCredentialRegeneration
+  - askReportingQuestion
+  - saveNaturalLanguageQuery
+  - bookVisitPlan
+  - bulkUpdateProducts
+  - decideApprovalRequest
+  - setTenantDomainMapping
+  - adjustGameCard
+  - loadGameCredits
+  - checkoutCart
+  - storePaymentToken
+  - enrolFacePass
+  - enrolFaceTag
+  - reviewFaceReenrolment
+  - revokeFacePass
+  - mergeGuests
+  - broadcastToGuests
+  - createPaymentLink
+  - resendPaymentLink
+  - verifyGuestEmail
+  - decideGuestCheckoutMatch
+  - compItem
+  - reconcileBurstEnvironment
+  - checkOutResource
+  - checkInResource
+  - redeemLoyaltyPoints
+  - setBiometricLifecycleRetention
+  - actOnPartnerApplicationReview
+  - approveBookingLimitCommercial
+  - approveMembershipProductValidation
+  - approvePartnerStatuLifecycle
+  - createPartnerAgreement
+  - createPartnerChangeRequest
+  - registerPartner
+  - setAgreementContractTerm
+  - setPartnerAllocations
+  - setPartnerCommissionRules
+  - setPartnerCreditProfile
+  - setPartnerRateNet
+  - setPaymentTermBilling
+  tables:
+  - access.entitlement
+  - approvals.request
+  - pii.subject_biometric
+  - marketing.consent_record
+  - marketing.message_dispatch
+  - platform.outbox
+  - platform.scope
+  - platform.audit_record
+  - platform.idempotency_record
+  files:
+  - events/_schema.yaml
+  - events/order-paid.yaml
+  - events/order-created.yaml
+  - events/entitlement-statusChanged.yaml
+  - events/entitlement-transferred.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/wallet-credited.yaml
+  - events/reporting-definitionPublished.yaml
+  - events/entitlement-voided.yaml
+  - events/entitlement-reissued.yaml
+  - events/entitlement-shareChanged.yaml
+  - events/invitation-issued.yaml
+  - events/paymentToken-stored.yaml
+  - events/biometric-enrolmentChanged.yaml
+  - events/guest-merged.yaml
+  - events/reporting-questionAnswered.yaml
+  - events/tenantDomain-mapped.yaml
+  - states/entitlement-status.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  - tools/derive-lineage.py
+  - tools/check-cross-deployable-writes.py
+  - tools/run-checks.py
+  tickets:
+  - DB-ROLES
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-002 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'Batch R6, 12 October 2026. The contract change is additive against r1 (a new x- extension, not one of
+  check-contract-compat''s semantic keys); the events change additively (new events, new emitters, new consumers, a
+  new optional consumer key). New emitters gain platform.outbox in the lineage through derive-lineage --apply
+  (W-OUTBOX). The 17 exceptions are 15 misplaced tables (CrossRegion''s and platform-ops'' records in the platform
+  schema, OrderService''s sync.rejection in CrossRegion''s sync schema), where the lead decides between moving the
+  table and a table-level grant, and 2 personal-data writes (pii.consent_identifier, pii.subject from
+  updateMyProfile) that wait for an Identity operation, because an event would copy the data into platform.outbox.
+  The DB-ROLES ticket text is not rewritten here; the developer reads the routes from
+  handoff/cross-deployable-writes.md, which ADR-0055 action item 8 names.'

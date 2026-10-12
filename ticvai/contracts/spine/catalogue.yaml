@@ -923,6 +923,9 @@ paths:
         format: uuid
     post:
       operationId: reinstateEntitlement
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
@@ -987,6 +990,9 @@ paths:
         format: uuid
     post:
       operationId: freezeEntitlement
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
@@ -5052,6 +5058,9 @@ paths:
         format: uuid
     post:
       operationId: suspendEntitlement
+      x-ticvai-write-via:
+      - table: access.entitlement
+        event: entitlement.statusChanged
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-audience:

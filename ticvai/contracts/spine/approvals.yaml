@@ -417,6 +417,15 @@ paths:
         format: uuid
     post:
       operationId: decideApprovalRequest
+      x-ticvai-write-via:
+      - table: control.partner_agreement
+        event: approval.granted
+      - table: control.partner_application
+        event: approval.granted
+      - table: control.partner_change_request
+        event: approval.granted
+      - table: marketing.privacy_notice_governance
+        event: approval.granted
       x-ticvai-consumed-by:
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P08 ADM-145 Promotion Approval Inbox"

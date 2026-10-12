@@ -137,6 +137,9 @@ paths:
   /auth/guest/verify-email:
     post:
       operationId: verifyGuestEmail
+      x-ticvai-write-via:
+      - table: marketing.message_dispatch
+        operation: sendTransactionalMessage
       x-ticvai-consumed-by:
         - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-020 Profile & Preferences"

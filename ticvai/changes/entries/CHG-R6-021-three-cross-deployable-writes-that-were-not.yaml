@@ -1,0 +1,55 @@
+id: CHG-R6-021
+date: '2026-10-12'
+source: cr
+kind: spec
+proposed: '2026-10-12'
+summary: 'Three of the cross-deployable writes ADAM CR-002 listed were not writes. applyMenuActions no longer writes
+  catalogue.price and publishMenu no longer writes catalogue.product_version (F&B prices are F&B''s since DEC-034);
+  issueCreditMemo no longer writes control.invoice_line, which tools/derive-lineage.py derived by matching the path
+  parameter {invoiceId} to the control database''s subscription invoice.'
+decision:
+  what: 'Removed from handoff/api-data-lineage.json: applyMenuActions -> catalogue.price, publishMenu ->
+    catalogue.product_version, issueCreditMemo -> control.invoice_line. tools/derive-lineage.py child_writes keeps a
+    path parameter''s table only in the schemas the operation''s own persisted refs name, where they name any, so
+    `/tax-invoices/{invoiceId}/credit-memos` (refs in ledger) no longer reaches control.invoice and its line table.
+    Measured over all 2,790 operations: issueCreditMemo is the only derivation that changes.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-002 (DB-ROLES) listed every write into another deployable''s schema. The two F&B writes contradict
+  DEC-034 (ADR-0028, amended 2 October 2026: F&B owns its own catalogue table and an F&B sale reads no central
+  catalogue row) and neither contract refs a catalogue schema; they were hand-mapped before that decision. A ledger
+  credit memo against a tax invoice does not touch the platform''s invoice to the tenant, which lives in the control
+  database (ADR-0039); the write came from a name match in the derivation (finding of CHG-R6-020). Decided with
+  option A by Chinmay on 12 October 2026.'
+keys_touched:
+  operations:
+  - applyMenuActions
+  - publishMenu
+  - issueCreditMemo
+  tables:
+  - catalogue.price
+  - catalogue.product_version
+  - control.invoice_line
+  files:
+  - handoff/api-data-lineage.json
+  - tools/derive-lineage.py
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-002 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/derive-lineage.py::child_writes
+status: open
+notes: 'Batch R6, 12 October 2026. applyMenuActions'' cache:resolution entry now bumps the menu resolver only (the
+  price-list bump followed from the catalogue.price write). A cross-deployable write that reappears in the lineage
+  without a route fails tools/check-cross-deployable-writes.py (CHG-R6-020).'

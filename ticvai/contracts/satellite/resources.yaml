@@ -428,6 +428,9 @@ paths:
         format: uuid
     post:
       operationId: checkOutResource
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: authoriseStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
         - "P08 BO-907 Guest & Resource Assignment"
@@ -524,6 +527,9 @@ paths:
         format: uuid
     post:
       operationId: checkInResource
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: captureStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
         - "P08 BO-937 Resource Collection, Handover & Return"

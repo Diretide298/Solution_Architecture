@@ -12,6 +12,7 @@ emittedWhen: TicketTransfer.status offered to claimed (claimTicketTransfer), or 
 emittedBy:
 - claimTicketTransfer
 - createResaleListing
+- transferOrderTickets
 payload:
 - field: entitlementId
   type: uuid
@@ -38,6 +39,15 @@ consumers:
   idempotencyKey: entitlementId + at
   onFailure: retryThenDeadLetter
   isCritical: false
+- context: access
+  purpose: Move the entitlement to its new holder on access.entitlement, which Access owns; OrderService runs in
+    commerce and cannot write the access schema (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020). transferOrderTickets emits
+    it when the entitlement leaves its holder (states/entitlement-status.yaml issued -> surrendered)
+  writes:
+  - access.entitlement
+  idempotencyKey: entitlementId + at
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication
 notes: '**Added 29 September (build pass, group OWN, from the AI group''s handoff).** One event per
   entitlement, not per transfer: a family transfer of four tickets is four edges, because the graph works

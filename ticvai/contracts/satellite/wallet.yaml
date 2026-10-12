@@ -2506,6 +2506,9 @@ paths:
         type: string
     post:
       operationId: loadGameCredits
+      x-ticvai-write-via:
+      - table: games.card
+        event: wallet.credited
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
       x-ticvai-note: >-
@@ -2608,6 +2611,9 @@ paths:
         type: string
     post:
       operationId: adjustGameCard
+      x-ticvai-write-via:
+      - table: games.card
+        event: wallet.credited
       x-ticvai-audience:
       - staff
       summary: Manually adjust credits or points

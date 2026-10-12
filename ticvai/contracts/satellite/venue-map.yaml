@@ -1703,6 +1703,13 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: bookVisitPlan
+      x-ticvai-write-via:
+      - table: catalogue.inventory_hold
+        operation: acquireInventoryHold
+      - table: orders.cart
+        operation: createCart
+      - table: orders.cart_line
+        operation: addCartLine
       x-ticvai-consumed-by:
         - "P01 WEB-050 Plan Your Visit"
         - "P02 GST-053 Your Plan"

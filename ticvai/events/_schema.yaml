@@ -95,6 +95,12 @@ properties:
           type: string
           description: The internal operation that handles it (`<contract>.<operationId>`), where one is
             modelled (SD-026).
+        writes:
+          type: array
+          items: { type: string }
+          description: The owner's tables this consumer writes (`<schema>.<table>`). Required on a consumer that
+            performs a write another deployable routes to it (`x-ticvai-write-via` on the operation, ADR-0055 rule
+            4, ADAM CR-002), and checked by tools/check-cross-deployable-writes.py.
         idempotencyKey:
           type: string
           description: >

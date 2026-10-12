@@ -1658,6 +1658,9 @@ paths:
   /reports/ask:
     post:
       operationId: askReportingQuestion
+      x-ticvai-write-via:
+      - table: ai.activity
+        event: reporting.questionAnswered
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P06 EMP-020 AI assistant — answer"
@@ -1791,6 +1794,9 @@ paths:
         type: string
     post:
       operationId: saveNaturalLanguageQuery
+      x-ticvai-write-via:
+      - table: ai.activity
+        event: reporting.definitionPublished
       x-ticvai-consumed-by:
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
