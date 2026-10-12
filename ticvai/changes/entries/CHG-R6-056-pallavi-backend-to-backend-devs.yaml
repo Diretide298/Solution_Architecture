@@ -1,0 +1,51 @@
+id: CHG-R6-056
+date: '2026-10-13'
+source: plan
+kind: plan
+proposed: '2026-10-13'
+summary: 'Every Backend task Pallavi Sawant held (109, 544 points, Blocks A and B, none started) moves to Pranay Shinde,
+  Tanmay Dukhande or Deep Khanvilkar, balanced block by block; four module tests whose testers became their app-module''s
+  main builder move to the next peer. Block A1''s last work day moves from 25 November to 3 December, accepted.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json ownerMoves: 109 moves from Pallavi Sawant (98 new; 11 of the CHG-R5-003
+    moves from Hrushikant Patkar to her repointed). Pranay Shinde takes 43 (237 points), Tanmay Dukhande 43 (224),
+    Deep Khanvilkar 23 (83, at his helper share of 0.55 and his 5-point cap); Hrushikant Patkar takes none because
+    every migration is his. moduleTestPeers: TEST-AM-FOUNDATION-API-PLATFORM and TEST-AM-TICKETING-P08-BLOCK-A leave
+    Tanmay Dukhande, TEST-AM-TICKETING-P08-6 leaves Pranay Shinde, TEST-AM-PLATFORM-OPERATIONS-P07 leaves Surendra.
+    Pallavi keeps her setup and Venue Management screens and her module tests.'
+  by: Chinmay
+  date: '2026-10-13'
+why: 'Lead decision in the r4 session (after commit 98743b6a), Chinmay, 13 October 2026: "lets re allocate backend tickets from pallavi and spread across backend devs";
+  receivers "Pranay, Tanmay, Deep (Recommended)"; shown that it moves Block A1''s last work day from 25 November to
+  4 December, A2 from 3 to 15 December and B from 16 to 29 December, with Pallavi left at 366 points, he chose "Move all
+  109 anyway".'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  tickets: []
+  other:
+  - CHG-R5-003
+  - CHG-R4-005
+root_class: 'new: lead-owner-move'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r4 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-13'
+    quote: 'Yes, include in r4 (Recommended)'
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Measured by regenerating build-service-docs and derive-block-a-schedule in place (r4-cr-fixes, 13 October):
+  loads Pallavi 892 -> 366, Pranay 780 -> 1,017, Tanmay 795 -> 1,019, Deep 480 -> 564 points; block last work days
+  A 2026-11-25 -> 2026-12-03, A2 2026-12-03 -> 2026-12-15, B 2026-12-16 -> 2026-12-29, C 2026-12-29 -> 2027-01-04,
+  D unchanged. check-plan-owners PASS (O-MOVE 0, O-SELF-TEST 0 new after the four module-test moves),
+  check-key-stability, check-plan-closure and check-ticket-builds PASS. Moving only Block B (55 tasks) kept A1 on
+  25 November and was offered; not chosen.'
