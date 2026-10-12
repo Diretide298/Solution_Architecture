@@ -1,17 +1,22 @@
 /* The tasks page. Only rules no other page has: the layout it sits in is the
    shared `set-` one in layers.css, the panels are the shared admin ones, and
-   every colour is either a shared token or one of the five state tokens below.
+   every colour is either a shared token or one of the state tokens below.
 
    ── the state colours ──────────────────────────────────────────────
-   One meaning each, the same in every bar on the page: the hero, a person, a
-   sprint, a block, a state row. Done is the strongest mark (ADAM's teal at
-   full weight), in progress is the same teal a step away from it, stalled is
-   ADAM's amber, not started is a neutral that recedes, and late is ADAM's red,
-   used only on a flag that also carries a "!" and a number. Validated with the
-   dataviz palette checks (adjacent pairs, colour-blind simulation) against the
-   panel surface in both themes; the in-progress step sits under 3:1 on the
-   light panel, which is why every bar has a legend, labels and a table twin.
-   Rejected tickets are never drawn — they are neither work done nor left. */
+   One meaning each, the same in every bar on the page: a person, a block in
+   the plan, a state row. Closed is the strongest mark (ADAM's teal at full
+   weight), waiting for QA is a green beside it (both are finished), in
+   progress is a lighter teal, on hold is ADAM's amber, not started is a
+   neutral that recedes. Validated with the dataviz palette checks (adjacent
+   pairs, colour-blind simulation) against the panel surface in both themes;
+   the in-progress step sits under 3:1 on the light panel, which is why every
+   bar has a legend, words beside it and a table twin. Rejected tickets are
+   never drawn: they are neither work done nor left.
+
+   ── where the boldness goes ────────────────────────────────────────
+   Once: the plan strip, Sprint 1 to 13 with the blocks as bands. Everything
+   else is quiet type on the panel, with no cards inside the panel, because a
+   grid of boxes was how the old page turned zeros into furniture. */
 :root {
   --tk-done: #0078a0;
   --tk-qa: #5e9e2e;
@@ -20,6 +25,10 @@
   --tk-fresh: #cad6dc;
   --tk-late: var(--red);
   --tk-track: color-mix(in srgb, var(--text-faint) 16%, transparent);
+  /* The plan strip's own ink: the sprint columns, the load under a band. */
+  --tk-col: color-mix(in srgb, var(--text-faint) 30%, transparent);
+  --tk-load: color-mix(in srgb, var(--accent) 42%, var(--bg-panel));
+  --tk-band: color-mix(in srgb, var(--accent) 16%, var(--bg-panel));
 }
 :root[data-theme="dark"] {
   --tk-done: #009fc6;
@@ -28,6 +37,9 @@
   --tk-stalled: #bd8730;
   --tk-fresh: #2a3e48;
   --tk-late: var(--red);
+  --tk-col: color-mix(in srgb, var(--text-faint) 26%, transparent);
+  --tk-load: color-mix(in srgb, var(--accent) 40%, var(--bg-panel));
+  --tk-band: color-mix(in srgb, var(--accent) 17%, var(--bg-panel));
 }
 
 /* ── what is being read, and the page's filter ───────────────────── */
@@ -61,22 +73,6 @@
 }
 .tk-scope-says:empty { display: none; }
 
-/* ── the headline: one figure and the bar it is a share of ───────── */
-.tk-hero {
-  display: grid; grid-template-columns: minmax(150px, auto) minmax(0, 1fr);
-  gap: 18px 28px; align-items: center;
-  margin: 6px 0 18px;
-}
-.tk-hero-figure { display: grid; gap: 2px; }
-/* The one hero number on the page: the same sans as everything else, its
-   default proportional figures, and big enough to read across a room. */
-.tk-hero-value {
-  font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;
-  color: var(--text);
-}
-.tk-hero-label { font-size: 13px; color: var(--text-dim); }
-.tk-hero-bar { display: grid; gap: 10px; min-width: 0; }
-
 /* ── the stacked state bar ───────────────────────────────────────── */
 .tk-stack { display: block; width: 100%; min-width: 0; }
 .tk-stack-fill {
@@ -102,104 +98,6 @@
 .tk-legend-aside { color: var(--text-faint); }
 .tk-key-swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
 
-/* ── the counts under it ─────────────────────────────────────────── */
-.tk-tiles {
-  display: grid; gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(122px, 1fr));
-  margin-bottom: 26px;
-}
-.tk-tile {
-  border: 1px solid var(--border); border-radius: 9px;
-  background: var(--bg-raised); padding: 12px 14px;
-}
-.tk-tile-top { display: flex; align-items: center; gap: 7px; }
-.tk-tile-value { font-size: 24px; font-weight: 650; line-height: 1.1; color: var(--text); }
-.tk-tile-label { margin-top: 4px; font-size: 12.5px; font-weight: 600; color: var(--text); }
-.tk-tile-hint { margin-top: 2px; font-size: 11.5px; color: var(--text-faint); }
-.tk-tile.is-bad { border-color: color-mix(in srgb, var(--tk-late) 45%, var(--border)); }
-.tk-tile.is-warn { border-color: color-mix(in srgb, var(--tk-stalled) 45%, var(--border)); }
-
-/* A flag that means somebody has to do something. Never colour alone: it
-   carries a glyph, and the number beside it says how many. */
-.tk-flag {
-  display: inline-grid; place-items: center; flex: none;
-  width: 16px; height: 16px; border-radius: 50%;
-  font-size: 10.5px; font-weight: 800; line-height: 1;
-  color: var(--tk-late);
-  background: color-mix(in srgb, var(--tk-late) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--tk-late) 55%, transparent);
-}
-.tk-tile.is-warn .tk-flag {
-  color: var(--tk-stalled);
-  background: color-mix(in srgb, var(--tk-stalled) 16%, transparent);
-  border-color: color-mix(in srgb, var(--tk-stalled) 55%, transparent);
-}
-
-/* ── blocks of the overview ──────────────────────────────────────── */
-.tk-block { margin-top: 8px; }
-.tk-block + .tk-dash, .tk-dash + .tk-block { margin-top: 26px; }
-.tk-block[hidden] { display: none; }
-.tk-block-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-}
-.tk-block-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
-.tk-note { margin: 4px 0 10px; font-size: 12px; line-height: 1.5; color: var(--text-dim); max-width: 78ch; }
-.tk-quiet { color: var(--text-faint); font-size: 12px; }
-
-/* ── the team ────────────────────────────────────────────────────────
- * The page's centre of gravity. One row per person, each a button: select it
- * and every section narrows to them. The bars share one scale, so the person
- * holding twice the work has twice the bar; inside it, done is the solid teal
- * a lead reads first. */
-.tk-roster-head, .tk-person {
-  display: grid;
-  grid-template-columns: minmax(150px, 1.15fr) minmax(120px, 3fr) 78px 82px 122px 168px;
-  gap: 14px; align-items: center;
-}
-.tk-roster-head {
-  padding: 0 10px 6px; border-bottom: 1px solid var(--border);
-  font-size: 11.5px; color: var(--text-faint);
-}
-.tk-roster { display: grid; gap: 2px; margin-top: 4px; }
-.tk-person {
-  width: 100%; margin: 0; padding: 8px 10px;
-  border: 0; border-radius: 8px; background: transparent;
-  font: inherit; font-size: 13px; color: var(--text); text-align: left;
-  cursor: pointer;
-}
-.tk-person:hover { background: var(--bg-hover); }
-.tk-person:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.tk-person.is-chosen {
-  background: var(--accent-soft);
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-.tk-person.is-nobody .tk-person-name { color: var(--text-dim); font-style: italic; }
-.tk-person-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.tk-avatar {
-  display: inline-grid; place-items: center; flex: none;
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--bg-hover); border: 1px solid var(--border);
-  font-size: 10.5px; font-weight: 700; color: var(--text-dim); letter-spacing: .02em;
-}
-.tk-person.is-chosen .tk-avatar { background: var(--accent); color: var(--ink-on-accent); border-color: var(--accent); }
-.tk-person-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tk-person-bar { min-width: 0; }
-.tk-person-done { font-size: 12px; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.tk-person-done strong { font-size: 14px; color: var(--text); }
-.tk-person-late {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--text); white-space: nowrap;
-}
-.tk-person-gate { min-width: 0; }
-.tk-person-gate .tk-gate-meter { flex-wrap: nowrap; white-space: nowrap; }
-
-.tk-spark { display: inline-flex; align-items: flex-end; gap: 6px; }
-.tk-spark svg { display: block; overflow: visible; }
-.tk-spark-base { stroke: var(--border-strong); stroke-width: 1; }
-.tk-spark-bar { fill: color-mix(in srgb, var(--tk-done) 55%, transparent); }
-.tk-spark-bar.is-latest { fill: var(--tk-done); }
-.tk-spark-total { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; min-width: 2ch; }
-
 /* ── the testing gate ── */
 .tk-gate-meter { display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap; }
 .tk-cells { display: inline-flex; gap: 2px; }
@@ -222,65 +120,6 @@
 .tk-gate-name { font-weight: 600; color: var(--text); }
 .tk-gate-when { font-size: 12px; color: var(--text-faint); text-align: right; }
 .tk-gate-row .tk-cell { width: 10px; height: 16px; }
-
-/* ── closed per week, and the sprints, side by side ── */
-.tk-dash {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 14px;
-  margin-top: 26px;
-  align-items: start;
-}
-.tk-dash-card {
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--bg-raised);
-  padding: 16px 18px 18px;
-  min-width: 0;   /* a grid child holding a chart must be allowed to shrink */
-}
-.tk-dash-heading { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--text); }
-
-.tk-sprints { display: grid; gap: 4px; margin-top: 8px; }
-.tk-sprint {
-  display: grid; gap: 6px;
-  width: 100%; margin: 0; padding: 9px 10px;
-  border: 1px solid transparent; border-radius: 8px; background: transparent;
-  font: inherit; text-align: left; color: var(--text); cursor: pointer;
-}
-.tk-sprint:hover { background: var(--bg-hover); }
-.tk-sprint:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-/* The current sprint is the one a lead opens this card for. */
-.tk-sprint.is-now { border-color: var(--accent-line); background: color-mix(in srgb, var(--accent-soft) 70%, transparent); }
-.tk-sprint.is-chosen { box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-soft); }
-.tk-sprint-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.tk-sprint-name { font-size: 13px; font-weight: 700; }
-.tk-sprint.is-past .tk-sprint-name { color: var(--text-dim); }
-.tk-now {
-  font-size: 11px; font-weight: 600; color: var(--accent-text);
-  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--accent-line);
-}
-.tk-sprint-dates { margin-left: auto; font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
-.tk-sprint-figures {
-  display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap;
-  font-size: 12px; color: var(--text-dim);
-}
-.tk-sprint-figures strong { color: var(--text); }
-.tk-pts { color: var(--text-faint); }
-.tk-sprint-left { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
-
-/* ── blocks ── */
-.tk-blocks { display: grid; gap: 2px; }
-.tk-blockrow {
-  display: grid; grid-template-columns: minmax(180px, 1.3fr) minmax(120px, 3fr) minmax(150px, auto);
-  gap: 14px; align-items: center; padding: 8px 10px; font-size: 13px;
-}
-.tk-blockrow-name {
-  color: var(--text); font-weight: 600; text-decoration: none;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.tk-blockrow-name:hover { text-decoration: underline; }
-.tk-blockrow-figures { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
-.tk-blockrow-figures strong { font-size: 14px; color: var(--text); }
 
 /* ── the people table ── */
 .tk-table-wrap { overflow-x: auto; margin-top: 8px; max-width: 100%; }
@@ -384,127 +223,6 @@ a.tk-badge:hover { background: var(--bg-hover); }
 .tk-artefact { font-family: var(--mono); font-size: 12px; color: var(--text); overflow-wrap: anywhere; }
 .tk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* ── throughput ──────────────────────────────────────────────────────
- * One series over twelve weeks. The rules it follows, and what each one
- * replaced:
- *
- * **The empty part of a week is not drawn.** Every column used to sit in its
- * own filled track, so the space above each bar was inked as heavily as the bar
- * — eight grey boxes reading louder than the eight numbers they carried.
- * Background now belongs to the plot, once, as three gridlines.
- *
- * **A rounded, labelled ceiling.** The old chart scaled to the tallest week, so
- * a good week and a bad week looked the same whenever each was the tallest
- * thing on screen. The shape changed between refreshes and the reading never
- * did.
- *
- * **Numbers on two bars, not twelve.** The peak and the week just gone. A value
- * over every column is the axis written out a second time.
- *
- * Marks are thin with a 4px rounded top anchored to the baseline, gridlines and
- * ticks are recessive, and the value text wears text tokens rather than the
- * series colour.
- */
-.tk-weeks { margin-top: 18px; }
-
-.tk-thr-plot {
-  position: relative;
-  margin-top: 16px;
-  height: 170px;
-  /* Room either side for the labels, which sit outside the plot so neither the
-     ticks nor the average ever land on a bar. */
-  margin-left: 30px;
-  margin-right: 52px;
-  border-bottom: 1px solid var(--border);
-}
-
-.tk-thr-grid { position: absolute; inset: 0; }
-/* Solid hairlines, one shade off the surface. Dashing them reads as a threshold
-   or a projection when it is only a grid. */
-.tk-thr-line {
-  position: absolute; left: 0; right: 0; height: 0;
-  border-top: 1px solid color-mix(in srgb, var(--text-faint) 22%, transparent);
-}
-.tk-thr-line:last-child { border-color: var(--border); }
-.tk-thr-tick {
-  position: absolute; right: calc(100% + 8px); top: -0.6em;
-  font-family: var(--mono); font-size: 10.5px; color: var(--text-faint);
-}
-
-/* The average, the one annotation worth its own line: what a throughput chart
-   is really asked is whether this week was normal.
-   Neutral rather than accent — an annotation that wears a saturated hue reads
-   as a second series, and here it would have been a hue away from the bars. */
-.tk-thr-mean {
-  position: absolute; left: 0; right: 0; height: 0;
-  border-top: 1px solid color-mix(in srgb, var(--text-faint) 70%, transparent);
-}
-.tk-thr-mean-label {
-  /* Outside the plot on the right, where the plot's own margin has reserved
-     room: inside it, it sat on the last bar. */
-  position: absolute; left: calc(100% + 8px); top: -0.72em;
-  font-family: var(--mono); font-size: 10px; white-space: nowrap;
-  color: var(--text-faint);
-}
-
-.tk-thr-bars {
-  position: absolute; inset: 0;
-  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
-  gap: 6px; align-items: end;
-}
-
-.tk-thr-col { position: relative; height: 100%; display: flex; align-items: flex-end; }
-.tk-thr-col:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-
-.tk-thr-bar {
-  width: 100%;
-  /* Thin, and capped so a 12-week window on a wide panel does not draw twelve
-     slabs. The bar is the measure, not the cell it sits in. */
-  max-width: 34px;
-  margin: 0 auto;
-  /* Two stacked series, awaiting QA over closed, with a 2px surface gap and
-     the 4px round only on the data end. */
-  display: flex; flex-direction: column; gap: 2px;
-  border-radius: 4px 4px 0 0; overflow: hidden;
-}
-.tk-thr-seg { display: block; flex: 1 1 0; min-height: 2px; }
-/* The week just gone is the one people came to read; the others are a step
-   quieter until pointed at. */
-.tk-thr-bar:not(.is-latest) { opacity: 0.72; }
-.tk-thr-col:hover .tk-thr-bar,
-.tk-thr-col:focus-visible .tk-thr-bar { opacity: 1; }
-.tk-legend-small { font-size: 12px; margin: 10px 0 2px; }
-
-.tk-thr-value {
-  position: absolute; left: 0; right: 0;
-  text-align: center;
-  font-family: var(--mono); font-size: 11px; color: var(--text-dim);
-  pointer-events: none;
-}
-
-.tk-thr-axis {
-  margin-left: 30px; margin-right: 52px; margin-top: 7px;
-  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px;
-}
-.tk-thr-when {
-  font-size: 10.5px; color: var(--text-faint);
-  text-align: center; white-space: nowrap;
-}
-
-/* The table twin: the same twelve numbers, for anything not looking at the
-   picture. Clipped rather than `display: none`, which would take it away from
-   screen readers too — the point of it is that it is read. */
-.tk-thr-table {
-  position: absolute; width: 1px; height: 1px;
-  margin: -1px; padding: 0; overflow: hidden;
-  clip-path: inset(50%); white-space: nowrap; border: 0;
-}
-
-@media (max-width: 760px) {
-  .tk-thr-plot { height: 130px; }
-  .tk-thr-bar { max-width: 20px; }
-}
-
 /* ── the timeline ──────────────────────────────────────────────────── */
 
 .tk-gantt { margin-top: 12px; display: grid; gap: 18px; }
@@ -571,60 +289,353 @@ a.tk-badge:hover { background: var(--bg-hover); }
 }
 
 
+
+/* ── the sheet: the overview panel, read top to bottom ───────────── */
+.tk-sheet { padding: 22px 26px 26px; }
+.tk-part { margin-top: 38px; }
+.tk-part-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
+.tk-part-title { margin: 0; font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.005em; }
+.tk-note { margin: 4px 0 12px; font-size: 12.5px; line-height: 1.55; color: var(--text-dim); max-width: 78ch; }
+.tk-quiet { color: var(--text-faint); font-size: 12px; }
+.tk-empty { color: var(--text-faint); margin: 12px 0; font-size: 13px; }
+.tk-field { display: grid; gap: 4px; font-size: 11.5px; color: var(--text-dim); min-width: 0; }
+.tk-field .scope-select { min-width: 150px; max-width: 100%; font-size: 13px; padding: 6px 9px; }
+.tk-field-inline { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tk-field-inline .scope-select { min-width: 0; font-size: 12.5px; padding: 4px 8px; }
+.tk-scope .scope-select:focus-visible,
+.tk-field-inline .scope-select:focus-visible,
+.tk-top .scope-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tk-top .scope-select[hidden] { display: none; }
+
+/* A table kept for screen readers and copying, out of sight. Clipped rather
+   than `display: none`, which would take it from screen readers too. */
+.tk-sr {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* ── this sprint ─────────────────────────────────────────────────── */
+.tk-sprint-hero {
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 18px 36px; align-items: start;
+}
+.tk-verdict { min-width: 0; }
+.tk-sprint-when { margin: 0 0 10px; font-size: 13px; color: var(--text-dim); display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.tk-sprint-when strong { font-size: 14px; color: var(--text); font-weight: 700; }
+.tk-day {
+  font-size: 11.5px; font-weight: 600; color: var(--accent-text);
+  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--accent-line);
+}
+/* The headline is the verdict, set as type rather than as a number in a box:
+   "Behind pace" and the figure it is about, on one line where it fits. */
+.tk-headline {
+  margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  font-size: clamp(26px, 2.6vw, 34px); font-weight: 750; line-height: 1.12;
+  letter-spacing: -0.02em; color: var(--text);
+}
+.tk-headline-figures { font-variant-numeric: tabular-nums; }
+.tk-verdict-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0; line-height: 1;
+  padding: 7px 12px 7px 9px; border-radius: 999px;
+  border: 1.5px solid currentColor; white-space: nowrap;
+}
+.tk-verdict-glyph {
+  display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%;
+  font-size: 12px; font-weight: 800; color: var(--bg-panel); background: var(--pill);
+}
+.tk-verdict-pill { --pill: var(--text-dim); color: var(--pill); }
+.tk-verdict-pill.is-ok { --pill: var(--accent-text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.tk-verdict-pill.is-warn { --pill: var(--amber); background: color-mix(in srgb, var(--amber) 12%, transparent); }
+.tk-verdict-pill.is-bad { --pill: var(--red); background: color-mix(in srgb, var(--red) 11%, transparent); }
+.tk-pace { margin: 12px 0 0; font-size: 14px; line-height: 1.55; color: var(--text); max-width: 60ch; }
+
+/* The composition as a line of figures, not tiles. */
+.tk-ledger { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 18px 0 0; }
+.tk-ledger-item { display: grid; gap: 2px; }
+.tk-ledger dt { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
+.tk-ledger dd { margin: 0; font-size: 20px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.tk-saying { margin: 14px 0 0; font-size: 13px; line-height: 1.55; color: var(--text-dim); max-width: 64ch; }
+.tk-saying:empty { display: none; }
+
+.tk-next {
+  margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-dim);
+}
+.tk-next:empty { display: none; }
+.tk-next strong { color: var(--text); }
+.tk-next-label {
+  font-size: 11.5px; font-weight: 600; color: var(--text-dim);
+  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border-strong);
+}
+
+/* ── the burn-up ── */
+.tk-burn { margin: 0; min-width: 0; }
+.tk-burn[hidden] { display: none; }
+.tk-burn-caption { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+.tk-burn-plot { position: relative; width: 100%; min-width: 0; }
+.tk-burn-plot svg { display: block; max-width: 100%; overflow: visible; }
+.tk-burn-grid { stroke: color-mix(in srgb, var(--text-faint) 22%, transparent); stroke-width: 1; }
+.tk-burn-base { stroke: var(--border-strong); stroke-width: 1; }
+.tk-burn-tick { fill: var(--text-faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+.tk-burn-label { fill: var(--text-dim); font-size: 11.5px; }
+.tk-burn-label.is-strong { fill: var(--text); font-weight: 700; font-size: 12.5px; }
+.tk-burn-today { fill: color-mix(in srgb, var(--accent) 9%, transparent); }
+.tk-burn-even { stroke: var(--text-faint); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.tk-burn-line { fill: none; stroke: var(--tk-done); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.tk-burn-dot { fill: var(--tk-done); stroke: var(--bg-panel); stroke-width: 2; }
+.tk-burn-expected { fill: var(--bg-panel); stroke: var(--text-faint); stroke-width: 1.5; }
+.tk-burn-gap { stroke: var(--red); stroke-width: 1.5; }
+.tk-burn-hit { fill: transparent; }
+.tk-burn-hit:hover { fill: color-mix(in srgb, var(--text-faint) 8%, transparent); }
+
+/* ── who is doing what ── */
+.tk-roster-head, .tk-person {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.15fr) minmax(140px, 3fr) 92px 124px 104px;
+  gap: 16px; align-items: center;
+}
+.tk-roster-head {
+  padding: 0 10px 6px; border-bottom: 1px solid var(--border);
+  font-size: 11.5px; color: var(--text-faint);
+}
+.tk-roster-head span:nth-child(n+3) { text-align: right; }
+.tk-roster { display: grid; gap: 1px; margin-top: 4px; }
+.tk-person {
+  width: 100%; margin: 0; padding: 8px 10px;
+  border: 0; border-radius: 8px; background: transparent;
+  font: inherit; font-size: 13px; color: var(--text); text-align: left;
+  cursor: pointer;
+}
+.tk-person:hover { background: var(--bg-hover); }
+.tk-person:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tk-person.is-chosen { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.tk-person.is-nobody .tk-person-name { color: var(--text-dim); font-style: italic; }
+.tk-person-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.tk-avatar {
+  display: inline-grid; place-items: center; flex: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bg-hover); border: 1px solid var(--border);
+  font-size: 10.5px; font-weight: 700; color: var(--text-dim); letter-spacing: .02em;
+}
+.tk-person.is-chosen .tk-avatar { background: var(--accent); color: var(--ink-on-accent); border-color: var(--accent); }
+.tk-person-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-person-bar { min-width: 0; }
+.tk-person-done, .tk-person-pace, .tk-person-open {
+  font-size: 12px; color: var(--text-dim); white-space: nowrap; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.tk-person-done strong, .tk-person-open strong { font-size: 14px; color: var(--text); }
+.tk-person-pace { display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.tk-person-pace.is-behind { color: var(--text); font-weight: 600; }
+.tk-pace-glyph { color: var(--red); font-weight: 800; }
+.tk-pace-glyph.is-ok { color: var(--accent-text); }
+.tk-roster-key { margin-top: 12px; }
+
+/* Where an even pace would have the finished part by now. Ink, not a status
+   colour: it is a yardstick. */
+.tk-stack { position: relative; }
+.tk-pace-tick {
+  position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px;
+  background: var(--text); border-radius: 1px;
+}
+.tk-key-tick { display: inline-block; width: 2px; height: 14px; background: var(--text); border-radius: 1px; }
+
+/* ── waiting for QA ── */
+.tk-qa-list { display: grid; }
+.tk-qa-row {
+  display: grid; grid-template-columns: 62px minmax(0, 1fr) minmax(0, 160px) 64px 72px;
+  gap: 14px; align-items: baseline;
+  padding: 8px 4px; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.tk-qa-row:last-child { border-bottom: 0; }
+.tk-waited { font-size: 12.5px; color: var(--text-dim); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tk-waited.is-long { color: var(--text); font-weight: 700; }
+.tk-qa-sprint { font-size: 12px; color: var(--text-faint); white-space: nowrap; text-align: right; }
+
+/* ── the plan: the one bold element ──────────────────────────────────
+ * Sprints as equal columns, a band per block across its planned window, the
+ * finished part solid from the band's start, how many tickets each sprint
+ * holds as columns rising inside the band, and today as one dark line through
+ * every row. Large block codes, because they are what people say out loud. */
+.tk-plan .tk-note { max-width: 92ch; }
+.tk-strip { margin-top: 6px; }
+.tk-strip-grid { --lab: 210px; display: grid; gap: 6px; }
+.tk-strip-scale, .tk-band-row {
+  display: grid; grid-template-columns: var(--lab) minmax(0, 1fr); gap: 14px; align-items: stretch;
+}
+.tk-strip-corner { align-self: end; font-size: 11.5px; color: var(--text-faint); padding-bottom: 4px; }
+.tk-strip-cols { position: relative; height: 46px; }
+.tk-strip-col {
+  position: absolute; top: 22px; bottom: 0;
+  display: grid; place-items: end center; padding-bottom: 4px;
+}
+.tk-strip-num { font-size: 12px; font-weight: 600; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.tk-strip-col.is-focus { background: color-mix(in srgb, var(--accent) 10%, transparent); border-radius: 6px 6px 0 0; }
+.tk-strip-col.is-focus .tk-strip-num { color: var(--accent-text); font-weight: 800; }
+.tk-strip-today {
+  position: absolute; top: 0; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap;
+  padding: 3px 7px; border-radius: 4px;
+  color: var(--bg-panel); background: var(--text);
+}
+.tk-strip-today.is-start { transform: translateX(-6px); }
+.tk-strip-today.is-end { transform: translateX(calc(-100% + 6px)); }
+
+.tk-band-label {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto;
+  column-gap: 12px; align-items: center; align-content: center;
+  text-decoration: none; color: var(--text); min-width: 0; padding: 4px 0;
+  border-radius: 6px;
+}
+.tk-band-label:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tk-band-label:hover .tk-band-words { text-decoration: underline; }
+.tk-band-code {
+  grid-row: 1 / 3; min-width: 1.6em;
+  font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1;
+}
+.tk-band-pct { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tk-band-words { font-size: 11.5px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tk-band-track {
+  position: relative; height: 62px;
+  /* A hairline at the start of every sprint, drawn once per row from the
+     column count rather than as thirteen elements per row. */
+  background: linear-gradient(to right, var(--tk-col) 1px, transparent 1px) 0 0 / calc(100% / var(--cols, 13)) 100%;
+  border-right: 1px solid var(--tk-col);
+}
+/* Today, through every row. */
+.tk-band-track::after {
+  content: ''; position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px;
+  left: calc(var(--now, -10) * 100%); background: var(--text); z-index: 3;
+}
+.tk-band {
+  position: absolute; top: 6px; bottom: 6px; overflow: hidden;
+  background: var(--tk-band);
+  border: 2px solid var(--accent); border-radius: 8px;
+}
+.tk-band-fill { position: absolute; inset: 0 auto 0 0; width: 100%; display: flex; }
+.tk-band-fill > span { display: block; height: 100%; min-width: 3px; }
+.tk-band-fill > span + span { border-left: 2px solid var(--tk-band); }
+/* How many tickets a sprint holds for this block. */
+.tk-load { position: absolute; bottom: 8px; height: 46px; z-index: 2; pointer-events: auto; }
+.tk-load::before {
+  content: ''; position: absolute; left: 18%; right: 18%; bottom: 0;
+  height: calc(var(--h, 0.1) * 100%);
+  background: var(--tk-load); border-radius: 3px 3px 0 0;
+}
+/* Outside the block's planned window: hatched as well as unbanded, so it does
+   not rest on colour. */
+.tk-load.is-outside::before {
+  background: repeating-linear-gradient(135deg, var(--tk-load) 0 2px, transparent 2px 5px);
+  outline: 1px solid var(--tk-load);
+}
+
+.tk-strip-months { position: relative; height: 18px; }
+.tk-strip-month {
+  position: absolute; top: 0; padding-left: 5px; border-left: 1px solid var(--border-strong);
+  font-size: 11px; color: var(--text-faint); white-space: nowrap;
+}
+
+/* ── what needs somebody ── */
+.tk-attend {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 34px;
+  margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--border);
+}
+.tk-attend-col { min-width: 0; }
+.tk-attend-col .tk-part-title { font-size: 14px; margin-bottom: 8px; }
+.tk-att-text { margin: 0 0 8px; font-size: 13px; line-height: 1.55; color: var(--text); }
+.tk-att-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.tk-att-item:last-of-type { border-bottom: 0; }
+.tk-att-head { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.tk-att-subject { font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-att-meta { margin: 3px 0 0; font-size: 11.5px; color: var(--text-dim); }
+.tk-att-meta.is-quiet { color: var(--text-faint); font-style: italic; }
+.tk-att-why {
+  margin: 6px 0 0; padding: 2px 0 2px 10px; border-left: 2px solid var(--amber);
+  font-size: 12.5px; line-height: 1.5; color: var(--text);
+}
+.tk-att-more { display: inline-block; margin-top: 4px; font-size: 12.5px; color: var(--accent-text); }
+.tk-att-gate { display: grid; gap: 4px; padding: 6px 0; }
+.tk-att-gate .tk-gate-name { font-size: 13px; }
+
+/* ── panels ── */
+details.tk-group > summary, details.tk-gantt-group > summary {
+  cursor: pointer; list-style-position: outside; margin-left: 16px;
+}
+details.tk-group > summary:focus-visible, details.tk-gantt-group > summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px;
+}
+a.tk-gantt-label { text-decoration: none; }
+a.tk-gantt-label:hover { text-decoration: underline; color: var(--text); }
+
 /* ── narrower screens ──────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .tk-roster-head, .tk-person {
-    grid-template-columns: minmax(140px, 1.1fr) minmax(100px, 2.4fr) 70px 78px 118px;
+    grid-template-columns: minmax(140px, 1.1fr) minmax(100px, 2.4fr) 84px 112px 92px;
+    gap: 12px;
   }
-  .tk-roster-head span:last-child { display: none; }
-  .tk-person-gate { display: none; }
+  .tk-strip-grid { --lab: 170px; }
+  .tk-band-code { font-size: 26px; }
+}
+
+@media (max-width: 900px) {
+  .tk-sprint-hero { grid-template-columns: minmax(0, 1fr); }
+  .tk-attend { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 760px) {
+  .tk-sheet { padding: 16px 14px 20px; }
   .tk-top-actions { margin-left: 0; width: 100%; justify-content: space-between; }
   .tk-scope { padding: 10px 12px; }
   .tk-field { flex: 1 1 140px; }
   .tk-field .scope-select { min-width: 0; width: 100%; }
+  .tk-headline { font-size: 25px; }
+  .tk-ledger { gap: 8px 18px; }
+  .tk-ledger dd { font-size: 18px; }
 
-  .tk-hero { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .tk-hero-value { font-size: 48px; }
-  .tk-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tk-tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
-
-  /* A person becomes three lines: who and how much is done; the bar across
-     the full width; then late, the twelve weeks and the gate. */
+  /* A person becomes two lines: who, finished and pace; then the bar across
+     the full width with the plan load at its end. */
   .tk-roster-head { display: none; }
   .tk-person {
-    grid-template-columns: minmax(0, 1fr) 112px 128px;
-    grid-template-areas: 'who who done' 'bar bar bar' 'late spark gate';
-    gap: 8px 12px; padding: 10px 8px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: 'who done pace' 'bar bar open';
+    gap: 6px 12px; padding: 10px 6px;
     border-bottom: 1px solid var(--border); border-radius: 0;
   }
   .tk-person.is-chosen { border-radius: 8px; }
   .tk-person-who { grid-area: who; }
   .tk-person-bar { grid-area: bar; }
-  .tk-person-done { grid-area: done; text-align: right; }
-  .tk-person-late { grid-area: late; }
-  .tk-spark { grid-area: spark; }
-  .tk-person-gate { grid-area: gate; display: block; justify-self: end; }
-  .tk-person-gate .tk-gate-meter { flex-wrap: wrap; justify-content: flex-end; row-gap: 2px; }
+  .tk-person-done { grid-area: done; }
+  .tk-person-pace { grid-area: pace; }
+  .tk-person-open { grid-area: open; }
 
-  .tk-dash { grid-template-columns: minmax(0, 1fr); }
-  .tk-dash-card { padding: 14px 12px 16px; }
-
-  .tk-blockrow {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: 'name figures' 'bar bar';
-    gap: 6px 10px; padding: 8px 4px;
+  .tk-qa-row {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    grid-template-areas: 'key main waited' 'key who sprint';
+    gap: 2px 10px;
   }
-  .tk-blockrow-name { grid-area: name; }
-  .tk-blockrow .tk-stack { grid-area: bar; }
-  .tk-blockrow-figures { grid-area: figures; }
+  .tk-qa-row .tk-key { grid-area: key; }
+  .tk-qa-row .tk-main { grid-area: main; }
+  .tk-qa-row .tk-who { grid-area: who; display: block; }
+  .tk-qa-row .tk-waited { grid-area: waited; }
+  .tk-qa-row .tk-qa-sprint { grid-area: sprint; }
 
-  .tk-gate-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-  }
+  /* The plan: the label sits above its band, and the bands take the width. */
+  .tk-strip-grid { --lab: 0px; gap: 4px; }
+  .tk-strip-scale, .tk-band-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .tk-strip-corner { display: none; }
+  .tk-band-row { margin-top: 8px; }
+  .tk-band-label { grid-template-columns: auto auto minmax(0, 1fr); grid-template-rows: auto; column-gap: 10px; }
+  .tk-band-code { grid-row: auto; font-size: 22px; }
+  .tk-band-track { height: 44px; }
+  .tk-load { height: 30px; bottom: 7px; }
+  .tk-strip-num { font-size: 10.5px; }
+
+  .tk-gate-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .tk-gate-when { text-align: left; }
 
   .tk-row { grid-template-columns: 52px minmax(0, 1fr) auto; }
@@ -635,5 +646,138 @@ a.tk-badge:hover { background: var(--bg-hover); }
   .tk-deliverable { grid-template-columns: minmax(0, 1fr); }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* ── one person ───────────────────────────────────────────────────── */
+.tk-back {
+  display: inline-block; margin-bottom: 14px;
+  font-size: 13px; font-weight: 600; color: var(--accent-text); text-decoration: none;
+}
+.tk-back::before { content: '\2039'; margin-right: 6px; font-weight: 800; }
+.tk-back:hover { text-decoration: underline; }
+.tk-back:focus-visible, .tk-p-pick-item:focus-visible, .tk-p-feature > summary:focus-visible, .tk-p-all:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+}
+.tk-p-pick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 4px 12px; margin-top: 8px; }
+.tk-p-pick-item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px;
+  align-items: center; text-align: left; padding: 8px 10px;
+  border: 0; border-radius: 8px; background: transparent; font: inherit; color: var(--text); cursor: pointer;
+}
+.tk-p-pick-item:hover { background: var(--bg-hover); }
+.tk-p-pick-item .tk-avatar { grid-row: 1 / 3; }
+
+/* The name is the headline here, set large, with the initials as the mark. */
+.tk-p-head { display: flex; align-items: center; gap: 16px; }
+.tk-p-avatar {
+  display: inline-grid; place-items: center; flex: none;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: var(--accent); color: var(--ink-on-accent);
+  font-size: 20px; font-weight: 800; letter-spacing: .02em;
+}
+.tk-p-id { min-width: 0; }
+.tk-p-name { margin: 0; font-size: clamp(26px, 2.8vw, 36px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: var(--text); }
+.tk-p-role { margin: 4px 0 0; font-size: 13.5px; color: var(--text-dim); }
+.tk-p-role:empty { display: none; }
+.tk-p-verdict {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  margin: 18px 0 0; font-size: 17px; font-weight: 650; color: var(--text);
+}
+.tk-p-hero { margin-top: 10px; }
+.tk-p-sub { margin: 22px 0 8px; font-size: 13px; font-weight: 700; color: var(--text); }
+.tk-p-rank { display: grid; gap: 10px; margin: 0; }
+.tk-p-rank-item { display: grid; grid-template-columns: 150px auto minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+.tk-p-rank-item dt { font-size: 12.5px; color: var(--text-dim); }
+.tk-p-rank-item dd { margin: 0; font-size: 16px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.tk-p-rank-item dd.tk-p-rank-words { font-size: 12.5px; font-weight: 400; color: var(--text-dim); }
+
+/* Their sprint work, feature by feature. */
+.tk-p-features { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
+.tk-p-feature, .tk-p-list, .tk-p-feature-rows { min-width: 0; }
+.tk-p-list { display: grid; grid-template-columns: minmax(0, 1fr); }
+.tk-p-feature { border-bottom: 1px solid var(--border); }
+.tk-p-feature > summary {
+  display: flex; align-items: baseline; gap: 10px; padding: 9px 4px; cursor: pointer;
+  font-size: 13px; color: var(--text); list-style: none;
+}
+.tk-p-feature > summary::-webkit-details-marker { display: none; }
+.tk-p-feature > summary::before { content: '\203A'; color: var(--text-faint); font-weight: 800; transition: transform .12s; }
+.tk-p-feature[open] > summary::before { transform: rotate(90deg); }
+.tk-p-feature-name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-p-feature-n { margin-left: auto; font-size: 12px; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tk-p-chip {
+  font-size: 11px; font-weight: 700; color: var(--accent-text); white-space: nowrap;
+  padding: 0 7px; border-radius: 999px; border: 1px solid var(--accent-line);
+}
+.tk-p-feature-rows { padding: 0 0 10px 18px; }
+.tk-p-ticket {
+  display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 12px; align-items: baseline;
+  padding: 6px 0; font-size: 12.5px; border-bottom: 1px solid var(--divider);
+}
+.tk-p-ticket:last-child { border-bottom: 0; }
+.tk-p-done-row { grid-template-columns: 62px minmax(0, 1fr) auto 104px; }
+.tk-p-ticket .tk-subject { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-p-when { font-size: 12px; color: var(--text-dim); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tk-p-ticket:has(.tk-p-when) { grid-template-columns: 62px minmax(0, 1fr) auto 104px; }
+
+/* Open, sprint by sprint: the plan strip's columns, at a person's size. */
+.tk-p-sprints {
+  display: grid; grid-template-columns: repeat(var(--n, 13), minmax(0, 1fr)); gap: 4px;
+}
+.tk-p-cell {
+  display: grid; grid-template-rows: auto 44px auto; justify-items: center; gap: 4px;
+  padding: 6px 2px; border-radius: 6px; min-width: 0;
+}
+.tk-p-cell.is-focus { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.tk-p-cell-n { font-size: 12.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.tk-p-cell.is-empty .tk-p-cell-n { color: var(--text-faint); font-weight: 400; }
+.tk-p-cell-bar { position: relative; width: 60%; max-width: 30px; height: 44px; }
+.tk-p-cell-bar::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: calc(var(--h, 0) * 100%); min-height: 0;
+  background: var(--tk-load); border-radius: 3px 3px 0 0;
+}
+.tk-p-cell:not(.is-empty) .tk-p-cell-bar::before { min-height: 2px; }
+.tk-p-cell.is-focus .tk-p-cell-bar::before { background: var(--accent); }
+.tk-p-cell-label { font-size: 11px; color: var(--text-faint); border-top: 1px solid var(--border-strong); width: 100%; text-align: center; padding-top: 3px; }
+.tk-p-cell.is-focus .tk-p-cell-label { color: var(--accent-text); font-weight: 700; }
+
+.tk-p-cuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 34px; }
+.tk-p-mini { display: grid; grid-template-columns: minmax(70px, 1fr) minmax(40px, 1.4fr) 52px; gap: 10px; align-items: center; padding: 4px 0; font-size: 12.5px; }
+.tk-p-mini-label { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-p-mini-bar { height: 8px; }
+.tk-p-mini-fill { display: block; height: 100%; background: var(--tk-load); border-radius: 0 3px 3px 0; }
+.tk-p-mini-n { text-align: right; color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.tk-p-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 34px; }
+.tk-p-two .tk-qa-row { grid-template-columns: 62px minmax(0, 1fr) auto 64px; }
+.tk-p-two .tk-qa-row .tk-qa-sprint { display: none; }
+.tk-p-two .tk-qa-row .tk-who { font-size: 11.5px; color: var(--text-faint); }
+.tk-p-warn { padding-left: 10px; border-left: 2px solid var(--amber); }
+.tk-p-allbox { padding-top: 18px; border-top: 1px solid var(--border); }
+.tk-p-all { font-size: 13px; padding: 7px 14px; }
+
+@media (max-width: 1100px) {
+  .tk-p-two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 900px) {
+  .tk-p-cuts { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .tk-p-avatar { width: 46px; height: 46px; font-size: 16px; }
+  .tk-p-name { font-size: 24px; }
+  .tk-p-verdict { font-size: 15px; }
+  .tk-p-rank-item { grid-template-columns: auto minmax(0, 1fr); }
+  .tk-p-rank-item dd.tk-p-rank-words { grid-column: 1 / -1; }
+  .tk-p-sprints { gap: 1px; }
+  .tk-p-cell { padding: 4px 0; grid-template-rows: auto 34px auto; }
+  .tk-p-cell-bar { height: 34px; }
+  .tk-p-cell-n { font-size: 10px; }
+  .tk-p-cell-label { font-size: 10px; }
+  .tk-p-ticket, .tk-p-done-row, .tk-p-ticket:has(.tk-p-when) { grid-template-columns: 54px minmax(0, 1fr) auto; }
+  .tk-p-ticket .tk-p-when { grid-column: 2 / -1; text-align: left; }
+  .tk-p-two .tk-qa-row { grid-template-columns: 54px minmax(0, 1fr) auto; grid-template-areas: 'key main waited' 'key who who'; }
+  .tk-p-pick-list { grid-template-columns: minmax(0, 1fr); }
+  .tk-p-feature > summary { flex-wrap: wrap; }
+  .tk-p-feature-name { white-space: normal; }
+  .tk-p-feature-n { margin-left: 0; flex-basis: 100%; padding-left: 14px; }
+  .tk-p-feature-rows { padding-left: 4px; }
 }

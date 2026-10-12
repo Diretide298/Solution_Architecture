@@ -79,9 +79,9 @@
         <h1 class="auth-title">Not for you</h1>
         <p class="auth-note">
           This page shows every ticket in the project and what each person is
-          holding, which an administrator or a project manager can see. If you
-          think that should be you, ask one of them. Your own work is on the
-          viewer&rsquo;s board.
+          holding, which the delivery team can see and a client account cannot.
+          If you think that should be you, ask an administrator. Your own work
+          is on the viewer&rsquo;s board.
         </p>
         <a class="auth-button" href="/">Back to the viewer</a>
       </div>
@@ -102,18 +102,18 @@
       <nav class="set-nav" aria-label="Sections">
         <h1 class="set-nav-title">Tasks</h1>
         <div class="set-nav-list">
-          <a href="#overview">Overview</a>
-          <div class="set-nav-group">Who is doing what</div>
-          <a href="#people">People</a>
+          <a href="#overview">This sprint</a>
+          <div class="set-nav-group">Who and when</div>
+          <a href="#person" id="tk-nav-person">One person</a>
+          <a href="#people">People, in numbers</a>
           <a href="#gate">Testing gate</a>
-          <div class="set-nav-group">Where the work is</div>
-          <a href="#states">States</a>
-          <a href="#dates">Overdue and due</a>
-          <div class="set-nav-group">What is being delivered</div>
-          <a href="#timeline">Timeline</a>
+          <a href="#dates">Late and due</a>
+          <div class="set-nav-group">The plan</div>
+          <a href="#timeline">Features by sprint</a>
           <a href="#deliverables">Deliverables</a>
-          <a href="#parents">Epics</a>
+          <a href="#parents">By parent</a>
           <div class="set-nav-group">Everything</div>
+          <a href="#states">States</a>
           <a href="#tickets">All tickets</a>
         </div>
       </nav>
@@ -146,66 +146,173 @@
           </div>
         </div>
 
-        <!-- ── overview ──────────────────────────────────────────────── -->
-        <section class="admin-panel set-section" id="overview">
-          <h2 class="admin-heading">Overview</h2>
-
-          <!-- The one number, and the bar it is a share of. -->
-          <div class="tk-hero">
-            <div class="tk-hero-figure">
-              <span class="tk-hero-value" id="tk-hero-value">—</span>
-              <span class="tk-hero-label" id="tk-hero-label"></span>
+        <!-- ── this sprint ───────────────────────────────────────────────
+             The page opens on the sprint people are working in, because that
+             is the question asked of it every morning: is this sprint on
+             track, and who is doing what. The whole plan is one strip further
+             down; the counts nobody acts on are in the panels on the rail. -->
+        <section class="admin-panel set-section tk-sheet" id="overview" aria-labelledby="tk-sprint-title">
+          <div class="tk-sprint-hero" id="tk-sprint-hero">
+            <div class="tk-verdict">
+              <p class="tk-sprint-when" id="tk-sprint-when"></p>
+              <h2 class="tk-headline" id="tk-sprint-title">…</h2>
+              <p class="tk-pace" id="tk-sprint-pace"></p>
+              <dl class="tk-ledger" id="tk-sprint-ledger"></dl>
+              <p class="tk-saying" id="tk-sprint-saying"></p>
             </div>
-            <div class="tk-hero-bar" id="tk-hero-bar"></div>
+            <figure class="tk-burn" id="tk-burn">
+              <figcaption class="tk-burn-caption" id="tk-burn-caption">Finished so far, against an even pace</figcaption>
+              <div class="tk-burn-plot" id="tk-burn-plot"></div>
+            </figure>
           </div>
-          <section class="tk-tiles" id="tk-stats" aria-label="Counts"></section>
+          <p class="tk-next" id="tk-next"></p>
 
-          <!-- ── the team ── -->
-          <div class="tk-block" id="team">
-            <div class="tk-block-head">
-              <h3 class="tk-block-title">Team <span class="admin-count" id="tk-team-count"></span></h3>
+          <!-- ── who is doing what ── -->
+          <section class="tk-part" id="team" aria-labelledby="tk-team-title">
+            <div class="tk-part-head">
+              <h3 class="tk-part-title" id="tk-team-title">Who is doing what</h3>
               <label class="tk-field tk-field-inline"><span>Order by</span>
                 <select class="scope-select" id="tk-team-sort">
-                  <option value="total">Most tickets</option>
-                  <option value="done">Most done</option>
-                  <option value="late">Most late</option>
+                  <option value="behind">Most behind</option>
+                  <option value="planned">Most in the sprint</option>
+                  <option value="done">Most finished</option>
                   <option value="name">Name</option>
                 </select></label>
             </div>
-            <p class="tk-note">
-              Each bar is one person's tickets, on one scale, so a longer bar is more
-              work. Finished counts closed and awaiting QA. Select a person to see
-              only their work on every section.
-            </p>
+            <p class="tk-note" id="tk-team-note"></p>
             <div class="tk-roster-head" aria-hidden="true">
-              <span>Person</span><span>Tickets by state</span><span>Finished</span>
-              <span>Late</span><span>Finished, last 12 weeks</span><span>Test gate</span>
+              <span>Person</span><span id="tk-roster-head-bar">This sprint</span><span>Finished</span>
+              <span>Against pace</span><span>Open in the plan</span>
             </div>
             <div class="tk-roster" id="tk-roster"></div>
+            <ul class="tk-legend tk-roster-key" id="tk-roster-key"></ul>
+          </section>
+
+          <!-- ── the queue somebody has to work ── -->
+          <section class="tk-part" id="qa" aria-labelledby="tk-qa-title">
+            <div class="tk-part-head">
+              <h3 class="tk-part-title" id="tk-qa-title">Waiting for QA</h3>
+            </div>
+            <p class="tk-note" id="tk-qa-note"></p>
+            <div class="tk-qa" id="tk-qa"></div>
+          </section>
+
+          <!-- ── the whole plan, once ── -->
+          <section class="tk-part tk-plan" id="plan" aria-labelledby="tk-plan-title">
+            <div class="tk-part-head">
+              <h3 class="tk-part-title" id="tk-plan-title">The plan</h3>
+            </div>
+            <p class="tk-note" id="tk-plan-note"></p>
+            <div class="tk-strip" id="tk-strip"></div>
+          </section>
+
+          <!-- ── what needs somebody ── -->
+          <div class="tk-attend">
+            <section class="tk-attend-col" aria-labelledby="tk-held-title">
+              <h3 class="tk-part-title" id="tk-held-title">On hold</h3>
+              <div id="tk-held"></div>
+            </section>
+            <section class="tk-attend-col" aria-labelledby="tk-due-title">
+              <h3 class="tk-part-title" id="tk-due-title">Late and due</h3>
+              <div id="tk-due"></div>
+            </section>
+            <section class="tk-attend-col" aria-labelledby="tk-gatebox-title">
+              <h3 class="tk-part-title" id="tk-gatebox-title">Testing gate</h3>
+              <div id="tk-gatebox"></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ── one person ────────────────────────────────────────────────
+             Everything about one developer. The page's person filter with a
+             page of its own: ?person=<name>#person is the link to send. -->
+        <section class="admin-panel set-section tk-sheet" id="person" aria-labelledby="tk-p-name">
+          <a class="tk-back" id="tk-p-back" href="#overview">Back to the team</a>
+
+          <div id="tk-p-pick">
+            <h2 class="tk-part-title">Choose a person</h2>
+            <p class="tk-note">Everything about one developer: their sprint, what they hold across the plan, what waits on QA, what they finished, the gate and their module tests.</p>
+            <div class="tk-p-pick-list" id="tk-p-pick-list"></div>
           </div>
 
-          <div class="tk-dash">
-            <div class="tk-dash-card" id="throughput">
-              <h3 class="tk-dash-heading">Finished per week <span class="admin-count" id="tk-throughput-who"></span></h3>
-              <p class="tk-note" id="tk-throughput-lede"></p>
-              <div id="tk-weeks" class="tk-weeks"></div>
+          <div id="tk-p-body" hidden>
+            <header class="tk-p-head">
+              <span class="tk-p-avatar" id="tk-p-avatar" aria-hidden="true"></span>
+              <div class="tk-p-id">
+                <h2 class="tk-p-name" id="tk-p-name"></h2>
+                <p class="tk-p-role" id="tk-p-role"></p>
+              </div>
+            </header>
+            <p class="tk-p-verdict" id="tk-p-verdict"></p>
+
+            <div class="tk-sprint-hero tk-p-hero">
+              <div class="tk-verdict">
+                <p class="tk-pace" id="tk-p-pace"></p>
+                <dl class="tk-ledger" id="tk-p-ledger"></dl>
+                <h3 class="tk-p-sub">Against the team</h3>
+                <dl class="tk-p-rank" id="tk-p-rank"></dl>
+              </div>
+              <figure class="tk-burn" id="tk-p-burn" hidden>
+                <figcaption class="tk-burn-caption" id="tk-p-burn-caption"></figcaption>
+                <div class="tk-burn-plot" id="tk-p-burn-plot"></div>
+              </figure>
             </div>
 
-            <div class="tk-dash-card" id="sprints">
-              <h3 class="tk-dash-heading">Sprints <span class="admin-count" id="tk-sprints-count"></span></h3>
-              <p class="tk-note" id="tk-sprints-lede"></p>
-              <div class="tk-sprints" id="tk-sprints"></div>
-            </div>
-          </div>
+            <section class="tk-part" aria-labelledby="tk-p-features-title">
+              <h3 class="tk-part-title" id="tk-p-features-title">Open this sprint, by feature</h3>
+              <p class="tk-note" id="tk-p-features-note"></p>
+              <div class="tk-p-features" id="tk-p-features"></div>
+            </section>
 
-          <div class="tk-block" id="blocks">
-            <div class="tk-block-head">
-              <h3 class="tk-block-title">Blocks <span class="admin-count" id="tk-blocks-count"></span></h3>
+            <section class="tk-part" aria-labelledby="tk-p-plan-title">
+              <h3 class="tk-part-title" id="tk-p-plan-title">Everything they hold</h3>
+              <p class="tk-note" id="tk-p-plan-note"></p>
+              <h4 class="tk-p-sub">Open, sprint by sprint</h4>
+              <div class="tk-p-sprints" id="tk-p-sprints" role="img"></div>
+              <div class="tk-p-cuts">
+                <div><h4 class="tk-p-sub">By block</h4><div id="tk-p-blocks"></div></div>
+                <div><h4 class="tk-p-sub">By type</h4><div id="tk-p-types"></div></div>
+                <div><h4 class="tk-p-sub">By kind of work</h4><div id="tk-p-tags"></div></div>
+              </div>
+            </section>
+
+            <div class="tk-p-two">
+              <section class="tk-part" aria-labelledby="tk-p-qa-title">
+                <h3 class="tk-part-title" id="tk-p-qa-title">Waiting for QA</h3>
+                <p class="tk-note">Finished, waiting for somebody to test and close; oldest first, from the ticket&rsquo;s last change.</p>
+                <div id="tk-p-qa"></div>
+              </section>
+              <section class="tk-part" aria-labelledby="tk-p-done-title">
+                <h3 class="tk-part-title" id="tk-p-done-title">Recently finished</h3>
+                <p class="tk-note" id="tk-p-done-note"></p>
+                <div id="tk-p-done"></div>
+              </section>
             </div>
-            <p class="tk-note">
-              Every ticket under each top-level epic, however deep, counted by state.
-            </p>
-            <div class="tk-blocks" id="tk-blocks"></div>
+
+            <div class="tk-attend">
+              <section class="tk-attend-col" aria-labelledby="tk-p-held-title">
+                <h3 class="tk-part-title" id="tk-p-held-title">On hold</h3>
+                <div id="tk-p-held"></div>
+              </section>
+              <section class="tk-attend-col" aria-labelledby="tk-p-gate-title">
+                <h3 class="tk-part-title" id="tk-p-gate-title">Testing gate</h3>
+                <div id="tk-p-gate"></div>
+              </section>
+              <section class="tk-attend-col" aria-labelledby="tk-p-tests-title">
+                <h3 class="tk-part-title" id="tk-p-tests-title">Module tests they own</h3>
+                <div id="tk-p-tests"></div>
+              </section>
+            </div>
+
+            <section class="tk-part" aria-labelledby="tk-p-crs-title">
+              <h3 class="tk-part-title" id="tk-p-crs-title">Change requests</h3>
+              <div id="tk-p-crs"></div>
+            </section>
+
+            <section class="tk-part tk-p-allbox">
+              <button class="chip tk-p-all" id="tk-p-all" type="button"></button>
+              <p class="tk-note" id="tk-p-all-note"></p>
+            </section>
           </div>
         </section>
 
@@ -213,18 +320,12 @@
         <!-- The roster's numbers as a table: every figure the bars draw, for
              anyone not reading the picture and for copying into a status note. -->
         <section class="admin-panel set-section" id="people">
-          <h2 class="admin-heading">People <span class="admin-count" id="tk-people-count"></span></h2>
-          <p class="auth-note set-lede">
-            Every person's tickets by state, counted by assignee. Finished is
-            closed plus awaiting QA (an open status named QA, review, test or
-            verify), because that is where a developer's finished work waits.
-            Rejected tickets are closed too but counted apart, so they never read
-            as work delivered. Late is still the developer's and past its due
-            date or its sprint's end.
-          </p>
+          <h2 class="admin-heading">People, in numbers <span class="admin-count" id="tk-people-count"></span></h2>
+          <p class="auth-note set-lede" id="tk-people-lede"></p>
           <div class="tk-table-wrap">
             <table class="tk-table" id="tk-people"></table>
           </div>
+          <p class="auth-note auth-fine" id="tk-people-zero"></p>
         </section>
 
         <!-- ── testing gate ──────────────────────────────────────────── -->
@@ -238,47 +339,41 @@
         <section class="admin-panel set-section" id="states">
           <h2 class="admin-heading">States <span class="admin-count" id="tk-states-count"></span></h2>
           <p class="auth-note set-lede">
-            Every status OpenProject has for this project's tickets, in its own
-            order. ADAM keeps no list of its own — a team that renames a column
-            keeps its numbers.
+            Every status in use on this project's tickets, in OpenProject's own
+            order, and what the page counts it as. ADAM keeps no list of its
+            own: a team that renames a column keeps its numbers.
           </p>
           <div class="admin-table" id="tk-states"></div>
         </section>
 
         <!-- ── dates ─────────────────────────────────────────────────── -->
         <section class="admin-panel set-section" id="dates">
-          <h2 class="admin-heading">Overdue and due <span class="admin-count" id="tk-dates-count"></span></h2>
-          <p class="auth-note set-lede">
-            Open tickets whose due date has passed, then what lands in the next
-            seven days. Tickets awaiting QA are left out: their developer has
-            finished them. A ticket with no due date cannot appear in either, which
-            is worth knowing about a board that looks empty here.
-          </p>
-          <h3 class="tk-sub" id="tk-overdue-title">Overdue</h3>
+          <h2 class="admin-heading">Late and due <span class="admin-count" id="tk-dates-count"></span></h2>
+          <p class="auth-note set-lede" id="tk-dates-lede"></p>
+          <h3 class="tk-sub" id="tk-overdue-title">Late</h3>
           <div class="admin-table" id="tk-overdue"></div>
           <h3 class="tk-sub" id="tk-soon-title">Due in the next seven days</h3>
           <div class="admin-table" id="tk-soon"></div>
         </section>
 
-        <!-- ── timeline ──────────────────────────────────────────────── -->
-        <!-- Drawn from the dates OpenProject already holds. ADAM schedules
+        <!-- ── features by sprint ────────────────────────────────────── -->
+        <!-- Drawn from OpenProject's own dates and sprints. ADAM schedules
              nothing and stores no dates of its own (CF-124): this is a view,
              and moving a bar means moving it in OpenProject. -->
         <section class="admin-panel set-section" id="timeline">
           <h2 class="admin-heading">
-            Timeline <span class="admin-count" id="tk-timeline-count"></span>
+            Features by sprint <span class="admin-count" id="tk-timeline-count"></span>
           </h2>
           <p class="auth-note set-lede">
-            Every epic that has dates, under the milestone it is being delivered
-            for. A bar runs from the earliest start to the latest date among its
-            tickets; the solid part is how much of it is finished (closed or
-            awaiting QA). Tickets with no
-            dates cannot be placed and are counted underneath rather than
-            quietly dropped.
+            Every feature under its block, drawn across the sprints its tickets
+            are in, or their own dates where a ticket has them. The solid part
+            of a bar is how much of the feature is finished. Tickets with
+            neither a sprint nor a date cannot be placed and are counted
+            underneath rather than quietly dropped.
           </p>
           <div class="set-actions">
             <label class="tk-only"><input id="tk-gantt-open" type="checkbox" />
-              Hide milestones where everything is finished</label>
+              Hide features where everything is finished</label>
           </div>
           <div class="tk-gantt" id="tk-gantt"></div>
           <p class="auth-note auth-fine" id="tk-undated"></p>
@@ -298,17 +393,16 @@
           <p class="auth-note auth-fine" id="tk-unlinked"></p>
         </section>
 
-        <!-- ── epics ─────────────────────────────────────────────────── -->
+        <!-- ── by parent ─────────────────────────────────────────────── -->
         <section class="admin-panel set-section" id="parents">
-          <h2 class="admin-heading">Epics <span class="admin-count" id="tk-parents-count"></span></h2>
+          <h2 class="admin-heading">By parent <span class="admin-count" id="tk-parents-count"></span></h2>
           <p class="auth-note set-lede">
-            Tickets grouped under their parent in OpenProject, with how far each
-            group has got. Progress counts tickets finished, not percentages
-            typed on them.
+            Tickets grouped under their parent in OpenProject, biggest first,
+            with how far each group has got. Progress counts tickets finished,
+            not percentages typed on them.
           </p>
           <div class="admin-table" id="tk-parents"></div>
         </section>
-
         <!-- ── every ticket ──────────────────────────────────────────── -->
         <section class="admin-panel set-section" id="tickets">
           <h2 class="admin-heading">All tickets <span class="admin-count" id="tk-tickets-count"></span></h2>

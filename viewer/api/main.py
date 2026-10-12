@@ -2739,6 +2739,14 @@ def _overview_payload(account: dict, scope: dict) -> dict:
     # filter must not turn an overview of one product into an overview of all.
     items = [item for item in items if item.get("projectId") == scope["pmsId"]]
 
+    # Why a ticket is on hold. OpenProject has no "reason" field, so the reason
+    # is whatever somebody last wrote on it; the Tasks page shows it beside the
+    # stalled ticket. One activities read per held ticket, capped, because a
+    # hold is rare (three in TICVAI r1) and a project with hundreds of them
+    # needs a conversation rather than a dashboard. A ticket whose comments
+    # cannot be read simply has no reason shown.
+    _held_reasons(endpoint, token, items)
+
     touching: dict = {}
     for row in db.all_rows(
         "SELECT external_key, target_kind, target_id FROM artefact_link "
@@ -2771,6 +2779,26 @@ def _overview_payload(account: dict, scope: dict) -> dict:
                 f"The OpenProject project '{scope['pmsName'] or scope['pmsIdentifier']}' "
                 f"has no work packages yet.",
     }
+
+
+# Open states that mean the work has stopped. The same guess the Tasks page
+# makes (tasks.js `STALLED`): OpenProject has no "blocked" flag, only a name.
+_HELD = re.compile(r"hold|block|wait|pend", re.I)
+HELD_REASON_LIMIT = 25
+
+
+def _held_reasons(endpoint: str, token: str, items: list) -> None:
+    """Attach `lastComment` {author, at, text} to each held ticket that has one."""
+    held = [item for item in items if _HELD.search(item.get("status") or "")]
+    for item in held[:HELD_REASON_LIMIT]:
+        try:
+            said = openproject.comments(endpoint, token, item["key"])
+        except Exception:  # noqa: BLE001 — a reason is extra; never fail the read for one
+            continue
+        if said:
+            last = said[-1]
+            item["lastComment"] = {"author": last["author"], "at": last["at"],
+                                   "text": last["text"][:400]}
 
 
 # ── where a ticket sits in the tree ──────────────────────────────────
