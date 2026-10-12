@@ -1413,7 +1413,7 @@ function mountTip() {
   // A reader's page, not an administrator's: it shows the delivery and changes
   // nothing on it. A pm was refused here, which left the role with no view of
   // the thing it exists to oversee.
-  if (!auth.isReader(state.me)) { denied(); return hideLoader(); }
+  if (auth.isClient(state.me)) { denied(); return hideLoader(); }  // the delivery team reads it (12 Oct)
 
   state.project = await auth.ensureProject();
   $('tasks').hidden = false;

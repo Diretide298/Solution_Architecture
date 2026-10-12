@@ -2852,7 +2852,7 @@ def _subtasks_of(key: str, kids: dict) -> list:
 def delivery_overview(
     project_id: str = Query(default=""),
     refresh: int = Query(default=0),
-    account: dict = Depends(require_reader),
+    account: dict = Depends(require_account),
 ):
     """Every ticket in the project's OpenProject project, cached for five minutes.
 
@@ -2861,7 +2861,7 @@ def delivery_overview(
     caller's own OpenProject token, so a pm sees what their own OpenProject
     account can see — ADAM widens who may ask, and does not widen the answer.
     """
-    scope = _pms_scope(account, project_id)
+    scope = _team_scope(account, project_id)  # the delivery team, not a client (12 Oct: "let them see each others work")
     held = _project_read(account, scope, refresh=bool(refresh))
     age = int(time.monotonic() - held["at"])
     return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,

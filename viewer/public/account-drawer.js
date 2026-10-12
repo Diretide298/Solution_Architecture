@@ -154,6 +154,7 @@ const DRAWER_HTML = `
 
         <nav class="drawer-group" aria-labelledby="drawer-explore">
           <h3 class="drawer-group-title" id="drawer-explore">Explore</h3>
+          <a class="drawer-link" href="/tasks.html">Tasks: who is doing what</a>
           <a class="drawer-link" href="/chat.html">Ask about the package</a>
           <a class="drawer-link" href="/document.html">Generate documentation</a>
           <a class="drawer-link" href="/domains.html">Domain lenses</a>
@@ -162,7 +163,6 @@ const DRAWER_HTML = `
         <nav class="drawer-group" id="account-admin" hidden aria-labelledby="drawer-admin">
           <h3 class="drawer-group-title" id="drawer-admin">Administration</h3>
           <a class="drawer-link" href="/admin.html">Admin: accounts, invites and projects</a>
-          <a class="drawer-link" href="/tasks.html">Tasks: the delivery overview</a>
           <a class="drawer-link" href="/costing.html">Costing: hours and what they cost</a>
           <a class="drawer-link" href="/audit.html">Audit the delivery package</a>
         </nav>
