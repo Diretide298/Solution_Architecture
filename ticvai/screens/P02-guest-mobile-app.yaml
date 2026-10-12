@@ -1904,6 +1904,21 @@ screens:
         notes: '**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31)
           with a calendar icon that opens the full month for later dates (M17-08).'
         provenance: decided 29 September 2026, M17-08
+      - kind: secondaryButton
+        label: Join the waitlist
+        operation: joinWaitlist
+        notes: '**Only on a sold-out time** (`getAvailability` `remaining` 0; sold, held and leased units at
+          capacity, audit R101); never on a time with places left, which `joinWaitlist` refuses `409`. Collects
+          the party size and how to be told; joining reserves nothing, and an offer from BO-017
+          (`offerWaitlistCapacity`) brings the guest back here to buy. The approved guest build''s sold-out
+          "Join the waitlist" (holds a returned place for 15 minutes) lands here, not on the status page
+          (CHG-SGU-022; 12 October 2026, CHG-R6-037).'
+        provenance: contract catalogue.yaml POST /waitlist-entries (12 October 2026, CHG-R6-037)
+      - kind: secondaryButton
+        label: Leave the waitlist
+        operation: leaveWaitlist
+        notes: Shown instead of Join once the guest is on this time's waitlist (CHG-R6-037).
+        provenance: contract catalogue.yaml DELETE /waitlist-entries/{entryId} (12 October 2026, CHG-R6-037)
   states:
     loading: The select date time list.
     error: Could not load. Names which read failed and leaves the select date time untouched.
@@ -1955,6 +1970,14 @@ screens:
     trigger: onAction
     invalidates:
     - getCart
+  - operationId: joinWaitlist
+    contract: catalogue
+    purpose: Join the waitlist of a sold-out time (CHG-R6-037)
+    trigger: onAction
+  - operationId: leaveWaitlist
+    contract: catalogue
+    purpose: Leave it (CHG-R6-037)
+    trigger: onAction
   - operationId: getPublishedBookingFlow
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'

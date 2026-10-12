@@ -1,0 +1,48 @@
+id: CHG-R6-034
+date: '2026-10-12'
+source: plan
+kind: plan
+proposed: '2026-10-12'
+summary: 'EDGE-WAITING-ROOM-LOAD''s subject and detail say 50,000 arrivals, the client''s sizing benchmark CHG-R4-017
+  adopted, not 30,000; check-load-targets now reads the authored ticket lists.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: EDGE-WAITING-ROOM-LOAD subject "Load test the waiting room at 50,000
+    arrivals in the burst environment"; detail names ADR-0066 item 4 as amended on 6 October, 50,000
+    simultaneous arrivals, the sale held at 3,000 concurrent B2C users and then stepped above it, and done-when
+    at 50,000. tools/check-load-targets.py: new rule L-TICKET-BELOW over docs/active/*.json (a task''s "load
+    test ... at N arrivals" or "N arrivals in the opening seconds" below 50,000).'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'CHG-R4-017 amended ADR-0066 and ADR-0035 to the client''s 50,000+ arrivals
+  (sources/client/2026-10-06-tracker-answers.md, T9) and listed EDGE-WAITING-ROOM-LOAD as unstarted, but the
+  ticket text lives in docs/active/block-a-extra-tasks.json, which check-load-targets did not read, so it still
+  said 30,000.'
+keys_touched:
+  tickets:
+  - 'EDGE-WAITING-ROOM-LOAD'
+  files:
+  - 'docs/active/block-a-extra-tasks.json'
+  - 'tools/check-load-targets.py'
+  other:
+  - 'ADR-0066'
+root_class: 'new: client-target-not-adopted'
+tickets:
+  started: []
+  unstarted:
+  - EDGE-WAITING-ROOM-LOAD
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; the lead''s request of 12 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-load-targets.py'
+status: open
+notes: 'Batch R6, 12 October 2026. A plan input, so kind plan; the 24-hour cooling-off is waived by the lead in
+  writing. EDGE-WAITING-ROOM-LOAD is a Block B ticket (B1), unstarted, so it picks the text up at r4 through its
+  pointer body. check-load-targets passes with the fix and fails L-TICKET-BELOW on the old text (lines 672-673).'

@@ -77002,5 +77002,89 @@
    "postgres",
    "redis"
   ]
+ },
+ "editSeatMapStructure": {
+  "contract": "seating",
+  "verb": "PATCH",
+  "path": "/seat-maps/{seatMapId}/structure",
+  "reads": [
+   "cache:idempotency",
+   "seating.seat_map"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "seating.seat_map",
+   "seating.section",
+   "seating.seat"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Build a seat map by hand",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "notifyPerformanceHolders": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/performance-cancellation-notices",
+  "reads": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Tell every holder of a cancelled performance",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAccessAreaCapacity": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/access-areas/{areaId}/capacity",
+  "reads": [
+   "cache:idempotency",
+   "access.access_area"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "access.access_area",
+   "access.configuration_change"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the capacity of a venue, park or area",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

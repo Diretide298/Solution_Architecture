@@ -7815,6 +7815,13 @@ screens:
           **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
           reads *always requires confirmation*.'
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Cancel notices sent
+        operation: listMessageDispatches
+        notes: 'For a cancelled performance, the notices `notifyPerformanceHolders` sent (`sourceRef` = the
+          performance id): delivered, failed and suppressed, guest by guest, so the refunds desk can confirm the
+          guests were told before they travel (F09 step 5). Shown when the refunds are for a cancelled performance.'
+        provenance: contract marketing-crm.yaml GET /message-dispatches (12 October 2026, CHG-R6-038)
     - name: contextPanel
       slot: selection
       components:
@@ -8143,6 +8150,12 @@ screens:
     purpose: Refund every order against a cancelled performance
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: listMessageDispatches
+    contract: marketing-crm
+    purpose: 'The cancel notices sent for a cancelled performance (sourceRef = performanceId): delivered, failed
+      and suppressed, so F09 step 5 can confirm the guests were told'
+    trigger: onAction
+    provenance: 12 October 2026 (CHG-R6-038)
   entryState:
     params:
     - name: orderId
@@ -19236,7 +19249,9 @@ screens:
     component: modal
     trigger: Save venue settings
     body: '**Collects what `setVenueSettings` sends before it is called, in sections, not property names.**
-      Nothing in the body is required. **Day and hours**: calendar day start, support hours, quiet hours.
+      Nothing in the body is required. **Day and hours**: calendar day start, business day cut-off
+      (`businessDayCutoff`, when the venue''s business day closes; empty inherits the tenant default, 00:00;
+      CHG-R6-032), support hours, quiet hours.
       **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer
       limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart
       lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp
@@ -36683,6 +36698,13 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createOrgUnit
+      - kind: secondaryButton
+        label: Set capacity
+        operation: setAccessAreaCapacity
+        notes: 'On the selected venue or park row: capacity (empty for no limit), the warning, high and critical
+          bands, and an operator count adjustment with its reason. **Without a capacity the scanner''s "Venue
+          full" never fires** (`capacityReached`); BO-255 links here for it (DEC-263).'
+        provenance: contract access.yaml PUT /access-areas/{areaId}/capacity (12 October 2026, CHG-R6-036)
   states:
     loading: The venue park access list.
     error: Could not load. Names which read failed and leaves the venue park access untouched.
@@ -36716,6 +36738,14 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listOrgUnits
+  - operationId: setAccessAreaCapacity
+    contract: access
+    purpose: 'Set the venue''s or a park''s capacity and occupancy bands: what makes the gate''s "Venue full"
+      (`capacityReached`) fire and what BO-255 measures against (12 October 2026, CHG-R6-036; DEC-263)'
+    trigger: onAction
+    provenance: 12 October 2026 (CHG-R6-036)
+    invalidates:
+    - listVenueParkAccess
   entryState:
     preloaded:
     - VenueParkAccessStructureView.entityType
@@ -36725,6 +36755,11 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrgUnits`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: areaId
+      from: navigation
+      optional: true
+      notes: 'Optional (12 October 2026, CHG-R6-036): `setAccessAreaCapacity` takes the id of the venue or park row
+        the user selects in the list (`listVenueParkAccess`); an edge that holds one only pre-selects it.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -36734,6 +36769,25 @@ screens:
     bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetAccessAreaCapacity
+    component: modal
+    trigger: Set capacity
+    body: '**Collects what `setAccessAreaCapacity` sends for the selected venue or park** (12 October 2026,
+      CHG-R6-036): capacity (empty for no limit, so the gate never denies for capacity), the warning, high and
+      critical bands in percent of capacity, and an operator count adjustment with its reason (required when
+      the adjustment changes). Dismissing sends nothing; the structure behind is unchanged.'
+    confirm:
+      label: Save capacity
+      operation: setAccessAreaCapacity
+    dismiss:
+      label: Cancel
+      discards:
+      - capacity
+      - occupancyThresholds
+      - operationalAdjustment
+      - reason
+    provenance: contract access.yaml PUT /access-areas/{areaId}/capacity (CHG-R6-036)
 - id: BO-146
   name: Access Area & Zone Builder
   module: Access & Venue
@@ -40830,7 +40884,10 @@ screens:
     trigger: Save verification method policy
     body: '**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`,
       `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`.
-      Optional: `reasonCodes`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as "Ticket credential for this product"
+      (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP
+      invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing
+      sends nothing; the screen behind is unchanged.'
     bindsTo: AccessVerificationMethodPolicy
     confirm:
       label: Save verification method policy
@@ -40845,6 +40902,7 @@ screens:
       - changeAfterLock
       - scopePath
       - reasonCodes
+      - credentialFormatOverride
     provenance: contract access.yaml PUT /verification-method-policies
 - id: BO-178
   name: Media Issuance & Encoding Profile
@@ -63284,8 +63342,10 @@ screens:
     error: Could not load. Names which read failed and leaves the pdf printable pos untouched.
     emptyFirstRun: 'No design saved for this media template yet: the designer opens on the defaults; Save
       design creates it.'
-    emptyNoAccess: Shown when the caller lacks `ACCESS_POINT_CONFIGURE`, which `getPdfPrintablePos` requires
-      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getPdfPrintablePos` requires to show
+      this screen, and names that permission; a caller without `PRODUCT_CONFIGURE` sees Save design disabled,
+      naming it (the product permission the ticket templates on BO-344 use; was ACCESS_POINT_CONFIGURE
+      until 12 October 2026, BC-034/BC-035, CHG-R6-030). **Never an empty table** — that reads as *there
       is no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setPdfPrintablePos
@@ -63451,8 +63511,10 @@ screens:
     error: Could not load. Names which read failed and leaves the apple wallet pass untouched.
     emptyFirstRun: No apple wallet pass configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setAppleWalletPass` requires, and names
+      that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE
+      until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: setAppleWalletPass
     contract: access
@@ -63593,8 +63655,10 @@ screens:
     error: Could not load. Names which read failed and leaves the google wallet pass untouched.
     emptyFirstRun: No google wallet pass configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setGoogleWalletPass` requires, and names
+      that permission (the product permission of the ticket templates on BO-344; was ACCESS_POINT_CONFIGURE
+      until 12 October 2026, CHG-R6-030). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: setGoogleWalletPass
     contract: access
@@ -131983,6 +132047,12 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createSeatMap
+      - kind: secondaryButton
+        label: Add sections, rows and seats
+        operation: editSeatMapStructure
+        notes: Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21 Aug 2026;
+          CHG-R6-035).
+        provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (12 October 2026, CHG-R6-035)
   states:
     loading: The venue canvas list.
     error: Could not load. Names which read failed and leaves the venue canvas untouched.
@@ -132010,6 +132080,14 @@ screens:
     invalidates:
     - getSeatMap
     - listSeatMaps
+  - operationId: editSeatMapStructure
+    contract: seating
+    purpose: 'Draw sections, rows and seats on a draft map by hand: the manual building MoM 21 Aug promised
+      beside import (12 October 2026, CHG-R6-035)'
+    trigger: onAction
+    provenance: 12 October 2026 (CHG-R6-035)
+    invalidates:
+    - getSeatMap
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-954
@@ -132025,6 +132103,27 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatMap`;
         a link or an edge that holds one opens it instead.'
+  overlays:
+  - id: formEditSeatMapStructure
+    component: modal
+    trigger: Add sections, rows and seats
+    body: '**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code,
+      name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction,
+      start and end point, a curve radius for a curved row, a category), single seats (section, row, number,
+      position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft
+      maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.'
+    confirm:
+      label: Apply to the map
+      operation: editSeatMapStructure
+    dismiss:
+      label: Cancel
+      discards:
+      - addSections
+      - addRows
+      - addSeats
+      - removeSeatIds
+      - relabel
+    provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)
 - id: BO-955
   name: Sections & Zones
   module: Access & Venue
@@ -132231,6 +132330,12 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: updateSeats
+      - kind: secondaryButton
+        label: Generate, renumber or remove rows and seats
+        operation: editSeatMapStructure
+        notes: Opens formEditSeatMapStructure on the draft map. Building by hand, beside import (MoM 21 Aug 2026;
+          CHG-R6-035).
+        provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (12 October 2026, CHG-R6-035)
   states:
     loading: The rows seats list.
     error: Could not load. Names which read failed and leaves the rows seats untouched.
@@ -132246,8 +132351,16 @@ screens:
     trigger: onAction
   - operationId: updateSeats
     contract: seating
-    purpose: Renumber, move or relabel
+    purpose: Category, attribute and status across a selection of seats
     trigger: onAction
+    invalidates:
+    - listSeats
+  - operationId: editSeatMapStructure
+    contract: seating
+    purpose: 'Generate, add, remove, renumber and relabel rows and seats on a draft map (12 October 2026,
+      CHG-R6-035): `updateSeats` cannot, it changes only the category, attribute and status of existing seats'
+    trigger: onAction
+    provenance: 12 October 2026 (CHG-R6-035)
     invalidates:
     - listSeats
   wireframe:
@@ -132266,6 +132379,27 @@ screens:
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listSeats`, `updateSeats`
         take the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+  overlays:
+  - id: formEditSeatMapStructure
+    component: modal
+    trigger: Generate, renumber or remove rows and seats
+    body: '**Collects what `editSeatMapStructure` sends** (12 October 2026, CHG-R6-035): sections to add (code,
+      name, outline), rows to generate (section, row label, seat count, first seat number, numbering direction,
+      start and end point, a curve radius for a curved row, a category), single seats (section, row, number,
+      position), seats to remove and seats to relabel. Nothing is required; an empty form sends nothing. Draft
+      maps only: a published map refuses a removal `409`. Dismissing sends nothing; the canvas is unchanged.'
+    confirm:
+      label: Apply to the map
+      operation: editSeatMapStructure
+    dismiss:
+      label: Cancel
+      discards:
+      - addSections
+      - addRows
+      - addSeats
+      - removeSeatIds
+      - relabel
+    provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)
 - id: BO-957
   name: Standing Zones
   module: Access & Venue
@@ -143898,6 +144032,14 @@ screens:
         operation: setVenueSettingsDefaults
         provenance: contract tenancy.yaml VenueSettings.calendarDayStartHour (defined 4 October 2026,
           CHG-FXS-001)
+      - kind: textField
+        label: Business day closes at (HH:MM)
+        bindsTo: VenueSettings.businessDayCutoff
+        operation: setVenueSettingsDefaults
+        notes: 'The tenant default every venue inherits; 00:00 (midnight) unless changed. Moves the business
+          date of shifts, the daily reconciliation, revenue postings and the daily reports, from the next business
+          day; not the calendar views, which follow the hour above.'
+        provenance: contract tenancy.yaml VenueSettings.businessDayCutoff (Chinmay, 6 October 2026; CHG-R6-032)
       - kind: secondaryButton
         label: Save venue setting defaults
         operation: setVenueSettingsDefaults
@@ -191336,6 +191478,16 @@ screens:
       - kind: selectField
         label: Collection
         provenance: pack Sales_Channel_Management_Reference.pdf, page 14 §Configure
+      - kind: selectField
+        label: Ticket credential
+        bindsTo: ChannelFeesPaymentFulfillmentConfigurationInput.ticketCredentialFormat
+        operation: setChannelFeePayment
+        notes: 'Platform signed QR (the default), Static signed QR, RFID card. **A partner''s or reseller''s
+          channel can issue its tickets without dynamic QR** (MoM 2 Sep 2026 §4.7, MOM-0330): ticket issuing
+          (`issueOrderEntitlements`) reads it for every order sold through this channel, after the product''s own
+          override on BO-177.'
+        provenance: contract catalogue.yaml ChannelFeesPaymentFulfillmentConfigurationInput.ticketCredentialFormat
+          (12 October 2026, CHG-R6-031)
     - name: actionBar
       slot: publish
       components:

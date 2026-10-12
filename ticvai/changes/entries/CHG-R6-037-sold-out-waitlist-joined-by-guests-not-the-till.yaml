@@ -1,0 +1,52 @@
+id: CHG-R6-037
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The sold-out waitlist can be joined: joinWaitlist and leaveWaitlist are bound on the guest booking screens
+  WEB-006 and GST-007, where CHG-SGU-022 said they belong. The POS keeps no waitlist mode; POS-002 says so.'
+decision:
+  what: 'screens/P01-guest-web-storefront.yaml WEB-006 and screens/P02-guest-mobile-app.yaml GST-007: "Join the
+    waitlist" (only on a sold-out time) and "Leave the waitlist" buttons and apis entries for joinWaitlist and
+    leaveWaitlist. screens/P04-point-of-sale.yaml POS-002: the approved build''s waitlistMode is not built on
+    the till; a counter waitlist is built only if the client asks. No contract change.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The Vivaticket comparison of 6 October: "the POS has a wait-list mode with nothing behind it". POS-002 already
+  left the mode out (CHG-SPO-015), but joinWaitlist and leaveWaitlist were bound on no screen at all while
+  BO-017 offers capacity to waitlist entries (offerWaitlistCapacity), and WEB-012''s note (CHG-SGU-022) sent the
+  guest build''s "Join the waitlist" to booking screens that never took it.'
+keys_touched:
+  operations:
+  - 'joinWaitlist'
+  - 'leaveWaitlist'
+  - 'offerWaitlistCapacity'
+  screens:
+  - 'WEB-006'
+  - 'GST-007'
+  - 'POS-002'
+  - 'BO-017'
+  files:
+  - 'tools/check-promises-kept.py'
+root_class: 'new: promise-without-operation'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: 'pending (the lead raises the ADAM CR for r4; the Vivaticket comparison of 6 October 2026)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: 'tools/check-promises-kept.py'
+status: open
+notes: 'Batch R6, 12 October 2026. **Choice flagged:** the comparison''s default (take the empty mode off the POS,
+  build a counter waitlist only if the client asks) is kept for the till; making joinWaitlist staff-callable
+  would change its x-ticvai-permission (null), a breaking change nobody approved. The guest side is bound
+  because the operation, its 409 and BO-017''s offer already existed. x-ticvai-consumed-by follows from
+  link-screens-contracts at the release refresh.'

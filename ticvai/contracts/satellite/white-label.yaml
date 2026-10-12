@@ -7336,6 +7336,36 @@ components:
           type: boolean
           readOnly: true
           x-ticvai-derived: onRead
+        passTypeIdentifier:
+          type: string
+          nullable: true
+          pattern: ^pass\.[A-Za-z0-9.-]+$
+          description: '**The Apple Wallet Pass Type ID** (`pass.<reverse-domain>`), registered in the client''s own
+            Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate;
+            CHG-R6-033). Apple entry only; a Google entry sending it is refused with 400.'
+        passCertificateSecretRef:
+          type: string
+          nullable: true
+          writeOnly: true
+          description: '**The Pass Type ID certificate** (its .p12 and password), from the client''s Apple Developer
+            account, sent once and kept in Key Vault; this is its reference, as `apiCredentialSecretRef` is. It signs
+            every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server
+            reads the certificate''s Pass Type ID, team and expiry; a certificate whose Pass Type ID is not
+            `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033).'
+        hasPassCertificate:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onRead
+        passCertificateExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**When the pass certificate expires**, read from the certificate when it is stored (CHG-R6-033).
+            Apple passes stop signing at this instant, and a pass that cannot be signed cannot be issued or updated,
+            so **30 days before it a daily job raises `whitelabel.passCertificateExpiring`**: the tenant admin is
+            told, and TICVAI operations get an alert. The client renews it in its own Apple account and sends the
+            new one here.'
         listing:
           type: object
           description: The store listing.

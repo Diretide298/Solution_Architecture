@@ -58,7 +58,12 @@ info:
     \ stored with it.\n- **Dates are the region's calendar.** A `format: date` field or parameter (a period\
     \ boundary,\n  a report range, an effective date) is a day in the region's time zone\n  (`platform.region_settings.time_zone`;\
     \ a venue inherits its region's zone and cannot override it),\n  running from local midnight to\
-    \ local midnight. Instants stay `date-time` in UTC (naming-and-style 5.2).\n-\
+    \ local midnight. Instants stay `date-time` in UTC (naming-and-style 5.2).\n  **A business date\
+    \ is the venue's trading day** (12 October 2026, CHG-R6-032): the venue-local date that closes at\n\
+    \  `VenueSettings.businessDayCutoff` (tenancy; per venue, inheriting the tenant default, default 00:00,\
+    \ where it is\n  the calendar day above). The revenue date of a sale, the venue-day of a reconciliation\
+    \ or a\n  settlement and a shift's business date are business dates; a tax, FX or fiscal-period boundary\
+    \ stays a\n  calendar date.\n-\
     \ **Dual ledger.** Transaction-level entries for reconciliation, journal entries for\n  trial balance,\
     \ P&L and balance sheet.\n- **Tax is computed per line item, not on the basket total**, with compound\
     \ tax support\n  and per-country structures.\n- **Multi-venue passes recognise on redemption**, not\
@@ -107,6 +112,11 @@ paths:
         **Idempotent on the order id**: the journal entry carries the order id as its source reference, and a
         redelivered `order.paid` finds it and returns it unchanged. An offline sale replayed by `orders.syncOrders`
         arrives by the same event and is dated by its `recordedAt`. Invoked by the event relay, never by a screen.
+
+
+        **The revenue date is the sale''s business date** (CHG-R6-032): the venue-local date of `recordedAt` taken
+        against the venue''s `businessDayCutoff` (tenancy `VenueSettings`, default 00:00), so a sale at 01:30 at a
+        venue whose day closes at 06:00 is posted on the previous day.
 
         '
       tags:
@@ -476,7 +486,8 @@ paths:
 
         **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; confirms
         audit R110 (b)). The unit a finance user works and signs off is one venue-day: `from` equal to
-        `to`. A longer range is a review of days already reconciled, never a reconciliation of its own;
+        `to`, a business date that closes at the venue''s `businessDayCutoff` (tenancy `VenueSettings`, default
+        00:00; CHG-R6-032). A longer range is a review of days already reconciled, never a reconciliation of its own;
         a provider that sends a monthly file (DI-268) is matched day by day against it.
 
         '
@@ -2642,7 +2653,8 @@ paths:
 
         **Daily, per venue** (decided 28 September, audit R110 (b); BO-043 Daily Reconciliation). One
         settlement is one provider, one venue and one trading day: `periodStart` and `periodEnd` are the
-        same day and `venueId` names the venue. A request whose period is longer than a day is refused
+        same day and `venueId` names the venue. The trading day is the venue''s business date, closing at its
+        `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032). A request whose period is longer than a day is refused
         with 400 `settlement-period-not-a-day`. Until this date the description said monthly, which
         contradicted the screen that runs it.
 
@@ -7465,8 +7477,8 @@ components:
                     currencies out of balance.
                   - `noUnapprovedJournals`: no `ledger.journal_entry` dated in the period is `draft` or awaiting approval. Blocking: those
                     entries.
-                  - `noOpenShifts`: no POS shift with a business date in the period is still open, suspended or awaiting close approval,
-                    asked of `orders.listShifts`. Blocking: those shifts.
+                  - `noOpenShifts`: no POS shift with a business date (`Shift.businessDate`, closing at the venue's `businessDayCutoff`;
+                    CHG-R6-032) in the period is still open, suspended or awaiting close approval, asked of `orders.listShifts`. Blocking: those shifts.
                   - `settlementsReconciled`: every `ledger.settlement` in the period is reconciled and no `ledger.settlement_exception`
                     on it is open. Blocking: unreconciled settlements plus open exceptions.
                   - `recognitionRunComplete`: no `ledger.recognition_schedule` line due on or before the period end is unrecognised.

@@ -710,6 +710,184 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-maps/{seatMapId}/structure:
+    parameters:
+    - name: seatMapId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: editSeatMapStructure
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '12 October 2026: CHG-R6-035 (the Vivaticket comparison of 6 October: seated events are
+        sold and a seat map could only come from an import, a clone or a template; MoM 21 Aug 2026, "the platform
+        will support both manual seat map building and AI-assisted import", docs/active/seating-contract-19-september.md)'
+      summary: Build a seat map by hand
+      description: '**The manual seat map building the minutes promised** (MoM 21 Aug 2026; 12 October 2026,
+        CHG-R6-035). BO-954 Venue Canvas and BO-956 Rows & Seats draw sections, rows and seats, but
+        `createSeatMap` names an empty map, `updateSeatMap` saves its name and views and `updateSeats` changes
+        only the category, attribute and status of seats that already exist: a venue with no drawing or manifest to
+        import could not build a map at all. This adds, removes and renumbers the structure of a **draft** map.
+
+
+        **One request, applied in order**: `addSections`, then `addRows` (a row of `seatCount` seats laid out
+        straight or on a curve and numbered from `firstSeatNumber` in `numberingDirection`), then `addSeats`
+        (single seats, for a box or an irregular row), then `removeSeatIds`, then `relabel` (a section code, a
+        row label or a seat number changed). A label already taken in the map, or a removal of a seat on a
+        published map, is refused `409` with the conflicting labels; nothing is applied. **Accepts `Prefer:
+        validate-only`**, as `updateSeats` does, for the AI executor''s plan validation
+        (`proposeSeatMapChanges`, kind `numbering`).'
+      tags:
+      - seatMap
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                addSections:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - code
+                    - name
+                    properties:
+                      code:
+                        type: string
+                        maxLength: 20
+                      name:
+                        type: string
+                        maxLength: 100
+                      boundary:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Point'
+                addRows:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - sectionCode
+                    - label
+                    - seatCount
+                    properties:
+                      sectionCode:
+                        type: string
+                      label:
+                        type: string
+                        maxLength: 10
+                      seatCount:
+                        type: integer
+                        minimum: 1
+                        maximum: 500
+                      firstSeatNumber:
+                        type: integer
+                        minimum: 0
+                        default: 1
+                      numberingDirection:
+                        type: string
+                        enum:
+                        - leftToRight
+                        - rightToLeft
+                        default: leftToRight
+                      start:
+                        $ref: '#/components/schemas/Point'
+                      end:
+                        $ref: '#/components/schemas/Point'
+                      curveRadius:
+                        type: number
+                        nullable: true
+                        description: Null or absent for a straight row.
+                      categoryId:
+                        type: string
+                        format: uuid
+                        nullable: true
+                addSeats:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - sectionCode
+                    - rowLabel
+                    - seatNumber
+                    properties:
+                      sectionCode:
+                        type: string
+                      rowLabel:
+                        type: string
+                      seatNumber:
+                        type: string
+                      position:
+                        $ref: '#/components/schemas/Point'
+                      categoryId:
+                        type: string
+                        format: uuid
+                        nullable: true
+                      attribute:
+                        $ref: '#/components/schemas/SeatAttribute'
+                removeSeatIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                relabel:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - seatId
+                    properties:
+                      seatId:
+                        type: string
+                        format: uuid
+                      sectionCode:
+                        type: string
+                      rowLabel:
+                        type: string
+                      seatNumber:
+                        type: string
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applied, or would be applied (validate-only)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sectionsAdded:
+                    type: integer
+                  seatsAdded:
+                    type: integer
+                  seatsRemoved:
+                    type: integer
+                  seatsRelabelled:
+                    type: integer
+        '409':
+          description: A label is already taken in the map, or a removal touches a published map
+          x-ticvai-problem-types:
+          - seat-label-taken
+          - seat-map-published
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-maps/{seatMapId}/validate:
     parameters:
     - name: seatMapId

@@ -27,6 +27,10 @@ payload:
 - field: channel
   type: string
   notes: pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice
+- field: channelProfileId
+  type: uuid
+  notes: Optional (12 October 2026, CHG-R6-031). The order's named sales channel (Order.channelProfileId); null
+    for the venue's own channels. access.issueOrderEntitlements reads its ticketCredentialFormat (MOM-0330)
 - field: total
   type: Money
 - field: lines

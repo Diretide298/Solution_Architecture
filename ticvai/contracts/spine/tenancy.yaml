@@ -3111,7 +3111,9 @@ components:
   # wall-clock time in an opening-hours window, a support or quiet-hours window, a segregated-
   # access schedule or a maintenance window, and a `format: date`, are read in the time zone of the
   # region the row sits in — except where a schema names its own zone, as `supportHours.timezone`
-  # does. `format: date-time` fields are instants in UTC, as naming-and-style 5.2 says.
+  # does. `format: date-time` fields are instants in UTC, as naming-and-style 5.2 says. A **business
+  # date** (a trading day: a shift's, a reconciliation's, a revenue posting's, a daily report's) is
+  # the venue-local date that closes at `VenueSettings.businessDayCutoff`, default 00:00 (CHG-R6-032).
   schemas:
     TenantDataRetentionClass:
       type: string
@@ -3368,7 +3370,11 @@ components:
             `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings
             belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to`
             must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be
-            earlier than or equal to `from`, so a window never spans more than 24 hours.
+            earlier than or equal to `from`, so a window never spans more than 24 hours. **Friday's
+            trading day is the business day, closing at the venue's `businessDayCutoff`** (12 October 2026,
+            CHG-R6-032): it keeps the window whole only when the cut-off is at or after the window's `to`
+            (01:00 or later here). At the default 00:00 a sale at 00:30 falls on Saturday's business date, so a
+            venue whose windows run past midnight sets its cut-off to cover them.
 
     TenantDomain:
       type: object
@@ -4785,6 +4791,26 @@ components:
             `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it
             belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant
             default (proposed 6, client to correct).
+        businessDayCutoff:
+          type: string
+          pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+          nullable: true
+          default: '00:00'
+          description: >
+            **When the venue's business day closes** (Chinmay, 6 October 2026, from the Vivaticket
+            comparison: the business day closes at 12 midnight, with a change request to make the cut-off
+            configurable, default 00:00; CHG-R6-032). A local wall-clock time `HH:MM` in the region's time
+            zone. **The business date of an instant is the venue-local date of that instant minus the
+            cut-off**: at 00:00 it is the calendar date; at 06:00 a sale at 01:30 on Saturday belongs to
+            Friday. Every business day the package names is this one: a shift's business date and its close
+            (shift `Shift.businessDate`, `closeShift`), the venue-day of the daily reconciliation
+            (finance `getUnifiedReconciliation`, a settlement's trading day), the date revenue is posted
+            on (`postOrderRevenue`), "today" in the daily reports (reporting `runReport`, `getKpiValues`,
+            `getServiceSummary`), the same-business-day void (orders `AfterSalePolicy.voidSameBusinessDayOnly`)
+            and the wallet's end-of-business-day reconciliation. A change applies from the next business day,
+            never to a day already open, so no day is cut twice. Null inherits the tenant default
+            (`setVenueSettingsDefaults`), and the tenant default's null is 00:00. Not
+            `calendarDayStartHour`, which only draws calendars (DEC-039 stands for that field).
         currencyCode:
           type: string
           pattern: ^[A-Z]{3}$

@@ -130,6 +130,11 @@ CHECKS = [
     # package's SQL, and MIG-BASELINE names the helper functions it copies (check-plan-owners gained O-MIG-OWNER,
     # CHG-R5-001).
     "check-migration-wording",
+    # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers
+    # take the product permission (BC-034..BC-037).
+    "check-screen-permissions",
+    # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
+    "check-promises-kept",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
