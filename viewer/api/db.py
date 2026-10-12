@@ -924,6 +924,45 @@ CREATE TABLE IF NOT EXISTS connector_seen (
   PRIMARY KEY (account_id, host)
 );
 CREATE INDEX IF NOT EXISTS connector_seen_build ON connector_seen(build, at DESC);
+
+-- The last good read of a whole OpenProject project, kept across restarts.
+--
+-- The delivery overview, the board's module column, costing and the plan all
+-- share one read of every ticket in the project (main.py `_project_read`), and
+-- that read is a quarter of a minute or more against OpenProject 10. It used to
+-- live only in memory, so every restart and every deploy emptied it, and the
+-- first person to open the Tasks page afterwards watched it take half a minute.
+-- With this row the service starts holding what it held when it stopped, says
+-- how old it is, and reads a fresh one behind it.
+--
+-- **A cache, not a record.** OpenProject is the truth about every field in
+-- here, and nothing reads this table except the startup that puts it back in
+-- memory and the loop that keeps it fresh. Losing it costs one slow first read
+-- and nothing else, so it is safe to delete at any time.
+--
+-- `payload` is the same JSON the overview route answers with, gzipped: about
+-- 200 KB for TICVAI's 8,000 tickets instead of 4.4 MB. It is ticket data the
+-- team can already read on the Tasks page, and it sits in the same file as
+-- everything else this service keeps.
+--
+-- `asked_by` is whose OpenProject token keeps it fresh: the last person who
+-- asked for the project read. An account id and never a token — the token
+-- stays in `account_secret`, encrypted, and is fetched the way every other read
+-- fetches it. `asked_at` is when they asked, and a project nobody has asked
+-- about for a day stops being read (main.py `OVERVIEW_WARM_HOURS`).
+--
+-- Keyed by the OpenProject project as well as the ADAM one, because an admin
+-- can point a project at a different OpenProject project, and a read of the old
+-- one must not be served as the new one.
+CREATE TABLE IF NOT EXISTS overview_held (
+  project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  pms_id      INTEGER NOT NULL,
+  as_of       TEXT    NOT NULL,
+  payload     BLOB    NOT NULL,
+  asked_by    INTEGER REFERENCES account(id) ON DELETE SET NULL,
+  asked_at    TEXT,
+  PRIMARY KEY (project_id, pms_id)
+);
 """
 
 # Indexes that cannot be created until the migration has run.

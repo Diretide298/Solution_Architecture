@@ -290,6 +290,7 @@ if (TEAM) {
     epic.updatedAt = `${iso(addDays(now, -20))}T09:00:00Z`;
   }
   let f = 0;
+  const sprintsOf = new Map();   // feature id -> its block's sprints, for FAKE_BULK below
   for (const [blockId, blockSubject, sprints] of BLOCKS) {
     const features = blockId === 5000 ? 6 : 3;
     for (let n = 0; n < features; n += 1) {
@@ -297,6 +298,7 @@ if (TEAM) {
       const name = FEATURES[f % FEATURES.length];
       f += 1;
       const feature = ensure(String(featureId));
+      sprintsOf.set(featureId, sprints);
       feature.subject = name;
       typed(feature, 'Feature', 4);
       feature._links.parent = { href: `/api/v3/work_packages/${blockId}`, title: blockSubject };
@@ -318,7 +320,50 @@ if (TEAM) {
       }
     }
   }
+
+  // FAKE_BULK=8000 pads the same project out to that many work packages, so a
+  // read of it is the size of TICVAI's release project (8,015 on 13 October)
+  // rather than a few hundred. Tasks under the features above, in the same
+  // sprints, by the same people, a third of them with a sub-task. Numbered from
+  // 20000 so they can never land on one of the hand-written tickets above,
+  // which `ensure` would otherwise hand back and `place` overwrite. Off unless
+  // asked for, like FAKE_TEAM, because every other check counts this project.
+  const BULK = Number(process.env.FAKE_BULK ?? 0);
+  if (BULK > packages.size) {
+    key = 20000;
+    while (packages.size < BULK) {
+      const featureId = 5100 + Math.floor(rand() * f);
+      const sprints = sprintsOf.get(featureId);
+      const version = sprints[Math.floor(rand() * sprints.length)];
+      const user = rand() < 0.03 ? 0 : pick(pool);
+      const name = FEATURES[(featureId - 5100) % FEATURES.length];
+      const task = place(`${pick(VERBS)} ${name.toLowerCase()} ${pick(NOUNS)}`, 'Task', 1,
+        featureId, name, version, user, false);
+      if (rand() < 0.33 && packages.size < BULK) {
+        place(`${task.subject}: part 1`, 'Sub Task', 6, task.id, task.subject, version,
+          user || pick(pool), true);
+      }
+    }
+  }
 }
+
+// FAKE_PAGE_MS and FAKE_CALL_MS make this answer as slowly as the live
+// instance, for timing ADAM's pages against something honest. OpenProject 10
+// takes a second and a half or more for a page of 200 work packages; the
+// collection read is charged FAKE_PAGE_MS per 200 rows asked for (a quarter of
+// it at least, because a small page is not free either), and every other
+// request FAKE_CALL_MS. Concurrent requests are not queued behind each other,
+// so this models an instance with room for every page asked at once — the
+// live one has fewer workers than that, and a read with more pages in flight
+// gains less there than it does here. Both default to 0: every check runs at
+// full speed unless somebody asks for the slow one.
+//
+// `/_slow?page=&call=` changes them while running, for a check that has to
+// catch a read in the middle — board-check's "Refresh does not wait" — and
+// puts them back afterwards.
+let PAGE_MS = Number(process.env.FAKE_PAGE_MS ?? 0);
+let CALL_MS = Number(process.env.FAKE_CALL_MS ?? 0);
+const pause = (ms) => (ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : null);
 
 let nextId = 1200;
 const created = [];
@@ -341,9 +386,20 @@ createServer(async (req, res) => {
   // What the check reads afterwards. Outside /api/v3 so it cannot be mistaken
   // for something OpenProject offers.
   if (path === '/_created') return json(res, 200, { created });
+  if (path === '/_slow') {
+    if (url.searchParams.has('page')) PAGE_MS = Number(url.searchParams.get('page')) || 0;
+    if (url.searchParams.has('call')) CALL_MS = Number(url.searchParams.get('call')) || 0;
+    return json(res, 200, { pageMs: PAGE_MS, callMs: CALL_MS });
+  }
 
   if (!(req.headers.authorization ?? '').startsWith('Basic ')) {
     return json(res, 401, { message: 'no credential' });
+  }
+
+  if (PAGE_MS || CALL_MS) {
+    const rows = Number(url.searchParams.get('pageSize') ?? 100);
+    await pause(path === '/api/v3/work_packages' && req.method === 'GET'
+      ? PAGE_MS * Math.max(0.25, rows / 200) : CALL_MS);
   }
 
   if (path === '/api/v3/users/me') {

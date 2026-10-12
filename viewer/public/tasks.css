@@ -51,6 +51,8 @@
 .tk-lede a { color: var(--accent-text); }
 .tk-top-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .tk-asof { font-size: 12px; color: var(--text-faint); }
+/* The last Refresh failed: still the held read on the page, said in red. */
+.tk-asof.is-failed { color: var(--red); }
 .tk-top .auth-error { margin: 0; }
 
 .tk-scope {

@@ -17,6 +17,16 @@ import { hideLoader } from '/loader.js';
 // two are the same file. See change-csv.js.
 import { CHANGE_KIND_LABEL, CHANGE_SIDE_LABEL, toChangeCsv } from '/change-csv.js';
 
+// The list and the project names asked for at the top, beside the sign-in check
+// rather than after it and after each other (13 October): three round trips
+// that depended on nothing but the project, which the address or the last
+// visit already names. Signed out, they come back 401 and are ignored, because
+// `requireSignIn` is already sending the reader to the door.
+const firstList = auth.ensureProject().then((project) => auth.listChanges(project));
+const firstRegistry = auth.listProjects();
+firstList.catch(() => { /* answered by load() */ });
+firstRegistry.catch(() => { /* answered below */ });
+
 const $ = (id) => document.getElementById(id);
 
 const el = (tag, className, text) => {
@@ -60,9 +70,9 @@ function showError(message) {
 
 // ── reading ──────────────────────────────────────────────────────────
 
-async function load() {
+async function load(answer = null) {
   try {
-    const data = await auth.listChanges(state.project);
+    const data = await (answer ?? auth.listChanges(state.project));
     state.items = data.items ?? [];
     state.counts = data.counts ?? {};
     state.mayResolve = Boolean(data.mayResolve);
@@ -515,7 +525,7 @@ function wireForm() {
   // The projects this account may open, by name, for the switcher.
   const picker = $('cr-project');
   try {
-    const registry = await auth.listProjects();
+    const registry = await firstRegistry;
     const names = Object.fromEntries((registry.projects ?? []).map((p) => [p.id, p.name || p.id]));
     const mine = (state.me?.projects ?? []).map((p) => p.id);
     for (const id of (mine.length ? mine : Object.keys(names))) {
@@ -540,6 +550,6 @@ function wireForm() {
   // and it is here so nobody is shown a link that will only tell them no.
   $('cr-settle-link').hidden = !auth.isAdmin(state.me);
   wireForm();
-  await load();
+  await load(firstList);
   hideLoader();
 })();

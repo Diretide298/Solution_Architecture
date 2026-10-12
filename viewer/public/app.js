@@ -45,6 +45,10 @@ let lineageGalaxy; // services against the tables they touch
 let appsGalaxy;  // the apps against the contracts their screens call
 
 async function boot() {
+  // The four reads the first drawing needs, asked for before anything else —
+  // beside the sign-in check below rather than after it (13 October). See
+  // `askIndex` for why that is safe for a stranger.
+  const asked = askIndex();
   machine = new StateMachine($('states-canvas'), {
     onSelect: (node) => {
       state.stateName = node.name;
@@ -333,7 +337,7 @@ async function boot() {
   // before anything has been fetched. Handing it to loadIndex starts that
   // layer's parts beside the index rather than after it — on Frontend, 430K
   // that used to begin only once 171K had arrived and been parsed.
-  await loadIndex(layerFromUrl());
+  await loadIndex(layerFromUrl(), asked);
   renderLayers();
   bindUI();
   connectLiveReload();
@@ -1162,11 +1166,28 @@ function prefetchRemainingParts() {
   idle(next);
 }
 
-async function loadIndex(openTo = null) {
-  const sessionP = auth.apiFetch('/api/session').then((r) => r.json()).catch(() => null);
+/**
+ * The four reads `loadIndex` starts from, started and not awaited.
+ *
+ * Split out so boot can ask for them in the same moment it asks whether
+ * anybody is signed in, rather than one round trip later. For a stranger the
+ * four come back 401 and are never read — `requireSignIn` is already sending
+ * them to the door, and nothing awaits these until it has said yes — so the
+ * cost of asking early is four refusals on a visit that was refused anyway.
+ */
+function askIndex() {
   const indexP = auth.apiFetch('/api/index').then((r) => r.json());
-  const tooltipsP = auth.apiFetch('/api/tooltips').then((r) => r.json()).catch(() => null);
-  const domainsP = auth.apiFetch('/api/domains').then((r) => r.json()).catch(() => null);
+  indexP.catch(() => { /* rethrown where it is awaited */ });
+  return {
+    sessionP: auth.apiFetch('/api/session').then((r) => r.json()).catch(() => null),
+    indexP,
+    tooltipsP: auth.apiFetch('/api/tooltips').then((r) => r.json()).catch(() => null),
+    domainsP: auth.apiFetch('/api/domains').then((r) => r.json()).catch(() => null),
+  };
+}
+
+async function loadIndex(openTo = null, asked = askIndex()) {
+  const { sessionP, indexP, tooltipsP, domainsP } = asked;
 
   // Started as soon as the session says it is allowed — a microtask, not a round
   // trip, since the session is already in flight beside the index. The check is

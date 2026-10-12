@@ -21,6 +21,17 @@
 
 import * as auth from '/validation.js';
 
+// Both halves of the board asked for at once, and before the sign-in check has
+// answered rather than after it (13 October). They are independent of each
+// other and of everything else the page does, and asked one after the other
+// they were two round trips laid end to end behind a third. Signed out, both
+// come back 401 and are ignored: `requireSignIn` is already sending the reader
+// to the door.
+const firstBoard = auth.myBoard();
+const firstBatches = auth.listBatches();
+firstBoard.catch(() => { /* answered by load() */ });
+firstBatches.catch(() => { /* answered by loadBatches() */ });
+
 const $ = (id) => document.getElementById(id);
 
 function el(tag, cls, text) {
@@ -250,19 +261,19 @@ function drawBatches() {
 
 // ── loading ──────────────────────────────────────────────────────────
 
-async function loadBatches() {
+async function loadBatches(answer = null) {
   try {
-    state.batches = await auth.listBatches();
+    state.batches = await (answer ?? auth.listBatches());
     drawBatches();
   } catch (error) {
     say('bd-batch-error', error.message);
   }
 }
 
-async function load() {
+async function load(answer = null) {
   say('bd-error', '');
   try {
-    state.data = await auth.myBoard();
+    state.data = await (answer ?? auth.myBoard());
   } catch (error) {
     // 428 is "OpenProject is not connected", which is a setup step rather than
     // a failure, and it has its own panel saying which half is missing.
@@ -307,6 +318,5 @@ async function load() {
     } catch (error) { say('bd-batch-error', error.message); }
   };
 
-  await load();
-  await loadBatches();
+  await Promise.all([load(firstBoard), loadBatches(firstBatches)]);
 })();

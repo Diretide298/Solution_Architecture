@@ -60,6 +60,20 @@ import * as auth from '/validation.js';
 import { hideLoader, loaderSays } from '/loader.js';
 import { mountPanels } from '/panels.js';
 
+// **The tickets are asked for before anything else on the page is** (13
+// October). They are the page, and they were the last thing asked for: the
+// sign-in check, then the project list, then the team file, then this, one
+// round trip after another, and only then the long one. Asked here, at the top
+// of the module, they travel beside the sign-in check instead of after it.
+//
+// Nothing is lost by asking before the sign-in check has answered. Signed out,
+// this comes back 401 and is ignored, because `requireSignIn` below is already
+// on its way to the sign-in page; signed in, it is exactly the request `load()`
+// would have made a second later. The project is the same one the page
+// settles on below, from the same promise.
+const firstAnswer = auth.ensureProject().then((project) => auth.boardOverview(project));
+firstAnswer.catch(() => { /* answered by load(), or the page is leaving */ });
+
 const $ = (id) => document.getElementById(id);
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -97,6 +111,9 @@ const state = {
   qaAll: false,
   team: null,      // docs/active/team.json's people, for a person's role
   changes: null,   // ADAM's change requests, read when somebody opens a person
+  // When the tickets on the page were read, and whether a newer read is
+  // running or the last one failed. See `drawAsOf`.
+  read: { asOf: null, ageSeconds: 0, receivedAt: 0, refreshing: false, error: null },
   ganttOpenOnly: false,
 };
 
@@ -301,33 +318,159 @@ function setScope(change) {
 }
 
 // ── reading ─────────────────────────────────────────────────────────
+//
+// **The service never makes this page wait on OpenProject**, and the page's half
+// of that is to ask again rather than to wait. Three answers come back:
+//
+//   the tickets, as read some minutes ago. Drawn at once. When `refreshing` is
+//   set a newer read is under way behind it — after a Refresh, or because the
+//   held one was past its five minutes — and the page says "Refreshing…" and
+//   asks again every ten seconds until it is not, then draws what came.
+//
+//   `reading`: nobody has read this project before (or not since the service
+//   was installed). The page shows its frame with one honest line about the
+//   first read, and asks again every five seconds until the tickets come.
+//
+//   an error, said as one, as before.
+//
+// There is one timer, so a Refresh pressed while the page is already asking
+// replaces the waiting ask rather than adding a second one.
+//
+// **Refresh starts a read now, and joins one already running.** The service
+// keeps one read per project, so pressing it while the five-minute loop or
+// somebody else's Refresh is reading attaches this page to that read rather
+// than starting a second. While a read runs — whoever started it — the button
+// says "Refreshing…" and is down, and the held tickets stay on the page.
 
-async function load({ refresh = false } = {}) {
+let asking = 0;
+const ASK_REFRESHING_MS = 10_000;
+const ASK_READING_MS = 5_000;
+
+/** The button, in step with whether a read is running. */
+function refreshButton(running, label = 'Refreshing…') {
+  const button = $('tk-refresh');
+  button.disabled = running;
+  button.textContent = running ? label : 'Refresh';
+}
+
+async function load({ refresh = false, answer = null } = {}) {
+  clearTimeout(asking);
   $('tk-error').hidden = true;
-  if (refresh) $('tk-asof').textContent = 'Reading OpenProject…';
+  if (refresh) {
+    refreshButton(true);
+    state.read.refreshing = true;
+    drawAsOf();
+  }
+  let data;
   try {
-    const data = await auth.boardOverview(state.project, { refresh });
+    data = await (answer ?? auth.boardOverview(state.project, { refresh }));
+  } catch (error) {
+    // 428 is the service saying the token or the project link is missing: the
+    // panel that says which of the two and where to fix it, not a red line.
+    if (error.status === 428) return needsSetup(error.message);
+    if (error.status === 403) return denied();
+    // 503 is a service older than `reading`: the first read of a big project,
+    // still running there. It carries on without us; asking again is the fix.
+    if (error.status === 503) {
+      $('tk-asof').textContent = `${error.message} Checking again in a few seconds…`;
+      asking = setTimeout(() => load(), ASK_REFRESHING_MS);
+      return;
+    }
+    // A read that failed on the way: the held tickets, if any, stay, and the
+    // button comes back so it can be tried again.
+    refreshButton(false);
+    state.read.refreshing = false;
+    if (state.data) drawAsOf();
+    else $('tk-asof').textContent = '';
+    showError(`Could not read the tickets: ${error.message}`);
+    return;
+  }
+  if (data?.reading) {
+    firstRead(data);
+    refreshButton(true, 'Reading…');
+    asking = setTimeout(() => load(), ASK_READING_MS);
+    return;
+  }
+  // Not redrawn when nothing changed: a page asking every ten seconds while a
+  // read runs would otherwise rebuild every section, and lose the reader's
+  // place in a long list, to show the same tickets.
+  if (!state.data || data.asOf !== state.data.asOf || data.total !== state.data.total
+      || !state.data.items) {
     state.data = data;
     state.closedByName = new Map((data.statuses ?? []).map((s) => [s.name, !!s.isClosed]));
     state.defaultStatus = new Set((data.statuses ?? []).filter((s) => s.isDefault).map((s) => s.name));
     buildSprints();
     buildTree();
     draw();
-  } catch (error) {
-    // 428 is the service saying the token or the project link is missing: the
-    // panel that says which of the two and where to fix it, not a red line.
-    if (error.status === 428) return needsSetup(error.message);
-    if (error.status === 403) return denied();
-    // 503 is the first read of a big project still running on the server. It
-    // carries on without us; asking again shortly is the whole of the fix.
-    if (error.status === 503) {
-      $('tk-asof').textContent = `${error.message} Checking again in 30 seconds…`;
-      setTimeout(() => load(), 30_000);
-      return;
-    }
-    $('tk-asof').textContent = '';
-    showError(`Could not read the tickets: ${error.message}`);
+  } else {
+    state.data = { ...data, items: state.data.items };
+    drawLede();
   }
+  state.read = {
+    asOf: data.asOf,
+    ageSeconds: data.ageSeconds ?? 0,
+    receivedAt: performance.now(),
+    refreshing: !!data.refreshing,
+    error: data.refreshError ?? null,
+  };
+  drawAsOf();
+  refreshButton(state.read.refreshing);
+  if (data.refreshing) asking = setTimeout(() => load(), ASK_REFRESHING_MS);
+}
+
+// ── when the tickets were read ──────────────────────────────────────
+//
+// Always on the page, beside Refresh, because a dashboard that does not say how
+// old it is invites people to act on a number from this morning. The clock
+// time comes from `asOf`, the moment the service finished reading OpenProject;
+// the "minutes ago" from `ageSeconds` plus the time since this page was told
+// it, so a reader's own clock being wrong cannot make the read look newer or
+// older than it is. It ticks once a minute without asking the service again.
+
+/** "02:51", or "12 Oct, 23:51" when the read was not today. Local time. */
+function clockOf(iso) {
+  const d = asDate(iso);
+  if (!d) return '—';
+  const time = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  return +today() === +new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    ? time
+    : `${d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}, ${time}`;
+}
+
+/** "3 minutes ago", for a read `seconds` old. */
+const ago = (seconds) => (seconds < 60 ? 'under a minute ago'
+  : seconds < 5400 ? `${plural(Math.round(seconds / 60), 'minute', 'minutes')} ago`
+    : `${plural(Math.round(seconds / 3600), 'hour', 'hours')} ago`);
+
+function drawAsOf() {
+  const read = state.read;
+  if (!read.asOf) return;
+  const age = read.ageSeconds + (performance.now() - read.receivedAt) / 1000;
+  const at = clockOf(read.asOf);
+  const line = $('tk-asof');
+  line.classList.toggle('is-failed', !read.refreshing && !!read.error);
+  line.title = read.error ?? '';
+  line.textContent = read.refreshing ? `Refreshing… (last read ${at})`
+    : read.error ? `Could not refresh from OpenProject. Last good read at ${at}, ${ago(age)}.`
+      : `Read from OpenProject at ${at}, ${ago(age)}`;
+}
+
+/**
+ * The page before its first read has ever finished: the frame, and one line
+ * saying what is happening and roughly how long it takes. Roughly, because the
+ * service estimates from the pages it has read so far and OpenProject's speed
+ * is OpenProject's. The sections stay as they are drawn empty in the HTML.
+ */
+function firstRead(progress) {
+  const size = progress.total ? `${progress.total.toLocaleString()} tickets` : 'every ticket';
+  const eta = progress.etaSeconds;
+  const wait = eta == null ? '' : eta <= 15 ? ', a few seconds'
+    : eta <= 45 ? ', about half a minute' : eta <= 90 ? ', about a minute'
+      : `, about ${Math.round(eta / 60)} minutes`;
+  $('tk-lede').textContent = `Reading ${size} from OpenProject for the first time${wait}.`;
+  $('tk-asof').textContent = progress.total
+    ? `${(progress.read ?? 0).toLocaleString()} of ${progress.total.toLocaleString()} read so far.`
+    : 'Starting the read.';
 }
 
 function showError(message) {
@@ -427,10 +570,8 @@ function drawLede() {
     op.url ? link(op.url, null, op.name || op.identifier) : el('span', null, op.name || op.identifier || 'OpenProject'),
     d.truncated ? ' — the newest of a larger project; older tickets are not counted.' : '.',
   );
-  const age = d.ageSeconds ?? 0;
-  $('tk-asof').textContent = d.fromCache
-    ? `Read ${age < 60 ? 'under a minute' : plural(Math.round(age / 60), 'minute', 'minutes')} ago`
-    : `Read just now, ${fmtWhen(d.asOf)}`;
+  // The line beside Refresh is `drawAsOf`'s, drawn by `load` once it knows
+  // whether a newer read is coming.
 }
 
 function drawScope() {
@@ -2205,9 +2346,13 @@ function redrawBurn() {
   } catch { /* storage denied */ }
   $('tk-team-sort').value = state.teamSort;
 
+  // The role file and the project picker, filled in as they arrive and not
+  // waited for: the tickets do not depend on either, and drawing them used to
+  // wait for both, one round trip after the other.
+  loadTeam();
   const picker = $('tk-project');
-  try {
-    const { projects } = await auth.listProjects();
+  picker.hidden = true;
+  auth.listProjects().then(({ projects }) => {
     const mine = projects.filter((p) => !state.me.projects?.length || state.me.projects.includes(p.id));
     picker.replaceChildren(...mine.map((p) => {
       const option = el('option', null, p.name || p.id);
@@ -2219,9 +2364,9 @@ function redrawBurn() {
       auth.rememberProject(picker.value);
       location.search = `?project=${encodeURIComponent(picker.value)}`;
     };
-  } catch { /* the page still works for the current project */ }
-  // One project, or none listed: a picker with nothing to pick is a blank box.
-  picker.hidden = picker.options.length < 2;
+    // One project, or none listed: a picker with nothing to pick is a blank box.
+    picker.hidden = picker.options.length < 2;
+  }).catch(() => { /* the page still works for the current project */ });
 
   $('tk-gantt-open').onchange = (e) => {
     state.ganttOpenOnly = e.target.checked;
@@ -2232,7 +2377,6 @@ function redrawBurn() {
   $('tk-p-all').onclick = () => { location.hash = '#tickets'; };
   // A link to somebody's page opens on it, whatever the rail last showed.
   if (state.scope.person && !location.hash) history.replaceState(null, '', `${location.pathname}${location.search}#person`);
-  loadTeam();
   $('tk-scope-sprint').onchange = (e) => setScope({ sprint: e.target.value });
   $('tk-scope-type').onchange = (e) => setScope({ type: e.target.value });
   $('tk-scope-clear').onclick = () => {
@@ -2247,11 +2391,11 @@ function redrawBurn() {
     drawPeopleTable(focus);
   };
 
-  $('tk-refresh').onclick = async () => {
-    $('tk-refresh').disabled = true;
-    await load({ refresh: true });
-    $('tk-refresh').disabled = false;
-  };
+  // Answered at once: the service starts the read (or joins the one running)
+  // and says `refreshing`, and `load` keeps asking until the new read is in.
+  // The button is `load`'s to put back up, when the read is done.
+  $('tk-refresh').onclick = () => load({ refresh: true });
+  setInterval(drawAsOf, 30_000);
   $('tk-search').oninput = (e) => { state.filter.text = e.target.value; listLimit = LIST_PAGE; drawList(); };
   $('tk-status').onchange = (e) => { state.filter.status = e.target.value; listLimit = LIST_PAGE; drawList(); };
   $('tk-open-only').onchange = (e) => { state.filter.openOnly = e.target.checked; listLimit = LIST_PAGE; drawList(); };
@@ -2261,7 +2405,7 @@ function redrawBurn() {
   addEventListener('resize', () => { clearTimeout(resizing); resizing = setTimeout(redrawBurn, 150); });
 
   loaderSays('Reading the delivery board…');
-  await load();
+  await load({ answer: firstAnswer });
   // One section at a time, driven by the rail. Same mechanism as the settings
   // page; see panels.js.
   mountPanels({ nav: document.querySelector('#tasks .set-nav'), fallback: 'overview',

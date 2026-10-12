@@ -19,13 +19,26 @@
 //   could be refused a close by a rule they had no way to satisfy. What the
 //   board says about it has to match what the service will do.
 //
+//   **The project read never makes a page wait.** The overview, the board's
+//   module column, costing and the plan share one read of every ticket, kept
+//   across a restart and refreshed behind the page. A Refresh answers at once
+//   and says `refreshing`; a restarted service answers from the read it kept;
+//   a project nobody has read yet says it is reading rather than hanging. The
+//   stand-in is slowed for these (`/_slow`) so the read is still running when
+//   the answer comes back, which is the only way to tell "did not wait" from
+//   "was quick". The restart is a second service on the same store, so this
+//   needs TICVAI_DB as the plan check does.
+//
 //   node api/fake-openproject.mjs                           # port 8798
 //   TICVAI_DB=/tmp/board.db TICVAI_SECRET_KEY=... python -m uvicorn api.main:app --port 8799
 //   TICVAI_DB=/tmp/board.db API=http://localhost:8799 PMS=http://127.0.0.1:8798 \
 //     node api/board-check.mjs
 
+import { spawn } from 'node:child_process';
+
 const API = process.env.API ?? 'http://localhost:8787';
 const PMS = process.env.PMS ?? 'http://127.0.0.1:8798';
+const STORE = process.env.TICVAI_DB ?? '';
 let pass = 0, fail = 0;
 const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ` — ${d}` : ''}`); ok ? pass++ : fail++; };
 
@@ -385,6 +398,111 @@ check('the overview carries the project versions, for sprint dates',
 check('and which status a new ticket starts in',
   (after.data?.statuses ?? []).some((st) => st.name === 'New' && st.isDefault === true),
   JSON.stringify(after.data?.statuses));
+
+// ── the project read never makes a page wait ─────────────────────────
+//
+// Everything above has read the project at full speed, so a read is held. From
+// here the stand-in takes two seconds a page: slow enough that an answer which
+// waited for OpenProject would be seen waiting.
+
+const slow = (page) => fetch(`${PMS}/_slow?page=${page}`).then((r) => r.ok, () => false);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const timed = async (...args) => {
+  const started = Date.now();
+  const answer = await as(...args);
+  return { ...answer, ms: Date.now() - started };
+};
+
+const heldRead = await as('boss', 'GET', '/api/board/overview');
+check('a held read says whether a newer one is on its way',
+  heldRead.status === 200 && heldRead.data?.refreshing === false && 'refreshError' in (heldRead.data ?? {}),
+  `${heldRead.status} refreshing=${heldRead.data?.refreshing}`);
+check('the stand-in can be slowed', await slow(2000));
+
+const pressed = await timed('boss', 'GET', '/api/board/overview?refresh=1');
+check('**Refresh answers at once, with the read it holds**',
+  pressed.status === 200 && pressed.ms < 1500 && pressed.data?.asOf === heldRead.data?.asOf
+    && (pressed.data?.items ?? []).length === (heldRead.data?.items ?? []).length,
+  `${pressed.status} in ${pressed.ms} ms, asOf ${pressed.data?.asOf} vs ${heldRead.data?.asOf}`);
+check('and says a newer read is on its way', pressed.data?.refreshing === true,
+  `refreshing=${pressed.data?.refreshing}`);
+const pressedAgain = await timed('boss', 'GET', '/api/board/overview?refresh=1');
+check('a second Refresh while it runs does not wait either',
+  pressedAgain.status === 200 && pressedAgain.ms < 1500 && pressedAgain.data?.refreshing === true, `${pressedAgain.ms} ms`);
+
+let landed = null;
+for (let tries = 0; tries < 30 && !landed; tries += 1) {
+  await sleep(1000);
+  const next = await as('boss', 'GET', '/api/board/overview');
+  if (next.data?.refreshing === false) landed = next;
+}
+check('the newer read lands behind it, and the next ask has it',
+  !!landed && landed.data.asOf !== heldRead.data?.asOf && landed.data.ageSeconds < 10
+    && landed.data.refreshError === null,
+  landed ? `asOf ${landed.data.asOf}, ${landed.data.ageSeconds}s old` : 'still refreshing after 30 s');
+
+// A project nobody has read: the second ADAM project, pointed at the same
+// OpenProject project, so nothing is heldRead for it. Five seconds a page is past
+// the few seconds a first read is waited for.
+await slow(5000);
+const pointed = await as('boss', 'PUT', '/api/pms/projects/greenleaf-demo', { pms_project_id: 42 });
+if (pointed.status === 200) {
+  const first = await timed('boss', 'GET', '/api/board/overview?project_id=greenleaf-demo');
+  check('**a project nobody has read says it is reading, rather than hanging**',
+    first.status === 202 && first.data?.reading === true && first.ms < 8000,
+    `${first.status} in ${first.ms} ms`);
+  check('and how far it has got, in a sentence for the page',
+    /for the first time/.test(first.data?.detail ?? '') && 'read' in (first.data ?? {})
+      && 'etaSeconds' in (first.data ?? {}),
+    first.data?.detail ?? '');
+  let read = null;
+  for (let tries = 0; tries < 30 && !read; tries += 1) {
+    await sleep(1000);
+    const next = await as('boss', 'GET', '/api/board/overview?project_id=greenleaf-demo');
+    if (next.status === 200) read = next;
+  }
+  check('and asking again a little later gets the tickets', (read?.data?.items ?? []).length > 0,
+    read ? `${read.data.items.length} tickets` : 'never arrived');
+  await as('boss', 'DELETE', '/api/pms/projects/greenleaf-demo');
+} else {
+  check('a second project can be pointed at OpenProject, to read it for the first time', false,
+    `${pointed.status} ${JSON.stringify(pointed.data?.detail ?? '')}`);
+}
+
+// A restart: a second service on the same store, which has never read anything
+// itself. It must answer the overview from the read the first one kept — at
+// once, with OpenProject still at five seconds a page.
+if (STORE) {
+  const port = 20000 + Math.floor(Math.random() * 20000);
+  const second = spawn('python', ['-m', 'uvicorn', 'api.main:app', '--host', '127.0.0.1', '--port', String(port)], {
+    cwd: new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'),
+    env: { ...process.env, TICVAI_DB: STORE },
+    stdio: 'ignore',
+  });
+  let up = false;
+  for (let tries = 0; tries < 60 && !up; tries += 1) {
+    await sleep(250);
+    up = await fetch(`http://127.0.0.1:${port}/api/health`).then((r) => r.ok, () => false);
+  }
+  const started = Date.now();
+  const restarted = up ? await fetch(`http://127.0.0.1:${port}/api/board/overview`, {
+    headers: { cookie: jars.get('boss') },
+  }).then(async (r) => ({ status: r.status, data: await r.json().catch(() => null) })) : null;
+  const ms = Date.now() - started;
+  check('**a restarted service answers from the read it kept, without asking OpenProject**',
+    restarted?.status === 200 && ms < 2000
+      && (restarted.data?.items ?? []).length === (landed?.data?.items ?? []).length
+      && restarted.data?.asOf === landed?.data?.asOf,
+    up ? `${restarted?.status} in ${ms} ms, asOf ${restarted?.data?.asOf} vs ${landed?.data?.asOf}` : 'the second service never came up');
+  check('and says how old that read really is, rather than calling it new',
+    restarted?.data?.fromCache === true && restarted?.data?.ageSeconds >= 0,
+    `fromCache=${restarted?.data?.fromCache} ageSeconds=${restarted?.data?.ageSeconds}`);
+  second.kill();
+} else {
+  check('**a restarted service answers from the read it kept** (needs TICVAI_DB)', false,
+    'no TICVAI_DB given');
+}
+await slow(0);
 
 // ── not connected is a setup step, not a failure ─────────────────────
 

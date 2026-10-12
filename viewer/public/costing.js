@@ -201,9 +201,10 @@ async function load() {
       return;
     }
     if (error.status === 503) {
-      // The first read of a big project, still running on the server.
-      say('ct-error', `${error.message} Checking again in 30 seconds…`);
-      setTimeout(() => load(), 30_000);
+      // The first read of a big project, still running on the server. It goes
+      // on without this page; asking again is the whole of the fix.
+      say('ct-error', `${error.message} Checking again in a few seconds…`);
+      setTimeout(() => load(), 10_000);
       return;
     }
     say('ct-error', error.message);
@@ -223,10 +224,24 @@ async function load() {
   if (!auth.isReader(me)) { $('denied').hidden = false; return; }
   state.mayEdit = auth.isAdmin(me);
 
+  // A Refresh is answered at once with the read the service holds, marked
+  // `refreshing` while the new one is read behind it; the button says so and
+  // stays down, and the page asks again every ten seconds until the new read
+  // is in.
   $('ct-refresh').onclick = async () => {
     $('ct-refresh').disabled = true;
-    try { state.data = await auth.costing(14, true); drawStats(); drawPeople(); drawGaps(); }
-    catch (error) { say('ct-error', error.message); }
+    try {
+      let answer = await auth.costing(14, true);
+      while (answer.refreshing) {
+        $('ct-refresh').textContent = 'Refreshing…';
+        await new Promise((resolve) => setTimeout(resolve, 10_000));
+        answer = await auth.costing(14, false);
+      }
+      say('ct-error', answer.refreshError ? `Could not refresh: ${answer.refreshError}` : '');
+      state.data = answer;
+      drawStats(); drawPeople(); drawGaps();
+    } catch (error) { say('ct-error', error.message); }
+    $('ct-refresh').textContent = 'Refresh';
     $('ct-refresh').disabled = false;
   };
 

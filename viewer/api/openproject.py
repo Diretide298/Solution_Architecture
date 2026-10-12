@@ -51,7 +51,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 # Named, so an edge does not refuse us for looking like a script. See above.
 USER_AGENT = "ADAM-bridge/1.0 (+https://adam.ainfinite.ai)"
@@ -517,10 +517,27 @@ def projects(endpoint: str, token: str) -> list:
 
 
 EVERYTHING_PAGE = 200
-EVERYTHING_WORKERS = 3
+# Six pages in flight, up from three (13 October), and deliberately no more.
+#
+# The read is almost all waiting: each page is one Rails request that holds one
+# of OpenProject's own worker threads for the second and a half to six seconds
+# it takes, while this process sits idle. Three at a time put TICVAI's 8,015
+# tickets (41 pages) at about half a minute against the live instance, which is
+# the half-minute people were watching a blank Tasks page for. Six halves the
+# rounds, 14 down to 7.
+#
+# It is not free, and the cost is somebody else's: every page in flight is a
+# worker the instance is not giving to the people using OpenProject itself, for
+# the quarter-minute the read lasts. That read now runs about once per project
+# per five minutes, behind the page rather than in front of it (main.py
+# `_keep_warm`), so nobody is waiting on it to finish faster than this. Past six
+# an instance with a few workers mostly queues the extra pages behind the
+# others, so more would buy little here and cost there.
+EVERYTHING_WORKERS = 6
 
 
-def everything(endpoint: str, token: str, project_id: int, limit: int = 20000) -> list:
+def everything(endpoint: str, token: str, project_id: int, limit: int = 20000,
+               progress: Optional[Callable[[int, Optional[int]], None]] = None) -> list:
     """
     Every work package in one OpenProject project, in every state.
 
@@ -532,13 +549,19 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 20000) -
     **Paged by id, and the pages read side by side.** OpenProject 10 takes about
     six seconds for a page of 200, and a release project holds thousands (TICVAI:
     7,967), so one page after another is minutes — past the proxy's two. The
-    first page says the total; the rest are asked for three at a time, which is
-    a load the instance carries and a minute instead of four. Sorted by id rather
-    than by last change, because pages read at different moments must not shift
-    under each other when somebody edits a ticket mid-read.
+    first page says the total; the rest are asked for `EVERYTHING_WORKERS` at a
+    time, which is a load the instance carries and a quarter of a minute instead
+    of several. Sorted by id rather than by last change, because pages read at
+    different moments must not shift under each other when somebody edits a
+    ticket mid-read.
 
     Page 200, not bigger: a page of 1,000 takes longer than `TIMEOUT`. The
     `limit` is a ceiling on rows; past it the newest-created are kept.
+
+    `progress(rows read, total)` is told after each page, so a caller holding
+    somebody's first read of a project can say how far it has got rather than
+    only that it is still going. Called from the reading threads; it must be
+    quick and must not raise.
     """
     filters = json.dumps([
         {"project": {"operator": "=", "values": [str(project_id)]}},
@@ -556,14 +579,26 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 20000) -
 
     first, total = page_at(1)
     pages = [first]
+    counted = [len(first)]
+    told = progress or (lambda _read, _total: None)
+    told(len(first), total if isinstance(total, int) else None)
     if isinstance(total, int) and len(first) >= EVERYTHING_PAGE:
         wanted = min(total, limit)
         last = -(-wanted // EVERYTHING_PAGE)  # ceiling
+
+        def later(n: int) -> list:
+            elements = page_at(n)[0]
+            # A running count across threads; a lost update would only make the
+            # progress line lag by a page, and it is corrected by the next one.
+            counted[0] += len(elements)
+            told(min(counted[0], wanted), wanted)
+            return elements
+
         # An instance that ignores paging would hand back page 1 forty times;
         # the dedupe below makes that harmless, and the page count is bounded
         # by the total it reported rather than by what keeps arriving.
         with ThreadPoolExecutor(max_workers=EVERYTHING_WORKERS) as pool:
-            pages.extend(pool.map(lambda n: page_at(n)[0], range(2, last + 1)))
+            pages.extend(pool.map(later, range(2, last + 1)))
 
     found: dict = {}
     for elements in pages:

@@ -273,6 +273,9 @@ function disarmSignOutAll() {
   $('signout-all-go').textContent = 'Yes, end every session';
 }
 
+// The count being asked for, while it is; see showMentionCount.
+let countAsked = null;
+
 /**
  * How many notes have named you, on the account button and on the link that
  * leads to them.
@@ -301,9 +304,13 @@ async function showMentionCount() {
   // allSettled, because the bell must draw whichever half answers: a reader
   // with three unread mentions should not lose them to an alerts query that
   // failed.
-  const [mentions, standing] = await Promise.allSettled([
-    auth.myMentions(), auth.myAlerts(),
-  ]);
+  //
+  // One question in flight at a time. A page load announces the account twice —
+  // the page's own sign-in check and the drawer's — and each announcement asked
+  // for both lists, so every page fetched them twice over.
+  countAsked ??= Promise.allSettled([auth.myMentions(), auth.myAlerts()])
+    .finally(() => { countAsked = null; });
+  const [mentions, standing] = await countAsked;
   if (mentions.status === 'rejected' && standing.status === 'rejected') {
     return;                       // the viewer is not about this
   }

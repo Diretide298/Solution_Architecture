@@ -18,6 +18,12 @@
 
 import * as auth from '/validation.js';
 
+// Asked for at the top, beside the sign-in check rather than after it (13
+// October). Anybody but the System Architect is refused it, and is shown the
+// refusal below without this answer ever being read.
+const firstPlan = auth.readPlan(auth.project());
+firstPlan.catch(() => { /* answered by load(), or refused */ });
+
 const $ = (id) => document.getElementById(id);
 
 function el(tag, cls, text) {
@@ -457,9 +463,30 @@ async function confirmShip() {
 
 // ── loading ──────────────────────────────────────────────────────────
 
-async function load(refresh = false) {
+// A Refresh is answered at once with the read the service holds, marked
+// `refreshing` while a newer one is read behind it. The page asks again every
+// ten seconds until it is in, and only then draws the chart again: drawing the
+// same bars every ten seconds would reset a bar somebody is in the middle of
+// dragging, for nothing.
+let asking = 0;
+const ASK_MS = 10_000;
+
+function askAgain(asOf) {
+  clearTimeout(asking);
+  asking = setTimeout(async () => {
+    let next;
+    try { next = await auth.readPlan(auth.project()); } catch { return; }
+    if (next.asOf !== asOf) return load(false, Promise.resolve(next));
+    if (next.refreshing) return askAgain(asOf);
+    if (next.refreshError) say('pl-error', `Could not refresh: ${next.refreshError}`);
+    $('pl-asof').textContent = $('pl-asof').textContent.replace(/ · refreshing…$/, '');
+  }, ASK_MS);
+}
+
+async function load(refresh = false, answer = null) {
+  clearTimeout(asking);
   try {
-    state.data = await auth.readPlan(auth.project(), { refresh });
+    state.data = await (answer ?? auth.readPlan(auth.project(), { refresh }));
   } catch (error) {
     if (error.status === 428) {
       $('plan').hidden = true;
@@ -468,9 +495,10 @@ async function load(refresh = false) {
       return;
     }
     if (error.status === 503) {
-      // The first read of a big project, still running on the server.
-      say('pl-error', `${error.message} Checking again in 30 seconds…`);
-      setTimeout(() => load(refresh), 30_000);
+      // The first read of a big project, still running on the server. It goes
+      // on without this page; asking again is the whole of the fix.
+      say('pl-error', `${error.message} Checking again in a few seconds…`);
+      asking = setTimeout(() => load(), ASK_MS);
       return;
     }
     say('pl-error', error.message);
@@ -488,7 +516,9 @@ async function load(refresh = false) {
     ? `OpenProject read ${new Date(state.data.asOf).toLocaleString()}`
       + (state.data.ageSeconds ? ` · ${state.data.ageSeconds}s ago` : '')
       + (state.data.truncated ? ' · more modules than this chart shows' : '')
+      + (state.data.refreshing ? ' · refreshing…' : '')
     : '';
+  if (state.data.refreshing) askAgain(state.data.asOf);
   draw();
 }
 
@@ -520,5 +550,5 @@ async function load(refresh = false) {
     if (event.target === $('pl-veil')) { $('pl-veil').hidden = true; state.proposal = null; }
   };
 
-  await load();
+  await load(false, firstPlan);
 })();
