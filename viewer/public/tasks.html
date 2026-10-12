@@ -103,8 +103,11 @@
         <h1 class="set-nav-title">Tasks</h1>
         <div class="set-nav-list">
           <a href="#overview">Overview</a>
-          <div class="set-nav-group">Where the work is</div>
+          <div class="set-nav-group">Who is doing what</div>
           <a href="#people">People</a>
+          <a href="#gate">Testing gate</a>
+          <div class="set-nav-group">Where the work is</div>
+          <a href="#states">States</a>
           <a href="#dates">Overdue and due</a>
           <div class="set-nav-group">What is being delivered</div>
           <a href="#timeline">Timeline</a>
@@ -116,57 +119,130 @@
       </nav>
 
       <main class="set-content">
+        <!-- ── what is being read, and the filter every section obeys ───────
+             Above the sections rather than inside one, because the rail shows
+             one section at a time and a filter that vanished with the overview
+             would leave the other panels filtered by something nobody can see. -->
+        <div class="tk-top">
+          <div class="tk-top-line">
+            <select class="scope-select" id="tk-project" aria-label="Project"></select>
+            <p class="tk-lede" id="tk-lede">…</p>
+            <div class="tk-top-actions">
+              <p class="set-state tk-asof" id="tk-asof" role="status"></p>
+              <button id="tk-refresh" class="chip" type="button"
+                      title="Reads OpenProject again, now">Refresh</button>
+            </div>
+          </div>
+          <p class="auth-error" id="tk-error" hidden></p>
+          <div class="tk-scope" role="group" aria-label="Filter the whole page">
+            <label class="tk-field"><span>Person</span>
+              <select class="scope-select" id="tk-scope-person"></select></label>
+            <label class="tk-field"><span>Sprint</span>
+              <select class="scope-select" id="tk-scope-sprint"></select></label>
+            <label class="tk-field"><span>Type</span>
+              <select class="scope-select" id="tk-scope-type"></select></label>
+            <button class="chip tk-clear" id="tk-scope-clear" type="button" hidden>Show everything</button>
+            <p class="tk-scope-says" id="tk-scope-says" aria-live="polite"></p>
+          </div>
+        </div>
+
         <!-- ── overview ──────────────────────────────────────────────── -->
         <section class="admin-panel set-section" id="overview">
-          <h2 class="admin-heading">
-            Overview
-            <select class="scope-select" id="tk-project" aria-label="Project"></select>
-          </h2>
-          <p class="auth-note set-lede" id="tk-lede">…</p>
-          <p class="auth-error" id="tk-error" hidden></p>
-          <div class="set-actions">
-            <button id="tk-refresh" class="chip" type="button"
-                    title="Reads OpenProject again, now">Refresh</button>
-            <p class="set-state" id="tk-asof" role="status"></p>
-          </div>
-          <section class="stat-strip" id="tk-stats"></section>
+          <h2 class="admin-heading">Overview</h2>
 
-          <!-- The dashboard proper. Throughput and the state pipeline were two
-               more full-width panels further down a page that was already nine
-               of them; here they are side by side with the counts, which is the
-               one screen somebody opens this page to see. Their ids are kept so
-               an existing #states or #throughput link still lands on them. -->
+          <!-- The one number, and the bar it is a share of. -->
+          <div class="tk-hero">
+            <div class="tk-hero-figure">
+              <span class="tk-hero-value" id="tk-hero-value">—</span>
+              <span class="tk-hero-label" id="tk-hero-label"></span>
+            </div>
+            <div class="tk-hero-bar" id="tk-hero-bar"></div>
+          </div>
+          <section class="tk-tiles" id="tk-stats" aria-label="Counts"></section>
+
+          <!-- ── the team ── -->
+          <div class="tk-block" id="team">
+            <div class="tk-block-head">
+              <h3 class="tk-block-title">Team <span class="admin-count" id="tk-team-count"></span></h3>
+              <label class="tk-field tk-field-inline"><span>Order by</span>
+                <select class="scope-select" id="tk-team-sort">
+                  <option value="total">Most tickets</option>
+                  <option value="done">Most done</option>
+                  <option value="late">Most late</option>
+                  <option value="name">Name</option>
+                </select></label>
+            </div>
+            <p class="tk-note">
+              Each bar is one person's tickets, on one scale, so a longer bar is more
+              work. Finished counts closed and awaiting QA. Select a person to see
+              only their work on every section.
+            </p>
+            <div class="tk-roster-head" aria-hidden="true">
+              <span>Person</span><span>Tickets by state</span><span>Finished</span>
+              <span>Late</span><span>Finished, last 12 weeks</span><span>Test gate</span>
+            </div>
+            <div class="tk-roster" id="tk-roster"></div>
+          </div>
+
           <div class="tk-dash">
             <div class="tk-dash-card" id="throughput">
-              <h3 class="tk-dash-heading">Throughput</h3>
-              <p class="auth-note tk-dash-note" id="tk-throughput-lede"></p>
+              <h3 class="tk-dash-heading">Finished per week <span class="admin-count" id="tk-throughput-who"></span></h3>
+              <p class="tk-note" id="tk-throughput-lede"></p>
               <div id="tk-weeks" class="tk-weeks"></div>
             </div>
 
-            <div class="tk-dash-card" id="states">
-              <h3 class="tk-dash-heading">
-                States <span class="admin-count" id="tk-states-count"></span>
-              </h3>
-              <p class="auth-note tk-dash-note">
-                Every status OpenProject has for this project's tickets, in its
-                own order. ADAM keeps no list of its own — a team that renames a
-                column keeps its numbers.
-              </p>
-              <div class="admin-table" id="tk-states"></div>
+            <div class="tk-dash-card" id="sprints">
+              <h3 class="tk-dash-heading">Sprints <span class="admin-count" id="tk-sprints-count"></span></h3>
+              <p class="tk-note" id="tk-sprints-lede"></p>
+              <div class="tk-sprints" id="tk-sprints"></div>
             </div>
+          </div>
+
+          <div class="tk-block" id="blocks">
+            <div class="tk-block-head">
+              <h3 class="tk-block-title">Blocks <span class="admin-count" id="tk-blocks-count"></span></h3>
+            </div>
+            <p class="tk-note">
+              Every ticket under each top-level epic, however deep, counted by state.
+            </p>
+            <div class="tk-blocks" id="tk-blocks"></div>
           </div>
         </section>
 
-        <!-- ── states ────────────────────────────────────────────────── -->
         <!-- ── people ────────────────────────────────────────────────── -->
+        <!-- The roster's numbers as a table: every figure the bars draw, for
+             anyone not reading the picture and for copying into a status note. -->
         <section class="admin-panel set-section" id="people">
           <h2 class="admin-heading">People <span class="admin-count" id="tk-people-count"></span></h2>
           <p class="auth-note set-lede">
-            What each person is holding: open tickets, and how many of those are
-            on hold or past their due date. Finished work is counted apart, so a
-            long-serving account does not read as overloaded.
+            Every person's tickets by state, counted by assignee. Finished is
+            closed plus awaiting QA (an open status named QA, review, test or
+            verify), because that is where a developer's finished work waits.
+            Rejected tickets are closed too but counted apart, so they never read
+            as work delivered. Late is still the developer's and past its due
+            date or its sprint's end.
           </p>
-          <div class="admin-table" id="tk-people"></div>
+          <div class="tk-table-wrap">
+            <table class="tk-table" id="tk-people"></table>
+          </div>
+        </section>
+
+        <!-- ── testing gate ──────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="gate">
+          <h2 class="admin-heading">Testing gate <span class="admin-count" id="tk-gate-count"></span></h2>
+          <p class="auth-note set-lede" id="tk-gate-lede"></p>
+          <div class="tk-gate" id="tk-gate"></div>
+        </section>
+
+        <!-- ── states ────────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="states">
+          <h2 class="admin-heading">States <span class="admin-count" id="tk-states-count"></span></h2>
+          <p class="auth-note set-lede">
+            Every status OpenProject has for this project's tickets, in its own
+            order. ADAM keeps no list of its own — a team that renames a column
+            keeps its numbers.
+          </p>
+          <div class="admin-table" id="tk-states"></div>
         </section>
 
         <!-- ── dates ─────────────────────────────────────────────────── -->
@@ -174,7 +250,8 @@
           <h2 class="admin-heading">Overdue and due <span class="admin-count" id="tk-dates-count"></span></h2>
           <p class="auth-note set-lede">
             Open tickets whose due date has passed, then what lands in the next
-            seven days. A ticket with no due date cannot appear in either, which
+            seven days. Tickets awaiting QA are left out: their developer has
+            finished them. A ticket with no due date cannot appear in either, which
             is worth knowing about a board that looks empty here.
           </p>
           <h3 class="tk-sub" id="tk-overdue-title">Overdue</h3>
@@ -194,13 +271,14 @@
           <p class="auth-note set-lede">
             Every epic that has dates, under the milestone it is being delivered
             for. A bar runs from the earliest start to the latest date among its
-            tickets; the solid part is how much of it is closed. Tickets with no
+            tickets; the solid part is how much of it is finished (closed or
+            awaiting QA). Tickets with no
             dates cannot be placed and are counted underneath rather than
             quietly dropped.
           </p>
           <div class="set-actions">
             <label class="tk-only"><input id="tk-gantt-open" type="checkbox" />
-              Hide milestones where everything is done</label>
+              Hide milestones where everything is finished</label>
           </div>
           <div class="tk-gantt" id="tk-gantt"></div>
           <p class="auth-note auth-fine" id="tk-undated"></p>
@@ -236,9 +314,9 @@
           <h2 class="admin-heading">All tickets <span class="admin-count" id="tk-tickets-count"></span></h2>
           <div class="signoff-controls">
             <input id="tk-search" class="auth-input signoff-filter" type="search"
-                   autocomplete="off" placeholder="Search subject, assignee, epic or number" />
+                   autocomplete="off" placeholder="Search subject, assignee, epic or number"
+                   aria-label="Search tickets" />
             <select class="scope-select" id="tk-status" aria-label="Status"></select>
-            <select class="scope-select" id="tk-person" aria-label="Assignee"></select>
             <label class="signoff-toggle">
               <input type="checkbox" id="tk-open-only" /> Open only
             </label>
@@ -250,6 +328,8 @@
       </main>
     </div>
 
+    <!-- One tooltip for every chart on the page, placed by tasks.js. -->
+    <div class="tk-tip" id="tk-tip" role="tooltip" hidden></div>
     <script type="module" src="/tasks.js"></script>
   </body>
 </html>

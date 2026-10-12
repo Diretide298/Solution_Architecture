@@ -351,6 +351,27 @@ const freed = await as('harness.dev', 'GET', '/api/board/mine');
 check('and the board stops warning', freed.data?.testing === null,
   JSON.stringify(freed.data?.testing));
 
+// ── what the delivery overview adds from ADAM's own tables ──────────
+//
+// tasks.html shows the team's gate and dates finished work by when ADAM closed
+// it, so the overview carries both, read fresh on every call rather than held
+// in the five-minute OpenProject cache.
+
+const after = await as('boss', 'GET', '/api/board/overview');
+const standing = (after.data?.testing ?? []).find((g) => g.email === 'harness.dev@softlabsgroup.com');
+check('the overview says where each developer is on the gate',
+  standing && standing.closed === 0 && !!standing.lastPassedAt && standing.every === 10,
+  JSON.stringify(standing));
+check('and when ADAM closed the tickets it closed',
+  Object.keys(after.data?.closes ?? {}).filter((k) => k.startsWith('80')).length === 10,
+  Object.keys(after.data?.closes ?? {}).join(' '));
+check('the overview carries the project versions, for sprint dates',
+  (after.data?.versions ?? []).some((v) => v.name === 'M1 Checkout'),
+  (after.data?.versions ?? []).map((v) => v.name).join(' '));
+check('and which status a new ticket starts in',
+  (after.data?.statuses ?? []).some((st) => st.name === 'New' && st.isDefault === true),
+  JSON.stringify(after.data?.statuses));
+
 // ── not connected is a setup step, not a failure ─────────────────────
 
 const stranger = await recruit('harness.new', 'dev');

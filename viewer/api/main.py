@@ -2728,6 +2728,13 @@ def _overview_payload(account: dict, scope: dict) -> dict:
         known = openproject.statuses(endpoint, token)
     except (openproject.Blocked, openproject.Refused) as exc:
         raise HTTPException(502, str(exc))
+    # The sprints' dates, which a ticket does not carry: it names its version
+    # and nothing more. Optional — a token that may not read versions still
+    # gets the overview, and the page falls back to the sprint calendar.
+    try:
+        sprints = openproject.versions(endpoint, token, scope["pmsId"])
+    except (openproject.Blocked, openproject.Refused):
+        sprints = []
     # Same belt-and-braces as the board: an instance that ignores the project
     # filter must not turn an overview of one product into an overview of all.
     items = [item for item in items if item.get("projectId") == scope["pmsId"]]
@@ -2753,6 +2760,9 @@ def _overview_payload(account: dict, scope: dict) -> dict:
         # `isClosed`, which is the instance's own answer and survives a team
         # renaming its columns.
         "statuses": known,
+        # The project's versions with their start and end dates, so "past the
+        # end of its sprint" can be asked of a ticket. Empty when unreadable.
+        "versions": sprints,
         "total": len(items),
         # Said out loud rather than left to look like a small project.
         "truncated": len(items) >= OVERVIEW_LIMIT,
@@ -2855,7 +2865,56 @@ def delivery_overview(
     held = _project_read(account, scope, refresh=bool(refresh))
     age = int(time.monotonic() - held["at"])
     return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,
-            "fromCache": age > 0, "cacheSeconds": OVERVIEW_TTL_SECONDS}
+            "fromCache": age > 0, "cacheSeconds": OVERVIEW_TTL_SECONDS,
+            **_overview_local(scope["project"])}
+
+
+def _overview_local(project: str) -> dict:
+    """What ADAM itself knows about the project's tickets, added per request.
+
+    Two answers OpenProject 10 cannot give in a list read, both from ADAM's own
+    tables, so they are read fresh on every call rather than cached with the
+    OpenProject half — a batch passed a minute ago shows a minute later.
+
+    `closes`: when a ticket was closed *through ADAM* (the testing gate records
+    every close it lets through). OpenProject's list has no closing date, only
+    `updatedAt`, which a later comment moves; where ADAM saw the close, this is
+    the real moment. Tickets closed in OpenProject's own web interface are not
+    here, and the page falls back to `updatedAt` for them and says so.
+
+    `testing`: every developer's standing on the ten-ticket gate — how many they
+    have closed since their last passed batch, and where that batch is. The
+    team view of what `/api/board/mine` shows one person.
+    """
+    closes = {
+        row["external_key"]: row["at"] for row in db.all_rows(
+            "SELECT i.external_key, MAX(i.closed_at) AS at FROM test_batch_item i "
+            "JOIN test_batch b ON b.id = i.batch_id WHERE b.project_id = ? "
+            "GROUP BY i.external_key", (project,))
+    }
+    testing = []
+    for row in db.all_rows(
+        "SELECT b.account_id, a.name, a.email FROM test_batch b "
+        "JOIN account a ON a.id = b.account_id WHERE b.project_id = ? "
+        "GROUP BY b.account_id ORDER BY a.name", (project,)
+    ):
+        batch = _open_batch(row["account_id"], project)
+        passed = db.one(
+            "SELECT checked_at FROM test_batch WHERE project_id = ? AND account_id = ? "
+            "AND verdict = 'passed' ORDER BY checked_at DESC LIMIT 1",
+            (project, row["account_id"]))
+        size = _batch_size(batch["id"]) if batch else 0
+        testing.append({
+            "name": row["name"] or row["email"],
+            "email": row["email"],
+            "closed": size,
+            "every": TEST_EVERY,
+            "full": size >= TEST_EVERY,
+            "submitted": bool(batch and batch["submitted_at"]),
+            "verdict": (batch["verdict"] if batch else "") or "",
+            "lastPassedAt": passed["checked_at"] if passed else None,
+        })
+    return {"closes": closes, "testing": testing, "testEvery": TEST_EVERY}
 
 
 # ── changing a work package: proposed, shown, then applied ───────────
