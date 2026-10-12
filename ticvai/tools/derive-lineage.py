@@ -167,9 +167,18 @@ def child_writes(op: dict, path: str, persist: dict, defs: dict, known: set) -> 
     for r in refs:
         if r in persist:
             parents.add(persist[r][0])
+    # **A path parameter names a table in the operation's own schemas, not any table of that name** (12 October 2026,
+    # CHG-R6-021). `issueCreditMemo` is `/tax-invoices/{invoiceId}/credit-memos` and returns `ledger.credit_memo`;
+    # `{invoiceId}` matched `control.invoice`, the platform's subscription invoice in the control database, and its
+    # body's `lines` became a write of `control.invoice_line` from a ledger operation (ADAM CR-002 found it as a
+    # cross-deployable write). Where the operation's persisted refs name schemas, a parameter's table must be in one.
+    own = {p.split(".", 1)[0] for p in parents}
     for pm in re.findall(r"\{([A-Za-z0-9_]+?)Id\}", path):
         short = _snake(pm)
-        parents |= {t for t in known if t.split(".", 1)[1] == short}
+        named = {t for t in known if t.split(".", 1)[1] == short}
+        if own:
+            named = {t for t in named if t.split(".", 1)[0] in own}
+        parents |= named
     out = set()
     for arr in arrays:
         sing = _snake(arr)
@@ -387,7 +396,24 @@ def derive(stored: dict) -> dict:
                     "service": svc.get(contract),
                     "stores": sto.get(contract, ["postgres"]),
                 }
+                # **A write into another deployable's schema names the route it takes** (12 October 2026, ADAM
+                # CR-002, CHG-R6-020). DB-ROLES grants each deployable's role DML only on its own modules' schemas, so
+                # PostgreSQL refuses such a write made with the caller's own SQL; ADR-0055 rule 4 sends it by event or
+                # by the owner's published operation, and `x-ticvai-write-via` on the operation says which. A fact
+                # read off the contract, so it is copied as `writeVia` onto new and existing entries alike, below.
+                via = write_via(op)
+                if via:
+                    out[op["operationId"]]["writeVia"] = via
     return out
+
+
+def write_via(op: dict) -> list:
+    """`x-ticvai-write-via` as the lineage records it: one `{table, event}` or `{table, operation}` per routed table."""
+    out = []
+    for w in op.get("x-ticvai-write-via") or []:
+        if isinstance(w, dict) and w.get("table"):
+            out.append({k: str(w[k]) for k in ("table", "event", "operation") if w.get(k)})
+    return sorted(out, key=lambda w: w["table"])
 
 
 def main() -> int:
@@ -549,7 +575,21 @@ def main() -> int:
             keyed += 1
     if keyed:
         print("  %d entry(s) given the cache:resolution key they fill or evict" % keyed)
-    if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired             and not keyed:
+    # `writeVia` (CHG-R6-020) is the contract's `x-ticvai-write-via`, so it is refreshed in place, and removed from an
+    # entry whose operation no longer routes a write.
+    routed = 0
+    for o in sorted(set(stored) & set(fresh)):
+        want = fresh[o].get("writeVia")
+        if want and stored[o].get("writeVia") != want:
+            stored[o]["writeVia"] = want
+            routed += 1
+        elif not want and "writeVia" in stored[o]:
+            del stored[o]["writeVia"]
+            routed += 1
+    if routed:
+        print("  %d entry(s) given the route their cross-deployable writes take (writeVia)" % routed)
+    if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired \
+            and not keyed and not routed:
         print("  nothing to add")
         return 0
     for o in missing:

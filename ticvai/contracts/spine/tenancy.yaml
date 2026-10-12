@@ -163,6 +163,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTenantDomainMapping
+      x-ticvai-write-via:
+      - table: control.tenant_domain
+        event: tenantDomain.mapped
       security:
       - serviceAuth: []
       x-ticvai-audience:

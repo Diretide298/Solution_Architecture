@@ -130,6 +130,9 @@ CHECKS = [
     # package's SQL, and MIG-BASELINE names the helper functions it copies (check-plan-owners gained O-MIG-OWNER,
     # CHG-R5-001).
     "check-migration-wording",
+    # 12 October (ADAM CR-002 on DB-ROLES, CHG-R6-020): a write into another deployable's schema goes by event or by
+    # the owner's operation (x-ticvai-write-via) or is a dated exception; the kernel grants are exactly the four agreed.
+    "check-cross-deployable-writes",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

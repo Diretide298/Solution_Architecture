@@ -3184,6 +3184,9 @@ paths:
         format: uuid
     post:
       operationId: compItem
+      x-ticvai-write-via:
+      - table: orders.order_line
+        operation: applyManualDiscount
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Take a line off the bill, with a reason and a name

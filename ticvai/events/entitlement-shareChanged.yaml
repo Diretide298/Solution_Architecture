@@ -1,0 +1,48 @@
+# entitlement.shareChanged v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: entitlement.shareChanged
+version: 1
+publisher: orders
+description: A holder let somebody else use an entitlement without giving it away, or took that share back.
+aggregate: entitlement
+emittedWhen: shareEntitlement or revokeEntitlementShare succeeds
+emittedBy:
+- shareEntitlement
+- revokeEntitlementShare
+payload:
+- field: entitlementId
+  type: uuid
+- field: shareId
+  type: uuid
+  notes: The identity.delegated_access row the share is recorded as
+- field: change
+  type: string
+  notes: shared or revoked
+- field: holderSubjectId
+  type: uuid
+- field: delegateSubjectId
+  type: uuid
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: access
+  purpose: Record who may present the entitlement on access.entitlement, which Access owns, and refresh the offline
+    validation bundle, so a revoked share stops admitting at a gate without a network
+  writes:
+  - access.entitlement
+  idempotencyKey: shareId + change
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: '**Added 12 October 2026 (ADAM CR-002, CHG-R6-020).** Both operations run in OrderService, in `commerce`;
+  access.entitlement is AccessService''s, in `access`. The DB-ROLES grants refuse the direct write, so the share
+  reaches the owner as this event (ADR-0055 rule 4, ADR-0057). identity.delegated_access is written in the
+  operation''s own transaction: identity is in `commerce` too (rule 3).
+
+
+  No state model emits this: a share is not a status of the entitlement.'

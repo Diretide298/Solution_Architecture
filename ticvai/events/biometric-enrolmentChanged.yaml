@@ -1,0 +1,85 @@
+# biometric.enrolmentChanged v1 — published by access
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: biometric.enrolmentChanged
+version: 1
+publisher: access
+description: A Face Pass or Face Tag enrolment was made, re-enrolled after review, or removed.
+aggregate: biometricEnrolment
+emittedWhen: enrolFacePass, enrolFaceTag, reviewFaceReenrolment (approved) or revokeFacePass succeeds
+emittedBy:
+- enrolFacePass
+- enrolFaceTag
+- reviewFaceReenrolment
+- revokeFacePass
+payload:
+- field: enrolmentId
+  type: uuid
+  notes: The pii.subject_biometric row's id
+- field: change
+  type: string
+  notes: enrolled, reenrolled or revoked
+- field: subjectId
+  type: uuid
+- field: entitlementId
+  type: uuid
+- field: kind
+  type: string
+  notes: facePass or faceTag
+- field: source
+  type: string
+- field: enrolmentChannel
+  type: string
+  required: false
+- field: consentFormId
+  type: uuid
+  required: false
+- field: consentFormVersion
+  type: integer
+  required: false
+- field: consentPurposeId
+  type: uuid
+  required: false
+- field: consentGivenAt
+  type: timestamp
+  required: false
+- field: guardianSubjectId
+  type: uuid
+  required: false
+- field: capturedAt
+  type: timestamp
+- field: expiresAt
+  type: timestamp
+  required: false
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: identity
+  purpose: Write, re-enrol or deactivate the enrolment on pii.subject_biometric, which Identity owns with the rest of
+    the pii schema, within the ADR-0047 retention ceiling the payload's expiresAt carries
+  writes:
+  - pii.subject_biometric
+  idempotencyKey: enrolmentId + change
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: marketing
+  purpose: Record the biometric consent given at a Face Pass enrolment as a marketing.consent_record, which Marketing
+    owns (consentPurposeId and consentGivenAt; nothing for a Face Tag or a revocation)
+  writes:
+  - marketing.consent_record
+  idempotencyKey: enrolmentId + change
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 7 days after publication. **The payload carries no template and no image**, only the enrolment's
+  metadata; the template never leaves the capture path
+notes: '**Added 12 October 2026 (ADAM CR-002, CHG-R6-020).** The four operations run in AccessService, in the
+  `access` deployable; pii.subject_biometric is in the pii schema (IdentityService, `commerce`) and the consent
+  record is MarketingService''s (`operations`). The DB-ROLES grants refuse both direct writes, so the enrolment
+  reaches each owner as this event (ADR-0055 rule 4, ADR-0057).
+
+
+  No state model emits this: the enrolment carries `isActive`, not a status model.'

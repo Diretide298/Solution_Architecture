@@ -371,6 +371,11 @@ paths:
   /products/bulk:
     post:
       operationId: bulkUpdateProducts
+      x-ticvai-write-via:
+      - table: catalogue.price
+        operation: bulkUpdateCatalogueProducts
+      - table: catalogue.product
+        operation: bulkUpdateCatalogueProducts
       deprecated: true
       x-ticvai-superseded-by: 'bulkUpdateCatalogueProducts'
       summary: Change many products at once, with a preview

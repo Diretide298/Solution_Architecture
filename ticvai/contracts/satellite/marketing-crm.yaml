@@ -603,6 +603,9 @@ paths:
   /guest-checkout/profile-match/decision:
     post:
       operationId: decideGuestCheckoutMatch
+      x-ticvai-write-via:
+      - table: orders.cart
+        operation: claimCart
       summary: Use the existing profile or keep this booking separate
       deprecated: true
       description: '**Retired from checkout, 28 September (decided 28 September, audit R120 (b)).** The guest
@@ -721,6 +724,9 @@ paths:
   /guests/merge:
     post:
       operationId: mergeGuests
+      x-ticvai-write-via:
+      - table: pii.subject
+        event: guest.merged
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-746 Duplicate Review & Merge"
@@ -2767,6 +2773,9 @@ paths:
   /loyalty/redemptions:
     post:
       operationId: redeemLoyaltyPoints
+      x-ticvai-write-via:
+      - table: orders.stored_value_authorisation
+        operation: authoriseStoredValue
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
