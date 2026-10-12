@@ -578,7 +578,7 @@ if (!viewerUp) {
   // busy in the answer is asked about by first name, the way a developer would.
   if (!board.needsSetup) {
     const team = parse(await mcp.send('tools/call', { name: 'adam_team', arguments: {} }));
-    if (Array.isArray(team.rows) && String(team.columns) === 'person,inProgress,open,closed14d,workingOn') {
+    if (Array.isArray(team.rows) && String(team.columns) === 'person,inProgress,awaitingQA,stalled,open,finished14d,workingOn') {
       pass(`adam_team answers - ${team.rows.length} people with work`);
       const busy = team.rows[0]?.person;
       if (busy) {

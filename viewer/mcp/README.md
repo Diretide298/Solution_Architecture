@@ -190,7 +190,7 @@ building.
 | `adam_decisions` | none, or `id` / `q` | the ADRs and registers; one ADR in full |
 | `adam_file` | `path`, optional `from` / `lines` | one file's source, windowed |
 | `adam_board` | nothing | what is open and assigned to you, and what each item touches |
-| `adam_team` | none, or `person` (a name, first name or part of one), `days`, `limit` | **read-only**: everybody's in-progress tickets with open / in progress / closed-in-14-days counts; or one teammate's open tickets (started first) and what they closed lately. Read with your own OpenProject token, so it shows only what you could see there; refused to client accounts |
+| `adam_team` | none, or `person` (a name, first name or part of one), `days`, `limit` | **read-only**: everybody's in-progress tickets with in progress / awaiting QA / stalled / open / finished-in-14-days counts; or one teammate's open tickets (in progress first) and what they finished lately (closed or moved to Ready for QA, with status and date). Read with your own OpenProject token, so it shows only what you could see there; refused to client accounts |
 | `adam_work` | `key` | one work package, live, plus the artefacts it touches |
 | `adam_links` | `kind`, `id` | what work is scheduled against one artefact |
 | `adam_link` | `kind`, `id`, `key` — or `remove` + `linkId` | **writes**: records that a work package is about an artefact |

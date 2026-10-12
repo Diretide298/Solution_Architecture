@@ -96,7 +96,7 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
 To see a teammate's work, ask ("what is Hrushikant working on?", "what's everyone doing?"):
-`adam_team` answers, read-only, with their open and in-progress tickets and what they closed lately.
+`adam_team` answers, read-only, with their open and in-progress tickets and what they finished lately.
 
 ## Ticket kinds
 

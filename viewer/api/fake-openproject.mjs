@@ -20,6 +20,10 @@ const STATUSES = [
   { id: 1, name: 'New', isClosed: false },
   { id: 7, name: 'In progress', isClosed: false },
   { id: 12, name: 'Closed', isClosed: true },
+  // Open, and not in progress: the team view counts these apart. On the live
+  // instance finished work goes to Ready for QA and stays open.
+  { id: 4, name: 'On hold', isClosed: false },
+  { id: 9, name: 'Ready for QA', isClosed: false },
 ];
 
 const TYPES = [
@@ -157,10 +161,14 @@ own(7013, { subject: 'Refund audit: retention window', parent: 7012, user: 9 });
 own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6, spent: 'PT6H' });
 
 // The team view's: one of Hrushikant's not started yet (New), so "in progress
-// first" has something to put last, and one he closed this week, so his
-// fourteen days are not empty.
+// first" has something to put last, one he closed this week, one he moved to
+// Ready for QA yesterday and one on hold.
 own(7200, { subject: 'Refund reconciliation report', status: 1, parent: 901, user: 9, order: 3 });
 own(7201, { subject: 'Refund API contract tests', status: 12, done: 100, parent: 901, user: 9, updated: day(-3) });
+// Finished the way the live instance finishes things, moved to Ready for QA
+// yesterday and still open; and one on hold, which is stalled, not in progress.
+own(7202, { subject: 'Refund receipt template', status: 9, done: 100, parent: 901, user: 9, updated: day(-1) });
+own(7203, { subject: 'Refund to gift card', status: 4, parent: 901, user: 9 });
 
 let nextId = 1200;
 const created = [];

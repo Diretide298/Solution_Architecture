@@ -1147,9 +1147,11 @@ export const TOOLS = [
       + "Hrushikant working on', 'what has Deep got open', 'what's everyone doing', 'who is busy / who is "
       + "free', or 'who is on the module ticket N is in' (read ticket N with adam_work first for its parent, "
       + 'then look for that parent here). With `person` (a name; a first name or the start of one is '
-      + "enough, any case) it gives that person's open tickets, started ones first, and the tickets they "
-      + 'closed in the last 14 days (or `days`, up to 60), each with its type, date and parent. Without it, it gives everybody on the project: how many tickets each has open, in '
-      + 'progress and closed lately, and what each has started. Your own work is adam_board. Read as you, '
+      + "enough, any case) it gives that person's open tickets (in progress first, then stalled, awaiting QA "
+      + 'and New) and what they finished in the last 14 days (or `days`, up to 60): closed or moved to Ready '
+      + 'for QA, each with its status, type, date and parent. Without it, it gives everybody on the project: '
+      + 'per person, how many tickets are in progress, awaiting QA, stalled (on hold or blocked), open, and '
+      + 'finished lately, and what each has in progress. Your own work is adam_board. Read as you, '
       + 'with your OpenProject token, so it shows only what your OpenProject account can see.',
     inputSchema: {
       type: 'object',
@@ -1166,7 +1168,7 @@ export const TOOLS = [
         },
         days: {
           type: 'number',
-          description: 'With `person`: how far back the closed list reaches, in days (default 14, at most 60).',
+          description: 'With `person`: how far back the finished list reaches, in days (default 14, at most 60).',
         },
         refresh: {
           type: 'boolean',
@@ -1208,14 +1210,15 @@ export const TOOLS = [
           due: t.dueDate ?? '',
           order: t.buildOrder ?? '',
         }));
-        // Most recent first, as the service sends them. `closed` is OpenProject's
-        // updatedAt (see closedNote), which on a closed ticket is normally the close.
-        const closedAll = data.finished ?? [];
-        const closed = closedAll.slice(0, limit).map((t) => ({
+        // Most recent first, as the service sends them: closed, and moved to an awaiting-QA status, in
+        // the window. `lastChanged` is OpenProject's updatedAt (see finishedNote).
+        const doneAll = data.finished ?? [];
+        const finished = doneAll.slice(0, limit).map((t) => ({
           ticket: t.key,
           task: t.subject,
           type: t.type ?? '',
-          closed: day(t.closedAt ?? t.updatedAt),
+          status: t.status,
+          lastChanged: day(t.lastChangedAt ?? t.updatedAt),
           partOf: partOf(t),
         }));
         return {
@@ -1224,29 +1227,32 @@ export const TOOLS = [
           ...(data.match === 'partial' ? { matchedFrom: person } : {}),
           open: data.total,
           inProgress: data.inProgress,
+          awaitingQA: data.awaitingQA,
+          stalled: data.stalled,
           shown: rows.length,
           ...(all.length > rows.length
             ? { more: `${all.length - rows.length} more open after these; pass a larger \`limit\` (up to 80) to see them` }
             : {}),
           columns: ['ticket', 'task', 'partOf', 'status', 'due', 'order'],
           rows,
-          closedWindowDays: data.windowDays,
-          closedTotal: data.finishedTotal ?? closedAll.length,
-          closedColumns: ['ticket', 'task', 'type', 'closed', 'partOf'],
-          closed,
-          ...(closedAll.length > closed.length
-            ? { moreClosed: `${closedAll.length - closed.length} more closed in the window after these; pass a larger \`limit\`` }
+          finishedWindowDays: data.windowDays,
+          finishedTotal: data.finishedTotal ?? doneAll.length,
+          finishedColumns: ['ticket', 'task', 'type', 'status', 'lastChanged', 'partOf'],
+          finished,
+          ...(doneAll.length > finished.length
+            ? { moreFinished: `${doneAll.length - finished.length} more finished in the window after these; pass a larger \`limit\`` }
             : {}),
-          closedNote: 'The `closed` date is when OpenProject last changed the ticket (updatedAt); OpenProject '
-            + 'gives no separate closing date, and for a closed ticket that is normally the close.',
+          finishedNote: 'Finished means closed, or moved to a QA/review status, in the window; `status` says which. '
+            + '`lastChanged` is when OpenProject last changed the ticket (updatedAt): there is no separate '
+            + 'closing date, so a later edit moves it too.',
           ...(data.note ? { note: data.note } : {}),
-          orderedBy: 'started first, then the build order, then priority, then due date',
-          display: `Say "${data.person.name}: N open, M in progress, K closed in the last ${data.windowDays} days" `
-            + 'in one line, then show `rows` as a markdown table using `columns`, in the order given (started '
-            + 'tickets come first). Then a heading "Closed in the last N days" and `closed` as a second table '
-            + 'using `closedColumns`, most recent first, with one line under it saying the date is the last '
-            + 'update in OpenProject; or "nothing closed in the last N days". If `more` or `moreClosed` is '
-            + 'present, say it in one line. Nothing else.',
+          orderedBy: 'in progress, then stalled, then awaiting QA, then New; within each the build order, priority, due date',
+          display: `Say "${data.person.name}: N open (a in progress, b awaiting QA, c stalled); K finished in the last `
+            + `${data.windowDays} days" in one line, then show \`rows\` as a markdown table using \`columns\`, in the `
+            + 'order given. Then a heading "Finished in the last N days" and `finished` as a second table using '
+            + '`finishedColumns`, most recent first, with one line under it saying the date is the last change in '
+            + 'OpenProject; or "nothing finished in the last N days". If `more` or `moreFinished` is present, say '
+            + 'it in one line. Nothing else.',
         };
       }
 
@@ -1257,19 +1263,22 @@ export const TOOLS = [
         return {
           person: p.name,
           inProgress: p.inProgress,
+          awaitingQA: p.awaitingQA,
+          stalled: p.stalled,
           open: p.open ?? '?',
-          closed14d: p.closedRecently,
+          finished14d: p.finishedRecently,
           workingOn: named.length
             ? named.join('; ') + (current.length > 3 ? `; +${current.length - 3} more` : '')
             : '—',
         };
       };
+      const busy = (p) => p.inProgress || p.awaitingQA || p.stalled || p.open || p.finishedRecently;
       const rows = people
-        .filter((p) => p.inProgress || p.open || p.closedRecently)
-        .sort((a, b) => (b.inProgress - a.inProgress) || ((b.open ?? 0) - (a.open ?? 0))
-          || a.name.localeCompare(b.name))
+        .filter(busy)
+        .sort((a, b) => (b.inProgress - a.inProgress) || (b.awaitingQA - a.awaitingQA)
+          || ((b.open ?? 0) - (a.open ?? 0)) || a.name.localeCompare(b.name))
         .map(row);
-      const idle = people.filter((p) => !p.inProgress && !p.open && !p.closedRecently).map((p) => p.name);
+      const idle = people.filter((p) => !busy(p)).map((p) => p.name);
       const tickets = people.flatMap((p) => (p.current ?? []).map((t) => ({
         person: p.name, ticket: t.key, task: t.subject, partOf: partOf(t), status: t.status, due: t.dueDate ?? '',
       })));
@@ -1279,12 +1288,18 @@ export const TOOLS = [
         windowDays: data.windowDays,
         asOf: data.asOf,
         ...(data.fromCache ? { heldFor: `${data.ageSeconds}s (refresh: true reads again)` } : {}),
-        inProgressMeans: `open and past New (${(data.startedStatuses ?? []).join(', ') || 'no such status'})`,
-        columns: ['person', 'inProgress', 'open', 'closed14d', 'workingOn'],
+        statusesMean: {
+          inProgress: (data.inProgressStatuses ?? []).join(', ') || 'none on this instance',
+          awaitingQA: (data.awaitingQAStatuses ?? []).join(', ') || 'none on this instance',
+          stalled: (data.stalledStatuses ?? []).join(', ') || 'none on this instance',
+          finished14d: data.finishedMeans,
+        },
+        columns: ['person', 'inProgress', 'awaitingQA', 'stalled', 'open', 'finished14d', 'workingOn'],
         rows,
         ...(idle.length ? { nothingAssigned: idle } : {}),
-        ...((unassigned.inProgress || unassigned.open)
-          ? { unassigned: { open: unassigned.open ?? '?', inProgress: unassigned.inProgress } } : {}),
+        ...((unassigned.inProgress || unassigned.awaitingQA || unassigned.stalled || unassigned.open)
+          ? { unassigned: { open: unassigned.open ?? '?', inProgress: unassigned.inProgress,
+            awaitingQA: unassigned.awaitingQA, stalled: unassigned.stalled } } : {}),
         ticketColumns: ['person', 'ticket', 'task', 'partOf', 'status', 'due'],
         tickets: tickets.slice(0, limit),
         ...(tickets.length > limit ? { moreTickets: `${tickets.length - limit} more in-progress tickets; pass a larger \`limit\`` } : {}),

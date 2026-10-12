@@ -164,33 +164,42 @@ check('and epics for it to draw a bar per',
 // ── a teammate's work, and the whole team's ──────────────────────────
 //
 // "What is Hrushikant working on", asked by another developer, by a partial
-// first name, in the wrong case. The fixture gives him five started tickets
-// (two epics and three subtasks), one still New, one closed three days ago and
-// one closed forty days ago.
+// first name, in the wrong case. The fixture gives him five tickets in
+// progress (two epics and three subtasks), one On hold, one moved to Ready for
+// QA yesterday, one still New, one closed three days ago and one closed forty
+// days ago. On the live instance finished work is moved to Ready for QA and
+// stays open, so "finished" has to count that as well as a close, and "in
+// progress" must not.
 
 const sortedKeys = (list) => (list ?? []).map((t) => t.key).sort();
+const inOrder = (list) => (list ?? []).map((t) => t.key).join(' ');
 const hr = await as('harness.dev', 'GET', '/api/board/person?who=hrushi');
 check('a developer can ask what a teammate is working on', hr.status === 200,
   `${hr.status} ${JSON.stringify(hr.data?.detail ?? '')}`);
 check('a partial first name finds them', hr.data?.person?.name === 'Hrushikant Patkar'
   && hr.data?.match === 'partial', `${hr.data?.match} ${hr.data?.person?.name}`);
 check('with every open ticket they hold',
-  sortedKeys(hr.data?.items).join(' ') === '7011 7012 7013 7200 900 901', sortedKeys(hr.data?.items).join(' '));
+  sortedKeys(hr.data?.items).join(' ') === '7011 7012 7013 7200 7202 7203 900 901', sortedKeys(hr.data?.items).join(' '));
 const hrItems = hr.data?.items ?? [];
-check('started ones first, and the New one after them',
-  hrItems.at(-1)?.key === '7200' && hrItems.slice(0, -1).every((t) => t.started) && hrItems.at(-1)?.started === false,
-  hrItems.map((t) => `${t.key}:${t.status}`).join(' '));
-check('and says how many are in progress', hr.data?.inProgress === 5, String(hr.data?.inProgress));
-check('with what they closed in the last fourteen days, and not before',
-  sortedKeys(hr.data?.finished).join(' ') === '7201', sortedKeys(hr.data?.finished).join(' ') || 'none');
-check('each closed one carries its type, parent and the date, said to be updatedAt',
-  hr.data?.finished?.[0]?.type === 'Task' && hr.data?.finished?.[0]?.parentSubject === 'Epic 901'
-  && hr.data?.finished?.[0]?.closedAt && /updatedAt/.test(hr.data?.closedAtIs ?? '') && hr.data?.finishedTotal === 1,
-  JSON.stringify(hr.data?.finished?.[0] ?? {}).slice(0, 160));
+check('in progress first, then stalled, then awaiting QA, then New',
+  hrItems.map((t) => t.stage).join(' ') === 'inProgress inProgress inProgress inProgress inProgress stalled awaitingQA new'
+  && inOrder(hrItems).endsWith('7203 7202 7200'),
+  hrItems.map((t) => `${t.key}:${t.stage}`).join(' '));
+check('and counts each apart: Ready for QA and On hold are not in progress',
+  hr.data?.inProgress === 5 && hr.data?.awaitingQA === 1 && hr.data?.stalled === 1 && hr.data?.new === 1,
+  `${hr.data?.inProgress}/${hr.data?.awaitingQA}/${hr.data?.stalled}/${hr.data?.new}`);
+check('finished is closed or moved to QA in the last fourteen days, most recent first, and not before',
+  inOrder(hr.data?.finished) === '7202 7201' && hr.data?.finishedTotal === 2, inOrder(hr.data?.finished) || 'none');
+const [toQa, closedOne] = hr.data?.finished ?? [];
+check('each says its status, so Ready for QA and Closed are told apart',
+  toQa?.status === 'Ready for QA' && closedOne?.status === 'Closed', `${toQa?.status} / ${closedOne?.status}`);
+check('and carries its type, parent and a date said to be the last change',
+  closedOne?.type === 'Task' && closedOne?.parentSubject === 'Epic 901' && closedOne?.lastChangedAt
+  && /last changed/.test(hr.data?.closedAtIs ?? ''),
+  JSON.stringify(closedOne ?? {}).slice(0, 160));
 const wider = await as('harness.dev', 'GET', '/api/board/person?who=hrushi&days=60');
-check('a wider window reaches further back, most recent first',
-  (wider.data?.finished ?? []).map((t) => t.key).join(' ') === '7201 902' && wider.data?.windowDays === 60,
-  (wider.data?.finished ?? []).map((t) => t.key).join(' '));
+check('a wider window reaches further back',
+  inOrder(wider.data?.finished) === '7202 7201 902' && wider.data?.windowDays === 60, inOrder(wider.data?.finished));
 check('and the window is capped at sixty days',
   (await as('harness.dev', 'GET', '/api/board/person?who=hrushi&days=61')).status === 422);
 check("and nobody else's tickets", hrItems.every((t) => t.assignee === 'Hrushikant Patkar'),
@@ -220,20 +229,27 @@ const team = await as('harness.dev', 'GET', '/api/board/team');
 check('a developer can see the whole team', team.status === 200,
   `${team.status} ${JSON.stringify(team.data?.detail ?? '')}`);
 const who = Object.fromEntries((team.data?.people ?? []).map((p) => [p.name, p]));
-const counts = (p) => (p ? `${p.open}/${p.inProgress}/${p.closedRecently}` : 'missing');
-check('each person with open, in progress and closed in fourteen days',
-  counts(who['Harness Person']) === '4/4/1' && counts(who['Hrushikant Patkar']) === '6/5/1'
-  && counts(who['Somebody Else']) === '1/1/0',
+// open / in progress / awaiting QA / stalled / finished in fourteen days
+const counts = (p) => (p ? `${p.open}/${p.inProgress}/${p.awaitingQA}/${p.stalled}/${p.finishedRecently}` : 'missing');
+check('each person with open, in progress, awaiting QA, stalled and finished in fourteen days',
+  counts(who['Harness Person']) === '4/4/0/0/1' && counts(who['Hrushikant Patkar']) === '8/5/1/1/2'
+  && counts(who['Somebody Else']) === '1/1/0/0/0',
   ['Harness Person', 'Hrushikant Patkar', 'Somebody Else'].map((n) => `${n} ${counts(who[n])}`).join('; '));
-check('and a member holding nothing is listed with zeros', counts(who['Harness Tester']) === '0/0/0',
+check('and a member holding nothing is listed with zeros', counts(who['Harness Tester']) === '0/0/0/0/0',
   counts(who['Harness Tester']));
-check("each person's current tickets are the started ones",
-  sortedKeys(who['Harness Person']?.current).join(' ') === '7001 7002 7003 7004', sortedKeys(who['Harness Person']?.current).join(' '));
-check('and a New ticket is not current work',
-  !(team.data?.people ?? []).some((p) => (p.current ?? []).some((t) => t.key === '7200')), 'no 7200');
-check('in progress means open and past New, said out loud',
-  (team.data?.startedStatuses ?? []).join(',') === 'In progress', (team.data?.startedStatuses ?? []).join(','));
-check('unassigned started work is counted apart', team.data?.unassigned?.inProgress >= 1,
+check("each person's current tickets are the ones in progress",
+  sortedKeys(who['Harness Person']?.current).join(' ') === '7001 7002 7003 7004'
+  && sortedKeys(who['Hrushikant Patkar']?.current).join(' ') === '7011 7012 7013 900 901',
+  sortedKeys(who['Hrushikant Patkar']?.current).join(' '));
+check('and New, On hold and Ready for QA tickets are not current work',
+  !(team.data?.people ?? []).some((p) => (p.current ?? []).some((t) => ['7200', '7202', '7203'].includes(t.key))),
+  'no 7200, 7202, 7203');
+check('what each word means is said out loud, from the instance\'s statuses',
+  (team.data?.inProgressStatuses ?? []).join(',') === 'In progress'
+  && (team.data?.awaitingQAStatuses ?? []).join(',') === 'Ready for QA'
+  && (team.data?.stalledStatuses ?? []).join(',') === 'On hold',
+  JSON.stringify([team.data?.inProgressStatuses, team.data?.awaitingQAStatuses, team.data?.stalledStatuses]));
+check('unassigned work is counted apart', team.data?.unassigned?.inProgress >= 1,
   JSON.stringify(team.data?.unassigned));
 const again = await as('harness.dev', 'GET', '/api/board/team');
 check('a second read inside two minutes is the held one', again.data?.fromCache === true
@@ -249,24 +265,28 @@ const devClient = new ViewerClient({ base: API, project: 'ticvai',
   email: 'harness.dev@softlabsgroup.com', password: PASSWORD });
 const askHr = await BY_NAME.get('adam_team').run(devClient, { person: 'Hrushi' });
 check('adam_team with a person answers with a table of their tickets',
-  askHr.found && askHr.person === 'Hrushikant Patkar' && askHr.rows?.length === 6
-  && String(askHr.columns) === 'ticket,task,partOf,status,due,order' && askHr.rows.at(-1)?.ticket === '7200',
+  askHr.found && askHr.person === 'Hrushikant Patkar' && askHr.rows?.length === 8
+  && String(askHr.columns) === 'ticket,task,partOf,status,due,order' && askHr.rows.at(-1)?.ticket === '7200'
+  && askHr.inProgress === 5 && askHr.awaitingQA === 1 && askHr.stalled === 1,
   JSON.stringify(askHr).slice(0, 200));
-check('and what they closed lately, as a list with type, date and parent',
-  (askHr.closed ?? []).map((t) => t.ticket).join(' ') === '7201' && askHr.closedTotal === 1
-  && String(askHr.closedColumns) === 'ticket,task,type,closed,partOf' && askHr.closed[0].partOf === '901 — Epic 901'
-  && /updatedAt/.test(askHr.closedNote ?? ''),
-  JSON.stringify(askHr.closed));
+check('and what they finished lately, as a list with status, type, date and parent',
+  (askHr.finished ?? []).map((t) => t.ticket).join(' ') === '7202 7201' && askHr.finishedTotal === 2
+  && String(askHr.finishedColumns) === 'ticket,task,type,status,lastChanged,partOf'
+  && askHr.finished[0].status === 'Ready for QA' && askHr.finished[1].partOf === '901 — Epic 901'
+  && /updatedAt/.test(askHr.finishedNote ?? ''),
+  JSON.stringify(askHr.finished));
 const askHr60 = await BY_NAME.get('adam_team').run(devClient, { person: 'Hrushi', days: 60, limit: 1 });
 check('with `days` it reaches further, and says how many it left out',
-  askHr60.closedTotal === 2 && askHr60.closed?.length === 1 && /1 more closed/.test(askHr60.moreClosed ?? ''),
-  JSON.stringify({ t: askHr60.closedTotal, c: askHr60.closed, m: askHr60.moreClosed }));
+  askHr60.finishedTotal === 3 && askHr60.finished?.length === 1 && /2 more finished/.test(askHr60.moreFinished ?? ''),
+  JSON.stringify({ t: askHr60.finishedTotal, c: askHr60.finished, m: askHr60.moreFinished }));
 const askAmb = await BY_NAME.get('adam_team').run(devClient, { person: 'harness' });
 check('adam_team with an ambiguous name lists the names to choose from',
   askAmb.found === false && askAmb.ambiguous && askAmb.candidates?.length === 2, JSON.stringify(askAmb).slice(0, 200));
 const askAll = await BY_NAME.get('adam_team').run(devClient, {});
 check('adam_team without a person answers with one row per busy person, busiest first',
   askAll.found && askAll.rows?.[0]?.person === 'Hrushikant Patkar' && askAll.rows.length === 3
+  && String(askAll.columns) === 'person,inProgress,awaitingQA,stalled,open,finished14d,workingOn'
+  && askAll.rows[0].awaitingQA === 1 && askAll.rows[0].stalled === 1 && askAll.rows[0].finished14d === 2
   && (askAll.nothingAssigned ?? []).join() === 'Harness Tester',
   JSON.stringify(askAll.rows ?? askAll).slice(0, 240));
 if (process.env.SHOW_TEAM) console.log(JSON.stringify({ askHr, askAmb, askAll }, null, 2));
