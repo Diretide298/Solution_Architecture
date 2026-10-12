@@ -43,5 +43,5 @@ prevention:
 status: open
 notes: 'Batch R6, 12 October 2026. Run against the third gate''s kept worktree (its derived output): check-ddl-conventions
   PASS (0 new, 248 known) and check-migration-tickets PASS (0 new; 1,126 tables in backend/, 1,117 in a migration, 9 listed
-  as storage only). Process note P-13 in audit/ticvai/PROCESS-LOG.md: after a rename, run every checker that reads table
+  as storage only). The lead''s process note P-13: after a rename, run every checker that reads table
   names alone before the full gate.'
