@@ -17,10 +17,23 @@ const PROJECT = { id: 42, identifier: 'ticvai-test', name: 'TICVAI (harness)' };
 // Three, and only `isClosed` matters here: the testing gate counts a close
 // because OpenProject said the status closes, never because of its name.
 const STATUSES = [
-  { id: 1, name: 'New', isClosed: false },
-  { id: 7, name: 'In progress', isClosed: false },
-  { id: 12, name: 'Closed', isClosed: true },
+  { id: 1, name: 'New', isClosed: false, isDefault: true },
+  { id: 7, name: 'In progress', isClosed: false, isDefault: false },
+  { id: 12, name: 'Closed', isClosed: true, isDefault: false },
 ];
+
+// FAKE_TEAM=1 fills the project with a whole team's sprint plan, for looking
+// at the delivery overview (tasks.html) with something on it. Opt-in, because
+// every other check counts this project's tickets and was written against the
+// handful below; with the switch off nothing here changes.
+const TEAM = process.env.FAKE_TEAM === '1';
+if (TEAM) {
+  STATUSES.push(
+    { id: 13, name: 'On hold', isClosed: false, isDefault: false },
+    { id: 14, name: 'Rejected', isClosed: true, isDefault: false },
+    { id: 15, name: 'Ready for QA', isClosed: false, isDefault: false },
+  );
+}
 
 const TYPES = [
   { id: 1, name: 'Task', isDefault: true, isMilestone: false },
@@ -73,6 +86,17 @@ function ensure(id) {
 /** Assign a ticket to the harness user and give it the shape a board and a
  *  timeline need: dates, an epic, a milestone, a percentage. */
 const USERS = { 'harness-key': 5, 'other-key': 6 };
+// The team dataset's people. Three of them can sign in, so a seed script can
+// close tickets through ADAM and put something on the testing gate.
+const TEAM_PEOPLE = [
+  [20, 'Hrushikant Patkar', 'hrushi-key'], [21, 'Pradnya Yeram', 'pradnya-key'],
+  [22, 'Chitrangi Mestry'], [23, 'Sanket Keluskar'], [24, 'Chinmay Patkar'],
+  [25, 'Pallavi Sawant'], [26, 'Surendra Loke', 'surendra-key'], [27, 'Tanmay Dukhande'],
+  [28, 'Deep Khanvilkar'], [29, 'Kalpita Mejari'],
+];
+if (TEAM) for (const [id, , key] of TEAM_PEOPLE) if (key) USERS[key] = id;
+const userName = (id) => (id === 5 ? 'Harness Person' : id === 6 ? 'Somebody Else'
+  : TEAM_PEOPLE.find(([n]) => n === id)?.[1] ?? 'Somebody Else');
 
 /** Which user a token belongs to. The whole point of `assignee = me` is that
  *  the answer depends on who is asking, so a stand-in that ignored the
@@ -95,7 +119,7 @@ function own(id, { subject, status = 7, done = 0, start, due, parent, version, u
   wp.startDate = start ?? null;
   wp.dueDate = due ?? null;
   wp._links.status = { href: `/api/v3/statuses/${status}`, title: STATUSES.find((s) => s.id === status).name };
-  wp._links.assignee = { href: `/api/v3/users/${user}`, title: user === 5 ? 'Harness Person' : 'Somebody Else' };
+  wp._links.assignee = { href: `/api/v3/users/${user}`, title: userName(user) };
   if (parent) wp._links.parent = { href: `/api/v3/work_packages/${parent}`, title: `Epic ${parent}` };
   if (version) wp._links.version = { href: '/api/v3/versions/1', title: version };
   // When it last changed, which for a closed ticket is when it was closed —
@@ -148,6 +172,132 @@ own(7013, { subject: 'Refund audit: retention window', parent: 7012, user: 9 });
 // Somebody else's, to prove a board is only ever your own.
 own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6, spent: 'PT6H' });
 
+// ── the team dataset (FAKE_TEAM=1) ───────────────────────────────────
+//
+// Five blocks as epics, features under them, tasks under those and sub-tasks
+// under some tasks — the shape TICVAI's plan has in OpenProject — spread over
+// two-week sprints. Sprint 1 starts on the Monday a week before today, so the
+// current sprint is always Sprint 1 and its dates never rot. The mix is the live
+// project's a week into Sprint 1: nearly everything New, finished work moved to
+// "Ready for QA" rather than closed, a couple On hold, nothing Closed (the seed
+// script closes a few through ADAM for the testing gate). Seeded, so two runs
+// draw the same picture.
+const VERSIONS = [];
+if (TEAM) {
+  let seed = 7;
+  const rand = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const pick = (list) => list[Math.floor(rand() * list.length)];
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const addDays = (d, n) => new Date(+d + n * 86400000);
+  const now = new Date(); now.setUTCHours(0, 0, 0, 0);
+  const s1 = addDays(now, -7);
+  s1.setUTCDate(s1.getUTCDate() - ((s1.getUTCDay() + 6) % 7));     // back to Monday
+  for (let n = 1; n <= 8; n += 1) {
+    VERSIONS.push({ id: 76 + n, name: `Sprint ${n}`, startDate: iso(addDays(s1, (n - 1) * 14)),
+                    endDate: iso(addDays(s1, (n - 1) * 14 + 11)), status: 'open' });
+  }
+  const versionOf = (name) => VERSIONS.find((v) => v.name === name);
+  const BLOCKS = [
+    [5000, 'Block A1: the first release, first drop (Sprints 1-4)', ['Sprint 1', 'Sprint 1', 'Sprint 2', 'Sprint 3', 'Sprint 4']],
+    [5001, 'Block A2: the rest of Block A (Sprint 5)', ['Sprint 5']],
+    [5002, 'Block B (Sprints 3-6)', ['Sprint 3', 'Sprint 4', 'Sprint 5', 'Sprint 6']],
+    [5003, 'Block C (Sprints 5-8)', ['Sprint 5', 'Sprint 6', 'Sprint 7', 'Sprint 8']],
+    [5004, 'Block D (Sprints 6-8)', ['Sprint 6', 'Sprint 7', 'Sprint 8']],
+  ];
+  const FEATURES = ['Orders', 'Payments', 'Menu', 'Kitchen display', 'Loyalty', 'Reports', 'Inventory',
+    'Staff', 'Tables', 'Receipts', 'Delivery', 'Promotions', 'Auth', 'Notifications', 'Search',
+    'Audit', 'Settings', 'Exports'];
+  const VERBS = ['Build', 'Wire', 'Test', 'Model', 'Validate', 'Migrate', 'Style', 'Document'];
+  const NOUNS = ['list screen', 'detail screen', 'create form', 'API contract', 'state machine',
+    'table schema', 'error states', 'empty state', 'permissions', 'events'];
+  // How much each person gets and how quickly they finish it, so the roster
+  // has a spread worth reading: one heavy finisher, one with work on hold, one
+  // who is behind, one nearly idle.
+  const WEIGHT = { 20: 9, 21: 6, 22: 6, 23: 5, 24: 5, 25: 5, 26: 4, 27: 4, 28: 3, 29: 1 };
+  const PACE = { 20: 0.82, 21: 0.6, 22: 0.55, 23: 0.5, 24: 0.45, 25: 0.5, 26: 0.3, 27: 0.35, 28: 0.55, 29: 0.4 };
+  const pool = Object.entries(WEIGHT).flatMap(([id, w]) => Array(w).fill(Number(id)));
+  const typed = (wp, name, id) => { wp._links.type = { href: `/api/v3/types/${id}`, title: name }; };
+
+  let key = 6000;
+  const place = (subject, typeName, typeId, parent, parentTitle, version, user, sub) => {
+    const v = versionOf(version);
+    const start = new Date(`${v.startDate}T00:00:00Z`);
+    const end = new Date(`${v.endDate}T00:00:00Z`);
+    const due = addDays(start, 2 + Math.floor(rand() * 10));
+    const pace = PACE[user] ?? 0.5;
+    let status = 1;
+    let updated = addDays(start, -3);
+    const r = rand();
+    if (version === 'Sprint 1') {
+      status = r < pace * 0.42 ? 15 : r > 0.985 ? 13 : 1;
+      if (user === 26 && r > 0.9) status = 13;        // the one with work on hold
+    } else if (version === 'Sprint 2') {
+      status = r < pace * 0.04 ? 15 : 1;
+    }
+    if (status === 15) {
+      // Moved to QA some time since the sprint began.
+      const lo = +start;
+      updated = new Date(lo + rand() * Math.max(0, +now - lo));
+    } else if (status !== 1) {
+      updated = addDays(now, -Math.floor(rand() * 6));
+    }
+    const id = key++;
+    const wp = ensure(String(id));
+    wp.subject = subject;
+    typed(wp, typeName, typeId);
+    wp._links.status = { href: `/api/v3/statuses/${status}`, title: STATUSES.find((st) => st.id === status).name };
+    if (user) wp._links.assignee = { href: `/api/v3/users/${user}`, title: userName(user) };
+    wp._links.parent = { href: `/api/v3/work_packages/${parent}`, title: parentTitle };
+    wp._links.version = { href: `/api/v3/versions/${v.id}`, title: v.name };
+    wp.startDate = iso(start);
+    wp.dueDate = iso(due);
+    wp.percentageDone = status === 12 || status === 15 ? 100 : 0;
+    wp.createdAt = `${iso(addDays(start, -10))}T09:00:00Z`;
+    wp.updatedAt = `${iso(updated)}T${String(8 + Math.floor(rand() * 9)).padStart(2, '0')}:15:00Z`;
+    if (!sub) { wp.storyPoints = pick([1, 2, 3, 5, 8]); wp.estimatedTime = `PT${pick([4, 6, 8, 12, 16])}H`; }
+    return wp;
+  };
+
+  for (const [id, subject, sprints] of BLOCKS) {
+    const epic = ensure(String(id));
+    epic.subject = subject;
+    typed(epic, 'Epic', 5);
+    epic._links.assignee = { href: '/api/v3/users/24', title: userName(24) };
+    epic.startDate = versionOf(sprints[0]).startDate;
+    epic.dueDate = versionOf(sprints.at(-1)).endDate;
+    epic.updatedAt = `${iso(addDays(now, -20))}T09:00:00Z`;
+  }
+  let f = 0;
+  for (const [blockId, blockSubject, sprints] of BLOCKS) {
+    const features = blockId === 5000 ? 6 : 3;
+    for (let n = 0; n < features; n += 1) {
+      const featureId = 5100 + f;
+      const name = FEATURES[f % FEATURES.length];
+      f += 1;
+      const feature = ensure(String(featureId));
+      feature.subject = name;
+      typed(feature, 'Feature', 4);
+      feature._links.parent = { href: `/api/v3/work_packages/${blockId}`, title: blockSubject };
+      feature._links.assignee = { href: '/api/v3/users/24', title: userName(24) };
+      feature.updatedAt = `${iso(addDays(now, -15))}T09:00:00Z`;
+      const tasks = blockId === 5000 ? 22 : 9;
+      for (let t = 0; t < tasks; t += 1) {
+        const version = sprints[Math.min(sprints.length - 1, Math.floor(rand() * sprints.length))];
+        const user = rand() < 0.03 ? 0 : pick(pool);
+        const task = place(`${pick(VERBS)} ${name.toLowerCase()} ${pick(NOUNS)}`, 'Task', 1,
+          featureId, name, version, user, false);
+        if (rand() < 0.45) {
+          const parts = 1 + Math.floor(rand() * 2);
+          for (let k = 0; k < parts; k += 1) {
+            place(`${task.subject}: part ${k + 1}`, 'Sub Task', 6, task.id, task.subject,
+              version, user || pick(pool), true);
+          }
+        }
+      }
+    }
+  }
+}
+
 let nextId = 1200;
 const created = [];
 
@@ -177,7 +327,7 @@ createServer(async (req, res) => {
   if (path === '/api/v3/users/me') {
     const me = userOf(req);
     return json(res, 200, { _type: 'User', id: me || 5,
-                            name: me === 6 ? 'Somebody Else' : 'Harness Person', login: `u${me}` });
+                            name: userName(me || 5), login: `u${me}` });
   }
 
   if (path === '/api/v3/projects') {
@@ -228,6 +378,20 @@ createServer(async (req, res) => {
       total: rows.length, count: page.length, pageSize: size,
       _embedded: { elements: page },
     });
+  }
+
+  // A project's versions, with their dates. The harness milestones have none
+  // of their own and are listed by name; the team dataset's sprints have dates.
+  const versionList = path.match(/^\/api\/v3\/projects\/(\d+)\/versions$/);
+  if (versionList) {
+    if (versionList[1] !== String(PROJECT.id)) return json(res, 404, { message: 'no such project' });
+    const named = [...new Set([...packages.values()].map((wp) => wp._links?.version?.title).filter(Boolean))];
+    const elements = [
+      ...VERSIONS,
+      ...named.filter((n) => !VERSIONS.some((v) => v.name === n))
+        .map((name, i) => ({ id: 300 + i, name, startDate: null, endDate: null, status: 'open' })),
+    ].map((v) => ({ _type: 'Version', ...v }));
+    return json(res, 200, { total: elements.length, _embedded: { elements } });
   }
 
   if (path === '/api/v3/statuses') {

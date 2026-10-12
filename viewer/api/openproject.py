@@ -295,6 +295,10 @@ def summarise(work_package: dict, endpoint: str, token: Optional[str] = None) ->
         # the moment of writing.
         "scheduleManually": bool(work_package.get("scheduleManually", False)),
         "percentDone": work_package.get("percentageDone"),
+        # Story points, when the instance has the backlogs module and somebody
+        # set them. None far more often than not, and the delivery overview
+        # only adds points up where some are present rather than showing zeros.
+        "storyPoints": work_package.get("storyPoints"),
         # What a ticket cost and what it was expected to. Both are durations in
         # OpenProject and hours here; `spentTime` needs permission to view time
         # entries, so a None means "this token cannot see it" as often as it
@@ -368,12 +372,34 @@ def comments(endpoint: str, token: str, key: str) -> list:
 
 
 def statuses(endpoint: str, token: str) -> list:
-    """Every status on the instance, as `{id, name, isClosed}`, in OpenProject's order.
-    Whether a given change is *allowed* is OpenProject's call, made when it is sent."""
+    """Every status on the instance, as `{id, name, isClosed, isDefault}`, in OpenProject's order.
+    Whether a given change is *allowed* is OpenProject's call, made when it is sent.
+
+    `isDefault` is the status a new work package starts in, which is the
+    instance's own answer to "not started yet" — the delivery overview reads it
+    rather than guessing from a name."""
     page = call(endpoint, token, "statuses")
     return [
-        {"id": st.get("id"), "name": st.get("name", ""), "isClosed": bool(st.get("isClosed"))}
+        {"id": st.get("id"), "name": st.get("name", ""), "isClosed": bool(st.get("isClosed")),
+         "isDefault": bool(st.get("isDefault"))}
         for st in page.get("_embedded", {}).get("elements", [])
+    ]
+
+
+def versions(endpoint: str, token: str, project_id: int) -> list:
+    """The versions (TICVAI's sprints) a project can use, with their dates.
+
+    A work package carries its version's name and nothing else, and "is this
+    sprint over" needs the end date. One call per project read, and the caller
+    treats a failure as "no dates" rather than as a failed read: the overview is
+    worth having without them.
+    """
+    page = call(endpoint, token, f"projects/{project_id}/versions")
+    return [
+        {"id": v.get("id"), "name": v.get("name", ""),
+         "startDate": v.get("startDate"), "endDate": v.get("endDate"),
+         "status": v.get("status")}
+        for v in page.get("_embedded", {}).get("elements", [])
     ]
 
 
