@@ -1,0 +1,47 @@
+id: CHG-R6-055
+date: '2026-10-12'
+source: developer
+kind: process
+proposed: '2026-10-12'
+summary: 'check-ddl-conventions (D-MIG-TABLES) and check-migration-tickets (M-TABLE-ASSIGNED) read a table renamed after
+  r1 under its new name, as build-service-docs.py already does (CHG-R6-054).'
+decision:
+  what: 'tools/check-ddl-conventions.py: a table the frozen r1 SQL creates under a name derive-schema-history.py RENAMES
+    retires also counts as creating its new name, so MIGRATIONS.md may list the new one. tools/check-migration-tickets.py:
+    the tables found in backend/ are mapped through the same post-r1 RENAMES before they are matched against the
+    migration tickets and the "Tables no migration creates" list. No derived output changes.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The third r4 gate of 12 October 2026 (refresh-safe --parallel 4 on r4-cr-fixes c95afd4f) failed these two checkers
+  with 15 findings each, one per table renamed at r4 (CHG-R6-010): MIGRATIONS.md and the MIG tickets name the new table,
+  the frozen DDL and backend/ the old one. Both checkers read table names from the SQL and neither knew the renames.'
+keys_touched:
+  files:
+  - tools/check-ddl-conventions.py
+  - tools/check-migration-tickets.py
+  tickets: []
+  other:
+  - CHG-R6-054
+  - CHG-R6-010
+  - CHG-R6-047
+root_class: 'new: checker-ignores-post-r1-rename'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r4 settlement)
+triage: blocker
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'Batch R6, 12 October 2026. Run against the third gate''s kept worktree (its derived output): check-ddl-conventions
+  PASS (0 new, 248 known) and check-migration-tickets PASS (0 new; 1,126 tables in backend/, 1,117 in a migration, 9 listed
+  as storage only). Process note P-13 in audit/ticvai/PROCESS-LOG.md: after a rename, run every checker that reads table
+  names alone before the full gate.'

@@ -377,6 +377,9 @@ def main() -> int:
         for db in ("tenant", "control"):
             for f in sorted((backend / db).glob("V*.sql")):
                 created |= {n.replace('"', "") for n, _ in CREATE.findall(f.read_text(encoding="utf-8"))}
+        # A table renamed after r1 (derive-schema-history.py RENAMES) is created under its old name by the frozen SQL
+        # and goes by its new one everywhere else, MIGRATIONS.md included (12 October 2026, CHG-R6-055).
+        created |= {r["to"] for r in _declared("RENAMES") if r["from"] in created}
         listed = {}
         for task, table in re.findall(r"^\| (MIG-[A-Z-]+) \| `([a-z_]+\.[a-z_0-9]+)` \|", text, re.M):
             listed.setdefault(task, set()).add(table)
