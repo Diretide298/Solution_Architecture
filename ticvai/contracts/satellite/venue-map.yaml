@@ -1704,7 +1704,7 @@ paths:
     post:
       operationId: bookVisitPlan
       x-ticvai-write-via:
-      - table: catalogue.inventory_hold
+      - table: catalogue.inventory_reservation
         operation: acquireInventoryHold
       - table: orders.cart
         operation: createCart

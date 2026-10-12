@@ -121,6 +121,7 @@ A banned word may appear only where this list allows it. **Code, contracts and D
 | Booking (DDL) | `resources.booking`, `whitelabel.booking_flow` and `whitelabel.booking_flow_step`, and the keys that name them: the guest-facing noun the guest books by | CR-011 |
 | Pool, drawer, POS (wire values) | Enum values a contract carries, which the DDL's CHECK repeats: `sharedPool` (`catalogue.channel_envelope.envelope_type`), `cashDrawer` (`platform.device.kind`), `posDemand` (`ai.forecast_definition.subject`), `posBasket` (`ai.rec_decision.placement`, `ai.rec_decline.placement`) and the sales channel `pos`. Changing a wire value is a breaking change. Table and column names still never take them | CR-011 |
 | Card (payment) | A payment card: the payment-method values `card` and `storedCard` (`wallet.exit_settlement.method`), the value `cardScheme`, and names in `payments` | CR-012, CR-014 |
+| Card (credential) | The RFID card credential value `rfidCard`, a wire value of the access and accreditation credential enums since r1 and of `TicketCredentialFormat` | r4 |
 | Other | The value `other` where a contract carries it: `wallet.credit_type.category`, `seating.seat_block.reason`, `resources.resource.kind`. A new `other` needs its own row | CR-012 |
 | Barcode | A retail product's GTIN: `catalogue.variant.barcode`, `inventory.inventory_item.barcode`. Not a Media Code | CR-012, CR-014 |
 | Terminal | A payment (card) terminal: names in `payments`, and `terminal_id` keys to `payments.terminal` (`orders.payment.terminal_id`). Not a Workstation | CR-014 |

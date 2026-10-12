@@ -62,7 +62,7 @@ Sorted by the owning deployable, then the table.
 | `setPartnerCreditProfile` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPartnerRateNet` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPaymentTermBilling` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
-| `bookVisitPlan` | operations / VenueOpsService | `catalogue.inventory_hold` | commerce / CatalogueService | operation `acquireInventoryHold` |
+| `bookVisitPlan` | operations / VenueOpsService | `catalogue.inventory_reservation` | commerce / CatalogueService | operation `acquireInventoryHold` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.price` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.product` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
 | `bookVisitPlan` | operations / VenueOpsService | `orders.cart` | commerce / OrderService | operation `createCart` |

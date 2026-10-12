@@ -72327,7 +72327,7 @@
   "note": "cart writes are made by the orders service through createCart/addCartLine (service to service), with addCartLine's lease and refusals; venue-map writes only visit_plan (status booked, cart_id)",
   "writeVia": [
    {
-    "table": "catalogue.inventory_hold",
+    "table": "catalogue.inventory_reservation",
     "operation": "acquireInventoryHold"
    },
    {
