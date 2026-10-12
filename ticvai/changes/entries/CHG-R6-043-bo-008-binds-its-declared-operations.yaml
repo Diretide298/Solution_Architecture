@@ -1,0 +1,51 @@
+id: CHG-R6-043
+date: '2026-10-12'
+source: audit
+kind: spec
+proposed: '2026-10-12'
+summary: BO-008 Product Detail & Variants gives a control to the four operations it declared and nothing called
+  (listProductVersions, restoreProductVersion, assessProductChange, cloneProduct).
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-008: actionBar gains Check the impact (assessProductChange), Clone
+    product (cloneProduct) and Restore this version (restoreProductVersion); the second contextPanel gains Versions
+    (listProductVersions: ProductVersion version, publishedAt, note, isCurrent) and Change impact
+    (ProductChangeImpact entitlementsIssued, ordersAffected, futurePerformances, openCarts, blockedBy); overlays
+    formCloneProduct (code, name, includeVariants) and formRestoreProductVersion (note). The apis list is unchanged.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'N10 of the lead''s list of 12 October 2026, a finding: BO-008 declared the four operations of the VM close-out of
+  29 September (versions, restore, change impact, clone) in its apis and no component, form or button called them, so
+  a developer had a screen with four calls and no place to make them (the design batch counts them as unbound).'
+keys_touched:
+  screens:
+  - BO-008
+  operations:
+  - listProductVersions
+  - restoreProductVersion
+  - assessProductChange
+  - cloneProduct
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: 'A-BINDING (declared, never bound)'
+tickets:
+  started:
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-008-REST
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request is N10 of the lead's list of 12 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Batch R6, 12 October 2026. The operations were already on BO-008''s tickets (declared in apis), so no operation
+  moves block and no backend ticket changes; the BO-008 tickets are Sprint 1 and taken as started, so the controls reach
+  them as a comment and a linked delta. check-binding-ratchet holds the unbound-control count per app and block and
+  fails if it rises; the lead lowers the baseline after this lands.'

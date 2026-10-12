@@ -2485,9 +2485,10 @@ screens:
         provenance: decided 29 September 2026, M18-15
       - kind: banner
         label: Order
-        operation: createOrder
-        notes: The order number once `createOrder` has answered, shown above the payment.
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+        operation: checkoutCart
+        notes: The order number once `checkoutCart` has answered, shown above the payment. `checkoutCart` is the
+          one way a guest order is created (Chinmay, 12 October 2026, CHG-R6-045).
+        provenance: decided by Chinmay, 12 October 2026 (CHG-R6-045); was createOrder (GFIX-3)
       - kind: banner
         label: Checking your payment
         operation: inquirePaymentStatus
@@ -2505,8 +2506,8 @@ screens:
       - kind: primaryButton
         label: Pay
         operation: createPayment
-        notes: 'One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick and the opt-in), creates
-          the order (`createOrder`) and takes the payment (`createPayment`). The provider token comes
+        notes: 'One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick and the opt-in), which
+          creates the order, and takes the payment (`createPayment`). The provider token comes
           from the gateway, never a form.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
@@ -2540,10 +2541,6 @@ screens:
       signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided
       2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).'
     trigger: onLoad
-  - operationId: createOrder
-    contract: orders
-    purpose: Turn the checked-out cart into an order
-    trigger: onAction
   - operationId: getPaymentLink
     contract: orders
     purpose: Open a payment link sent to this guest
@@ -2607,6 +2604,12 @@ screens:
     at checkout (law and the client''s marketing policy)? Until the client confirms, the opt-in is shown
     unticked and nothing is sent without it.'
   gaps:
+  - operation: createOrder
+    removed: true
+    why: '`checkoutCart` turns the cart into the order (contracts/spine/orders.yaml), so `createOrder` made a second
+      one; it is the till''s and the partner''s way to enter an order, never a guest''s. The web twin (WEB-011,
+      WEB-012) never called it, and flows F01, F02 and F50 use `checkoutCart` and `createPayment` only.'
+    source: decided by Chinmay, 12 October 2026 (CHG-R6-045)
   - operation: transferOrderTickets
     removed: true
     why: Transfer does not belong on a payment screen; it is GST-014's, after purchase.

@@ -1,0 +1,53 @@
+id: CHG-R6-044
+date: '2026-10-12'
+source: audit
+kind: contract
+proposed: '2026-10-12'
+summary: 'recordConsent declares GUEST_MANAGE: a staff caller needs it to record a guest''s consent; a guest still records
+  their own with no permission (self-scoped subject). An approved breaking change (BC-040).'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml recordConsent: x-ticvai-permission null -> GUEST_MANAGE, x-ticvai-self-scoped:
+    subject kept, and a paragraph in the description saying so. docs/active/breaking-changes.yaml BC-040 approves the
+    permission change (tag r4; producer SVC-MARKETING-CONSENT-3; consumers POS-027, BO-748 and the guest consent
+    screens). handoff/api-data-lineage.json recordConsent perm follows the contract.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'N14 of the lead''s list of 12 October 2026, a finding of check-subject on main (SUB-CALLER-ON-STAFF): BO-748 and
+  POS-027 act for a named guest and bound recordConsent, which declared no permission with x-ticvai-self-scoped: subject,
+  so the declared contract meant "the caller''s own consent only" although its description required GUEST_MANAGE of a
+  staff caller (CHG-CSA-045, CHG-WIR-007). Chinmay approved the breaking change on 12 October 2026: "Approve
+  (Recommended)", staff need GUEST_MANAGE to record a guest''s consent; a guest still records their own.'
+keys_touched:
+  screens:
+  - BO-748
+  - POS-027
+  operations:
+  - recordConsent
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - docs/active/breaking-changes.yaml
+  - handoff/api-data-lineage.json
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-MARKETING-CONSENT-3
+  - APP-POS-POS-027
+  - VM-BO-748
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; Chinmay's answer of 12 October 2026 on N14)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-subject.py
+status: open
+notes: 'Batch R6, 12 October 2026. check-subject fails before (2 new, SUB-CALLER-ON-STAFF on BO-748 and POS-027) and passes
+  after; check-contract-compat passes with BC-040. SVC-MARKETING-CONSENT-3 and APP-POS-POS-027 are Sprint 2 and
+  VM-BO-748 Block D, so no started ticket changes. BC-040 is numbered apart from the BC entry the r4-spec agent adds in
+  parallel, so the two merge as a union.'

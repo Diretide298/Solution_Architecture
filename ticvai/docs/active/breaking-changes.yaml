@@ -475,3 +475,16 @@ changes:
     tag: r4
     producer-tickets: [SVC-ACCESS-ACCESS-63]
     consumer-tickets: [VM-BO-348, TEST-AM-ADMISSION-ACCESS-P08-7]
+  - id: BC-040
+    contract: marketing-crm
+    operation: recordConsent
+    change: "x-ticvai-permission changed None -> \"GUEST_MANAGE\""
+    reason: >-
+      A staff caller recording a guest's consent (POS-027 at the till, BO-748) must hold GUEST_MANAGE, as the operation's
+      own description always said; it declared no permission, so the declared contract read as "the caller's own
+      consent only" and check-subject failed both staff screens (CHG-R6-044). A guest still records their own with no
+      permission under x-ticvai-self-scoped: subject. A permission change cannot be made additive.
+    approved-by: 'Chinmay Parab, 12 October 2026 ("Approve (Recommended)": staff need GUEST_MANAGE to record a guest''s consent; a guest still records their own)'
+    tag: r4
+    producer-tickets: [SVC-MARKETING-CONSENT-3]
+    consumer-tickets: [APP-POS-POS-027, VM-BO-748, APP-WEB-WEB-020, APP-WEB-WEB-024, APP-MOB-GST-039, APP-MOB-GST-066]

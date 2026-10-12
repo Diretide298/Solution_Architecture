@@ -1,0 +1,51 @@
+id: CHG-R6-046
+date: '2026-10-12'
+source: audit
+kind: spec
+proposed: '2026-10-12'
+summary: F164 step 10 and its Block A brief frame are drawn on BO-087 Approval Delegations, not on ADM-243, which was merged
+  into it; check-flow-briefs refuses a Block A frame on a merged screen.
+decision:
+  what: 'flows/F164 step 10: screen ADM-243 -> BO-087, the action naming the ADM-243 section. handoff/flow-briefs/platform-foundation.yaml
+    F164: the input source, the processing step, the output (with BO-087''s states) and frame 2 name BO-087, and
+    listApprovalDelegations loses its "(not Block A)" mark (BO-087 is a Block A screen). tools/check-flow-briefs.py: a
+    frame marked block A on a screen whose notes lead with "Merged into X" (ticket_done.MERGED_NOTE) is an error.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'N10 of the lead''s list of 12 October 2026, a finding: "F164: a Block A step with no Block A screen". ADM-243 was merged
+  into BO-087 as a section (CHG-MOV-002, CHG-FXP-002), so no Block A task builds ADM-243 and the brief''s Block A frame
+  pointed at a screen nobody draws. Chinmay approved the repoint on 12 October 2026.'
+keys_touched:
+  screens:
+  - BO-087
+  - ADM-243
+  flows:
+  - F164
+  operations:
+  - listApprovalDelegations
+  - createApprovalDelegation
+  files:
+  - flows/F164-rules-workflow-approval-automation-engine-board-1-rules-work.yaml
+  - handoff/flow-briefs/platform-foundation.yaml
+  - tools/check-flow-briefs.py
+root_class: 'A-FLOW-SCREEN (a flow step on a merged screen)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; Chinmay's answer of 12 October 2026 on N10)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-flow-briefs.py
+status: open
+notes: 'Batch R6, 12 October 2026. The new rule fails on the brief before this change (F164 steps[1] on ADM-243) and
+  passes after; it finds no other Block A frame on a merged screen (F156''s frame on ADM-158, merged into BO-010, has no
+  block mark and is left to the lead). F164 runs on Venue Management only, so the Block A closure is unchanged and no
+  ticket moves.'

@@ -6672,7 +6672,7 @@
   ],
   "routing": "",
   "scope": "venue",
-  "perm": null,
+  "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Record a consent decision",
   "source": "path-inferred",
@@ -77447,6 +77447,79 @@
    "staff"
   ],
   "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "archiveEntitlementTemplate": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/entitlement-templates/{templateId}/archive",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [
+   "catalogue.entitlement_template"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Archive an entitlement template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getEntitlementTemplate": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/entitlement-templates/{templateId}",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Read an entitlement template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateEntitlementTemplate": {
+  "contract": "catalogue",
+  "verb": "PATCH",
+  "path": "/entitlement-templates/{templateId}",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [
+   "catalogue.entitlement_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Update an entitlement template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
   "stores": [
    "postgres",
    "redis"
