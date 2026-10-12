@@ -156,7 +156,7 @@ const names = (list.result?.tools ?? []).map((t) => t.name).sort();
 const want = ['adam_apply', 'adam_board', 'adam_changes', 'adam_check_batch', 'adam_contract',
   'adam_decisions', 'adam_draft_change', 'adam_file', 'adam_journey', 'adam_link', 'adam_links',
   'adam_module', 'adam_propose', 'adam_pull', 'adam_raise_change', 'adam_repin', 'adam_screen', 'adam_search',
-  'adam_service', 'adam_submit_batch', 'adam_table', 'adam_testing', 'adam_work'];
+  'adam_service', 'adam_submit_batch', 'adam_table', 'adam_team', 'adam_testing', 'adam_work'];
 if (String(names) === String(want)) pass(`${want.length} tools listed: ${names.join(', ')}`);
 else fail(`${want.length} tools listed`, `got ${names.join(', ') || '(none)'}`);
 
@@ -572,6 +572,23 @@ if (!viewerUp) {
     }
   } else {
     fail('adam_board answers', JSON.stringify(board).slice(0, 250));
+  }
+
+  // The team view: read-only, on the same credential as the board. Somebody
+  // busy in the answer is asked about by first name, the way a developer would.
+  if (!board.needsSetup) {
+    const team = parse(await mcp.send('tools/call', { name: 'adam_team', arguments: {} }));
+    if (Array.isArray(team.rows) && String(team.columns) === 'person,inProgress,open,closed14d,workingOn') {
+      pass(`adam_team answers - ${team.rows.length} people with work`);
+      const busy = team.rows[0]?.person;
+      if (busy) {
+        const first = busy.split(/\s+/)[0];
+        const one = parse(await mcp.send('tools/call', { name: 'adam_team', arguments: { person: first } }));
+        if (one.found && Array.isArray(one.rows)) pass(`adam_team("${first}") - ${one.open} open, ${one.inProgress} in progress`);
+        else if (one.ambiguous && one.candidates?.length > 1) pass(`adam_team("${first}") is ambiguous and lists ${one.candidates.length} names`);
+        else fail(`adam_team("${first}")`, JSON.stringify(one).slice(0, 200));
+      }
+    } else fail('adam_team answers', JSON.stringify(team).slice(0, 250));
   }
 
   // Change requests need no OpenProject credential. The draft is kept and never

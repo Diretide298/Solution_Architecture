@@ -548,7 +548,7 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 20000) -
 
 
 def mine_finished(endpoint: str, token: str, project_id: Optional[int] = None,
-                  limit: int = 50) -> list:
+                  limit: int = 50, assignee: str = "me") -> list:
     """What this person has closed lately, newest first.
 
     **Filtered by status and sorted by date, never filtered by date.** A date
@@ -559,9 +559,13 @@ def mine_finished(endpoint: str, token: str, project_id: Optional[int] = None,
 
     A board that shows only what is left reads as a list of things you have not
     done. What somebody finished this week is the other half of the same board.
+
+    `assignee` is `me` for a person's own board, or an OpenProject user id for
+    the team view (`/api/board/person`), which asks the same question about a
+    teammate with the caller's own token.
     """
     wanted = [
-        {"assignee": {"operator": "=", "values": ["me"]}},
+        {"assignee": {"operator": "=", "values": [str(assignee)]}},
         {"status": {"operator": "c", "values": [""]}},
     ]
     if project_id is not None:
@@ -605,7 +609,7 @@ def build_order_field(endpoint: str, token: str, sample: dict) -> Optional[str]:
 
 
 def mine(endpoint: str, token: str, limit: int = 2000,
-         project_id: Optional[int] = None) -> list:
+         project_id: Optional[int] = None, assignee: str = "me") -> list:
     """
     What is assigned to the owner of this token and still open.
 
@@ -614,15 +618,24 @@ def mine(endpoint: str, token: str, limit: int = 2000,
     user id. `status: o` is the built-in "open" set — asking for every status
     would return the closed ones too, and a board of finished work is not a
     board.
+
+    `assignee` is `me` unless the team view is asking about a teammate, in
+    which case it is their OpenProject user id. Still the caller's token either
+    way, so a teammate's board holds only what the caller may see.
     """
     wanted = [
-        {"assignee": {"operator": "=", "values": ["me"]}},
+        {"assignee": {"operator": "=", "values": [str(assignee)]}},
         {"status": {"operator": "o", "values": [""]}},
     ]
     # Only the project the ADAM package is scheduled in. Without it the board
     # is everything assigned to you anywhere on the instance.
     if project_id is not None:
         wanted.append({"project": {"operator": "=", "values": [str(project_id)]}})
+    return _walk(endpoint, token, wanted, limit)
+
+
+def _walk(endpoint: str, token: str, wanted: list, limit: int) -> list:
+    """Every page of one filtered work package query, in id order, summarised."""
     filters = json.dumps(wanted)
     # **Every page, in id order.** This used to be one page of 100 sorted newest-updated first, so
     # anybody holding more than 100 tickets saw a different 100 each time a comment or a push touched
@@ -647,6 +660,116 @@ def mine(endpoint: str, token: str, limit: int = 2000,
         total = page.get("total")
         if (len(elements) < size or len(found) == before or len(found) >= limit
                 or (isinstance(total, int) and len(found) >= total)):
+            break
+        offset += 1
+    return list(found.values())[:limit]
+
+
+# ── the team view: what a teammate holds, and what everybody has started ──
+#
+# The same questions as the board, asked about somebody else and still asked
+# with the caller's own token, so the answer is never wider than what that
+# person could open in OpenProject themselves. ADAM widens who may ask, not
+# what the answer may contain.
+
+
+def assignable(endpoint: str, token: str, project_id: int) -> list:
+    """The people a ticket in this project could be assigned to, as `{id, name}`.
+
+    OpenProject's own list, so a name typed into "what is X working on" is
+    matched against the project's members rather than against whoever happens
+    to hold a ticket today.
+    """
+    page = call(endpoint, token, f"projects/{project_id}/available_assignees")
+    found = {}
+    for user in page.get("_embedded", {}).get("elements", []):
+        if user.get("id") is not None and user.get("name"):
+            found[user["id"]] = {"id": user["id"], "name": user["name"]}
+    return sorted(found.values(), key=lambda u: u["name"].lower())
+
+
+def in_statuses(endpoint: str, token: str, project_id: int, status_ids: list,
+                limit: int = 5000) -> list:
+    """Every ticket in the project whose status is one of `status_ids`, paged.
+
+    The team view asks for the started statuses by id rather than for "open"
+    and filtering here: a release project's open set is thousands of New
+    tickets, and what has been started is a few dozen.
+    """
+    if not status_ids:
+        return []
+    return _walk(endpoint, token, [
+        {"project": {"operator": "=", "values": [str(project_id)]}},
+        {"status": {"operator": "=", "values": [str(s) for s in status_ids]}},
+    ], limit)
+
+
+def open_counts(endpoint: str, token: str, project_id: int) -> Optional[dict]:
+    """How many open tickets each assignee holds, from one grouped query.
+
+    `{user id or None: {"name", "count"}}`, None being unassigned. Asked with
+    `groupBy=assignee` and a page of one, so the instance does the counting and
+    only the counts come back. None when the instance answered without groups;
+    the caller then counts some other way.
+    """
+    page = call(endpoint, token, "work_packages", {
+        "filters": json.dumps([
+            {"project": {"operator": "=", "values": [str(project_id)]}},
+            {"status": {"operator": "o", "values": [""]}},
+        ]),
+        "groupBy": "assignee",
+        "pageSize": 1,
+    })
+    groups = page.get("groups")
+    if groups is None:
+        groups = (page.get("_embedded") or {}).get("groups")
+    if not isinstance(groups, list):
+        return None
+    found: dict = {}
+    for group in groups:
+        links = (group.get("_links") or {}).get("valueLink") or []
+        uid = _id_from_href(links[0].get("href")) if links else None
+        entry = found.setdefault(uid, {"name": "" if uid is None else (group.get("value") or ""),
+                                       "count": 0})
+        entry["count"] += int(group.get("count") or 0)
+    return found
+
+
+def closed_since(endpoint: str, token: str, project_id: int, since: str,
+                 assignee: Optional[str] = None, limit: int = 2000) -> list:
+    """Closed tickets last changed at or after `since` (an ISO stamp), newest first.
+
+    The window is chosen in Python for the reason `mine_finished` gives: the
+    date operators changed shape across OpenProject versions. Sorted by last
+    change, so the walk stops at the first page that reaches past the window.
+    """
+    wanted = [
+        {"project": {"operator": "=", "values": [str(project_id)]}},
+        {"status": {"operator": "c", "values": [""]}},
+    ]
+    if assignee is not None:
+        wanted.append({"assignee": {"operator": "=", "values": [str(assignee)]}})
+    filters = json.dumps(wanted)
+    found: dict = {}
+    offset, size = 1, 200
+    for _ in range(50):
+        page = call(endpoint, token, "work_packages", {
+            "filters": filters,
+            "pageSize": size,
+            "offset": offset,
+            "sortBy": json.dumps([["updatedAt", "desc"]]),
+        })
+        elements = page.get("_embedded", {}).get("elements", [])
+        before = len(found)
+        reached_past = False
+        for raw in elements:
+            if (raw.get("updatedAt") or "") < since:
+                reached_past = True
+                continue
+            summary = summarise(raw, endpoint, token)
+            found[summary["key"]] = summary
+        if (reached_past or len(elements) < size or len(found) == before
+                or len(found) >= limit):
             break
         offset += 1
     return list(found.values())[:limit]

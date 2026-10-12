@@ -74,6 +74,11 @@ function ensure(id) {
  *  timeline need: dates, an epic, a milestone, a percentage. */
 const USERS = { 'harness-key': 5, 'other-key': 6 };
 
+// Who is who, by OpenProject user id: the names the team view matches a typed
+// name against. 9 holds the epics and the subtasks; 12 holds nothing, so
+// "harness" is ambiguous and the whole-team view has somebody idle in it.
+const NAMES = { 5: 'Harness Person', 6: 'Somebody Else', 9: 'Hrushikant Patkar', 12: 'Harness Tester' };
+
 /** Which user a token belongs to. The whole point of `assignee = me` is that
  *  the answer depends on who is asking, so a stand-in that ignored the
  *  credential would make "a board is only ever your own" untestable. */
@@ -83,7 +88,7 @@ function userOf(req) {
   return USERS[token] ?? 0;
 }
 
-function own(id, { subject, status = 7, done = 0, start, due, parent, version, user = 5, updated, spent, estimate }) {
+function own(id, { subject, status = 7, done = 0, start, due, parent, version, user = 5, updated, spent, estimate, order }) {
   const wp = ensure(String(id));
   wp.subject = subject;
   wp.percentageDone = done;
@@ -95,7 +100,10 @@ function own(id, { subject, status = 7, done = 0, start, due, parent, version, u
   wp.startDate = start ?? null;
   wp.dueDate = due ?? null;
   wp._links.status = { href: `/api/v3/statuses/${status}`, title: STATUSES.find((s) => s.id === status).name };
-  wp._links.assignee = { href: `/api/v3/users/${user}`, title: user === 5 ? 'Harness Person' : 'Somebody Else' };
+  wp._links.assignee = { href: `/api/v3/users/${user}`, title: NAMES[user] ?? 'Somebody Else' };
+  // The line the delivery plan writes at the top of a task, which is where the
+  // build order is read from on a project without the number field.
+  if (order !== undefined) wp.description = { raw: `Build order: #${order}` };
   if (parent) wp._links.parent = { href: `/api/v3/work_packages/${parent}`, title: `Epic ${parent}` };
   if (version) wp._links.version = { href: '/api/v3/versions/1', title: version };
   // When it last changed, which for a closed ticket is when it was closed —
@@ -148,6 +156,12 @@ own(7013, { subject: 'Refund audit: retention window', parent: 7012, user: 9 });
 // Somebody else's, to prove a board is only ever your own.
 own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6, spent: 'PT6H' });
 
+// The team view's: one of Hrushikant's not started yet (New), so "in progress
+// first" has something to put last, and one he closed this week, so his
+// fourteen days are not empty.
+own(7200, { subject: 'Refund reconciliation report', status: 1, parent: 901, user: 9, order: 3 });
+own(7201, { subject: 'Refund API contract tests', status: 12, done: 100, parent: 901, user: 9, updated: day(-3) });
+
 let nextId = 1200;
 const created = [];
 
@@ -187,6 +201,15 @@ createServer(async (req, res) => {
     });
   }
 
+  // Who a ticket in the project can be assigned to: the members the team view
+  // matches a typed name against.
+  const assignees = path.match(/^\/api\/v3\/projects\/(\d+)\/available_assignees$/);
+  if (assignees) {
+    if (assignees[1] !== String(PROJECT.id)) return json(res, 404, { message: 'no such project' });
+    const elements = Object.entries(NAMES).map(([id, name]) => ({ _type: 'User', id: Number(id), name }));
+    return json(res, 200, { total: elements.length, count: elements.length, _embedded: { elements } });
+  }
+
   const types = path.match(/^\/api\/v3\/projects\/(\d+)\/types$/);
   if (types) {
     if (types[1] !== String(PROJECT.id)) return json(res, 404, { message: 'no such project' });
@@ -211,6 +234,11 @@ createServer(async (req, res) => {
       if (field === 'assignee' && spec.values?.includes('me')) {
         const me = userOf(req);
         rows = rows.filter((wp) => (wp._links?.assignee?.href ?? '') === `/api/v3/users/${me}`);
+      } else if (field === 'assignee' && spec.operator === '=') {
+        // By user id, which is how the team view asks about somebody else.
+        rows = rows.filter((wp) => spec.values.some((v) => (wp._links?.assignee?.href ?? '') === `/api/v3/users/${v}`));
+      } else if (field === 'status' && spec.operator === '=') {
+        rows = rows.filter((wp) => spec.values.some((v) => (wp._links?.status?.href ?? '').endsWith(`/${v}`)));
       } else if (field === 'status' && spec.operator === 'o') {
         rows = rows.filter((wp) => !closedOf(wp));
       } else if (field === 'status' && spec.operator === 'c') {
@@ -224,8 +252,24 @@ createServer(async (req, res) => {
     // `offset` is OpenProject's page number, from 1.
     const from = (Math.max(1, Number(url.searchParams.get('offset') ?? 1)) - 1) * size;
     const page = rows.slice(from, from + size);
+    // `groupBy=assignee`: the instance counts every matching row per assignee,
+    // whatever the page size, and says so under `groups` (OpenProject 10's
+    // shape: the name as `value`, the user under `_links.valueLink`).
+    let groups;
+    if (url.searchParams.get('groupBy') === 'assignee') {
+      const by = new Map();
+      for (const wp of rows) {
+        const href = wp._links?.assignee?.href ?? '';
+        const held = by.get(href) ?? { value: wp._links?.assignee?.title ?? null, count: 0,
+          _links: { valueLink: href ? [{ href }] : [] } };
+        held.count += 1;
+        by.set(href, held);
+      }
+      groups = [...by.values()].map((g) => ({ _type: 'Group', ...g }));
+    }
     return json(res, 200, {
       total: rows.length, count: page.length, pageSize: size,
+      ...(groups ? { groups } : {}),
       _embedded: { elements: page },
     });
   }

@@ -146,7 +146,7 @@ async function handle(message) {
           + 'the status change and a comment, show the person, and adam_apply only after they say yes. '
           + 'If the package contradicts itself or lacks what the ticket needs, do not settle it in code: '
           + 'check adam_changes, then adam_draft_change, show the draft, and adam_raise_change only '
-          + 'after they say yes.',
+          + 'after they say yes. To see what a teammate or the whole team is working on, adam_team (read-only).',
       });
     }
 
