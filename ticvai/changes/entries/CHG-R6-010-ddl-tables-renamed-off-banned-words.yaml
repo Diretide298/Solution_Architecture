@@ -1,0 +1,120 @@
+id: CHG-R6-010
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'Eleven tables the derived DDL named with words naming-and-style bans in DDL are renamed at the generator:
+  Hold becomes reservation, channel_allocation becomes channel_envelope, and the plural rule tables become singular. A
+  declared rename now reaches migration-review.md as a rename, not as a new table beside the old one.'
+decision:
+  what: 'Rename at the generator, database names only (CR-011, option 1). seating.seat_hold -> seating.seat_reservation,
+    seating.seat_hold_item -> seating.seat_reservation_item, wallet.hold -> wallet.fund_reservation,
+    catalogue.inventory_hold -> catalogue.inventory_reservation, resources.resource_hold -> resources.resource_reservation,
+    catalogue.channel_allocation -> catalogue.channel_envelope, seating.recommendation_rules -> seating.recommendation_rule,
+    wallet.channel_rules/funding_rules/transfer_rules -> wallet.channel_rule/funding_rule/transfer_rule, wallet.risk_rules ->
+    wallet.risk_rule_set. Declared in tools/derive-schema-history.py RENAMES; the x-ticvai-persistence and
+    x-ticvai-references tags, the contract prose naming the tables and handoff/api-data-lineage.json repointed by
+    tools/applied/ddl-names-12-october.py. Keys that name a renamed table follow it with x-ticvai-column
+    (seat_reservation_id, inventory_reservation_id, resource_reservation_id, fund_reservation_id, risk_rule_set_id), and
+    the new COLUMN_RENAMES list declares them. wallet.hold.wallet_hold_id was a second identity beside the surrogate id
+    (the wire''s walletHoldId is the row''s id, /wallet-holds/{walletHoldId}) and is stored as id. Generator:
+    tools/ddl_forward.py takes the declared renames (a "table renamed" or "column renamed" row with the ALTER ... RENAME,
+    and an "after rename" row listing the generated names its indexes, constraints and policy take);
+    tools/derive-schema.py reads a stale relationship graph under the new names. Contract wire names and enum values
+    unchanged.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-011, raised by the backend developer: naming-and-style 3.3 says code, contracts and DDL never
+  take a banned word unless a row allows it, and the generated tenant DDL carried Hold, Allocation and plural table names
+  into every migration that copies it. Chinmay approved option 1 on 12 October 2026 (rename at the generator, x-ticvai-column
+  where a field keeps its wire name). Without the rename-aware forward migration, frozen mode would have created each
+  renamed table empty beside the old one.'
+keys_touched:
+  tables:
+  - seating.seat_reservation
+  - seating.seat_reservation_item
+  - wallet.fund_reservation
+  - catalogue.inventory_reservation
+  - resources.resource_reservation
+  - catalogue.channel_envelope
+  - seating.recommendation_rule
+  - wallet.channel_rule
+  - wallet.funding_rule
+  - wallet.risk_rule_set
+  - wallet.transfer_rule
+  - orders.order_line
+  - orders.cart_line
+  - orders.reservation_line
+  - wallet.wallet_transaction
+  - platform.wallet_authorisation
+  - wallet.risk_rule
+  files:
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/cross-region.yaml
+  - handoff/api-data-lineage.json
+  - handoff/schema-reference.json
+  - tools/derive-schema-history.py
+  - tools/derive-schema.py
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/applied/ddl-names-12-october.py
+  - tools/check-ddl-conventions.py
+  - tools/check-parameter-columns.py
+  - tools/check-doc-tables.py
+  - tools/check-package.py
+  - tools/derive-burst-scope.py
+  - tools/derive-table-notes.py
+  - handoff/schema-history.json
+  - handoff/burst-model.js
+  - handoff/service-sections.json
+  - handoff/Burst Simulator.dc.html
+  - docs/adr/0031-contention-and-locking.md
+  - docs/adr/0036-burst-cell-database-segregation.md
+  - docs/adr/0038-cell-is-a-region-database-per-tenant.md
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - docs/active/action-register-22-september.md
+  - docs/active/adr-0038-implementation-log.md
+  - docs/active/full-layer-audit-20aug.md
+  - docs/active/three-deployment-scenarios.md
+  - docs/active/workshop-pack-write-decisions.md
+  tickets:
+  - MIG-SEATING
+  - MIG-WALLET
+  - MIG-CATALOGUE
+  - MIG-RESOURCES
+  - MIG-ORDERS
+  - MIG-PLATFORM
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-011 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. The baseline is frozen at r1, so every rename is listed in handoff/migration-review.md
+  for the developer ("table renamed", "column renamed", "after rename", "index after rename", "constraint after rename")
+  and none is generated; V0102 gains nothing from it. check-ddl-conventions D-RENAME-APPLIED fails on a declared rename
+  the schema reference does not show, and D-BANNED-NAME on a banned word the DDL takes after r1 (CHG-R6-012). Not
+  renamed, because CR-011 did not list them: seating.hold_pool, seating.hold_type, marketing.legal_hold,
+  orders.reservation_hold_policy and the hold_* time columns; r1 already has them, so D-BANNED-NAME does not fail on
+  them. Started MIG tickets are not rewritten: the rename is a forward migration. Swept with the rename: the table names
+  hardcoded as lookups in tools (check-package CURRENCY_OK, derive-burst-scope, derive-table-notes) and the burst model,
+  the documents check-doc-tables --fix rewrote (renames-26-august.md exempted: a record of the August rename), and
+  check-parameter-columns, which now lets a renamed table answer to the wire''s old name (getSeatHold keeps holdId).
+  tools/derive-schema.py also reads a field''s x-ticvai-references itself, so one refresh with last run''s graph keeps
+  every contract declaration (it used to take two).'

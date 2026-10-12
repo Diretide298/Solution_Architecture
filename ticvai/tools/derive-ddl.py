@@ -269,9 +269,20 @@ SHARED_SCOPE = {
 # at the tenant root. Each entry here is that decision, made. `catalogue.product_media` is a product's
 # photo (the rows of `Product.media[]`, so `product_id` is its parent key); `asset_id -> assets.media_asset`
 # names what the photo shows and does not own it. `inventory.quotation_line` and `reporting.dashboard_tile`
-# have the same shape and are not decided here.
+# had the same shape (CHG-R6-013, 12 October 2026): a quotation's line is the rows of `Quotation.lines[]`
+# (`quotation_id`), and `item_id -> inventory.inventory_item` names what is quoted; a dashboard's tile is
+# the rows of `Dashboard.tiles[]` (`dashboard_id`), and `report_id -> reporting.report_definition` names
+# what the tile shows. Each follows its parent.
 ROW_OWNER = {
     "catalogue.product_media": "product_id",   # CHG-R6-005 (CR-009)
+    "inventory.quotation_line": "quotation_id",   # CHG-R6-013
+    "reporting.dashboard_tile": "dashboard_id",   # CHG-R6-013
+    # CHG-R6-015 (ADAM CR-013): declaring `location_id -> inventory.location` gave these a second protected
+    # owner. A stock row follows its inventory item, as the movement did at r1 (and the serialised item and the
+    # count line do); a goods receipt follows its purchase order, as at r1.
+    "inventory.movement": "item_id",              # CHG-R6-015
+    "inventory.stock_earmark": "item_id",         # CHG-R6-015
+    "inventory.goods_receipt": "purchase_order_id",   # CHG-R6-015
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -527,8 +538,12 @@ $$;
 # **Listed, not inferred.** Which tables are append-only trails that every scope writes is a decision
 # per table (a venue reading another venue's trail is the risk this keeps out); the list is short and
 # each entry names its change.
+# `identity.authz_audit` (CHG-R6-014, 12 October 2026) is the second: every authorisation decision a
+# principal's request takes is appended there, venue-scoped principals included, and it sat at the tenant
+# root under `apply_tenant_rls` for the same reason `platform.audit_record` did.
 APPEND_AUDIT = {
     "platform.audit_record",   # CHG-R6-002 (CR-005)
+    "identity.authz_audit",    # CHG-R6-014
 }
 
 RLS_APPEND_AUDIT = """
@@ -1107,6 +1122,28 @@ def key_of(table: str, cols: dict) -> str | None:
     return None
 
 
+def declared_renames() -> dict:
+    """The renames declared in `tools/derive-schema-history.py`: `RENAMES` (tables) and `COLUMN_RENAMES`
+    (columns, by the table's name now), read from its source so importing it runs nothing (CHG-R6-010).
+    Frozen mode hands them to ddl_forward, so a renamed table or column reaches migration-review.md as a
+    rename rather than as a new table or column beside the old one."""
+    import ast
+    out = {"tables": {}, "columns": {}}
+    try:
+        tree = ast.parse((ROOT / "tools" / "derive-schema-history.py").read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):
+        return out
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        names = {getattr(t, "id", None) for t in node.targets}
+        if "RENAMES" in names:
+            out["tables"] = {r["from"]: r["to"] for r in ast.literal_eval(node.value)}
+        if "COLUMN_RENAMES" in names:
+            out["columns"] = {(r["table"], r["from"]): r["to"] for r in ast.literal_eval(node.value)}
+    return out
+
+
 def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     """After r1: leave every baseline `.sql` file as it is and write the difference as a forward migration.
 
@@ -1130,6 +1167,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     safe_tag = re.sub(r"[^\w]+", "_", tag).strip("_") or "baseline"
 
     plans, extra = [], []
+    renames = declared_renames()
     for area_dir in (CONTROL, "tenant"):
         old, new = ddl_forward.Model(), ddl_forward.Model()
         for path in sorted(ls_tree(commit, f"backend/{area_dir}")):
@@ -1143,7 +1181,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                 old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
         for name in sorted(n for n in files if n.startswith(area_dir + "/") and n.endswith(".sql")):
             new.add_file(files[name])
-        plans.append(ddl_forward.diff(area_dir, old, new))
+        plans.append(ddl_forward.diff(area_dir, old, new, renames))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):

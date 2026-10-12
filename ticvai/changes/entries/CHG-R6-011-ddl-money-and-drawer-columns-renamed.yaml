@@ -1,0 +1,89 @@
+id: CHG-R6-011
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The bare money columns CR-011 lists take their naming-and-style 5.1 names (list_price for an entered price,
+  *_amount otherwise), and cash_drawer_limit becomes deposit_box_limit_amount, typed numeric(18,4) as the Money it is.
+  The contract fields keep their wire names.'
+decision:
+  what: 'x-ticvai-column on the contract fields, declared in tools/derive-schema-history.py COLUMN_RENAMES:
+    catalogue.price.amount and seating.seat_price_band.amount -> list_price; seating.seat_reservation_item.held_price ->
+    gross_amount; wallet.wallet.balance and wallet.gift_card.balance -> balance_amount; wallet.gift_card.face_value ->
+    face_value_amount; wallet amounts -> transaction_amount (wallet_transaction), adjustment_amount (adjustment),
+    disputed_amount (dispute), settled_amount (exit_settlement); wallet.fund_reservation.wallet_hold_amount ->
+    reserved_amount and wallet_hold_status -> status; platform.workstation and platform.venue_settings cash_drawer_limit ->
+    deposit_box_limit_amount; catalogue.channel_envelope.allocation_type -> envelope_type (its values, sharedPool among
+    them, are wire values and stay). tools/derive-schema.py reads a one-member oneOf as its member, so cashDrawerLimit
+    (oneOf: [Money]) is numeric(18,4) instead of text.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-011: naming-and-style 5.1 says never price, value or total alone, an entered price is list_price, and
+  drawer is staff copy only (3.3); the derived DDL had amount, balance, face_value, held_price and cash_drawer_limit
+  (text). Chinmay approved option 1 on 12 October 2026, with x-ticvai-column where the field keeps its wire name, the
+  mechanism of the 27 money columns of 24 September (handoff/money-column-names.md).'
+keys_touched:
+  tables:
+  - catalogue.price
+  - seating.seat_price_band
+  - seating.seat_reservation_item
+  - wallet.wallet
+  - wallet.gift_card
+  - wallet.wallet_transaction
+  - wallet.adjustment
+  - wallet.dispute
+  - wallet.exit_settlement
+  - wallet.fund_reservation
+  - platform.workstation
+  - platform.venue_settings
+  - catalogue.channel_envelope
+  schemas:
+  - catalogue.Price
+  - seating.SeatPriceBand
+  - seating.SeatingSeatHoldItem
+  - wallet.Wallet
+  - wallet.GiftCard
+  - wallet.WalletTransaction
+  - wallet.WalletAdjustment
+  - wallet.WalletDispute
+  - wallet.WalletExitSettlement
+  - wallet.WalletHold
+  - tenancy.Workstation
+  - tenancy.VenueSettings
+  - catalogue.ChannelAllocation
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/wallet.yaml
+  - handoff/schema-reference.json
+  - tools/derive-schema.py
+  - tools/derive-schema-history.py
+  tickets:
+  - MIG-CATALOGUE
+  - MIG-SEATING
+  - MIG-WALLET
+  - MIG-PLATFORM
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-011 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. Every rename is a "column renamed" row in handoff/migration-review.md (RENAME COLUMN by
+  hand; the two deposit_box_limit_amount rows also change the type, text -> numeric(18,4), with no data to convert while
+  the client has set no limit). Names chosen by the agent and open to correction: held_price -> gross_amount (the seat''s
+  share of seat_reservation.gross_amount), the wallet *_amount names, allocation_type -> envelope_type (CR-011 named the
+  table; Allocation is the banned synonym of Envelope). check-ddl-conventions D-BANNED-NAME fails on a bare money name a
+  table takes after r1.'

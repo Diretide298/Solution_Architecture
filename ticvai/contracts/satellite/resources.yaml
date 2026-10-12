@@ -3841,7 +3841,7 @@ components:
           format: uuid
           nullable: true
     ResourceHold:
-      x-ticvai-persistence: resources.resource_hold
+      x-ticvai-persistence: resources.resource_reservation
       type: object
       description: '**A guest''s pick on the map, held while they pay** (decided 29 September, rev 3
         REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted

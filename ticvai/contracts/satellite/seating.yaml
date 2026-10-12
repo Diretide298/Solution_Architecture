@@ -2965,7 +2965,7 @@ components:
           format: date-time
     SeatingSeatHoldItem:
       type: object
-      x-ticvai-persistence: seating.seat_hold_item
+      x-ticvai-persistence: seating.seat_reservation_item
       description: '**Taken from the backend workbook, 20 September.** Stores each individual seat included in a temporary seat hold.'
       required:
       - holdId
@@ -2976,13 +2976,15 @@ components:
           type: string
           format: uuid
         holdId:
+          x-ticvai-column: seat_reservation_id
           type: string
           format: uuid
-          x-ticvai-references: seating.seat_hold
+          x-ticvai-references: seating.seat_reservation
         seatId:
           type: string
           format: uuid
         heldPrice:
+          x-ticvai-column: gross_amount
           type: number
           nullable: true
         createdAt:
@@ -3396,7 +3398,7 @@ components:
           nullable: true
     SeatRecommendationRules:
       type: object
-      x-ticvai-persistence: seating.recommendation_rules
+      x-ticvai-persistence: seating.recommendation_rule
       description: 'Board 9, and the 21 August minute: *"best-seat ranking… must be configurable per
         seat map/event."* **Five kinds, one scoring model** — five algorithms would eventually
         contradict each other.
@@ -4024,6 +4026,7 @@ components:
           nullable: true
           pattern: ^#[0-9A-Fa-f]{6}$
         amount:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         channel:
           nullable: true
@@ -4603,7 +4606,7 @@ components:
           type: string
           format: uuid
     SeatHold:
-      x-ticvai-persistence: seating.seat_hold
+      x-ticvai-persistence: seating.seat_reservation
       type: object
       required:
       - id

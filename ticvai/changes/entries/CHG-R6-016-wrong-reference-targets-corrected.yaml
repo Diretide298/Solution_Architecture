@@ -1,0 +1,55 @@
+id: CHG-R6-016
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'Four keys the name rule pointed at the wrong table are corrected: coupon_code.campaign_id ->
+  promotions.coupon_campaign, code_assignment.batch_id -> promotions.coupon_code_batch, and the e-invoicing
+  provider_message_id and participant_id are plain values, not keys into ai.message and rental.participant.'
+decision:
+  what: 'x-ticvai-references: promotions.coupon_campaign on promotions.CouponCode.campaignId and
+    promotions.coupon_code_batch on promotions.CouponCodeAssignment.batchId (declared, so a foreign key). A new value
+    x-ticvai-references: none on finance.FinEInvoiceTransmission.providerMessageId and
+    finance.FinEInvoicingProvider.participantId: tools/derive-relationships.py makes no convention or precedent edge for a
+    field that says it is not a key, so 910 drops their indexes into ai.message and rental.participant.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-013: 910 indexed coupon_code.campaign_id against promotions.campaign (the marketing campaign, not the coupon
+  campaign that issues the code), code_assignment.batch_id against voucher_batch, and two external identifiers of the
+  e-invoicing provider against an AI chat message and a rental participant, because the name rule matched the words.
+  Chinmay approved on 12 October 2026.'
+keys_touched:
+  tables:
+  - promotions.coupon_code
+  - promotions.code_assignment
+  - ledger.einvoice_transmission
+  - ledger.einvoicing_provider
+  files:
+  - contracts/satellite/promotions.yaml
+  - contracts/spine/finance.yaml
+  - tools/derive-relationships.py
+  - handoff/schema-reference.json
+  tickets:
+  - MIG-PROMOTIONS
+  - MIG-LEDGER
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-013 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/derive-relationships.py::contract_declarations
+status: open
+notes: 'Batch R6, 12 October 2026. migration-review.md lists the two new foreign keys ("constraint added": validate
+  existing rows first) and the two dropped indexes (einvoice_transmission_provider_message_id_idx,
+  einvoicing_provider_participant_id_idx). x-ticvai-references: none is a contract extension, not a wire change
+  (check-contract-compat passes).'

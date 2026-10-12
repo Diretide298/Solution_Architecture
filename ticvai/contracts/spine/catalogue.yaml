@@ -3910,7 +3910,7 @@ paths:
 
 
         **The order''s seat holds convert in the same call** (3 October 2026, CHG-R1S-010): each held seat of
-        the order moves to `sold` (`seating.seat_hold`, `seating.seat_hold_item`) and `seat.sold` is written to
+        the order moves to `sold` (`seating.seat_reservation`, `seating.seat_reservation_item`) and `seat.sold` is written to
         the outbox once per seat. Seating belongs to this service, so the seat event is published here and not
         by the order service that called it.
 
@@ -21358,6 +21358,7 @@ components:
           type: string
           format: uuid
         amount:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxCodeId:
           type: string
@@ -21774,7 +21775,7 @@ components:
           type: integer
           minimum: 0
     ChannelAllocation:
-      x-ticvai-persistence: catalogue.channel_allocation
+      x-ticvai-persistence: catalogue.channel_envelope
       type: object
       required:
       - channel
@@ -21820,6 +21821,7 @@ components:
           description: >-
             The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3).
         allocationType:
+          x-ticvai-column: envelope_type
           type: string
           enum:
           - sharedPool
@@ -22260,7 +22262,7 @@ components:
           type: string
           format: date-time
     InventoryHold:
-      x-ticvai-persistence: catalogue.inventory_hold
+      x-ticvai-persistence: catalogue.inventory_reservation
       type: object
       required:
       - id
@@ -23280,7 +23282,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Publication & Activation Scheduler submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
@@ -29816,7 +29818,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Fee Applicability & Charging Rule Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
@@ -31378,7 +31380,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Pricing Approval Workflow & Authority Matrix submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
@@ -35537,7 +35539,7 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today
+        is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What A/B Pricing Experiment Studio submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure

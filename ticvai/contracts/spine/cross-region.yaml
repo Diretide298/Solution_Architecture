@@ -1338,12 +1338,13 @@ components:
           type: string
           nullable: true
         walletHoldId:
+          x-ticvai-column: fund_reservation_id
           type: string
           format: uuid
           description: '**The wallet hold this authorisation refers to** (SD-027): the home cell''s
-            `wallet.hold` row made by `holdWalletFunds`. The balance lives there, once; this row holds no
+            `wallet.fund_reservation` row made by `holdWalletFunds`. The balance lives there, once; this row holds no
             amount of its own beyond the figures echoed for the consuming cell.'
-          x-ticvai-references: wallet.hold
+          x-ticvai-references: wallet.fund_reservation
         createdAt:
           type: string
           format: date-time

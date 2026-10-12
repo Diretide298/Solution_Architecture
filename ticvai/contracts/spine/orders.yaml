@@ -14923,7 +14923,7 @@ components:
           - partner
           - manualEntry
         organisationId:
-          x-ticvai-references: orders.group_customer_organization
+          x-ticvai-references: orders.group_customer_organisation
           type: string
           format: uuid
           nullable: true
@@ -15080,7 +15080,7 @@ components:
               nullable: true
     GroupCustomerOrganizationView:
       type: object
-      x-ticvai-persistence: orders.group_customer_organization + orders.group_customer_organization_contact
+      x-ticvai-persistence: orders.group_customer_organisation + orders.group_customer_organisation_contact
       description: '**The organisation a group buys under.** Saved by `setGroupCustomerOrganization`
         (decided 29 September, readiness close-out); `listGroupCustomerOrganization` is the
         screen''s projection over these.
@@ -15231,6 +15231,7 @@ components:
       - participants
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -15417,16 +15418,16 @@ components:
           format: uuid
           description: The opportunity (`orders.group_enquiry`) this quote answers.
         organisationId:
-          x-ticvai-references: orders.group_customer_organization
+          x-ticvai-references: orders.group_customer_organisation
           type: string
           format: uuid
           nullable: true
         contactId:
-          x-ticvai-references: orders.group_customer_organization_contact
+          x-ticvai-references: orders.group_customer_organisation_contact
           type: string
           format: uuid
           nullable: true
-          description: A contact of the organisation (`orders.group_customer_organization_contact`).
+          description: A contact of the organisation (`orders.group_customer_organisation_contact`).
         salesOwnerPrincipalId:
           type: string
           format: uuid
@@ -15719,7 +15720,7 @@ components:
           maxLength: 500
           nullable: true
         contactId:
-          x-ticvai-references: orders.group_customer_organization_contact
+          x-ticvai-references: orders.group_customer_organisation_contact
           type: string
           format: uuid
           nullable: true
@@ -17520,6 +17521,7 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         reservationId:
@@ -17808,7 +17810,7 @@ components:
       description: '**How long a hold lasts, what it locks, whether it may be extended, and what
         happens when it expires**, per hold type and scope (DM5, 29 September: data model for the
         agreed operations; written by `setReservationHoldPolicy`; MoM 1 Sep 4.11-4.12). The holds
-        themselves stay in `catalogue.inventory_hold`; this is the rule that sets their
+        themselves stay in `catalogue.inventory_reservation`; this is the rule that sets their
         `expiresAt`. Narrowest match wins.'
       required:
       - id
@@ -21258,6 +21260,8 @@ components:
         bookedWindow:
           $ref: '#/components/schemas/BookedWindow'
         inventoryHoldId:
+          x-ticvai-column: inventory_reservation_id
+          x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
           description: Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
@@ -21274,6 +21278,7 @@ components:
             POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder`
             refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`).
         resourceHoldId:
+          x-ticvai-column: resource_reservation_id
           type: string
           format: uuid
           nullable: true
@@ -21497,6 +21502,7 @@ components:
             type: string
             format: uuid
         resourceHoldId:
+          x-ticvai-column: resource_reservation_id
           type: string
           format: uuid
           nullable: true
@@ -21556,6 +21562,8 @@ components:
         lineTotal:
           $ref: ../shared/common.yaml#/components/schemas/Money
         inventoryHoldId:
+          x-ticvai-column: inventory_reservation_id
+          x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
           description: 'The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id
@@ -21967,6 +21975,7 @@ components:
           format: uuid
           description: The client UUIDv7 from `CreateOrderRequest.id`.
         orderNumber:
+          x-ticvai-unique: tenant
           type: string
           readOnly: true
           description: 'The number a guest reads and a cashier types. **Server-assigned: the venue prefix and
@@ -22441,6 +22450,7 @@ components:
           readOnly: true
           description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001).
         amount:
+          x-ticvai-column: refunded_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPercentage:
           type: number
@@ -22613,6 +22623,7 @@ components:
 
             '
         amount:
+          x-ticvai-column: payment_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         changeAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money

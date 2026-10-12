@@ -13,7 +13,7 @@ want the same rows, and the 31 July minute records what that costs: a Bahrain th
 platform went down and the outage cost the client relationship.
 
 **The package already decided the shape.** CF-115 settled that contended inventory is leased rather
-than reserved, and `catalogue.inventory_hold` and `seating.seat_hold` are the tables. **What it
+than reserved, and `catalogue.inventory_reservation` and `seating.seat_reservation` are the tables. **What it
 never said is how the lease is taken.**
 
 **Nothing in 1,025 operations declares a locking strategy.** Every write carries an idempotency key
@@ -37,8 +37,8 @@ to prevent it is the wrong trade.
 **Four operations take a row lock**, declared as `x-ticvai-lock: rowExclusive`:
 
 ```
-acquireInventoryHold      catalogue.inventory_hold
-createSeatHold            seating.seat_hold
+acquireInventoryHold      catalogue.inventory_reservation
+createSeatHold            seating.seat_reservation
 captureStoredValue        orders.stored_value_authorisation
 authoriseWalletSpend      platform.wallet_authorisation
 ```

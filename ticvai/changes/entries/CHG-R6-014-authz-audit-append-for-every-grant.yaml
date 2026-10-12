@@ -1,0 +1,44 @@
+id: CHG-R6-014
+date: '2026-10-12'
+source: cr
+kind: spec
+proposed: '2026-10-12'
+summary: 'identity.authz_audit, the second append-only audit trail at the tenant root, takes apply_append_audit_rls: any
+  connection holding a grant may insert, and only the tenant root reads, updates or deletes.'
+decision:
+  what: 'tools/derive-ddl.py APPEND_AUDIT gains identity.authz_audit beside platform.audit_record (CHG-R6-002). 920 applies
+    platform.apply_append_audit_rls to it (four policies: _append FOR INSERT for any grant, _read, _update and _delete at
+    the tenant root) instead of apply_tenant_rls.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'CHG-R6-002 (ADAM CR-005) noted that identity.authz_audit has the same shape and was not part of that decision: it has
+  no scope column and no protected owner, so SD-015 put it under apply_tenant_rls, and a venue-scoped principal whose
+  request is authorised and audited fails the tenant-root WITH CHECK on the audit insert. Chinmay decided on 12 October
+  2026 to add it to APPEND_AUDIT.'
+keys_touched:
+  tables:
+  - identity.authz_audit
+  files:
+  - tools/derive-ddl.py
+  tickets:
+  - MIG-IDENTITY
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-005 (ADAM), follow-up
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::APPEND_AUDIT
+status: open
+notes: 'Batch R6, 12 October 2026. derive-ddl now reports 2 append-only audit tables. The policy switch touches an existing
+  table, so migration-review.md lists it ("statement dropped" apply_tenant_rls, "statement added"
+  apply_append_audit_rls for identity.authz_audit); the function itself is in V0102 with CHG-R6-002.'

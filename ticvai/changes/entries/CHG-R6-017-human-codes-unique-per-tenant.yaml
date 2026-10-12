@@ -1,0 +1,57 @@
+id: CHG-R6-017
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: 'The human codes CR-013 lists are unique per tenant: order number, inventory item SKU, ledger account code, tax
+  code, journal entry number, tax invoice number and credit memo number.'
+decision:
+  what: 'x-ticvai-unique: tenant on orders.Order.orderNumber (orders.sales_order.order_number),
+    inventory.CreateInventoryItemRequest.sku (inventory.inventory_item.sku), finance.Account.code (ledger.account.code),
+    finance.TaxCode.code (ledger.tax_code.code), finance.JournalEntry.entryNumber (ledger.journal_entry.entry_number),
+    finance.FinTaxInvoice.invoiceNumber (ledger.tax_invoice.invoice_number) and finance.FinCreditMemo.creditMemoNumber
+    (ledger.credit_memo.credit_memo_number). derive-ddl writes <table>_<column>_uniq (partial, WHERE NOT NULL, on the
+    nullable order_number).'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-013: nothing stopped two orders, invoices or journal entries carrying one number, or two accounts, tax codes
+  or SKUs one code, in a tenant; a human code is what people type and read, so a duplicate is a wrong row found. Chinmay
+  approved on 12 October 2026. Column and table names verified in handoff/schema-reference.json.'
+keys_touched:
+  tables:
+  - orders.sales_order
+  - inventory.inventory_item
+  - ledger.account
+  - ledger.tax_code
+  - ledger.journal_entry
+  - ledger.tax_invoice
+  - ledger.credit_memo
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/finance.yaml
+  - contracts/satellite/inventory.yaml
+  tickets:
+  - MIG-ORDERS
+  - MIG-INVENTORY
+  - MIG-LEDGER
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-013 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::table_marks
+status: open
+notes: 'Batch R6, 12 October 2026. Six indexes are additive and go into V0102 (existing duplicates would make them fail:
+  check before applying); inventory_item_sku_uniq waits for the inventory.item rename and is listed under it in
+  migration-review.md. Per tenant means over the column alone: one tenant per database (ADR-0039). If the ledger codes
+  should be unique per legal entity instead, that is a new decision.'

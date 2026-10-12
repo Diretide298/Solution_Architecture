@@ -454,7 +454,7 @@
   "verb": "GET",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "reads": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "writes": [],
   "routing": "primary",
@@ -478,11 +478,11 @@
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "routing": "",
   "scope": "venue",
@@ -612,7 +612,7 @@
   "verb": "GET",
   "path": "/inventory-holds",
   "reads": [
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -635,16 +635,16 @@
   "path": "/inventory-holds",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": "",
   "scope": "workstation",
@@ -671,12 +671,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": "",
   "scope": "workstation",
@@ -701,12 +701,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -730,7 +730,7 @@
   "path": "/availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -2173,7 +2173,7 @@
   "verb": "POST",
   "path": "/payments",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
@@ -2183,7 +2183,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -2282,7 +2282,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -2350,14 +2350,14 @@
   "verb": "POST",
   "path": "/sync/orders",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.price_list",
    "catalogue.variant",
    "orders.sales_order"
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.price_variance",
    "orders.order_line",
    "orders.order_line_discount",
@@ -10048,7 +10048,7 @@
    "fnb.recipe",
    "fnb.recipe_ingredient",
    "fnb.substitution_rule",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -10553,7 +10553,7 @@
   "reads": [
    "seating.seat",
    "seating.seat_category",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -10577,12 +10577,12 @@
   "path": "/seat-holds",
   "reads": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -10607,7 +10607,7 @@
   "verb": "GET",
   "path": "/seat-holds/{holdId}",
   "reads": [
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -10630,11 +10630,11 @@
   "path": "/seat-holds/{holdId}/extend",
   "reads": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -10710,11 +10710,11 @@
   "path": "/seat-blocks/{blockId}/allocate",
   "reads": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -10788,12 +10788,12 @@
   "reads": [
    "catalogue.performance",
    "seating.accessible",
-   "seating.recommendation_rules",
+   "seating.recommendation_rule",
    "seating.seat",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_price_band"
   ],
   "writes": [],
@@ -10820,7 +10820,7 @@
   "verb": "GET",
   "path": "/inventory-items",
   "reads": [
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -10843,11 +10843,11 @@
   "path": "/inventory-items",
   "reads": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -10869,7 +10869,7 @@
   "verb": "GET",
   "path": "/inventory-items/{itemId}",
   "reads": [
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -10892,11 +10892,11 @@
   "path": "/inventory-items/{itemId}",
   "reads": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -10918,7 +10918,7 @@
   "verb": "GET",
   "path": "/inventory-items/lookup",
   "reads": [
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -10940,10 +10940,10 @@
   "verb": "GET",
   "path": "/stock",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [],
   "routing": "primary",
@@ -11016,7 +11016,7 @@
   "verb": "GET",
   "path": "/stock/valuation",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement",
    "ledger.account"
   ],
@@ -12622,13 +12622,13 @@
   "reads": [
    "cache:idempotency",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "retail.reservation",
    "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "retail.reservation",
    "retail.reservation_line"
   ],
@@ -12962,13 +12962,13 @@
   "path": "/work-orders/{workOrderId}/parts",
   "reads": [
    "cache:idempotency",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order"
   ],
   "writes": [
    "cache:idempotency",
    "inventory.movement",
-   "inventory.stock_reservation",
+   "inventory.stock_earmark",
    "maintenance.work_order"
   ],
   "routing": "",
@@ -19546,7 +19546,7 @@
   "path": "/carts/{cartId}",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19580,7 +19580,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart"
   ],
   "routing": "",
@@ -19648,7 +19648,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart_line"
   ],
   "routing": "",
@@ -19680,7 +19680,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart_line"
   ],
   "routing": "",
@@ -19705,7 +19705,7 @@
   "path": "/carts/{cartId}/extend",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19713,7 +19713,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart"
   ],
   "routing": "",
@@ -19768,7 +19768,7 @@
   "verb": "POST",
   "path": "/carts/{cartId}/checkout",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "marketing.consent_question",
    "orders.cart",
    "orders.cart_line",
@@ -20004,7 +20004,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.waitlist_entry"
   ],
   "routing": "",
@@ -22868,7 +22868,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [],
   "routing": "replica",
@@ -22896,7 +22896,7 @@
    "cache:idempotency",
    "resources.booking",
    "resources.resource",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.selection_policy"
   ],
   "writes": [
@@ -24000,13 +24000,13 @@
    "cache:idempotency",
    "catalogue.price",
    "seating.seat",
-   "seating.seat_hold",
+   "seating.seat_reservation",
    "seating.seating_rules"
   ],
   "writes": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -24299,7 +24299,7 @@
   "verb": "GET",
   "path": "/stock-batches/expiring",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.stock_batch"
   ],
   "writes": [],
@@ -26350,7 +26350,7 @@
   "verb": "GET",
   "path": "/serialised-items",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.serialised_item",
    "inventory.stock_batch"
   ],
@@ -26960,7 +26960,7 @@
   "path": "/stock-counts/{countId}/lines",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.movement"
   ],
   "writes": [
@@ -28013,7 +28013,7 @@
   "path": "/requisitions/{requisitionId}/lines",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.requisition",
    "inventory.requisition_line"
   ],
@@ -28044,7 +28044,7 @@
   "reads": [
    "cache:idempotency",
    "inventory.daily_count_list",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -28086,14 +28086,14 @@
    "cache:idempotency",
    "catalogue.price",
    "catalogue.product",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "catalogue.price",
    "catalogue.product",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -28114,7 +28114,7 @@
    "role": "evicts",
    "resolvers": [
     "catalogue.product",
-    "inventory.item",
+    "inventory.inventory_item",
     "price-list"
    ],
    "key": "res:{tenantId}:{resolver}:{scopePath}",
@@ -28285,7 +28285,7 @@
    "fnb.recipe",
    "fnb.recipe_ingredient",
    "fnb.substitution_rule",
-   "inventory.item"
+   "inventory.inventory_item"
   ],
   "writes": [
    "fnb.allergen_verdict"
@@ -28484,7 +28484,7 @@
   "path": "/stock-transfers/{transferId}",
   "reads": [
    "fnb.cold_chain_event",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.transfer",
    "inventory.transfer_line"
   ],
@@ -31504,7 +31504,7 @@
   "path": "/bundle-availability-forecast",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.sales_order",
    "promotions.bundle",
@@ -31695,7 +31695,7 @@
   "verb": "GET",
   "path": "/buyer-checkout-inventory",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "orders.resale_listing",
@@ -31955,7 +31955,7 @@
   "path": "/capacity-pool-reservation",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle",
    "promotions.bundle_capacity_policy",
    "promotions.bundle_component"
@@ -31975,7 +31975,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Reservations from catalogue.inventory_hold/channel_capacity; capacity source, hard/soft allocation, hold duration, overbooking and waitlist from promotions.bundle_capacity_policy"
+  "lineageNote": "Reservations from catalogue.inventory_reservation/channel_capacity; capacity source, hard/soft allocation, hold duration, overbooking and waitlist from promotions.bundle_capacity_policy"
  },
  "listCapacityReservationInventory": {
   "contract": "orders",
@@ -31983,7 +31983,7 @@
   "path": "/capacity-reservation-inventory",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
@@ -32003,7 +32003,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "commitments = reservation/order lines against catalogue.inventory_hold (expires_at, released_at, force_release_reason) and channel_capacity"
+  "lineageNote": "commitments = reservation/order lines against catalogue.inventory_reservation (expires_at, released_at, force_release_reason) and channel_capacity"
  },
  "listCartTransactionThreshold": {
   "contract": "promotions",
@@ -32116,7 +32116,7 @@
   "path": "/channel",
   "reads": [
    "catalogue.ai_finding",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity"
   ],
   "writes": [],
@@ -32141,10 +32141,10 @@
   "verb": "GET",
   "path": "/channel-allocation-rebalancing",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.event",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -32325,7 +32325,7 @@
   "verb": "GET",
   "path": "/channel-performance-commercial",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.product",
    "catalogue.sales_channel",
@@ -32797,7 +32797,7 @@
   "path": "/component-inventory-availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle_component"
   ],
   "writes": [],
@@ -35436,8 +35436,8 @@
   "path": "/group-customer-organization",
   "reads": [
    "orders.group_booking",
-   "orders.group_customer_organization",
-   "orders.group_customer_organization_contact",
+   "orders.group_customer_organisation",
+   "orders.group_customer_organisation_contact",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.sales_order"
@@ -35464,7 +35464,7 @@
   "verb": "GET",
   "path": "/group-enquiry-opportunity",
   "reads": [
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry"
   ],
   "writes": [],
@@ -35548,7 +35548,7 @@
   "path": "/group-requirement-availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "orders.group_booking",
    "orders.group_enquiry"
@@ -35578,7 +35578,7 @@
    "access.scan_event",
    "orders.discount",
    "orders.group_booking",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_quote",
    "orders.order_line",
@@ -35845,7 +35845,7 @@
   "verb": "GET",
   "path": "/internal-demand-booking",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.event",
    "catalogue.performance",
@@ -35875,9 +35875,9 @@
   "verb": "GET",
   "path": "/inventory-capacity-channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.sales_channel",
    "catalogue.waitlist_entry"
@@ -35897,7 +35897,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DM3: allocation rules are new columns on catalogue.channel_allocation (allocationType, min/max, replenishment, release, waitlist, contractual, frozen) | L2: allocated/sold/held/remaining come from channel_capacity, channel_allocation, inventory_hold (getAvailability neighbour pattern); min/max/replenishment/release rules need catalogue.channel_allocation_rule (missing)"
+  "lineageNote": "DM3: allocation rules are new columns on catalogue.channel_envelope (allocationType, min/max, replenishment, release, waitlist, contractual, frozen) | L2: allocated/sold/held/remaining come from channel_capacity, channel_allocation, inventory_hold (getAvailability neighbour pattern); min/max/replenishment/release rules need catalogue.channel_allocation_rule (missing)"
  },
  "listLearningModelPerformance": {
   "contract": "catalogue",
@@ -37142,7 +37142,7 @@
   "verb": "GET",
   "path": "/order-reservation",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "orders.payment",
    "orders.payment_link",
@@ -38614,7 +38614,7 @@
   "verb": "GET",
   "path": "/product-price-availability",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_sync",
    "catalogue.price",
    "catalogue.product"
@@ -39121,7 +39121,7 @@
   "path": "/real-time-availability",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "promotions.bundle",
    "promotions.bundle_component"
   ],
@@ -39147,10 +39147,10 @@
   "verb": "GET",
   "path": "/real-time-channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.event",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "catalogue.performance"
   ],
   "writes": [],
@@ -39776,7 +39776,7 @@
   "verb": "GET",
   "path": "/reservation-confirmation-expiry",
   "reads": [
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.payment_link",
    "orders.reservation",
    "orders.reservation_line",
@@ -39827,7 +39827,7 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Partner control.partner and allocation source control.partner_allocation with catalogue.performance/product/channel_capacity and control.partner_agreement; hold rows are orders.reservation / catalogue.inventory_hold, reached via their owners' ops."
+  "lineageNote": "Partner control.partner and allocation source control.partner_allocation with catalogue.performance/product/channel_capacity and control.partner_agreement; hold rows are orders.reservation / catalogue.inventory_reservation, reached via their owners' ops."
  },
  "listResidencyNationalityMarket": {
   "contract": "catalogue",
@@ -40083,7 +40083,7 @@
   "verb": "GET",
   "path": "/sale-channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
    "catalogue.price_list",
@@ -41775,7 +41775,7 @@
   "path": "/channel-readiness-validation",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
    "catalogue.channel_sales_rule",
@@ -43144,7 +43144,7 @@
   "reads": [
    "cache:idempotency",
    "orders.group_booking",
-   "orders.group_customer_organization_contact",
+   "orders.group_customer_organisation_contact",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -43242,7 +43242,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.price",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_quote",
    "orders.group_quote_line"
@@ -43629,7 +43629,7 @@
    "access.entitlement",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.after_sale_policy",
    "orders.after_sale_request",
    "orders.order_line",
@@ -44411,7 +44411,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "saves an orders.reservation_hold_policy row (hold type, scope qualifiers, duration, locked capacity, on-expiry actions, extension rules); the holds themselves stay in catalogue.inventory_hold; IdempotencyKey"
+  "lineageNote": "saves an orders.reservation_hold_policy row (hold type, scope qualifiers, duration, locked capacity, on-expiry actions, extension rules); the holds themselves stay in catalogue.inventory_reservation; IdempotencyKey"
  },
  "setRfidNfc": {
   "contract": "access",
@@ -45196,7 +45196,7 @@
   "verb": "GET",
   "path": "/channel",
   "reads": [
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
    "catalogue.channel_connection",
    "catalogue.channel_incident",
@@ -45229,7 +45229,7 @@
   "path": "/dynamic-bundle",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.order_line",
    "promotions.bundle",
    "promotions.bundle_component"
@@ -45286,7 +45286,7 @@
   "path": "/group-sale",
   "reads": [
    "orders.group_booking",
-   "orders.group_customer_organization",
+   "orders.group_customer_organisation",
    "orders.group_enquiry",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
@@ -45463,11 +45463,11 @@
   "path": "/inventory-holds/{inventoryHoldId}",
   "reads": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "routing": null,
   "scope": "workstation",
@@ -45521,11 +45521,11 @@
   "verb": "DELETE",
   "path": "/seat-holds/{holdId}",
   "reads": [
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "writes": [
    "platform.outbox",
-   "seating.seat_hold"
+   "seating.seat_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -45624,10 +45624,10 @@
   "verb": "POST",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
   "reads": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "writes": [
-   "catalogue.channel_allocation"
+   "catalogue.channel_envelope"
   ],
   "routing": null,
   "scope": "venue",
@@ -45732,8 +45732,8 @@
    "seating.seat",
    "seating.seat_block",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_price_band",
    "seating.seating_rules",
    "seating.section",
@@ -45742,8 +45742,8 @@
   "writes": [
    "cache:idempotency",
    "seating.group_request",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -48239,7 +48239,7 @@
    "resources.resource",
    "resources.resource_block",
    "resources.resource_category",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_schedule",
    "resources.resource_type"
   ],
@@ -48369,8 +48369,8 @@
    "seating.seat_block",
    "seating.seat_block_item",
    "seating.seat_category",
-   "seating.seat_hold",
-   "seating.seat_hold_item",
+   "seating.seat_reservation",
+   "seating.seat_reservation_item",
    "seating.seat_rules"
   ],
   "writes": [],
@@ -48395,7 +48395,7 @@
   "verb": "GET",
   "path": "/seat-recommendation-rules",
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -48420,8 +48420,8 @@
   "reads": [
    "seating.seat",
    "seating.seat_block_item",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -48547,7 +48547,7 @@
   "verb": "GET",
   "path": "/wallet-funding-rules",
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -50465,16 +50465,16 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -51911,7 +51911,7 @@
    "cache:idempotency",
    "seating.group_request",
    "seating.group_request_participant",
-   "seating.seat_hold_item"
+   "seating.seat_reservation_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -53065,10 +53065,10 @@
   "verb": "PUT",
   "path": "/seat-recommendation-rules",
   "reads": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "writes": [
-   "seating.recommendation_rules"
+   "seating.recommendation_rule"
   ],
   "routing": null,
   "scope": "venue",
@@ -53322,10 +53322,10 @@
   "verb": "PUT",
   "path": "/wallet-channel-rules",
   "reads": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "writes": [
-   "wallet.channel_rules"
+   "wallet.channel_rule"
   ],
   "routing": null,
   "scope": "venue",
@@ -53346,10 +53346,10 @@
   "verb": "PUT",
   "path": "/wallet-funding-rules",
   "reads": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "writes": [
-   "wallet.funding_rules"
+   "wallet.funding_rule"
   ],
   "routing": null,
   "scope": "venue",
@@ -53419,11 +53419,11 @@
   "path": "/wallet-risk-rules",
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "routing": null,
   "scope": "tenant",
@@ -53444,10 +53444,10 @@
   "verb": "PUT",
   "path": "/wallet-transfer-rules",
   "reads": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "writes": [
-   "wallet.transfer_rules"
+   "wallet.transfer_rule"
   ],
   "routing": null,
   "scope": "tenant",
@@ -56060,7 +56060,7 @@
   "verb": "GET",
   "path": "/stock-reservations",
   "reads": [
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [],
   "routing": "replica",
@@ -56130,7 +56130,7 @@
   "verb": "GET",
   "path": "/wallets/{walletId}/holds",
   "reads": [
-   "wallet.hold"
+   "wallet.fund_reservation"
   ],
   "writes": [],
   "routing": "replica",
@@ -59148,12 +59148,12 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.placed_resource"
   ],
   "writes": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -59442,17 +59442,17 @@
   "reads": [
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.configuration_version",
    "wallet.configuration_version_snapshot",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "writes": [],
@@ -59502,10 +59502,10 @@
   "verb": "POST",
   "path": "/resource-holds/{holdId}/extend",
   "reads": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -59625,7 +59625,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "venuemap.map",
    "venuemap.map_version",
    "venuemap.placed_resource"
@@ -59740,7 +59740,7 @@
   "verb": "GET",
   "path": "/resource-holds/{holdId}",
   "reads": [
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -60210,7 +60210,7 @@
    "resources.booking",
    "resources.resource",
    "resources.resource_block",
-   "resources.resource_hold",
+   "resources.resource_reservation",
    "resources.resource_requirement",
    "resources.resource_schedule"
   ],
@@ -60740,11 +60740,11 @@
   "path": "/resource-holds/{holdId}",
   "reads": [
    "cache:idempotency",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "resources.resource_hold"
+   "resources.resource_reservation"
   ],
   "routing": null,
   "scope": "venue",
@@ -60761,7 +60761,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DELETE /resource-holds/{holdId} idempotent; neighbours createResourceHold/getResourceHold on resources.resource_hold"
+  "lineageNote": "DELETE /resource-holds/{holdId} idempotent; neighbours createResourceHold/getResourceHold on resources.resource_reservation"
  },
  "replaceCredential": {
   "contract": "access",
@@ -60926,15 +60926,15 @@
    "cache:idempotency",
    "wallet.accounting_mapping",
    "wallet.authentication_policy",
-   "wallet.channel_rules",
+   "wallet.channel_rule",
    "wallet.consumption_policy",
    "wallet.credit_type",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
-   "wallet.risk_rules",
-   "wallet.transfer_rules",
+   "wallet.risk_rule_set",
+   "wallet.transfer_rule",
    "wallet.wallet_type"
   ],
   "routing": null,
@@ -61604,11 +61604,11 @@
   "verb": "PUT",
   "path": "/group-customer-organization",
   "reads": [
-   "orders.group_customer_organization",
-   "orders.group_customer_organization_contact"
+   "orders.group_customer_organisation",
+   "orders.group_customer_organisation_contact"
   ],
   "writes": [
-   "orders.group_customer_organization_contact"
+   "orders.group_customer_organisation_contact"
   ],
   "routing": null,
   "scope": "venue",
@@ -62444,10 +62444,10 @@
   "path": "/wallet-risk-rules/{ruleCode}/status",
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "routing": null,
   "scope": "tenant",
@@ -68167,7 +68167,7 @@
   "verb": "GET",
   "path": "/inventory-items/{itemId}/kit-definition",
   "reads": [
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component"
   ],
   "writes": [],
@@ -71678,7 +71678,7 @@
   "path": "/inventory-items/{itemId}/kit-definition",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.kit_component",
    "inventory.movement"
   ],
@@ -71761,7 +71761,7 @@
    "cache:idempotency",
    "payments.token",
    "wallet.auto_reload_setting",
-   "wallet.funding_rules",
+   "wallet.funding_rule",
    "wallet.wallet"
   ],
   "writes": [
@@ -72305,7 +72305,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "orders.cart",
    "orders.cart_line",
    "venuemap.visit_plan"
@@ -72346,13 +72346,13 @@
   "path": "/wallet-holds/{walletHoldId}/capture",
   "reads": [
    "wallet.balance",
-   "wallet.hold"
+   "wallet.fund_reservation"
   ],
   "writes": [
    "platform.idempotency_record",
    "platform.outbox",
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -72377,18 +72377,18 @@
   "path": "/inventory-holds/{inventoryHoldId}/convert",
   "reads": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_reservation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.channel_allocation",
+   "catalogue.channel_envelope",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "platform.outbox",
-   "seating.seat_hold",
-   "seating.seat_hold_item"
+   "seating.seat_reservation",
+   "seating.seat_reservation_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -72441,14 +72441,14 @@
   "path": "/stock-reservations",
   "reads": [
    "cache:idempotency",
-   "inventory.item",
+   "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "routing": null,
   "scope": "venue",
@@ -72825,14 +72825,14 @@
   "path": "/wallets/{walletId}/holds",
   "reads": [
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet"
   ],
   "writes": [
    "platform.idempotency_record",
    "platform.outbox",
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -73268,7 +73268,7 @@
   ],
   "writes": [
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
+   "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
    "orders.order_event",
@@ -73299,11 +73299,11 @@
   "path": "/stock-reservations/{stockReservationId}/release",
   "reads": [
    "cache:idempotency",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.stock_reservation"
+   "inventory.stock_earmark"
   ],
   "routing": null,
   "scope": "venue",
@@ -73327,13 +73327,13 @@
   "path": "/wallet-holds/{walletHoldId}/release",
   "reads": [
    "wallet.balance",
-   "wallet.hold"
+   "wallet.fund_reservation"
   ],
   "writes": [
    "platform.idempotency_record",
    "platform.outbox",
    "wallet.balance",
-   "wallet.hold",
+   "wallet.fund_reservation",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -76761,7 +76761,7 @@
   "path": "/wallet-risk-rules",
   "reads": [
    "wallet.risk_rule",
-   "wallet.risk_rules"
+   "wallet.risk_rule_set"
   ],
   "writes": [],
   "routing": "replica",

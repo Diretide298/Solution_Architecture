@@ -24,6 +24,16 @@ once and not again on the next run. A destructive change a person has already wr
 (`DROP COLUMN`, `DROP TABLE`, `DROP INDEX`, `DROP CONSTRAINT`, `ALTER COLUMN`, `RENAME COLUMN`) is
 recognised in those files and stops being listed.
 
+**A declared rename is a rename, not a drop and a create** (CHG-R6-010, ADAM CR-011, 12 October 2026). Without
+this a table renamed in `derive-schema-history.py` (`RENAMES`) reached the forward migration as a new, empty
+`CREATE TABLE` beside the old one, and a column renamed by `x-ticvai-column` as `ADD COLUMN` beside the old one,
+with the old name listed as "dropped". `diff(..., renames=...)` takes the declared table renames and column
+renames (`COLUMN_RENAMES`): the new table, its keys, indexes, constraints and policies, and an index or
+constraint on a renamed column, are not generated; one "table renamed" or "column renamed" row tells the person
+the `ALTER TABLE ... RENAME` to write, and what follows from it. A foreign key that differs only because the
+table it points at was renamed is not listed: Postgres follows a renamed table. `ALTER TABLE ... RENAME TO` and
+`ALTER INDEX ... RENAME TO` written by hand in a forward migration are recognised, like `RENAME COLUMN`.
+
 This is not a SQL parser. It understands the statements `derive-ddl.py` emits and the handful a
 person writes in a forward migration; anything else it cannot place is listed for review rather than
 guessed at.
@@ -219,6 +229,22 @@ class Model:
         for s in split_statements(sql):
             self.add(s)
 
+    def rename_table(self, old: str, new: str) -> None:
+        """`ALTER TABLE old RENAME TO new`, written by hand: the table, its constraints and every statement
+        naming it follow (index names do not change on a table rename; `ALTER INDEX ... RENAME` moves those)."""
+        self.tables[new] = self.tables.pop(old)
+        pat = re.compile(r"(?<![\w.])" + re.escape(old) + r"(?![\w])")
+        stmts, order = {}, []
+        for k, st in self.order:
+            nk = k
+            if k[0] in ("table", "constraint") and k[1] == old:
+                nk = (k[0], new) + k[2:]
+            elif k[0] == "stmt":
+                nk = ("stmt", pat.sub(new, k[1]))
+            stmts[nk] = pat.sub(new, self.stmts[k])
+            order.append((nk, pat.sub(new, st)))
+        self.stmts, self.order = stmts, order
+
     def drop(self, pred) -> None:
         for k in [k for k in self.stmts if pred(k)]:
             del self.stmts[k]
@@ -229,6 +255,18 @@ class Model:
         for stmt in split_statements(sql):
             s = norm(stmt)
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
+                continue
+            m = re.match(rf"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?({QNAME}) RENAME TO ({NAME})$", s, re.I)
+            if m and unq(m.group(1)) in self.tables:
+                self.rename_table(unq(m.group(1)), unq(m.group(1)).split(".")[0] + "." + unq(m.group(2)))
+                continue
+            m = re.match(rf"ALTER INDEX (?:IF EXISTS )?({QNAME}|{NAME}) RENAME TO ({NAME})$", s, re.I)
+            if m:
+                name, to = unq(m.group(1)), unq(m.group(2))
+                for k in [k for k in self.stmts if k[0] == "index" and (k[1] == name or k[1].split(".", 1)[1] == name)]:
+                    nk = ("index", k[1].split(".")[0] + "." + to)
+                    self.stmts[nk] = self.stmts.pop(k)
+                    self.order = [(nk if ok == k else ok, st) for ok, st in self.order]
                 continue
             m = re.match(rf"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?({QNAME}) (.*)$", s, re.I)
             if m and unq(m.group(1)) in self.tables:
@@ -298,14 +336,60 @@ class Plan:
     counts: dict = field(default_factory=lambda: {"tables": 0, "columns": 0, "indexes": 0, "other": 0})
 
 
-def diff(area: str, old: Model, new: Model) -> Plan:
+def _cols_in_parens(stmt: str) -> set:
+    m = re.search(r"\(([^)]*)\)", norm(stmt).split(" ON ", 1)[-1])
+    return {unq(x.strip().split()[0]) for x in m.group(1).split(",") if x.strip()} if m else set()
+
+
+def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan:
+    """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
+    declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
+    side under its new one is treated as renamed; likewise a column."""
     p = Plan(area)
+    renames = renames or {}
     known = set(old.tables) | set(new.tables)
-    new_tables = set(new.tables) - set(old.tables)
+    # new name -> old name, for the tables renamed since the old side
+    rt = {n: o for o, n in (renames.get("tables") or {}).items()
+          if o in old.tables and o not in new.tables and n in new.tables and n not in old.tables}
+    # (table now, new column) -> old column, where the old side still has the old column
+    rc = {}
+    for (t, oc), nc in (renames.get("columns") or {}).items():
+        was = old.tables.get(rt.get(t, t))
+        if was is not None and oc in was.cols and nc != oc and t in new.tables and nc in new.tables[t].cols:
+            rc[(t, nc)] = oc
+    old_renamed = {(t, oc) for (t, _n), oc in rc.items()}
+    new_tables = set(new.tables) - set(old.tables) - set(rt)
     new_cols: dict[str, set] = {}
+    follows: dict[str, list] = {t: [] for t in rt}   # renamed table -> generated objects named for it
+    qual = [(re.compile(r"(?<![\w.])" + re.escape(o) + r"(?![\w])"), n) for n, o in rt.items()]
+
+    def subst(st: str) -> str:
+        for pat, n in qual:
+            st = pat.sub(n, st)
+        return st
 
     def review(kind, obj, change, todo):
         p.review.append((kind, obj, change, todo))
+
+    def on_renamed_col(t, cols) -> bool:
+        return bool(cols) and any((t, c) in rc for c in cols)
+
+    def same_but_name(new_name, old_def, new_def) -> bool:
+        """The same definition under a new column name. An inline CHECK is named for its table and column
+        (`<table>_<column>_chk`), so its name and the column inside it move with a rename and are not a change."""
+        old_name = old_def.split(" ", 1)[0]
+        was = re.sub(r"(?<![\w])" + re.escape(old_name) + r"(?![\w])", new_name, old_def)
+        strip = lambda d: norm(re.sub(r"(?<![\w])CONSTRAINT \S+ ", "", d))
+        return strip(was) == strip(new_def)
+
+    for t in sorted(rt):
+        o = rt[t]
+        cr = sorted((oc, nc) for (tt, nc), oc in rc.items() if tt == t)
+        review("table renamed", f"{o} -> {t}", "declared rename (derive-schema-history.py RENAMES)",
+               f"ALTER TABLE {o} RENAME TO {t.split('.', 1)[1]}"
+               + "".join(f"; ALTER TABLE {t} RENAME COLUMN {oc} TO {nc}" for oc, nc in cr)
+               + "; then rename its key, indexes, constraints and policies to the generated names and apply its "
+                 "row-level security again (the \"after rename\" row for it)")
 
     for k, stmt in new.order:
         kind = k[0]
@@ -313,6 +397,25 @@ def diff(area: str, old: Model, new: Model) -> Plan:
             continue
         if kind == "table":
             t = k[1]
+            if t in rt:
+                a, b = old.tables[rt[t]], new.tables[t]
+                for c, d in b.cols.items():
+                    oc = rc.get((t, c), c)
+                    if oc not in a.cols:
+                        review("column added", f"{t}.{c}", f"`{d}`, on a renamed table",
+                               "after the rename: ALTER TABLE ... ADD COLUMN in a forward migration")
+                    elif not same_but_name(c, a.cols[oc], d):
+                        review("column changed", f"{t}.{c}", f"`{a.cols[oc]}` -> `{d}`",
+                               "after the rename: write the ALTER COLUMN (and any data rewrite) by hand")
+                    else:
+                        # an inline CHECK is named for its table: its new name follows the rename
+                        follows[t] += [n for n in re.findall(r"CONSTRAINT (\S+) ", d)
+                                       if n not in re.findall(r"CONSTRAINT (\S+) ", a.cols[oc])]
+                for c in a.cols:
+                    if c not in b.cols and (t, c) not in old_renamed:
+                        review("column dropped", f"{t}.{c}", "no longer in the schema reference",
+                               "a rename or a drop: decide, then RENAME COLUMN or the four-step drop by hand")
+                continue
             if t in new_tables:
                 p.statements.append(stmt)
                 p.rollback.append(f"DROP TABLE IF EXISTS {t};")
@@ -320,6 +423,16 @@ def diff(area: str, old: Model, new: Model) -> Plan:
                 continue
             a, b = old.tables[t], new.tables[t]
             for c, d in b.cols.items():
+                if (t, c) in rc:
+                    oc = rc[(t, c)]
+                    same = same_but_name(c, a.cols[oc], d)
+                    review("column renamed", f"{t}.{oc} -> {c}",
+                           "declared rename (derive-schema-history.py COLUMN_RENAMES)"
+                           + ("" if same else f"; the definition changes too: `{a.cols[oc]}` -> `{d}`"),
+                           f"ALTER TABLE {t} RENAME COLUMN {oc} TO {c}"
+                           + ("" if same else "; then the ALTER COLUMN (and any data rewrite)")
+                           + "; rename the indexes and constraints on it to the generated names")
+                    continue
                 if c not in a.cols:
                     add = relaxed(d)
                     p.statements.append(f"ALTER TABLE {t} ADD COLUMN IF NOT EXISTS {add}")
@@ -338,7 +451,7 @@ def diff(area: str, old: Model, new: Model) -> Plan:
                                "type, default, nullability or check changed: write the ALTER COLUMN (and any "
                                "data rewrite) by hand")
             for c in a.cols:
-                if c not in b.cols:
+                if c not in b.cols and (t, c) not in old_renamed:
                     review("column dropped", f"{t}.{c}", "no longer in the schema reference",
                            "a rename or a drop: decide, then RENAME COLUMN or the four-step drop by hand")
             for c in sorted(b.constraints - a.constraints):
@@ -350,6 +463,16 @@ def diff(area: str, old: Model, new: Model) -> Plan:
                        "partitioning changed: a table rewrite, planned by hand")
             continue
         if kind == "index":
+            on = tables_named(stmt, known)
+            if on & set(rt):
+                for t in on & set(rt):
+                    follows[t].append(k[1].split(".", 1)[1])
+                continue
+            if any(on_renamed_col(t, _cols_in_parens(stmt)) for t in on):
+                review("index after rename", k[1], f"`{new.stmts[k]}`",
+                       "names a renamed column: rename the old index to this name (ALTER INDEX ... RENAME TO) "
+                       "after the RENAME COLUMN")
+                continue
             if k not in old.stmts:
                 p.statements.append(stmt)
                 p.rollback.append(f"DROP INDEX IF EXISTS {k[1]};")
@@ -361,6 +484,16 @@ def diff(area: str, old: Model, new: Model) -> Plan:
         if kind == "constraint":
             t, name = k[1], k[2]
             cols = constraint_columns(stmt)
+            if t in rt:
+                follows[t].append(name)
+                continue
+            if on_renamed_col(t, cols):
+                review("constraint after rename", f"{t} {name}", f"`{new.stmts[k]}`",
+                       "names a renamed column: rename the old constraint to this name (ALTER TABLE ... RENAME "
+                       "CONSTRAINT) after the RENAME COLUMN")
+                continue
+            if k in old.stmts and subst(old.stmts[k]) == new.stmts[k]:
+                continue   # a key to a renamed table: Postgres follows the rename
             if k not in old.stmts and (t in new_tables or (cols and cols <= new_cols.get(t, set()))):
                 p.statements.append(stmt)
                 if t not in new_tables:
@@ -394,6 +527,10 @@ def diff(area: str, old: Model, new: Model) -> Plan:
             p.counts["other"] += 1
             continue
         refs = tables_named(s, known)
+        if refs & set(rt):
+            for t in refs & set(rt):
+                follows[t].append(s[:70])
+            continue
         if refs and refs <= new_tables:
             p.statements.append(stmt)
             p.counts["other"] += 1
@@ -402,10 +539,29 @@ def diff(area: str, old: Model, new: Model) -> Plan:
                    "touches objects that already exist: write it into a forward migration by hand")
 
     removed_tables = set(old.tables) - set(new.tables)
+    renamed_away = set(rt.values())
+    for t, objs in sorted(follows.items()):
+        if objs:
+            review("after rename", t, f"{len(objs)} generated object(s) for the renamed table: "
+                   + ", ".join(f"`{x}`" for x in objs),
+                   "in the forward migration that renames the table: rename its old indexes and constraints to "
+                   "these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level "
+                   "security again")
+    renamed_new_stmts = {new.stmts[nk] for nk in new.stmts}
     for k in old.stmts:
         if k in new.stmts:
             continue
         kind = k[0]
+        if kind == "table" and k[1] in renamed_away:
+            continue
+        if kind in ("constraint", "stmt") and subst(old.stmts[k]) in renamed_new_stmts:
+            continue   # unchanged but for a renamed table it names
+        if kind == "constraint" and (constraint_columns(old.stmts[k]) or set()) & {oc for (tt, oc) in old_renamed
+                                                                                   if tt == k[1]}:
+            continue   # on a renamed column: the "column renamed" row covers it
+        if kind == "index" and any((t, c) in old_renamed for t in tables_named(old.stmts[k], known)
+                                   for c in _cols_in_parens(old.stmts[k])):
+            continue
         if kind == "table":
             review("table dropped", k[1], "no longer in the schema reference",
                    "a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand")

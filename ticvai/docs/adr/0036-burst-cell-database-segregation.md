@@ -46,7 +46,7 @@ needed.
 standing between 640 client connections and a primary that will not want them.
 
 **Cross-service reads over the network on the hold path.** `acquireInventoryHold` reads
-`catalogue.performance` and writes `catalogue.inventory_hold`; a hold that crosses a database
+`catalogue.performance` and writes `catalogue.inventory_reservation`; a hold that crosses a database
 boundary adds a round trip **inside the lock**, and ADR-0031 already establishes that the lease
 duration is the ceiling. **A 6 ms lease becoming 8 ms drops the per-row ceiling by a quarter.**
 
