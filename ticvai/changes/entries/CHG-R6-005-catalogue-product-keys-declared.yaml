@@ -1,0 +1,61 @@
+id: CHG-R6-005
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: catalogue.group_package.product_id and catalogue.product_eligibility_rule.product_id become uuid declared keys
+  to catalogue.product; catalogue.product_media gains product_id uuid NOT NULL and is owned by its product; its
+  asset_id references assets.media_asset, not maintenance.asset.
+decision:
+  what: 'contracts/spine/catalogue.yaml: GroupPackageDefinition.productId and ProductEligibilityRule.productId carry
+    `x-ticvai-references: catalogue.product` (the wire type stays `string`, so the contract is unchanged against r1; the
+    column becomes uuid by the ADR-0056 one-id-type rule because the reference is declared). Product persists to
+    `catalogue.product + catalogue.product_media`, so the media rows are Product.media[] and derive-schema writes their
+    parent key product_id uuid NOT NULL -> catalogue.product. ProductMedia.assetId carries `x-ticvai-references:
+    assets.media_asset`. Because product_media then has two NOT NULL declared references to protected tables,
+    tools/derive-ddl.py ROW_OWNER records the decision that product_id owns the row, and 920 gives it apply_parent_rls
+    through catalogue.product.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-009, raised by the backend developer: text product keys cannot join to a uuid key, and product_media had no
+  key to its product and a wrong asset target. Approved by Chinmay on 12 October 2026. check-contract-compat: additive
+  against r1 (only x-ticvai annotations and a persistence tag changed).'
+keys_touched:
+  tables:
+  - catalogue.group_package
+  - catalogue.product_eligibility_rule
+  - catalogue.product_media
+  schemas:
+  - catalogue.Product
+  - catalogue.GroupPackageDefinition
+  - catalogue.ProductEligibilityRule
+  - catalogue.ProductMedia
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/derive-ddl.py
+  - handoff/schema-reference.json
+  tickets:
+  - MIG-CATALOGUE
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-009 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. V0102 adds product_media.product_id (nullable until backfilled: migration-review.md
+  says set NOT NULL after the backfill), its foreign key and its index. migration-review.md lists the two text -> uuid
+  type changes, the foreign keys on group_package, product_eligibility_rule and product_media.asset_id, and the
+  product_media policy switch (apply_parent_rls added, apply_tenant_rls dropped). No contract property changed type,
+  so nothing here needed a breaking-change entry. inventory.quotation_line and reporting.dashboard_tile have the same
+  two-owner shape and stay at the tenant root: ROW_OWNER does not decide them.'

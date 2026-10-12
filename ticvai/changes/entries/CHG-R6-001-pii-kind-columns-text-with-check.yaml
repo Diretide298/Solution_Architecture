@@ -1,0 +1,52 @@
+id: CHG-R6-001
+date: '2026-10-12'
+source: cr
+kind: spec
+proposed: '2026-10-12'
+summary: pii.subject.kind and pii.subject_contact.kind were typed pii.subject_kind and pii.contact_kind, enum types
+  no file creates, so 010-pii.sql cannot be applied. Both become text NOT NULL with a CHECK on their values.
+decision:
+  what: 'handoff/schema-reference.json: pii.subject.kind and pii.subject_contact.kind are type text and carry `enum`
+    on the column record (subject: guest, employee, contact, applicant; contact: email, mobile, phone, whatsapp,
+    postal, the values their descriptions already named). tools/derive-ddl.py column_spec reads `enum`, `maxLength`
+    and `default` from a column record that has no contract property (a storage-only column), so the column gets the
+    same `<table>_<column>_chk` CHECK a contract enum gets. tools/check-ddl-conventions.py gains D-UNDEFINED-TYPE: a
+    schema-reference column typed `<schema>.<name>` that no CREATE TYPE or CREATE DOMAIN in backend/ creates.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-001, raised by the backend developer writing the [DB] migrations: the r1 baseline types two pii columns
+  with enum types that nothing defines. Chinmay approved making them text with a CHECK on 12 October 2026.'
+keys_touched:
+  tables:
+  - pii.subject
+  - pii.subject_contact
+  files:
+  - handoff/schema-reference.json
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+  - handoff/audit-baseline.json
+  tickets:
+  - MIG-PII
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-001 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. The baseline 010-pii.sql is frozen at r1 and still names the two types, so the type
+  change is not generated: handoff/migration-review.md lists both columns (`kind pii.subject_kind NOT NULL` -> `kind
+  text NOT NULL CONSTRAINT subject_kind_chk CHECK (...)`, and the same for subject_contact) for the developer to write
+  by hand. Because the baseline file cannot be applied as it stands, MIG-PII has to create the columns as text with
+  the CHECK in its own V0007 migration rather than copy 010-pii.sql verbatim. The MIG tickets'' states were not
+  checked here; the lead decides delta or pointer at r4.'

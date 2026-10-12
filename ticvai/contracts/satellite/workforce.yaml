@@ -3804,7 +3804,7 @@ components:
       required: [id, attendanceRecordId, amendedByPrincipalId, amendedAt, occurredAtBefore, occurredAtAfter, reason]
       properties:
         id: { type: string, format: uuid }
-        attendanceRecordId: { type: string, format: uuid }
+        attendanceRecordId: { type: string, format: uuid, x-ticvai-references: workforce.attendance }
         amendedByPrincipalId: { type: string, format: uuid }
         amendedAt: { type: string, format: date-time }
         occurredAtBefore:

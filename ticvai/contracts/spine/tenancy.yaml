@@ -4713,7 +4713,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         level: { $ref: '#/components/schemas/ScopeLevel' }
-        parentId: { type: string, format: uuid, nullable: true }
+        parentId: { type: string, format: uuid, nullable: true, x-ticvai-references: platform.scope }
         path:
           type: string
           description: Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.

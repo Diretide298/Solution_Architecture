@@ -1,0 +1,51 @@
+id: CHG-R6-002
+date: '2026-10-12'
+source: cr
+kind: spec
+proposed: '2026-10-12'
+summary: platform.audit_record was under apply_tenant_rls, so a venue-scoped principal's audit INSERT failed WITH CHECK
+  and its whole business write with it. INSERT is now open to any connection holding a grant; SELECT, UPDATE and
+  DELETE stay at the tenant root.
+decision:
+  what: 'Option B. tools/derive-ddl.py gains APPEND_AUDIT (today only platform.audit_record) and
+    platform.apply_append_audit_rls(target), emitted beside the other apply_* helpers in 920-row-level-security.sql: four
+    policies, `<table>_append` FOR INSERT WITH CHECK (cardinality(platform.current_scope_paths()) > 0), `<table>_read`
+    FOR SELECT, `<table>_update` FOR UPDATE and `<table>_delete` FOR DELETE all on platform.tenant_root_in_scope(); it
+    drops the single `<table>_scope` policy apply_tenant_rls made. A table in APPEND_AUDIT that would have been tenant
+    root only gets this helper instead; one another rule already protects is reported, not overridden.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-005, raised by the backend developer: every operation that audits itself writes platform.audit_record in
+  its own transaction, and the tenant-root WITH CHECK (SD-015) refuses the row for any principal scoped below the
+  tenant. Chinmay chose option B on 12 October 2026.'
+keys_touched:
+  tables:
+  - platform.audit_record
+  files:
+  - tools/derive-ddl.py
+  tickets:
+  - MIG-PLATFORM
+  - MIG-BASELINE
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-005 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::APPEND_AUDIT
+status: open
+notes: 'Batch R6, 12 October 2026. In frozen mode the new function is additive and goes into the next forward migration
+  (V0102); switching the table from apply_tenant_rls to apply_append_audit_rls touches an existing table, so
+  handoff/migration-review.md lists it ("statement added" / "statement dropped" for platform.audit_record) for the
+  developer to write by hand: one SELECT platform.apply_append_audit_rls(''platform.audit_record''::regclass). Only
+  platform.audit_record is in the set; identity.authz_audit is the other append-only trail at the tenant root and was
+  not part of the decision.'

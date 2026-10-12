@@ -37,6 +37,10 @@ RULES = {
     "D-FK-TARGET-NAME": "a declared key whose column names a different table than it references (R082)",
     "D-JSONB-TWIN": "a jsonb column and a child table holding the same data (R111)",
     "D-RENAME-RESIDUE": "a DDL comment or contract description naming a table by its pre-rename name (R160)",
+    "D-UNDEFINED-TYPE": "a column typed with a schema-qualified type that no DDL file creates (CHG-R6-001, CR-001)",
+    "D-CHILD-PARENT": "an item, line, amendment or media table whose key to its parent is not a NOT NULL declared "
+                      "reference (CHG-R6-004..006, CR-007 CR-009 CR-010)",
+    "D-SCOPE-TREE": "the scope tree without its declared parent key, one tenant root or unique paths (CHG-R6-003, CR-006)",
 }
 # `require_` beside `requires_`, as `allow_` beside `allows_` (CHG-GTRB-006: till_shift_policy.require_open_approval).
 BOOL_OK = re.compile(r"^(is|has|can|require|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
@@ -274,6 +278,61 @@ def main() -> int:
                 for child in (f"{t}_{sing}", f"{t}_{c}"):
                     if child in tables and any(k.startswith(t.split(".")[-1]) for k in tables[child]):
                         guard.add("D-JSONB-TWIN", f"{t}.{c}", f"{t}.{c} is jsonb and {child} holds the same rows")
+
+    # CHG-R6-001 (ADAM CR-001, 12 October 2026): `pii.subject.kind` was typed `pii.subject_kind`, which no file
+    # creates, so 010-pii.sql could not be applied. The schema reference is what derive-ddl types columns from, so
+    # it is read here rather than the frozen baseline: a type named `<schema>.<name>` must be created by a
+    # CREATE TYPE or CREATE DOMAIN somewhere in backend/.
+    defined = set()
+    for f in backend.rglob("*.sql"):
+        defined |= {n.replace('"', "") for n in re.findall(
+            r"CREATE\s+(?:TYPE|DOMAIN)\s+(?:IF\s+NOT\s+EXISTS\s+)?([a-z_]+\.[a-z_0-9]+)",
+            f.read_text(encoding="utf-8"), re.I)}
+    ref_cols = (ref.get("cols") or {})
+    for t, cols in sorted(ref_cols.items()):
+        for c in cols:
+            typ = str(c.get("type") or "").strip().lower().removesuffix("[]")
+            if re.match(r"^[a-z_]+\.[a-z_0-9]+$", typ) and typ not in defined:
+                guard.add("D-UNDEFINED-TYPE", f"{t}.{c.get('column')}",
+                          f"{t}.{c.get('column')} is typed {typ}, which no DDL file creates: give it a built-in "
+                          "type (an enum is text with `enum` on the column record) or create the type")
+
+    # CHG-R6-004..006 (ADAM CR-007, CR-009, CR-010, 12 October 2026): `workforce.attendance_amendment`,
+    # `seating.seat_hold_item` and `seating.seat_block_item` pointed at their parent by convention (an index, no
+    # constraint, so no parent policy and the rows sat at the tenant root), and `catalogue.product_media` had no key
+    # to its product at all. A table `<schema>.<parent>_{item,line,amendment,media}` beside `<schema>.<parent>` keeps
+    # its parent key as a NOT NULL declared reference (`x-ticvai-references` on the contract property, or a `+`
+    # persistence tag).
+    for t, cols in sorted(ref_cols.items()):
+        if "." not in t:
+            continue
+        s, short = t.split(".", 1)
+        m = re.match(r"^(.+)_(item|line|amendment|media)$", short)
+        if not m or f"{s}.{m.group(1)}" not in ref_cols:
+            continue
+        parent, p = f"{s}.{m.group(1)}", m.group(1)
+        keys = [c for c in cols if str(c.get("column", "")).endswith("_id") and c.get("column") != "id"
+                and (p.endswith(c["column"][:-3]) or c["column"][:-3].startswith(p))]
+        if not any(c.get("references") == parent and c.get("enforced") == "yes" and c.get("required") == "yes"
+                   for c in keys):
+            have = ", ".join(f"{c['column']} -> {c.get('references')} ({c.get('referenceHow')})" for c in keys)
+            guard.add("D-CHILD-PARENT", t, f"{t}: no NOT NULL declared key to {parent}"
+                      + (f" (has {have})" if have else " (no key column)"))
+
+    # CHG-R6-003 (ADAM CR-006, 12 October 2026): every policy resolves a grant through platform.scope by
+    # `level = 'tenant'` and by `path`. Its parent key is declared, it has one tenant root, and a path names one node.
+    scope_cols = {c.get("column"): c for c in ref_cols.get("platform.scope", [])}
+    if scope_cols:
+        pc = scope_cols.get("parent_id") or {}
+        if not (pc.get("references") == "platform.scope" and pc.get("enforced") == "yes"):
+            guard.add("D-SCOPE-TREE", "platform.scope.parent_id",
+                      "platform.scope.parent_id is not a declared reference to platform.scope")
+        series = "\n".join(f.read_text(encoding="utf-8") for f in (backend / "tenant").glob("*.sql"))
+        if not re.search(r"CREATE UNIQUE INDEX[^;]*ON platform\.scope\s*\(\(true\)\)\s*WHERE level = 'tenant'", series):
+            guard.add("D-SCOPE-TREE", "platform.scope:tenant-root",
+                      "nothing in backend/tenant makes the tenant root of platform.scope unique")
+        if not re.search(r"CREATE UNIQUE INDEX[^;]*ON platform\.scope\s*\(path\)", series):
+            guard.add("D-SCOPE-TREE", "platform.scope:path", "nothing in backend/tenant makes platform.scope.path unique")
 
     # R160: a renamed table's old name left in DDL comments and contract prose.
     renames = [(str(r.get("from")), str(r.get("to"))) for r in

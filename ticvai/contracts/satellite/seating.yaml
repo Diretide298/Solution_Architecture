@@ -2956,6 +2956,7 @@ components:
         blockId:
           type: string
           format: uuid
+          x-ticvai-references: seating.seat_block
         seatId:
           type: string
           format: uuid
@@ -2977,6 +2978,7 @@ components:
         holdId:
           type: string
           format: uuid
+          x-ticvai-references: seating.seat_hold
         seatId:
           type: string
           format: uuid
@@ -3873,6 +3875,9 @@ components:
           description: Create from a template rather than empty.
     Seat:
       x-ticvai-persistence: seating.seat
+      # One seat per position on a map (CHG-R6-006): unique (seat_map_id, section_code, row_label, seat_number).
+      x-ticvai-unique-together:
+      - [seat_map_id, sectionCode, rowLabel, seatNumber]
       type: object
       required:
       - id
@@ -3958,6 +3963,7 @@ components:
           format: uuid
         code:
           type: string
+          x-ticvai-unique: venue
         name:
           type: string
         venueId:
@@ -3983,6 +3989,9 @@ components:
             $ref: '#/components/schemas/SeatPriceBand'
     SeatPriceBand:
       x-ticvai-persistence: seating.seat_price_band
+      # One band per code within a seat category (CHG-R6-006): unique (seat_category_id, code).
+      x-ticvai-unique-together:
+      - [seatCategoryId, code]
       type: object
       description: 'One price band on a seat category (decided 28 September, audit R275 (d)). The currency
         is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries

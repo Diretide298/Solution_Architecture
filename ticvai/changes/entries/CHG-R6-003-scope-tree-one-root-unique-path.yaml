@@ -1,0 +1,49 @@
+id: CHG-R6-003
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: platform.scope gets one tenant root, a unique path and a declared parent key, which every row-level security
+  policy already assumed.
+decision:
+  what: 'contracts/spine/tenancy.yaml OrgUnit.parentId carries `x-ticvai-references: platform.scope`, so parent_id is a
+    declared reference: FOREIGN KEY (parent_id) REFERENCES platform.scope(id) with its index scope_parent_id_idx.
+    tools/derive-ddl.py adds, for the scope table, scope_tenant_root_uniq (UNIQUE ON platform.scope ((true)) WHERE level
+    = ''tenant'', the spelling of the level CHECK) and scope_path_uniq (UNIQUE ON platform.scope (path), beside the GiST
+    index). tools/check-ddl-conventions.py gains D-SCOPE-TREE.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-006, raised by the backend developer: venue_in_scope and tenant_root_in_scope resolve grants by level =
+  tenant and by path, and nothing kept either unique or the tree linked. Approved by Chinmay on 12 October 2026. The
+  contract change is an x-ticvai annotation only (check-contract-compat: additive against r1).'
+keys_touched:
+  tables:
+  - platform.scope
+  schemas:
+  - tenancy.OrgUnit
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+  - handoff/schema-reference.json
+  tickets:
+  - MIG-PLATFORM
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-006 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. V0102 carries the two unique indexes and scope_parent_id_idx; the foreign key is on an
+  existing column, so migration-review.md lists scope_parent_id_fkey (add NOT VALID, then VALIDATE).'

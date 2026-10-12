@@ -1,0 +1,53 @@
+id: CHG-R6-004
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: workforce.attendance_amendment.attendance_record_id pointed at workforce.training_record by naming convention
+  and was not declared; it now references workforce.attendance(id), enforced, so the amendment takes its attendance
+  row's policy.
+decision:
+  what: 'contracts/satellite/workforce.yaml AttendanceAmendment.attendanceRecordId carries `x-ticvai-references:
+    workforce.attendance`. The column keeps its name. It is a NOT NULL declared reference, so 920 gives the table
+    apply_parent_rls(attendance_record_id -> workforce.attendance) instead of apply_tenant_rls.
+    tools/check-ddl-conventions.py gains D-CHILD-PARENT: a `<parent>_{item,line,amendment,media}` table beside its
+    parent with no NOT NULL declared key to it.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-007, raised by the backend developer: the convention guess chose the wrong table, so the amendments had no
+  constraint and sat at the tenant root. Approved by Chinmay on 12 October 2026; additive against r1
+  (check-contract-compat).'
+keys_touched:
+  tables:
+  - workforce.attendance_amendment
+  schemas:
+  - workforce.AttendanceAmendment
+  files:
+  - contracts/satellite/workforce.yaml
+  - tools/check-ddl-conventions.py
+  - handoff/schema-reference.json
+  - handoff/audit-baseline.json
+  tickets:
+  - MIG-WORKFORCE
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-007 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. Nothing additive: migration-review.md lists
+  attendance_amendment_attendance_record_id_fkey (constraint added) and the policy switch (apply_parent_rls added,
+  apply_tenant_rls dropped). D-CHILD-PARENT starts with five known members in handoff/audit-baseline.json:
+  catalogue.performance_media and maintenance.incident_media (parent key by convention), rental.agreement_item and
+  rental.inspection_item (no key to the parent), and fnb.menu_item (a name match, not a child of fnb.menu).'

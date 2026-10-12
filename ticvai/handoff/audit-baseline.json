@@ -2082,9 +2082,16 @@
   "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
  },
  "check-ddl-conventions": {
-  "updated": "2026-10-01",
-  "commit": "278cc437",
+  "updated": "2026-10-12",
+  "commit": "4e841b3f",
   "rules": {
+   "D-CHILD-PARENT": [
+    "catalogue.performance_media",
+    "fnb.menu_item",
+    "maintenance.incident_media",
+    "rental.agreement_item",
+    "rental.inspection_item"
+   ],
    "D-DOUBLE-KEY": [
     "platform.venue_settings.org_unit_id",
     "platform.workstation.org_unit_id"
@@ -2094,7 +2101,6 @@
     "access.scan_event.ticket_id",
     "ai.proposed_action.interaction_id",
     "catalogue.channel_allocation.envelope_id",
-    "maintenance.work_order_attachment.asset_ref",
     "marketing.conversation_message.ai_interaction_id",
     "orders.group_enquiry.organisation_id",
     "orders.group_quote.organisation_id",
@@ -2102,7 +2108,6 @@
     "platform.tenant.home_region_id",
     "queue.queue.fast_pass_id",
     "retail.shop_and_drop.collection_point_id",
-    "transport.network_import.source_ref",
     "venuemap.visit_plan.subject_id"
    ],
    "D-MIG-ORDER": [
@@ -2125,9 +2130,6 @@
     "access.consumption_rule.one_per_attraction",
     "access.credential_issuance_retry_policy.automatic_retry",
     "access.credential_policy.before_first_validation_only",
-    "access.credential_policy.require_acceptance",
-    "access.credential_policy.require_otp",
-    "access.credential_policy.require_recipient_account",
     "access.credential_policy.return_to_sender",
     "access.credential_security_profile.offline_ready",
     "access.device_configuration.biometric_capability",
@@ -2179,8 +2181,6 @@
     "catalogue.approval_policy.creator_cannot_give_final_approval",
     "catalogue.channel_sales_rule.overrides_product_rule",
     "catalogue.dynamic_pricing_control.exclude_protected_rates",
-    "catalogue.dynamic_pricing_control.require_guardrails_passed",
-    "catalogue.dynamic_pricing_control.require_healthy_forecast_data",
     "catalogue.entitlement_template.carries_stored_value",
     "catalogue.entitlement_template.crosses_cells",
     "catalogue.event_registration.capture_per_attendee",
@@ -2222,7 +2222,6 @@
     "identity.access_review_campaign.prefill_from_findings",
     "identity.guest_verification_policy.uae_pass_satisfies_id_document",
     "identity.password_policy.force_change_on_first_logon",
-    "identity.password_policy.require_breach_check",
     "identity.segregation_rule.scope_sensitive",
     "ledger.recognition_schedule.revalidate_on_validity_change",
     "ledger.tax_invoice_template.resets_yearly",
@@ -2230,7 +2229,6 @@
     "marketing.audience_activation.enforce_consent",
     "marketing.booking_consent_record.blocks_booking",
     "marketing.campaign.optimise_channel",
-    "marketing.case_routing_rule.require_language_match",
     "marketing.case_routing_rule.respect_sla_capability",
     "marketing.case_routing_rule.sticky_ownership",
     "marketing.communication_policy_decision.email_preference",
@@ -2280,13 +2278,11 @@
     "orders.upgrade_rule.exclude_fees_from_credit",
     "payments.credit_account.over_limit",
     "payments.failover_policy.failover_to_next_provider",
-    "payments.instalment_policy.require_stored_card",
     "payments.matching_rules.net_of_fees",
     "payments.provider.supports3ds",
     "payments.reconciliation_source.alert_if_missing",
     "promotions.allocation_split.crosses_legal_entities",
     "promotions.recommendation_strategy.exclude_in_basket",
-    "promotions.recommendation_strategy.require_availability",
     "queue.queue.accessibility_priority",
     "rental.agreement_rules.guardian_signature_for_minor",
     "rental.availability_rules.release_on_payment_failure",
@@ -2304,7 +2300,6 @@
     "seating.recommendation_rules.explain_to_guest",
     "seating.recommendation_rules.reverse_row_order",
     "seating.seating_rules.prevent_orphan_seats",
-    "seating.seating_rules.require_contiguous",
     "subscription.membership_household_policy.eligibility_revalidation",
     "subscription.membership_product.promotional_pricing_eligibility",
     "subscription.membership_product.separate_purchase_and_activation_rules",
@@ -2352,8 +2347,7 @@
     "platform.sale_board_tile",
     "platform.tenant"
    ]
-  },
-  "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
+  }
  },
  "check-device-tiers": {
   "updated": "2026-10-05",

@@ -20150,6 +20150,7 @@ components:
         productId:
           type: string
           readOnly: true
+          x-ticvai-references: catalogue.product
         minAgeYears:
           type: integer
           minimum: 0
@@ -20312,6 +20313,7 @@ components:
         productId:
           type: string
           readOnly: true
+          x-ticvai-references: catalogue.product
         kind:
           type: string
           enum:
@@ -20356,7 +20358,8 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     Product:
-      x-ticvai-persistence: catalogue.product
+      # `media[]` is the rows of catalogue.product_media, which carries product_id (CHG-R6-005).
+      x-ticvai-persistence: catalogue.product + catalogue.product_media
       type: object
       required:
       - id
@@ -21049,6 +21052,7 @@ components:
           type: string
           format: uuid
           description: A `MediaAsset` of `assets.yaml`, in status `ready`.
+          x-ticvai-references: assets.media_asset
         kind:
           type: string
           enum:

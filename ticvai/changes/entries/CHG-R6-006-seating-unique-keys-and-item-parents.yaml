@@ -1,0 +1,63 @@
+id: CHG-R6-006
+date: '2026-10-12'
+source: cr
+kind: contract
+proposed: '2026-10-12'
+summary: Seating gets its natural keys (seat_price_band, seat, seat_category) as unique indexes, and seat_hold_item and
+  seat_block_item declare their parent so they take its policy.
+decision:
+  what: 'contracts/satellite/seating.yaml: SeatPriceBand `x-ticvai-unique-together: [[seatCategoryId, code]]`, Seat
+    `x-ticvai-unique-together: [[seat_map_id, sectionCode, rowLabel, seatNumber]]` (seat_map_id is a relationship-graph
+    column, so it is named by column), SeatCategory.code `x-ticvai-unique: venue` (venue_id, code);
+    SeatingSeatHoldItem.holdId `x-ticvai-references: seating.seat_hold` and SeatingSeatBlockItem.blockId
+    `x-ticvai-references: seating.seat_block`. tools/derive-ddl.py reads the new schema-level
+    `x-ticvai-unique-together` (table_marks) and emits `<table>_<columns>_uniq`; a member that is not a column is
+    reported.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'ADAM CR-010, raised by the backend developer: nothing stopped two seats at one position, or two bands or categories
+  with one code, and the hold and block items had no constraint to their parent and sat at the tenant root. Approved by
+  Chinmay on 12 October 2026; additive against r1 (check-contract-compat).'
+keys_touched:
+  tables:
+  - seating.seat_price_band
+  - seating.seat
+  - seating.seat_category
+  - seating.seat_hold_item
+  - seating.seat_block_item
+  schemas:
+  - seating.SeatPriceBand
+  - seating.Seat
+  - seating.SeatCategory
+  - seating.SeatingSeatHoldItem
+  - seating.SeatingSeatBlockItem
+  files:
+  - contracts/satellite/seating.yaml
+  - tools/derive-ddl.py
+  - handoff/schema-reference.json
+  tickets:
+  - MIG-SEATING
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: CR-010 (ADAM)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets get these out'
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch R6, 12 October 2026. V0102 carries the three unique indexes (seat_price_band_seat_category_id_code_uniq,
+  seat_seat_map_id_section_code_row_label_seat_number_uniq, seat_category_venue_id_code_uniq); existing duplicate rows
+  would make them fail, so check before applying. migration-review.md lists seat_hold_item_hold_id_fkey and
+  seat_block_item_block_id_fkey and the two policy switches to apply_parent_rls. seat_hold.id is text in the schema
+  reference and uuid in the DDL (one-id-type rule), so hold_id stays uuid in the DDL. D-CHILD-PARENT
+  (check-ddl-conventions) catches an item table without its declared parent key; the uniqueness itself is a generator
+  rule (tools/derive-ddl.py::table_marks).'

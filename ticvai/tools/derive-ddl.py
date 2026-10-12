@@ -68,8 +68,16 @@ Vectors are not here: they live in each tenant's Qdrant collection (decided 30 S
 column DEFAULT (storage-design.md, "Enum agreement": the database holds the same values as the
 contract). **Uniqueness is carried where the contract marks it**: a property with
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
-28 September). Uniqueness and immutability rules the contracts state only in prose are not --
-there is nothing machine-readable to derive them from.
+28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
+several columns, each named by property or by column (CHG-R6-006). Uniqueness and immutability rules
+the contracts state only in prose are not -- there is nothing machine-readable to derive them from.
+**A storage-only column carries its own `enum`** (and `maxLength`, `default`) on its schema-reference
+record, and gets the same CHECK (CHG-R6-001).
+
+**Row-level security, by rule** (920): `scope_path`, else `venue_id`, else through the NOT NULL declared
+reference that owns the row (`ROW_OWNER` decides where two could), else by subject or at the tenant
+root -- except an `APPEND_AUDIT` trail, which any grant appends to and only the tenant root reads
+(CHG-R6-002).
 
 **Frozen once the git tag `r1` exists** (plan item 1C, C3, 1 October). From then on this does not
 rewrite a baseline `.sql` file under `backend/`: databases were built from them. It writes the
@@ -253,6 +261,17 @@ def is_not_persisted(tag) -> bool:
 # visibility is a decision, not a naming habit.
 SHARED_SCOPE = {
     "inventory.transfer": "to_scope_path",
+}
+
+# **Which reference owns the row, where several could** (CHG-R6-005, ADAM CR-009, 12 October 2026). A table
+# with two NOT NULL declared references to protected tables gets no parent policy: which of them owns the
+# row is a modelling decision (see the owner rounds in `main`), and until somebody makes it the table sits
+# at the tenant root. Each entry here is that decision, made. `catalogue.product_media` is a product's
+# photo (the rows of `Product.media[]`, so `product_id` is its parent key); `asset_id -> assets.media_asset`
+# names what the photo shows and does not own it. `inventory.quotation_line` and `reporting.dashboard_tile`
+# have the same shape and are not decided here.
+ROW_OWNER = {
+    "catalogue.product_media": "product_id",   # CHG-R6-005 (CR-009)
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -495,6 +514,54 @@ END
 $$;
 """
 
+# **An audit trail every principal writes and only the tenant root reads** (CHG-R6-002, ADAM CR-005,
+# 12 October 2026). `platform.audit_record` had no scope column and no protected owner, so SD-015 put it
+# under `apply_tenant_rls`, whose WITH CHECK is the tenant root. Every operation that audits itself
+# writes a row there in the same transaction as its business write, so a venue-scoped principal's audit
+# INSERT failed the WITH CHECK and took the business write down with it: the policy meant to protect
+# the trail stopped venues doing anything that is audited. Chinmay chose option B: INSERT is open to
+# any connection holding a grant (a scope path set, so an unconfigured connection still writes
+# nothing); SELECT, UPDATE and DELETE stay at the tenant root. One policy per command, because a single
+# FOR ALL policy cannot give INSERT a different check from the rest.
+#
+# **Listed, not inferred.** Which tables are append-only trails that every scope writes is a decision
+# per table (a venue reading another venue's trail is the risk this keeps out); the list is short and
+# each entry names its change.
+APPEND_AUDIT = {
+    "platform.audit_record",   # CHG-R6-002 (CR-005)
+}
+
+RLS_APPEND_AUDIT = """
+-- **An append-only audit trail** (CHG-R6-002): any connection holding a grant may append a row, and
+-- only the tenant root may read, correct or remove one. A venue principal's business write audits itself
+-- in the same transaction, and a tenant-root WITH CHECK on the INSERT failed that whole write.
+CREATE OR REPLACE FUNCTION platform.apply_append_audit_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    base text := (SELECT left(c.relname, 55) FROM pg_class c WHERE c.oid = target);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    -- the single FOR ALL policy apply_tenant_rls created, if the table had it
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', platform.rls_policy_name(target), target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_append', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_read', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_update', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_delete', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR INSERT '
+                   'WITH CHECK (cardinality(platform.current_scope_paths()) > 0)', base || '_append', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR SELECT USING (platform.tenant_root_in_scope())',
+                   base || '_read', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR UPDATE USING (platform.tenant_root_in_scope()) '
+                   'WITH CHECK (platform.tenant_root_in_scope())', base || '_update', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR DELETE USING (platform.tenant_root_in_scope())',
+                   base || '_delete', target);
+END
+$$;
+"""
+
 # Where the venue half of RLS_HEAD starts; the control database's file is cut here.
 VENUE_MARKER = "-- **{n_venue} tables carry `venue_id`"
 assert VENUE_MARKER in RLS_HEAD
@@ -669,12 +736,14 @@ CREATE TABLE IF NOT EXISTS platform.schema_version (
 
 def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: list,
              total: int, has_scope_table: bool, shared: dict | None = None,
-             by_subject: list | None = None, tenant_only: list | None = None) -> str:
+             by_subject: list | None = None, tenant_only: list | None = None,
+             append_audit: list | None = None) -> str:
     """The functions, then one call per table -- by `scope_path` where it has one, by `venue_id`
     where it does not, and through its owning parent where it has neither.
 
     `by_parent` is `(table, fk_column, parent, parent_key)`; `unscoped` is `(table, why)`;
-    `shared` maps a scoped table to the second path column that also admits a caller."""
+    `shared` maps a scoped table to the second path column that also admits a caller;
+    `append_audit` is `(table, why)` for an APPEND_AUDIT trail (CHG-R6-002)."""
     shared = shared or {}
     head = RLS_HEAD.replace("{n_venue}", str(len(by_venue)))
     if db != "tenant":
@@ -689,10 +758,13 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     body = [head]
     by_subject = by_subject or []
     tenant_only = tenant_only or []
+    append_audit = append_audit or []
     if by_parent:
         body.append(RLS_PARENT)
-    if by_subject or tenant_only:
+    if by_subject or tenant_only or append_audit:
         body.append(RLS_TENANT)
+    if append_audit:
+        body.append(RLS_APPEND_AUDIT)
     n_venue = len(by_venue) if db == "tenant" else 0
     # **Counted, not asserted.** The line this replaced called every table with neither column
     # "reference data, a registry, or the migration log", and the audit of 26 September found
@@ -701,7 +773,9 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     body.append(
         f"-- **{total} tables: {len(scoped)} scoped by `scope_path`, {n_venue} by `venue_id`, "
         f"{len(by_parent)} through the parent that owns them, {len(by_subject)} by subject, "
-        f"{len(tenant_only)} to the tenant root only, {len(unscoped)} with no policy.**\n"
+        f"{len(tenant_only)} to the tenant root only, "
+        + (f"{len(append_audit)} append-only audit trail(s), " if append_audit else "")
+        + f"{len(unscoped)} with no policy.**\n"
         "-- A table with no policy is listed at the end of this file with the reason. It is not\n"
         "-- claimed to be reference data: for most of them that is a scoping decision nobody has\n"
         "-- made yet, and they stay readable by every connection to this database until it is.\n")
@@ -748,6 +822,11 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
                     "-- reached only through their owning service's role; this policy is the floor.")
         body += [f"SELECT platform.apply_tenant_rls('{qual(t)}'::regclass);  -- was: {why}"
                  for t, why in tenant_only]
+    if append_audit:
+        body.append("\n-- Append-only audit trails (CHG-R6-002): any connection holding a grant appends, only the\n"
+                    "-- tenant root reads, corrects or removes.")
+        body += [f"SELECT platform.apply_append_audit_rls('{qual(t)}'::regclass);  -- was: {why}"
+                 for t, why in append_audit]
     if unscoped:
         body.append("\n-- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a\n"
                     "-- NOT NULL owning reference) before row-level security can hold for it.")
@@ -883,8 +962,8 @@ def table_marks(cols: dict, tables) -> dict:
     **A table is found from its columns' `source`**, which names `module.Schema.property` or
     `module.Parent.array[].property` — so a table with no persistence tag of its own
     (`platform.audit_record`) or one derived from an array (`ledger.journal_line`) resolves too.
-    Returns `table -> {"append_only": column, "primary_key": [columns], "schema": name}`, with
-    property names already turned into this table's column names."""
+    Returns `table -> {"append_only": column, "primary_key": [columns], "unique_together": [[columns]],
+    "schema": name}`, with property names already turned into this table's column names."""
     out = {}
     for t in tables:
         votes: dict = defaultdict(int)
@@ -917,6 +996,15 @@ def table_marks(cols: dict, tables) -> dict:
         pk = marks.get("x-ticvai-primary-key")
         if isinstance(pk, list) and pk:
             entry["primary_key"] = [column_of(str(p)) or f"?{p}" for p in pk]
+        # **A natural key over several columns** (CHG-R6-006, ADAM CR-010): `x-ticvai-unique-together` lists
+        # column sets, each named by contract property or, for a column no property carries (`seat_map_id`
+        # comes from the relationship graph), by its column name.
+        names = {c["column"] for c in cols.get(t, [])}
+        ut = marks.get("x-ticvai-unique-together")
+        if isinstance(ut, list) and ut:
+            entry["unique_together"] = [
+                [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
+                for group in ut if isinstance(group, list) and group]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -957,6 +1045,24 @@ def column_rules(short: str, col: str, typ: str, spec: dict) -> str:
         out += (f" CONSTRAINT {obj_name(short, col, suffix='chk')} CHECK ("
                 + " AND ".join(checks) + ")")
     return out
+
+
+# **A storage-only column states its own rules** (CHG-R6-001, ADAM CR-001, 12 October 2026).
+# `pii.subject.kind` and `pii.subject_contact.kind` are columns no contract describes, and the schema reference
+# typed them `pii.subject_kind` and `pii.contact_kind` -- enum types no file creates, so 010-pii.sql could not be
+# applied. Their values were only in the description. A column record may now carry `enum` (and `maxLength`,
+# `default`) itself, read where the column has no contract property, and the column is plain `text` with the
+# `<table>_<column>_chk` CHECK every contract enum gets. check-ddl-conventions D-UNDEFINED-TYPE fails on a type
+# that names a schema-qualified type nothing creates.
+STORAGE_RULE_KEYS = ("enum", "maxLength", "default")
+
+
+def column_spec(c: dict, contract_props: dict) -> dict:
+    """The rules a column's CHECK and DEFAULT come from: its contract property, else its own record."""
+    spec = contract_props.get(str(c.get("source") or ""))
+    if spec:
+        return spec
+    return {k: c[k] for k in STORAGE_RULE_KEYS if k in c}
 
 
 def pg_type(t: str | None) -> str:
@@ -1365,8 +1471,7 @@ def main() -> int:
                 pk = " PRIMARY KEY" if inline_pk and col == tkey else ""
                 # **Contract enums, maxLength and defaults become a CHECK and a DEFAULT.** Not on
                 # a path column: its contract type is a string and its column is an ltree.
-                rules = "" if is_path else column_rules(
-                    short, col, typ, contract_props.get(str(c.get("source") or ""), {}))
+                rules = "" if is_path else column_rules(short, col, typ, column_spec(c, contract_props))
                 if " CONSTRAINT " in rules:
                     n_chk += 1
                 if " DEFAULT " in rules:
@@ -1480,6 +1585,25 @@ def main() -> int:
                     f"CREATE INDEX IF NOT EXISTS {index_name(schema, short, 'path')} "
                     f"ON {q(schema)}.{q(short)} USING gist (path);"))
                 n_idx += 1
+            # **The scope tree is a tree with one root, and a path names one node** (CHG-R6-003, ADAM CR-006,
+            # 12 October 2026). `venue_in_scope` and `tenant_root_in_scope` resolve a grant by `level = 'tenant'`
+            # and by `path`, and a second tenant row or a duplicated path would make both answer for two nodes;
+            # `venue_in_scope` even counts the tenant rows to hide null-venue rows when there are two. Nothing
+            # stopped either. The tenant root is unique through a partial index on a constant, and the path by a
+            # plain unique index beside the GiST one (GiST cannot be unique). `parent_id -> platform.scope(id)`
+            # is declared in the contract (`OrgUnit.parentId`, x-ticvai-references) and comes out as a foreign key.
+            if t == SCOPE_TABLE and "level" in names:
+                idx_lines.append((schema,
+                    "-- one tenant root per tenant database (CHG-R6-003)\n"
+                    f"CREATE UNIQUE INDEX IF NOT EXISTS {obj_name(short, 'tenant_root', suffix='uniq')} "
+                    f"ON {q(schema)}.{q(short)} ((true)) WHERE level = 'tenant';"))
+                n_uniq += 1
+            if t == SCOPE_TABLE and "path" in names:
+                idx_lines.append((schema,
+                    "-- a path names one node (CHG-R6-003)\n"
+                    f"CREATE UNIQUE INDEX IF NOT EXISTS {obj_name(short, 'path', suffix='uniq')} "
+                    f"ON {q(schema)}.{q(short)} (path);"))
+                n_uniq += 1
             # **A second visibility path is indexed like the first** -- the shared policy tests it
             # on every read.
             second = SHARED_SCOPE.get(t)
@@ -1522,6 +1646,24 @@ def main() -> int:
                     f"-- unique per {level} (x-ticvai-unique): {t}.{col}\n"
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
                     f"({', '.join(q(k) for k in keycols)}){where};"))
+                n_uniq += 1
+
+            # **Uniqueness over several columns the contract schema names** (`x-ticvai-unique-together`,
+            # CHG-R6-006). Postgres treats nulls as distinct, so a row with a null member never collides.
+            for group in (marks.get(t) or {}).get("unique_together") or []:
+                missing = [k for k in group if k.startswith("?")]
+                if missing:
+                    no_unique.append(f"{t} (x-ticvai-unique-together {group}): "
+                                     f"{', '.join(k[1:] for k in missing)} is not a column")
+                    continue
+                keycols = list(group)
+                if part_col and part_col not in keycols:
+                    keycols.append(part_col)
+                uname = obj_name(short, *keycols, suffix="uniq")
+                idx_lines.append((schema,
+                    f"-- unique together (x-ticvai-unique-together): {t} ({', '.join(group)})\n"
+                    f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
+                    f"({', '.join(q(k) for k in keycols)});"))
                 n_uniq += 1
 
             if not inline_pk and pk_cols:
@@ -1655,12 +1797,19 @@ def main() -> int:
     if SCOPE_TABLE in real:
         protected[SCOPE_TABLE] = "self"
     by_parent: list[tuple[str, str, str, str]] = []
+    for t, col in sorted(ROW_OWNER.items()):
+        if t in real and not any(o[0] == col for o in owners.get(t, [])):
+            print(f"  ! ROW_OWNER names {t}.{col}, which is not a NOT NULL declared reference; the table "
+                  "falls back to the default owner rule")
     while True:
         round_ = []
         for t in sorted(real):
             if t in protected:
                 continue
-            cands = [o for o in owners.get(t, []) if o[1] in protected]
+            own = owners.get(t, [])
+            if t in ROW_OWNER:
+                own = [o for o in own if o[0] == ROW_OWNER[t]]
+            cands = [o for o in own if o[1] in protected]
             if cands and len({o[1] for o in cands}) == 1:
                 col, par, key = sorted(cands)[0]
                 round_.append((t, col, par, key))
@@ -1688,7 +1837,12 @@ def main() -> int:
                 f"{c['column']} -> {c['references']}" for c in nullable) + ")")
         return "no scope column and no declared owner"
 
-    n_subject_rls, n_tenant_rls = [0], [0]
+    n_subject_rls, n_tenant_rls, n_append_rls = [0], [0], [0]
+    # **An APPEND_AUDIT table that another rule already protects is not silently left to it**: the list
+    # names a decision about who may append, and a scope column added later would undo it unseen.
+    for t in sorted(APPEND_AUDIT):
+        if t in real and (t in protected or t in venue_only):
+            print(f"  ! {t} is in APPEND_AUDIT but protected by another rule; its append policy is not applied")
     unscoped_all = [t for t in sorted(real)
                     if t not in protected and t not in venue_only and t != SCOPE_TABLE]
     for db in ("tenant", CONTROL):
@@ -1696,22 +1850,25 @@ def main() -> int:
         vmine = [t for t in venue_only if area(t.split(".")[0]) == db]
         pmine = [p for p in by_parent if area(p[0].split(".")[0]) == db]
         umine = [(t, why_unscoped(t)) for t in unscoped_all if area(t.split(".")[0]) == db]
-        smine, tmine = [], []
+        smine, tmine, amine = [], [], []
         if db == "tenant" and SCOPE_TABLE in real:
             for t, why in umine:
-                if any(c["column"] == "subject_id" for c in cols[t]):
+                if t in APPEND_AUDIT:
+                    amine.append((t, why))
+                elif any(c["column"] == "subject_id" for c in cols[t]):
                     smine.append((t, why))
                 else:
                     tmine.append((t, why))
             umine = []
             n_subject_rls[0] += len(smine)
             n_tenant_rls[0] += len(tmine)
+            n_append_rls[0] += len(amine)
         total = len(by_schema.get(CONTROL) or []) if db == CONTROL else n_tenant_tables
         files[f"{db}/920-row-level-security.sql"] = rls_file(
             db, mine, vmine, pmine, umine, total,
             has_scope_table=(SCOPE_TABLE in real and db == "tenant"),
             shared={t: c for t, c in shared_scope.items() if t in mine},
-            by_subject=smine, tenant_only=tmine)
+            by_subject=smine, tenant_only=tmine, append_audit=amine)
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.
@@ -1767,8 +1924,8 @@ def main() -> int:
         print(f"     append-only but not partitioned: {t} -- {why}")
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
           f"{len(by_parent)} through their owner · {n_subject_rls[0]} by subject · "
-          f"{n_tenant_rls[0]} tenant root only · "
-          f"{len(unscoped_all) - n_subject_rls[0] - n_tenant_rls[0]} with no policy")
+          f"{n_tenant_rls[0]} tenant root only · {n_append_rls[0]} append-only audit · "
+          f"{len(unscoped_all) - n_subject_rls[0] - n_tenant_rls[0] - n_append_rls[0]} with no policy")
     print(f"  {len(by_schema.get(CONTROL) or [])} control tables · "
           f"{n_tenant_tables} tenant tables in {len(tenant_schemas)} schemas")
     if n_xdb:
