@@ -583,6 +583,19 @@ def read_ddl() -> dict[str, dict]:
         t["policy_label"] = POLICY_LABEL.get(t.get("policy", ""), "none")
         # ADR-0056 (amends ADR-0044): release 1 partitions by month, and the SQL says which tables.
         t["partitioned"] = bool(t.get("partition_by"))
+    # **A table renamed after the baseline froze goes by its new name** (12 October 2026, CHG-R6-054). The frozen r1
+    # SQL still creates it under the old name while the lineage names the new one (CHG-R6-010; derive-schema-history.py
+    # RENAMES), so it fell between the two: no task built it, and seating.seat_block, in Block A only through
+    # seat_hold's key, dropped to Block C. The table and every key into it take the new name.
+    import importlib.util as _iu
+    _sp = _iu.spec_from_file_location("derive_schema_history", ROOT / "tools" / "derive-schema-history.py")
+    _dsh = _iu.module_from_spec(_sp)
+    _sp.loader.exec_module(_dsh)
+    ren = {r["from"]: r["to"] for r in _dsh.RENAMES if r["from"] in tables and r["to"] not in tables}
+    for a, b in ren.items():
+        tables[b] = tables.pop(a)
+    for t in tables.values():
+        t["fks"] = {ren.get(x, x) for x in t["fks"]}
     return tables
 
 

@@ -1,0 +1,64 @@
+id: CHG-R6-054
+date: '2026-10-12'
+source: developer
+kind: process
+proposed: '2026-10-12'
+summary: 'A pushed operation stays under its pushed task when its first consumer, and so its app-module, changes; the
+  task keeps its parent unless one of its operations now needs an earlier block, and then the whole task moves to that
+  block. read_ddl() reads a table renamed after the baseline froze under its new name.'
+decision:
+  what: 'tools/build-service-docs.py. (1) The first-release slice and the Venue Management cut leave an operation to its
+    pushed task (held_elsewhere) when that task was a later app-module''s Block A task in the plan this run replaces and
+    its task-mates are planned outside the cut; the later blocks then plan it. (2) After the later blocks assign each
+    operation an app-module, the operations of one pushed task that landed in different app-modules all go to one: the
+    earliest block any of them needs, and within it the task''s previous parent when it is there, else the first in build
+    order ("pushed task kept whole" in the log). SVC-IDENTITY-IDENTITY-7 (listModules, listSegregationRules,
+    listSegregationViolations) therefore moves whole from AM-IDENTITY-SECURITY-P08 (Block B) to
+    AM-SETUP-PLATFORM-FOUNDATION-P08-REST (Block A, Sprint 3), because ADM-340 moved to Block A (CHG-R6-042): the plan
+    expresses it, so nothing goes into op-retire.py SUBTASK_MOVES. (3) A screen task planned before the later blocks waits
+    on the pushed task that now builds one of its operations (GST-007 and WEB-006 on SVC-CATALOGUE-CATALOGUE-7 for
+    joinWaitlist and leaveWaitlist). (4) read_ddl() renames every table derive-schema-history.py RENAMES lists from its
+    frozen r1 name to its new one, with every key into it, so a renamed table is planned again (seating.seat_block was in
+    Block A only through seat_hold''s key and had dropped to Block C).'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The r4 gate of 12 October 2026 (refresh-safe --parallel 4 on r4-cr-fixes after merging the seven r4 branches) failed
+  check-key-stability with 11 `moved` findings (CHG-R6-052): spec changes of the other r4 branches gave pushed operations
+  a first consumer in another app-module, the slice or a Venue Management wave. The rename gap was found by the screens
+  agent (r4-screens 4e90e21b, CHG-R6-047) against the CHG-R6-010 renames.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - SVC-IDENTITY-IDENTITY-7
+  - SVC-CATALOGUE-CATALOGUE-7
+  - SVC-CATALOGUE-EVENTS-3
+  - SVC-CATALOGUE-EVENTS-4
+  - SVC-CATALOGUE-EVENTS-5
+  - SVC-MARKETING-MARKETING-11
+  other:
+  - CHG-R6-052
+  - CHG-R6-042
+  - CHG-R6-010
+root_class: 'new: regroup-moves-pushed-subtask'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR; the request is the coordinator's r4 gate follow-up of 12 October 2026)
+triage: blocker
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: 'Batch R6, 12 October 2026. Regenerated in place (derive-delivery-slice, build-service-docs, derive-block-a-schedule)
+  on r4-tooling with r4-screens merged: check-key-stability 0 moved (16 tests), check-plan-closure PASS (0 new), and
+  check-ticket-text unchanged against the generator before this change (the same 15 findings either way). Every renamed
+  table stays in the migration task it was in. The four SVC-TENANCY-APPROVALS moves of the gate did not reproduce in this
+  scoped regeneration; the rule that keeps a pushed task whole covers them.'
