@@ -27394,6 +27394,7 @@ screens:
     - BO-1018
     - BO-1034
     - BO-1191
+    - BO-954
     entryFrom:
     - BO-108
     - BO-594
@@ -28034,6 +28035,10 @@ screens:
       trigger: Opens Best Seat Recommendations
       provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever
         A, CHG-RONEP-007); its command centre is not in Block A'
+    - to: BO-954
+      trigger: Opens Venue Canvas
+      provenance: 'CHG-R6-047: the section home links to the Block A seat-map screen it leads to (lever A,
+        CHG-RONEP-007); its command centre BO-953 is not in Block A'
     - to: BO-1191
       trigger: Organisation
       provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
@@ -132079,6 +132084,7 @@ screens:
   navigation:
     entryFrom:
     - BO-953
+    - BO-100
     exitTo:
     - BO-953
     transitions:
