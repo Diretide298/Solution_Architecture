@@ -1,0 +1,51 @@
+id: CHG-R6-045
+date: '2026-10-12'
+source: audit
+kind: spec
+proposed: '2026-10-12'
+summary: GST-009 Review & Payment no longer calls createOrder; checkoutCart is the one way a guest order is created, as
+  on its web twin.
+decision:
+  what: 'screens/P02-guest-mobile-app.yaml GST-009: the Order banner reads the order number from checkoutCart; createOrder
+    leaves apis and is recorded as a removed gap with the reason; the Pay note says checkoutCart creates the order.
+    contracts/spine/orders.yaml createOrder no longer lists GST-009 in x-ticvai-consumed-by. tools/check-screen-patterns.py
+    gains the DEC row (CHG-R6-045, GST-009, without createOrder).'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'N10 of the lead''s list of 12 October 2026, a finding: "WEB-012 binds no createOrder". The guest checkout pair
+  (WEB-011, WEB-012, WEB-014 and GST-009) called different operations: GST-009 alone bound createOrder, kept as a
+  banner by GFIX-3 on 2 October, while checkoutCart already turns the cart into the order (contracts/spine/orders.yaml)
+  and flows F01, F02 and F50 use checkoutCart and createPayment only, so the app would have made two orders. Chinmay
+  decided on 12 October 2026: "Drop it from GST-009 (Recommended)".'
+keys_touched:
+  screens:
+  - GST-009
+  operations:
+  - createOrder
+  - checkoutCart
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - contracts/spine/orders.yaml
+  - tools/check-screen-patterns.py
+root_class: 'A-TWIN-OPS (guest web and app twins call different operations)'
+tickets:
+  started:
+  - APP-MOB-GST-009
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; Chinmay's answer of 12 October 2026 on N10)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch R6, 12 October 2026. **Started ticket:** APP-MOB-GST-009 is a Sprint 1 Block A ticket, so it is not
+  rewritten: the release gives it a comment and a linked delta ticket (stop calling createOrder; show the order number
+  checkoutCart returns). createOrder stays in Block A for the till (POS) and the partner portal, so no backend ticket
+  changes. The DEC row fails if createOrder comes back on GST-009.'

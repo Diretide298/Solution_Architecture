@@ -3972,7 +3972,6 @@ paths:
     post:
       operationId: createOrder
       x-ticvai-consumed-by:
-        - "P02 GST-009 Review & Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"

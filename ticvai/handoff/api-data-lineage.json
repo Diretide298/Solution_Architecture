@@ -6645,7 +6645,7 @@
   ],
   "routing": "",
   "scope": "venue",
-  "perm": null,
+  "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Record a consent decision",
   "source": "path-inferred",

@@ -158,6 +158,8 @@ DECIDED = [
     ("CHG-R6-040", "BO-1192", "with", "listProducts"),
     # ADM-340 reads the segregation rules it replaces (r1 gate READ; CHG-R6-042)
     ("CHG-R6-042", "ADM-340", "with", "listSegregationRules"),
+    # checkoutCart is the one way a guest order is created (Chinmay, 12 October 2026, CHG-R6-045)
+    ("CHG-R6-045", "GST-009", "without", "createOrder"),
 ]
 # READ outside Block A: 545 on 3 October (430 screens with no read, 115 edits with no read back), found
 # by the rule that fixed the 47 in Block A (CHG-R1S-004); 574 once the same day's lineage fix (CHG-R1S-005)
