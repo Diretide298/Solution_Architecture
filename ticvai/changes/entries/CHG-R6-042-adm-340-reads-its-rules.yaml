@@ -1,0 +1,58 @@
+id: CHG-R6-042
+date: '2026-10-12'
+source: audit
+kind: spec
+proposed: '2026-10-12'
+summary: ADM-340 Segregation of Duties Policy Manager reads the rules it replaces (listSegregationRules, on load) and is
+  wave 1 like the rest of Block A.
+decision:
+  what: 'screens/P08-venue-back-office.yaml ADM-340: wave 3 -> 1; apis gain listSegregationRules (onLoad); a Rules in
+    force table (SegregationRule name, permissionA, permissionB, severity) the save form opens on, since
+    setSegregationRules is a PUT of the whole list; the loading and no-access states name the read and its permission
+    (PERMISSION_VIEW, and ROLE_MANAGE for the save). contracts/spine/identity.yaml: listSegregationRules lists ADM-340 in
+    x-ticvai-consumed-by.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'N14 of the lead''s list of 12 October 2026, a finding of check-screen-patterns on main: P8 (a Block A screen with
+  wave 3) and READ (the r1 gate''s G3, CHG-R1S-004: the screen shows data and binds no read) on ADM-340. A developer
+  handed it builds a form that opens empty and replaces every saved rule on save. listSegregationRules was added for
+  exactly this screen (BL-110) and never bound.'
+keys_touched:
+  screens:
+  - ADM-340
+  operations:
+  - listSegregationRules
+  - setSegregationRules
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-screen-patterns.py
+root_class: 'A-READ (r1 gate G3)'
+tickets:
+  started:
+  - APP-SETUP-ADM-340
+  unstarted:
+  - SVC-IDENTITY-IDENTITY-10
+  - SVC-IDENTITY-IDENTITY-7
+  - APP-SETUP-ADM-340-REST (new)
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request is N14 of the lead's list of 12 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch R6, 12 October 2026. check-screen-patterns found it (P8 and READ on ADM-340 fail before, pass after); a
+  DEC row (CHG-R6-042, ADM-340 with listSegregationRules) keeps the read bound. **Plan effect, checked with
+  tools/build-service-docs.py in place and reverted:** the Block A closure takes listSegregationRules, so it moves from
+  SVC-IDENTITY-IDENTITY-7 (Block B, Sprint 3) to SVC-IDENTITY-IDENTITY-10 (Block A, Sprint 2, unstarted), and the screen''s
+  read becomes a new APP-SETUP-ADM-340-REST task in Block A. APP-SETUP-ADM-340 is Sprint 1 and taken as started: not
+  rewritten, the read reaches it as a comment and a linked delta (the new -REST task). Left as they were: the stale gap
+  on ADM-340 that says it declares no write, and the other P8 findings (BO-087, BO-344, BO-1018, BO-1034, BO-1179,
+  BO-1187, ADM-606), whose wave change could move their keys between the VM and setup task families.'

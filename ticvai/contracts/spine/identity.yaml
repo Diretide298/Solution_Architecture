@@ -564,6 +564,8 @@ paths:
   /segregation-rules:
     get:
       operationId: listSegregationRules
+      x-ticvai-consumed-by:
+        - "P08 ADM-340 Segregation of Duties Policy Manager"
       summary: Read the conflicting-permission rules back
       description: 'BL-110, 3.3.31. **`setSegregationRules` was a PUT with no GET**, so the screen
         named above manages rules it cannot load — and nobody could audit a tenant''s controls

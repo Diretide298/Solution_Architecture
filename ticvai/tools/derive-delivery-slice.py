@@ -87,6 +87,21 @@ ALSO = ["evaluateAiGovernance", "getAiUsage", "getAiPolicy", "proposeGuidedChoic
         "openAiIncident", "listAiIncidents", "getForecast", "listOperationalRequirements"]
 
 
+# **Placed in a later block by the lead** (Chinmay, 12 October 2026, N32: the client's feedback of 6 October,
+# CHG-R6-040). A writer of a table a core operation reads becomes setup, and so Block A, by the fixpoint below, and a
+# screen calling a setup operation can become its Block A host. The Organisation tree and the Entitlement templates
+# screens are Block B by decision, with the template's new read, edit and archive: these writers are not setup, and
+# these screens host no setup operation (an operation already in the slice stays there, built in Block A as before).
+LATER_BLOCK_OPERATIONS = {
+    "updateEntitlementTemplate": "edits a template on BO-1192, Block B (CHG-R6-040)",
+    "archiveEntitlementTemplate": "retires a template on BO-1192, Block B (CHG-R6-040)",
+}
+LATER_BLOCK_SCREENS = {
+    "BO-1191": "Organisation, Block B (CHG-R6-040)",
+    "BO-1192": "Entitlement Templates, Block B (CHG-R6-040)",
+}
+
+
 def is_deferred(s: dict) -> bool:
     """**A screen with a `deferred` block is out of the first release** (decided 28 September, audit
     R187 and R242). None is deferred today: the in-venue notifications feed GST-030 and WEB-046 came back in
@@ -163,7 +178,7 @@ def main() -> int:
             if writers[t] & slice_:
                 continue
             for w in writers[t]:
-                if is_setup(w, lineage[w]):
+                if is_setup(w, lineage[w]) and w not in LATER_BLOCK_OPERATIONS:
                     add.add(w)
                     setup_for[w].add(t)
         add -= slice_
@@ -191,7 +206,7 @@ def main() -> int:
             "path": d.get("path"),
             "perm": d.get("perm"),
             "platforms": sorted(core.get(o, ())),
-            "screens": sorted(called_by.get(o, ())),
+            "screens": sorted(called_by.get(o, set()) - set(LATER_BLOCK_SCREENS)),
             "enables": sorted(setup_for.get(o, ())),
         }
 

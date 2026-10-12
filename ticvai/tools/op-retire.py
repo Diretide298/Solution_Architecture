@@ -41,6 +41,12 @@ MERGED = {"BO-127": "BO-036", "BO-472": "BO-141", "CMS-020": "CMS-015", "BO-320"
 # Tickets out of the plan for a reason other than their own screen. "merge" names the ticket that carries
 # the work now (closed as Rejected); "defer" is on hold, off the board.
 OTHER = {
+    # BO-1192 Entitlement Templates joined Ticketing on Venue Management (CHG-R6-040, 12 October 2026), which re-cut that
+    # app-module's parts: setSpace, this unstarted Block B ticket's one operation, is now chunked with setEventSchedule
+    # and setEventType (found by check-key-stability on a local derive).
+    "SVC-CATALOGUE-EVENTS-6": ("merge", "SVC-CATALOGUE-EVENTS-4", "its one operation, setSpace, is built with "
+                               "setEventSchedule and setEventType after BO-1192 re-cut Ticketing on Venue Management "
+                               "(CHG-R6-040)"),
     "SVC-IDENTITY-MFA-2": ("merge", "SVC-IDENTITY-MFA-1", "verifyMfaChallenge and verifyMfaEnrolment were regrouped "
                            "into one task with the rest of MFA (audit R126, R135)"),
     "APP-SETUP-ADM-421": ("merge", "APP-SETUP-ADM-342", "its one setup operation, setPasswordPolicy, is built on "

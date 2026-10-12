@@ -225,6 +225,7 @@ paths:
         - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-064 Zones & Areas"
         - "P08 BO-068 Audit Log"
+        - "P08 BO-1191 Organisation"
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-412 Payment Method & Settlement Setup"
@@ -273,6 +274,7 @@ paths:
       operationId: createOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-1191 Organisation"
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-420 Tenant & Organization Provisioning"
@@ -1188,6 +1190,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P08 BO-1062 Tenant & Brand Context"
+        - "P08 BO-1191 Organisation"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a scope node
@@ -1210,6 +1213,7 @@ paths:
       operationId: updateOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-1191 Organisation"
         - "P08 BO-145 Venue & Park Access Structure"
       x-ticvai-audience: [staff]
       summary: Rename or deactivate a scope node

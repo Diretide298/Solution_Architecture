@@ -13,7 +13,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 1661
+  screenCount: 1663
   app: venue-management-web
   appStatus: scaffolded
   packages:
@@ -2615,9 +2615,46 @@ screens:
           3 23SEP-6), its barcode, and whether it is the default. The combination of values and the SKU
           come from the attributes and are not edited here. A retired variant is refused `409`.'
         provenance: contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}
+      - kind: secondaryButton
+        label: Check the impact
+        operation: assessProductChange
+        notes: Sends the unsaved product edit to `assessProductChange` before Save product and shows what it would
+          touch (Change impact, below). Nothing is written.
+        provenance: contract catalogue.yaml POST /products/{productId}/change-impact
+      - kind: secondaryButton
+        label: Clone product
+        operation: cloneProduct
+        provenance: contract catalogue.yaml POST /products/{productId}/clone
+      - kind: secondaryButton
+        label: Restore this version
+        operation: restoreProductVersion
+        notes: On the row picked in Versions; the current version is never offered.
+        provenance: contract catalogue.yaml POST /products/{productId}/versions/{version}/restore
     - name: contextPanel
       slot: selection
       components:
+      - kind: dataTable
+        label: Versions
+        bindsTo: ProductVersion
+        columns:
+        - ProductVersion.version
+        - ProductVersion.publishedAt
+        - ProductVersion.note
+        - ProductVersion.isCurrent
+        operation: listProductVersions
+        notes: What this product used to be, newest first; the row Restore this version puts back.
+        provenance: contract catalogue.yaml GET /products/{productId}/versions
+      - kind: detailPanel
+        label: Change impact
+        bindsTo: ProductChangeImpact
+        columns:
+        - ProductChangeImpact.entitlementsIssued
+        - ProductChangeImpact.ordersAffected
+        - ProductChangeImpact.futurePerformances
+        - ProductChangeImpact.openCarts
+        - ProductChangeImpact.blockedBy
+        operation: assessProductChange
+        provenance: contract catalogue.yaml POST /products/{productId}/change-impact
       - kind: selectField
         label: Booking flow
         bindsTo: Product.bookingFlowId
@@ -2847,6 +2884,34 @@ screens:
       - barcode
       - isDefault
     provenance: contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}
+  - id: formCloneProduct
+    component: modal
+    trigger: Clone product
+    body: '**Collects what `cloneProduct` sends before it is called.** Required: `code` (a new code; a code in use
+      is refused), `name`. Optional: `includeVariants`. The copy is a new draft. Dismissing sends nothing.'
+    confirm:
+      label: Clone product
+      operation: cloneProduct
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - includeVariants
+    provenance: contract catalogue.yaml POST /products/{productId}/clone
+  - id: formRestoreProductVersion
+    component: modal
+    trigger: Restore this version
+    body: '**Collects what `restoreProductVersion` sends before it is called.** Required: `note`, why this
+      version is put back. The version is the row picked in Versions. Dismissing sends nothing.'
+    confirm:
+      label: Restore this version
+      operation: restoreProductVersion
+    dismiss:
+      label: Cancel
+      discards:
+      - note
+    provenance: contract catalogue.yaml POST /products/{productId}/versions/{version}/restore
   gaps:
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): An operation that renders the PDF ticket
@@ -4310,6 +4375,7 @@ screens:
     - BO-007
     - BO-008
     - BO-009
+    - BO-1192
     inferred: true
     entryFrom:
     - BO-102
@@ -4332,6 +4398,9 @@ screens:
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none
         of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
         and BO-009 opens on its own'
+    - to: BO-1192
+      trigger: Entitlement Templates
+      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -18728,9 +18797,15 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ZonesAreasDetail.tsx
     status: notStarted
   navigation:
+    exitTo:
+    - BO-1191
     inferred: true
     entryFrom:
     - BO-108
+    transitions:
+    - to: BO-1191
+      trigger: Organisation
+      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Direction is
@@ -27303,6 +27378,7 @@ screens:
     - ADM-606
     - BO-1018
     - BO-1034
+    - BO-1191
     entryFrom:
     - BO-108
     - BO-594
@@ -27943,6 +28019,9 @@ screens:
       trigger: Opens Best Seat Recommendations
       provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever
         A, CHG-RONEP-007); its command centre is not in Block A'
+    - to: BO-1191
+      trigger: Organisation
+      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
@@ -28498,6 +28577,7 @@ screens:
     - ADM-603
     - BO-696
     - BO-485
+    - BO-1192
     transitions:
     - to: BO-485
       trigger: Kiosk groups
@@ -28686,6 +28766,9 @@ screens:
       trigger: Opens Event Duplication & Clone Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+    - to: BO-1192
+      trigger: Entitlement Templates
+      provenance: "decided 12 October 2026, Chinmay: the client's feedback of 6 October, N32 (CHG-R6-040)"
   notes: Section landing. **14 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -162024,6 +162107,495 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract catalogue.yaml POST /donation-campaigns
+- id: BO-1191
+  name: Organisation
+  permission: SCOPE_VIEW
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  implementation:
+    app: venue-management-web
+    route: /setup/organisation
+    component: apps/venue-management-web/src/routes/setup/Organisation.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-100
+    - BO-064
+    exitTo:
+    - BO-100
+    - BO-064
+    inferred: false
+    notes: 'Reached from BO-100 Venue Home (Setup) and from BO-064 Zones & Areas, which keeps zones and areas
+      and links here for departments (client feedback of 6 October 2026, N32; CHG-R6-040).'
+    transitions:
+    - to: BO-100
+      trigger: Back to Venue Home
+      provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+      back: true
+    - to: BO-064
+      trigger: Zones & Areas
+      provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  notes: '**Created 12 October 2026 (CHG-R6-040) from the client''s feedback of 6 October** ("some of the
+    basic setup is not there such as Departments, Sub Departments ... and it''s confusing";
+    design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no organisation tree: departments existed only
+    through the Create org unit button of BO-064 Zones & Areas and the wave-3 BO-145, and the tree itself is
+    ADM-006, in the console. **This screen is the venue''s department, sub-department and outlet tree**, on
+    the org units the package already has (`listOrgUnits`, `createOrgUnit`, `getOrgUnit`, `updateOrgUnit`);
+    every "choose a department" field (outlets, BO-055 Rota & Scheduling, products) reads the same tree.
+    **Archive is deactivate**: `updateOrgUnit` with `isActive` false, which makes every permission query at or
+    beneath the unit resolve to deny and deletes nothing. Block B (Chinmay''s decision on N32).'
+  density: compact
+  pattern: listDetail
+  patternReason: '`listOrgUnits` reads the tree and `getOrgUnit` reads one unit of it — list, select, act'
+  purpose: Keep the venue's departments, sub-departments and outlets as one tree that every department
+    picker reads.
+  layout:
+    template: split
+    regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: selectField
+        label: Level
+        operation: listOrgUnits
+        bindsTo: OrgUnit.level
+        notes: Sends `?level=` to `listOrgUnits`. Offers Department, Sub-department and Outlet; the levels above
+          the venue are the console's (ADM-006).
+        provenance: contract tenancy.yaml GET /org-units
+      - kind: toggle
+        label: Show archived
+        operation: listOrgUnits
+        notes: Sends `?includeInactive=` to `listOrgUnits`. Off by default, so an archived unit leaves the
+          tree and the pickers.
+        provenance: contract tenancy.yaml GET /org-units
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: treeNav
+        label: Departments, sub-departments and outlets
+        bindsTo: OrgUnit
+        columns:
+        - OrgUnit.level
+        - OrgUnit.code
+        - OrgUnit.name
+        - OrgUnit.isActive
+        - OrgUnit.childCount
+        operation: listOrgUnits
+        notes: '`listOrgUnits` with `?under=` the venue''s path, so the tree starts at the venue the session
+          holds. Each node shows its level, name and how many units sit directly under it (`childCount`).
+          Cursor-paged: a large venue loads the next page as the tree is scrolled.'
+        provenance: contract tenancy.yaml GET /org-units
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected unit
+        bindsTo: OrgUnit
+        columns:
+        - OrgUnit.level
+        - OrgUnit.code
+        - OrgUnit.name
+        - OrgUnit.path
+        - OrgUnit.isActive
+        - OrgUnit.childCount
+        operation: getOrgUnit
+        provenance: contract tenancy.yaml GET /org-units/{orgUnitId}
+      - kind: cardList
+        label: Units under it
+        bindsTo: OrgUnit
+        columns:
+        - OrgUnit.level
+        - OrgUnit.name
+        - OrgUnit.isActive
+        operation: listOrgUnits
+        notes: '`listOrgUnits` with `?under=` the selected unit''s path.'
+        provenance: contract tenancy.yaml GET /org-units
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Add a unit
+        operation: createOrgUnit
+        notes: Adds a department under the venue, a sub-department under a department, or an outlet under
+          either; the selected unit is the parent.
+        provenance: contract tenancy.yaml POST /org-units
+      - kind: secondaryButton
+        label: Rename unit
+        operation: updateOrgUnit
+        provenance: contract tenancy.yaml PATCH /org-units/{orgUnitId}
+      - kind: destructiveButton
+        label: Archive unit
+        operation: updateOrgUnit
+        notes: Sends `isActive` false. **Everything at or beneath the unit is denied from then on**; nothing
+          is deleted, and Show archived brings it back to restore (`isActive` true).
+        provenance: contract tenancy.yaml PATCH /org-units/{orgUnitId}
+  states:
+    loading: The venue's tree, read by `listOrgUnits` under the venue's path.
+    error: Could not load. Names which read failed and leaves the tree untouched.
+    emptyFirstRun: No departments yet. Offers Add a unit (`createOrgUnit`) with Department chosen; the department
+      pickers on BO-055 and the outlet and product screens show nothing to choose until one exists.
+    emptyNoResults: Nothing matches the Level or Show archived filter and the tree is still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show this screen,
+      and names that permission. **Never an empty tree.** A caller who can see the screen but lacks `SCOPE_MANAGE`
+      (`createOrgUnit`, `updateOrgUnit`, held at brand level) sees Add a unit, Rename unit and Archive unit disabled,
+      naming that permission.'
+    validation: '`400` on a code that is not lower-case letters, digits and underscores, or a level that cannot
+      sit under the selected parent; `409` on a code already used under that parent. Marked on the field.'
+  apis:
+  - operationId: listOrgUnits
+    contract: tenancy
+    purpose: The tree under the venue, and the units under the selected one
+    trigger: onLoad
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  - operationId: getOrgUnit
+    contract: tenancy
+    purpose: The selected unit
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  - operationId: createOrgUnit
+    contract: tenancy
+    purpose: Add a department, sub-department or outlet
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    invalidates:
+    - listOrgUnits
+  - operationId: updateOrgUnit
+    contract: tenancy
+    purpose: Rename, archive or restore a unit
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    invalidates:
+    - listOrgUnits
+  entryState:
+    params:
+    - name: orgUnitId
+      from: navigation
+      optional: true
+      notes: Opened without it, the screen shows the venue's tree and the user picks a unit; an edge that holds
+        one (BO-064) may carry it to open on that unit.
+    coldEntry: Resolves the tenant and venue from the session, never from the link; a unit the session cannot
+      see is said to be out of reach, not silently dropped.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P08 Venue Management.dc.html#bo-1191
+  overlays:
+  - id: formCreateOrgUnit
+    component: modal
+    trigger: Add a unit
+    body: '**Collects what `createOrgUnit` sends before it is called.** Required: `level` (Department, Sub-department
+      or Outlet), `code` (lower-case, fixed once created), `name`. `parentId` is the selected unit, never typed.
+      Dismissing sends nothing; the tree behind is unchanged.'
+    bindsTo: CreateScopeNodeRequest
+    confirm:
+      label: Add unit
+      operation: createOrgUnit
+    dismiss:
+      label: Cancel
+      discards:
+      - level
+      - code
+      - name
+    provenance: contract tenancy.yaml POST /org-units
+  - id: formUpdateOrgUnit
+    component: modal
+    trigger: Rename unit
+    body: '**Collects what `updateOrgUnit` sends before it is called.** Optional: `name`. The code and the place
+      in the tree do not change. Dismissing sends nothing.'
+    confirm:
+      label: Save unit
+      operation: updateOrgUnit
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+    provenance: contract tenancy.yaml PATCH /org-units/{orgUnitId}
+  - id: confirmArchiveOrgUnit
+    component: modal
+    trigger: Archive unit
+    body: '**Archive *Food & Beverage* and the 4 units under it?** Staff granted at or beneath it lose that access
+      until it is restored; nothing is deleted. `updateOrgUnit` with `isActive` false.'
+    confirm:
+      label: Archive unit
+      operation: updateOrgUnit
+    dismiss:
+      label: Keep it
+    provenance: contract tenancy.yaml PATCH /org-units/{orgUnitId}
+  gaps:
+  - operation: null
+    why: '**Move is not in the contract.** A unit''s code is the last segment of its ltree path and is fixed once
+      created, and no operation re-parents a unit; the client''s "add, edit, move and archive" gets add, rename and
+      archive. Moving a department is archive and re-create until an operation exists (CHG-R6-040).'
+    source: contracts/spine/tenancy.yaml#createOrgUnit | design-r1/COMMAND.md ADDED 6 Oct
+  - operation: null
+    why: '**The counts under each node are only the child count.** `OrgUnit` carries `childCount`; the outlets,
+      staff and products under a unit (asked for in the wireframe intent) have no read that counts them by unit
+      (CHG-R6-040).'
+    source: contracts/spine/tenancy.yaml#OrgUnit | design-r1/COMMAND.md ADDED 6 Oct
+- id: BO-1192
+  name: Entitlement Templates
+  permission: PRODUCT_VIEW
+  module: Sell
+  requiresModule: ticketing
+  wave: 3
+  implementation:
+    app: venue-management-web
+    route: /sell/entitlement-templates
+    component: apps/venue-management-web/src/routes/sell/EntitlementTemplates.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-102
+    - BO-012
+    exitTo:
+    - BO-102
+    - BO-012
+    inferred: false
+    notes: 'Reached from BO-102 Sell (Ticketing) and from BO-012 Membership Products, which links here for the
+      templates its memberships grant (client feedback of 6 October 2026, N32; CHG-R6-040).'
+    transitions:
+    - to: BO-102
+      trigger: Back to Sell
+      provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+      back: true
+    - to: BO-012
+      trigger: Membership Products
+      provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  notes: '**Created 12 October 2026 (CHG-R6-040) from the client''s feedback of 6 October** ("entitlement for the
+    tickets ... it''s confusing"; design-r1/COMMAND.md, ADDED 6 Oct). Venue Management had no list of ticket
+    entitlements: templates were created only from BO-012 Membership Products and the wave-3 membership builders
+    BO-288 and BO-289. **This screen is that list first**, with the products that use each template, and the
+    template opened whole: what it admits, validity (kind and offsets), re-entry, transfer, limits and blackout
+    dates. `getEntitlementTemplate`, `updateEntitlementTemplate`, `archiveEntitlementTemplate` and the
+    `entitlementTemplateId` filter on `listProducts` were added for it (CHG-R6-040). **An edit applies to
+    entitlements issued from then on**; a pass already sold keeps its rules, except blackout dates, which reach
+    issued entitlements at their next validation. Block B (Chinmay''s decision on N32).'
+  density: compact
+  pattern: listDetail
+  patternReason: '`listEntitlementTemplates` reads the population and `getEntitlementTemplate` reads one of
+    them — list, select, act'
+  purpose: List the rights the venue's tickets and passes grant, see which products use each, and create, edit
+    or retire one.
+  layout:
+    template: split
+    regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: toggle
+        label: Show archived
+        notes: Filters the loaded list on `isActive`; off by default.
+        provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Every entitlement template
+        bindsTo: EntitlementTemplate
+        columns:
+        - EntitlementTemplate.code
+        - EntitlementTemplate.name
+        - EntitlementTemplate.validityKind
+        - EntitlementTemplate.entriesAllowed
+        - EntitlementTemplate.reentryAllowed
+        - EntitlementTemplate.isActive
+        operation: listEntitlementTemplates
+        provenance: contract catalogue.yaml GET /entitlement-templates
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected template
+        bindsTo: EntitlementTemplate
+        columns:
+        - EntitlementTemplate.name
+        - EntitlementTemplate.description
+        - EntitlementTemplate.validityKind
+        - EntitlementTemplate.validFromOffsetDays
+        - EntitlementTemplate.validForDays
+        - EntitlementTemplate.reentryAllowed
+        - EntitlementTemplate.isTransferable
+        - EntitlementTemplate.blackoutDates
+        operation: getEntitlementTemplate
+        provenance: contract catalogue.yaml GET /entitlement-templates/{templateId}
+      - kind: dataTable
+        label: Products using this template
+        bindsTo: Product
+        columns:
+        - Product.code
+        - Product.name
+        - Product.kind
+        - Product.lifecycleState
+        operation: listProducts
+        notes: Sends `?entitlementTemplateId=` the selected template to `listProducts` (CHG-R6-040). Each row opens
+          the product (BO-012 for a membership).
+        provenance: contract catalogue.yaml GET /products
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: New template
+        operation: createEntitlementTemplate
+        provenance: contract catalogue.yaml POST /entitlement-templates
+      - kind: secondaryButton
+        label: Edit template
+        operation: updateEntitlementTemplate
+        provenance: contract catalogue.yaml PATCH /entitlement-templates/{templateId}
+      - kind: secondaryButton
+        label: Set blackout dates
+        operation: setEntitlementTemplateBlackoutDates
+        provenance: contract catalogue.yaml PUT /entitlement-templates/{templateId}/blackout-dates
+      - kind: destructiveButton
+        label: Archive template
+        operation: archiveEntitlementTemplate
+        notes: Disabled, naming the products, while Products using this template lists one that is not retired
+          (`409 template-in-use`).
+        provenance: contract catalogue.yaml POST /entitlement-templates/{templateId}/archive
+  states:
+    loading: The venue's entitlement templates, read by `listEntitlementTemplates`.
+    error: Could not load. Names which read failed and leaves the templates untouched.
+    emptyFirstRun: No entitlement templates yet. Offers New template (`createEntitlementTemplate`); a product
+      created before one exists grants nothing at the gate.
+    emptyNoResults: Show archived is off and every template is archived. Offers to show them.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listEntitlementTemplates` requires to show
+      this screen, and names that permission. **Never an empty table.** A caller who can see the screen but lacks
+      `PRODUCT_CONFIGURE` sees New template, Edit template, Set blackout dates and Archive template disabled, naming
+      that permission.'
+    validation: '`400` on a missing code, name or validity kind, or offsets that do not fit the kind; marked on
+      the step and field it belongs to.'
+    conflict: '`409 template-in-use` on Archive names the products still granting it, from Products using this
+      template; `409 template-archived` on Save says the template was archived meanwhile and reloads it.'
+  apis:
+  - operationId: listEntitlementTemplates
+    contract: catalogue
+    purpose: Every template the venue has
+    trigger: onLoad
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  - operationId: getEntitlementTemplate
+    contract: catalogue
+    purpose: The selected template, whole
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  - operationId: listProducts
+    contract: catalogue
+    purpose: The products that use the selected template
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+  - operationId: createEntitlementTemplate
+    contract: catalogue
+    purpose: Create a template, step by step
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    invalidates:
+    - listEntitlementTemplates
+  - operationId: updateEntitlementTemplate
+    contract: catalogue
+    purpose: Edit a template's rules for what is issued from now on
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    invalidates:
+    - listEntitlementTemplates
+  - operationId: setEntitlementTemplateBlackoutDates
+    contract: catalogue
+    purpose: Replace the dates the template does not admit
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    invalidates:
+    - listEntitlementTemplates
+  - operationId: archiveEntitlementTemplate
+    contract: catalogue
+    purpose: Retire a template no product still grants
+    trigger: onAction
+    provenance: decided 12 October 2026, Chinmay (CHG-R6-040)
+    invalidates:
+    - listEntitlementTemplates
+  entryState:
+    params:
+    - name: templateId
+      from: navigation
+      optional: true
+      notes: Opened without it, the screen lists the templates with `listEntitlementTemplates` and the user picks
+        one; an edge that holds one may carry it to open on that template.
+    coldEntry: Resolves the tenant and venue from the session; a template that is gone is said to be gone, and
+      the list is shown.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P08 Venue Management.dc.html#bo-1192
+  overlays:
+  - id: formCreateEntitlementTemplate
+    component: modal
+    trigger: New template
+    body: '**Numbered steps, each with its own fields, then a check** (the builder pattern, design-r1/COMMAND.md
+      ADDED 6 Oct): 1 What it admits (`code`, `name`, `description`, `fastTrackTier`); 2 Validity (`validityKind`,
+      `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `validTimeWindows`, `expiryAnchor`, `expiryDate`,
+      `expiryNoticeDays`); 3 Re-entry (`reentryAllowed`); 4 Transfer (`isTransferable`, `isNameBound`); 5 Limits
+      (`entriesAllowed`, `purchaseEligibility`); 6 Blackout dates (`blackoutDates`); 7 Check: the rules read back in
+      words before `createEntitlementTemplate` is called. Required: `code`, `name`, `validityKind`. Dismissing sends nothing. Not asked, because the server sets it
+      (readOnly in the contract): `id`.'
+    bindsTo: EntitlementTemplate
+    confirm:
+      label: Create template
+      operation: createEntitlementTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - validityKind
+    provenance: contract catalogue.yaml POST /entitlement-templates
+  - id: formUpdateEntitlementTemplate
+    component: modal
+    trigger: Edit template
+    body: '**The same steps as New template, opened on the template''s values**, without the code (fixed once
+      created) and without blackout dates (Set blackout dates). Only what changed is sent to
+      `updateEntitlementTemplate`. Says before saving that the change applies to entitlements issued from now on.'
+    bindsTo: UpdateEntitlementTemplateRequest
+    confirm:
+      label: Save template
+      operation: updateEntitlementTemplate
+    dismiss:
+      label: Cancel
+    provenance: contract catalogue.yaml PATCH /entitlement-templates/{templateId}
+  - id: formSetEntitlementTemplateBlackoutDates
+    component: modal
+    trigger: Set blackout dates
+    body: '**Collects what `setEntitlementTemplateBlackoutDates` sends.** Required: `blackoutDates`, the whole list
+      (an empty list clears it). Optional: `reason`. Says that issued entitlements apply it at their next
+      validation and a date already admitted on is not undone.'
+    confirm:
+      label: Save blackout dates
+      operation: setEntitlementTemplateBlackoutDates
+    dismiss:
+      label: Cancel
+      discards:
+      - blackoutDates
+      - reason
+    provenance: contract catalogue.yaml PUT /entitlement-templates/{templateId}/blackout-dates
+  - id: confirmArchiveEntitlementTemplate
+    component: modal
+    trigger: Archive template
+    body: '**Archive *Annual Pass — Adult*?** No new product can use it, and archiving is final. Passes already sold
+      keep their rules and still admit. Optional: `reason`. `archiveEntitlementTemplate`.'
+    confirm:
+      label: Archive template
+      operation: archiveEntitlementTemplate
+    dismiss:
+      label: Keep it
+    provenance: contract catalogue.yaml POST /entitlement-templates/{templateId}/archive
+  gaps:
+  - operation: null
+    why: '**No versions or publish step for a template.** The builder pattern ends in check, publish and versions;
+      a template has no draft state or version history in the contract, so a save is live for what is issued from
+      then on and the screen shows no version list (CHG-R6-040).'
+    source: contracts/spine/catalogue.yaml#EntitlementTemplate | design-r1/COMMAND.md ADDED 6 Oct
+  - operation: null
+    why: '**The ticket creator''s Entitlement step is not drawn here.** `createProduct` already takes
+      `entitlementTemplateId`; a step on the product screens (BO-007, BO-008) that picks or creates a template is a
+      change to those started tickets and waits for its own delta (CHG-R6-040).'
+    source: contracts/spine/catalogue.yaml#CreateProductRequest | design-r1/COMMAND.md ADDED 6 Oct
 - id: ADM-048
   name: Commercial Pricing Command Center
   module: Commercial
@@ -218279,7 +218851,7 @@ screens:
   name: Segregation of Duties Policy Manager
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Approval_Workflows_and_Governance_Reference.pdf
     board: '6'
@@ -218325,6 +218897,19 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: dataTable
+        label: Rules in force
+        bindsTo: SegregationRule
+        columns:
+        - SegregationRule.name
+        - SegregationRule.permissionA
+        - SegregationRule.permissionB
+        - SegregationRule.severity
+        operation: listSegregationRules
+        notes: 'The tenant''s rules as saved, read on load (12 October 2026, CHG-R6-042). Save segregation rules
+          sends the whole list (`setSegregationRules` is a PUT), so the form opens on these rows and a rule left
+          out is removed.'
+        provenance: contract identity.yaml GET /segregation-rules
       - kind: multiSelect
         label: Roles that may not be held together
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 51 §Price Configuration
@@ -218338,13 +218923,20 @@ screens:
         operation: setSegregationRules
         provenance: contract identity.yaml PUT /segregation-rules
   states:
-    loading: The segregation duties policy configuration as saved.
+    loading: The segregation rules as saved, read by `listSegregationRules`.
     error: Could not load. Names which read failed and leaves the segregation duties policy untouched.
     emptyFirstRun: No segregation duties policy configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `PERMISSION_VIEW`, which `listSegregationRules` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller without `ROLE_MANAGE` sees Save
+      segregation rules disabled, naming it.
   apis:
+  - operationId: listSegregationRules
+    contract: identity
+    purpose: The rules in force, read before the whole list is replaced
+    trigger: onLoad
+    provenance: 'r1 gate rule READ, 12 October 2026 (CHG-R6-042)'
   - operationId: setSegregationRules
     contract: identity
     purpose: Which roles may not be held together

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 231
+  x-ticvai-screen-count: 235
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -1611,6 +1611,7 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-048 Retail Products"
         - "P08 BO-094 Map Editor & Publish"
+        - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
@@ -1693,6 +1694,15 @@ paths:
           below it** in the tree, so a tile for *Guided tours* also lists what sits under its subcategories.
           Guest-callable (decided 29 September, rev 3 REV3-16). A `categoryId` that names no category of the
           venue is a `400`.
+        schema:
+          type: string
+          format: uuid
+      - name: entitlementTemplateId
+        in: query
+        description: '**Products using this template** (client feedback of 6 October 2026, N32; CHG-R6-040): only
+          products whose `entitlementTemplateId` is this one. The Entitlement templates screen (BO-1192) lists them
+          under each template, and `archiveEntitlementTemplate` is refused while any of them is not retired. A
+          guest caller gets the same filter over what it may see.'
         schema:
           type: string
           format: uuid
@@ -4979,6 +4989,7 @@ paths:
       operationId: listEntitlementTemplates
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+        - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
@@ -5011,6 +5022,7 @@ paths:
       operationId: createEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+        - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
       - staff
@@ -14495,6 +14507,171 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /entitlement-templates/{templateId}:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Read an entitlement template
+      description: '**One template, whole** (client feedback of 6 October 2026, N32; CHG-R6-040): the Entitlement
+        templates screen (BO-1192) opens a template from its list and shows every rule it grants: what it admits,
+        the validity kind and offsets, re-entry, transfer, limits and blackout dates. Until now a template could
+        be listed and created, never read back alone, so nothing could edit one safely. An archived template
+        (`isActive` false) is still returned.
+
+        '
+      tags:
+      - entitlement
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    patch:
+      operationId: updateEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-config-scope: venue
+      summary: Update an entitlement template
+      description: '**Edit the rules a template grants** (client feedback of 6 October 2026, N32; CHG-R6-040).
+        Only the fields sent change; `code` is fixed once created. **A change applies to entitlements issued from
+        now on**; one already issued keeps the rules it was issued with, so a guest holding a pass is never
+        re-ruled after paying. Blackout dates have their own operation (`setEntitlementTemplateBlackoutDates`),
+        which also reaches entitlements already issued. An archived template is refused `409 template-archived`.
+
+        '
+      tags:
+      - entitlement
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEntitlementTemplateRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The template, updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`template-archived`: the template is archived and can no longer change.'
+          x-ticvai-problem-types:
+          - template-archived
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /entitlement-templates/{templateId}/archive:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: archiveEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-audience:
+      - staff
+      summary: Archive an entitlement template
+      description: '**Retires a template** (client feedback of 6 October 2026, N32; CHG-R6-040): `isActive`
+        becomes false, the template is no longer offered when a product is created or edited, and archiving is
+        final (a new rule set is a new template). **Refused `409 template-in-use` while a product that is not
+        retired still grants it**; the screen lists those products with `listProducts?entitlementTemplateId=`, so
+        the user moves them to another template first. Entitlements already issued from it keep their rules and
+        still admit.
+
+        '
+      tags:
+      - entitlement
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: The template, archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`template-in-use`: a product that is not retired still grants this template.'
+          x-ticvai-problem-types:
+          - template-in-use
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlement-templates/{templateId}/blackout-dates:
     parameters:
     - name: templateId
@@ -14505,6 +14682,8 @@ paths:
         format: uuid
     put:
       operationId: setEntitlementTemplateBlackoutDates
+      x-ticvai-consumed-by:
+        - "P08 BO-1192 Entitlement Templates"
       x-ticvai-audience:
         - staff
       x-ticvai-config-scope: venue
@@ -19620,6 +19799,96 @@ components:
             '
         notificationsQueued:
           type: integer
+    UpdateEntitlementTemplateRequest:
+      type: object
+      minProperties: 1
+      description: '**What `updateEntitlementTemplate` may change** (CHG-R6-040). Each field means what it means on
+        `EntitlementTemplate`; only the fields sent change. `code` is not here: it is fixed once created. Blackout
+        dates are set with `setEntitlementTemplateBlackoutDates`, and archiving with `archiveEntitlementTemplate`.'
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        validityKind:
+          type: string
+          enum:
+          - singleUse
+          - dated
+          - dateRange
+          - rolling
+          - unlimited
+          - countLimited
+        validFromOffsetDays:
+          type: integer
+          nullable: true
+        validForDays:
+          type: integer
+          nullable: true
+        daysOfWeek:
+          type: array
+          nullable: true
+          items:
+            type: string
+            enum:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+        expiryAnchor:
+          type: string
+          nullable: true
+          enum:
+          - offsetDays
+          - endOfMonth
+          - endOfQuarter
+          - endOfYear
+          - fixedDate
+          - seasonEnd
+        expiryDate:
+          type: string
+          format: date
+          nullable: true
+        expiryNoticeDays:
+          type: integer
+          minimum: 1
+          maximum: 180
+          nullable: true
+        validTimeWindows:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              from:
+                type: string
+              to:
+                type: string
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+        fastTrackTier:
+          type: string
+          nullable: true
+          enum:
+          - none
+          - priority
+          - express
+          - unlimited
+        entriesAllowed:
+          type: integer
+          nullable: true
+        reentryAllowed:
+          type: boolean
+        isTransferable:
+          type: boolean
+        isNameBound:
+          type: boolean
     EntitlementTemplate:
       x-ticvai-persistence: catalogue.entitlement_template
       type: object

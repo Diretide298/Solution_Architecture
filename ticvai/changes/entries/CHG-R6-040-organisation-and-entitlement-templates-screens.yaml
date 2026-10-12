@@ -1,0 +1,94 @@
+id: CHG-R6-040
+date: '2026-10-12'
+source: client-review
+kind: spec
+proposed: '2026-10-12'
+summary: 'Venue Management gets two Block B screens the client found missing on 6 October: BO-1191 Organisation (the
+  department, sub-department and outlet tree on the existing org units) and BO-1192 Entitlement Templates (the list, the
+  products using each, and the template read, edited and archived). catalogue gains getEntitlementTemplate,
+  updateEntitlementTemplate, archiveEntitlementTemplate and listProducts?entitlementTemplateId=, all additive.'
+decision:
+  what: 'contracts/spine/catalogue.yaml: GET and PATCH /entitlement-templates/{templateId} (getEntitlementTemplate,
+    PRODUCT_VIEW; updateEntitlementTemplate, PRODUCT_CONFIGURE, config scope venue, body UpdateEntitlementTemplateRequest,
+    409 template-archived), POST /entitlement-templates/{templateId}/archive (archiveEntitlementTemplate,
+    PRODUCT_CONFIGURE, 409 template-in-use while a product that is not retired grants it), and the optional query
+    parameter entitlementTemplateId on listProducts. screens/P08-venue-back-office.yaml: BO-1191 Organisation (Setup &
+    Go-Live, wave 3, listDetail on listOrgUnits, getOrgUnit, createOrgUnit, updateOrgUnit; archive is isActive false) and
+    BO-1192 Entitlement Templates (Sell, wave 3, listDetail on listEntitlementTemplates, getEntitlementTemplate,
+    listProducts, createEntitlementTemplate, updateEntitlementTemplate, setEntitlementTemplateBlackoutDates,
+    archiveEntitlementTemplate; the create form is the numbered steps). Linked from BO-100 and BO-064 (Organisation) and
+    from BO-102 and BO-012 (Entitlement Templates). tools/derive-delivery-slice.py gains LATER_BLOCK_OPERATIONS and
+    LATER_BLOCK_SCREENS so the two new writers are not Block A setup and the two screens host no setup operation:
+    both screens plan into Block B (VM-BO-1191 under Tenancy & Venues, VM-BO-1192 under Ticketing).'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The client''s feedback of 6 October 2026 before the UAE walkthrough ("some of the basic setup is not there such as
+  Departments, Sub Departments, entitlement for the tickets, and it''s confusing"), filed verbatim in
+  sources/client/2026-10-06-basic-setup-feedback.md. Venue Management had no organisation tree (departments only through
+  BO-064''s Create org unit and the wave-3 BO-145; the tree is ADM-006 in the console) and no entitlement list (only
+  BO-012 and the wave-3 BO-288/289); entitlement templates could be listed, created and given blackout dates
+  (CHG-CSP-051) but never read alone, edited or retired. Chinmay placed both screens in Block B (N32).'
+keys_touched:
+  screens:
+  - BO-1191
+  - BO-1192
+  - BO-064
+  - BO-012
+  - BO-100
+  - BO-102
+  operations:
+  - getEntitlementTemplate
+  - updateEntitlementTemplate
+  - archiveEntitlementTemplate
+  - listProducts
+  schemas:
+  - UpdateEntitlementTemplateRequest
+  tables:
+  - catalogue.entitlement_template
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/tenancy.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/_id-register.yaml
+  - handoff/api-data-lineage.json
+  - tools/derive-delivery-slice.py
+  - tools/check-screen-patterns.py
+  - tools/op-retire.py
+  - sources/client/2026-10-06-basic-setup-feedback.md
+root_class: A28 MISSING-OPERATION
+tickets:
+  started:
+  - APP-SETUP-BO-064
+  - APP-SETUP-BO-012
+  - VM-BO-102
+  unstarted:
+  - VM-BO-100
+  - VM-BO-1191 (new, Block B)
+  - VM-BO-1192 (new, Block B)
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the request is N32 of the lead's list of 12 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch R6, 12 October 2026. **Started tickets:** APP-SETUP-BO-064, APP-SETUP-BO-012 and VM-BO-102 are Sprint 1
+  tickets (handoff/service-docs/plan-tasks.csv), so they are taken as started and not rewritten: the only change to
+  each is one navigation link (exitTo and a transition) to the new screen, which the release carries as a comment and a
+  linked delta ticket. BO-064 keeps its Create org unit and BO-012 its Create entitlement template (both are their slice
+  operations). VM-BO-100 is Sprint 2. **Block B checked** against a fresh tools/build-service-docs.py run of HEAD (both run in place and reverted): VM-BO-1191 lands in AM-TENANCY-VENUES-P08-3 and VM-BO-1192 in AM-TICKETING-P08-8, both Block B, Sprint 2; the three new operations join suspendEntitlement on SVC-CATALOGUE-ENTITLEMENT-3 (Block B, Sprint 2 -> 3); no started ticket and no Block A backend task changes. Two decisions keep it there: the screens are wave 3, because a wave-2 Venue Management screen is chunked with the VM epic''s operations and its template reads joined listEntitlementTemplates on SVC-CATALOGUE-ENTITLEMENT-2 (Block A, Sprint 1); and LATER_BLOCK_OPERATIONS, because the slice''s fixpoint otherwise takes the two new writers into SVC-CATALOGUE-ENTITLEMENT-1 (Sprint 1) and makes BO-1192 a Block A setup screen. **Side effects on later blocks, for the lead:** BO-1192 re-cuts Ticketing on Venue Management, so SVC-CATALOGUE-EVENTS-6 (pushed #29892, Block B, Sprint 5, unstarted; its one operation setSpace) merges into SVC-CATALOGUE-EVENTS-4, recorded in tools/op-retire.py OTHER so check-key-stability passes; the added Block B points move Rentals on the Staff App part 1 (23 tasks: APP-STAFF-EMP-071..087, SVC-VENUEOPS-RENTAL-3..5, MIG-RENTAL-3, TEST-AM-RENTALS-P06) from Block C to Block D, and shift 155 later tasks'' sprints. **Gates:**
+  PRODUCT_VIEW and PRODUCT_CONFIGURE are in the permission vocabulary; updateEntitlementTemplate''s config scope is
+  reached by check-config-scope (Template); archiveEntitlementTemplate declares no config scope, as archiveMediaTemplate
+  (the archive verb is outside the checker''s reach and widening it fails archiveMediaTemplate, another owner''s); no
+  new list read (getEntitlementTemplate reads one; listProducts is already paged). **Not in the contract, recorded as
+  gaps on the screens:** moving an org unit (its code is the ltree segment, fixed once created), the outlet, staff and
+  product counts under a unit (only childCount), template versions and a publish step, and the Entitlement step on
+  the product screens (BO-007, BO-008, started). listEntitlementTemplates still returns a bare array with no paging (an
+  r1 shape; paging it would break r1). check-screen-patterns DEC rows CHG-R6-040 fail if either screen drops the reads
+  and writes it was made for; on the commit before this change they fail as "the screen is gone".'
