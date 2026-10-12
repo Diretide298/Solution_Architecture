@@ -341,7 +341,32 @@ def previous_structure(release):
             or r["key"].startswith("TEST-")}
 
 
-def regroup(rows, mp, retire_plan, unexplained, release, structure=None):
+def release_day() -> str:
+    """The day the release was decided: the date of the commit the bundle is built from ('12 October 2026'), else
+    today. A retirement worked out at this release is dated with it (CHG-R6-053)."""
+    d = git("log", "-1", "--format=%cs", "HEAD")
+    try:
+        day = datetime.strptime(d, "%Y-%m-%d")
+    except ValueError:
+        day = datetime.now(timezone.utc)
+    return f"{day.day} {day:%B %Y}"
+
+
+def retire_note_errors(retire, release, per_release=()):
+    """**A note worked out at this release names this release** (CHG-R6-053): r4's bundle closed sub-tasks as
+    duplicates "(decided 1 October)" because the text was fixed when the first regrouping was. Every note this release
+    works out (op-retire.py PER_RELEASE_NOTES: a regrouped sub-task's duplicate, out-of-plan and fragment notes; and the
+    sprint plan's replaced epics and features below) must carry "release <tag>". The fixed decisions of op-retire.py
+    (deferred and merged screens, OTHER, REPLACED, the holds of 4 October) keep their own dates."""
+    heads = tuple(per_release) + (REGROUP_HEAD,)
+    return [f"retire note of {r['key']} does not name release {release}: {r['note'][:80]}"
+            for r in retire if r["note"].startswith(heads) and f"release {release}" not in r["note"]]
+
+
+REGROUP_HEAD = "**Replaced by the sprint plan**"
+
+
+def regroup(rows, mp, retire_plan, unexplained, release, structure=None, day=None):
     """**The hierarchy of 1 October** (Epic = Block, Feature = app-module): the epics and features of the previous
     release that left the plan grouped tickets by service and app; their tickets move under the new parents in the
     same push, and they are closed (Rejected) with a comment once nothing is under them (op-release.rb checks).
@@ -350,9 +375,9 @@ def regroup(rows, mp, retire_plan, unexplained, release, structure=None):
     structure = previous_structure(release) if structure is None else structure
     planned = {r["key"] for r in rows}
     gone = [k for k in unexplained if k in structure and k not in planned]
-    note = ("**Replaced by the sprint plan** (release " + release + ", decided 1 October): tickets are grouped by "
-            "Block (epic) and app-module (feature, e.g. Ticketing · Guest Web) now. Every ticket that was under this "
-            "one has moved under its app-module, so this one is closed.")
+    note = (REGROUP_HEAD + " (release " + release + (f", decided {day}" if day else "") + "): tickets "
+            "are grouped by Block (epic) and app-module (feature, e.g. Ticketing · Guest Web), as decided on 1 October. "
+            "Every ticket that was under this one has moved under its app-module, so this one is closed.")
     return (list(retire_plan) + [(k, "regroup", note) for k in gone],
             [k for k in unexplained if k not in set(gone)])
 
@@ -391,8 +416,10 @@ def main() -> int:
     mp = json.loads((DOCS / "pms-map.json").read_text(encoding="utf-8"))
     sched = json.loads((DOCS / "block-a-schedule.json").read_text(encoding="utf-8"))
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
-    _, retire_plan, unexplained = _load("op_retire", "op-retire.py").build_plan()
-    retire_plan, unexplained = regroup(rows, mp, retire_plan, unexplained, release)
+    day = release_day()
+    op_retire = _load("op_retire", "op-retire.py")
+    _, retire_plan, unexplained = op_retire.build_plan(release, day)
+    retire_plan, unexplained = regroup(rows, mp, retire_plan, unexplained, release, day=day)
 
     bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release)
     # **Fresh start** (Chinmay, 3 October, CHG-GTR-001): r1 goes into a NEW OpenProject project; project 153's map
@@ -407,6 +434,7 @@ def main() -> int:
         errors.append(f"pms-map.json holds no pushed ticket and the project is #{ARCHIVED_PROJECT}: name it with "
                       "--project to confirm a fresh push into it (op-release.rb refuses while it holds tickets)")
     errors += op10_problems()
+    errors += retire_note_errors(bundle["retire"], release, getattr(op_retire, "PER_RELEASE_NOTES", ()))
     # CHG-REL-003: every task a developer pulls says what finishes it
     errors += [f"{t['key']}: its pointer has no done-when" for t in bundle["tickets"]
                if t["type"] == "Task" and "**Done when:**" not in t["pointer"]]
@@ -416,6 +444,8 @@ def main() -> int:
             k_errors, _ = ks.check(rows, mp, ks.gen.closed_keys(), ks.retired_keys(mp))
         else:
             k_errors, _ = ks.check(rows, mp, ks.gen.closed_keys())
+        if hasattr(ks, "moved_subtasks"):    # a pushed sub-task never moves to another task (CHG-R6-052)
+            k_errors += ks.moved_subtasks(rows, mp, ks.released_retirements() | ks.allowed_moves())
         errors += [f"check-key-stability: {e}" for e in k_errors]
     if errors:
         for e in errors[:40]:

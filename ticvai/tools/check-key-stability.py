@@ -20,6 +20,13 @@ Reads handoff/service-docs/tasks.csv and pms-map.json and fails on:
               built elsewhere. Either way the planned key differs from the pushed key for the same work.
   unstable    a planned key the generator's own reconciliation would write differently: tasks.csv is
               older than the generator, or was edited by hand.
+  moved       (12 October 2026, CHG-R6-052) a pushed sub-task `<TASK>#<operation>` whose task is still planned
+              but no longer builds the operation, while another planned task does: the sub-task's key is gone
+              and pushing makes a second one (SVC-ORDER-SHIFT-3#openShift became SVC-ORDER-SHIFT-4#openShift
+              when the shift tasks were regrouped, and three pushed sub-tasks were closed as duplicates). A
+              pushed task keeps its operations (build-service-docs.py stable_chunks); a move on purpose is
+              named in op-retire.py SUBTASK_MOVES with its reason. Sub-tasks an earlier release already
+              retired (the committed op-release.json `retire` list) have been dealt with and pass.
 
 and reports without failing: a new key whose work sits on a sub-task of a ticket still in the plan (a split:
 the new key is new work linked to its parent, and a person moves the sub-task), or on a ticket op-retire
@@ -35,6 +42,7 @@ without retiring it, must both fail; the same prefix move written under the push
 """
 import argparse
 import csv
+from collections import defaultdict
 import importlib.util
 import json
 import re
@@ -92,6 +100,71 @@ def retired_keys(mp) -> frozenset:
         if "#" not in k and any(re.search(rf"-{re.escape(s)}$", k) for s in sids):
             out.add(k)
     return frozenset(out)
+
+
+def _push():
+    spec = importlib.util.spec_from_file_location("push_openproject", ROOT / "tools" / "push-openproject.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def planned_subtasks(rows):
+    """{operation: [planned sub-task keys]} -- the KEY#operation sub-tasks the push makes from the plan rows
+    (push-openproject.py sub_tasks: the operation ids after the colon of a backend task's subject)."""
+    push = _push()
+    home = {}
+    for r in rows:
+        if r.get("track") != "Backend":
+            continue                  # a screen's build, wire and test sub-tasks are not operations
+        for k, *_ in push.sub_tasks(r, {}):
+            op = k.partition("#")[2]
+            if push.OP_ID.match(op):
+                home.setdefault(op, []).append(k)
+    return home
+
+
+def released_retirements() -> frozenset:
+    """Pushed keys a release bundle already retires (the committed handoff/service-docs/op-release.json `retire`):
+    an earlier release closed them, so their leaving is settled."""
+    try:
+        b = json.loads((DOCS / "op-release.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return frozenset()
+    return frozenset(r["key"] for r in b.get("retire") or [])
+
+
+def allowed_moves() -> frozenset:
+    """op-retire.py SUBTASK_MOVES: pushed sub-tasks whose operation moved to another task on purpose, with the reason."""
+    try:
+        spec = importlib.util.spec_from_file_location("op_retire", ROOT / "tools" / "op-retire.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    except Exception:
+        return frozenset()
+    return frozenset(getattr(mod, "SUBTASK_MOVES", {}))
+
+
+def moved_subtasks(rows, mp, allowed=frozenset()):
+    """errors: every pushed KEY#operation whose task is still planned, whose operation is no longer under it but is
+    under another planned task (the 'moved' rule above), unless `allowed` names it."""
+    push = _push()
+    tasks = {r["key"] for r in rows if r["type"] == "Task"}
+    home = planned_subtasks(rows)
+    subs = {k for ks in home.values() for k in ks}
+    errors = []
+    for k in sorted(mp):
+        base, _, op = k.partition("#")
+        if (not op or not push.OP_ID.match(op) or op in ("build", "wire", "test") or base not in tasks or k in subs
+                or k in allowed):
+            continue
+        other = [h for h in home.get(op, []) if h != k]
+        if other:
+            errors.append(f"moved      #{mp[k]} {k}: `{op}` is now under {other[0]}, so this pushed sub-task is "
+                          f"gone and the push makes another; keep it under {base} (a pushed task keeps its "
+                          "operations: re-run build-service-docs.py), or name it in op-retire.py SUBTASK_MOVES "
+                          "with the reason")
+    return errors
 
 
 def overlap(kind, fam, work_k, p, pitems):
@@ -296,6 +369,64 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
         # retired as merged into b, which closes the ticket (op-retire's merge = Rejected), so it is closed here too
         errs, _ = check(rs, mp, closed | {a}, retired | {a})
         case(f"work of {a} moved into {b}, retired in op-retire, passes", errs, [])
+
+    # 13-14. **A pushed task keeps its operations** (12 October 2026, CHG-R6-052). The shift tasks were regrouped and
+    # openShift, resumeShift and suspendShift each moved one task up: their pushed sub-tasks had to be closed as
+    # duplicates. 13: a plan moving one pushed operation into another planned task of its service is blocked; 14:
+    # named in SUBTASK_MOVES, it passes.
+    home = planned_subtasks(rows)
+    subs = {x for xs in home.values() for x in xs}
+    by_row = {r["key"]: r for r in rows}
+    def ops_key(k):
+        return (gen.key_identity(k) or ("",))[0] == "ops"
+
+    backend = [r for r in rows if r["type"] == "Task" and r["track"] == "Backend" and ": " in r["subject"]
+               and ops_key(r["key"])]
+    mv = None
+    for sk in sorted(k for k in mp if k in subs and ops_key(k.partition("#")[0])):
+        base = sk.partition("#")[0]
+        dest = next((r["key"] for r in backend if r["key"] != base and r["service"] == by_row[base]["service"]), None)
+        if dest:
+            mv = (sk, base, sk.partition("#")[2], dest)
+            break
+    if mv:
+        sk, base, op, dest = mv
+
+        def edit(r):
+            if r["key"] == base:
+                head, _, ol = r["subject"].partition(": ")
+                return dict(r, subject=head + ": " + ", ".join(x for x in ol.split(", ") if x != op))
+            if r["key"] == dest:
+                return dict(r, subject=r["subject"] + ", " + op)
+            return r
+
+        rs = [edit(r) for r in rows]
+        errs = moved_subtasks(rs, mp)
+        case(f"{sk} moved under {dest} is blocked", any(e.startswith("moved") and sk in e for e in errs), True)
+        case(f"{sk} moved under {dest}, named in SUBTASK_MOVES, passes",
+             [e for e in moved_subtasks(rs, mp, frozenset({sk})) if sk in e], [])
+    # 15-16. The generator rule: a new operation sorted in front of a pushed group. Cut in plain chunks of four (as
+    # before 12 October), pushed operations move to another task; stable_chunks keeps each with its pushed task.
+    pin = gen.pinned_ops(mp)
+    stems = defaultdict(list)
+    for o, p in pin.items():
+        if p in planned:
+            stems[p.rsplit("-", 1)[0]].append(o)
+
+    def multi(st):
+        return len({pin[o] for o in stems.get(st, [])}) >= 2 and len(stems[st]) >= 5
+
+    stem = "SVC-ORDER-SHIFT" if multi("SVC-ORDER-SHIFT") else next((st for st in sorted(stems) if multi(st)), None)
+    if stem:
+        gl = sorted(stems[stem] + ["aaNewOperation"])
+        chunk = {o: i // 4 for i, o in enumerate(gl)}
+        moved_plain = [o for o in gl if o in pin and
+                       any(pin.get(x) not in (None, pin[o]) for x in gl if chunk[x] == chunk[o])]
+        case(f"{stem}: a new operation cut in plain chunks of four moves pushed operations", bool(moved_plain), True)
+        got = {o: k for k, part in gen.stable_chunks(gl, pin, stem, set()) for o in part}
+        kept = all(got[o] == pin[o] for o in gl if o in pin and pin[o].rsplit("-", 1)[0] == stem)
+        case(f"{stem}: stable_chunks keeps every pushed operation with its task, the new one on a new task",
+             kept and got["aaNewOperation"] not in set(pin.values()), True)
     return out
 
 
@@ -309,6 +440,7 @@ def main() -> int:
     mp = json.loads(Path(a.map).read_text(encoding="utf-8"))
     closed = gen.closed_keys()
     errors, notes = check(rows, mp, closed, retired_keys(mp))
+    errors += moved_subtasks(rows, mp, released_retirements() | allowed_moves())
     planned = {r["key"] for r in rows}
     pushed = set(gen.pushed_items(mp))
     print(f"plan {len(planned)} keys, {len(planned & pushed)} with a ticket, {len(planned - pushed)} new; "

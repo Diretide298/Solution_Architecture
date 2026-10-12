@@ -1,0 +1,44 @@
+id: CHG-R6-053
+date: '2026-10-12'
+source: developer
+kind: process
+proposed: '2026-10-12'
+summary: 'A retirement worked out at a release names that release and its day instead of "decided 1 October": the
+  regrouped sub-task notes of op-retire.py and the replaced epics and features of op-release.py.'
+decision:
+  what: 'tools/op-retire.py build_plan(release, day) puts " (release rN, decided <day>)" on the notes it works out again
+    at every release (a regrouped sub-task''s "Duplicate of", "Out of the plan" and "Not a separate piece of work"; their
+    heads in PER_RELEASE_NOTES) and names no date when it is not told one (op-review, a dry run). tools/op-release.py
+    passes its release and the day of the commit the bundle is built from (release_day), dates the "Replaced by the sprint
+    plan" note the same way (the grouping itself still says it was decided on 1 October), and refuses a bundle in which
+    one of these notes does not name its release (retire_note_errors). The fixed decisions (deferred and merged screens,
+    OTHER, REPLACED, the holds of 4 October) keep their own dates. op-release.rb only applies the note: unchanged.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The lead''s r4 tooling list, 12 October 2026: the bundle''s retire notes for #32646, #30864 and #32650 say
+  "decided 1 October" although the r2 bundle (commit 44db9a27, 6 October) first retired them; the text was fixed in
+  op-retire.py when the first regrouping was decided.'
+keys_touched:
+  files:
+  - tools/op-retire.py
+  - tools/op-release.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR; the request is the lead's r4 tooling list of 12 October 2026)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py::retire_note_errors
+status: open
+notes: 'Batch R6, 12 October 2026. Built to scratch for r4 from this branch (not committed; op-release.json is the
+  release''s): the three shift notes read "(release r4, decided 12 October 2026)". op-release.rb never re-notes a ticket
+  already in its target status, so the tickets r2 closed keep their old comment.'
