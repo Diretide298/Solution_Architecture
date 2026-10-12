@@ -1,0 +1,69 @@
+id: CHG-R6-047
+date: '2026-10-12'
+source: audit
+kind: plan
+proposed: '2026-10-12'
+summary: 'The r4 gate''s check-plan-closure findings, fixed at the source: Venue Home links to BO-954 Venue Canvas so the
+  Block A seat-map screen has a Block A path, and the fifteen tables renamed at r4 carry a departures reason under their
+  old names. The seat_block finding and the renamed tables'' new names need the plan builder to read the frozen DDL
+  through the renames (handed to the r4-tooling worktree).'
+decision:
+  what: 'screens/P08-venue-back-office.yaml: BO-100 Venue Home gains exitTo BO-954 and an "Opens Venue Canvas" transition
+    (lever A, CHG-RONEP-007, as for BO-1018 and BO-1034), and BO-954 lists BO-100 in entryFrom. docs/active/block-a-extra-tasks.json
+    departures: one entry per table derive-schema-history.py RENAMES renamed on 12 October (seating.seat_hold,
+    seating.seat_hold_item, seating.recommendation_rules, wallet.hold, wallet.channel_rules, wallet.funding_rules,
+    wallet.risk_rules, wallet.transfer_rules, catalogue.inventory_hold, catalogue.channel_allocation,
+    resources.resource_hold, inventory.item, inventory.stock_reservation, orders.group_customer_organization,
+    orders.group_customer_organization_contact): renamed at r4, the same table built by the same migration task under
+    its new name.'
+  by: Chinmay
+  date: '2026-10-12'
+why: 'The full r4 gate (merged state 46cdea05) failed check-plan-closure: C-REACH on BO-954 (bound to editSeatMapStructure
+  by CHG-R6-035 and kept in the first release, reached only through BO-953, outside Block A), C-GONE on nine renamed
+  tables and C-UNTICKETED on seating.seat_block (CHG-R6-010, ADAM CR-011). Root cause of the last two, found by a local
+  derive: tools/build-service-docs.py read_ddl reads tables from the frozen r1 DDL (old names) while the lineage names the
+  new ones, so a renamed table fell between them and no task built it under either name; seating.seat_block had been in
+  Block A only through seat_hold''s key into it, so it fell to Block C with it.'
+keys_touched:
+  screens:
+  - BO-100
+  - BO-954
+  tables:
+  - seating.seat_reservation
+  - seating.seat_reservation_item
+  - seating.seat_block
+  - wallet.fund_reservation
+  - catalogue.channel_envelope
+  - inventory.stock_earmark
+  - resources.resource_reservation
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/block-a-extra-tasks.json
+root_class: 'A-PLAN-CLOSURE (C-REACH, C-GONE, C-UNTICKETED)'
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-100
+release_tag: r4
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR for r4; the r4 gate follow-up of 12 October 2026)
+triage: blocker
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-12'
+    quote: 'lets finish these as well now'
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Batch R6, 12 October 2026. **Tested in place** (derive-delivery-slice, then the plan builder, then
+  check-plan-closure; derived files reverted): with the link, C-REACH clears. With read_ddl following RENAMES (a scratch copy
+  of build-service-docs.py with eight lines added after the table loop: each RENAMES from-table present in the frozen DDL
+  and its to-table absent is renamed, and every key into it re-pointed), every renamed table is built under its new name by
+  the same task (seat_reservation, seat_reservation_item and recommendation_rule by MIG-SEATING, the wallet ones by
+  MIG-WALLET, channel_envelope and inventory_reservation by MIG-CATALOGUE, and so on), seating.seat_block is back in
+  MIG-SEATING and MIG-FOREIGN-KEYS (Block A), and check-plan-closure passes with these departures. build-service-docs.py
+  is the r4-tooling worktree''s to edit, so that change is handed over, not committed here; until it lands the departures''
+  "built under its new name" is not yet true and C-UNTICKETED on seating.seat_block stays. VM-BO-100 is Sprint 2 and
+  unstarted, so the link reaches it at the next tag.'

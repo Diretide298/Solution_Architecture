@@ -93,6 +93,7 @@ VALUE_EXCEPTIONS = {
     ("resources.resource.kind", "other"),
     ("*", "pos"),          # the point-of-sale sales channel, a wire value in every channel enum
     ("*", "cardScheme"),   # a payment card's scheme (CR-014)
+    ("*", "rfidCard"),     # the RFID card credential, a wire value of the credential enums since r1 (r4 gate, 12 Oct)
 }
 
 
