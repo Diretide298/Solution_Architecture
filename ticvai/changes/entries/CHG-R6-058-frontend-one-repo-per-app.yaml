@@ -1,0 +1,56 @@
+id: CHG-R6-058
+date: '2026-10-13'
+source: developer
+kind: process
+proposed: '2026-10-13'
+summary: 'The frontend standards (frontend-patterns, quickstart) say that each TICVAI app has its own repository in the
+  GitLab group ticvai-frontend, cloned inside an ADAM workspace, rather than one Nx workspace of thirteen apps; the
+  standards themselves are unchanged.'
+decision:
+  what: 'setup/frontend-patterns.md and setup/quickstart.md in the six repos/* mirrors (and their source, the ADAM
+    starter docs) qualify the statements that held only for the old single workspace: the app code lives in its own
+    repository (ticvai-guest-web, ticvai-guest-app, ticvai-pos, ticvai-employee-app, ticvai-venue-management,
+    ticvai-kiosk), cloned inside the workspace ADAM setup creates, and build, test and lint commands come from that
+    repository. check-starter-fit keeps the seven copies equal.'
+  by: Chinmay
+  date: '2026-10-13'
+why: 'Lead decision of 13 October 2026 (after commit 66fc67a0), Chinmay: "lets let frontend guys pull we just setup the
+  bible and rest", then "First we run adam setup run and than within that git clone". A frontend developer (Chitrangi
+  Mestry) had cloned her repository and got no project bible from setup.'
+keys_touched:
+  files:
+  - repos/ticvai-ai/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-ai/project-bible/setup/quickstart.md
+  - repos/ticvai-backend/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-backend/project-bible/setup/quickstart.md
+  - repos/ticvai-contracts/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-contracts/project-bible/setup/quickstart.md
+  - repos/ticvai-docs/setup/frontend-patterns.md
+  - repos/ticvai-docs/setup/quickstart.md
+  - repos/ticvai-frontend/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-frontend/project-bible/setup/quickstart.md
+  - repos/ticvai-infra/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-infra/project-bible/setup/quickstart.md
+  tickets: []
+  other:
+  - CHG-R6-057
+root_class: 'new: frontend-repo-per-app'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r5
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r5 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-13'
+    quote: 'Fix the zip than and than push I will deploy'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: 'Shipped with the ADAM setup change (viewer/mcp/setup, branch adam-fe-setup 6167a871); setup-check 73/73,
+  hooks-check 89/89, mcp-check 41/41, plugin-check 25/25, check-starter-fit pass. The frontend tickets still name the
+  old workspace app folders; making them name the repository is a package change for r5.'
