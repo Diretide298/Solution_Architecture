@@ -1,0 +1,65 @@
+id: CHG-R6-060
+date: '2026-10-13'
+source: developer
+kind: process
+proposed: '2026-10-13'
+summary: 'Every frontend ticket and frontend spec page names the GitLab repository its screen is built in, with a
+  suggested location relative to that repository, or says there is no repository yet; none names an apps/<app>/
+  folder of the old single workspace any more.'
+decision:
+  what: 'The ticket text generators read docs/active/frontend-repos.yaml (CHG-R6-059) through tools/frontend_repos.py.
+    tools/op-descriptions.py: a screen block gives "Repository: <repo> (<url>)" (or "No repository yet: ask the
+    lead"), then the route, the component name and, with a repository, "suggested location <path> in <repo> (match
+    the repository''s own layout if it differs)", where <path> is the screen''s component with its apps/<app>/
+    prefix taken off; a frontend task keyed by no screen (APP-KIOSK-CONFIG, VM-FE-ADM-582-KIOSK) gets the
+    repository of the screen its subject names. tools/op-release.py: the pointer body of every Frontend-track
+    ticket and sub-task carries the same repository line. tools/build-service-docs.py: the frontend pages
+    (handoff/service-docs/frontend/*.md) give the repository per platform and, per screen, Repository, Component
+    (its name) and Suggested location in place of the apps/ path. tools/derive-frontend.py: each frontend/<app>.yaml
+    carries repositories (per platform: repo, repoUrl, assumed), repo and repoUrl when one repository serves the
+    whole app, and its screens derived from screens/*.yaml with platform, repo and the repository-relative path.
+    No ticket key, subject or screen file changes; screens/*.yaml keep their authored implementation.component.'
+  by: Chinmay
+  date: '2026-10-13'
+why: 'Lead decision for release r5, Chinmay, 13 October 2026: frontend tickets must name the team''s real app
+  repository instead of folders of the old single Nx workspace (apps/venue-pos/..., apps/guest-app/...), which no
+  longer exist since CHG-R6-058 and the ADAM setup merged at 8a6cb48b. Before this change the generated ticket text
+  (op-descriptions.json) named such a folder 3,330 times and the four frontend spec pages 196 times.'
+keys_touched:
+  files:
+  - tools/frontend_repos.py
+  - tools/op-descriptions.py
+  - tools/op-release.py
+  - tools/build-service-docs.py
+  - tools/derive-frontend.py
+  - tools/check-ticket-text.py
+  - tools/tests/test_op_release.py
+  tickets: []
+  other:
+  - CHG-R6-059
+root_class: 'new: frontend-repo-per-app'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r5
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r5 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-13'
+    quote: 'We release it tonight.. whatever is left for friday'
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: 'check-ticket-text gains T-APP-REPO: a ticket (sub-tasks included) or a frontend spec section that names an
+  apps/<app>/ folder, or a screen ticket or section that does not name its screen''s repository (or "No repository
+  yet"), fails. Run against the text generated before this change it finds the old folders; against the
+  regenerated text, none. Assumption carried from CHG-R6-059: the repositories'' inside is unknown, so the path is a
+  suggested location (a repository''s root is taken to hold what apps/<app>/ held). Every Frontend-track pointer body
+  changes at r5, so the release bundle (op-release.py --release r5) rewrites the unstarted frontend tickets and
+  comments on the started ones (op-release-api.py). Not changed: the screen record ADAM serves (adam_screen and the
+  screen files adam_pull writes) still carries the authored implementation.component with apps/<app>/; the
+  ticket''s description, read first, names the repository and the suggested location.'

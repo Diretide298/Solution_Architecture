@@ -1,0 +1,57 @@
+id: CHG-R6-059
+date: '2026-10-13'
+source: developer
+kind: process
+proposed: '2026-10-13'
+summary: 'One authored root, docs/active/frontend-repos.yaml, says which GitLab repository of the group ticvai-frontend
+  each screen platform is built in (or that it has none yet), with a check that every platform and frontend app has
+  an entry and that ADAM setup names the same repositories.'
+decision:
+  what: 'docs/active/frontend-repos.yaml maps each platform of screens/P*.yaml to its app and repository: P01
+    ticvai-guest-web, P02 ticvai-guest-app, P04 ticvai-pos, P05 ticvai-kiosk (assumed), P06 ticvai-employee-app
+    (assumed), P08 ticvai-venue-management; P07, P09 to P17 (P13 and P16 included, which the package serves from the
+    same app as P08) have repo null. The key is the platform, not the app: guest-app serves P02 and P05, which go to
+    two repositories, and venue-management-web serves P08, P13 and P16, of which only P08 has one. The url is
+    http://gitlab.softlabsgroup.in/ticvai-frontend/<repo>.git. tools/frontend_repos.py reads it for the generators;
+    tools/check-frontend-repos.py checks it (every platform and frontend app on an entry, the app is the platform''s
+    app, a repository on one platform unless `shared` says why, `assumed` set, and the platform table in
+    viewer/mcp/setup/starters/frontend/CLAUDE.md naming the same repository per platform).'
+  by: Chinmay
+  date: '2026-10-13'
+why: 'Lead decision for release r5, Chinmay, 13 October 2026: frontend tickets must name the team''s real app
+  repository, not folders of the old single Nx workspace, which no longer exist. The repositories and the ADAM setup
+  workspace came in with CHG-R6-058 and the setup change merged at 8a6cb48b; the setup table there is the
+  platform-to-repository list this root agrees with.'
+keys_touched:
+  files:
+  - docs/active/frontend-repos.yaml
+  - tools/frontend_repos.py
+  - tools/check-frontend-repos.py
+  - tools/run-checks.py
+  tickets: []
+  other:
+  - CHG-R6-058
+root_class: 'new: frontend-repo-per-app'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r5
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r5 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-13'
+    quote: 'We release it tonight.. whatever is left for friday'
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: 'Assumptions, recorded as the lead gave them: P05 Guest Kiosk to ticvai-kiosk and P06 Venue Staff App
+  (venue-staff-app) to ticvai-employee-app are the lead''s assumptions, not yet confirmed (assumed: true). The
+  package serves P05 from guest-app, the same app as P02, so the kiosk screens (KSK-*) and the guest app screens
+  (GST-*) now point at two repositories. The inside of the six repositories is unknown (nobody on the package team
+  can read GitLab); the root records the layout rule the generators use (layout.assumed: true): a repository''s root
+  holds what apps/<app>/ held, given as a suggested location only. check-frontend-repos run with the mapping file
+  absent fails FR-PLATFORM-MISSING; with it, 0 findings.'
