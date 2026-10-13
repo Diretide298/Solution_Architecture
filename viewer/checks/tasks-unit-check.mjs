@@ -1,6 +1,7 @@
 // The Count switch, in a browser: Tasks and Tickets each leave no number on
 // the page counted in the other unit, the switch asks the service for nothing,
-// and it lands in the address and in the reader's storage.
+// and it lands in the address and in the reader's storage. Finished each day
+// is held to the same, and its numbers list the tickets behind them.
 //
 //   TICVAI_VIEWER=http://localhost:4822 node checks/tasks-unit-check.mjs ["Person Name"]
 //
@@ -52,6 +53,24 @@ check(`${person || 'team'}: the page opens counting tasks`, (await p.$eval('[dat
 check('in Tasks, no number is a ticket count', countsIn(text, 'ticket').length === 0, countsIn(text, 'ticket').slice(0, 5).join(' | '));
 check('and numbers are labelled in tasks', countsIn(text, 'task').length > 10, `${countsIn(text, 'task').length} labelled`);
 check('the daily table says tasks a day', /Tasks per working day/.test(text));
+check('Finished each day says tasks', /Tasks finished each day/.test(text));
+
+// Finished each day: a number lists the tickets behind it, and days to come
+// are blank rather than 0.
+const fd = await p.evaluate(() => {
+  const future = [...document.querySelectorAll('#tk-fd td.is-future')];
+  const button = document.querySelector('#tk-fd tfoot .tk-fd-n');
+  if (!button) return { future: future.length, blank: future.every((td) => td.textContent === ''), n: null };
+  button.click();
+  const rows = document.querySelectorAll('#tk-fd-detail .tk-row').length;
+  const head = document.querySelector('#tk-fd-detail .tk-sub')?.textContent ?? '';
+  return { future: future.length, blank: future.every((td) => td.textContent === ''), n: Number(button.textContent.replace(/,/g, '')), rows, head };
+});
+check('days still to come are blank, not 0', fd.blank, `${fd.future} future cells`);
+check('a number in the table lists exactly the tickets behind it', fd.n != null && fd.rows === fd.n, JSON.stringify(fd));
+check('and the list says its unit', / tasks? finished$/.test(fd.head ?? ''), fd.head);
+text = await read();
+check('with the list open, still no number is a ticket count', countsIn(text, 'ticket').length === 0, countsIn(text, 'ticket').slice(0, 5).join(' | '));
 
 asked.length = 0;
 const t0 = Date.now();
@@ -63,6 +82,7 @@ const ticketsHead = await headline();
 check('in Tickets, no number is a task count', countsIn(text, 'task').length === 0, countsIn(text, 'task').slice(0, 5).join(' | '));
 check('and numbers are labelled in tickets', countsIn(text, 'ticket').length > 10, `${countsIn(text, 'ticket').length} labelled`);
 check('the daily table says tickets a day', /Tickets per working day/.test(text));
+check('Finished each day says tickets', /Tickets finished each day/.test(text));
 check('the sprint verdict changed', tasksHead !== ticketsHead, `${tasksHead} → ${ticketsHead}`);
 check('switching asked the service for nothing', asked.length === 0, asked.join(' '));
 check('and was quick', took < 3000, `${took} ms`);

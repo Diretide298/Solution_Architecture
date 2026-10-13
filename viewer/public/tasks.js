@@ -121,6 +121,12 @@ const state = {
   // per reader. Switching redraws from the tickets already read; nothing is
   // asked of the service again.
   unit: 'tasks',
+  // Finished each day: the days shown ('' = the sprint filter's or the current
+  // sprint, 'sprint:<name>', 'last15'), the number picked, and what is behind
+  // each number.
+  fdRange: '',
+  fdPick: null,
+  fdCells: null,
 };
 
 /** One of the unit, and many: "task"/"tasks" or "ticket"/"tickets". */
@@ -590,6 +596,7 @@ function draw() {
   drawAttention(items);
   drawPeopleTable(focus);
   drawDaily();
+  drawFinishedDaily();
   drawGate();
   drawStates(items);
   drawDates(items);
@@ -1925,6 +1932,299 @@ function drawDaily() {
   $('tk-daily-count').textContent = `${WsCap()} a day, ${plural(names.filter((n) => n !== 'Unassigned').length, 'person', 'people')}`;
 }
 
+// ── finished each day ───────────────────────────────────────────────
+//
+// "Each day, tasks closed": what each person finished on each working day of a
+// sprint, by the page's own rule for finished (closed, or waiting for QA). A
+// ticket counts on the day ADAM closed it where the close went through ADAM
+// (`closes`), and otherwise on the day it last changed in OpenProject, which
+// is the nearest OpenProject 10's list gives and which a later edit moves; the
+// note under the table says so every time, because a release that touches
+// many tickets makes its own day read high.
+
+/** Local calendar day of a moment, as a key. */
+const dayKey = (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+
+/** The days the section shows: a sprint's working days, or the last fifteen. */
+function finishedRange() {
+  const pick = state.fdRange;
+  if (pick === 'last15') {
+    const list = [];
+    for (let d = today(); list.length < 15; d = addDays(d, -1)) if (isWorkday(d)) list.unshift(d);
+    return { label: 'the last 15 working days', days: list, sprint: null };
+  }
+  const named = pick.startsWith('sprint:') ? sprintOf(pick.slice(7)) : null;
+  const chosen = state.scope.sprint ? sprintOf(state.scope.sprint) : null;
+  const s = (named?.start && named) || (chosen?.start && chosen) || currentSprint() || focusSprint();
+  if (!s) { state.fdRange = 'last15'; return finishedRange(); }
+  return { label: s.name, days: clock(s).days, sprint: s };
+}
+
+function drawFinishedDaily() {
+  const range = finishedRange();
+  const now = today();
+  // A weekend day joins the table when something was finished on it: dropping
+  // it would lose those tickets, and moving them to Monday would misdate them.
+  {
+    const first = range.days[0];
+    const end = addDays(range.days.at(-1), 1);
+    const have = new Set(range.days.map(dayKey));
+    const extra = new Map();
+    for (const t of counted()) {
+      if (!isFinished(t) || !typeOk(t)) continue;
+      const at = finishedAt(t);
+      if (!at || at < first || at >= end) continue;
+      const d = new Date(at.getFullYear(), at.getMonth(), at.getDate());
+      if (!have.has(dayKey(d))) extra.set(dayKey(d), d);
+    }
+    if (extra.size) range.days = [...range.days, ...extra.values()].sort((x, y) => x - y);
+  }
+  const keys = range.days.map(dayKey);
+  const index = new Map(keys.map((k, i) => [k, i]));
+  const isFuture = (d) => d > now;
+
+  // The days a reader can pick: each sprint that has begun, and the last 15.
+  const select = $('tk-fd-range');
+  const started = datedSprints().filter((s) => s.number != null && s.start <= now);
+  const current = currentSprint()?.name;
+  const value = range.sprint ? `sprint:${range.sprint.name}` : 'last15';
+  select.replaceChildren(...started.map((s) => {
+    const o = el('option', null, `${s.name}${s.name === current ? ' (now)' : ''}`);
+    o.value = `sprint:${s.name}`;
+    return o;
+  }), Object.assign(el('option', null, 'Last 15 working days'), { value: 'last15' }));
+  select.value = value;
+
+  // Every finished ticket in the unit, under the type filter, on one of the days.
+  const pool = counted().filter(typeOk);
+  const per = new Map();
+  const cells = new Map();     // `${name}|${day}` -> tickets
+  const team = new Array(keys.length).fill(0);
+  for (const t of pool) {
+    if (!isFinished(t)) continue;
+    const at = finishedAt(t);
+    if (!at) continue;
+    const i = index.get(dayKey(at));
+    if (i == null) continue;
+    const name = who(t);
+    if (!per.has(name)) per.set(name, new Array(keys.length).fill(0));
+    per.get(name)[i] += 1;
+    team[i] += 1;
+    const cellKey = `${name}|${keys[i]}`;
+    if (!cells.has(cellKey)) cells.set(cellKey, []);
+    cells.get(cellKey).push([t, at]);
+  }
+  // Everybody with work in the unit gets a row, so a day nobody finished
+  // anything still shows who that was.
+  for (const t of pool) if (!per.has(who(t))) per.set(who(t), new Array(keys.length).fill(0));
+  const names = [...per.keys()].sort((a, b) => (a === 'Unassigned') - (b === 'Unassigned') || a.localeCompare(b));
+  state.fdCells = cells;
+
+  // The even pace for a day: its sprint's planned count over its working days.
+  const planned = new Map();
+  const target = range.days.map((d) => {
+    if (!isWorkday(d)) return null;
+    const s = datedSprints().find((x) => x.number != null && x.start <= d && d <= x.end);
+    if (!s) return null;
+    if (!planned.has(s.name)) {
+      const live = pool.filter((t) => t.version === s.name && !isRejected(t)).length;
+      planned.set(s.name, live / clock(s).n);
+    }
+    return planned.get(s.name);
+  });
+
+  const total = team.reduce((n, v) => n + v, 0);
+  $('tk-fd-count').textContent = `${nu(total)} finished in ${range.label}`;
+  $('tk-fd-lede').textContent = `${WsCap()} finished on each day of ${range.label}, by who holds them. `
+    + `Finished is closed or waiting for QA. Select a number to list those ${Ws()} below the table.`;
+
+  drawFinishedChart(range, team, target);
+
+  // The table.
+  const table = $('tk-fd');
+  const head = el('tr');
+  const th0 = el('th', null, 'Person');
+  th0.scope = 'col';
+  head.append(th0);
+  range.days.forEach((d) => {
+    const th = el('th', `is-num${+d === +now ? ' is-now' : ''}${isWorkday(d) ? '' : ' is-weekend'}`);
+    th.scope = 'col';
+    if (!isWorkday(d)) th.title = 'A weekend day, shown because something was finished on it';
+    th.append(el('span', 'tk-daily-sprint', d.toLocaleDateString(undefined, { weekday: 'short' })),
+      el('span', 'tk-daily-dates', fmtShort(d)));
+    head.append(th);
+  });
+  const thT = el('th', 'is-num', `${WsCap()} finished`);
+  thT.scope = 'col';
+  head.append(thT);
+
+  const pickCell = (name, i, n) => {
+    const d = range.days[i];
+    const td = el('td', `is-num${+d === +now ? ' is-now' : ''}`);
+    if (isFuture(d)) { td.classList.add('is-future'); return td; }      // blank, not 0
+    if (!n) { td.append(el('span', 'tk-fd-zero', '0')); return td; }
+    const b = el('button', 'tk-fd-n', num(n));
+    b.type = 'button';
+    b.setAttribute('aria-label', `${name || 'The team'}, ${fmtWeekday(d)}: ${nu(n)} finished. List them.`);
+    b.onclick = () => { state.fdPick = { name, day: keys[i] }; drawFinishedDetail(range); };
+    td.append(b);
+    return td;
+  };
+  const body = el('tbody');
+  for (const name of names) {
+    const tr = el('tr', state.scope.person === name ? 'is-chosen' : null);
+    const th = el('th');
+    th.scope = 'row';
+    const pick = el('button', 'tk-link', name);
+    pick.type = 'button';
+    pick.onclick = () => openPerson(name);
+    th.append(pick);
+    tr.append(th);
+    const row = per.get(name);
+    row.forEach((n, i) => tr.append(pickCell(name, i, n)));
+    const sum = row.reduce((a, v) => a + v, 0);
+    const td = el('td', 'is-num');
+    if (sum) {
+      const b = el('button', 'tk-fd-n', num(sum));
+      b.type = 'button';
+      b.setAttribute('aria-label', `${name}: ${nu(sum)} finished in ${range.label}. List them.`);
+      b.onclick = () => { state.fdPick = { name, day: '' }; drawFinishedDetail(range); };
+      td.append(b);
+    } else td.append(el('span', 'tk-fd-zero', '0'));
+    tr.append(td);
+    body.append(tr);
+  }
+  const foot = el('tfoot');
+  const tr = el('tr', 'tk-daily-team');
+  const tht = el('th', null, 'Team');
+  tht.scope = 'row';
+  tr.append(tht);
+  team.forEach((n, i) => tr.append(pickCell('', i, n)));
+  tr.append(el('td', 'is-num', num(total)));
+  foot.append(tr);
+  const thead = el('thead');
+  thead.append(head);
+  table.replaceChildren(el('caption', null, `${WsCap()} finished each day, ${range.label}`), thead, body, foot);
+
+  const fromAdam = [...cells.values()].flat().filter(([t]) => state.data.closes?.[t.key]).length;
+  $('tk-fd-note').textContent = `A ${W1()} counts on the day ADAM closed it where the close went through ADAM`
+    + `${fromAdam ? ` (${num(fromAdam)} here)` : ' (none here yet)'}. Every other one counts on the day it last changed `
+    + 'in OpenProject, because OpenProject 10 does not say when a status was reached, and that date is an approximation: '
+    + 'a later edit or comment moves it. The r4 release changed many tickets on 13 October, so that day reads high. '
+    + 'Days still to come are left blank'
+    + (range.days.some((d) => !isWorkday(d)) ? '; a weekend day appears only when something was finished on it.' : '.');
+  drawFinishedDetail(range);
+}
+
+/** The tickets behind the selected number, under the table. */
+function drawFinishedDetail(range) {
+  const box = $('tk-fd-detail');
+  const pick = state.fdPick;
+  if (!pick) { box.replaceChildren(); return; }
+  const rows = [];
+  for (const [key, list] of state.fdCells ?? []) {
+    const [name, day] = key.split('|');
+    if (pick.name && name !== pick.name) continue;
+    if (pick.day && day !== pick.day) continue;
+    rows.push(...list);
+  }
+  rows.sort((a, b) => b[1] - a[1]);
+  const when = pick.day ? fmtWeekday(range.days.find((d) => dayKey(d) === pick.day)) : range.label;
+  const head = el('div', 'tk-fd-detail-head');
+  head.append(el('h3', 'tk-sub', `${pick.name || 'The team'}, ${when}: ${nu(rows.length)} finished`));
+  const close = el('button', 'chip', 'Close the list');
+  close.type = 'button';
+  close.onclick = () => { state.fdPick = null; drawFinishedDetail(range); };
+  head.append(close);
+  const list = el('div', 'admin-table');
+  for (const [t, at] of rows) {
+    const row = el('div', 'admin-row tk-row tk-fd-row');
+    const main = el('span', 'tk-main');
+    main.append(el('span', 'tk-subject', t.subject || '(no subject)'));
+    if (t.parentSubject) main.append(el('span', 'tk-parent', t.parentSubject));
+    const how = state.data.closes?.[t.key] ? 'closed through ADAM' : 'last change';
+    row.append(link(t.url, 'tk-key', `#${t.key}`), main, el('span', 'tk-who', who(t)), stateBadge(t),
+      el('span', 'tk-when', `${at.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}, ${how}`));
+    list.append(row);
+  }
+  if (!rows.length) list.append(el('p', 'tk-empty', `No ${W1()} here.`));
+  box.replaceChildren(head, list);
+}
+
+/**
+ * The team's finished count per day as thin bars, with the even pace for each
+ * day as a dashed step line: a yardstick, not data, as in the burn-up. Days
+ * to come draw no bar. Hover and focus per day; a hidden table twin.
+ */
+function drawFinishedChart(range, team, target) {
+  const box = $('tk-fd-plot');
+  const now = today();
+  const W = Math.max(280, Math.round(box.clientWidth || 640));
+  const H = 170;
+  const m = { l: 40, r: 78, t: 16, b: 28 };
+  const iw = W - m.l - m.r;
+  const ih = H - m.t - m.b;
+  const n = range.days.length;
+  const top = roundUp(Math.max(1, ...team, ...target.filter((v) => v != null)));
+  const x = (i) => m.l + (i / n) * iw;
+  const y = (v) => m.t + ih - (v / top) * ih;
+  const bw = Math.min(26, (iw / n) * 0.55);
+  const pic = svg('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+    'aria-label': `${WsCap()} finished each day by the team, ${range.label}, against an even pace.` });
+  for (const v of [0, top / 2, top]) {
+    pic.append(svg('line', { x1: m.l, x2: m.l + iw, y1: y(v), y2: y(v), class: v ? 'tk-burn-grid' : 'tk-burn-base' }));
+    pic.append(svg('text', { x: m.l - 8, y: y(v) + 4, class: 'tk-burn-tick', 'text-anchor': 'end' }, num(Math.round(v))));
+  }
+  // Day labels by priority (today, the first, the last, then Mondays), each
+  // kept only where it does not touch one already placed.
+  const gap = Math.ceil(46 / Math.max(1, iw / n));
+  const todayAt = range.days.findIndex((d) => +d === +now);
+  const wanted = [todayAt, 0, n - 1, ...range.days.map((d, i) => (d.getDay() === 1 ? i : -1))].filter((i) => i >= 0);
+  const labelled = [];
+  for (const i of wanted) if (!labelled.some((j) => Math.abs(j - i) < gap)) labelled.push(i);
+  range.days.forEach((d, i) => {
+    const cx = (x(i) + x(i + 1)) / 2;
+    if (+d === +now) pic.append(svg('rect', { x: x(i), y: m.t, width: x(i + 1) - x(i), height: ih, class: 'tk-burn-today' }));
+    if (labelled.includes(i)) {
+      pic.append(svg('text', { x: cx, y: H - 10, class: 'tk-burn-tick', 'text-anchor': 'middle' }, +d === +now ? 'today' : fmtShort(d)));
+    }
+    if (d > now || !team[i]) return;
+    const h = Math.max(2, (team[i] / top) * ih);
+    // Square at the baseline, a 4px round at the data end.
+    pic.append(svg('path', { class: 'tk-fd-bar', d: `M${cx - bw / 2},${y(0)} V${y(0) - h + 4} q0,-4 4,-4 H${cx + bw / 2 - 4} q4,0 4,4 V${y(0)} Z` }));
+  });
+  // The even pace, a step per day, dashed.
+  const steps = [];
+  target.forEach((v, i) => { if (v != null) steps.push(`M${x(i)},${y(v)} H${x(i + 1)}`); });
+  if (steps.length) {
+    pic.append(svg('path', { d: steps.join(' '), class: 'tk-burn-even tk-fd-even' }));
+    const last = target.findLastIndex((v) => v != null);
+    pic.append(svg('text', { x: x(n) + 6, y: y(target[last]) + 4, class: 'tk-burn-label' }, 'even pace'));
+    pic.append(svg('text', { x: x(n) + 6, y: y(target[last]) + 18, class: 'tk-burn-tick' }, `${target[last].toFixed(1)} ${Ws()}`));
+  }
+  const hits = svg('g', { class: 'tk-burn-hits' });
+  range.days.forEach((d, i) => {
+    const hit = svg('rect', { x: x(i), y: m.t, width: x(i + 1) - x(i), height: ih, class: 'tk-burn-hit' });
+    hit.dataset.tip = `${fmtWeekday(d)}: ${d > now ? 'still to come' : `${nu(team[i])} finished`}`
+      + (target[i] != null ? `; an even pace is ${target[i].toFixed(1)} ${Ws()} a day` : '');
+    hits.append(hit);
+  });
+  pic.append(hits);
+  const table = el('table', 'tk-sr');
+  table.append(el('caption', null, `${WsCap()} finished each day, ${range.label}`));
+  const head = el('tr');
+  head.append(el('th', null, 'Day'), el('th', null, `${WsCap()} finished`), el('th', null, `Even pace, ${Ws()} a day`));
+  table.append(head);
+  range.days.forEach((d, i) => {
+    const row = el('tr');
+    row.append(el('td', null, fmtWeekday(d)), el('td', null, d > now ? '' : num(team[i])),
+      el('td', null, target[i] == null ? '' : target[i].toFixed(1)));
+    table.append(row);
+  });
+  box.replaceChildren(pic, table);
+  $('tk-fd-caption').textContent = `The team's ${Ws()} finished each day, against an even pace for the sprint`;
+}
+
 // ── the testing gate ────────────────────────────────────────────────
 
 const norm = (s) => String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -2465,6 +2765,7 @@ function mountTip() {
 /** The burn-up is drawn to its box's width, so it is drawn again when that changes. */
 function redrawBurn() {
   if (!state.data) return;
+  if (!$('finished').hidden) drawFinishedDaily();
   const focus = focusSprint();
   if (!focus) return;
   const k = clock(focus);
@@ -2540,7 +2841,8 @@ function redrawBurn() {
   $('tk-p-all').onclick = () => { location.hash = '#tickets'; };
   // A link to somebody's page opens on it, whatever the rail last showed.
   if (state.scope.person && !location.hash) history.replaceState(null, '', `${location.pathname}${location.search}#person`);
-  $('tk-scope-sprint').onchange = (e) => setScope({ sprint: e.target.value });
+  $('tk-scope-sprint').onchange = (e) => { state.fdRange = ''; state.fdPick = null; setScope({ sprint: e.target.value }); };
+  $('tk-fd-range').onchange = (e) => { state.fdRange = e.target.value; state.fdPick = null; drawFinishedDaily(); };
   $('tk-scope-type').onchange = (e) => setScope({ type: e.target.value });
   $('tk-scope-clear').onclick = () => {
     setScope({ person: '', sprint: '', type: '' });
@@ -2572,6 +2874,10 @@ function redrawBurn() {
   // One section at a time, driven by the rail. Same mechanism as the settings
   // page; see panels.js.
   mountPanels({ nav: document.querySelector('#tasks .set-nav'), fallback: 'overview',
-    onShow: (name) => { if (name === 'overview' || name === 'person') redrawBurn(); } });
+    onShow: (name) => {
+      if (name === 'overview' || name === 'person') redrawBurn();
+      // Drawn to its box's width, which is nothing while the section is hidden.
+      if (name === 'finished' && state.data) drawFinishedDaily();
+    } });
   hideLoader();
 })();

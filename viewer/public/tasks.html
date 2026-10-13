@@ -107,6 +107,7 @@
           <a href="#person" id="tk-nav-person">One person</a>
           <a href="#people">People, in numbers</a>
           <a href="#daily">Daily expected</a>
+          <a href="#finished">Finished each day</a>
           <a href="#gate">Testing gate</a>
           <a href="#dates">Late and due</a>
           <div class="set-nav-group">The plan</div>
@@ -341,6 +342,27 @@
             7 a day about 23. A task is anything from 1 to 8 points, so the tasks a day differ from
             person to person.
           </p>
+        </section>
+
+        <!-- ── finished each day ────────────────────────────────────────
+             What each person finished on each working day, by the page's
+             finished rule, in the unit the page counts. -->
+        <section class="admin-panel set-section" id="finished">
+          <h2 class="admin-heading">Finished each day <span class="admin-count" id="tk-fd-count"></span></h2>
+          <p class="auth-note set-lede" id="tk-fd-lede"></p>
+          <div class="set-actions">
+            <label class="tk-field tk-field-inline"><span>Days</span>
+              <select class="scope-select" id="tk-fd-range"></select></label>
+          </div>
+          <figure class="tk-burn tk-fd-chart">
+            <figcaption class="tk-burn-caption" id="tk-fd-caption"></figcaption>
+            <div class="tk-burn-plot" id="tk-fd-plot"></div>
+          </figure>
+          <div class="tk-table-wrap">
+            <table class="tk-table tk-daily tk-fd" id="tk-fd"></table>
+          </div>
+          <p class="auth-note auth-fine" id="tk-fd-note"></p>
+          <div class="tk-fd-detail" id="tk-fd-detail" aria-live="polite"></div>
         </section>
 
         <!-- ── people ────────────────────────────────────────────────── -->
