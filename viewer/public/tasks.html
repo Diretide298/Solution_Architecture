@@ -106,6 +106,7 @@
           <div class="set-nav-group">Who and when</div>
           <a href="#person" id="tk-nav-person">One person</a>
           <a href="#people">People, in numbers</a>
+          <a href="#daily">Daily expected</a>
           <a href="#gate">Testing gate</a>
           <a href="#dates">Late and due</a>
           <div class="set-nav-group">The plan</div>
@@ -135,6 +136,15 @@
           </div>
           <p class="auth-error" id="tk-error" hidden></p>
           <div class="tk-scope" role="group" aria-label="Filter the whole page">
+            <div class="tk-field tk-unit">
+              <span id="tk-unit-label">Count</span>
+              <div class="tk-switch" role="group" aria-labelledby="tk-unit-label">
+                <button type="button" data-unit="tasks" aria-pressed="true"
+                        title="Count OpenProject Tasks only: the unit the plan is made of">Tasks</button>
+                <button type="button" data-unit="tickets" aria-pressed="false"
+                        title="Count every ticket: features, tasks and sub-tasks">Tickets</button>
+              </div>
+            </div>
             <label class="tk-field"><span>Person</span>
               <select class="scope-select" id="tk-scope-person"></select></label>
             <label class="tk-field"><span>Sprint</span>
@@ -218,7 +228,7 @@
             </section>
             <section class="tk-attend-col" aria-labelledby="tk-gatebox-title">
               <h3 class="tk-part-title" id="tk-gatebox-title">Testing gate</h3>
-              <div id="tk-gatebox"></div>
+              <div id="tk-gatebox" data-unit-fixed="tickets"></div>
             </section>
           </div>
         </section>
@@ -296,7 +306,7 @@
               </section>
               <section class="tk-attend-col" aria-labelledby="tk-p-gate-title">
                 <h3 class="tk-part-title" id="tk-p-gate-title">Testing gate</h3>
-                <div id="tk-p-gate"></div>
+                <div id="tk-p-gate" data-unit-fixed="tickets"></div>
               </section>
               <section class="tk-attend-col" aria-labelledby="tk-p-tests-title">
                 <h3 class="tk-part-title" id="tk-p-tests-title">Module tests they own</h3>
@@ -316,6 +326,23 @@
           </div>
         </section>
 
+        <!-- ── daily expected ──────────────────────────────────────────
+             What each person's sprint asks of a working day: their count in
+             that sprint over its working days. In the unit the page counts. -->
+        <section class="admin-panel set-section" id="daily">
+          <h2 class="admin-heading">Expected per day, by sprint <span class="admin-count" id="tk-daily-count"></span></h2>
+          <p class="auth-note set-lede" id="tk-daily-lede"></p>
+          <div class="tk-table-wrap">
+            <table class="tk-table tk-daily" id="tk-daily"></table>
+          </div>
+          <p class="auth-note auth-fine" id="tk-daily-empty"></p>
+          <p class="auth-note" data-unit-fixed="plan">
+            The plan is sized in points: 6 tasks a day is about 19.8 points, and the back end&rsquo;s
+            7 a day about 23. A task is anything from 1 to 8 points, so the tasks a day differ from
+            person to person.
+          </p>
+        </section>
+
         <!-- ── people ────────────────────────────────────────────────── -->
         <!-- The roster's numbers as a table: every figure the bars draw, for
              anyone not reading the picture and for copying into a status note. -->
@@ -329,7 +356,7 @@
         </section>
 
         <!-- ── testing gate ──────────────────────────────────────────── -->
-        <section class="admin-panel set-section" id="gate">
+        <section class="admin-panel set-section" id="gate" data-unit-fixed="tickets">
           <h2 class="admin-heading">Testing gate <span class="admin-count" id="tk-gate-count"></span></h2>
           <p class="auth-note set-lede" id="tk-gate-lede"></p>
           <div class="tk-gate" id="tk-gate"></div>

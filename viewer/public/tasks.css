@@ -783,3 +783,28 @@ a.tk-gantt-label:hover { text-decoration: underline; color: var(--text); }
   .tk-p-feature-n { margin-left: 0; flex-basis: 100%; padding-left: 14px; }
   .tk-p-feature-rows { padding-left: 4px; }
 }
+
+/* ── the count switch: tasks or tickets ─────────────────────────────── */
+.tk-unit { flex: none; }
+.tk-switch {
+  display: inline-flex; padding: 2px; gap: 2px;
+  border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg-raised);
+}
+.tk-switch button {
+  border: 0; border-radius: 6px; background: transparent; cursor: pointer;
+  padding: 5px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--text-dim);
+}
+.tk-switch button:hover { color: var(--text); }
+.tk-switch button[aria-pressed='true'] { background: var(--accent); color: var(--ink-on-accent); }
+.tk-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tk-scope .tk-field[hidden] { display: none; }
+
+/* ── expected per day ───────────────────────────────────────────────── */
+.tk-daily th, .tk-daily td { padding: 8px 8px; }
+.tk-daily th.is-num, .tk-daily td.is-num { min-width: 52px; }
+.tk-daily-sprint { display: block; }
+.tk-daily-dates { display: block; font-size: 10.5px; font-weight: 400; color: var(--text-faint); }
+.tk-daily .is-now { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent); }
+.tk-daily thead th.is-now { color: var(--accent-text); }
+.tk-daily tfoot th, .tk-daily tfoot td { font-weight: 700; border-top: 2px solid var(--border-strong); }
+.tk-daily td.is-num { color: var(--text); }
