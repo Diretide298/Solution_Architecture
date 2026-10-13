@@ -23,8 +23,10 @@ Work ticket $ARGUMENTS, following "Working a ticket (ADAM)" in CLAUDE.md:
      (`/cr`, source developer) if the change is wrong for this ticket. Ask me; do not choose.
 3. If the ticket and its contract disagree, or the package contradicts itself, follow
    "When the package is wrong" in CLAUDE.md instead of guessing.
-4. Build what the ticket and its contract describe, in the app and packages CLAUDE.md lists.
-5. Add tests for the success case and each listed error. Run `pnpm lint`, `pnpm typecheck` and `pnpm test` until they pass.
+4. Build what the ticket and its contract describe, in the repository for the ticket's platform (the table
+   in CLAUDE.md). If that repository is not cloned in this folder, or has no repository yet, stop and say so.
+5. Add tests for the success case and each listed error. Run that repository's lint, typecheck and test
+   commands inside its folder ("Git, build, test and lint" in CLAUDE.md) until they pass.
 6. `adam_propose` the QA status (**Ready for QA** - `adam_propose` with only the ticket number lists the live statuses; use the one named for QA, and if there is none, stop and ask), 100%, and a 2-4 line comment that says what QA should check. Never **Closed**. If the build or the tests are not
    finished, propose **In progress** with an honest % done instead; if something outside this
    repository blocks it (an open change request, say), propose **On hold** and say what. Show me the proposal and stop.

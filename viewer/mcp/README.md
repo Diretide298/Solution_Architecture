@@ -28,7 +28,10 @@ the connector, not a copy of it, and there is no second place for the tools to d
 
 The plugin also ships `hooks/hooks.json`, which wires the usage hooks that fill the Agents page.
 Those were previously a block of JSON in `hooks/README.md` for somebody to paste into their
-settings by hand, which meant they were mostly not installed.
+settings by hand, which meant they were mostly not installed. Since 13 October 2026 the zip's
+setup and `/update-adam` put them into `~/.claude/settings.json` too, and `adam-hook.mjs` sits
+beside `client.mjs` so both installs have one layout — `hooks/README.md` says how, and
+`hooks-check.mjs` walks it end to end.
 
 **A plugin install updates through the marketplace** (`/plugin update adam@adam`), never through
 `update.mjs`: Claude Code replaces the whole plugin directory on update, so anything the updater
@@ -71,7 +74,13 @@ which:
    the project (`Greenleaf Demo` → `GreenleafDemo`, `ticvai` → `greenleaf-demo`), `CLAUDE.md`,
    `.claude\` (permissions with `adam_apply` always asking, and `/ticket`, `/board`, `/done`), the
    role's standards in `project-bible\setup\` (not renamed), and a git repository with the
-   starter as its first commit. A folder that already has files is only connected, never changed,
+   starter as its first commit. **Frontend** (13 Oct 2026: one repository per app) is different: a new
+   folder is a workspace with ADAM's files only (`CLAUDE.md`, `.claude\`, `project-bible\setup\`),
+   setup prints one clone command per app repository, and the developer clones inside it and opens
+   Claude Code in the workspace (`-UseStarter` brings back the old Nx starter). A folder that already
+   has files keeps every one of them and gets ADAM's own where they are missing, nothing committed;
+   in a repository, what was added goes into `.git\info\exclude`, so it never reaches the team's
+   repository (`setup-check.mjs` checks both orders),
 7. copies the connector to `%USERPROFILE%\.adam\connector` (without the starters: the installed
    copy can reconnect and remove, not create),
 8. registers it with `claude mcp add -s local` for that folder only — or `-s user` for
@@ -121,13 +130,22 @@ a developer who is offline gets a connector that works and no noise.
 
 **The build is a hash of the shipped files, not a version number.** Nothing to bump and nothing to
 forget; two people are on the same build exactly when they are running the same code. `version.mjs`
-holds the list, and `setup.ps1` and `build-zip.ps1` copy the same six — if those three ever
+holds the list, and `setup.ps1` and `build-zip.ps1` copy the same seven — if those three ever
 disagree, every install computes a build the server never offers and updating silently fixes
 nothing, so `mcp-check.mjs` compares the three lists and fails when they drift.
 
+**The updater says which files it can take** (`/connector/version?accept=…`, the same on
+`/connector/bundle`), and the viewer answers with those files and the hash of exactly those. An
+updater from before 13 October 2026 sends no list and refuses a bundle naming a file it does not
+know, so it is answered with the six it does know (`BEFORE_HOOKS` in `version.mjs`): it updates
+cleanly to the new updater, and the next run of that one brings `adam-hook.mjs`. `latest` in the
+version answer is the whole connector's build, which is what the fleet list compares against.
+
 What `update.mjs` will not do: fetch from any address but the configured one, write any path that
 is not already part of the connector, or run anything it downloads. It writes text files and tells
-you to restart.
+you to restart. The one other file it touches is `~/.claude/settings.json`, once, to add the usage
+hooks — with its own code, keeping a backup, never against a file it cannot parse, and never again
+after somebody has taken them out (`hooks/README.md`).
 
 **By hand**, for Git Bash or a machine where the zip is not an option:
 

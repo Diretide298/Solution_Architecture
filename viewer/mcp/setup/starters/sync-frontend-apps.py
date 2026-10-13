@@ -7,8 +7,12 @@ in the Block A pull audit (R249, with R031 and R037) were a developer looking fo
 package names and the starter does not have.
 
 This makes the starter's apps/ exactly the package's apps, and rewrites the app table in the
-starter CLAUDE.md between its markers. Run it after the package adds, renames or removes an app,
+starter README.md between its markers. Run it after the package adds, renames or removes an app,
 then rebuild the setup zip.
+
+The table moved from the starter CLAUDE.md to its README.md on 13 October 2026: the frontend is one
+repository per app now, setup adds that CLAUDE.md to a developer's own clone, and a clone of one app
+must not be told it holds thirteen. The starter itself is only made with setup's -UseStarter.
 
     python viewer\\mcp\\setup\\starters\\sync-frontend-apps.py [--package ticvai]
 """
@@ -87,21 +91,11 @@ table = "\n".join([BEGIN,
     "in the ADAM repo scaffolds it here. Do not create an app folder by hand - it would not match the screens.",
     END])
 
-claude = os.path.join(STARTER, "CLAUDE.md")
-text = open(claude, encoding="utf-8").read()
-if BEGIN in text:
-    text = text[:text.index(BEGIN)] + table + text[text.index(END) + len(END):]
-else:
-    old_rows = [l for l in text.splitlines() if l.startswith("| `apps/")]
-    for l in old_rows:
-        text = text.replace(l + "\n", "")
-    text = text.replace("Import a package as `@ticvai/<name>`", table + "\n\nImport a package as `@ticvai/<name>`", 1)
-text = text.replace("React Native apps and a React web app share four packages.",
-                    f"{len(apps)} apps (React Native and React web) share four packages.")
-open(claude, "w", encoding="utf-8", newline="\n").write(text)
-
 readme = os.path.join(STARTER, "README.md")
 r = open(readme, encoding="utf-8").read()
+if BEGIN not in r or END not in r:
+    raise SystemExit(f"{readme} has lost its {BEGIN} ... {END} markers; put them back around the app table")
+r = r[:r.index(BEGIN)] + table + r[r.index(END) + len(END):]
 import re
 r = re.sub(r"Nx workspace: .*? and four shared packages\.",
            f"Nx workspace: the package's {len(apps)} apps and four shared packages.", r)

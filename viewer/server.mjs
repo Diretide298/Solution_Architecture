@@ -43,7 +43,7 @@ import { resolveRelease, writeServed, describeRelease, releaseRoot, TAG as RELEA
 import { buildView, diffTicket } from './lib/release-diff.mjs';
 // The connector's own manifest, so the two sides compute the build the same
 // way rather than agreeing by coincidence.
-import { buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
+import { acceptedOf as connectorAccepted, buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
 import { gate, callerIp, DROP_PATH, DROP_HASH } from './lib/session.mjs';
@@ -954,12 +954,23 @@ const server = http.createServer(async (req, res) => {
     // version check behind the sign-in they cannot complete is a lock with the
     // key inside. Nothing here is anybody's data: it is the same four files the
     // setup zip hands out, which every developer already has a copy of.
+    //
+    // **Only the files the caller can take, and the hash of exactly those.**
+    // `?accept=` names them; a caller that sends no list is an updater from
+    // before 13 October 2026, which refuses a bundle naming any file it does not
+    // know — adam-hook.mjs, now — and is answered with the six it does, so it
+    // still updates, to a build that then asks for the rest (`BEFORE_HOOKS` in
+    // mcp/version.mjs says why). Names are only ever taken from `FILES`; asking
+    // for anything else gets nothing. `latest` is the whole connector's build,
+    // for the fleet page, which compares it with what each install reported.
     if (url.pathname === '/connector/version' || url.pathname === '/connector/bundle') {
-      const build = await connectorBuild();
+      const names = connectorAccepted(url.searchParams.get('accept'));
+      const build = await connectorBuild(undefined, names);
       if (url.pathname === '/connector/version') {
-        return send(res, 200, JSON.stringify({ build }), MIME['.json']);
+        const latest = await connectorBuild();
+        return send(res, 200, JSON.stringify({ build, latest }), MIME['.json']);
       }
-      return send(res, 200, JSON.stringify({ build, files: await connectorFiles() }),
+      return send(res, 200, JSON.stringify({ build, files: await connectorFiles(undefined, names) }),
         MIME['.json']);
     }
 

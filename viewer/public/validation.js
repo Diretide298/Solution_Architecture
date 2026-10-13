@@ -412,7 +412,10 @@ export const connectorFleet = () => call('/api/connector/fleet');
 export const servedBuild = async () => {
   const answer = await fetch('/connector/version', { headers: { accept: 'application/json' } });
   if (!answer.ok) throw new Error('the viewer did not say which build it serves');
-  return (await answer.json()).build ?? '';
+  // `latest`, the whole connector. Plain `build` is what an updater too old to
+  // say which files it takes is offered, and no current install reports that.
+  const served = await answer.json();
+  return served.latest ?? served.build ?? '';
 };
 export const saveGitIdentity = (gitEmail) =>
   call('/api/settings/git-identity', { method: 'PUT', body: { git_email: gitEmail } });

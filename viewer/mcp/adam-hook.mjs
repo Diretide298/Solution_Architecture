@@ -23,14 +23,25 @@
  * developer's work to report that a *statistics* upload did not happen, which
  * is a bad trade in every direction — so every path ends in exit 0.
  *
- * Install: see hooks/README.md.
+ * Install: setup.cmd and /update-adam put it into `~/.claude/settings.json`
+ * (see hooks/README.md); the plugin wires it through hooks/hooks.json.
+ *
+ * **It sits beside client.mjs, not in hooks/.** The zip install is a flat copy
+ * of the files `version.mjs` lists, and that list holds bare names so the
+ * updater can refuse any path with a separator in it. One layout for both
+ * installs means one import below, rather than a guess at which one this is.
  */
 
 import { appendFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { realpathSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const MODE = process.argv[2] ?? 'record';
+
+/** The connector folder: this file's own, in both installs. */
+const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 /** Where the session's lines live until they are sent. Under the user's home
  *  rather than the repository: this is not the project's data and must not
@@ -39,25 +50,80 @@ const HOME = path.join(os.homedir(), '.adam', 'agent');
 
 const stamp = (d = new Date()) => d.toISOString().replace(/\.\d+Z$/, 'Z');
 
+/** A path as something two spellings of it can be compared on: resolved where
+ *  it exists (a registration may spell the folder in Windows' short form,
+ *  CHINMA~1.PAR, where Claude Code hands the long one), forward slashes, lower
+ *  case, no trailing slash. Windows paths are case-blind, and VS Code and a
+ *  terminal disagree about the drive letter. */
+const real = (f) => { try { return realpathSync.native(f); } catch { return f; } };
+const norm = (f) => real(String(f)).toLowerCase().replace(/\\/g, '/').replace(/\/+$/, '');
+
 /**
- * Who to sign in as, from whichever install put us here.
+ * Who to sign in as, and which folder the session belongs to.
  *
- * A zip install sets `ADAM_*` in the MCP server's registration and in the hook
- * commands the README has people paste into `settings.json`. The plugin sets
- * neither: it collects the same four values as `userConfig` and exports them to
- * hook processes as `CLAUDE_PLUGIN_OPTION_<KEY>`, with the password coming out
- * of the OS credential store rather than out of a settings file.
+ * **The environment first, from whichever install exported it.** The plugin
+ * collects the four values as `userConfig` and exports them to hook processes
+ * as `CLAUDE_PLUGIN_OPTION_<KEY>`, the password out of the OS credential store.
+ * `ADAM_*` is preferred over those so somebody debugging can override by hand.
  *
- * `ADAM_*` is preferred so that somebody debugging can still override by hand.
+ * **Then the zip install's registration, which is where its password already
+ * is.** A plain hook in settings.json gets no `ADAM_*`: setup hands them to the
+ * connector's own process (`claude mcp add -e`), and Claude Code keeps that
+ * registration in `~/.claude.json`. Reading it from there means the password
+ * stays in the one place setup already put it, rather than being copied into
+ * settings.json or a file of ours. Only an entry that launches *this*
+ * connector's server.mjs counts — the same rule update.mjs uses for the
+ * address — so a stranger's MCP server is never read.
+ *
+ * Which entry: the one registered for the session's folder, or for a folder it
+ * is inside (Claude may have cd'd into `src`); else the every-folder one.
+ *
+ * Answers one of three things, because flush does three different things:
+ * `{ creds, folder }` to send; `{ elsewhere: true }` when ADAM is set up on this
+ * machine but not for this folder; `{}` when nothing says who you are at all.
  */
-function credentials() {
+async function credentials(cwd) {
   const pick = (name, option) => process.env[name] || process.env[`CLAUDE_PLUGIN_OPTION_${option}`] || '';
-  return {
+  const fromEnv = {
     base: pick('ADAM_VIEWER_URL', 'VIEWER_URL'),
     project: pick('ADAM_PROJECT', 'PROJECT') || null,
     email: pick('ADAM_EMAIL', 'EMAIL'),
     password: pick('ADAM_PASSWORD', 'PASSWORD'),
   };
+  if (fromEnv.email && fromEnv.password) return { creds: fromEnv, folder: cwd };
+
+  let cfg;
+  try {
+    cfg = JSON.parse(await readFile(path.join(os.homedir(), '.claude.json'), 'utf8'));
+  } catch {
+    return {};
+  }
+  const server = norm(path.join(HERE, 'server.mjs'));
+  const ours = (s) => Boolean(s?.env?.ADAM_EMAIL && s?.env?.ADAM_PASSWORD)
+    && (s?.args ?? []).some((a) => norm(a) === server);
+  const toCreds = (env) => ({
+    base: env.ADAM_VIEWER_URL || '',
+    project: env.ADAM_PROJECT || null,
+    email: env.ADAM_EMAIL,
+    password: env.ADAM_PASSWORD,
+  });
+
+  const here = norm(cwd);
+  let best = null;
+  let anywhere = false;
+  for (const [folder, entry] of Object.entries(cfg.projects ?? {})) {
+    const mine = Object.values(entry?.mcpServers ?? {}).find(ours);
+    if (!mine) continue;
+    anywhere = true;
+    const f = norm(folder);
+    if ((here === f || here.startsWith(`${f}/`)) && (!best || f.length > best.length)) {
+      best = { length: f.length, folder, env: mine.env };
+    }
+  }
+  if (best) return { creds: toCreds(best.env), folder: best.folder };
+  const everywhere = Object.values(cfg.mcpServers ?? {}).find(ours);
+  if (everywhere) return { creds: toCreds(everywhere.env), folder: cwd };
+  return anywhere ? { elsewhere: true } : {};
 }
 
 async function readStdin() {
@@ -180,23 +246,43 @@ async function flush(hook) {
   }
   if (!events.length) return;
 
+  const cwd = hook.cwd || process.cwd();
+  const { creds, folder, elsewhere } = await credentials(cwd);
+
+  // **A folder ADAM is not connected to is not ADAM's session.** The hooks are
+  // in the user's settings, so they run in every folder, but setup connects
+  // ADAM to chosen folders only; a session in some other repository would
+  // otherwise be filed against an ADAM project it has nothing to do with, and
+  // read on the Agents page as work on it. Removed rather than kept: nothing
+  // will ever send it, and a file that waits forever is a slow leak.
+  if (elsewhere) {
+    await rm(file, { force: true }).catch(() => {});
+    await rm(`${file}.pending`, { force: true }).catch(() => {});
+    return;
+  }
+  // Nobody to sign in as at all: kept, so connecting ADAM later is not too late.
+  if (!creds) return;
+
   // The same client the connector uses, signing in as the same developer. That
   // is what makes the session land against the right person: there is no way to
   // file somebody else's time.
-  const { ViewerClient } = await import('../client.mjs').catch(() => ({}));
+  const { ViewerClient } = await import('./client.mjs').catch(() => ({}));
   if (!ViewerClient) return;
 
-  const cwd = hook.cwd || process.cwd();
-  const client = new ViewerClient({ ...credentials() });
+  // `|| undefined`, not the empty string: the client defaults only a missing
+  // address, and an empty one would send the request nowhere.
+  const client = new ViewerClient({ ...creds, base: creds.base || undefined });
   const answer = await client.service('/api/agent/flush', {
     method: 'POST',
     body: {
       key,
       project_id: (await client.projectId().catch(() => '')) ?? '',
-      external_key: await ticketOf(cwd),
+      // From the connected folder rather than wherever Claude last cd'd to:
+      // .adam/work/ is at its top, and `src` is not the repository's name.
+      external_key: await ticketOf(folder),
       // The folder's name, never its path: a path carries somebody's home
       // directory and sometimes a client's name.
-      repo: path.basename(cwd),
+      repo: path.basename(folder),
       host: os.hostname(),
       agent: 'claude-code',
       started_at: events[0].at,

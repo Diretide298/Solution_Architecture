@@ -7,13 +7,13 @@
 
 **Done when:** a new engineer clones, runs, and hits a mocked endpoint from the frontend without asking anyone a question.
 
-## The six repos
+## The repos
 
 | Repo | What it is |
 |---|---|
 | `ticvai-contracts` | OpenAPI, event schemas, generated clients. **Everything downstream reads from here** |
 | `ticvai-backend` | .NET 10, one cell. `TICVAI-Backend.slnx`: `TICVAI.Api`, `.Application`, `.Domain`, `.Infrastructure`, `.Contracts`, and three test projects |
-| `ticvai-frontend` | Nx monorepo: 13 apps, 4 shared packages (`api-client`, `design-tokens`, `offline-core`, `ui`) |
+| `ticvai-frontend/*` | One repository per app since 13 October 2026, in the GitLab group `ticvai-frontend`: `ticvai-venue-management`, `ticvai-guest-web`, `ticvai-employee-app`, `ticvai-kiosk`, `ticvai-guest-app`, `ticvai-pos`. Before that one Nx monorepo (13 apps, 4 shared packages: `api-client`, `design-tokens`, `offline-core`, `ui`), still ADAM's starter with `-UseStarter` |
 | `ticvai-ai` | Python / FastAPI |
 | `ticvai-infra` | Terraform, K8s, cell provisioning (Azure, UAE region) |
 | `ticvai-docs` | This |
@@ -33,12 +33,16 @@
 4. **Seed the reference fixture:** two brands, three regions across two countries, AED and OMR. **SETUP-SEED** builds it. **Never develop against a single-venue fixture.**
 5. **Mock server:** `make mock` in `ticvai-contracts` runs Prism on :4010. It serves the **identity** contract only. For another contract, bundle first (`make bundle`), then:
    `npx @stoplight/prism-cli mock dist/<contract>.yaml -p 4010 --dynamic`
-6. **Frontend:** `pnpm install && pnpm nx serve <app>`. The app is the one your ticket names:
+6. **Frontend:** run ADAM's setup (it makes a frontend workspace), then clone your app's repository
+   inside that workspace. Install and serve the app inside the repository's folder, as its README
+   says (in the one-workspace starter: `pnpm install && pnpm nx serve <app>`). The ticket's screen
+   names its platform and the package's app; the workspace's CLAUDE.md says which repository builds
+   which platform. The package's app names:
    - guest: `guest-web`, `guest-app`
    - staff and venue: `venue-pos`, `venue-staff-app`, `venue-scanner`, `kitchen-display`, `venue-management-web`, `venue-support-web`
    - platform and partners: `ticvai-web`, `partner-web`, `accreditation-web`, `developer-portal-web`, `signup-web`
 
-   Each app points at the mock by default.
+   In the starter, each app points at the mock by default; in an app repository, its README says how.
 7. **Verify:** in `ticvai-backend`, run `dotnet build TICVAI-Backend.slnx`, then `dotnet test tests/TICVAI.ArchitectureTests`.
    - Warnings are errors, so a clean build means no warnings.
    - If either fails on a clean clone, something is wrong with the environment, not your code.
