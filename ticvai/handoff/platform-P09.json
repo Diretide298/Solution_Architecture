@@ -179,11 +179,11 @@
    "operations": 1
   },
   {
-   "contract": "workforce",
+   "contract": "payments",
    "operations": 1
   },
   {
-   "contract": "payments",
+   "contract": "workforce",
    "operations": 1
   }
  ],

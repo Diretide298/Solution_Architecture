@@ -197,7 +197,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
 | `BO-120` | Omnichannel Commerce & Journey Configuration | D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
 | `BO-1190` | Donation Campaigns | B | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
-| `BO-1192` | Entitlement Templates | B–D | 67 | 18 | 8 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-1192` | Entitlement Templates | B | 67 | 18 | 8 | 57 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -2131,7 +2131,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · ticket #35648 (VM-BO-1192) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listEntitlementTemplates` reads the population and `getEntitlementTemplate` reads one of them — list, select, act |

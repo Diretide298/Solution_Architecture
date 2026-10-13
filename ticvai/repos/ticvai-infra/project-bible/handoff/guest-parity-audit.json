@@ -12,7 +12,7 @@
   "appOnly": 6
  },
  "severity": {
-  "high": 28,
+  "high": 26,
   "medium": 165,
   "low": 222,
   "info": 3
@@ -31,20 +31,6 @@
    "where": "reserve-table-or-cabana",
    "detail": "GST-070 Reserve a Table has no web screen; its operations are on WEB-031, WEB-036, WEB-040; **not callable on the web at all: listBookableOutlets**",
    "fix": "draw the screen on the other shell, or record the fold as the decision"
-  },
-  {
-   "severity": "high",
-   "dimension": "frontend manifest",
-   "where": "frontend/guest-app.yaml",
-   "detail": "lists 80 screens against 77: missing 14 (GST-066, GST-067, GST-068, GST-069, GST-070, GST-071, GST-072, GST-073, GST-074, GST-075, GST-076, GST-077…); ghosts ['GST-060', 'GST-064']; 14 renamed, 43 in another wave",
-   "fix": "derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them"
-  },
-  {
-   "severity": "high",
-   "dimension": "frontend manifest",
-   "where": "frontend/guest-web.yaml",
-   "detail": "lists 35 screens against 50: missing 15 (WEB-036, WEB-037, WEB-038, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-044, WEB-045, WEB-046, WEB-047…); ghosts —; 7 renamed, 15 in another wave",
-   "fix": "derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them"
   },
   {
    "severity": "high",

@@ -79,6 +79,7 @@ def _load(name, file):
 
 
 _done = _load("ticket_done", "ticket_done.py")
+fr = _load("frontend_repos", "frontend_repos.py")     # the repository a screen is built in (CHG-R6-060)
 builds_of, DONE_WHEN, done_when, SCREEN = _done.builds_of, _done.DONE_WHEN, _done.done_when, _done.SCREEN
 push = _load("push_openproject", "push-openproject.py")
 assign_sync = _load("op_assign_sync", "op-assign-sync.py")
@@ -217,6 +218,18 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
         m_ = SCREEN.search(base) if r["track"] == "Frontend" or base.startswith("VM-") else None
         if m_ and SCREEN_NOTES.get(m_.group(1)):
             carry.append("Decided: " + " ".join(str(SCREEN_NOTES[m_.group(1)]).split()))
+        # **A frontend ticket names its repository** (CHG-R6-060): the GitLab repository of its screen's platform and
+        # a path relative to it, or that there is none yet. The screens still say apps/<app>/..., a folder of the old
+        # single workspace that no team repository has. A Venue Management screen on the backend track ("[BE] BO-102
+        # ...", op-descriptions.py screen_of) is a screen ticket too.
+        vm_screen = (r["track"] == "Backend" and r.get("area") == "VM" and m_
+                     and r["subject"].startswith(f"[BE] {m_.group(1)} "))
+        fe_sid = fr.screen_of_ticket(base, r["subject"]) if r["track"] == "Frontend" or vm_screen else None
+        if fe_sid:
+            w = fr.where(fe_sid)
+            loc = fr.location_sentence(w)
+            carry.append(fr.repo_sentence(w) + (f"; {fe_sid}: {loc}" if loc and w["repo"] else
+                                                 (f" {fe_sid}: {loc}." if loc else "")))
         tickets.append({
             "key": key, "type": typ, "type_id": push.TYPES[typ], "parent": parent or None,
             "subject": subject[:255], "priority_id": push.PRIORITY.get(r["wave"] or "2", 8),

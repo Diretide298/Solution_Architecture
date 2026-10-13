@@ -197,7 +197,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
 | `BO-120` | Omnichannel Commerce & Journey Configuration | D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
 | `BO-1190` | Donation Campaigns | B | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
-| `BO-1192` | Entitlement Templates | B–D | 67 | 18 | 8 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-1192` | Entitlement Templates | B | 67 | 18 | 8 | 57 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

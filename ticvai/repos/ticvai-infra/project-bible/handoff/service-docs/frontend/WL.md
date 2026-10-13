@@ -7,6 +7,7 @@
 | Audience | staff |
 | Runtime | reactWeb |
 | App | venue-management-web |
+| Repository | P09 none yet: ask the lead; P13 none yet: ask the lead |
 | Offline | no |
 | Themes |  |
 | Directions | ltr, rtl |
@@ -64,7 +65,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/white-label-branding-management` |
-| Component | `apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `WhiteLabelBrandingManagementForm` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -128,7 +130,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/domain-and-certificate-management` |
-| Component | `apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `DomainAndCertificateManagementForm` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -182,7 +185,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/localisation-and-language-pack` |
-| Component | `apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `LocalisationAndLanguagePackDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -233,7 +237,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/tenants-licensing/module-activation-dependency-validation-adm-424` |
-| Component | `apps/ticvai-web/src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ModuleActivationDependencyValidation` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -281,7 +286,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/tenant-workspace` |
-| Component | `apps/venue-management-web/src/routes/white-label/TenantWorkspaceDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `TenantWorkspaceDetail` |
 | Pattern | statusTracker |
 
 **Operations**
@@ -341,7 +347,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/brand-kit` |
-| Component | `apps/venue-management-web/src/routes/white-label/BrandKitDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `BrandKitDetail` |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -387,7 +394,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/typography` |
-| Component | `apps/venue-management-web/src/routes/white-label/TypographyDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `TypographyDetail` |
 | Pattern | statusTracker |
 
 **Operations**
@@ -425,7 +433,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/logo-assets` |
-| Component | `apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `LogoAssetsDetail` |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -473,7 +482,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/theme-editor` |
-| Component | `apps/venue-management-web/src/routes/white-label/ThemeEditorDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ThemeEditorDetail` |
 | Pattern | statusTracker |
 
 **Operations**
@@ -512,7 +522,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/component-preview` |
-| Component | `apps/venue-management-web/src/routes/white-label/ComponentPreviewDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ComponentPreviewDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -561,7 +572,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/page-builder` |
-| Component | `apps/venue-management-web/src/routes/white-label/PageBuilderDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `PageBuilderDetail` |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -619,7 +631,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/content-blocks` |
-| Component | `apps/venue-management-web/src/routes/white-label/ContentBlocksDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ContentBlocksDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -673,7 +686,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/navigation-menus` |
-| Component | `apps/venue-management-web/src/routes/white-label/NavigationMenusDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `NavigationMenusDetail` |
 | Pattern | listDetail |
 
 **Operations**
@@ -715,7 +729,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/media-library` |
-| Component | `apps/venue-management-web/src/routes/white-label/MediaLibraryDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `MediaLibraryDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -769,7 +784,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/translations` |
-| Component | `apps/venue-management-web/src/routes/white-label/TranslationsDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `TranslationsDetail` |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -814,7 +830,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/rtl-preview` |
-| Component | `apps/venue-management-web/src/routes/white-label/RtlPreviewDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `RtlPreviewDetail` |
 | Pattern | statusTracker |
 
 **Operations**
@@ -852,7 +869,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/seo-metadata` |
-| Component | `apps/venue-management-web/src/routes/white-label/SeoMetadataDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `SeoMetadataDetail` |
 | Pattern | configEditor |
 
 **Operations**
@@ -890,7 +908,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/publishing-workflow` |
-| Component | `apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `PublishingWorkflowDetail` |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -947,7 +966,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/version-history` |
-| Component | `apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `VersionHistoryDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -993,7 +1013,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/site-settings` |
-| Component | `apps/venue-management-web/src/routes/white-label/SiteSettingsDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `SiteSettingsDetail` |
 | Pattern | statusTracker |
 
 **Operations**
@@ -1038,7 +1059,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/domain-certificate` |
-| Component | `apps/venue-management-web/src/routes/white-label/DomainCertificateDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `DomainCertificateDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1087,7 +1109,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/consent-legal` |
-| Component | `apps/venue-management-web/src/routes/white-label/ConsentLegalDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ConsentLegalDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1138,7 +1161,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/user-access` |
-| Component | `apps/venue-management-web/src/routes/white-label/UserAccessDetail.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `UserAccessDetail` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1183,7 +1207,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/help-me-choose` |
-| Component | `apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `HelpMeChoose` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1238,7 +1263,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/site-builder` |
-| Component | `apps/venue-management-web/src/routes/white-label/SiteBuilder.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `SiteBuilder` |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -1304,7 +1330,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/booking-flows` |
-| Component | `apps/venue-management-web/src/routes/white-label/BookingFlows.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `BookingFlows` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1363,7 +1390,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/app-publishing` |
-| Component | `apps/venue-management-web/src/routes/white-label/AppPublishing.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `AppPublishing` |
 | Pattern | listDetail |
 
 **Entry parameters**

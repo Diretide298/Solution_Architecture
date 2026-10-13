@@ -117,6 +117,9 @@ CHECKS = [
     # built in Block A, and no artefact the last released plan built leaves the tickets without a reason; a ticket's
     # builds are real ids, a module test names what it tests, a setup ticket links only its own part.
     "check-plan-closure", "check-ticket-builds",
+    # 13 October (Chinmay, r5, CHG-R6-059): the frontend is one GitLab repository per app; every screen platform and
+    # frontend app has its entry in docs/active/frontend-repos.yaml, and ADAM setup's table names the same ones.
+    "check-frontend-repos",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",

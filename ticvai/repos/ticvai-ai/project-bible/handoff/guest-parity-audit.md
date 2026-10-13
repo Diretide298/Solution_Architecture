@@ -9,7 +9,7 @@
 | Screens | P01 50 · P02 77 |
 | Capability groups | 56 — appOnly 6 · folded 3 · paired 46 · webOnly 1 |
 | Operations | web 215 · app 219 · shared 206 |
-| Findings | high 28 · medium 165 · low 222 · info 3 |
+| Findings | high 26 · medium 165 · low 222 · info 3 |
 
 ## By dimension
 
@@ -18,7 +18,6 @@
 | operations | 14 | 39 |  | 1 |
 | licence | 10 |  |  |  |
 | coverage | 2 | 4 | 2 | 2 |
-| frontend manifest | 2 | 1 |  |  |
 | bindings |  | 26 |  |  |
 | entry parameters |  | 24 |  |  |
 | states |  | 19 |  |  |
@@ -31,6 +30,7 @@
 | platform |  | 2 |  |  |
 | design |  | 1 |  |  |
 | documents |  | 1 | 3 |  |
+| frontend manifest |  | 1 |  |  |
 | machine |  | 1 |  |  |
 | capability code |  |  | 42 |  |
 | components |  |  | 28 |  |
@@ -56,14 +56,12 @@
 - **density** — compact on the web, comfortable on the app: the input, not the product
 - **routes and component paths** — each shell's own codebase
 
-## High — 28
+## High — 26
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
 | coverage | add-to-calendar | GST-018 Add to Calendar / Reminders — app only (gap). Adding a visit to a calendar is as much a desktop act as a phone one, and issueWalletPass is already on the web's My Tickets. Not callable on the web: getOrderCalendarEvent, getVisitReminder, setVisitReminder. | add the screen to the web |
 | coverage | reserve-table-or-cabana | GST-070 Reserve a Table has no web screen; its operations are on WEB-031, WEB-036, WEB-040; **not callable on the web at all: listBookableOutlets** | draw the screen on the other shell, or record the fold as the decision |
-| frontend manifest | frontend/guest-app.yaml | lists 80 screens against 77: missing 14 (GST-066, GST-067, GST-068, GST-069, GST-070, GST-071, GST-072, GST-073, GST-074, GST-075, GST-076, GST-077…); ghosts ['GST-060', 'GST-064']; 14 renamed, 43 in another wave | derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them |
-| frontend manifest | frontend/guest-web.yaml | lists 35 screens against 50: missing 15 (WEB-036, WEB-037, WEB-038, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-044, WEB-045, WEB-046, WEB-047…); ghosts —; 7 renamed, 15 in another wave | derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them |
 | licence | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web requires ['ai'], app requires ['ai', 'ticketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | web requires ['marketing', 'ticketing'], app requires ['ticketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | web requires ['core'], app requires ['core', 'marketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |

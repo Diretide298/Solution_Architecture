@@ -1,5 +1,6 @@
 # venue-staff-app — operated by venue · staff on mobileApp
 # Serves: P06 Venue Staff App — Operations
+# Repository: P06 ticvai-employee-app (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: venue-staff-app
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P06 Venue Staff App — Operations
 servesMultiplePlatforms: false
+repo: ticvai-employee-app
+repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-employee-app.git
+repositories:
+- platform: P06
+  repo: ticvai-employee-app
+  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-employee-app.git
+  assumed: true
 packages:
 - design-tokens
 - ui
@@ -50,309 +58,777 @@ deployment:
   deviceOwnership: venue-owned or BYOD
   networkAssumption: venue wifi, dead zones expected
   releaseCadence: fortnightly
-screenCount: 50
+screenCount: 96
 byWave:
-  wave1: 29
-  wave2: 20
-  wave3: 1
+  wave1: 30
+  wave2: 35
+  wave3: 31
 screens:
 - id: EMP-001
   name: Sign in
+  platform: P06
   route: /operations/sign-in
-  component: apps/venue-staff-app/src/routes/operations/SignInDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/SignInDetail.tsx
   wave: 1
   status: notStarted
 - id: EMP-002
   name: Select venue & role
+  platform: P06
   route: /operations/select-venue-role
-  component: apps/venue-staff-app/src/routes/operations/SelectVenueRoleDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/SelectVenueRoleDetail.tsx
   wave: 1
   status: notStarted
 - id: EMP-003
   name: Home — on duty
+  platform: P06
   route: /operations/home-on-duty
-  component: apps/venue-staff-app/src/routes/operations/HomeOnDutyDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-004
-  name: Task list
-  route: /operations/task-list
-  component: apps/venue-staff-app/src/routes/operations/TaskListDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-005
-  name: Task detail
-  route: /operations/task-detail
-  component: apps/venue-staff-app/src/routes/operations/TaskDetailDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-006
-  name: Raise a task
-  route: /operations/raise-a-task
-  component: apps/venue-staff-app/src/routes/operations/RaiseATaskDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-009
-  name: End shift
-  route: /operations/end-shift
-  component: apps/venue-staff-app/src/routes/operations/EndShiftDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-010
-  name: Scan — ready
-  route: /operations/scan-ready
-  component: apps/venue-staff-app/src/routes/operations/ScanReadyDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-011
-  name: Scan — admitted
-  route: /operations/scan-admitted
-  component: apps/venue-staff-app/src/routes/operations/ScanAdmittedDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-012
-  name: Scan — denied
-  route: /operations/scan-denied
-  component: apps/venue-staff-app/src/routes/operations/ScanDeniedDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-013
-  name: Override
-  route: /operations/override
-  component: apps/venue-staff-app/src/routes/operations/OverrideDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-014
-  name: Ticket lookup
-  route: /operations/ticket-lookup
-  component: apps/venue-staff-app/src/routes/operations/TicketLookupDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-016
-  name: Offline scanning
-  route: /operations/offline-scanning
-  component: apps/venue-staff-app/src/routes/operations/OfflineScanningDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-017
-  name: Sync & reconciliation
-  route: /operations/sync-reconciliation
-  component: apps/venue-staff-app/src/routes/operations/SyncReconciliationDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-018
-  name: Offline package
-  route: /operations/offline-package
-  component: apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-019
-  name: AI assistant — home
-  route: /operations/ai-assistant-home
-  component: apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-020
-  name: AI assistant — answer
-  route: /operations/ai-assistant-answer
-  component: apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-021
-  name: Roster
-  route: /operations/roster
-  component: apps/venue-staff-app/src/routes/operations/RosterDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-022
-  name: My rota
-  route: /operations/my-rota
-  component: apps/venue-staff-app/src/routes/operations/MyRotaDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-024
-  name: Clock in / out
-  route: /operations/clock-in-out
-  component: apps/venue-staff-app/src/routes/operations/ClockInOutDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-026
-  name: Incident report
-  route: /operations/incident-report
-  component: apps/venue-staff-app/src/routes/operations/IncidentReportDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-037
-  name: Notifications
-  route: /operations/notifications
-  component: apps/venue-staff-app/src/routes/operations/NotificationsDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-042
-  name: Profile
-  route: /operations/profile
-  component: apps/venue-staff-app/src/routes/operations/ProfileDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-043
-  name: Device settings
-  route: /operations/device-settings
-  component: apps/venue-staff-app/src/routes/operations/DeviceSettingsDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-045
-  name: Arabic / RTL
-  route: /operations/arabic-rtl
-  component: apps/venue-staff-app/src/routes/operations/ArabicRtlDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-046
-  name: Sign out
-  route: /operations/sign-out
-  component: apps/venue-staff-app/src/routes/operations/SignOutDetail.tsx
-  wave: 1
-  status: notStarted
-- id: EMP-047
-  name: Emergency mode
-  route: /operations/emergency-mode
-  component: apps/venue-staff-app/src/routes/operations/EmergencyModeDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/HomeOnDutyDetail.tsx
   wave: 1
   status: notStarted
 - id: EMP-048
   name: Opening checklist
+  platform: P06
   route: /operations/opening-checklist
-  component: apps/venue-staff-app/src/routes/operations/OpeningChecklistDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/OpeningChecklistDetail.tsx
   wave: 1
   status: notStarted
-- id: EMP-049
-  name: Hand over the journal
-  route: /operations/hand-over-the-journal
-  component: apps/venue-staff-app/src/routes/operations/HandOverTheJournalDetail.tsx
+- id: EMP-009
+  name: End shift
+  platform: P06
+  route: /operations/end-shift
+  repo: ticvai-employee-app
+  path: src/routes/operations/EndShiftDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-010
+  name: Scan — ready
+  platform: P06
+  route: /operations/scan-ready
+  repo: ticvai-employee-app
+  path: src/routes/operations/ScanReadyDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-014
+  name: Ticket lookup
+  platform: P06
+  route: /operations/ticket-lookup
+  repo: ticvai-employee-app
+  path: src/routes/operations/TicketLookupDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-015
+  name: Group scan
+  platform: P06
+  route: /operations/group-scan
+  repo: ticvai-employee-app
+  path: src/routes/operations/GroupScanDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-017
+  name: Sync & reconciliation
+  platform: P06
+  route: /operations/sync-reconciliation
+  repo: ticvai-employee-app
+  path: src/routes/operations/SyncReconciliationDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-018
+  name: Offline package
+  platform: P06
+  route: /operations/offline-package
+  repo: ticvai-employee-app
+  path: src/routes/operations/OfflinePackageDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-004
+  name: Task list
+  platform: P06
+  route: /operations/task-list
+  repo: ticvai-employee-app
+  path: src/routes/operations/TaskListDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-005
+  name: Task detail
+  platform: P06
+  route: /operations/task-detail
+  repo: ticvai-employee-app
+  path: src/routes/operations/TaskDetailDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-006
+  name: Raise a task
+  platform: P06
+  route: /operations/raise-a-task
+  repo: ticvai-employee-app
+  path: src/routes/operations/RaiseATaskDetail.tsx
   wave: 1
   status: notStarted
 - id: EMP-007
   name: Handover notes
+  platform: P06
   route: /operations/handover-notes
-  component: apps/venue-staff-app/src/routes/operations/HandoverNotesDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/HandoverNotesDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-008
   name: Shift summary
+  platform: P06
   route: /operations/shift-summary
-  component: apps/venue-staff-app/src/routes/operations/ShiftSummaryDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/ShiftSummaryDetail.tsx
   wave: 2
   status: notStarted
-- id: EMP-015
-  name: Group scan
-  route: /operations/group-scan
-  component: apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx
-  wave: 2
+- id: EMP-019
+  name: AI assistant — home
+  platform: P06
+  route: /operations/ai-assistant-home
+  repo: ticvai-employee-app
+  path: src/routes/operations/AiAssistantHomeDetail.tsx
+  wave: 1
   status: notStarted
-- id: EMP-023
-  name: Swap request
-  route: /operations/swap-request
-  component: apps/venue-staff-app/src/routes/operations/SwapRequestDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-025
-  name: Break management
-  route: /operations/break-management
-  component: apps/venue-staff-app/src/routes/operations/BreakManagementDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-027
-  name: Incident detail
-  route: /operations/incident-detail
-  component: apps/venue-staff-app/src/routes/operations/IncidentDetailDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-028
-  name: Lost & found
-  route: /operations/lost-found
-  component: apps/venue-staff-app/src/routes/operations/LostFoundDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-029
-  name: Guest assistance
-  route: /operations/guest-assistance
-  component: apps/venue-staff-app/src/routes/operations/GuestAssistanceDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-030
-  name: Venue map
-  route: /operations/venue-map
-  component: apps/venue-staff-app/src/routes/operations/VenueMapDetail.tsx
-  wave: 2
+- id: EMP-020
+  name: AI assistant — answer
+  platform: P06
+  route: /operations/ai-assistant-answer
+  repo: ticvai-employee-app
+  path: src/routes/operations/AiAssistantAnswerDetail.tsx
+  wave: 1
   status: notStarted
 - id: EMP-031
   name: Queue monitor
+  platform: P06
   route: /operations/queue-monitor
-  component: apps/venue-staff-app/src/routes/operations/QueueMonitorDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/QueueMonitorDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-032
   name: Manual wait entry
+  platform: P06
   route: /operations/manual-wait-entry
-  component: apps/venue-staff-app/src/routes/operations/ManualWaitEntryDetail.tsx
-  wave: 2
+  repo: ticvai-employee-app
+  path: src/routes/operations/ManualWaitEntryDetail.tsx
+  wave: 1
   status: notStarted
 - id: EMP-033
   name: Capacity view
+  platform: P06
   route: /operations/capacity-view
-  component: apps/venue-staff-app/src/routes/operations/CapacityViewDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/CapacityViewDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-034
   name: Walk-up sale
+  platform: P06
   route: /operations/walk-up-sale
-  component: apps/venue-staff-app/src/routes/operations/WalkUpSaleDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/WalkUpSaleDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-035
   name: Payment on device
+  platform: P06
   route: /operations/payment-on-device
-  component: apps/venue-staff-app/src/routes/operations/PaymentOnDeviceDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/PaymentOnDeviceDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-036
   name: Issue media
+  platform: P06
   route: /operations/issue-media
-  component: apps/venue-staff-app/src/routes/operations/IssueMediaDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/IssueMediaDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-037
+  name: Notifications
+  platform: P06
+  route: /operations/notifications
+  repo: ticvai-employee-app
+  path: src/routes/operations/NotificationsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-039
+  name: Announcements
+  platform: P06
+  route: /operations/announcements
+  repo: ticvai-employee-app
+  path: src/routes/operations/AnnouncementsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-047
+  name: Emergency mode
+  platform: P06
+  route: /operations/emergency-mode
+  repo: ticvai-employee-app
+  path: src/routes/operations/EmergencyModeDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-050
+  name: Post-incident restore
+  platform: P06
+  route: /operations/post-incident-restore
+  repo: ticvai-employee-app
+  path: src/routes/operations/PostIncidentRestoreDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-021
+  name: Roster
+  platform: P06
+  route: /operations/roster
+  repo: ticvai-employee-app
+  path: src/routes/operations/RosterDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-022
+  name: My rota
+  platform: P06
+  route: /operations/my-rota
+  repo: ticvai-employee-app
+  path: src/routes/operations/MyRotaDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-023
+  name: Swap request
+  platform: P06
+  route: /operations/swap-request
+  repo: ticvai-employee-app
+  path: src/routes/operations/SwapRequestDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-024
+  name: Clock in / out
+  platform: P06
+  route: /operations/clock-in-out
+  repo: ticvai-employee-app
+  path: src/routes/operations/ClockInOutDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-025
+  name: Break management
+  platform: P06
+  route: /operations/break-management
+  repo: ticvai-employee-app
+  path: src/routes/operations/BreakManagementDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-026
+  name: Incident report
+  platform: P06
+  route: /operations/incident-report
+  repo: ticvai-employee-app
+  path: src/routes/operations/IncidentReportDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-027
+  name: Incident detail
+  platform: P06
+  route: /operations/incident-detail
+  repo: ticvai-employee-app
+  path: src/routes/operations/IncidentDetailDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-028
+  name: Lost & found
+  platform: P06
+  route: /operations/lost-found
+  repo: ticvai-employee-app
+  path: src/routes/operations/LostFoundDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-029
+  name: Guest assistance
+  platform: P06
+  route: /operations/guest-assistance
+  repo: ticvai-employee-app
+  path: src/routes/operations/GuestAssistanceDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-030
+  name: Venue map
+  platform: P06
+  route: /operations/venue-map
+  repo: ticvai-employee-app
+  path: src/routes/operations/VenueMapDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-038
   name: Broadcast to team
+  platform: P06
   route: /operations/broadcast-to-team
-  component: apps/venue-staff-app/src/routes/operations/BroadcastToTeamDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-039
-  name: Announcements
-  route: /operations/announcements
-  component: apps/venue-staff-app/src/routes/operations/AnnouncementsDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/BroadcastToTeamDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-040
   name: Knowledge base
+  platform: P06
   route: /operations/knowledge-base
-  component: apps/venue-staff-app/src/routes/operations/KnowledgeBaseDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-044
-  name: Accessibility
-  route: /operations/accessibility
-  component: apps/venue-staff-app/src/routes/operations/AccessibilityDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-050
-  name: Post-incident restore
-  route: /operations/post-incident-restore
-  component: apps/venue-staff-app/src/routes/operations/PostIncidentRestoreDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/KnowledgeBaseDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-041
   name: Training
+  platform: P06
   route: /operations/training
-  component: apps/venue-staff-app/src/routes/operations/TrainingDetail.tsx
+  repo: ticvai-employee-app
+  path: src/routes/operations/TrainingDetail.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-042
+  name: Profile
+  platform: P06
+  route: /operations/profile
+  repo: ticvai-employee-app
+  path: src/routes/operations/ProfileDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-043
+  name: Device settings
+  platform: P06
+  route: /operations/device-settings
+  repo: ticvai-employee-app
+  path: src/routes/operations/DeviceSettingsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-044
+  name: Accessibility
+  platform: P06
+  route: /operations/accessibility
+  repo: ticvai-employee-app
+  path: src/routes/operations/AccessibilityDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-045
+  name: Arabic / RTL
+  platform: P06
+  route: /operations/arabic-rtl
+  repo: ticvai-employee-app
+  path: src/routes/operations/ArabicRtlDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-046
+  name: Sign out
+  platform: P06
+  route: /operations/sign-out
+  repo: ticvai-employee-app
+  path: src/routes/operations/SignOutDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-049
+  name: Hand over the journal
+  platform: P06
+  route: /operations/hand-over-the-journal
+  repo: ticvai-employee-app
+  path: src/routes/operations/HandOverTheJournalDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-051
+  name: Restaurant Service Command Center
+  platform: P06
+  route: /operations/restaurant-service-command-center
+  repo: ticvai-employee-app
+  path: src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-052
+  name: Floor Plan & Table Map
+  platform: P06
+  route: /operations/floor-plan-table-map
+  repo: ticvai-employee-app
+  path: src/routes/operations/FloorPlanTableMapDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-053
+  name: Table & Seating Configuration
+  platform: P06
+  route: /operations/table-seating-configuration
+  repo: ticvai-employee-app
+  path: src/routes/operations/TableSeatingConfigurationDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-054
+  name: Reservation Calendar & Timeline
+  platform: P06
+  route: /operations/reservation-calendar-timeline
+  repo: ticvai-employee-app
+  path: src/routes/operations/ReservationCalendarTimelineDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-055
+  name: Create / Edit Reservation
+  platform: P06
+  route: /operations/create-edit-reservation
+  repo: ticvai-employee-app
+  path: src/routes/operations/CreateEditReservationDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-056
+  name: Walk-In & Waitlist Management
+  platform: P06
+  route: /operations/walk-in-waitlist-management
+  repo: ticvai-employee-app
+  path: src/routes/operations/WalkInWaitlistManagementDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-057
+  name: Guest Profile & Dining History
+  platform: P06
+  route: /operations/guest-profile-dining-history
+  repo: ticvai-employee-app
+  path: src/routes/operations/GuestProfileDiningHistoryDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-058
+  name: Live Table & Service Management
+  platform: P06
+  route: /operations/live-table-service-management
+  repo: ticvai-employee-app
+  path: src/routes/operations/LiveTableServiceManagementDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-059
+  name: Table Order, Bill & Payment Management
+  platform: P06
+  route: /operations/table-order-bill-payment-management
+  repo: ticvai-employee-app
+  path: src/routes/operations/TableOrderBillPaymentManagementDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-060
+  name: Reservation & Table Performance
+  platform: P06
+  route: /operations/reservation-table-performance
+  repo: ticvai-employee-app
+  path: src/routes/operations/ReservationTablePerformanceDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-061
+  name: Retail Inventory Command Center
+  platform: P06
+  route: /operations/retail-inventory-command-center
+  repo: ticvai-employee-app
+  path: src/routes/operations/RetailInventoryCommandCenterDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-062
+  name: Store Stock & SKU Availability
+  platform: P06
+  route: /operations/store-stock-sku-availability
+  repo: ticvai-employee-app
+  path: src/routes/operations/StoreStockSkuAvailabilityDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-063
+  name: Requisition & Smart Store Replenishment
+  platform: P06
+  route: /operations/requisition-smart-store-replenishment
+  repo: ticvai-employee-app
+  path: src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-064
+  name: Store-to-Store & Warehouse Transfers
+  platform: P06
+  route: /operations/store-to-store-warehouse-transfers
+  repo: ticvai-employee-app
+  path: src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-065
+  name: Receiving
+  platform: P06
+  route: /operations/receiving-store-put-away
+  repo: ticvai-employee-app
+  path: src/routes/operations/ReceivingStorePutAwayDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-066
+  name: Stock Count & Cycle Count Management
+  platform: P06
+  route: /operations/stock-count-cycle-count-management
+  repo: ticvai-employee-app
+  path: src/routes/operations/StockCountCycleCountManagementDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-067
+  name: Damage, Loss, Shrinkage & Stock Adjustment
+  platform: P06
+  route: /operations/damage-loss-shrinkage-stock-adjustment
+  repo: ticvai-employee-app
+  path: src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-068
+  name: Reservation, Allocation & Omnichannel Inventory
+  platform: P06
+  route: /operations/reservation-allocation-omnichannel-inventory
+  repo: ticvai-employee-app
+  path: src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-069
+  name: Barcode, RFID, Serialized Stock & Traceability
+  platform: P06
+  route: /operations/barcode-rfid-serialized-stock-traceability
+  repo: ticvai-employee-app
+  path: src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-070
+  name: Inventory Exceptions, AI Replenishment & Action Center
+  platform: P06
+  route: /operations/inventory-exceptions-ai-replenishment-action-cen
+  repo: ticvai-employee-app
+  path: src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-071
+  name: Rental Checkout Command Center
+  platform: P06
+  route: /rentals/rental-checkout-command-center-emp-071
+  repo: ticvai-employee-app
+  path: src/routes/rentals/RentalCheckoutCommandCenter.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-072
+  name: Voucher Scan & Reservation Retrieval
+  platform: P06
+  route: /rentals/voucher-scan-reservation-retrieval-emp-072
+  repo: ticvai-employee-app
+  path: src/routes/rentals/VoucherScanReservationRetrieval.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-073
+  name: Checkout Readiness Validation
+  platform: P06
+  route: /rentals/checkout-readiness-validation-emp-073
+  repo: ticvai-employee-app
+  path: src/routes/rentals/CheckoutReadinessValidation.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-074
+  name: Equipment Assignment Workspace
+  platform: P06
+  route: /rentals/equipment-assignment-workspace-emp-074
+  repo: ticvai-employee-app
+  path: src/routes/rentals/EquipmentAssignmentWorkspace.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-075
+  name: Equipment Scan & Validation
+  platform: P06
+  route: /rentals/equipment-scan-validation-emp-075
+  repo: ticvai-employee-app
+  path: src/routes/rentals/EquipmentScanValidation.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-076
+  name: Pre-Rental Condition Inspection
+  platform: P06
+  route: /rentals/pre-rental-condition-inspection-emp-076
+  repo: ticvai-employee-app
+  path: src/routes/rentals/PreRentalConditionInspection.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-077
+  name: Safety & Handover Checklist
+  platform: P06
+  route: /rentals/safety-handover-checklist-emp-077
+  repo: ticvai-employee-app
+  path: src/routes/rentals/SafetyHandoverChecklist.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-078
+  name: Deposit & Financial Handover Validation
+  platform: P06
+  route: /rentals/deposit-financial-handover-validation-emp-078
+  repo: ticvai-employee-app
+  path: src/routes/rentals/DepositFinancialHandoverValidation.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-079
+  name: Group & Multi-Item Checkout
+  platform: P06
+  route: /rentals/group-multi-item-checkout-emp-079
+  repo: ticvai-employee-app
+  path: src/routes/rentals/GroupMultiItemCheckout.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-080
+  name: Checkout Confirmation & Rental Activation
+  platform: P06
+  route: /rentals/checkout-confirmation-rental-activation-emp-080
+  repo: ticvai-employee-app
+  path: src/routes/rentals/CheckoutConfirmationRentalActivation.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-081
+  name: Active Rental Operations Command Center
+  platform: P06
+  route: /rentals/active-rental-operations-command-center-emp-081
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-082
+  name: Active Rental Detail & Live Timeline
+  platform: P06
+  route: /rentals/active-rental-detail-live-timeline-emp-082
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-083
+  name: Rental Extension Request
+  platform: P06
+  route: /rentals/rental-extension-request-emp-083
+  repo: ticvai-employee-app
+  path: src/routes/rentals/RentalExtensionRequest.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-084
+  name: Extension Pricing & Confirmation
+  platform: P06
+  route: /rentals/extension-pricing-confirmation-emp-084
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ExtensionPricingConfirmation.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-085
+  name: Equipment Swap / Replacement
+  platform: P06
+  route: /rentals/equipment-swap-replacement-emp-085
+  repo: ticvai-employee-app
+  path: src/routes/rentals/EquipmentSwapReplacement.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-086
+  name: Rental Incident & Operational Exception
+  platform: P06
+  route: /rentals/rental-incident-operational-exception-emp-086
+  repo: ticvai-employee-app
+  path: src/routes/rentals/RentalIncidentOperationalException.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-087
+  name: Due Soon & Customer Notification Management
+  platform: P06
+  route: /rentals/due-soon-customer-notification-management-emp-087
+  repo: ticvai-employee-app
+  path: src/routes/rentals/DueSoonCustomerNotificationManagement.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-088
+  name: Overdue Rental Management
+  platform: P06
+  route: /rentals/overdue-rental-management-emp-088
+  repo: ticvai-employee-app
+  path: src/routes/rentals/OverdueRentalManagement.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-089
+  name: Active Group Rental Management
+  platform: P06
+  route: /rentals/active-group-rental-management-emp-089
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ActiveGroupRentalManagement.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-090
+  name: Active Rental Intelligence & Operational Alerts
+  platform: P06
+  route: /rentals/active-rental-intelligence-operational-alerts-emp-090
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-091
+  name: Rental Return Command Center
+  platform: P06
+  route: /rentals/rental-return-command-center-emp-091
+  repo: ticvai-employee-app
+  path: src/routes/rentals/RentalReturnCommandCenter.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-092
+  name: Return Scan & Rental Retrieval
+  platform: P06
+  route: /rentals/return-scan-rental-retrieval-emp-092
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ReturnScanRentalRetrieval.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-093
+  name: Return Summary & Actual Return Time
+  platform: P06
+  route: /rentals/return-summary-actual-return-time-emp-093
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ReturnSummaryActualReturnTime.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-094
+  name: Post-Rental Condition Inspection
+  platform: P06
+  route: /rentals/post-rental-condition-inspection-emp-094
+  repo: ticvai-employee-app
+  path: src/routes/rentals/PostRentalConditionInspection.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-095
+  name: Before vs After Condition Comparison
+  platform: P06
+  route: /rentals/before-vs-after-condition-comparison-emp-095
+  repo: ticvai-employee-app
+  path: src/routes/rentals/BeforeVsAfterConditionComparison.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-096
+  name: Damage Assessment & Charge Workflow
+  platform: P06
+  route: /rentals/damage-assessment-charge-workflow-emp-096
+  repo: ticvai-employee-app
+  path: src/routes/rentals/DamageAssessmentChargeWorkflow.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-097
+  name: Partial Return & Missing Equipment
+  platform: P06
+  route: /rentals/partial-return-missing-equipment-emp-097
+  repo: ticvai-employee-app
+  path: src/routes/rentals/PartialReturnMissingEquipment.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-098
+  name: Late Fees, Damage Fees & Final Settlement
+  platform: P06
+  route: /rentals/late-fees-damage-fees-final-settlement-emp-098
+  repo: ticvai-employee-app
+  path: src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-099
+  name: Deposit Release, Capture & Customer Confirmation
+  platform: P06
+  route: /rentals/deposit-release-capture-customer-confirmation-emp-099
+  repo: ticvai-employee-app
+  path: src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx
+  wave: 3
+  status: notStarted
+- id: EMP-100
+  name: Return Completion & Equipment Disposition
+  platform: P06
+  route: /rentals/return-completion-equipment-disposition-emp-100
+  repo: ticvai-employee-app
+  path: src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx
   wave: 3
   status: notStarted

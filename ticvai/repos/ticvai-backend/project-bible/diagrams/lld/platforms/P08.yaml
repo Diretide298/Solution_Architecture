@@ -2886,6 +2886,7 @@ screens:
   entryParams:
   - delegationId<-deepLink
   goesTo:
+  - ADM-238
   - BO-084
   - BO-085
   - BO-086
@@ -34671,6 +34672,7 @@ screens:
   - ADM-246
   - ADM-247
   - BO-086
+  - BO-087
   - BO-100
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#adm-238

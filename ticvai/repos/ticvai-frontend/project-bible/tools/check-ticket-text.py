@@ -22,6 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import frontend_repos as fr  # noqa: E402
 
 RULES = {
     "T-DONE-WHEN": "a work ticket has checkable Done-when items (R041 R053 R059)",
@@ -40,6 +41,8 @@ RULES = {
     "T-BOILERPLATE": "no sub-task/reviewer boilerplate with nothing behind it (R044)",
     "T-NONEMPTY-LABEL": "'makes <table> non-empty' only on an operation that creates rows (R064)",
     "T-SPEC-SCREEN": "a frontend spec section's route and wave match the screen record (R274)",
+    "T-APP-REPO": "a screen ticket and its spec section name the screen's repository (or none yet), never an "
+                  "apps/<app>/ folder of the old single workspace (CHG-R6-060)",
 }
 
 SCREEN_ID = re.compile(r"\b(?:[A-Z]{2,5})-\d{3,4}\b")
@@ -58,10 +61,16 @@ def main() -> int:
     key_of = {str(v): k for k, v in pms.items()}
     ops = g.operations()
     screens = {s["id"]: s for _, s in g.screens()}
+    apps = {p.get("app") for p in g.platforms().values() if p.get("app")}
 
     for oid, text in sorted(desc.items(), key=lambda kv: key_of.get(kv[0], kv[0])):
         # an id through the map; a plan key as it is (a ticket not pushed yet: op-descriptions.py, CHG-GTR-001)
         key = key_of.get(oid) or ("op-" + oid if oid.isdigit() else oid)
+        # --- the repository, not the old workspace folder (CHG-R6-060); sub-tasks too ------------
+        old_dirs = sorted({m.group(1) for m in fr.OLD_APP_PATH.finditer(text) if m.group(1) in apps})
+        if old_dirs:
+            guard.add("T-APP-REPO", key, f"{key}: names a folder of the old single workspace "
+                                         f"({', '.join('apps/' + a + '/' for a in old_dirs)}), which no repository has")
         if "#" in key:
             # A sub-task (`KEY#build`, `KEY#<operationId>`) repeats its parent's text; the parent is
             # checked once.
@@ -158,6 +167,11 @@ def main() -> int:
                 if wave and sc.get("wave") is not None and wave.group(1) != str(sc.get("wave")):
                     guard.add("T-WAVE", key, f"{key}: ticket says wave {wave.group(1)}, {sid} is "
                                              f"wave {sc.get('wave')}")
+                w = fr.where(sid)
+                want = f"**Repository:** {w['repo']} (" if w["repo"] else "**No repository yet:**"
+                if want not in text:
+                    guard.add("T-APP-REPO", key + ":repo", f"{key}: {sid} is built in "
+                              f"{w['repo'] or 'no repository yet'} ({w['platform']}); the ticket does not say so")
                 purpose = " ".join(str(sc.get("purpose") or "").split())
                 if purpose and purpose not in " ".join(text.split()):
                     guard.add("T-PURPOSE-CUT", key, f"{key}: the ticket does not carry {sid}'s "
@@ -204,6 +218,15 @@ def main() -> int:
             route = re.search(r"^\| Route \| `([^`]*)` \|", sec, re.M)
             wave = re.search(r"^\| Wave \| (\w+) \|", sec, re.M)
             yroute = (sc.get("implementation") or {}).get("route")
+            w = fr.where(sid)
+            want = f"| Repository | {w['repo']} (" if w["repo"] else "| Repository | none yet"
+            if want not in sec:
+                guard.add("T-APP-REPO", f"{page.name}:{sid}:repo", f"{page.name}: {sid} is built in "
+                          f"{w['repo'] or 'no repository yet'}; its section does not say so")
+            old_dirs = sorted({m.group(1) for m in fr.OLD_APP_PATH.finditer(sec) if m.group(1) in apps})
+            if old_dirs:
+                guard.add("T-APP-REPO", f"{page.name}:{sid}:apps", f"{page.name}: {sid} names "
+                          f"{', '.join('apps/' + a + '/' for a in old_dirs)}, a folder of the old single workspace")
             if route and yroute and route.group(1) != yroute:
                 guard.add("T-SPEC-SCREEN", f"{page.name}:{sid}:route",
                           f"{page.name}: {sid} route {route.group(1)}, the screen says {yroute}")

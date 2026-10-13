@@ -566,7 +566,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One line, with the lease that holds its capacity. Null lease for a product with no capacity **Hangs off**: a child of `orders.cart`; reaches `orders.sales_order` through its keys; references `catalogue.inventory_hold`, `"
+   "note": "One line, with the lease that holds its capacity. Null lease for a product with no capacity **Hangs off**: a child of `orders.cart`; reaches `orders.sales_order` through its keys; references `catalogue.inventory_reservat"
   },
   {
    "table": "pii.subject",

@@ -361,6 +361,7 @@ screens:
   - eventId<-deepLink
   - cartId<-session
   - venueId<-session
+  - entryId<-navigation
   goesTo:
   - GST-001
   - GST-002

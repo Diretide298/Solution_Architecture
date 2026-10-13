@@ -1,5 +1,6 @@
 # venue-pos — operated by venue · staff on posTerminal
 # Serves: P04 Venue POS — Terminal and Tablet
+# Repository: P04 ticvai-pos (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: venue-pos
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P04 Venue POS — Terminal and Tablet
 servesMultiplePlatforms: false
+repo: ticvai-pos
+repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git
+repositories:
+- platform: P04
+  repo: ticvai-pos
+  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -48,68 +56,263 @@ deployment:
   deviceOwnership: venue-owned, staffed
   networkAssumption: venue LAN with expected outages
   releaseCadence: monthly, never during trading
-screenCount: 10
+screenCount: 32
 byWave:
-  wave1: 7
-  wave2: 3
+  wave1: 32
 screens:
+- id: POS-000
+  name: Sign In
+  platform: P04
+  route: /sign-in
+  repo: ticvai-pos
+  path: src/routes/SignInTerminal.tsx
+  wave: 1
+  status: notStarted
 - id: POS-001
   name: Begin Shift
+  platform: P04
   route: /shift/begin-shift
-  component: apps/venue-pos/src/routes/shift/BeginShiftWizard.tsx
+  repo: ticvai-pos
+  path: src/routes/shift/BeginShiftWizard.tsx
   wave: 1
   status: notStarted
 - id: POS-002
   name: Sell — Ticket Catalogue
+  platform: P04
   route: /sell/sell-ticket-catalogue
-  component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+  repo: ticvai-pos
+  path: src/routes/sell/SellTicketCatalogueBoard.tsx
   wave: 1
   status: notStarted
 - id: POS-003
   name: Sell — Timed Entry
-  route: /sell/sell-timed-entry
-  component: apps/venue-pos/src/routes/sell/SellTimedEntryForm.tsx
-  wave: 1
-  status: notStarted
-- id: POS-005
-  name: Payment
-  route: /payment/payment
-  component: apps/venue-pos/src/routes/payment/PaymentForm.tsx
-  wave: 1
-  status: notStarted
-- id: POS-006
-  name: Held Orders
-  route: /sell/held-orders
-  component: apps/venue-pos/src/routes/sell/HeldOrdersList.tsx
-  wave: 1
-  status: notStarted
-- id: POS-007
-  name: Close Shift
-  route: /shift/close-shift
-  component: apps/venue-pos/src/routes/shift/CloseShiftWizard.tsx
-  wave: 1
-  status: notStarted
-- id: POS-010
-  name: Add to Existing Ticket
-  route: /sell/add-to-existing-ticket
-  component: apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx
+  platform: P04
+  route: /sell/sell-ticket-catalogue/timedentry
+  repo: ticvai-pos
+  path: src/routes/sell/SellTicketCatalogueBoard.tsx
   wave: 1
   status: notStarted
 - id: POS-004
   name: Sell — Seat Map
-  route: /sell/sell-seat-map
-  component: apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx
-  wave: 2
+  platform: P04
+  route: /sell/sell-ticket-catalogue/seatmap
+  repo: ticvai-pos
+  path: src/routes/sell/SellTicketCatalogueBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-005
+  name: Payment
+  platform: P04
+  route: /payment/payment
+  repo: ticvai-pos
+  path: src/routes/payment/PaymentForm.tsx
+  wave: 1
+  status: notStarted
+- id: POS-006
+  name: Held Orders
+  platform: P04
+  route: /sell/held-orders
+  repo: ticvai-pos
+  path: src/routes/sell/HeldOrdersBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-007
+  name: Close Shift
+  platform: P04
+  route: /shift/close-shift
+  repo: ticvai-pos
+  path: src/routes/shift/CloseShiftWizard.tsx
+  wave: 1
   status: notStarted
 - id: POS-008
   name: Reports
+  platform: P04
   route: /reports/reports
-  component: apps/venue-pos/src/routes/reports/ReportsDashboard.tsx
-  wave: 2
+  repo: ticvai-pos
+  path: src/routes/reports/ReportsDashboard.tsx
+  wave: 1
   status: notStarted
 - id: POS-009
   name: Staff Roster
-  route: /shift/staff-roster
-  component: apps/venue-pos/src/routes/shift/StaffRosterList.tsx
-  wave: 2
+  platform: P04
+  route: /sell/staff-roster
+  repo: ticvai-pos
+  path: src/routes/sell/StaffRosterBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-010
+  name: Add to Existing Ticket
+  platform: P04
+  route: /sell/add-to-existing-ticket
+  repo: ticvai-pos
+  path: src/routes/sell/AddToExistingTicketDetail.tsx
+  wave: 1
+  status: notStarted
+- id: POS-011
+  name: Returns, Refunds & Exchanges
+  platform: P04
+  route: /sell/returns-refunds-exchanges
+  repo: ticvai-pos
+  path: src/routes/sell/ReturnsRefundsExchangesBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-012
+  name: Omnichannel Order & Fulfilment Center
+  platform: P04
+  route: /sell/omnichannel-order-fulfilment-center
+  repo: ticvai-pos
+  path: src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-013
+  name: Mobile POS, Event Sales & Offline Operations
+  platform: P04
+  route: /sell/mobile-pos-event-sales-offline-operations
+  repo: ticvai-pos
+  path: src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-014
+  name: Sales Exceptions, Controls & Operational Actions
+  platform: P04
+  route: /sell/sales-exceptions-controls-operational-actions
+  repo: ticvai-pos
+  path: src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-015
+  name: Cash Operations Dashboard
+  platform: P04
+  route: /sell/cash-operations-dashboard
+  repo: ticvai-pos
+  path: src/routes/sell/CashOperationsDashboardBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-016
+  name: Till Configuration
+  platform: P04
+  route: /sell/till-configuration
+  repo: ticvai-pos
+  path: src/routes/sell/TillConfigurationBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-017
+  name: Cash In / Cash Out Operations
+  platform: P04
+  route: /sell/cash-in-cash-out-operations
+  repo: ticvai-pos
+  path: src/routes/sell/CashInCashOutOperationsBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-018
+  name: Safe Drop & Cash Transfer Management
+  platform: P04
+  route: /sell/safe-drop-cash-transfer-management
+  repo: ticvai-pos
+  path: src/routes/sell/SafeDropCashTransferManagementBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-019
+  name: Shift Templates & Policies
+  platform: P04
+  route: /sell/shift-templates-policies
+  repo: ticvai-pos
+  path: src/routes/sell/ShiftTemplatesPoliciesBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-020
+  name: Shift Exceptions & Alerts
+  platform: P04
+  route: /sell/shift-exceptions-alerts
+  repo: ticvai-pos
+  path: src/routes/sell/ShiftExceptionsAlertsBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-021
+  name: Sell — Food & Drink
+  platform: P04
+  route: /sell/sell---food-and-drink
+  repo: ticvai-pos
+  path: src/routes/sell/SellFoodDrinkBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-022
+  name: Send to Kitchen
+  platform: P04
+  route: /sell/send-to-kitchen
+  repo: ticvai-pos
+  path: src/routes/sell/SendToKitchenBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-023
+  name: Sell — Merchandise
+  platform: P04
+  route: /sell/sell---merchandise
+  repo: ticvai-pos
+  path: src/routes/sell/SellMerchandiseBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-024
+  name: Outlet Setup
+  platform: P04
+  route: /sell/outlet-setup
+  repo: ticvai-pos
+  path: src/routes/sell/OutletSetupBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-025
+  name: Till Home
+  platform: P04
+  route: /home
+  repo: ticvai-pos
+  path: src/routes/home/TillHomeBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-026
+  name: Receipt & Reprint
+  platform: P04
+  route: /sell/receipt
+  repo: ticvai-pos
+  path: src/routes/sell/ReceiptReprintBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-027
+  name: Guest Lookup
+  platform: P04
+  route: /sell/guests
+  repo: ticvai-pos
+  path: src/routes/sell/GuestLookupBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-028
+  name: Table Service
+  platform: P04
+  route: /sell/tables
+  repo: ticvai-pos
+  path: src/routes/sell/TableServiceBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-029
+  name: Order Queue
+  platform: P04
+  route: /sell/queue
+  repo: ticvai-pos
+  path: src/routes/sell/OrderQueueBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-030
+  name: Sales Journal
+  platform: P04
+  route: /sell/journal
+  repo: ticvai-pos
+  path: src/routes/sell/SalesJournalBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-031
+  name: Reservations & Group Arrivals
+  platform: P04
+  route: /sell/reservations
+  repo: ticvai-pos
+  path: src/routes/sell/ReservationsGroupArrivalsBoard.tsx
+  wave: 1
   status: notStarted

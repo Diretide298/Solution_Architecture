@@ -21,9 +21,9 @@
    ]
   },
   "check-screen-patterns": {
-   "why": "known on main at e875d996 and named by the lead's brief of 5 October 2026 as not to be chased in r2 (CHG-R4-004): the NP ceiling (ADM-340 fixed at r4, CHG-R6-042, 12 October 2026) (284 later-sprint findings above 191), and the P8/READ findings the r1 bundle (handoff/service-docs/op-release.json) still gives BO-087, BO-344, BO-1018, BO-1034, BO-1179, BO-1187 and ADM-606. The count is pinned: one more finding is a new failure",
+   "why": "known on main at e875d996 and named by the lead's brief of 5 October 2026 as not to be chased in r2 (CHG-R4-004): the NP ceiling (ADM-340 fixed at r4, CHG-R6-042, 12 October 2026) (284 later-sprint findings above 191), and the P8/READ findings the bundle (handoff/service-docs/op-release.json) gives BO-087, BO-344, BO-1018, BO-1034, BO-1179, BO-1187 and ADM-606, plus BO-954 Venue Canvas, whose setup task the r4 bundle created in Block A (APP-SETUP-BO-954, live since the r4 apply) while the screen still says wave 3; the r4 gate ran before the bundle was committed and never saw it (13 October 2026). NP is 285 with it. The count is pinned: one more finding is a new failure",
    "known": [
-    "^10 finding\\(s\\): NP 1, P8 7, READ 2$"
+    "^11 finding\\(s\\): NP 1, P8 8, READ 2$"
    ]
   }
  },

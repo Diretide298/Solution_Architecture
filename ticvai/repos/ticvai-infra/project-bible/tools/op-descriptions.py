@@ -29,6 +29,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import frontend_repos as fr  # noqa: E402  the repository a screen is built in (CHG-R6-060)
+
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "handoff" / "service-docs"
 # Three or four digits: the Block A setup screens of 30 September are BO-1094 to BO-1190.
@@ -424,8 +427,15 @@ def build(schedule, keys):
         if s.get("purpose"):
             out += [purpose_of(s), ""]
         out.append(f"- **Platform:** {s.get('_platform', '')}; module: {s.get('module', '-')}; wave {s.get('wave', '-')}")
+        # **The repository, not the old workspace folder** (CHG-R6-060). The screen's component path is written
+        # against one Nx workspace (apps/<app>/...), which no longer exists: the frontend is one GitLab repository
+        # per app (docs/active/frontend-repos.yaml). Name the repository of the screen's platform and a path
+        # relative to it, offered as a suggestion; with no repository yet, say so and name no folder.
+        w = fr.where(sid)
+        head, _, rest = fr.repo_sentence(w).partition(": ")
+        out.append(f"- **{head}:** {rest}")
         if impl.get("route") or impl.get("component"):
-            out.append(f"- **Route:** `{impl.get('route', '-')}`; component `{impl.get('component', '-')}`")
+            out.append(f"- **Route:** `{impl.get('route', '-')}`; " + fr.location_sentence(dict(w, route=None)))
         if s.get("permission"):
             out.append(f"- **Permission:** {s['permission']}")
         st = s.get("states")
@@ -525,6 +535,12 @@ def build(schedule, keys):
                     "", "Sub-tasks: build (every state), connect (the real API), tests."]
         else:
             text += [r["description"]]
+            # A frontend task keyed by no screen (APP-KIOSK-CONFIG, VM-FE-ADM-582-KIOSK) still lands in the
+            # repository of the screens its subject names (CHG-R6-060).
+            fe_sid = fr.screen_of_ticket(base, r["subject"]) if r["track"] == "Frontend" and r["type"] == "Task" else None
+            if fe_sid:
+                head, _, rest = fr.repo_sentence(fr.where(fe_sid)).partition(": ")
+                text += ["", f"- **{head}:** {rest}"]
             if children.get(base):
                 text += ["", f"Under this: {len(children[base])} "
                          f"{'features' if r['type'] == 'Epic' else 'tasks'}."]

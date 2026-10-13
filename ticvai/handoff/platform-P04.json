@@ -80,15 +80,7 @@
    "operations": 7
   },
   {
-   "contract": "marketing-crm",
-   "operations": 5
-  },
-  {
    "contract": "promotions",
-   "operations": 5
-  },
-  {
-   "contract": "finance",
    "operations": 5
   },
   {
@@ -96,11 +88,19 @@
    "operations": 5
   },
   {
-   "contract": "seating",
-   "operations": 4
+   "contract": "marketing-crm",
+   "operations": 5
+  },
+  {
+   "contract": "finance",
+   "operations": 5
   },
   {
    "contract": "approvals",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -116,11 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "inventory",
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "games",
    "operations": 1
   }
  ],

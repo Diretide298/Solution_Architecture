@@ -758,7 +758,7 @@
       "eventId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-007 holds eventId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-007 holds eventId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -1070,7 +1070,7 @@
       "cartId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -1335,7 +1335,7 @@
      "carries": [
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-009 holds performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-009 holds performanceId, so an edge into it carries them"
     }
    ]
   },
