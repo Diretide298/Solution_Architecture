@@ -1005,7 +1005,7 @@
      "eventId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-007 holds eventId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-007 holds eventId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-010",
@@ -1164,7 +1164,7 @@
      "cartId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-010",
@@ -1275,7 +1275,7 @@
     "carries": [
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-009 holds performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-009 holds performanceId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -5891,7 +5891,7 @@
     "carries": [
      "eventId"
     ],
-    "provenance": "derived \u2014 GST-007 declares entryState.params eventId and GST-001 holds eventId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-007 declares entryState.params entryId, eventId and GST-001 holds eventId, so an edge into it carries them"
    },
    {
     "to": "GST-008",

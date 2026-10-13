@@ -1,5 +1,6 @@
 # developer-portal-web — operated by partner · partner on web
 # Serves: P14 Developer Portal
+# Repository: P14 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: developer-portal-web
@@ -14,6 +15,13 @@ directions:
 platforms:
 - P14 Developer Portal
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P14
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -32,3 +40,65 @@ deployment:
     **The portal may change weekly; the contract it describes may not.**
 
     '
+screenCount: 8
+byWave:
+  wave1: 4
+  wave2: 3
+  wave3: 1
+screens:
+- id: DEV-001
+  name: API Reference
+  platform: P14
+  route: /developer/reference
+  repo: null
+  wave: 1
+  status: notStarted
+- id: DEV-002
+  name: Register & Organisation
+  platform: P14
+  route: /developer/organisation
+  repo: null
+  wave: 1
+  status: notStarted
+- id: DEV-003
+  name: Clients & Credentials
+  platform: P14
+  route: /developer/clients
+  repo: null
+  wave: 1
+  status: notStarted
+- id: DEV-004
+  name: Sandbox
+  platform: P14
+  route: /developer/sandbox
+  repo: null
+  wave: 2
+  status: notStarted
+- id: DEV-005
+  name: Webhooks
+  platform: P14
+  route: /developer/webhooks
+  repo: null
+  wave: 2
+  status: notStarted
+- id: DEV-006
+  name: Usage & Limits
+  platform: P14
+  route: /developer/usage
+  repo: null
+  wave: 2
+  status: notStarted
+- id: DEV-007
+  name: Marketplace Listing
+  platform: P14
+  route: /developer/marketplace
+  repo: null
+  wave: 3
+  status: notStarted
+- id: DEV-008
+  name: Programme Administration
+  platform: P14
+  route: /developer/admin
+  repo: null
+  wave: 1
+  status: notStarted

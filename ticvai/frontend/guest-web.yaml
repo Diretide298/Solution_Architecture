@@ -1,5 +1,6 @@
 # guest-web — operated by guest · guest on web
 # Serves: P01 Guest Web — Storefront
+# Repository: P01 ticvai-guest-web (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: guest-web
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P01 Guest Web — Storefront
 servesMultiplePlatforms: false
+repo: ticvai-guest-web
+repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git
+repositories:
+- platform: P01
+  repo: ticvai-guest-web
+  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -48,219 +56,407 @@ deployment:
   deviceOwnership: guest device
   networkAssumption: public internet, unmanaged
   releaseCadence: continuous
-screenCount: 35
+screenCount: 50
 byWave:
-  wave1: 20
-  wave2: 11
-  wave3: 4
+  wave1: 50
 screens:
 - id: WEB-001
   name: Home / Landing
+  platform: P01
   route: /discovery-and-browse/home-landing
-  component: apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
+  repo: ticvai-guest-web
+  path: src/routes/discovery-and-browse/HomeLandingDashboard.tsx
   wave: 1
   status: notStarted
 - id: WEB-002
   name: Event & Attraction Listing
+  platform: P01
   route: /discovery-and-browse/event-and-attraction-listing
-  component: apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx
+  repo: ticvai-guest-web
+  path: src/routes/discovery-and-browse/EventAndAttractionListingList.tsx
   wave: 1
   status: notStarted
 - id: WEB-003
   name: Search Results
+  platform: P01
   route: /discovery-and-browse/search-results
-  component: apps/guest-web/src/routes/discovery-and-browse/SearchResultsList.tsx
+  repo: ticvai-guest-web
+  path: src/routes/discovery-and-browse/SearchResultsList.tsx
   wave: 1
   status: notStarted
 - id: WEB-004
-  name: Event / Attraction Detail
+  name: Attraction Details
+  platform: P01
   route: /discovery-and-browse/event-attraction-detail
-  component: apps/guest-web/src/routes/discovery-and-browse/EventAttractionDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/discovery-and-browse/EventAttractionDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-005
   name: Ticket Type Selection
+  platform: P01
   route: /booking-and-selection/ticket-type-selection
-  component: apps/guest-web/src/routes/booking-and-selection/TicketTypeSelectionForm.tsx
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/TicketTypeSelectionForm.tsx
   wave: 1
   status: notStarted
 - id: WEB-006
-  name: Date & Session Selection
+  name: Date & Performance Selection
+  platform: P01
   route: /booking-and-selection/date-and-session-selection
-  component: apps/guest-web/src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-007
+  name: Interactive Seat Selection
+  platform: P01
+  route: /booking-and-selection/seat-map-selection
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-008
+  name: Add-ons & Upsell
+  platform: P01
+  route: /booking-and-selection/add-ons-and-upsell
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-009
+  name: Wishlist
+  platform: P01
+  route: /booking-and-selection/wishlist
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/WishlistDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-010
   name: Shopping Cart
+  platform: P01
   route: /cart-and-checkout/shopping-cart
-  component: apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/cart-and-checkout/ShoppingCartDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-011
   name: Guest Details & Attendee Forms
+  platform: P01
   route: /cart-and-checkout/guest-details-and-attendee-forms
-  component: apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
+  repo: ticvai-guest-web
+  path: src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
   wave: 1
   status: notStarted
 - id: WEB-012
   name: Checkout — Payment
+  platform: P01
   route: /cart-and-checkout/checkout-payment
-  component: apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
+  repo: ticvai-guest-web
+  path: src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
   wave: 1
   status: notStarted
 - id: WEB-013
-  name: Order Confirmation
+  name: Booking Confirmation
+  platform: P01
   route: /cart-and-checkout/order-confirmation
-  component: apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-014
+  name: Pay for a Booking
+  platform: P01
+  route: /pay/:token
+  repo: ticvai-guest-web
+  path: src/routes/cart-and-checkout/PayByLinkForm.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-015
+  name: Branded Queue / Waiting Room
+  platform: P01
+  route: /high-demand-access/virtual-waiting-room
+  repo: ticvai-guest-web
+  path: src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-016
   name: Login / Register
+  platform: P01
   route: /account-and-self-service/login-register
-  component: apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx
+  repo: ticvai-guest-web
+  path: src/routes/account-and-self-service/LoginRegisterList.tsx
   wave: 1
   status: notStarted
 - id: WEB-017
   name: My Account Dashboard
+  platform: P01
   route: /account-and-self-service/my-account-dashboard
-  component: apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx
+  repo: ticvai-guest-web
+  path: src/routes/account-and-self-service/MyAccountDashboard.tsx
   wave: 1
   status: notStarted
 - id: WEB-018
   name: My Tickets
+  platform: P01
   route: /account-and-self-service/my-tickets
-  component: apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/account-and-self-service/MyTicketsDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-019
   name: Order History
+  platform: P01
   route: /account-and-self-service/order-history
-  component: apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx
+  repo: ticvai-guest-web
+  path: src/routes/account-and-self-service/OrderHistoryList.tsx
   wave: 1
   status: notStarted
 - id: WEB-020
   name: Profile & Preferences
+  platform: P01
   route: /account-and-self-service/profile-and-preferences
-  component: apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-021
+  name: Wallet & Gift Cards
+  platform: P01
+  route: /membership-loyalty-and-value/wallet-and-gift-cards
+  repo: ticvai-guest-web
+  path: src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-022
+  name: Membership Plans
+  platform: P01
+  route: /membership-loyalty-and-value/membership-plans
+  repo: ticvai-guest-web
+  path: src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-023
+  name: Membership Management
+  platform: P01
+  route: /membership-loyalty-and-value/membership-management
+  repo: ticvai-guest-web
+  path: src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-024
+  name: Devices, Wishlist & Consent
+  platform: P01
+  route: /membership-loyalty-and-value/devices-wishlist-consent
+  repo: ticvai-guest-web
+  path: src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-025
   name: Help Centre / FAQ
+  platform: P01
   route: /engagement-and-support/help-centre-faq
-  component: apps/guest-web/src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-026
+  name: Survey & Feedback
+  platform: P01
+  route: /engagement-and-support/survey-and-feedback
+  repo: ticvai-guest-web
+  path: src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-027
+  name: Newsletter Subscription
+  platform: P01
+  route: /engagement-and-support/newsletter-subscription
+  repo: ticvai-guest-web
+  path: src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-028
   name: Contact & Venue Information
+  platform: P01
   route: /engagement-and-support/contact-and-venue-information
-  component: apps/guest-web/src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx
+  repo: ticvai-guest-web
+  path: src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx
   wave: 1
   status: notStarted
 - id: WEB-029
   name: Error / Sold Out / Maintenance
+  platform: P01
   route: /system-states/error-sold-out-maintenance
-  component: apps/guest-web/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
+  repo: ticvai-guest-web
+  path: src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-030
   name: Ticket Transfer
+  platform: P01
   route: /ticket-transfer
-  component: apps/guest-web/src/routes/TicketTransfer.tsx
+  repo: ticvai-guest-web
+  path: src/routes/TicketTransfer.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-031
+  name: My Reservations
+  platform: P01
+  route: /my-reservations
+  repo: ticvai-guest-web
+  path: src/routes/MyReservations.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-032
+  name: Offers & Promotions
+  platform: P01
+  route: /offers-promotions
+  repo: ticvai-guest-web
+  path: src/routes/OffersPromotions.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-033
+  name: Shop
+  platform: P01
+  route: /shop
+  repo: ticvai-guest-web
+  path: src/routes/Shop.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-034
+  name: Lost & Found
+  platform: P01
+  route: /lost-found
+  repo: ticvai-guest-web
+  path: src/routes/LostFound.tsx
   wave: 1
   status: notStarted
 - id: WEB-035
   name: Multi-Currency & Pricing
+  platform: P01
   route: /multi-currency-pricing
-  component: apps/guest-web/src/routes/MulticurrencyPricing.tsx
+  repo: ticvai-guest-web
+  path: src/routes/MulticurrencyPricing.tsx
   wave: 1
   status: notStarted
-- id: WEB-007
-  name: Seat Map Selection
-  route: /booking-and-selection/seat-map-selection
-  component: apps/guest-web/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx
-  wave: 2
+- id: WEB-036
+  name: F&B – Browse & Order
+  platform: P01
+  route: /fandb--browse-and-order
+  repo: ticvai-guest-web
+  path: src/routes/FBBrowseOrder.tsx
+  wave: 1
   status: notStarted
-- id: WEB-008
-  name: Add-ons & Upsell
-  route: /booking-and-selection/add-ons-and-upsell
-  component: apps/guest-web/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx
-  wave: 2
+- id: WEB-037
+  name: Menu Item Detail
+  platform: P01
+  route: /menu-item-detail
+  repo: ticvai-guest-web
+  path: src/routes/MenuItemDetail.tsx
+  wave: 1
   status: notStarted
-- id: WEB-014
-  name: Payment Link Landing
-  route: /cart-and-checkout/payment-link-landing
-  component: apps/guest-web/src/routes/cart-and-checkout/PaymentLinkLandingDetail.tsx
-  wave: 2
+- id: WEB-038
+  name: F&B – Order Tracking
+  platform: P01
+  route: /fandb--order-tracking
+  repo: ticvai-guest-web
+  path: src/routes/FBOrderTracking.tsx
+  wave: 1
   status: notStarted
-- id: WEB-015
-  name: Virtual Waiting Room
-  route: /high-demand-access/virtual-waiting-room
-  component: apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx
-  wave: 2
+- id: WEB-039
+  name: Venue Map & Wait Times
+  platform: P01
+  route: /venue-map-and-wait-times
+  repo: ticvai-guest-web
+  path: src/routes/VenueMapWaitTimes.tsx
+  wave: 1
   status: notStarted
-- id: WEB-021
-  name: Wallet & Gift Cards
-  route: /membership-loyalty-and-value/wallet-and-gift-cards
-  component: apps/guest-web/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx
-  wave: 2
+- id: WEB-040
+  name: Virtual Queue
+  platform: P01
+  route: /virtual-queue
+  repo: ticvai-guest-web
+  path: src/routes/VirtualQueue.tsx
+  wave: 1
   status: notStarted
-- id: WEB-022
-  name: Membership Plans
-  route: /membership-loyalty-and-value/membership-plans
-  component: apps/guest-web/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx
-  wave: 2
+- id: WEB-041
+  name: Parking – Reserve & Pay
+  platform: P01
+  route: /parking--reserve-and-pay
+  repo: ticvai-guest-web
+  path: src/routes/ParkingReservePay.tsx
+  wave: 1
   status: notStarted
-- id: WEB-023
-  name: Membership Management
-  route: /membership-loyalty-and-value/membership-management
-  component: apps/guest-web/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx
-  wave: 2
+- id: WEB-042
+  name: Retail & Shop and Drop
+  platform: P01
+  route: /retail-and-shop-and-drop
+  repo: ticvai-guest-web
+  path: src/routes/RetailShopAndDrop.tsx
+  wave: 1
   status: notStarted
-- id: WEB-027
-  name: Newsletter Subscription
-  route: /engagement-and-support/newsletter-subscription
-  component: apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
-  wave: 2
-  status: notStarted
-- id: WEB-031
-  name: My Reservations
-  route: /my-reservations
-  component: apps/guest-web/src/routes/MyReservations.tsx
-  wave: 2
-  status: notStarted
-- id: WEB-032
-  name: Offers & Promotions
-  route: /offers-promotions
-  component: apps/guest-web/src/routes/OffersPromotions.tsx
-  wave: 2
-  status: notStarted
-- id: WEB-033
-  name: Shop
-  route: /shop
-  component: apps/guest-web/src/routes/Shop.tsx
-  wave: 2
-  status: notStarted
-- id: WEB-009
-  name: Wishlist
-  route: /booking-and-selection/wishlist
-  component: apps/guest-web/src/routes/booking-and-selection/WishlistDetail.tsx
-  wave: 3
-  status: notStarted
-- id: WEB-024
+- id: WEB-043
   name: Loyalty & Rewards
-  route: /membership-loyalty-and-value/loyalty-and-rewards
-  component: apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
-  wave: 3
+  platform: P01
+  route: /loyalty-and-rewards
+  repo: ticvai-guest-web
+  path: src/routes/LoyaltyRewards.tsx
+  wave: 1
   status: notStarted
-- id: WEB-026
-  name: Survey & Feedback
-  route: /engagement-and-support/survey-and-feedback
-  component: apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
-  wave: 3
+- id: WEB-044
+  name: AI Concierge – Home
+  platform: P01
+  route: /ai-concierge
+  repo: ticvai-guest-web
+  path: src/routes/AiConcierge.tsx
+  wave: 1
   status: notStarted
-- id: WEB-034
-  name: Lost & Found
-  route: /lost-found
-  component: apps/guest-web/src/routes/LostFound.tsx
-  wave: 3
+- id: WEB-045
+  name: Help Centre & Accessibility
+  platform: P01
+  route: /help-centre-and-accessibility
+  repo: ticvai-guest-web
+  path: src/routes/HelpCentreAccessibility.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-046
+  name: In-Venue Notifications
+  platform: P01
+  route: /in-venue-notifications
+  repo: ticvai-guest-web
+  path: src/routes/InVenueNotifications.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-047
+  name: Map Booking — Cabanas & Spots
+  platform: P01
+  route: /booking-and-selection/map-booking
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/MapBookingCanvas.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-048
+  name: Book a Space by the Hour
+  platform: P01
+  route: /booking-and-selection/space-by-the-hour
+  repo: ticvai-guest-web
+  path: src/routes/booking-and-selection/SpaceByTheHourWizard.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-049
+  name: Transport — Route & Schedule
+  platform: P01
+  route: /transport/route-and-schedule
+  repo: ticvai-guest-web
+  path: src/routes/transport/RouteAndScheduleSplit.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-050
+  name: Plan Your Visit
+  platform: P01
+  route: /plan-your-visit
+  repo: ticvai-guest-web
+  path: src/routes/PlanYourVisit.tsx
+  wave: 1
   status: notStarted

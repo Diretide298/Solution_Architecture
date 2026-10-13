@@ -171,7 +171,7 @@
    "operations": 12
   },
   {
-   "contract": "wallet",
+   "contract": "venue-map",
    "operations": 8
   },
   {
@@ -179,7 +179,7 @@
    "operations": 8
   },
   {
-   "contract": "venue-map",
+   "contract": "wallet",
    "operations": 8
   },
   {
@@ -187,11 +187,11 @@
    "operations": 7
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -199,11 +199,11 @@
    "operations": 5
   },
   {
-   "contract": "seating",
+   "contract": "payments",
    "operations": 4
   },
   {
-   "contract": "payments",
+   "contract": "promotions",
    "operations": 4
   },
   {
@@ -211,7 +211,7 @@
    "operations": 4
   },
   {
-   "contract": "promotions",
+   "contract": "seating",
    "operations": 4
   },
   {

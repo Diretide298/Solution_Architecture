@@ -74,11 +74,11 @@
    "operations": 22
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 14
   },
   {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 14
   },
   {
@@ -106,11 +106,11 @@
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "reporting",
    "operations": 6
   },
   {
-   "contract": "reporting",
+   "contract": "ai",
    "operations": 6
   },
   {

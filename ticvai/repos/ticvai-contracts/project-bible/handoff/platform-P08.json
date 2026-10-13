@@ -218,11 +218,11 @@
    "operations": 56
   },
   {
-   "contract": "inventory",
+   "contract": "seating",
    "operations": 53
   },
   {
-   "contract": "seating",
+   "contract": "inventory",
    "operations": 53
   },
   {

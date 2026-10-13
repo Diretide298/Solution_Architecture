@@ -1775,8 +1775,8 @@ screens:
       carries:
       - eventId
       - performanceId
-      provenance: derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-007
-        holds eventId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId
+        and WEB-007 holds eventId, performanceId, so an edge into it carries them
     - to: WEB-010
       trigger: Reviews the cart
       provenance: flow F02 step 2→3
@@ -2049,8 +2049,8 @@ screens:
       carries:
       - cartId
       - performanceId
-      provenance: derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-008
-        holds cartId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId
+        and WEB-008 holds cartId, performanceId, so an edge into it carries them
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -2270,8 +2270,8 @@ screens:
       trigger: Date & Performance Selection
       carries:
       - performanceId
-      provenance: derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-009
-        holds performanceId, so an edge into it carries them
+      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId
+        and WEB-009 holds performanceId, so an edge into it carries them
   notes: 'Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
     it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations
     on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that

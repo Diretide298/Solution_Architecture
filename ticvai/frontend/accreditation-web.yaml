@@ -1,5 +1,6 @@
 # accreditation-web — operated by public · public on web
 # Serves: P11 Accreditation Web — Applications
+# Repository: P11 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: accreditation-web
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P11 Accreditation Web — Applications
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P11
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -35,49 +43,57 @@ byWave:
 screens:
 - id: ACC-001
   name: Landing / Programme Overview
+  platform: P11
   route: /applicant-journey/landing-programme-overview
-  component: apps/accreditation-web/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-002
   name: Registration Form
+  platform: P11
   route: /applicant-journey/registration-form
-  component: apps/accreditation-web/src/routes/applicant-journey/RegistrationForm.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-003
   name: Application Review & Submit
+  platform: P11
   route: /applicant-journey/application-review-and-submit
-  component: apps/accreditation-web/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-004
   name: Application Status Tracking
+  platform: P11
   route: /applicant-journey/application-status-tracking
-  component: apps/accreditation-web/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-005
   name: Accreditation Badge
+  platform: P11
   route: /applicant-journey/accreditation-badge
-  component: apps/accreditation-web/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-006
   name: Reviewer Queue
+  platform: P11
   route: /reviewer-internal/reviewer-queue
-  component: apps/accreditation-web/src/routes/reviewer-internal/ReviewerQueueList.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-007
   name: Reviewer Application Detail
+  platform: P11
   route: /reviewer-internal/reviewer-application-detail
-  component: apps/accreditation-web/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ACC-008
   name: Credential Register
+  platform: P11
   route: /reviewer-internal/credential-register
-  component: apps/accreditation-web/src/routes/reviewer-internal/CredentialRegisterList.tsx
+  repo: null
   wave: 3
   status: notStarted

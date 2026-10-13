@@ -1,5 +1,6 @@
 # ticvai-web — operated by ticvai · platformAdmin on web
 # Serves: P09 TICVAI Web — Platform Console
+# Repository: P09 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: ticvai-web
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P09 TICVAI Web — Platform Console
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P09
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -44,231 +52,1486 @@ deployment:
   deviceOwnership: platform staff device
   networkAssumption: corporate network, IP-restricted
   releaseCadence: weekly
-screenCount: 37
+screenCount: 211
 byWave:
-  wave1: 11
-  wave2: 16
-  wave3: 10
+  wave1: 28
+  wave2: 13
+  wave3: 170
 screens:
 - id: ADM-001
   name: Platform Login / MFA
+  platform: P09
   route: /general/platform-login-mfa
-  component: apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: ADM-002
   name: Platform Dashboard
+  platform: P09
   route: /general/platform-dashboard
-  component: apps/ticvai-web/src/routes/general/PlatformDashboard.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-005
-  name: Tenant Directory
-  route: /general/tenant-directory
-  component: apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-006
-  name: Tenant Hierarchy Explorer
-  route: /general/tenant-hierarchy-explorer
-  component: apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-007
-  name: Module & Feature Entitlement
-  route: /general/module-and-feature-entitlement
-  component: apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-008
-  name: Subscription & Plan Management
-  route: /general/subscription-and-plan-management
-  component: apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-012
-  name: Tenant Isolation & Resource Pool
-  route: /general/tenant-isolation-and-resource-pool
-  component: apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-020
-  name: Platform User Directory
-  route: /general/platform-user-directory
-  component: apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-021
-  name: Platform Role Management
-  route: /general/platform-role-management
-  component: apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-027
-  name: Database Migration Console
-  route: /general/database-migration-console
-  component: apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx
-  wave: 1
-  status: notStarted
-- id: ADM-037
-  name: AI Provider & Credentials
-  route: /ai/providers
-  component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
+  platform: P09
   route: /general/cross-tenant-health-dashboard
-  component: apps/ticvai-web/src/routes/general/CrossTenantHealthDashboard.tsx
-  wave: 2
+  repo: null
+  wave: 1
   status: notStarted
 - id: ADM-004
   name: Platform Audit Log
+  platform: P09
   route: /general/platform-audit-log
-  component: apps/ticvai-web/src/routes/general/PlatformAuditLogList.tsx
+  repo: null
   wave: 2
+  status: notStarted
+- id: ADM-005
+  name: Tenant Directory
+  platform: P09
+  route: /general/tenant-directory
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-006
+  name: Tenant Hierarchy Explorer
+  platform: P09
+  route: /general/tenant-hierarchy-explorer
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-007
+  name: Module & Feature Entitlement
+  platform: P09
+  route: /general/module-and-feature-entitlement
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-008
+  name: Subscription & Plan Management
+  platform: P09
+  route: /general/subscription-and-plan-management
+  repo: null
+  wave: 1
   status: notStarted
 - id: ADM-009
   name: Tenant Billing & Invoicing
+  platform: P09
   route: /general/tenant-billing-and-invoicing
-  component: apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx
+  repo: null
   wave: 2
   status: notStarted
 - id: ADM-010
   name: Usage Metering
+  platform: P09
   route: /general/usage-metering
-  component: apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx
+  repo: null
   wave: 2
   status: notStarted
 - id: ADM-011
   name: Licence & Seat Management
+  platform: P09
   route: /general/licence-and-seat-management
-  component: apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx
+  repo: null
   wave: 2
+  status: notStarted
+- id: ADM-012
+  name: Tenant Isolation & Resource Pool
+  platform: P09
+  route: /general/tenant-isolation-and-resource-pool
+  repo: null
+  wave: 1
   status: notStarted
 - id: ADM-013
   name: Tenant Performance Monitor
+  platform: P09
   route: /general/tenant-performance-monitor
-  component: apps/ticvai-web/src/routes/general/TenantPerformanceMonitorDashboard.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-016
-  name: White-Label Branding Management
-  route: /general/white-label-branding-management
-  component: apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-017
-  name: Domain & Certificate Management
-  route: /general/domain-and-certificate-management
-  component: apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-018
-  name: Localisation & Language Pack
-  route: /general/localisation-and-language-pack
-  component: apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-019
-  name: Global Configuration & Defaults
-  route: /general/global-configuration-and-defaults
-  component: apps/ticvai-web/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-022
-  name: Release & Version Management
-  route: /general/release-and-version-management
-  component: apps/ticvai-web/src/routes/general/ReleaseAndVersionManagementForm.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-023
-  name: Staging Promotion & Approval
-  route: /general/staging-promotion-and-approval
-  component: apps/ticvai-web/src/routes/general/StagingPromotionAndApprovalWizard.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-025
-  name: Tenant Upgrade Scheduler
-  route: /general/tenant-upgrade-scheduler
-  component: apps/ticvai-web/src/routes/general/TenantUpgradeSchedulerForm.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-028
-  name: Environment Registry
-  route: /general/environment-registry
-  component: apps/ticvai-web/src/routes/general/EnvironmentRegistryDetail.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-029
-  name: Deployment Monitor
-  route: /general/deployment-monitor
-  component: apps/ticvai-web/src/routes/general/DeploymentMonitorDashboard.tsx
-  wave: 2
-  status: notStarted
-- id: ADM-033
-  name: Backup & DR Status
-  route: /general/backup-and-dr-status
-  component: apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx
+  repo: null
   wave: 2
   status: notStarted
 - id: ADM-014
   name: Auto-Scaling Configuration
+  platform: P09
   route: /general/auto-scaling-configuration
-  component: apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ADM-015
   name: API Rate Limit & Quota Management
+  platform: P09
   route: /general/api-rate-limit-and-quota-management
-  component: apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: ADM-016
+  name: White-Label Branding Management
+  platform: P09
+  route: /general/white-label-branding-management
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-017
+  name: Domain & Certificate Management
+  platform: P09
+  route: /general/domain-and-certificate-management
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-018
+  name: Interface Languages
+  platform: P09
+  route: /general/localisation-and-language-pack
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-019
+  name: Global Configuration & Defaults
+  platform: P09
+  route: /general/global-configuration-and-defaults
+  repo: null
+  wave: 2
+  status: notStarted
+- id: ADM-020
+  name: Platform User Directory
+  platform: P09
+  route: /general/platform-user-directory
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-021
+  name: Platform Role Management
+  platform: P09
+  route: /general/platform-role-management
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-699
+  name: My Account & Security
+  platform: P09
+  route: /access-identity/my-account-security
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-022
+  name: Release & Version Management
+  platform: P09
+  route: /general/release-and-version-management
+  repo: null
+  wave: 2
+  status: notStarted
+- id: ADM-023
+  name: Staging Promotion & Approval
+  platform: P09
+  route: /general/staging-promotion-and-approval
+  repo: null
+  wave: 2
   status: notStarted
 - id: ADM-024
   name: Release Notification Composer
+  platform: P09
   route: /general/release-notification-composer
-  component: apps/ticvai-web/src/routes/general/ReleaseNotificationComposerForm.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: ADM-025
+  name: Tenant Upgrade Scheduler
+  platform: P09
+  route: /general/tenant-upgrade-scheduler
+  repo: null
+  wave: 2
   status: notStarted
 - id: ADM-026
   name: End-of-Support Notice Management
+  platform: P09
   route: /general/end-of-support-notice-management
-  component: apps/ticvai-web/src/routes/general/EndOfSupportNoticeManagementForm.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: ADM-027
+  name: Database Migration Console
+  platform: P09
+  route: /general/database-migration-console
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-028
+  name: Environment Registry
+  platform: P09
+  route: /general/environment-registry
+  repo: null
+  wave: 2
+  status: notStarted
+- id: ADM-700
+  name: Configuration Promotion
+  platform: P09
+  route: /releases-environments/configuration-promotion
+  repo: null
+  wave: 2
+  status: notStarted
+- id: ADM-029
+  name: Deployment Monitor
+  platform: P09
+  route: /general/deployment-monitor
+  repo: null
+  wave: 2
   status: notStarted
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
+  platform: P09
   route: /general/infrastructure-sizing-and-scaling-policy
-  component: apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ADM-031
   name: Security & Compliance Dashboard
+  platform: P09
   route: /general/security-and-compliance-dashboard
-  component: apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx
-  wave: 3
+  repo: null
+  wave: 1
   status: notStarted
 - id: ADM-032
   name: WAF & Security Policy View
+  platform: P09
   route: /general/waf-and-security-policy-view
-  component: apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: ADM-033
+  name: Backup & DR Status
+  platform: P09
+  route: /general/backup-and-dr-status
+  repo: null
+  wave: 2
   status: notStarted
 - id: ADM-034
   name: Archival Job Monitor
+  platform: P09
   route: /general/archival-job-monitor
-  component: apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ADM-035
   name: Support & Escalation Console
+  platform: P09
   route: /general/support-and-escalation-console
-  component: apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: ADM-036
   name: Platform Notification Broadcast
+  platform: P09
   route: /general/platform-notification-broadcast
-  component: apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-037
+  name: AI Provider & Credentials
+  platform: P09
+  route: /ai/providers
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-068
+  name: Tax, Fee & Calculation Command Center
+  platform: P09
+  route: /commercial/tax-fee-calculation-command-center-adm-068
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-318
+  name: Dead Letters
+  platform: P09
+  route: /platform/dead-letters
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-369
+  name: Commercial Command Center
+  platform: P09
+  route: /tenants-licensing/commercial-command-center-adm-369
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-370
+  name: Customer Subscription & Commercial Portfolio
+  platform: P09
+  route: /tenants-licensing/customer-subscription-commercial-portfolio-adm-370
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-371
+  name: Customer Commercial 360°
+  platform: P09
+  route: /tenants-licensing/customer-commercial-360-adm-371
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-372
+  name: Operational Profile, VSI & Commercial Model Intelligence
+  platform: P09
+  route: /tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-373
+  name: Revenue & Commercial Model Analytics
+  platform: P09
+  route: /tenants-licensing/revenue-commercial-model-analytics-adm-373
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-374
+  name: Trial & Conversion Monitor
+  platform: P09
+  route: /tenants-licensing/trial-conversion-monitor-adm-374
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-375
+  name: Renewal & Retention Center
+  platform: P09
+  route: /tenants-licensing/renewal-retention-center-adm-375
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-376
+  name: Commercial Optimization & Expansion Opportunities
+  platform: P09
+  route: /tenants-licensing/commercial-optimization-expansion-opportunities-adm-376
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-377
+  name: Subscription Exceptions & Commercial Alerts
+  platform: P09
+  route: /tenants-licensing/subscription-exceptions-commercial-alerts-adm-377
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-378
+  name: Executive AI Commercial Intelligence
+  platform: P09
+  route: /tenants-licensing/executive-ai-commercial-intelligence-adm-378
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-379
+  name: Welcome & Start Your TICVAI Journey
+  platform: P09
+  route: /tenants-licensing/welcome-start-your-ticvai-journey-adm-379
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-380
+  name: Customer & Organization Registration
+  platform: P09
+  route: /tenants-licensing/customer-organization-registration-adm-380
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-381
+  name: Venue Type & Business Profile
+  platform: P09
+  route: /tenants-licensing/venue-type-business-profile-adm-381
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-382
+  name: Visitor, Capacity & Operational Scale
+  platform: P09
+  route: /tenants-licensing/visitor-capacity-operational-scale-adm-382
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-383
+  name: Sales Channel Assessment
+  platform: P09
+  route: /tenants-licensing/sales-channel-assessment-adm-383
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-384
+  name: Ticketing & Product Requirements
+  platform: P09
+  route: /tenants-licensing/ticketing-product-requirements-adm-384
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-385
+  name: Access, Queue & Visitor Experience Assessment
+  platform: P09
+  route: /tenants-licensing/access-queue-visitor-experience-assessment-adm-385
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-386
+  name: Additional Business Module Assessment
+  platform: P09
+  route: /tenants-licensing/additional-business-module-assessment-adm-386
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-387
+  name: Integration, Payment & Technical Readiness
+  platform: P09
+  route: /tenants-licensing/integration-payment-technical-readiness-adm-387
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-388
+  name: AI Assessment Summary & Handoff
+  platform: P09
+  route: /tenants-licensing/ai-assessment-summary-handoff-adm-388
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-389
+  name: Commercial Rules Engine Overview
+  platform: P09
+  route: /tenants-licensing/commercial-rules-engine-overview-adm-389
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-390
+  name: VSI Model Builder
+  platform: P09
+  route: /tenants-licensing/vsi-model-builder-adm-390
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-391
+  name: VSI Scoring & Tier Threshold Configuration
+  platform: P09
+  route: /tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-392
+  name: Subscription Tier Configuration
+  platform: P09
+  route: /tenants-licensing/subscription-tier-configuration-adm-392
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-393
+  name: Tier Included Allowances
+  platform: P09
+  route: /tenants-licensing/tier-included-allowances-adm-393
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-394
+  name: Commercial & Licensing Model Configuration
+  platform: P09
+  route: /tenants-licensing/commercial-licensing-model-configuration-adm-394
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-395
+  name: Billable Unit, Minimum Guarantee & Enforcement Rules
+  platform: P09
+  route: /tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-396
+  name: Overage Pricing & Capacity Packs
+  platform: P09
+  route: /tenants-licensing/overage-pricing-capacity-packs-adm-396
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-397
+  name: Commercial Model & Rule Simulation
+  platform: P09
+  route: /tenants-licensing/commercial-model-rule-simulation-adm-397
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-398
+  name: Rule Versioning, Approval & Publication
+  platform: P09
+  route: /tenants-licensing/rule-versioning-approval-publication-adm-398
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-399
+  name: Recommended Package Overview
+  platform: P09
+  route: /tenants-licensing/recommended-package-overview-adm-399
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-400
+  name: Commercial Model & Tier Selection
+  platform: P09
+  route: /tenants-licensing/commercial-model-tier-selection-adm-400
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-401
+  name: Module Marketplace
+  platform: P09
+  route: /tenants-licensing/module-marketplace-adm-401
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-402
+  name: AI Module & Package Recommendations
+  platform: P09
+  route: /tenants-licensing/ai-module-package-recommendations-adm-402
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-403
+  name: Module Detail & Commercial Treatment
+  platform: P09
+  route: /tenants-licensing/module-detail-commercial-treatment-adm-403
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-404
+  name: Module Dependency & Compatibility Manager
+  platform: P09
+  route: /tenants-licensing/module-dependency-compatibility-manager-adm-404
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-405
+  name: Add-Ons, Capacity & Commercial Options
+  platform: P09
+  route: /tenants-licensing/add-ons-capacity-commercial-options-adm-405
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-406
+  name: Commercial Package Simulator
+  platform: P09
+  route: /tenants-licensing/commercial-package-simulator-adm-406
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-407
+  name: Package Review & Commercial Summary
+  platform: P09
+  route: /tenants-licensing/package-review-commercial-summary-adm-407
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-408
+  name: Final Package Approval & Handoff
+  platform: P09
+  route: /tenants-licensing/final-package-approval-handoff-adm-408
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-409
+  name: Purchase / Trial Journey Selection
+  platform: P09
+  route: /tenants-licensing/purchase-trial-journey-selection-adm-409
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-410
+  name: Contract & Billing Cycle Selection
+  platform: P09
+  route: /tenants-licensing/contract-billing-cycle-selection-adm-410
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-411
+  name: Billing & Legal Entity Information
+  platform: P09
+  route: /tenants-licensing/billing-legal-entity-information-adm-411
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-412
+  name: Payment Method & Settlement Setup
+  platform: P09
+  route: /tenants-licensing/payment-method-settlement-setup-adm-412
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-413
+  name: Trial Configuration & Conversion Rules
+  platform: P09
+  route: /tenants-licensing/trial-configuration-conversion-rules-adm-413
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-414
+  name: Order & Commercial Pricing Review
+  platform: P09
+  route: /tenants-licensing/order-commercial-pricing-review-adm-414
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-415
+  name: Commercial Agreement, Billable Definition & Customer Acceptance
+  platform: P09
+  route: /tenants-licensing/commercial-agreement-billable-definition-customer-accept-adm-415
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-416
+  name: Payment, Contract & Commercial Validation
+  platform: P09
+  route: /tenants-licensing/payment-contract-commercial-validation-adm-416
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-417
+  name: Subscription Confirmation & Commercial Activation
+  platform: P09
+  route: /tenants-licensing/subscription-confirmation-commercial-activation-adm-417
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-418
+  name: Subscription Lifecycle & Trial-to-Paid Handoff
+  platform: P09
+  route: /tenants-licensing/subscription-lifecycle-trial-to-paid-handoff-adm-418
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-419
+  name: Provisioning Command Center
+  platform: P09
+  route: /tenants-licensing/provisioning-command-center-adm-419
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-420
+  name: Tenant & Organization Provisioning
+  platform: P09
+  route: /tenants-licensing/tenant-organization-provisioning-adm-420
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-421
+  name: Venue & Operational Structure Creation
+  platform: P09
+  route: /tenants-licensing/venue-operational-structure-creation-adm-421
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-422
+  name: Administrator & Security Initialization
+  platform: P09
+  route: /tenants-licensing/administrator-security-initialization-adm-422
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-423
+  name: License & Entitlement Activation
+  platform: P09
+  route: /tenants-licensing/license-entitlement-activation-adm-423
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-424
+  name: Module Activation & Dependency Validation
+  platform: P09
+  route: /tenants-licensing/module-activation-dependency-validation-adm-424
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-425
+  name: Venue Template Application
+  platform: P09
+  route: /tenants-licensing/venue-template-application-adm-425
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-426
+  name: Initial Configuration & Regional Defaults
+  platform: P09
+  route: /tenants-licensing/initial-configuration-regional-defaults-adm-426
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-427
+  name: Provisioning Validation & Exception Management
+  platform: P09
+  route: /tenants-licensing/provisioning-validation-exception-management-adm-427
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-449
+  name: Usage & License Command Center
+  platform: P09
+  route: /tenants-licensing/usage-license-command-center-adm-449
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-450
+  name: Entitlement & License Inventory
+  platform: P09
+  route: /tenants-licensing/entitlement-license-inventory-adm-450
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-451
+  name: Commercial Consumption & Billable Event Metering
+  platform: P09
+  route: /tenants-licensing/commercial-consumption-billable-event-metering-adm-451
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-452
+  name: Operational Usage & Threshold Monitor
+  platform: P09
+  route: /tenants-licensing/operational-usage-threshold-monitor-adm-452
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-453
+  name: License Enforcement & Decision Engine
+  platform: P09
+  route: /tenants-licensing/license-enforcement-decision-engine-adm-453
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-454
+  name: Minimum Guarantee & Variable Consumption Monitor
+  platform: P09
+  route: /tenants-licensing/minimum-guarantee-variable-consumption-monitor-adm-454
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-455
+  name: Overage, Capacity & Temporary Exception Management
+  platform: P09
+  route: /tenants-licensing/overage-capacity-temporary-exception-management-adm-455
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-456
+  name: Usage Alerts, Reconciliation & Exception Center
+  platform: P09
+  route: /tenants-licensing/usage-alerts-reconciliation-exception-center-adm-456
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-457
+  name: AI Usage Forecast & Commercial Optimization
+  platform: P09
+  route: /tenants-licensing/ai-usage-forecast-commercial-optimization-adm-457
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-458
+  name: License, Metering & Commercial Synchronization Audit
+  platform: P09
+  route: /tenants-licensing/license-metering-commercial-synchronization-audit-adm-458
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-459
+  name: Billing & Commercial Command Center
+  platform: P09
+  route: /tenants-licensing/billing-commercial-command-center-adm-459
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-460
+  name: Billing Calculation & Charge Breakdown
+  platform: P09
+  route: /tenants-licensing/billing-calculation-charge-breakdown-adm-460
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-461
+  name: Consumption Reconciliation & Billing Approval
+  platform: P09
+  route: /tenants-licensing/consumption-reconciliation-billing-approval-adm-461
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-462
+  name: Invoice & Payment Management
+  platform: P09
+  route: /tenants-licensing/invoice-payment-management-adm-462
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-463
+  name: Subscription & Commercial Change Management
+  platform: P09
+  route: /tenants-licensing/subscription-commercial-change-management-adm-463
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-464
+  name: Renewal Management Center
+  platform: P09
+  route: /tenants-licensing/renewal-management-center-adm-464
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-465
+  name: AI Upgrade, Downgrade & Commercial Right-Sizing
+  platform: P09
+  route: /tenants-licensing/ai-upgrade-downgrade-commercial-right-sizing-adm-465
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-466
+  name: Commercial Scenario Simulator
+  platform: P09
+  route: /tenants-licensing/commercial-scenario-simulator-adm-466
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-467
+  name: Discount, Credit & Commercial Override Management
+  platform: P09
+  route: /tenants-licensing/discount-credit-commercial-override-management-adm-467
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-468
+  name: Renewal Approval, Activation & Commercial Handoff
+  platform: P09
+  route: /tenants-licensing/renewal-approval-activation-commercial-handoff-adm-468
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-469
+  name: AI Configuration Home & Start
+  platform: P09
+  route: /platform/ai-configuration-home-start-adm-469
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-470
+  name: Setup Type & Business Intent Discovery
+  platform: P09
+  route: /platform/setup-type-business-intent-discovery-adm-470
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-471
+  name: Venue & Business Model Discovery
+  platform: P09
+  route: /platform/venue-business-model-discovery-adm-471
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-472
+  name: Guided Question & Answer Workspace
+  platform: P09
+  route: /platform/guided-question-answer-workspace-adm-472
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-473
+  name: Product & Admission Model Discovery
+  platform: P09
+  route: /platform/product-admission-model-discovery-adm-473
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-474
+  name: Operational Requirement Discovery
+  platform: P09
+  route: /platform/operational-requirement-discovery-adm-474
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-475
+  name: Commercial Requirement Discovery
+  platform: P09
+  route: /platform/commercial-requirement-discovery-adm-475
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-476
+  name: Required, Recommended & Optional Decisions
+  platform: P09
+  route: /platform/required-recommended-optional-decisions-adm-476
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-477
+  name: Missing Information & Clarification Center
+  platform: P09
+  route: /platform/missing-information-clarification-center-adm-477
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-478
+  name: Configuration Blueprint & Dependency Map
+  platform: P09
+  route: /platform/configuration-blueprint-dependency-map-adm-478
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-479
+  name: AI Configuration Build Command Center
+  platform: P09
+  route: /platform/ai-configuration-build-command-center-adm-479
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-480
+  name: Venue & Organization Configuration
+  platform: P09
+  route: /platform/venue-organization-configuration-adm-480
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-481
+  name: Product Configuration Assistant
+  platform: P09
+  route: /platform/product-configuration-assistant-adm-481
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-482
+  name: Schedule, Capacity & Availability Configuration
+  platform: P09
+  route: /platform/schedule-capacity-availability-configuration-adm-482
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-483
+  name: Pricing & Commercial Configuration
+  platform: P09
+  route: /platform/pricing-commercial-configuration-adm-483
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-484
+  name: Promotion, Bundle & Upsell Configuration
+  platform: P09
+  route: /platform/promotion-bundle-upsell-configuration-adm-484
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-485
+  name: Seating, Access & Operational Configuration
+  platform: P09
+  route: /platform/seating-access-operational-configuration-adm-485
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-486
+  name: Channel, Media & Fulfillment Configuration
+  platform: P09
+  route: /platform/channel-media-fulfillment-configuration-adm-486
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-487
+  name: Cross-Module Conflict & Dependency Validation
+  platform: P09
+  route: /platform/cross-module-conflict-dependency-validation-adm-487
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-488
+  name: Configuration Preview & Impact Analysis
+  platform: P09
+  route: /platform/configuration-preview-impact-analysis-adm-488
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-489
+  name: AI Configuration Readiness Center
+  platform: P09
+  route: /platform/ai-configuration-readiness-center-adm-489
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-490
+  name: Configuration Validation Results
+  platform: P09
+  route: /platform/configuration-validation-results-adm-490
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-491
+  name: AI Recommendations & Best-Practice Review
+  platform: P09
+  route: /platform/ai-recommendations-best-practice-review-adm-491
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-492
+  name: Configuration Approval Workflow
+  platform: P09
+  route: /platform/configuration-approval-workflow-adm-492
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-493
+  name: AI Configuration Execution Center
+  platform: P09
+  route: /platform/ai-configuration-execution-center-adm-493
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-494
+  name: Execution Progress & Dependency Monitor
+  platform: P09
+  route: /platform/execution-progress-dependency-monitor-adm-494
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-495
+  name: Configuration Results & Object Mapping
+  platform: P09
+  route: /platform/configuration-results-object-mapping-adm-495
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-496
+  name: Configuration Change & Modification Assistant
+  platform: P09
+  route: /platform/configuration-change-modification-assistant-adm-496
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-497
+  name: Configuration History, Versions & Rollback
+  platform: P09
+  route: /platform/configuration-history-versions-rollback-adm-497
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-498
+  name: AI Configuration Audit & Governance
+  platform: P09
+  route: /platform/ai-configuration-audit-governance-adm-498
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-499
+  name: Forecasting Command Center
+  platform: P09
+  route: /analytics/forecasting-command-center-adm-499
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-500
+  name: Forecast Configuration & Forecasting Strategy
+  platform: P09
+  route: /analytics/forecast-configuration-forecasting-strategy-adm-500
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-501
+  name: Forecast Data & Signal Configuration
+  platform: P09
+  route: /analytics/forecast-data-signal-configuration-adm-501
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-502
+  name: Attendance & Visitation Forecast
+  platform: P09
+  route: /analytics/attendance-visitation-forecast-adm-502
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-503
+  name: Ticket, Product & Timeslot Demand Forecast
+  platform: P09
+  route: /analytics/ticket-product-timeslot-demand-forecast-adm-503
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-504
+  name: Channel & Booking Pace Forecast
+  platform: P09
+  route: /analytics/channel-booking-pace-forecast-adm-504
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-505
+  name: Revenue & Commercial Forecast
+  platform: P09
+  route: /analytics/revenue-commercial-forecast-adm-505
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-506
+  name: Forecast Drivers, Confidence & Explainability
+  platform: P09
+  route: /analytics/forecast-drivers-confidence-explainability-adm-506
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-507
+  name: Forecast Scenario & What-If Simulator
+  platform: P09
+  route: /analytics/forecast-scenario-what-if-simulator-adm-507
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-508
+  name: Forecast Accuracy, Review & Publication Center
+  platform: P09
+  route: /analytics/forecast-accuracy-review-publication-center-adm-508
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-509
+  name: Operational Forecasting Command Center
+  platform: P09
+  route: /analytics/operational-forecasting-command-center-adm-509
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-510
+  name: Capacity & Occupancy Forecast
+  platform: P09
+  route: /analytics/capacity-occupancy-forecast-adm-510
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-511
+  name: Attraction Utilization & Queue Forecast
+  platform: P09
+  route: /analytics/attraction-utilization-queue-forecast-adm-511
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-512
+  name: Entry, Access & Guest Flow Forecast
+  platform: P09
+  route: /analytics/entry-access-guest-flow-forecast-adm-512
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-513
+  name: Workforce Demand & Staffing Forecast
+  platform: P09
+  route: /analytics/workforce-demand-staffing-forecast-adm-513
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-514
+  name: POS, Kiosk & Frontline Service Forecast
+  platform: P09
+  route: /analytics/pos-kiosk-frontline-service-forecast-adm-514
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-515
+  name: F&B, Retail & Inventory Demand Forecast
+  platform: P09
+  route: /analytics/f-b-retail-inventory-demand-forecast-adm-515
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-516
+  name: Resource, Equipment & Facility Requirement Forecast
+  platform: P09
+  route: /analytics/resource-equipment-facility-requirement-forecast-adm-516
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-517
+  name: Operational Scenario & Readiness Simulator
+  platform: P09
+  route: /analytics/operational-scenario-readiness-simulator-adm-517
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-518
+  name: Operational Forecast Review, Recommendations & Handover
+  platform: P09
+  route: /analytics/operational-forecast-review-recommendations-handover-adm-518
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-519
+  name: AI Governance Command Center
+  platform: P09
+  route: /platform/ai-governance-command-center-adm-519
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-520
+  name: AI Capability Registry & Ownership
+  platform: P09
+  route: /platform/ai-capability-registry-ownership-adm-520
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-521
+  name: AI Risk Classification & Assessment
+  platform: P09
+  route: /platform/ai-risk-classification-assessment-adm-521
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-522
+  name: AI Autonomy Level Configuration
+  platform: P09
+  route: /platform/ai-autonomy-level-configuration-adm-522
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-523
+  name: AI Action & Permission Policy Builder
+  platform: P09
+  route: /platform/ai-action-permission-policy-builder-adm-523
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-524
+  name: AI Data Access & Usage Policy
+  platform: P09
+  route: /platform/ai-data-access-usage-policy-adm-524
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-525
+  name: Environment, Tenant & Scope Governance
+  platform: P09
+  route: /platform/environment-tenant-scope-governance-adm-525
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-526
+  name: AI Policy Conflict, Exception & Override Management
+  platform: P09
+  route: /platform/ai-policy-conflict-exception-override-management-adm-526
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-527
+  name: AI Policy Testing & Governance Simulation
+  platform: P09
+  route: /platform/ai-policy-testing-governance-simulation-adm-527
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-528
+  name: AI Governance Policy Publication & Effective Policy Map
+  platform: P09
+  route: /platform/ai-governance-policy-publication-effective-policy-map-adm-528
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-529
+  name: AI Human Oversight Command Center
+  platform: P09
+  route: /platform/ai-human-oversight-command-center-adm-529
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-530
+  name: AI Approval Requirement & Routing Configuration
+  platform: P09
+  route: /platform/ai-approval-requirement-routing-configuration-adm-530
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-531
+  name: AI Approval Review Workspace
+  platform: P09
+  route: /platform/ai-approval-review-workspace-adm-531
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-532
+  name: Conditional Approval & Approval Conditions
+  platform: P09
+  route: /platform/conditional-approval-approval-conditions-adm-532
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-533
+  name: Human Review, Challenge & AI Clarification Workspace
+  platform: P09
+  route: /platform/human-review-challenge-ai-clarification-workspace-adm-533
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-534
+  name: Escalation, Delegation & Approval SLA Management
+  platform: P09
+  route: /platform/escalation-delegation-approval-sla-management-adm-534
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-535
+  name: Live AI Execution Oversight & Human Intervention
+  platform: P09
+  route: /platform/live-ai-execution-oversight-human-intervention-adm-535
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-536
+  name: Human Override & Manual Control Center
+  platform: P09
+  route: /platform/human-override-manual-control-center-adm-536
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-537
+  name: Approval & Intervention History / Decision Timeline
+  platform: P09
+  route: /platform/approval-intervention-history-decision-timeline-adm-537
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-538
+  name: Human Oversight Workflow Simulator & Readiness Center
+  platform: P09
+  route: /platform/human-oversight-workflow-simulator-readiness-center-adm-538
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-539
+  name: AI Explainability & Audit Command Center
+  platform: P09
+  route: /platform/ai-explainability-audit-command-center-adm-539
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-540
+  name: AI Decision Explorer & Search
+  platform: P09
+  route: /platform/ai-decision-explorer-search-adm-540
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-541
+  name: AI Decision Explanation Workspace
+  platform: P09
+  route: /platform/ai-decision-explanation-workspace-adm-541
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-542
+  name: Data, Feature & Evidence Provenance
+  platform: P09
+  route: /platform/data-feature-evidence-provenance-adm-542
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-543
+  name: Candidate, Rule & Decision Path Trace
+  platform: P09
+  route: /platform/candidate-rule-decision-path-trace-adm-543
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-544
+  name: Model, Provider & AI Runtime Trace
+  platform: P09
+  route: /platform/model-provider-ai-runtime-trace-adm-544
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-545
+  name: Governance, Approval & Human Decision Trace
+  platform: P09
+  route: /platform/governance-approval-human-decision-trace-adm-545
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-546
+  name: Execution & Business Outcome Trace
+  platform: P09
+  route: /platform/execution-business-outcome-trace-adm-546
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-547
+  name: AI Audit Record & Evidence Package
+  platform: P09
+  route: /platform/ai-audit-record-evidence-package-adm-547
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-548
+  name: AI Trace Investigation & Replay Simulator
+  platform: P09
+  route: /platform/ai-trace-investigation-replay-simulator-adm-548
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-549
+  name: AI Governance Monitoring Command Center
+  platform: P09
+  route: /platform/ai-governance-monitoring-command-center-adm-549
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-550
+  name: AI Risk Register & Risk Exposure Management
+  platform: P09
+  route: /platform/ai-risk-register-risk-exposure-management-adm-550
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-551
+  name: AI Governance Control Library & Control Effectiveness
+  platform: P09
+  route: /platform/ai-governance-control-library-control-effectiveness-adm-551
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-552
+  name: AI Policy Compliance & Violation Monitoring
+  platform: P09
+  route: /platform/ai-policy-compliance-violation-monitoring-adm-552
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-553
+  name: AI Data, Privacy & Usage Compliance Monitoring
+  platform: P09
+  route: /platform/ai-data-privacy-usage-compliance-monitoring-adm-553
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-554
+  name: AI Quality, Behavior & Governance Drift Monitoring
+  platform: P09
+  route: /platform/ai-quality-behavior-governance-drift-monitoring-adm-554
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-555
+  name: AI Governance Alert & Detection Center
+  platform: P09
+  route: /platform/ai-governance-alert-detection-center-adm-555
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-556
+  name: AI Incident & Remediation Management
+  platform: P09
+  route: /platform/ai-incident-remediation-management-adm-556
+  repo: null
+  wave: 1
+  status: notStarted
+- id: ADM-557
+  name: AI Compliance, Assurance & Governance Reporting
+  platform: P09
+  route: /platform/ai-compliance-assurance-governance-reporting-adm-557
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-558
+  name: AI Governance Review, Action Plan & Continuous Improvement
+  platform: P09
+  route: /platform/ai-governance-review-action-plan-continuous-improvement-adm-558
+  repo: null
+  wave: 3
+  status: notStarted
+- id: ADM-619
+  name: Reconciliation & Settlement Command Center
+  platform: P09
+  route: /commercial/reconciliation-settlement-command-center-t139-adm-619
+  repo: null
   wave: 3
   status: notStarted

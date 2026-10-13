@@ -1,5 +1,6 @@
 # partner-web — operated by partner · partner on web
 # Serves: P10 Partner Web — Reseller Portal
+# Repository: P10 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: partner-web
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P10 Partner Web — Reseller Portal
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P10
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -39,134 +47,310 @@ deployment:
   deviceOwnership: partner device, unmanaged
   networkAssumption: public internet
   releaseCadence: monthly — partners integrate against it
-screenCount: 21
+screenCount: 43
 byWave:
-  wave2: 11
-  wave3: 10
+  wave1: 1
+  wave2: 10
+  wave3: 32
 screens:
 - id: PTR-001
   name: Partner Login / MFA
+  platform: P10
   route: /general/partner-login-mfa
-  component: apps/partner-web/src/routes/general/PartnerLoginMfaList.tsx
-  wave: 2
+  repo: null
+  wave: 1
   status: notStarted
 - id: PTR-002
   name: Partner Dashboard
+  platform: P10
   route: /general/partner-dashboard
-  component: apps/partner-web/src/routes/general/PartnerDashboard.tsx
+  repo: null
   wave: 2
   status: notStarted
 - id: PTR-003
   name: Profile & Company Details
+  platform: P10
   route: /general/profile-and-company-details
-  component: apps/partner-web/src/routes/general/ProfileAndCompanyDetailsDetail.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-005
-  name: Inventory & Allocation View
-  route: /general/inventory-and-allocation-view
-  component: apps/partner-web/src/routes/general/InventoryAndAllocationViewDetail.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-006
-  name: Product Catalog (B2B Pricing)
-  route: /general/product-catalog-b2b-pricing
-  component: apps/partner-web/src/routes/general/ProductCatalogB2bPricingList.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-007
-  name: Availability Search
-  route: /general/availability-search
-  component: apps/partner-web/src/routes/general/AvailabilitySearchList.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-008
-  name: Booking Creation
-  route: /general/booking-creation
-  component: apps/partner-web/src/routes/general/BookingCreationForm.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-012
-  name: Checkout / Credit Purchase
-  route: /general/checkout-credit-purchase
-  component: apps/partner-web/src/routes/general/CheckoutCreditPurchaseWizard.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-013
-  name: Credit Limit & Balance
-  route: /general/credit-limit-and-balance
-  component: apps/partner-web/src/routes/general/CreditLimitAndBalanceDetail.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-015
-  name: Order History
-  route: /general/order-history
-  component: apps/partner-web/src/routes/general/OrderHistoryList.tsx
-  wave: 2
-  status: notStarted
-- id: PTR-016
-  name: Voucher / Ticket Download
-  route: /general/voucher-ticket-download
-  component: apps/partner-web/src/routes/general/VoucherTicketDownloadDetail.tsx
+  repo: null
   wave: 2
   status: notStarted
 - id: PTR-004
   name: Notifications
+  platform: P10
   route: /general/notifications
-  component: apps/partner-web/src/routes/general/NotificationsDetail.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: PTR-005
+  name: Inventory & Allocation View
+  platform: P10
+  route: /general/inventory-and-allocation-view
+  repo: null
+  wave: 2
+  status: notStarted
+- id: PTR-006
+  name: Product Catalog (B2B Pricing)
+  platform: P10
+  route: /general/product-catalog-b2b-pricing
+  repo: null
+  wave: 2
+  status: notStarted
+- id: PTR-007
+  name: Availability Search
+  platform: P10
+  route: /general/availability-search
+  repo: null
+  wave: 2
+  status: notStarted
+- id: PTR-008
+  name: Booking Creation
+  platform: P10
+  route: /general/booking-creation
+  repo: null
+  wave: 2
   status: notStarted
 - id: PTR-009
   name: Group / Bulk Booking
+  platform: P10
   route: /general/group-bulk-booking
-  component: apps/partner-web/src/routes/general/GroupBulkBookingDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: PTR-010
   name: Cart & Quote
+  platform: P10
   route: /general/cart-and-quote
-  component: apps/partner-web/src/routes/general/CartAndQuoteDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: PTR-011
   name: Quote Management
+  platform: P10
   route: /general/quote-management
-  component: apps/partner-web/src/routes/general/QuoteManagementForm.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: PTR-012
+  name: Checkout / Credit Purchase
+  platform: P10
+  route: /general/checkout-credit-purchase
+  repo: null
+  wave: 2
+  status: notStarted
+- id: PTR-013
+  name: Credit Limit & Balance
+  platform: P10
+  route: /general/credit-limit-and-balance
+  repo: null
+  wave: 2
   status: notStarted
 - id: PTR-014
   name: Settlement & Payment History
+  platform: P10
   route: /general/settlement-and-payment-history
-  component: apps/partner-web/src/routes/general/SettlementAndPaymentHistoryList.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: PTR-015
+  name: Order History
+  platform: P10
+  route: /general/order-history
+  repo: null
+  wave: 2
+  status: notStarted
+- id: PTR-016
+  name: Voucher / Ticket Download
+  platform: P10
+  route: /general/voucher-ticket-download
+  repo: null
+  wave: 2
   status: notStarted
 - id: PTR-017
   name: Commission Statement
+  platform: P10
   route: /general/commission-statement
-  component: apps/partner-web/src/routes/general/CommissionStatementDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: PTR-018
   name: Reports & Sales Performance
+  platform: P10
   route: /general/reports-and-sales-performance
-  component: apps/partner-web/src/routes/general/ReportsAndSalesPerformanceDashboard.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: PTR-019
   name: API Credentials & Integration
+  platform: P10
   route: /general/api-credentials-and-integration
-  component: apps/partner-web/src/routes/general/ApiCredentialsAndIntegrationDetail.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: PTR-020
   name: Sub-Agent Management
+  platform: P10
   route: /general/sub-agent-management
-  component: apps/partner-web/src/routes/general/SubAgentManagementForm.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: PTR-021
   name: Support & Contact
+  platform: P10
   route: /general/support-and-contact
-  component: apps/partner-web/src/routes/general/SupportAndContactDetail.tsx
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-022
+  name: Partner Management Command Center
+  platform: P10
+  route: /partners/partner-management-command-center-ptr-022
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-023
+  name: Partner Profile & Organization Setup
+  platform: P10
+  route: /partners/partner-profile-organization-setup-ptr-023
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-024
+  name: Partner Onboarding & Application Workflow
+  platform: P10
+  route: /partners/partner-onboarding-application-workflow-ptr-024
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-025
+  name: Partner Contacts & User Administration
+  platform: P10
+  route: /partners/partner-contacts-user-administration-ptr-025
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-027
+  name: Partner Brand, Venue & Business Scope Assignment
+  platform: P10
+  route: /partners/partner-brand-venue-business-scope-assignment-ptr-027
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-028
+  name: Partner Documentation & Compliance Repository
+  platform: P10
+  route: /partners/partner-documentation-compliance-repository-ptr-028
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-030
+  name: Partner Approval, Status & Lifecycle Management
+  platform: P10
+  route: /partners/partner-approval-status-lifecycle-management-ptr-030
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-031
+  name: Partner 360° Profile, Readiness & AI Review
+  platform: P10
+  route: /partners/partner-360-profile-readiness-ai-review-ptr-031
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-032
+  name: Commercial Agreement Command Center
+  platform: P10
+  route: /partners/commercial-agreement-command-center-ptr-032
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-033
+  name: Agreement & Contract Terms Builder
+  platform: P10
+  route: /partners/agreement-contract-terms-builder-ptr-033
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-034
+  name: Partner Rate & Net Pricing Configuration
+  platform: P10
+  route: /partners/partner-rate-net-pricing-configuration-ptr-034
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-038
+  name: Payment Terms, Billing & Account Configuration
+  platform: P10
+  route: /partners/payment-terms-billing-account-configuration-ptr-038
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-040
+  name: Booking Limits, Commercial Exceptions & Approval
+  platform: P10
+  route: /partners/booking-limits-commercial-exceptions-approval-ptr-040
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-041
+  name: Commercial Agreement 360°, Health & AI Review
+  platform: P10
+  route: /partners/commercial-agreement-360-health-ai-review-ptr-041
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-042
+  name: Partner Operations Command Center
+  platform: P10
+  route: /partners/partner-operations-command-center-ptr-042
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-043
+  name: Partner Orders & Booking Management
+  platform: P10
+  route: /partners/partner-orders-booking-management-ptr-043
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-044
+  name: Reservations, Holds & Release Management
+  platform: P10
+  route: /partners/reservations-holds-release-management-ptr-044
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-045
+  name: Partner Cancellations, Refunds & Amendments
+  platform: P10
+  route: /partners/partner-cancellations-refunds-amendments-ptr-045
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-046
+  name: Partner Statement & Account Activity
+  platform: P10
+  route: /partners/partner-statement-account-activity-ptr-046
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-049
+  name: Partner Disputes, Cases & Service Management
+  platform: P10
+  route: /partners/partner-disputes-cases-service-management-ptr-049
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-050
+  name: Partner Performance Scorecard & Risk Monitoring
+  platform: P10
+  route: /partners/partner-performance-scorecard-risk-monitoring-ptr-050
+  repo: null
+  wave: 3
+  status: notStarted
+- id: PTR-051
+  name: Partner AI Intelligence & Relationship Optimization
+  platform: P10
+  route: /partners/partner-ai-intelligence-relationship-optimization-ptr-051
+  repo: null
   wave: 3
   status: notStarted

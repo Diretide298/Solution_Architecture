@@ -82,12 +82,27 @@ def rel_run?(name)
 end
 
 # No mail for anything this run writes. OpenProject 10 has Journal::NotificationConfiguration; older ones do not.
+# The constant is named, not tested with defined?: defined? does not autoload, so a class not loaded yet
+# read as absent and the r4 apply ran with mail on (13 October, P-16).
+REL_MAIL_SWITCH = begin
+  Journal::NotificationConfiguration
+rescue NameError
+  nil
+end
+
 def rel_quietly
-  if defined?(Journal::NotificationConfiguration)
-    Journal::NotificationConfiguration.with(false) { yield }
+  if REL_MAIL_SWITCH
+    REL_MAIL_SWITCH.with(false) { yield }
   else
     yield
   end
+end
+
+# Queued jobs that could send mail, counted before and after (P-16): a rise after an apply is mail on its way.
+def rel_mail_jobs
+  Delayed::Job.where("handler LIKE ? OR handler LIKE ?", "%Notification%", "%Mailer%").count
+rescue StandardError
+  nil
 end
 
 def rel_count_by(list)
@@ -138,6 +153,11 @@ left_ids = (B["retire"].map { |e| e["id"] } + B["unexplained"].map { |e| e["id"]
 rel_say "OpenProject #{OpenProject::VERSION}: release #{RELEASE} bundle, built from #{B['built_from']} at #{B['built_at']}"
 rel_say "project ##{PROJECT_ID} #{project.name}; author #{author.name}; statuses: New = #{status_new.name}, " \
     "defer = #{status_hold.name}, merge = #{status_rejected.name}"
+REL_MAIL_JOBS0 = rel_mail_jobs
+rel_say "mail: " + (REL_MAIL_SWITCH ? "off for what this run writes (Journal::NotificationConfiguration)" :
+    "CANNOT be switched off on this OpenProject: comments and owner changes would mail the team") +
+    "; queued mail jobs now: #{REL_MAIL_JOBS0.nil? ? 'unknown' : REL_MAIL_JOBS0}"
+abort("mail cannot be switched off here; QUIET_ANYWAY=1 applies with mail on") if APPLY && !REL_MAIL_SWITCH && ENV["QUIET_ANYWAY"] != "1"
 rel_say "#{APPLY ? 'APPLY' : 'DRY RUN (APPLY=1 applies)'}; phases: #{ONLY.join(', ')}" +
     (BATCH ? "; BATCH=#{BATCH}" : "") + (LINK_LIMIT ? "; LIMIT=#{LINK_LIMIT}" : "")
 rel_say "bundle: #{tickets.size} plan tickets, #{ids.size} pushed ids, #{B['create'].size} to create, " \
@@ -696,4 +716,5 @@ end
 
 rel_say ""
 rel_say "== summary #{APPLY ? '(APPLIED)' : '(dry run: nothing written; APPLY=1 applies)'}"
+rel_say "  queued mail jobs: #{REL_MAIL_JOBS0.nil? ? 'unknown' : REL_MAIL_JOBS0} before, #{rel_mail_jobs || 'unknown'} now"
 results.each { |r| rel_say "  #{r}" }

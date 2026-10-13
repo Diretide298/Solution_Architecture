@@ -1,5 +1,6 @@
 # venue-support-web — operated by venue · staff on web
 # Serves: P12 Venue Support — Agent Console
+# Repository: P12 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: venue-support-web
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P12 Venue Support — Agent Console
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P12
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -37,56 +45,204 @@ deployment:
   deviceOwnership: agent workstation
   networkAssumption: corporate network
   releaseCadence: weekly
-screenCount: 8
+screenCount: 28
 byWave:
-  wave2: 2
-  wave3: 6
+  wave1: 4
+  wave3: 24
 screens:
-- id: SUP-004
-  name: Conversation Queue
-  route: /general/conversation-queue
-  component: apps/venue-support-web/src/routes/general/ConversationQueueList.tsx
-  wave: 2
-  status: notStarted
-- id: SUP-005
-  name: Live Chat Workspace
-  route: /general/live-chat-workspace
-  component: apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx
-  wave: 2
-  status: notStarted
 - id: SUP-001
-  name: Agent Login
-  route: /general/agent-login
-  component: apps/venue-support-web/src/routes/general/AgentLoginList.tsx
-  wave: 3
+  name: Venue Management Sign In
+  platform: P12
+  route: /general/venue-management-sign-in
+  repo: null
+  wave: 1
   status: notStarted
 - id: SUP-002
   name: Agent Dashboard
+  platform: P12
   route: /general/agent-dashboard
-  component: apps/venue-support-web/src/routes/general/AgentDashboard.tsx
-  wave: 3
+  repo: null
+  wave: 1
   status: notStarted
 - id: SUP-003
   name: Availability & Routing Settings
+  platform: P12
   route: /general/availability-and-routing-settings
-  component: apps/venue-support-web/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx
+  repo: null
   wave: 3
+  status: notStarted
+- id: SUP-004
+  name: Conversation Queue
+  platform: P12
+  route: /general/conversation-queue
+  repo: null
+  wave: 1
+  status: notStarted
+- id: SUP-005
+  name: Live Chat Workspace
+  platform: P12
+  route: /general/live-chat-workspace
+  repo: null
+  wave: 1
   status: notStarted
 - id: SUP-006
   name: Knowledge Base Search
+  platform: P12
   route: /general/knowledge-base-search
-  component: apps/venue-support-web/src/routes/general/KnowledgeBaseSearchList.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: SUP-007
   name: Canned Response Management
+  platform: P12
   route: /general/canned-response-management
-  component: apps/venue-support-web/src/routes/general/CannedResponseManagementForm.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: SUP-008
   name: Agent Performance & SLA View
+  platform: P12
   route: /general/agent-performance-and-sla-view
-  component: apps/venue-support-web/src/routes/general/AgentPerformanceAndSlaViewDashboard.tsx
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-009
+  name: Customer Service Command Center
+  platform: P12
+  route: /support/customer-service-command-center-sup-009
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-010
+  name: Customer 360° Service Profile
+  platform: P12
+  route: /support/customer-360-service-profile-sup-010
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-011
+  name: Unified Interaction & Communication History
+  platform: P12
+  route: /support/unified-interaction-communication-history-sup-011
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-012
+  name: Case Creation, Classification & Intelligent Routing
+  platform: P12
+  route: /support/case-creation-classification-intelligent-routing-sup-012
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-013
+  name: Case Investigation & Resolution Workspace
+  platform: P12
+  route: /support/case-investigation-resolution-workspace-sup-013
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-014
+  name: Order, Booking & Ticket Service Workspace
+  platform: P12
+  route: /support/order-booking-ticket-service-workspace-sup-014
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-015
+  name: Refund, Compensation & Service Exception Workspace
+  platform: P12
+  route: /support/refund-compensation-service-exception-workspace-sup-015
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-016
+  name: Escalation, Collaboration & Internal Resolution
+  platform: P12
+  route: /support/escalation-collaboration-internal-resolution-sup-016
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-017
+  name: Case Resolution, Closure & Customer Feedback
+  platform: P12
+  route: /support/case-resolution-closure-customer-feedback-sup-017
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-018
+  name: AI Customer Service Copilot & Knowledge Workspace
+  platform: P12
+  route: /support/ai-customer-service-copilot-knowledge-workspace-sup-018
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-019
+  name: Contact Center Operations Command Center
+  platform: P12
+  route: /support/contact-center-operations-command-center-sup-019
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-020
+  name: Queue Configuration & Management
+  platform: P12
+  route: /support/queue-configuration-management-sup-020
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-021
+  name: Intelligent Routing, Skills & Assignment Engine
+  platform: P12
+  route: /support/intelligent-routing-skills-assignment-engine-sup-021
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-022
+  name: SLA Policy & Service-Level Management
+  platform: P12
+  route: /support/sla-policy-service-level-management-sup-022
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-023
+  name: Agent Workload, Availability & Workforce Control
+  platform: P12
+  route: /support/agent-workload-availability-workforce-control-sup-023
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-024
+  name: Escalation & Critical Case Monitor
+  platform: P12
+  route: /support/escalation-critical-case-monitor-sup-024
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-025
+  name: Quality Management & Agent Evaluation
+  platform: P12
+  route: /support/quality-management-agent-evaluation-sup-025
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-026
+  name: Customer Satisfaction, Feedback & Voice of Customer
+  platform: P12
+  route: /support/customer-satisfaction-feedback-voice-of-customer-sup-026
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-027
+  name: Service Analytics & Root-Cause Intelligence
+  platform: P12
+  route: /support/service-analytics-root-cause-intelligence-sup-027
+  repo: null
+  wave: 3
+  status: notStarted
+- id: SUP-028
+  name: AI Contact Center Intelligence & Automation Studio
+  platform: P12
+  route: /support/ai-contact-center-intelligence-automation-studio-sup-028
+  repo: null
   wave: 3
   status: notStarted

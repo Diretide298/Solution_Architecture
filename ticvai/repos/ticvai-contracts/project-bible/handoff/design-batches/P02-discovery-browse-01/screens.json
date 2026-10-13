@@ -124,7 +124,7 @@
      "carries": [
       "eventId"
      ],
-     "provenance": "derived — GST-007 declares entryState.params eventId and GST-001 holds eventId, so an edge into it carries them"
+     "provenance": "derived — GST-007 declares entryState.params entryId, eventId and GST-001 holds eventId, so an edge into it carries them"
     },
     {
      "to": "GST-008",

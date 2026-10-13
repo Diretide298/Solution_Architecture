@@ -1,5 +1,6 @@
 # kitchen-display — operated by venue · staff on kiosk
 # Serves: P15 Kitchen Display — Pass and Stations
+# Repository: P15 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: kitchen-display
@@ -14,6 +15,13 @@ directions:
 platforms:
 - P15 Kitchen Display — Pass and Stations
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P15
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -31,3 +39,77 @@ deployment:
   networkAssumption: venue LAN, and it must survive losing it
   releaseCadence: '**Deployed when the kitchen is closed, never during service.** A display that restarts
     mid-service loses the rail a chef is reading.'
+screenCount: 10
+byWave:
+  wave1: 10
+screens:
+- id: KIT-001
+  name: Kitchen Operations Command Center
+  platform: P15
+  route: /kitchen/kitchen-operations-command-center
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-002
+  name: Kitchen Display System (KDS)
+  platform: P15
+  route: /kitchen/kitchen-display-system-kds
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-003
+  name: Order Firing & Course Management
+  platform: P15
+  route: /kitchen/order-firing-course-management
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-004
+  name: Active Order Management & Fulfilment Journey
+  platform: P15
+  route: /kitchen/active-order-management-fulfilment-journey
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-005
+  name: Kitchen Station Workload & Dynamic Routing
+  platform: P15
+  route: /kitchen/kitchen-station-workload-dynamic-routing
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-006
+  name: Expeditor & Order Assembly
+  platform: P15
+  route: /kitchen/expeditor-order-assembly
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-007
+  name: Guest Collection, Buzzer & Digital Notification
+  platform: P15
+  route: /kitchen/guest-collection-buzzer-digital-notification
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-008
+  name: Exceptions, Re-Fire & Unavailable Items
+  platform: P15
+  route: /kitchen/exceptions-re-fire-unavailable-items
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-009
+  name: SLA, Priority & Service Rules
+  platform: P15
+  route: /kitchen/sla-priority-service-rules
+  repo: null
+  wave: 1
+  status: notStarted
+- id: KIT-010
+  name: Kitchen Performance, AI & Operational Optimization
+  platform: P15
+  route: /kitchen/kitchen-performance-ai-operational-optimization
+  repo: null
+  wave: 1
+  status: notStarted

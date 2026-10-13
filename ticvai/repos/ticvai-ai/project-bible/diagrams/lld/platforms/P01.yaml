@@ -300,6 +300,7 @@ screens:
   - cartId<-navigation
   - eventId<-WEB-004
   - venueId<-session
+  - entryId<-navigation
   goesTo:
   - WEB-001
   - WEB-005

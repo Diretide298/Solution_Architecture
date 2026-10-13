@@ -7,6 +7,7 @@
 | Audience | staff |
 | Runtime | reactNativeTablet |
 | App | venue-pos |
+| Repository | P04 ticvai-pos; P15 none yet: ask the lead |
 | Offline | yes |
 | Themes | light, dark |
 | Directions | ltr, rtl |
@@ -77,7 +78,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/kitchen-operations-command-center` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenOperationsCommandCenterBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `KitchenOperationsCommandCenterBoard` |
 | Pattern | commandCentre |
 
 **Entry parameters**
@@ -130,7 +132,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/kitchen-display-system-kds` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenDisplaySystemKdsBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `KitchenDisplaySystemKdsBoard` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -183,7 +186,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/order-firing-course-management` |
-| Component | `apps/kitchen-display/src/routes/kitchen/OrderFiringCourseManagementBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `OrderFiringCourseManagementBoard` |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -233,7 +237,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/active-order-management-fulfilment-journey` |
-| Component | `apps/kitchen-display/src/routes/kitchen/ActiveOrderManagementFulfilmentJouBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ActiveOrderManagementFulfilmentJouBoard` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -279,7 +284,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/kitchen-station-workload-dynamic-routing` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenStationWorkloadDynamicRoutiBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `KitchenStationWorkloadDynamicRoutiBoard` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -324,7 +330,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/expeditor-order-assembly` |
-| Component | `apps/kitchen-display/src/routes/kitchen/ExpeditorOrderAssemblyBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ExpeditorOrderAssemblyBoard` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -375,7 +382,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/guest-collection-buzzer-digital-notification` |
-| Component | `apps/kitchen-display/src/routes/kitchen/GuestCollectionBuzzerDigitalNotifiBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `GuestCollectionBuzzerDigitalNotifiBoard` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -418,7 +426,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/exceptions-re-fire-unavailable-items` |
-| Component | `apps/kitchen-display/src/routes/kitchen/ExceptionsReFireUnavailableItemsBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `ExceptionsReFireUnavailableItemsBoard` |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -468,7 +477,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/sla-priority-service-rules` |
-| Component | `apps/kitchen-display/src/routes/kitchen/SlaPriorityServiceRulesBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `SlaPriorityServiceRulesBoard` |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -513,7 +523,8 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/kitchen/kitchen-performance-ai-operational-optimization` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenPerformanceAiOperationalOptBoard.tsx` |
+| Repository | none yet: ask the lead |
+| Component | `KitchenPerformanceAiOperationalOptBoard` |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -560,7 +571,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sign-in` |
-| Component | `apps/venue-pos/src/routes/SignInTerminal.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SignInTerminal` |
+| Suggested location | `src/routes/SignInTerminal.tsx` (match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -611,7 +624,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/shift/begin-shift` |
-| Component | `apps/venue-pos/src/routes/shift/BeginShiftWizard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `BeginShiftWizard` |
+| Suggested location | `src/routes/shift/BeginShiftWizard.tsx` (match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -679,7 +694,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/sell-ticket-catalogue` |
-| Component | `apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SellTicketCatalogueBoard` |
+| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -775,7 +792,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/sell-ticket-catalogue/timedentry` |
-| Component | `apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SellTicketCatalogueBoard` |
+| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -829,7 +848,9 @@
 | Wave | 1 |
 | Licensed module | seating |
 | Route | `/sell/sell-ticket-catalogue/seatmap` |
-| Component | `apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SellTicketCatalogueBoard` |
+| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -882,7 +903,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/payment/payment` |
-| Component | `apps/venue-pos/src/routes/payment/PaymentForm.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `PaymentForm` |
+| Suggested location | `src/routes/payment/PaymentForm.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -945,7 +968,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/held-orders` |
-| Component | `apps/venue-pos/src/routes/sell/HeldOrdersBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `HeldOrdersBoard` |
+| Suggested location | `src/routes/sell/HeldOrdersBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1003,7 +1028,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/shift/close-shift` |
-| Component | `apps/venue-pos/src/routes/shift/CloseShiftWizard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `CloseShiftWizard` |
+| Suggested location | `src/routes/shift/CloseShiftWizard.tsx` (match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -1063,7 +1090,9 @@
 | Wave | 1 |
 | Licensed module | analytics |
 | Route | `/reports/reports` |
-| Component | `apps/venue-pos/src/routes/reports/ReportsDashboard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `ReportsDashboard` |
+| Suggested location | `src/routes/reports/ReportsDashboard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1109,7 +1138,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/staff-roster` |
-| Component | `apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `StaffRosterBoard` |
+| Suggested location | `src/routes/sell/StaffRosterBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -1155,7 +1186,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/add-to-existing-ticket` |
-| Component | `apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `AddToExistingTicketDetail` |
+| Suggested location | `src/routes/sell/AddToExistingTicketDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1205,7 +1238,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/returns-refunds-exchanges` |
-| Component | `apps/venue-pos/src/routes/sell/ReturnsRefundsExchangesBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `ReturnsRefundsExchangesBoard` |
+| Suggested location | `src/routes/sell/ReturnsRefundsExchangesBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1258,7 +1293,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/omnichannel-order-fulfilment-center` |
-| Component | `apps/venue-pos/src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `OmnichannelOrderFulfilmentCenterBoard` |
+| Suggested location | `src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1309,7 +1346,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/mobile-pos-event-sales-offline-operations` |
-| Component | `apps/venue-pos/src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `MobilePosEventSalesOfflineOperatioBoard` |
+| Suggested location | `src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1358,7 +1397,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/sales-exceptions-controls-operational-actions` |
-| Component | `apps/venue-pos/src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SalesExceptionsControlsOperationalBoard` |
+| Suggested location | `src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1405,7 +1446,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/cash-operations-dashboard` |
-| Component | `apps/venue-pos/src/routes/sell/CashOperationsDashboardBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `CashOperationsDashboardBoard` |
+| Suggested location | `src/routes/sell/CashOperationsDashboardBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1450,7 +1493,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/till-configuration` |
-| Component | `apps/venue-pos/src/routes/sell/TillConfigurationBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `TillConfigurationBoard` |
+| Suggested location | `src/routes/sell/TillConfigurationBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1497,7 +1542,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/cash-in-cash-out-operations` |
-| Component | `apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `CashInCashOutOperationsBoard` |
+| Suggested location | `src/routes/sell/CashInCashOutOperationsBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1540,7 +1587,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/safe-drop-cash-transfer-management` |
-| Component | `apps/venue-pos/src/routes/sell/SafeDropCashTransferManagementBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SafeDropCashTransferManagementBoard` |
+| Suggested location | `src/routes/sell/SafeDropCashTransferManagementBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1587,7 +1636,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/shift-templates-policies` |
-| Component | `apps/venue-pos/src/routes/sell/ShiftTemplatesPoliciesBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `ShiftTemplatesPoliciesBoard` |
+| Suggested location | `src/routes/sell/ShiftTemplatesPoliciesBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1633,7 +1684,9 @@
 | Wave | 1 |
 | Licensed module | analytics |
 | Route | `/sell/shift-exceptions-alerts` |
-| Component | `apps/venue-pos/src/routes/sell/ShiftExceptionsAlertsBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `ShiftExceptionsAlertsBoard` |
+| Suggested location | `src/routes/sell/ShiftExceptionsAlertsBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -1684,7 +1737,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/sell/sell---food-and-drink` |
-| Component | `apps/venue-pos/src/routes/sell/SellFoodDrinkBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SellFoodDrinkBoard` |
+| Suggested location | `src/routes/sell/SellFoodDrinkBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1737,7 +1792,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/sell/send-to-kitchen` |
-| Component | `apps/venue-pos/src/routes/sell/SendToKitchenBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SendToKitchenBoard` |
+| Suggested location | `src/routes/sell/SendToKitchenBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1789,7 +1846,9 @@
 | Wave | 1 |
 | Licensed module | retail |
 | Route | `/sell/sell---merchandise` |
-| Component | `apps/venue-pos/src/routes/sell/SellMerchandiseBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SellMerchandiseBoard` |
+| Suggested location | `src/routes/sell/SellMerchandiseBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1838,7 +1897,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/sell/outlet-setup` |
-| Component | `apps/venue-pos/src/routes/sell/OutletSetupBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `OutletSetupBoard` |
+| Suggested location | `src/routes/sell/OutletSetupBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1887,7 +1948,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/home` |
-| Component | `apps/venue-pos/src/routes/home/TillHomeBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `TillHomeBoard` |
+| Suggested location | `src/routes/home/TillHomeBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | dashboard |
 
 **Entry parameters**
@@ -1950,7 +2013,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/receipt` |
-| Component | `apps/venue-pos/src/routes/sell/ReceiptReprintBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `ReceiptReprintBoard` |
+| Suggested location | `src/routes/sell/ReceiptReprintBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | detail |
 
 **Entry parameters**
@@ -2004,7 +2069,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/guests` |
-| Component | `apps/venue-pos/src/routes/sell/GuestLookupBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `GuestLookupBoard` |
+| Suggested location | `src/routes/sell/GuestLookupBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2051,7 +2118,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/sell/tables` |
-| Component | `apps/venue-pos/src/routes/sell/TableServiceBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `TableServiceBoard` |
+| Suggested location | `src/routes/sell/TableServiceBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | board |
 
 **Entry parameters**
@@ -2110,7 +2179,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/sell/queue` |
-| Component | `apps/venue-pos/src/routes/sell/OrderQueueBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `OrderQueueBoard` |
+| Suggested location | `src/routes/sell/OrderQueueBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | board |
 
 **Entry parameters**
@@ -2158,7 +2229,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/sell/journal` |
-| Component | `apps/venue-pos/src/routes/sell/SalesJournalBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `SalesJournalBoard` |
+| Suggested location | `src/routes/sell/SalesJournalBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2216,7 +2289,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/sell/reservations` |
-| Component | `apps/venue-pos/src/routes/sell/ReservationsGroupArrivalsBoard.tsx` |
+| Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
+| Component | `ReservationsGroupArrivalsBoard` |
+| Suggested location | `src/routes/sell/ReservationsGroupArrivalsBoard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**

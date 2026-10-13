@@ -1,5 +1,6 @@
 # guest-app — operated by guest · guest on mobileApp
 # Serves: P02 Guest App — Mobile, P05 Guest Kiosk — Self-Service
+# Repository: P02 ticvai-guest-app; P05 ticvai-kiosk (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: guest-app
@@ -16,6 +17,17 @@ platforms:
 - P02 Guest App — Mobile
 - P05 Guest Kiosk — Self-Service
 servesMultiplePlatforms: true
+repo: null
+repoUrl: null
+repositories:
+- platform: P02
+  repo: ticvai-guest-app
+  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git
+  assumed: false
+- platform: P05
+  repo: ticvai-kiosk
+  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-kiosk.git
+  assumed: true
 packages:
 - design-tokens
 - ui
@@ -49,489 +61,760 @@ deployment:
   deviceOwnership: guest device
   networkAssumption: mobile data, intermittent
   releaseCadence: fortnightly, gated by review
-screenCount: 80
+screenCount: 94
 byWave:
-  wave1: 21
-  wave2: 42
-  wave3: 17
+  wave1: 79
+  wave2: 15
 screens:
 - id: GST-001
-  name: Home – Default
+  name: Home
+  platform: P02
   route: /general/home-default
-  component: apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/HomeDefaultDashboard.tsx
   wave: 1
   status: notStarted
 - id: GST-002
-  name: Explore Categories
+  name: Explore
+  platform: P02
   route: /general/explore-categories
-  component: apps/guest-app/src/routes/general/ExploreCategoriesList.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/ExploreCategoriesList.tsx
   wave: 1
   status: notStarted
 - id: GST-003
-  name: Attractions List
-  route: /general/attractions-list
-  component: apps/guest-app/src/routes/general/AttractionsList.tsx
+  name: Buy Tickets
+  platform: P02
+  route: /general/buy-tickets
+  repo: ticvai-guest-app
+  path: src/routes/general/BuyTicketsList.tsx
   wave: 1
   status: notStarted
 - id: GST-004
-  name: Attraction Details
-  route: /general/attraction-details
-  component: apps/guest-app/src/routes/general/AttractionDetailsDetail.tsx
+  name: Item Detail
+  platform: P02
+  route: /general/item-detail
+  repo: ticvai-guest-app
+  path: src/routes/general/ItemDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-005
   name: What's On
+  platform: P02
   route: /general/whats-on
-  component: apps/guest-app/src/routes/general/WhatsOnList.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/WhatsOnList.tsx
   wave: 1
   status: notStarted
 - id: GST-006
-  name: Event / Exhibition Details
+  name: Item Detail – Event / Exhibition
+  platform: P02
   route: /general/event-exhibition-details
-  component: apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/EventExhibitionDetailsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-007
   name: Select Date & Time
+  platform: P02
   route: /general/select-date-and-time
-  component: apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/SelectDateAndTimeDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-008
   name: Tickets & Add-ons
+  platform: P02
   route: /general/tickets-and-add-ons
-  component: apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/TicketsAndAddOnsList.tsx
   wave: 1
   status: notStarted
 - id: GST-009
   name: Review & Payment
+  platform: P02
   route: /general/review-and-payment
-  component: apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/ReviewAndPaymentForm.tsx
   wave: 1
   status: notStarted
 - id: GST-010
   name: Booking Confirmation
+  platform: P02
   route: /general/booking-confirmation
-  component: apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-012
-  name: My Tickets
-  route: /general/my-tickets
-  component: apps/guest-app/src/routes/general/MyTicketsList.tsx
-  wave: 1
-  status: notStarted
-- id: GST-013
-  name: Ticket Details
-  route: /general/ticket-details
-  component: apps/guest-app/src/routes/general/TicketDetailsDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-039
-  name: Profile
-  route: /general/profile
-  component: apps/guest-app/src/routes/general/ProfileDashboard.tsx
-  wave: 1
-  status: notStarted
-- id: GST-041
-  name: Checkout Entry
-  route: /general/checkout-entry
-  component: apps/guest-app/src/routes/general/CheckoutEntryForm.tsx
-  wave: 1
-  status: notStarted
-- id: GST-042
-  name: Simple Registration & OTP
-  route: /general/simple-registration-and-otp
-  component: apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-043
-  name: Arabic / RTL Experience
-  route: /general/arabic-rtl-experience
-  component: apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-046
-  name: Branded Queue / Waiting Room
-  route: /general/branded-queue-waiting-room
-  component: apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-047
-  name: Maintenance Page
-  route: /general/maintenance-page
-  component: apps/guest-app/src/routes/general/MaintenancePageDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-055
-  name: Dynamic QR Ticket
-  route: /general/dynamic-qr-ticket
-  component: apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx
-  wave: 1
-  status: notStarted
-- id: GST-060
-  name: Maintenance / Upgrade Page
-  route: /general/maintenance-upgrade-page
-  component: apps/guest-app/src/routes/general/MaintenanceUpgradePageDetail.tsx
-  wave: 1
-  status: notStarted
-- id: GST-063
-  name: Search
-  route: /search
-  component: apps/guest-app/src/routes/Search.tsx
+  repo: ticvai-guest-app
+  path: src/routes/general/BookingConfirmationDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-011
   name: Wallet Overview
+  platform: P02
   route: /general/wallet-overview
-  component: apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/WalletOverviewDashboard.tsx
+  wave: 1
+  status: notStarted
+- id: GST-012
+  name: My Tickets
+  platform: P02
+  route: /general/my-tickets
+  repo: ticvai-guest-app
+  path: src/routes/general/MyTicketsList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-013
+  name: Ticket Details
+  platform: P02
+  route: /general/ticket-details
+  repo: ticvai-guest-app
+  path: src/routes/general/TicketDetailsDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-014
   name: Ticket Transfer
+  platform: P02
   route: /general/ticket-transfer
-  component: apps/guest-app/src/routes/general/TicketTransferDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/TicketTransferDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-015
   name: Memberships
+  platform: P02
   route: /general/memberships
-  component: apps/guest-app/src/routes/general/MembershipsDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/MembershipsDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-016
   name: My Reservations
+  platform: P02
   route: /general/my-reservations
-  component: apps/guest-app/src/routes/general/MyReservationsDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/MyReservationsDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-017
   name: Reservation Details
+  platform: P02
   route: /general/reservation-details
-  component: apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/ReservationDetailsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-018
+  name: Add to Calendar / Reminders
+  platform: P02
+  route: /general/add-to-calendar-reminders
+  repo: ticvai-guest-app
+  path: src/routes/general/AddToCalendarRemindersDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-019
-  name: Order History (Wallet)
+  name: Order History
+  platform: P02
   route: /general/order-history-wallet
-  component: apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/OrderHistoryWalletDashboard.tsx
+  wave: 1
+  status: notStarted
+- id: GST-020
+  name: Saved Items / Wishlist
+  platform: P02
+  route: /general/saved-items-wishlist
+  repo: ticvai-guest-app
+  path: src/routes/general/SavedItemsWishlistList.tsx
+  wave: 1
   status: notStarted
 - id: GST-021
   name: Interactive Map
+  platform: P02
   route: /general/interactive-map
-  component: apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/InteractiveMapCanvas.tsx
+  wave: 1
   status: notStarted
 - id: GST-022
   name: Attraction Wait Times
+  platform: P02
   route: /general/attraction-wait-times
-  component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/AttractionWaitTimesDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-023
+  name: Virtual Queue
+  platform: P02
+  route: /general/virtual-queue-join-queue
+  repo: ticvai-guest-app
+  path: src/routes/general/VirtualQueueJoinQueueDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-024
   name: F&B – Browse & Order
+  platform: P02
   route: /general/fandb-browse-and-order
-  component: apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/FandbBrowseAndOrderList.tsx
+  wave: 1
   status: notStarted
 - id: GST-025
   name: F&B – Order Tracking
+  platform: P02
   route: /general/fandb-order-tracking
-  component: apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/FandbOrderTrackingDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-026
   name: Retail / Merchandise
+  platform: P02
   route: /general/retail-merchandise
-  component: apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/RetailMerchandiseDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-027
+  name: Parking – Reserve & Pay
+  platform: P02
+  route: /general/parking-reserve-and-pay
+  repo: ticvai-guest-app
+  path: src/routes/general/ParkingReserveAndPayDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-028
+  name: Parking – Reservation Confirmed
+  platform: P02
+  route: /general/parking-reservation-confirmed
+  repo: ticvai-guest-app
+  path: src/routes/general/ParkingReservationConfirmedDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-029
   name: Venue Info & Services
+  platform: P02
   route: /general/venue-info-and-services
-  component: apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/VenueInfoAndServicesDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-030
   name: In-Venue Notifications
+  platform: P02
   route: /general/in-venue-notifications
-  component: apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/InVenueNotificationsDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-031
   name: AI Concierge – Home
+  platform: P02
   route: /general/ai-concierge-home
-  component: apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/AiConciergeHomeDashboard.tsx
+  wave: 1
   status: notStarted
 - id: GST-032
   name: AI Concierge – Chat
+  platform: P02
   route: /general/ai-concierge-chat
-  component: apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/AiConciergeChatDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-033
   name: AI Concierge – Contextual Help
+  platform: P02
   route: /general/ai-concierge-contextual-help
-  component: apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/AiConciergeContextualHelpDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-034
   name: Lost & Found
+  platform: P02
   route: /general/lost-and-found
-  component: apps/guest-app/src/routes/general/LostAndFoundDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/LostAndFoundDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-035
+  name: Feedback & Ratings
+  platform: P02
+  route: /general/feedback-and-ratings
+  repo: ticvai-guest-app
+  path: src/routes/general/FeedbackAndRatingsList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-036
+  name: Loyalty & Rewards
+  platform: P02
+  route: /loyalty-rewards
+  repo: ticvai-guest-app
+  path: src/routes/LoyaltyRewards.tsx
+  wave: 1
   status: notStarted
 - id: GST-037
   name: Offers & Promotions
+  platform: P02
   route: /general/offers-and-promotions
-  component: apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/OffersAndPromotionsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-038
+  name: At the Venue
+  platform: P02
+  route: /general/at-the-venue
+  repo: ticvai-guest-app
+  path: src/routes/general/AtTheVenueDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-039
+  name: Profile
+  platform: P02
+  route: /general/profile
+  repo: ticvai-guest-app
+  path: src/routes/general/ProfileDashboard.tsx
+  wave: 1
   status: notStarted
 - id: GST-040
   name: Help & Support
+  platform: P02
   route: /general/help-and-support
-  component: apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/HelpAndSupportDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-041
+  name: Checkout Entry
+  platform: P02
+  route: /general/checkout-entry
+  repo: ticvai-guest-app
+  path: src/routes/general/CheckoutEntryForm.tsx
+  wave: 1
+  status: notStarted
+- id: GST-042
+  name: Simple Registration & OTP
+  platform: P02
+  route: /general/simple-registration-and-otp
+  repo: ticvai-guest-app
+  path: src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-043
+  name: Arabic / RTL Experience
+  platform: P02
+  route: /general/arabic-rtl-experience
+  repo: ticvai-guest-app
+  path: src/routes/general/ArabicRtlExperienceDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-044
   name: Multi-Currency & Pricing
+  platform: P02
   route: /general/multi-currency-and-pricing
-  component: apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/MultiCurrencyAndPricingDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-045
   name: Ticket Delivery & Sharing
+  platform: P02
   route: /general/ticket-delivery-and-sharing
-  component: apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/TicketDeliveryAndSharingDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-046
+  name: Branded Queue / Waiting Room
+  platform: P02
+  route: /general/branded-queue-waiting-room
+  repo: ticvai-guest-app
+  path: src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-047
+  name: Maintenance / Upgrade Page
+  platform: P02
+  route: /general/maintenance-page
+  repo: ticvai-guest-app
+  path: src/routes/general/MaintenancePageDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-048
   name: Upsell / Cross-Sell
+  platform: P02
   route: /general/upsell-cross-sell
-  component: apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/UpsellCrossSellDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-049
   name: Interactive Seat Selection
+  platform: P02
   route: /general/interactive-seat-selection
-  component: apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/InteractiveSeatSelectionCanvas.tsx
+  wave: 1
+  status: notStarted
+- id: GST-050
+  name: Resource Booking – Cabana
+  platform: P02
+  route: /general/resource-booking-cabana
+  repo: ticvai-guest-app
+  path: src/routes/general/ResourceBookingCabanaDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-051
+  name: Plan
+  platform: P02
+  route: /general/plan-your-adventure-start
+  repo: ticvai-guest-app
+  path: src/routes/general/PlanYourAdventureStartDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-052
+  name: Suggested Itineraries
+  platform: P02
+  route: /general/suggested-itineraries
+  repo: ticvai-guest-app
+  path: src/routes/general/SuggestedItinerariesDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-053
+  name: Your Plan
+  platform: P02
+  route: /general/your-plan
+  repo: ticvai-guest-app
+  path: src/routes/general/YourPlanDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-054
+  name: AI Planner
+  platform: P02
+  route: /general/ai-planner
+  repo: ticvai-guest-app
+  path: src/routes/general/AIPlannerDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-055
+  name: Dynamic QR Ticket
+  platform: P02
+  route: /general/dynamic-qr-ticket
+  repo: ticvai-guest-app
+  path: src/routes/general/DynamicQrTicketCanvas.tsx
+  wave: 1
   status: notStarted
 - id: GST-056
   name: Bundle Package
+  platform: P02
   route: /general/bundle-package
-  component: apps/guest-app/src/routes/general/BundlePackageDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/BundlePackageDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-057
   name: Accessibility Information
+  platform: P02
   route: /general/accessibility-information
-  component: apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/general/AccessibilityInformationForm.tsx
+  wave: 1
+  status: notStarted
+- id: GST-058
+  name: Resource Availability (Cabana)
+  platform: P02
+  route: /general/resource-availability-cabana
+  repo: ticvai-guest-app
+  path: src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-059
+  name: Plan in Progress
+  platform: P02
+  route: /general/plan-my-day-in-progress
+  repo: ticvai-guest-app
+  path: src/routes/general/PlanMyDayInProgressDetail.tsx
+  wave: 1
   status: notStarted
 - id: GST-061
   name: Menu Item Detail
+  platform: P02
   route: /in-venue-experience/menu-item-detail
-  component: apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx
-  wave: 2
+  repo: ticvai-guest-app
+  path: src/routes/in-venue-experience/MenuItemDetail.tsx
+  wave: 1
   status: notStarted
-- id: GST-064
-  name: Loyalty & Rewards
-  route: /loyalty-rewards
-  component: apps/guest-app/src/routes/LoyaltyRewards.tsx
-  wave: 2
+- id: GST-062
+  name: Shop & Drop Collection
+  platform: P02
+  route: /in-venue-experience/shop-and-drop-collection
+  repo: ticvai-guest-app
+  path: src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-063
+  name: Explore – Search Results
+  platform: P02
+  route: /search
+  repo: ticvai-guest-app
+  path: src/routes/Search.tsx
+  wave: 1
+  status: notStarted
+- id: GST-065
+  name: Newsletter & Preferences
+  platform: P02
+  route: /newsletter-preferences
+  repo: ticvai-guest-app
+  path: src/routes/NewsletterPreferences.tsx
+  wave: 1
+  status: notStarted
+- id: GST-066
+  name: Privacy & My Data
+  platform: P02
+  route: /account/privacy-my-data
+  repo: ticvai-guest-app
+  path: src/routes/account/PrivacyMyData.tsx
+  wave: 1
+  status: notStarted
+- id: GST-067
+  name: Refunds & Resale
+  platform: P02
+  route: /account/refunds-resale
+  repo: ticvai-guest-app
+  path: src/routes/account/RefundsResale.tsx
+  wave: 1
+  status: notStarted
+- id: GST-068
+  name: Help & My Cases
+  platform: P02
+  route: /account/help-my-cases
+  repo: ticvai-guest-app
+  path: src/routes/account/HelpMyCases.tsx
+  wave: 1
+  status: notStarted
+- id: GST-069
+  name: Face Pass
+  platform: P02
+  route: /account/face-pass
+  repo: ticvai-guest-app
+  path: src/routes/account/FacePass.tsx
+  wave: 1
+  status: notStarted
+- id: GST-070
+  name: Reserve a Table
+  platform: P02
+  route: /reserve-table
+  repo: ticvai-guest-app
+  path: src/routes/ReserveTable.tsx
+  wave: 1
+  status: notStarted
+- id: GST-071
+  name: Payment Methods
+  platform: P02
+  route: /account/payment-methods
+  repo: ticvai-guest-app
+  path: src/routes/account/PaymentMethods.tsx
+  wave: 1
+  status: notStarted
+- id: GST-072
+  name: Share & Group Booking
+  platform: P02
+  route: /account/share-group-booking
+  repo: ticvai-guest-app
+  path: src/routes/account/ShareGroupBooking.tsx
+  wave: 1
+  status: notStarted
+- id: GST-073
+  name: Security & Sign-in
+  platform: P02
+  route: /account/security-sign-in
+  repo: ticvai-guest-app
+  path: src/routes/account/SecuritySignIn.tsx
+  wave: 1
+  status: notStarted
+- id: GST-074
+  name: Map Booking — Cabanas & Spots
+  platform: P02
+  route: /general/map-booking
+  repo: ticvai-guest-app
+  path: src/routes/general/MapBookingCanvas.tsx
+  wave: 1
+  status: notStarted
+- id: GST-075
+  name: Book a Space by the Hour
+  platform: P02
+  route: /general/space-by-the-hour
+  repo: ticvai-guest-app
+  path: src/routes/general/SpaceByTheHourWizard.tsx
+  wave: 1
+  status: notStarted
+- id: GST-076
+  name: Intercity Trip — Route & Schedule
+  platform: P02
+  route: /transport/route-and-schedule
+  repo: ticvai-guest-app
+  path: src/routes/transport/RouteAndScheduleList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-077
+  name: Intercity Trip — Route & Passengers
+  platform: P02
+  route: /transport/route-and-passengers
+  repo: ticvai-guest-app
+  path: src/routes/transport/RouteAndPassengersDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-078
+  name: Intercity Trip — Multi-trip Passes
+  platform: P02
+  route: /transport/multi-trip-passes
+  repo: ticvai-guest-app
+  path: src/routes/transport/MultiTripPassesList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-079
+  name: Intercity Trip — Favourite Routes
+  platform: P02
+  route: /transport/favourite-routes
+  repo: ticvai-guest-app
+  path: src/routes/transport/FavouriteRoutesList.tsx
+  wave: 1
   status: notStarted
 - id: KSK-001
   name: Attract Loop
+  platform: P05
   route: /sell/attract-loop
-  component: apps/guest-app/src/routes/sell/AttractLoopDetail.tsx
-  wave: 2
+  repo: ticvai-kiosk
+  path: src/routes/sell/AttractLoopDetail.tsx
+  wave: 1
   status: notStarted
 - id: KSK-002
   name: Language Select
+  platform: P05
   route: /sell/language-select
-  component: apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/LanguageSelectDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-003
   name: What are you buying
+  platform: P05
   route: /sell/what-are-you-buying
-  component: apps/guest-app/src/routes/sell/WhatAreYouBuyingDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/WhatAreYouBuyingDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-004
   name: Choose tickets
+  platform: P05
   route: /sell/choose-tickets
-  component: apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/ChooseTicketsDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-005
-  name: Choose a session
+  name: Choose a performance
+  platform: P05
   route: /sell/choose-a-session
-  component: apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/ChooseASessionDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-006
   name: Review
+  platform: P05
   route: /sell/review
-  component: apps/guest-app/src/routes/sell/ReviewDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/ReviewDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-007
   name: Payment
+  platform: P05
   route: /sell/payment
-  component: apps/guest-app/src/routes/sell/PaymentDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/PaymentDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-008
   name: Payment unresolved
+  platform: P05
   route: /sell/payment-unresolved
-  component: apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/PaymentUnresolvedDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-009
   name: Ticket issued
+  platform: P05
   route: /sell/ticket-issued
-  component: apps/guest-app/src/routes/sell/TicketIssuedDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/TicketIssuedDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-010
   name: Print failure
+  platform: P05
   route: /sell/print-failure
-  component: apps/guest-app/src/routes/sell/PrintFailureDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/PrintFailureDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-011
   name: Collect a booking
+  platform: P05
   route: /sell/collect-a-booking
-  component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/CollectABookingDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-012
   name: Booking found
+  platform: P05
   route: /sell/booking-found
-  component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/BookingFoundDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-013
   name: Call staff
+  platform: P05
   route: /sell/call-staff
-  component: apps/guest-app/src/routes/sell/CallStaffDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/CallStaffDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-014
   name: Out of service
+  platform: P05
   route: /sell/out-of-service
-  component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
+  repo: ticvai-kiosk
+  path: src/routes/sell/OutOfServiceDetail.tsx
   wave: 2
   status: notStarted
 - id: KSK-015
   name: Assistant
+  platform: P05
   route: /kiosk/assistant
-  component: apps/guest-app/src/routes/Assistant.tsx
+  repo: ticvai-kiosk
+  path: src/routes/Assistant.tsx
+  wave: 1
+  status: notStarted
+- id: KSK-016
+  name: Order Food
+  platform: P05
+  route: /sell/order-food
+  repo: ticvai-kiosk
+  path: src/routes/sell/OrderFoodList.tsx
   wave: 2
   status: notStarted
-- id: GST-018
-  name: Add to Calendar / Reminders
-  route: /general/add-to-calendar-reminders
-  component: apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-020
-  name: Saved Items / Wishlist
-  route: /general/saved-items-wishlist
-  component: apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx
-  wave: 3
-  status: notStarted
-- id: GST-023
-  name: Virtual Queue / Join Queue
-  route: /general/virtual-queue-join-queue
-  component: apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-027
-  name: Parking – Reserve & Pay
-  route: /general/parking-reserve-and-pay
-  component: apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-028
-  name: Parking – Reservation Confirmed
-  route: /general/parking-reservation-confirmed
-  component: apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-035
-  name: Feedback & Ratings
-  route: /general/feedback-and-ratings
-  component: apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx
-  wave: 3
-  status: notStarted
-- id: GST-036
-  name: Loyalty & Rewards
-  route: /general/loyalty-and-rewards
-  component: apps/guest-app/src/routes/general/LoyaltyAndRewardsDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-038
-  name: Digital Companion Mode
-  route: /general/digital-companion-mode
-  component: apps/guest-app/src/routes/general/DigitalCompanionModeDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-050
-  name: Resource Booking – Cabana
-  route: /general/resource-booking-cabana
-  component: apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-051
-  name: Plan Your Adventure – Start
-  route: /general/plan-your-adventure-start
-  component: apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-052
-  name: Suggested Itineraries
-  route: /general/suggested-itineraries
-  component: apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-053
-  name: Build Your Own Itinerary
-  route: /general/build-your-own-itinerary
-  component: apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-054
-  name: AI Optimized Itinerary
-  route: /general/ai-optimized-itinerary
-  component: apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-058
-  name: Resource Availability (Cabana)
-  route: /general/resource-availability-cabana
-  component: apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-059
-  name: Plan My Day – In Progress
-  route: /general/plan-my-day-in-progress
-  component: apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx
-  wave: 3
-  status: notStarted
-- id: GST-062
-  name: Shop & Drop Collection
-  route: /in-venue-experience/shop-and-drop-collection
-  component: apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
-  wave: 3
-  status: notStarted
-- id: GST-065
-  name: Newsletter & Preferences
-  route: /newsletter-preferences
-  component: apps/guest-app/src/routes/NewsletterPreferences.tsx
-  wave: 3
+- id: KSK-017
+  name: Shop
+  platform: P05
+  route: /sell/shop
+  repo: ticvai-kiosk
+  path: src/routes/sell/ShopList.tsx
+  wave: 2
   status: notStarted

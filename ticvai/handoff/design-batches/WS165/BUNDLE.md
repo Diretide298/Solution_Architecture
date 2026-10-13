@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-953` | Seat Map Command Center | C | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
-| `BO-954` | Venue Canvas | C | 35 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
+| `BO-954` | Venue Canvas | A | 35 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
 | `BO-955` | Sections & Zones | C | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
 | `BO-956` | Rows & Seats | C | 35 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
 | `BO-957` | Standing Zones | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
@@ -285,7 +285,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | Block C · task VM-BO-954 |
+| Block | Block A · ticket #35640 (APP-SETUP-BO-954) |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

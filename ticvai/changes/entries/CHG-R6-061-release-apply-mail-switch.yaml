@@ -1,0 +1,41 @@
+id: CHG-R6-061
+date: '2026-10-13'
+source: developer
+kind: process
+proposed: '2026-10-13'
+summary: 'The OpenProject release apply (tools/op-release.rb) loads its mail switch instead of testing it with
+  defined?, says at the start whether mail is off, refuses to apply when it cannot be switched off, and counts the
+  queued mail jobs before and after.'
+decision:
+  what: 'op-release.rb names Journal::NotificationConfiguration (rescuing NameError) where it used
+    defined?(Journal::NotificationConfiguration). On the server''s Rails 5.2 classic autoloader, defined? does not
+    load a class, so a class not loaded yet read as absent and every write ran with mail on. The run prints "mail:
+    off" or "mail: CANNOT be switched off", an apply stops in the second case unless QUIET_ANYWAY=1, and the start
+    line and the summary give the count of queued Delayed::Job rows whose handler names a notification or a
+    mailer.'
+  by: Chinmay
+  date: '2026-10-13'
+why: 'The r4 apply (13 October 2026, recorded in commit bbf1a004) mailed the team about the tickets it changed, and the lead cleared the queued
+  jobs on the server by hand (process note P-16). Lead, 13 October: "it does send out a ton of them", then "We
+  release ot tonight.. whatever is left for friday".'
+keys_touched:
+  files:
+  - tools/op-release.rb
+  tickets: []
+  other:
+  - CHG-R6-060
+root_class: 'new: release-apply-mail'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r5
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR with the r5 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/op-release.rb::rel_quietly
+status: open
+notes: 'Not run against OpenProject 10 before r5: the r5 dry run is its first test, and its "mail:" line says which
+  way it went. r5 rewrites descriptions with update_all, which makes no journal and sends no mail; only the one
+  comment on started tickets goes through a journal.'

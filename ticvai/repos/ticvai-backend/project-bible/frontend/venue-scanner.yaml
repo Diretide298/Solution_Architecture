@@ -1,5 +1,6 @@
 # venue-scanner — operated by venue · staff on handheld
 # Serves: P07 Venue Scanner — Access Control
+# Repository: P07 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: venue-scanner
@@ -15,6 +16,13 @@ directions:
 platforms:
 - P07 Venue Scanner — Access Control
 servesMultiplePlatforms: false
+repo: null
+repoUrl: null
+repositories:
+- platform: P07
+  repo: null
+  repoUrl: null
+  assumed: false
 packages:
 - design-tokens
 - ui
@@ -35,103 +43,84 @@ deployment:
   deviceOwnership: venue-owned, issued per shift
   networkAssumption: must function with none
   releaseCadence: monthly, never on an event day
-screenCount: 16
+screenCount: 11
 byWave:
-  wave1: 16
+  wave1: 11
 screens:
 - id: SCN-001
   name: Sign in
+  platform: P07
   route: /access/sign-in
-  component: apps/venue-scanner/src/routes/access/SignInDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-002
   name: Access point & direction
+  platform: P07
   route: /access/access-point-direction
-  component: apps/venue-scanner/src/routes/access/AccessPointDirectionDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-003
   name: Ready to scan
+  platform: P07
   route: /access/ready-to-scan
-  component: apps/venue-scanner/src/routes/access/ReadyToScanDetail.tsx
-  wave: 1
-  status: notStarted
-- id: SCN-004
-  name: Admitted
-  route: /access/admitted
-  component: apps/venue-scanner/src/routes/access/AdmittedDetail.tsx
-  wave: 1
-  status: notStarted
-- id: SCN-005
-  name: Denied
-  route: /access/denied
-  component: apps/venue-scanner/src/routes/access/DeniedDetail.tsx
-  wave: 1
-  status: notStarted
-- id: SCN-006
-  name: Override
-  route: /access/override
-  component: apps/venue-scanner/src/routes/access/OverrideDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-007
   name: Group admission
+  platform: P07
   route: /access/group-admission
-  component: apps/venue-scanner/src/routes/access/GroupAdmissionDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-008
   name: Manual entry
+  platform: P07
   route: /access/manual-entry
-  component: apps/venue-scanner/src/routes/access/ManualEntryDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-009
   name: Ticket lookup
+  platform: P07
   route: /access/ticket-lookup
-  component: apps/venue-scanner/src/routes/access/TicketLookupDetail.tsx
-  wave: 1
-  status: notStarted
-- id: SCN-010
-  name: Blacklisted
-  route: /access/blacklisted
-  component: apps/venue-scanner/src/routes/access/BlacklistedDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-011
   name: Delegated right
+  platform: P07
   route: /access/delegated-right
-  component: apps/venue-scanner/src/routes/access/DelegatedRightDetail.tsx
-  wave: 1
-  status: notStarted
-- id: SCN-012
-  name: Offline scanning
-  route: /access/offline-scanning
-  component: apps/venue-scanner/src/routes/access/OfflineScanningDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-013
   name: Offline journal
+  platform: P07
   route: /access/offline-journal
-  component: apps/venue-scanner/src/routes/access/OfflineJournalDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-014
   name: Sync & reconciliation
+  platform: P07
   route: /access/sync-reconciliation
-  component: apps/venue-scanner/src/routes/access/SyncReconciliationDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-015
   name: Offline package
+  platform: P07
   route: /access/offline-package
-  component: apps/venue-scanner/src/routes/access/OfflinePackageDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: SCN-016
   name: Gate mode
+  platform: P07
   route: /access/gate-mode
-  component: apps/venue-scanner/src/routes/access/GateModeDetail.tsx
+  repo: null
   wave: 1
   status: notStarted

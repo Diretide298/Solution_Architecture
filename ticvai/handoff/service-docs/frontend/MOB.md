@@ -7,6 +7,7 @@
 | Audience | guest |
 | Runtime | reactNative |
 | App | guest-app |
+| Repository | P02 ticvai-guest-app |
 | Offline | yes |
 | Themes | light |
 | Directions | ltr, rtl |
@@ -112,7 +113,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/general/home-default` |
-| Component | `apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `HomeDefaultDashboard` |
+| Suggested location | `src/routes/general/HomeDefaultDashboard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -230,7 +233,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/explore-categories` |
-| Component | `apps/guest-app/src/routes/general/ExploreCategoriesList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ExploreCategoriesList` |
+| Suggested location | `src/routes/general/ExploreCategoriesList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -271,7 +276,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/buy-tickets` |
-| Component | `apps/guest-app/src/routes/general/BuyTicketsList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `BuyTicketsList` |
+| Suggested location | `src/routes/general/BuyTicketsList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -325,7 +332,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/item-detail` |
-| Component | `apps/guest-app/src/routes/general/ItemDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ItemDetail` |
+| Suggested location | `src/routes/general/ItemDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -386,7 +395,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/whats-on` |
-| Component | `apps/guest-app/src/routes/general/WhatsOnList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `WhatsOnList` |
+| Suggested location | `src/routes/general/WhatsOnList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -431,7 +442,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/event-exhibition-details` |
-| Component | `apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `EventExhibitionDetailsDetail` |
+| Suggested location | `src/routes/general/EventExhibitionDetailsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -476,7 +489,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/select-date-and-time` |
-| Component | `apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `SelectDateAndTimeDetail` |
+| Suggested location | `src/routes/general/SelectDateAndTimeDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -536,7 +551,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/tickets-and-add-ons` |
-| Component | `apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `TicketsAndAddOnsList` |
+| Suggested location | `src/routes/general/TicketsAndAddOnsList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -591,7 +608,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/review-and-payment` |
-| Component | `apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ReviewAndPaymentForm` |
+| Suggested location | `src/routes/general/ReviewAndPaymentForm.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -646,7 +665,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/booking-confirmation` |
-| Component | `apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `BookingConfirmationDetail` |
+| Suggested location | `src/routes/general/BookingConfirmationDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -691,7 +712,9 @@
 | Wave | 1 |
 | Licensed module | retail |
 | Route | `/general/wallet-overview` |
-| Component | `apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `WalletOverviewDashboard` |
+| Suggested location | `src/routes/general/WalletOverviewDashboard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -744,7 +767,9 @@
 | Wave | 1 |
 | Licensed module | access |
 | Route | `/general/my-tickets` |
-| Component | `apps/guest-app/src/routes/general/MyTicketsList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MyTicketsList` |
+| Suggested location | `src/routes/general/MyTicketsList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -794,7 +819,9 @@
 | Wave | 1 |
 | Licensed module | access |
 | Route | `/general/ticket-details` |
-| Component | `apps/guest-app/src/routes/general/TicketDetailsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `TicketDetailsDetail` |
+| Suggested location | `src/routes/general/TicketDetailsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -843,7 +870,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/ticket-transfer` |
-| Component | `apps/guest-app/src/routes/general/TicketTransferDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `TicketTransferDetail` |
+| Suggested location | `src/routes/general/TicketTransferDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -889,7 +918,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/memberships` |
-| Component | `apps/guest-app/src/routes/general/MembershipsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MembershipsDetail` |
+| Suggested location | `src/routes/general/MembershipsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -944,7 +975,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/my-reservations` |
-| Component | `apps/guest-app/src/routes/general/MyReservationsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MyReservationsDetail` |
+| Suggested location | `src/routes/general/MyReservationsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -990,7 +1023,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/reservation-details` |
-| Component | `apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ReservationDetailsDetail` |
+| Suggested location | `src/routes/general/ReservationDetailsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1033,7 +1068,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/add-to-calendar-reminders` |
-| Component | `apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AddToCalendarRemindersDetail` |
+| Suggested location | `src/routes/general/AddToCalendarRemindersDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1079,7 +1116,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/order-history-wallet` |
-| Component | `apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `OrderHistoryWalletDashboard` |
+| Suggested location | `src/routes/general/OrderHistoryWalletDashboard.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1131,7 +1170,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/general/saved-items-wishlist` |
-| Component | `apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `SavedItemsWishlistList` |
+| Suggested location | `src/routes/general/SavedItemsWishlistList.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1174,7 +1215,9 @@
 | Wave | 1 |
 | Licensed module | seating |
 | Route | `/general/interactive-map` |
-| Component | `apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `InteractiveMapCanvas` |
+| Suggested location | `src/routes/general/InteractiveMapCanvas.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1225,7 +1268,9 @@
 | Wave | 1 |
 | Licensed module | queue |
 | Route | `/general/attraction-wait-times` |
-| Component | `apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AttractionWaitTimesDetail` |
+| Suggested location | `src/routes/general/AttractionWaitTimesDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -1262,7 +1307,9 @@
 | Wave | 1 |
 | Licensed module | queue |
 | Route | `/general/virtual-queue-join-queue` |
-| Component | `apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `VirtualQueueJoinQueueDetail` |
+| Suggested location | `src/routes/general/VirtualQueueJoinQueueDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1309,7 +1356,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/general/fandb-browse-and-order` |
-| Component | `apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `FandbBrowseAndOrderList` |
+| Suggested location | `src/routes/general/FandbBrowseAndOrderList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1363,7 +1412,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/general/fandb-order-tracking` |
-| Component | `apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `FandbOrderTrackingDetail` |
+| Suggested location | `src/routes/general/FandbOrderTrackingDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1408,7 +1459,9 @@
 | Wave | 1 |
 | Licensed module | retail |
 | Route | `/general/retail-merchandise` |
-| Component | `apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `RetailMerchandiseDetail` |
+| Suggested location | `src/routes/general/RetailMerchandiseDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1456,7 +1509,9 @@
 | Wave | 1 |
 | Licensed module | access |
 | Route | `/general/parking-reserve-and-pay` |
-| Component | `apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ParkingReserveAndPayDetail` |
+| Suggested location | `src/routes/general/ParkingReserveAndPayDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1505,7 +1560,9 @@
 | Wave | 1 |
 | Licensed module | access |
 | Route | `/general/parking-reservation-confirmed` |
-| Component | `apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ParkingReservationConfirmedDetail` |
+| Suggested location | `src/routes/general/ParkingReservationConfirmedDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1553,7 +1610,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/venue-info-and-services` |
-| Component | `apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `VenueInfoAndServicesDetail` |
+| Suggested location | `src/routes/general/VenueInfoAndServicesDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1596,7 +1655,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/general/in-venue-notifications` |
-| Component | `apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `InVenueNotificationsDetail` |
+| Suggested location | `src/routes/general/InVenueNotificationsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1639,7 +1700,9 @@
 | Wave | 1 |
 | Licensed module | ai |
 | Route | `/general/ai-concierge-home` |
-| Component | `apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AiConciergeHomeDashboard` |
+| Suggested location | `src/routes/general/AiConciergeHomeDashboard.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1691,7 +1754,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/ai-concierge-chat` |
-| Component | `apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AiConciergeChatDetail` |
+| Suggested location | `src/routes/general/AiConciergeChatDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1746,7 +1811,9 @@
 | Wave | 1 |
 | Licensed module | ai |
 | Route | `/general/ai-concierge-contextual-help` |
-| Component | `apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AiConciergeContextualHelpDetail` |
+| Suggested location | `src/routes/general/AiConciergeContextualHelpDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1792,7 +1859,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/general/lost-and-found` |
-| Component | `apps/guest-app/src/routes/general/LostAndFoundDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `LostAndFoundDetail` |
+| Suggested location | `src/routes/general/LostAndFoundDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1837,7 +1906,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/general/feedback-and-ratings` |
-| Component | `apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `FeedbackAndRatingsList` |
+| Suggested location | `src/routes/general/FeedbackAndRatingsList.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1881,7 +1952,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/loyalty-rewards` |
-| Component | `apps/guest-app/src/routes/LoyaltyRewards.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `LoyaltyRewards` |
+| Suggested location | `src/routes/LoyaltyRewards.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1935,7 +2008,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/offers-and-promotions` |
-| Component | `apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `OffersAndPromotionsDetail` |
+| Suggested location | `src/routes/general/OffersAndPromotionsDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1981,7 +2056,9 @@
 | Wave | 1 |
 | Licensed module | queue |
 | Route | `/general/at-the-venue` |
-| Component | `apps/guest-app/src/routes/general/AtTheVenueDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AtTheVenueDetail` |
+| Suggested location | `src/routes/general/AtTheVenueDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2027,7 +2104,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/general/profile` |
-| Component | `apps/guest-app/src/routes/general/ProfileDashboard.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ProfileDashboard` |
+| Suggested location | `src/routes/general/ProfileDashboard.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -2076,7 +2155,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/general/help-and-support` |
-| Component | `apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `HelpAndSupportDetail` |
+| Suggested location | `src/routes/general/HelpAndSupportDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | commandCentre |
 
 **Entry parameters**
@@ -2125,7 +2206,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/checkout-entry` |
-| Component | `apps/guest-app/src/routes/general/CheckoutEntryForm.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `CheckoutEntryForm` |
+| Suggested location | `src/routes/general/CheckoutEntryForm.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2186,7 +2269,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/simple-registration-and-otp` |
-| Component | `apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `SimpleRegistrationAndOtpDetail` |
+| Suggested location | `src/routes/general/SimpleRegistrationAndOtpDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -2244,7 +2329,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/arabic-rtl-experience` |
-| Component | `apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ArabicRtlExperienceDetail` |
+| Suggested location | `src/routes/general/ArabicRtlExperienceDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Operations**
@@ -2278,7 +2365,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/multi-currency-and-pricing` |
-| Component | `apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MultiCurrencyAndPricingDetail` |
+| Suggested location | `src/routes/general/MultiCurrencyAndPricingDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2315,7 +2404,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/ticket-delivery-and-sharing` |
-| Component | `apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `TicketDeliveryAndSharingDetail` |
+| Suggested location | `src/routes/general/TicketDeliveryAndSharingDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -2359,7 +2450,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/branded-queue-waiting-room` |
-| Component | `apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `BrandedQueueWaitingRoomDetail` |
+| Suggested location | `src/routes/general/BrandedQueueWaitingRoomDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2401,7 +2494,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/maintenance-page` |
-| Component | `apps/guest-app/src/routes/general/MaintenancePageDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MaintenancePageDetail` |
+| Suggested location | `src/routes/general/MaintenancePageDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -2441,7 +2536,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/upsell-cross-sell` |
-| Component | `apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `UpsellCrossSellDetail` |
+| Suggested location | `src/routes/general/UpsellCrossSellDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2485,7 +2582,9 @@
 | Wave | 1 |
 | Licensed module | seating |
 | Route | `/general/interactive-seat-selection` |
-| Component | `apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `InteractiveSeatSelectionCanvas` |
+| Suggested location | `src/routes/general/InteractiveSeatSelectionCanvas.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2534,7 +2633,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/resource-booking-cabana` |
-| Component | `apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ResourceBookingCabanaDetail` |
+| Suggested location | `src/routes/general/ResourceBookingCabanaDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2579,7 +2680,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/plan-your-adventure-start` |
-| Component | `apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `PlanYourAdventureStartDetail` |
+| Suggested location | `src/routes/general/PlanYourAdventureStartDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -2627,7 +2730,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/suggested-itineraries` |
-| Component | `apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `SuggestedItinerariesDetail` |
+| Suggested location | `src/routes/general/SuggestedItinerariesDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2673,7 +2778,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/your-plan` |
-| Component | `apps/guest-app/src/routes/general/YourPlanDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `YourPlanDetail` |
+| Suggested location | `src/routes/general/YourPlanDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2730,7 +2837,9 @@
 | Wave | 1 |
 | Licensed module | ai |
 | Route | `/general/ai-planner` |
-| Component | `apps/guest-app/src/routes/general/AIPlannerDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AIPlannerDetail` |
+| Suggested location | `src/routes/general/AIPlannerDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2782,7 +2891,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/dynamic-qr-ticket` |
-| Component | `apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `DynamicQrTicketCanvas` |
+| Suggested location | `src/routes/general/DynamicQrTicketCanvas.tsx` (match the repository's own layout if it differs) |
 | Pattern | credentialView |
 
 **Entry parameters**
@@ -2829,7 +2940,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/bundle-package` |
-| Component | `apps/guest-app/src/routes/general/BundlePackageDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `BundlePackageDetail` |
+| Suggested location | `src/routes/general/BundlePackageDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2874,7 +2987,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/accessibility-information` |
-| Component | `apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `AccessibilityInformationForm` |
+| Suggested location | `src/routes/general/AccessibilityInformationForm.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2911,7 +3026,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/resource-availability-cabana` |
-| Component | `apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ResourceAvailabilityCabanaDetail` |
+| Suggested location | `src/routes/general/ResourceAvailabilityCabanaDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2950,7 +3067,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/general/plan-my-day-in-progress` |
-| Component | `apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `PlanMyDayInProgressDetail` |
+| Suggested location | `src/routes/general/PlanMyDayInProgressDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2999,7 +3118,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/in-venue-experience/menu-item-detail` |
-| Component | `apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MenuItemDetail` |
+| Suggested location | `src/routes/in-venue-experience/MenuItemDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3043,7 +3164,9 @@
 | Wave | 1 |
 | Licensed module | retail |
 | Route | `/in-venue-experience/shop-and-drop-collection` |
-| Component | `apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ShopAndDropCollectionList` |
+| Suggested location | `src/routes/in-venue-experience/ShopAndDropCollectionList.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3086,7 +3209,9 @@
 | Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/search` |
-| Component | `apps/guest-app/src/routes/Search.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `Search` |
+| Suggested location | `src/routes/Search.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -3123,7 +3248,9 @@
 | Wave | 1 |
 | Licensed module | marketing |
 | Route | `/newsletter-preferences` |
-| Component | `apps/guest-app/src/routes/NewsletterPreferences.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `NewsletterPreferences` |
+| Suggested location | `src/routes/NewsletterPreferences.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3169,7 +3296,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/privacy-my-data` |
-| Component | `apps/guest-app/src/routes/account/PrivacyMyData.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `PrivacyMyData` |
+| Suggested location | `src/routes/account/PrivacyMyData.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3219,7 +3348,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/refunds-resale` |
-| Component | `apps/guest-app/src/routes/account/RefundsResale.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `RefundsResale` |
+| Suggested location | `src/routes/account/RefundsResale.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3264,7 +3395,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/help-my-cases` |
-| Component | `apps/guest-app/src/routes/account/HelpMyCases.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `HelpMyCases` |
+| Suggested location | `src/routes/account/HelpMyCases.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3309,7 +3442,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/face-pass` |
-| Component | `apps/guest-app/src/routes/account/FacePass.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `FacePass` |
+| Suggested location | `src/routes/account/FacePass.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3357,7 +3492,9 @@
 | Wave | 1 |
 | Licensed module | fnb |
 | Route | `/reserve-table` |
-| Component | `apps/guest-app/src/routes/ReserveTable.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ReserveTable` |
+| Suggested location | `src/routes/ReserveTable.tsx` (match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -3410,7 +3547,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/payment-methods` |
-| Component | `apps/guest-app/src/routes/account/PaymentMethods.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `PaymentMethods` |
+| Suggested location | `src/routes/account/PaymentMethods.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3461,7 +3600,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/share-group-booking` |
-| Component | `apps/guest-app/src/routes/account/ShareGroupBooking.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `ShareGroupBooking` |
+| Suggested location | `src/routes/account/ShareGroupBooking.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3512,7 +3653,9 @@
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/account/security-sign-in` |
-| Component | `apps/guest-app/src/routes/account/SecuritySignIn.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `SecuritySignIn` |
+| Suggested location | `src/routes/account/SecuritySignIn.tsx` (match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -3567,7 +3710,9 @@
 | Wave | 1 |
 | Licensed module | resources |
 | Route | `/general/map-booking` |
-| Component | `apps/guest-app/src/routes/general/MapBookingCanvas.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MapBookingCanvas` |
+| Suggested location | `src/routes/general/MapBookingCanvas.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3622,7 +3767,9 @@
 | Wave | 1 |
 | Licensed module | resources |
 | Route | `/general/space-by-the-hour` |
-| Component | `apps/guest-app/src/routes/general/SpaceByTheHourWizard.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `SpaceByTheHourWizard` |
+| Suggested location | `src/routes/general/SpaceByTheHourWizard.tsx` (match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -3669,7 +3816,9 @@
 | Wave | 1 |
 | Licensed module | transport |
 | Route | `/transport/route-and-schedule` |
-| Component | `apps/guest-app/src/routes/transport/RouteAndScheduleList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `RouteAndScheduleList` |
+| Suggested location | `src/routes/transport/RouteAndScheduleList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3718,7 +3867,9 @@
 | Wave | 1 |
 | Licensed module | transport |
 | Route | `/transport/route-and-passengers` |
-| Component | `apps/guest-app/src/routes/transport/RouteAndPassengersDetail.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `RouteAndPassengersDetail` |
+| Suggested location | `src/routes/transport/RouteAndPassengersDetail.tsx` (match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3771,7 +3922,9 @@
 | Wave | 1 |
 | Licensed module | transport |
 | Route | `/transport/multi-trip-passes` |
-| Component | `apps/guest-app/src/routes/transport/MultiTripPassesList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `MultiTripPassesList` |
+| Suggested location | `src/routes/transport/MultiTripPassesList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3816,7 +3969,9 @@
 | Wave | 1 |
 | Licensed module | transport |
 | Route | `/transport/favourite-routes` |
-| Component | `apps/guest-app/src/routes/transport/FavouriteRoutesList.tsx` |
+| Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
+| Component | `FavouriteRoutesList` |
+| Suggested location | `src/routes/transport/FavouriteRoutesList.tsx` (match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**

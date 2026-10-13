@@ -120,6 +120,22 @@ def test_pointer_differs_between_releases_only_on_the_release_line():
     assert one != two and norm(one) == norm(two)
 
 
+def test_frontend_pointer_names_its_repository_never_an_apps_folder():
+    """CHG-R6-060: a frontend ticket names the GitLab repository of its screen's platform (docs/active/
+    frontend-repos.yaml) and a path relative to it; a platform with no repository says so and names no folder."""
+    rows = plan() + [row("APP-P09-ADM-001", "Task", "SVC-THING-CORE", track="Frontend", seq="6",
+                         subject="[FE] ADM-001 Platform Login / MFA", area="P09")]
+    t = by_key(build(rows=rows)[0])
+    for key in ("APP-MOB-GST-001", "APP-MOB-GST-001#build"):
+        p = t[key]["pointer"]
+        assert ("**Repository:** ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/"
+                "ticvai-guest-app.git)") in p, p
+        assert "suggested location `src/" in p and "apps/" not in p
+    p = t["APP-P09-ADM-001"]["pointer"]
+    assert "**No repository yet:** ask the lead" in p and "apps/" not in p and "suggested location" not in p
+    assert "Repository" not in t["SVC-THING-CORE-1"]["pointer"]
+
+
 def test_long_artefact_lists_are_capped():
     tables = ", ".join(f"s.t{i}" for i in range(rel.MAX_BUILDS + 5))
     rows = plan()

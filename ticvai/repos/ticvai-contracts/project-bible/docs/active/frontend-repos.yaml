@@ -1,0 +1,110 @@
+# The frontend repositories: which GitLab repository a screen's ticket is built in.
+#
+# Authored root (CHG-R6-059, decided by Chinmay on 13 October 2026). The frontend is one GitLab repository per app
+# in the group ticvai-frontend, not the single Nx workspace of thirteen apps the package was written against
+# (CHG-R6-058); the folders apps/<app>/ that screens/*.yaml name in implementation.component do not exist.
+#
+# Read by tools/frontend_repos.py, which tools/derive-frontend.py, tools/op-descriptions.py, tools/op-release.py
+# and tools/build-service-docs.py use to name the repository in the ticket text. Checked by
+# tools/check-frontend-repos.py: every platform the screens declare has an entry here, its app is the platform's
+# app, a repository serves one platform unless `shared` says why, and the table in
+# viewer/mcp/setup/starters/frontend/CLAUDE.md (ADAM setup) names the same repository for each platform.
+#
+# **The key is the platform, not the app.** The package serves P02 and P05 from one app (guest-app) and P08, P13
+# and P16 from another (venue-management-web); the repositories split them differently.
+
+group: ticvai-frontend
+url: http://gitlab.softlabsgroup.in/ticvai-frontend/{repo}.git
+
+# Nobody on the package team can read GitLab, so the inside of each repository is not known. The ticket text
+# assumes a repository's root holds what the package's app folder held: apps/venue-pos/src/x is src/x in
+# ticvai-pos. It presents that as a suggested location, to be matched to the repository's own layout.
+layout:
+  assumed: true
+  strip: apps/{app}/
+  wording: match the repository's own layout if it differs
+  note: 'The internal layout of the six repositories is unknown (13 October 2026). A ticket gives the route, the
+    component name and a suggested location only; a developer who finds the repository laid out differently
+    follows the repository.'
+
+# One entry per platform in screens/P*.yaml. `repo: null` is a platform with no repository yet: its tickets say
+# so and name no folder. `assumed: true` is a mapping the lead stated as an assumption, not yet confirmed.
+platforms:
+  P01:
+    name: Guest Web - Storefront
+    app: guest-web
+    repo: ticvai-guest-web
+    assumed: false
+  P02:
+    name: Guest App - Mobile
+    app: guest-app
+    repo: ticvai-guest-app
+    assumed: false
+  P04:
+    name: Venue POS - Terminal and Tablet
+    app: venue-pos
+    repo: ticvai-pos
+    assumed: false
+  P05:
+    name: Guest Kiosk - Self-Service
+    app: guest-app
+    repo: ticvai-kiosk
+    assumed: true
+    note: 'The package serves P05 from guest-app, the same app as P02 (screens/P05-guest-kiosk.yaml). The lead
+      maps it to its own repository, ticvai-kiosk, as an assumption of 13 October 2026, not yet confirmed.'
+  P06:
+    name: Venue Staff App - Operations
+    app: venue-staff-app
+    repo: ticvai-employee-app
+    assumed: true
+    note: 'The lead maps the Venue Staff App (venue-staff-app) to ticvai-employee-app as an assumption of
+      13 October 2026, not yet confirmed.'
+  P07:
+    name: Venue Scanner - Access Control
+    app: venue-scanner
+    repo: null
+  P08:
+    name: Venue Management - Back Office
+    app: venue-management-web
+    repo: ticvai-venue-management
+    assumed: false
+  P09:
+    name: TICVAI Web - Platform Console
+    app: ticvai-web
+    repo: null
+  P10:
+    name: Partner Web - Reseller Portal
+    app: partner-web
+    repo: null
+  P11:
+    name: Accreditation Web - Applications
+    app: accreditation-web
+    repo: null
+  P12:
+    name: Venue Support - Agent Console
+    app: venue-support-web
+    repo: null
+  P13:
+    name: Venue CMS - White Label
+    app: venue-management-web
+    repo: null
+    note: 'The package serves P13 from the same app as P08 (venue-management-web); no repository is named for it
+      yet, and ADAM setup tells a developer to ask the lead.'
+  P14:
+    name: Developer Portal
+    app: developer-portal-web
+    repo: null
+  P15:
+    name: Kitchen Display - Pass and Stations
+    app: kitchen-display
+    repo: null
+  P16:
+    name: Venue Analytics - Cross-Domain Reporting
+    app: venue-management-web
+    repo: null
+    note: 'The package serves P16 from the same app as P08 (venue-management-web); no repository is named for it
+      yet, and ADAM setup tells a developer to ask the lead.'
+  P17:
+    name: TICVAI Sign-up - Onboarding and Purchase
+    app: signup-web
+    repo: null

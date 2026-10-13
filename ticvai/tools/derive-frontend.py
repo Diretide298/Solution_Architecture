@@ -12,6 +12,14 @@ person not to edit the thing they now have to edit.
 Everything here comes from the screens: which platforms an app serves, which contracts it reaches
 through their operations, which packages it needs, and the deployment posture the platform
 declares.
+
+**And the repository each platform is built in** (CHG-R6-060). Since 13 October the frontend is one GitLab
+repository per app (docs/active/frontend-repos.yaml, through tools/frontend_repos.py), so each manifest carries
+`repositories` (per platform: repo, repoUrl, assumed), `repo` and `repoUrl` when every platform of the app is
+built in one repository (null otherwise, or when there is none yet), and its screens with their path relative to
+that repository (`path`), not the `apps/<app>/` folder of the old single workspace. The screen list, `screenCount`
+and `byWave` are derived from the screens on every run; until now they were carried over from the previous file
+and had drifted (audit-guest-parity's "frontend manifest" finding).
 """
 from __future__ import annotations
 
@@ -21,6 +29,9 @@ from collections import defaultdict
 from pathlib import Path
 
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import frontend_repos as fr  # noqa: E402
 
 # Windows consoles are cp1252 and this tool closes by printing a unicode arrow. **The write
 # has already happened by then**, so the traceback reported a failure on a run that succeeded
@@ -58,11 +69,23 @@ def main() -> int:
             "platforms": [],
             "contracts": set(),
             "deployment": p.get("deployment"),
+            "screens": [],
         })
         entry["offlineCapable"] = entry["offlineCapable"] or bool(p.get("offlineCapable"))
         entry["directions"] |= set(p.get("directions") or [])
         entry["platforms"].append(f"{p['code']} {p['name']}")
+        entry.setdefault("_codes", []).append(p["code"])
+        repo = fr.repo_of(p["code"])
         for s in doc["screens"]:
+            imp = s.get("implementation") or {}
+            row = {"id": s["id"], "name": s.get("name"), "platform": p["code"], "route": imp.get("route"),
+                   "repo": repo}
+            if repo and imp.get("component"):
+                row["path"] = fr.relative_path(imp["component"], app)
+            row["wave"] = s.get("wave")
+            if imp.get("status"):
+                row["status"] = imp["status"]
+            entry["screens"].append(row)
             for a in (s.get("apis") or []):
                 oid = a.get("operationId")
                 if oid in lineage:
@@ -73,6 +96,17 @@ def main() -> int:
         e["directions"] = sorted(e["directions"]) or ["ltr"]
         e["contracts"] = sorted(e["contracts"])
         e["servesMultiplePlatforms"] = len(e["platforms"]) > 1
+        codes = e.pop("_codes")
+        e["repositories"] = [{"platform": c, "repo": fr.repo_of(c), "repoUrl": fr.url_of(fr.repo_of(c)),
+                              "assumed": bool(fr.platform_entry(c).get("assumed"))} for c in codes]
+        one = {r["repo"] for r in e["repositories"]}
+        e["repo"] = next(iter(one)) if len(one) == 1 else None
+        e["repoUrl"] = fr.url_of(e["repo"])
+        e["screenCount"] = len(e["screens"])
+        waves = defaultdict(int)
+        for s in e["screens"]:
+            waves[f"wave{s['wave']}" if s.get("wave") is not None else "unwaved"] += 1
+        e["byWave"] = dict(sorted(waves.items()))
         # **The package set is not derived and is not invented here.** An existing manifest's
         # choice is preserved; a new app gets the three every app needs. Guessing which packages
         # a team will split out is not something a screen file can answer.
@@ -84,13 +118,16 @@ def main() -> int:
 
         ordered = {k: e[k] for k in (
             "app", "operator", "audience", "formFactor", "status", "runtime", "offlineCapable",
-            "directions", "platforms", "servesMultiplePlatforms", "packages", "contracts",
-            "deployment") if e.get(k) is not None}
+            "directions", "platforms", "servesMultiplePlatforms", "repo", "repoUrl", "repositories",
+            "packages", "contracts", "deployment", "screenCount", "byWave", "screens")
+            if e.get(k) is not None or k in ("repo", "repoUrl")}
         for k, v in e.items():
             ordered.setdefault(k, v)
 
+        repos = "; ".join(f"{r['platform']} {r['repo'] or 'none yet (ask the lead)'}" for r in e["repositories"])
         head = (f"# {app} — operated by {e['operator']} · {e['audience']} on {e['formFactor']}\n"
                 f"# Serves: {', '.join(e['platforms'])}\n"
+                f"# Repository: {repos} (docs/active/frontend-repos.yaml)\n"
                 f"# Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.\n\n")
         path.write_text(head + yaml.safe_dump(ordered, sort_keys=False, allow_unicode=True, width=98),
                         encoding="utf-8")

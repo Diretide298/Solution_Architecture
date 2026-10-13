@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-594` | Environment Ready & Handoff to AI Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1191` | Organisation | B–D | 10 | 14 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
+| `BO-1191` | Organisation | B | 10 | 14 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -233,7 +233,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · ticket #35646 (VM-BO-1191) |
 | Who uses it | venue staff holding `SCOPE_MANAGE`, `SCOPE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listOrgUnits` reads the tree and `getOrgUnit` reads one unit of it — list, select, act |
