@@ -36,8 +36,12 @@ import { fileURLToPath } from 'node:url';
  * and `build-zip.ps1` copies the same list.
  *
  * Sorted, so the hash does not depend on how anybody happened to type it.
+ *
+ * `adam-hook.mjs` joined on 13 October 2026: it is what fills the Agents page,
+ * and until then only a plugin install had it, which is to say nobody did.
  */
 export const FILES = [
+  'adam-hook.mjs',
   'client.mjs',
   'mcp-check.mjs',
   'server.mjs',
@@ -45,6 +49,38 @@ export const FILES = [
   'update.mjs',
   'version.mjs',
 ];
+
+/**
+ * The list every updater from before 13 October 2026 has, and all it accepts.
+ *
+ * **Why a second list exists at all.** An installed update.mjs refuses a whole
+ * bundle that names a file it does not know, and checks what it wrote against
+ * a hash of its own list. So a bundle of all of `FILES` would be refused by
+ * every connector in the field, and those connectors could never update again.
+ * The viewer therefore answers a request that does not say which files it can
+ * take with these six and their hash; that update brings the new update.mjs,
+ * and the new one asks for everything (`?accept=`), hook included. Two runs of
+ * /update-adam for anybody on an old build, and no run that fails.
+ */
+export const BEFORE_HOOKS = [
+  'client.mjs',
+  'mcp-check.mjs',
+  'server.mjs',
+  'tools.mjs',
+  'update.mjs',
+  'version.mjs',
+];
+
+/**
+ * Which of `FILES` a caller can take, from the comma-separated names it sent.
+ * No list means an updater too old to send one. Names not in `FILES` are
+ * dropped rather than refused: asking is not a way to be sent anything else.
+ */
+export function acceptedOf(list) {
+  if (list === null || list === undefined) return BEFORE_HOOKS;
+  const asked = new Set(String(list).split(',').map((s) => s.trim()));
+  return FILES.filter((name) => asked.has(name));
+}
 
 /** Where this file is, which is the connector directory on both sides. */
 export const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -57,9 +93,9 @@ export const HERE = path.dirname(fileURLToPath(import.meta.url));
  * was never expected — "you are missing a file" and "you are current" have to
  * be different answers.
  */
-export async function buildOf(dir = HERE) {
+export async function buildOf(dir = HERE, names = FILES) {
   const digest = createHash('sha256');
-  for (const name of FILES) {
+  for (const name of names) {
     const text = await readFile(path.join(dir, name), 'utf8').catch(() => null);
     digest.update(name);
     digest.update('\u0000');
@@ -74,9 +110,9 @@ export async function buildOf(dir = HERE) {
  * `/connector/bundle`; a file that cannot be read is left out rather than sent
  * as an empty string, which the updater would happily write over working code.
  */
-export async function filesOf(dir = HERE) {
+export async function filesOf(dir = HERE, names = FILES) {
   const out = [];
-  for (const name of FILES) {
+  for (const name of names) {
     const text = await readFile(path.join(dir, name), 'utf8').catch(() => null);
     if (text !== null) out.push({ path: name, text });
   }

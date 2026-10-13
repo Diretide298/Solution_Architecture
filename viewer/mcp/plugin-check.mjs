@@ -119,7 +119,7 @@ ok(modes.has('record') && modes.has('flush'),
 
 console.log('\nthe plugin install and the zip install diverge where they have to');
 
-const hookSrc = await readFile(path.join(HERE, 'hooks', 'adam-hook.mjs'), 'utf8');
+const hookSrc = await readFile(path.join(HERE, 'adam-hook.mjs'), 'utf8');
 ok(hookSrc.includes('CLAUDE_PLUGIN_OPTION_'),
   'the hook reads the plugin\'s options as well as ADAM_*',
   'a plugin exports CLAUDE_PLUGIN_OPTION_<KEY> to hooks and sets no ADAM_* at all');

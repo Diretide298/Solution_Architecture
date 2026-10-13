@@ -113,17 +113,55 @@ WORKING A TICKET
   Never choose "always allow" for adam_apply.
 
 
+WHAT ADAM IS TOLD ABOUT YOUR SESSIONS
+-------------------------------------
+  Setup also turns on ADAM's usage hooks, which fill the Agents page (under
+  Tasks): is the agent being used, on which tickets, and which tools keep
+  failing. When a Claude Code session ends, ADAM is sent:
+
+    for each tool call: which tool ran, whether it worked, how long it took,
+    and a one-word reason when it failed (timeout, refused, not-found,
+    conflict, cancelled, error);
+    when you sent a prompt and when Claude stopped - the times, not the words;
+    which ticket was open (from .adam\work\), the folder's name and the
+    computer's name.
+
+  Never your prompts, tool arguments, file contents, diffs, commands or the
+  error text, and never the folder's full path. Only sessions in folders ADAM
+  is connected to are sent; anything else is dropped on your machine.
+
+  The hooks are five entries in %USERPROFILE%\.claude\settings.json, added
+  beside whatever is already there. Setup keeps the file as it was next to it
+  (settings.json.adam-<date>.bak) and changes nothing else in it. If that file
+  is not valid JSON, setup leaves it alone and prints what to add by hand.
+  The hooks sign in with the same ADAM account as the connector; no new copy
+  of your password is made.
+
+  Turn them off:   node "%USERPROFILE%\.adam\connector\update.mjs" --remove-hooks
+  Back on:         node "%USERPROFILE%\.adam\connector\update.mjs" --install-hooks
+  /update-adam never turns them back on once you have turned them off.
+
+
 LATER
 -----
   * Changed your ADAM password?      Run setup.cmd again and give the same
                                      project folder; its files are not touched.
   * Got a newer version of this zip? Run its setup.cmd the same way.
+  * Keep the connector current:      /update-adam in Claude Code, then
+                                     restart Claude Code. On a connector
+                                     from before 13 October 2026, run
+                                     /update-adam twice: the first run
+                                     brings the updater that knows about
+                                     the usage hook, the second brings it.
   * Another project or role?         Run setup.cmd again and pick it.
   * Remove ADAM from one folder, in PowerShell:
         powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.adam\connector\setup.ps1" -RemoveFolder "C:\work\ticvai-backend"
     Setup prints this line, with your own folder, when it finishes.
   * Remove it everywhere:            Double-click uninstall.cmd. Project
-                                     folders are left as they are.
+                                     folders are left as they are. ADAM's
+                                     usage hooks are taken out of your
+                                     Claude Code settings; nothing else
+                                     in that file changes.
   * Removing your token from ADAM does not revoke it in OpenProject -
     delete it there too.
 
@@ -174,6 +212,9 @@ WHAT IS IN THIS FOLDER
     client.mjs     how it talks to ADAM
     tools.mjs      the 19 tools
     mcp-check.mjs  the connection test
+    version.mjs    which build this is
+    update.mjs     what /update-adam runs; also turns the usage hooks on/off
+    adam-hook.mjs  the usage hook (see WHAT ADAM IS TOLD ABOUT YOUR SESSIONS)
     starters\      the backend and frontend skeletons and coding standards
 
 Setup keeps a copy of the connector and its scripts in

@@ -214,7 +214,7 @@ log(`ready — ${TOOLS.length} tools, viewer at ${client.base}`
 // ADAM that has no such route, gets a connector that works and says nothing.
 (async () => {
   try {
-    const { buildOf, HERE } = await import('./version.mjs');
+    const { buildOf, HERE, FILES } = await import('./version.mjs');
     const { hostname } = await import('node:os');
     const mine = await buildOf(HERE);
 
@@ -246,7 +246,9 @@ log(`ready — ${TOOLS.length} tools, viewer at ${client.base}`
       },
     }).catch(() => { /* older ADAM, or offline: nothing to say */ });
 
-    const res = await fetch(`${client.base}/connector/version`, {
+    // Which files this build is made of, so the answer is a hash of the same
+    // set: see `BEFORE_HOOKS` in version.mjs for what is sent without it.
+    const res = await fetch(`${client.base}/connector/version?accept=${FILES.join(',')}`, {
       signal: AbortSignal.timeout(2500),
       headers: { accept: 'application/json' },
     });

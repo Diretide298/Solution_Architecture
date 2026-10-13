@@ -12,7 +12,8 @@
           docs\              the TICVAI build plan and development plan, how tickets
                              are ordered, build readiness and the decisions register
           adam-connector\   the connector (server.mjs, client.mjs, tools.mjs,
-                             mcp-check.mjs), setup.ps1, and starters\ - the
+                             mcp-check.mjs, the updater and the usage hook),
+                             setup.ps1, and starters\ - the
                              backend and frontend skeletons and the coding
                              standards setup copies into a new project folder
 
@@ -44,12 +45,13 @@ $folder = Join-Path $top 'adam-connector'
 New-Item -ItemType Directory -Force -Path $folder | Out-Null
 
 try {
-    # The same six files `mcp/version.mjs` hashes, and it has to stay the same
-    # six: the build id is computed from this set on both sides, so a file
+    # The same seven files `mcp/version.mjs` hashes, and it has to stay the same
+    # seven: the build id is computed from this set on both sides, so a file
     # shipped here and not listed there -- or the other way round -- makes every
-    # install read as out of date forever.
+    # install read as out of date forever. adam-hook.mjs is the usage hook;
+    # setup.ps1 puts it into the user's Claude Code settings.
     foreach ($file in 'server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs',
-                      'version.mjs', 'update.mjs') {
+                      'version.mjs', 'update.mjs', 'adam-hook.mjs') {
         Copy-Item -LiteralPath (Join-Path $Mcp $file) -Destination $folder
     }
     Copy-Item -LiteralPath (Join-Path $Here 'setup.ps1') -Destination $folder

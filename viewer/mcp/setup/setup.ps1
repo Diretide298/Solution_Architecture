@@ -127,11 +127,12 @@ $Roles = [ordered]@{
 }
 # The connector itself. `version.mjs` and `update.mjs` are part of it and not
 # an extra: without them an install has no way to tell it is out of date and
-# no way to fix it, which is the whole point of shipping them. The same six
+# no way to fix it, which is the whole point of shipping them. The same seven
 # are hashed by version.mjs and copied by build-zip.ps1 -- three lists that
 # have to agree, and the build id is what says when they do not.
+# adam-hook.mjs is the usage hook that fills ADAM's Agents page (13 Oct 2026).
 $Files = @('server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs',
-          'version.mjs', 'update.mjs')
+          'version.mjs', 'update.mjs', 'adam-hook.mjs')
 # Kept beside the installed connector, so a folder can be removed later
 # without the zip.
 $Tools = @('setup.ps1', 'setup.cmd', 'uninstall.cmd')
@@ -468,6 +469,44 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
     return $codeName
 }
 
+# ---- the usage hooks -----------------------------------------------------------
+#
+# adam-hook.mjs fills ADAM's Agents page, and does nothing until Claude Code's
+# settings name it. Until 13 October 2026 only the plugin did that, so no zip
+# install ever sent a session. The edit to %USERPROFILE%\.claude\settings.json
+# is made by update.mjs rather than here, so setup and /update-adam make the
+# same edit with the same code: ADAM's five entries replaced, everything else
+# kept, the file as it was kept beside it, and a file that is not valid JSON
+# left alone with one line saying what to add by hand. In node, too, because
+# Windows PowerShell 5.1 rewrites JSON it round-trips (escapes, depth limits).
+#
+# A failure here is a Note, never a stop: the connector works without them.
+function Invoke-UsageHooks([string]$Switch) {
+    $updater = Join-Path $InstallDir 'update.mjs'
+    $nodeExe = Get-Command node -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $nodeExe -or -not (Test-Path -LiteralPath $updater)) { return $null }
+    $ErrorActionPreference = 'Continue'
+    $said = @(& $nodeExe.Source $updater $Switch 2>&1 | ForEach-Object { "$_" -replace '^\[adam\]\s*', '' })
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = 'Stop'
+    return [pscustomobject]@{ Code = $code; Said = $said }
+}
+
+function Install-UsageHooks {
+    $result = Invoke-UsageHooks '--install-hooks'
+    if (-not $result) { Note 'usage hooks not installed: node or update.mjs is missing'; return }
+    foreach ($line in $result.Said) { if ($line) { Note $line } }
+    if ($result.Code -eq 0) { Good 'usage hooks on, for every folder ADAM is connected to' }
+    else { Note 'usage hooks not installed - the line above says why. The connector works without them.' }
+}
+
+function Remove-UsageHooks {
+    $result = Invoke-UsageHooks '--remove-hooks'
+    if (-not $result) { return }
+    foreach ($line in $result.Said) { if ($line) { Note $line } }
+    if ($result.Code -eq 0) { Good 'usage hooks removed' }
+}
+
 Write-Host ''
 Write-Host 'ADAM connector for Claude Code' -ForegroundColor White
 $script:Claude = Find-Claude
@@ -495,6 +534,10 @@ if ($Uninstall -or $RemoveFolder) {
         }
         # Removed whether or not the ledger knows about it: an older setup made one.
         if ((Invoke-Claude @('mcp', 'remove', $Name, '-s', 'user')).Code -eq 0) { Good "removed the every-folder '$Name'" }
+        # The usage hooks, before the folder they run from goes: a hook left
+        # pointing at a deleted file fails on every tool call in every folder.
+        # ADAM's entries only - every other hook and setting in the file stays.
+        Remove-UsageHooks
         if (Test-Path -LiteralPath $InstallDir) {
             Remove-Item -LiteralPath $InstallDir -Recurse -Force
             Good "deleted $InstallDir"
@@ -800,6 +843,13 @@ $entries += [pscustomobject]@{ Scope = $scope; Folder = $where; Project = $Proje
 Write-Ledger $entries
 if ($scope -eq 'user') { Good "registered as '$Name' for every folder, reading $Project" }
 else { Good "registered as '$Name' for $where only, reading $Project" }
+
+# After the registration rather than before: the hook signs in with what that
+# registration holds, so hooks without one would only collect files.
+Step 'Turning on the usage hooks'
+Note 'What ADAM is told: which tool ran, whether it worked, how long it took and which ticket was open.'
+Note 'Never your prompts, tool arguments, file contents or the error text. Only from folders ADAM is connected to.'
+Install-UsageHooks
 
 # ---- 9. optionally, the full test --------------------------------------------
 $run = $Test
