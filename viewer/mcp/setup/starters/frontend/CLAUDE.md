@@ -1,47 +1,52 @@
-# TICVAI frontend
+# TICVAI frontend workspace
 
-Nx 20 workspace, pnpm, TypeScript (strict). 13 apps (React Native and React web) share four packages.
+This folder is a TICVAI frontend workspace. ADAM's setup made it with only this file, `.claude/` and
+`project-bible/setup/`, and connected ADAM to it. **The app code is not here: it is in the app
+repositories cloned inside this folder**, one subfolder each, from the GitLab group
+`ticvai-frontend`. Somebody on two apps has two.
 
-| Path | What it is |
+| Platform (the package's code and name) | Repository (subfolder) |
 |---|---|
-| `packages/api-client` | the typed client for the API contracts: the transport now, the generated operations from SETUP-CLIENTS |
-| `packages/design-tokens` | colours, type, spacing, density, from the package's `screens/_design-tokens.yaml` - depends on nothing |
-| `packages/ui` | shared components; for now their props and the token-to-style mapping (`buttonStyle`, `badgeStyle`) |
-| `packages/offline-core` | the one offline store: SQLite adapter, outbox, sync, ids (UUIDv7) |
+| P01 Guest Web - Storefront | `ticvai-guest-web` |
+| P02 Guest App - Mobile | `ticvai-guest-app` |
+| P04 Venue POS - Terminal and Tablet | `ticvai-pos` |
+| P05 Guest Kiosk - Self-Service | `ticvai-kiosk` |
+| P06 Venue Staff App - Operations | `ticvai-employee-app` |
+| P08 Venue Management - Back Office | `ticvai-venue-management` |
+| any other platform (P07 Venue Scanner, P09 to P17, including P13 and P16, which the package serves from the same app as P08, and P15 Kitchen Display) | none yet: **ask the lead** before building it anywhere |
 
-<!-- apps:begin (sync-frontend-apps.py) -->
-The apps are the package's own (`ticvai/frontend/*.yaml`), named by who operates them. A screen's
-`implementation.app` is the folder it goes in; its platform code (P01...) maps to an app here.
+A screen names its platform (P01...) and the package's app (`implementation.app`). **A ticket's work
+goes in the repository for that ticket's platform.** If that repository is not cloned here, say so:
+the person clones it into this folder (setup printed the clone lines; the group is
+http://gitlab.softlabsgroup.in/ticvai-frontend). Do not build it in another app's repository.
 
-| App | Runtime | Offline | Serves | Screens |
-|---|---|---|---|---|
-| `apps/accreditation-web` | React web (web) | no | P11 | 8 |
-| `apps/developer-portal-web` | React web (web) | no | P14 |  |
-| `apps/guest-app` | React Native (mobileApp) | **yes** | P02, P05 | 80 |
-| `apps/guest-web` | React web (web) | no | P01 | 35 |
-| `apps/kitchen-display` | React web (kiosk) | **yes** | P15 |  |
-| `apps/partner-web` | React web (web) | no | P10 | 21 |
-| `apps/signup-web` | React web (web) | no | P17 |  |
-| `apps/ticvai-web` | React web (web) | no | P09 | 37 |
-| `apps/venue-management-web` | React web (web) | no | P08, P13, P16 | 111 |
-| `apps/venue-pos` | React Native (posTerminal) | **yes** | P04 | 10 |
-| `apps/venue-scanner` | React Native (handheld) | **yes** | P07 | 16 |
-| `apps/venue-staff-app` | React Native (mobileApp) | **yes** | P06 | 50 |
-| `apps/venue-support-web` | React web (web) | no | P12 | 8 |
+**Open Claude Code in this folder, not in a repository folder.** ADAM is connected to this folder
+only: a session started inside `ticvai-pos/` does not get ADAM's tools, `/ticket` or these
+permissions.
 
-**Adding an app:** the package adds its manifest first; then `python viewer/mcp/setup/starters/sync-frontend-apps.py`
-in the ADAM repo scaffolds it here. Do not create an app folder by hand - it would not match the screens.
-<!-- apps:end -->
+(If this folder is itself a git repository with a `package.json` at the top - somebody ran setup
+on their clone, or made the old one-workspace starter with setup's `-UseStarter` - the app code
+is here instead, and "the repository folder" below means this folder.)
 
-Import a package as `@ticvai/<name>` (see `tsconfig.base.json`).
+## Git, build, test and lint: inside the repository folder
 
-```
-pnpm install
-pnpm lint          # nx run-many -t lint
-pnpm typecheck
-pnpm test          # vitest per project
-pnpm nx graph
-```
+- Run git, the package manager, the build, the tests and the linter **inside the repository's
+  folder** (`cd ticvai-pos` first, or `git -C ticvai-pos ...`). This folder is not a git repository.
+- Take the commands from **that repository's own** `README.md` and the `scripts` in its
+  `package.json`, with the package manager its lock file belongs to. Do not carry a command over
+  from another repository or from memory. If it has no lint, typecheck or test script, say so; do
+  not invent one.
+- **Commit only inside the repository folder.** ADAM's files (`CLAUDE.md`, `.claude/`,
+  `project-bible/`, `.adam/`) are this workspace's and never go into a team repository.
+
+## Where the screen comes from
+
+**The screen spec comes from ADAM, not from local folders.** ADAM holds the screens, journeys and API
+contracts at a release; `adam_pull` writes the ones a ticket links under `.adam/work/<ticket>/` in
+this folder, and `adam_screen`, `adam_journey` and `adam_contract` answer the rest. A screen
+description, wireframe, mock-up or spec file found anywhere else - in a repository, in another
+clone, in a download - is not the spec, however recent it looks. Where it disagrees with ADAM, ADAM
+wins: say so.
 
 ## Coding standards
 
@@ -55,31 +60,41 @@ Read these when the work calls for them, not before:
 
 | Read | When |
 |---|---|
-| `project-bible/setup/api-conventions.md` | adding or changing an endpoint, an error or paging |
+| `project-bible/setup/api-conventions.md` | calling an endpoint, handling an error or paging |
 | `project-bible/setup/git-and-mrs.md` | before a commit or a merge request |
 | `project-bible/setup/llm-conventions.md` | before a commit: what AI-written code must carry |
-| `project-bible/setup/data-and-storage.md` | touching tables, migrations or local storage |
-| `project-bible/setup/config-and-secrets.md` | adding a setting, a connection string or a secret |
+| `project-bible/setup/data-and-storage.md` | touching local storage |
+| `project-bible/setup/config-and-secrets.md` | adding a setting or a secret |
 | `project-bible/setup/dependencies.md` | adding a package |
 | `project-bible/setup/adding-things.md` | adding a module, a permission or an integration |
 
-In one session, a document already read does not need reading again.
+In one session, a document already read does not need reading again. Where the standards name a
+path or a package of the old one-workspace layout, follow the rule and find where the app's
+repository keeps the equivalent; ask when it has none.
 
 ## Hard rules
 
-- Apps depend only on packages (`.eslintrc.cjs` enforces it). A package never imports an app.
-- **No app talks to SQLite or does its own sync.** Everything offline goes through `@ticvai/offline-core`.
+- **The screen and its API calls come from ADAM:** build what the screen and the contract say.
 - Clients never compute permissions; they read `effectivePermissions` from the session.
-- Ids created on a device are UUIDv7 from `newId()`, the format the server mints; human codes
-  people read or type (order numbers, ticket codes) are separate fields.
+- Ids created on a device are UUIDv7, the format the server mints; human codes people read or type
+  (order numbers, ticket codes) are separate fields.
 - Function components with hooks, named exports, no `any`.
-- The screen and its API calls come from ADAM: build what the screen and contract say.
+- **Offline goes through one store.** In an app that works offline, a write the contract marks
+  offline-capable goes through the repository's single offline store and outbox; no screen talks
+  to SQLite or does its own sync (frontend-patterns 4.4). Use the one the app's repository has; if it
+  has none and the ticket needs it, say so rather than writing one inside the ticket.
+- **The API client is generated, not written.** Calls go through the client generated from the
+  contracts. Where the app's repository does not have it yet, build against the contract's types as the
+  contract names them and stub the calls; never hand-write a client. Writes send an
+  `Idempotency-Key`, and an error - RFC 9457 problem details - is told apart by its problem `type`,
+  never by the status or the text (api-conventions).
 
 ## Working a ticket (ADAM)
 
 ADAM is connected for this folder. It holds the screens, journeys and contracts; OpenProject holds the tickets.
 
-1. `adam_pull` the ticket with `dir` set to this folder. Read `.adam/work/<ticket>/README.md`,
+1. `adam_pull` the ticket with `dir` set to this folder - the workspace, where this file is, not the
+   repository folder - so `.adam/` stays out of the team's repository. Read `.adam/work/<ticket>/README.md`,
    then only the linked files it lists. Ask ADAM (`adam_screen`, `adam_journey`, `adam_contract`)
    rather than guessing a name or a shape.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
@@ -90,27 +105,26 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
    diffs, and they choose between taking the change (`adam_repin`) and raising a change request.
    **Re-pin required** - a breaking contract change on an operation this ticket produces or
    consumes - is not a choice: say so, then `adam_repin` with `breaking: true` before building.
-2. Build exactly what the ticket and its linked artefacts describe, in the app it names.
-3. Add tests next to the code (`*.test.ts[x]`). `pnpm lint`, `pnpm typecheck` and `pnpm test` must pass.
+2. Build exactly what the ticket and its linked artefacts describe, in the repository for the
+   ticket's platform (the table above), following its existing structure. Nothing outside the ticket.
+3. Add tests the way that repository already writes them. Its lint, typecheck and test commands
+   (see "Git, build, test and lint") must pass, run inside its folder.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
 To see a teammate's work, ask ("what is Hrushikant working on?", "what's everyone doing?"):
 `adam_team` answers, read-only, with their open and in-progress tickets and what they finished lately.
 
+A ticket's commit holds the ticket's change, made in the repository folder. Where ADAM's files sit
+inside a repository (the setup-on-a-clone case above), setup has listed them in
+`.git/info/exclude`; they are still not part of any ticket, so never force-add them.
+
 ## Ticket kinds
 
 | Ticket | Built means | Tested means |
 |---|---|---|
-| **[FE]** (`APP-*`) | the screen in the app its `implementation.app` names, with every state the screen lists | component tests per state; `pnpm lint`, `pnpm typecheck`, `pnpm test` pass |
+| **[FE]** (`APP-*`) | the screen, with every state the screen lists, in the repository for its platform | component tests per state; the repository's lint, typecheck and tests pass |
 | **[DevOps]** / **[Onboarding]** | see the description; nothing is linked, and that is normal | as the description says |
-
-**The API client is generated, not written.** `packages/api-client` is filled from the contracts by
-the `SETUP-CLIENTS` ticket. Until it lands, a screen ticket builds against the client's generated
-types as the contract names them and stubs the calls; do not hand-write a client. What is there
-already is the transport the generated operations call: `createApiClient` sends the `Idempotency-Key`
-(a UUIDv7) on every write, returns the `X-Consistency-Token`, and throws a problem+json response as
-`ApiError` - switch on its `slug`, never on the status or the text.
 
 **Wireframes.** Build from a screen's wireframe only when its record says it is client-verified.
 Otherwise build the logic (calls, state, offline) with a placeholder layout, and never from a
@@ -118,7 +132,7 @@ wireframe that did not come through ADAM.
 
 ## Searching pulled files
 
-`.adam/` is git-ignored, so **Grep skips it unless told not to**: search pulled files with
+`.adam/` carries its own `.gitignore`, so **Grep may skip it**: search pulled files with
 `--no-ignore` (or read them directly). Read works as usual.
 
 ## When the package is wrong

@@ -74,7 +74,13 @@ which:
    the project (`Greenleaf Demo` → `GreenleafDemo`, `ticvai` → `greenleaf-demo`), `CLAUDE.md`,
    `.claude\` (permissions with `adam_apply` always asking, and `/ticket`, `/board`, `/done`), the
    role's standards in `project-bible\setup\` (not renamed), and a git repository with the
-   starter as its first commit. A folder that already has files is only connected, never changed,
+   starter as its first commit. **Frontend** (13 Oct 2026: one repository per app) is different: a new
+   folder is a workspace with ADAM's files only (`CLAUDE.md`, `.claude\`, `project-bible\setup\`),
+   setup prints one clone command per app repository, and the developer clones inside it and opens
+   Claude Code in the workspace (`-UseStarter` brings back the old Nx starter). A folder that already
+   has files keeps every one of them and gets ADAM's own where they are missing, nothing committed;
+   in a repository, what was added goes into `.git\info\exclude`, so it never reaches the team's
+   repository (`setup-check.mjs` checks both orders),
 7. copies the connector to `%USERPROFILE%\.adam\connector` (without the starters: the installed
    copy can reconnect and remove, not create),
 8. registers it with `claude mcp add -s local` for that folder only — or `-s user` for

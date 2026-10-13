@@ -16,18 +16,26 @@
       3. checks that they actually sign in to ADAM - before changing anything,
       4. lists the ADAM projects you can open and asks which one to use,
       5. asks whether you are a backend or a frontend developer,
-      6. creates <project>-<role> beside setup.cmd: a clone of the team's repository when the
-         project has one for your role (TICVAI backend: GitLab ticvai/ticvai-backend), else the starter:
+      6. backend: creates <project>-<role> beside setup.cmd: a clone of the team's repository when the
+         project has one (TICVAI: GitLab ticvai/ticvai-backend), else the starter:
          the code skeleton, CLAUDE.md, .claude\ (permissions and /ticket,
          /board, /done) and project-bible\setup\ (the coding standards),
-         renamed for the project, as a new git repository,
+         renamed for the project, as a new git repository.
+         frontend: the frontend is one repository per app (TICVAI: six, in the GitLab group
+         ticvai-frontend). Setup builds no frontend code: it creates <project>-frontend as a
+         workspace holding ADAM's files only, and ends by printing one clone command per app
+         repository; the developer clones theirs inside it and opens Claude Code in the
+         workspace. -UseStarter brings back the old Nx starter instead,
       7. copies the connector to %USERPROFILE%\.adam\connector,
       8. registers it with Claude Code for that folder only,
       9. and, if you want, runs the full connection test.
 
     Only Claude Code sessions opened in that folder - in VS Code or a terminal -
-    can use ADAM. Pointed at a folder that already has files, setup changes
-    none of them and only connects ADAM there (after a password change, say).
+    can use ADAM. Pointed at a folder that already has code - a clone, or a
+    folder setup made before - setup changes none of its files. It adds ADAM's
+    own (CLAUDE.md, .claude\, project-bible\setup\) where they are missing,
+    commits nothing, and connects ADAM there. Run again (after a password
+    change, say), it finds them and adds nothing.
     uninstall.cmd removes every registration.
 
     ASCII only, on purpose: Windows PowerShell 5.1 reads a script saved without
@@ -44,16 +52,24 @@
     The ADAM project id (for example ticvai). Asked for when not given.
 
 .PARAMETER Role
-    backend or frontend - which starter a new folder is made from. Asked for when not given.
+    backend or frontend - which CLAUDE.md, commands and standards the folder gets. Asked for when not given.
 
 .PARAMETER Folder
-    The project folder. A new or empty one is created from the starter; one
-    with files in it is only connected. Asked for when not given. "all"
-    connects every folder and creates nothing.
+    The project folder. A new or empty one is created from the team's repository or the
+    starter (frontend: a workspace, see -UseStarter); one with files in it keeps every file and gets
+    ADAM's own where they are missing. Asked for when not given; given here, it is not
+    asked about again. "all" connects every folder and creates or adds nothing.
 
 .PARAMETER RepoUrl
     The git repository a new folder is cloned from, instead of the team repository setup knows
-    for the project and role. Without one, the folder is made from the starter.
+    for the project and role. Without one, the folder is made from the starter. A frontend
+    developer can name their app's repository here and get the clone and ADAM's files in one run.
+
+.PARAMETER UseStarter
+    Frontend only. Make a new or empty folder from the old frontend starter - one Nx workspace
+    with every app in it - as setup did before the frontend became one repository per app.
+    Without it, a new frontend folder is a workspace with ADAM's files only, and the app
+    repositories are cloned inside it.
 
 .PARAMETER GitUser
     Your GitLab username for that clone. Asked for when not given; Git asks for the password.
@@ -80,6 +96,10 @@
     C:\work\setup.cmd -Project ticvai -Role backend -Folder C:\work\ticvai-backend
 
 .EXAMPLE
+    C:\work\setup.cmd -Project ticvai -Role frontend -Folder C:\work\ticvai-frontend
+    (then, inside C:\work\ticvai-frontend, the clone line for your app that setup prints)
+
+.EXAMPLE
     .\setup.ps1 -RemoveFolder C:\work\ticvai-backend
 
 .EXAMPLE
@@ -94,6 +114,7 @@ param(
     [string]$Folder = '',
     [string]$RepoUrl = '',
     [string]$GitUser = '',
+    [switch]$UseStarter,
     [ValidateSet('ask', 'yes', 'no')]
     [string]$Test = 'ask',
     [switch]$Uninstall,
@@ -117,11 +138,29 @@ $Starters = Join-Path $Here 'starters'
 $TeamRepos = @{
     'ticvai/backend' = 'http://gitlab.softlabsgroup.in/ticvai/ticvai-backend.git'
 }
+# The frontend is one repository per app (13 Oct 2026; before that, one Nx workspace with every
+# app in it). The lead's call: "first we run adam setup and then within that git clone". A new
+# frontend folder is a workspace: setup puts ADAM's files in it (Add-AdamFiles) and connects it,
+# and the developer clones their app's repository - or two, for somebody on two apps - inside it,
+# one subfolder each. So ADAM's files never enter a team repository, nothing can collide with a
+# CLAUDE.md the team commits, and setup builds no frontend code. Setup clones none of these; it
+# prints them. Same order as the GitLab group.
+$AppRepos = @{
+    'ticvai/frontend' = @(
+        'http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git',
+        'http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git',
+        'http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-employee-app.git',
+        'http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-kiosk.git',
+        'http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git',
+        'http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git')
+}
+# What a role needs installed to build. The frontend repositories each say in their own README;
+# only the old starter is known to need pnpm, so it is checked only with -UseStarter.
 $Roles = [ordered]@{
     backend  = [pscustomobject]@{ Label = 'Backend  (.NET 10 API, clean architecture)'; Check = 'dotnet'; Docs = @(
         'naming-and-style', 'backend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
         'llm-conventions', 'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
-    frontend = [pscustomobject]@{ Label = 'Frontend (Nx workspace: React Native apps and a web app)'; Check = 'pnpm'; Docs = @(
+    frontend = [pscustomobject]@{ Label = 'Frontend (your app''s repository: React Native or React web)'; Check = 'pnpm'; Docs = @(
         'naming-and-style', 'frontend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
         'llm-conventions', 'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
 }
@@ -355,6 +394,195 @@ function Copy-StarterDocs([string]$Target, [string]$RoleName) {
     Set-Content -LiteralPath (Join-Path $bible 'README.md') -Value $index -Encoding UTF8
 }
 
+# TICVAI, Ticvai and ticvai in these files' contents become the project's names (see Get-CodeName).
+# Only text files, by extension; a byte-order mark is kept if the file had one.
+function Set-ProjectNames([string[]]$Paths, $picked) {
+    $id = $picked.id
+    if ($id -eq 'ticvai') { return }
+    $codeName = Get-CodeName $picked
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    $utf8Bom = New-Object System.Text.UTF8Encoding($true)
+    foreach ($path in $Paths) {
+        if (-not ($TextFiles -contains [IO.Path]::GetExtension($path).ToLower())) { continue }
+        $bytes = [IO.File]::ReadAllBytes($path)
+        $bom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+        $text = [IO.File]::ReadAllText($path)
+        $new = $text.Replace('TICVAI', $codeName).Replace('Ticvai', $codeName).Replace('ticvai', $id)
+        if ($new -cne $text) {
+            if ($bom) { [IO.File]::WriteAllText($path, $new, $utf8Bom) }
+            else { [IO.File]::WriteAllText($path, $new, $utf8) }
+        }
+    }
+}
+
+# What ADAM owns in a project folder, and the only thing setup puts into one that already has code
+# - a clone of the team's repository, or a folder the developer cloned themselves (13 Oct 2026: a
+# frontend developer ran setup on her app's clone and got none of it, because a folder with files
+# was only connected) - or into a new frontend workspace, which holds nothing else. Exactly what a
+# new folder gets beyond the starter's code:
+#   CLAUDE.md               how this project works and how to pull a ticket through ADAM,
+#   .claude\                the permissions and /ticket, /board, /done, /cr, /update-adam,
+#   .mcp.json               when the starter has one (none today: the registration is per folder),
+#   project-bible\setup\    the role's coding standards, with an index.
+# Never the starter's code - apps, packages, src, tests, nx.json, package.json, lock files, the
+# solution, .gitignore, CI: the repository has its own, and a second copy would be a second app.
+# .adam\ is not made here either: the connector makes it on the first pull, as for a new folder.
+#
+# Each is added only where it is missing. Nothing that is there is overwritten, nothing is deleted,
+# nothing is staged or committed. .claude\ is filled file by file, so a repository that keeps its
+# own .claude\settings.json still gets the commands, and its settings stay its own. Returns what
+# it added, in the words a developer sees; empty when nothing was missing.
+$AdamItems = @('CLAUDE.md', '.claude', '.mcp.json')
+function Add-AdamFiles([string]$Target, [string]$RoleName, $picked) {
+    $source = Join-Path $Starters $RoleName
+    if (-not (Test-Path -LiteralPath $source)) { return $null }
+    $added = @()
+    $copied = @()
+    foreach ($item in $AdamItems) {
+        $from = Join-Path $source $item
+        $to = Join-Path $Target $item
+        if (-not (Test-Path -LiteralPath $from)) { continue }
+        if (Test-Path -LiteralPath $from -PathType Leaf) {
+            if (Test-Path -LiteralPath $to) { continue }
+            Copy-Item -LiteralPath $from -Destination $to
+            $added += $item
+            $copied += $to
+            continue
+        }
+        # A file where the folder should be is the repository's business; left alone.
+        if (Test-Path -LiteralPath $to -PathType Leaf) { continue }
+        $whole = -not (Test-Path -LiteralPath $to)
+        $base = (Get-Item -LiteralPath $from -Force).FullName.TrimEnd('\')
+        $some = @()
+        foreach ($file in @(Get-ChildItem -LiteralPath $base -Recurse -File -Force)) {
+            $relative = $file.FullName.Substring($base.Length + 1)
+            $dest = Join-Path $to $relative
+            if (Test-Path -LiteralPath $dest) { continue }
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dest) | Out-Null
+            Copy-Item -LiteralPath $file.FullName -Destination $dest
+            $some += "$item\$relative"
+            $copied += $dest
+        }
+        if ($whole -and $some.Count) { $added += $item } else { $added += $some }
+    }
+    Set-ProjectNames $copied $picked
+    # The standards as one folder: its index lists what is in it, so it is not topped up file by file.
+    if (-not (Test-Path -LiteralPath (Join-Path $Target 'project-bible\setup'))) {
+        Copy-StarterDocs $Target $RoleName
+        $added += 'project-bible\setup'
+    }
+    return ,$added
+}
+
+# Kept out of git on this machine only. .git\info\exclude is git's own per-clone ignore list: it
+# is never committed or pushed, so the team's .gitignore - a tracked file - is not touched, and a
+# file the repository tracks is never hidden by it. Listed, when the folder is itself a repository
+# (somebody ran setup on their clone, or a team clone setup made):
+#   .adam/                        pulled copies of the package and a developer's own notes and log
+#                                 (the connector also writes .adam\.gitignore on the first pull;
+#                                 this covers the folder before that, and tools that read only
+#                                 the repository's own rules),
+#   .claude/settings.local.json   Claude Code's personal settings for one person on one machine,
+#   and exactly what Add-AdamFiles added this run, by its own path - CLAUDE.md, .claude/ (or the
+#   files it added inside the repository's own .claude/), project-bible/setup/. The lead's rule
+#   (13 Oct 2026): ADAM's files never enter a team repository. Left visible, one `git add -A` for
+#   a ticket would commit them for everybody; by its own path, nothing the team adds later under
+#   .claude/ or project-bible/ is hidden.
+# A frontend workspace is not a repository, so none of this applies there: the clones inside it
+# never see ADAM's files at all.
+# Only at the top of a repository, where these patterns mean the folder setup was given.
+# Returns the lines it added; empty when they were all there or this is not a repository.
+$LocalOnly = @('.adam/', '.claude/settings.local.json')
+function Add-GitExcludes([string]$Target, $added) {
+    $dotGit = Join-Path $Target '.git'
+    if (-not (Test-Path -LiteralPath $dotGit)) { return ,@() }
+    $file = Join-Path $dotGit 'info\exclude'
+    if (Test-Path -LiteralPath $dotGit -PathType Leaf) {
+        # A worktree or a submodule: .git is a file naming the real folder, and git knows where.
+        $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $git) { return ,@() }
+        $ErrorActionPreference = 'Continue'
+        $said = (& $git.Source -C $Target rev-parse --git-path info/exclude 2>$null | Select-Object -First 1)
+        $ErrorActionPreference = 'Stop'
+        if (-not $said) { return ,@() }
+        $file = $said.Trim().Replace('/', '\')
+        if (-not [IO.Path]::IsPathRooted($file)) { $file = Join-Path $Target $file }
+    }
+    $wanted = @($LocalOnly)
+    foreach ($item in @($added | Where-Object { $_ })) {
+        $line = '/' + $item.Replace('\', '/')
+        if (Test-Path -LiteralPath (Join-Path $Target $item) -PathType Container) { $line += '/' }
+        $wanted += $line
+    }
+    $have = @()
+    if (Test-Path -LiteralPath $file) { $have = @(Get-Content -LiteralPath $file | ForEach-Object { $_.Trim() }) }
+    $missing = @($wanted | Where-Object { $have -notcontains $_ })
+    if (-not $missing.Count) { return ,@() }
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $file) | Out-Null
+    $text = ''
+    if (Test-Path -LiteralPath $file) {
+        $old = [IO.File]::ReadAllText($file)
+        if ($old.Length -and -not $old.EndsWith("`n")) { $text = "`n" }
+    }
+    $text += "# ADAM setup: ADAM's files and local-only items, kept out of this repository`n" + (($missing | ForEach-Object { "$_`n" }) -join '')
+    [IO.File]::AppendAllText($file, $text, (New-Object System.Text.UTF8Encoding($false)))
+    return ,$missing
+}
+
+# One line each for what Add-AdamFiles and Add-GitExcludes did, or that nothing was missing.
+function Show-Added($added, $excluded) {
+    if ($null -eq $added) {
+        Note "ADAM's files (CLAUDE.md, .claude\, project-bible\setup\) cannot be added from the installed copy:"
+        Note 'it has no starters. Run setup.cmd from the unzipped setup folder to add them.'
+    } elseif ($added.Count) {
+        Good ("added what ADAM needs and the folder lacked, not committed: " + ($added -join ', '))
+    } else {
+        Good "nothing was missing: ADAM's files are already there"
+    }
+    if ($excluded -and $excluded.Count) {
+        Note ("kept out of git on this computer only (.git\info\exclude): " + ($excluded -join ', '))
+    }
+}
+
+# The frontend workspace's next step: one clone command per app repository, ready to copy, and
+# where to open Claude Code afterwards.
+#
+# **Opened in the workspace, not in the clone.** The registration is Claude Code's local scope,
+# filed under this one folder, and a session started in a subfolder does not get it - checked on
+# Claude Code 2.1.280 with `claude mcp get` from a subfolder that is a git repository and from one
+# that is not: "No MCP server named". The workspace's CLAUDE.md would still load there (Claude Code
+# reads CLAUDE.md from every folder above), but ADAM's tools, /ticket and the permissions would not.
+#
+# The username goes into the address and the credentials are sent up front, as for the backend
+# clone in New-ProjectFolder: a private GitLab project answers "not found" without them, and Git
+# never asks.
+function Show-CloneCommands([string]$Workspace, $picked, [string]$user) {
+    $repos = @($AppRepos["$($picked.id)/frontend"] | Where-Object { $_ })
+    if (-not $user) { $user = 'YOUR-GITLAB-USERNAME' }
+    $cloned = @(Get-ChildItem -LiteralPath $Workspace -Directory -Force -ErrorAction SilentlyContinue |
+        Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.git') } | ForEach-Object { $_.Name })
+    Write-Host '  1. Clone your app''s repository inside this folder: copy the line for your app'
+    Write-Host '     (on two apps, both lines). Git asks for your GitLab password.'
+    Write-Host "       cd `"$Workspace`"" -ForegroundColor Gray
+    if ($repos.Count) {
+        foreach ($url in $repos) {
+            $address = $url -replace '^(https?)://', ('$1://' + [uri]::EscapeDataString($user) + '@')
+            Write-Host "       git -c http.proactiveAuth=basic clone $address" -ForegroundColor Gray
+        }
+        $first = [IO.Path]::GetFileNameWithoutExtension(($repos[0] -split '/')[-1])
+        Write-Host "     Each lands in its own subfolder, for example $(Join-Path $Workspace $first)."
+    } else {
+        Write-Host "     (ADAM does not list the frontend repositories for $($picked.id); your lead has them.)"
+    }
+    if ($cloned.Count) { Write-Host ("     Already cloned here: " + ($cloned -join ', ')) }
+    Write-Host '     Commit and push inside your repository''s folder; ADAM''s files stay out of it.'
+    Write-Host "  2. Open VS Code / Claude Code in $Workspace, not inside the repo folder,"
+    Write-Host '     so ADAM and the project bible load. In VS Code: File > Open Folder, this folder; or'
+    Write-Host "       cd `"$Workspace`"; claude" -ForegroundColor Gray
+    Write-Host '     A session opened in the repository''s own folder does not get ADAM: Claude Code'
+    Write-Host '     connects it to this folder only, not to the folders inside it.'
+}
+
 function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
     $script:FolderFrom = "the $RoleName starter"
     $source = Join-Path $Starters $RoleName
@@ -384,7 +612,10 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
         $ErrorActionPreference = 'Stop'
         if ($cloned) {
             $hasCode = @(Get-ChildItem -LiteralPath $Target -Force | Where-Object { $_.Name -ne '.git' }).Count -gt 0
-            if (-not $hasCode) {
+            # A frontend app repository that is still empty gets ADAM's files only: its code is its
+            # team's to start, not the old all-apps starter's.
+            $starterFirst = -not $hasCode -and ($RoleName -ne 'frontend' -or $UseStarter)
+            if ($starterFirst) {
                 # An empty repository: the starter is its first commit, ready to push.
                 Copy-Item -Path (Join-Path $source '*') -Destination $Target -Recurse -Force
                 Copy-StarterDocs $Target $RoleName
@@ -394,51 +625,33 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
                 $ErrorActionPreference = 'Stop'
                 Good "cloned $url (empty), with the starter as its first commit"
                 Note 'Push it once, if you are the first: git push -u origin HEAD'
+                $script:StarterCode = $true
             } else {
                 # The team's code stays as it is; only what ADAM needs and the clone lacks is added.
-                $added = @()
-                foreach ($item in @('CLAUDE.md', '.claude', '.mcp.json')) {
-                    $from = Join-Path $source $item
-                    $to = Join-Path $Target $item
-                    if ((Test-Path -LiteralPath $from) -and -not (Test-Path -LiteralPath $to)) {
-                        Copy-Item -LiteralPath $from -Destination $to -Recurse -Force
-                        $added += $item
-                    }
-                }
-                if (-not (Test-Path -LiteralPath (Join-Path $Target 'project-bible\setup'))) {
-                    Copy-StarterDocs $Target $RoleName
-                    $added += 'project-bible\setup'
-                }
                 Good "cloned $url"
-                if ($added.Count) { Note ("added what ADAM needs and the repository lacks, not committed: " + ($added -join ', ')) }
+                $added = Add-AdamFiles $Target $RoleName $picked
+                Show-Added $added (Add-GitExcludes $Target $added)
             }
             $script:FolderFrom = "a clone of $url"
             return (Get-CodeName $picked)
         }
-        Note "Could not clone $url. A wrong password says Authentication failed; a right one that says not found means your GitLab account has no access to the project yet. Starting from the starter instead; ask your lead for access and clone it later."
         if (Test-Path -LiteralPath $Target) { Remove-Item -LiteralPath $Target -Recurse -Force -ErrorAction SilentlyContinue }
+        $why = "Could not clone $url. A wrong password says Authentication failed; a right one that says not found means your GitLab account has no access to the project yet."
+        if ($RoleName -eq 'frontend' -and -not $UseStarter) {
+            Stop-Setup "$why Ask your lead for access, clone it yourself, then run setup on that folder."
+        }
+        Note "$why Starting from the starter instead; ask your lead for access and clone it later."
     }
     New-Item -ItemType Directory -Force -Path $Target | Out-Null
     # -Force brings the dot-folders too: .claude and .github matter.
     Copy-Item -Path (Join-Path $source '*') -Destination $Target -Recurse -Force
+    $script:StarterCode = $true
 
     $codeName = Get-CodeName $picked
-    $id = $picked.id
-    if ($id -ne 'ticvai') {
-        $utf8 = New-Object System.Text.UTF8Encoding($false)
-        $utf8Bom = New-Object System.Text.UTF8Encoding($true)
-        foreach ($file in @(Get-ChildItem -LiteralPath $Target -Recurse -File -Force)) {
-            if ($file.FullName -like '*\project-bible\*' -or $file.Name -eq 'pnpm-lock.yaml') { continue }
-            if (-not ($TextFiles -contains $file.Extension.ToLower())) { continue }
-            $bytes = [IO.File]::ReadAllBytes($file.FullName)
-            $bom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
-            $text = [IO.File]::ReadAllText($file.FullName)
-            $new = $text.Replace('TICVAI', $codeName).Replace('Ticvai', $codeName).Replace('ticvai', $id)
-            if ($new -cne $text) {
-                if ($bom) { [IO.File]::WriteAllText($file.FullName, $new, $utf8Bom) }
-                else { [IO.File]::WriteAllText($file.FullName, $new, $utf8) }
-            }
-        }
+    if ($picked.id -ne 'ticvai') {
+        Set-ProjectNames @(Get-ChildItem -LiteralPath $Target -Recurse -File -Force |
+            Where-Object { $_.FullName -notlike '*\project-bible\*' -and $_.Name -ne 'pnpm-lock.yaml' } |
+            ForEach-Object { $_.FullName }) $picked
         # Deepest first, so a folder is renamed after what is inside it.
         $named = @(Get-ChildItem -LiteralPath $Target -Recurse -Force |
             Where-Object { $_.Name -clike '*TICVAI*' } |
@@ -698,8 +911,10 @@ if ($Folder -ne 'all') {
         }
     }
     Good $Roles[$Role].Label
-    if (-not (Get-Command $Roles[$Role].Check -ErrorAction SilentlyContinue)) {
-        Note "$($Roles[$Role].Check) is not installed. The folder is still created; install it before building."
+    $check = $Roles[$Role].Check
+    if ($Role -eq 'frontend' -and -not $UseStarter) { $check = '' }
+    if ($check -and -not (Get-Command $check -ErrorAction SilentlyContinue)) {
+        Note "$check is not installed. Setup carries on; install it before building."
     }
 }
 
@@ -723,8 +938,18 @@ if (-not $parent -or ($notHere -contains $parent) -or $parent.StartsWith("$env:w
 }
 $default = Join-Path $parent "$Project-$Role"
 $create = $false
+# A new frontend folder is a workspace for the developer's clones, not a codebase (see $AppRepos).
+$asWorkspace = $Role -eq 'frontend' -and -not $UseStarter -and -not $RepoUrl
+# Named on the command line, the folder is the answer: asking again would stop an unattended run,
+# and setup changes no file that is already there.
+$folderGiven = [bool]$Folder
 Note 'Only Claude Code sessions opened in this folder - in VS Code or a terminal - will be able to use ADAM.'
-if ($Folder -ne 'all') { Note 'Press Enter to create the folder shown, or paste another path.' }
+if ($Folder -ne 'all' -and $asWorkspace) {
+    Note 'Press Enter to create the folder shown, or paste another path. It is your frontend workspace:'
+    Note 'ADAM''s files go in it, and you clone your app''s repository inside it afterwards.'
+} elseif ($Folder -ne 'all') {
+    Note 'Press Enter to create the folder shown, or paste another path.'
+}
 while ($true) {
     if (-not $Folder) {
         $Folder = (Read-Host "   Folder [$default]").Trim().Trim('"')
@@ -735,24 +960,40 @@ while ($true) {
     if ($Folder -match '^[A-Za-z]:$') { Note 'Not a whole drive - name a folder.'; $Folder = ''; continue }
     if (Test-EmptyFolder $Folder) { $create = $true; break }
     if (-not (Test-Path -LiteralPath $Folder -PathType Container)) {
-        Note "$Folder is a file."; $Folder = ''; continue
+        Note "$Folder is a file."; $Folder = ''; $folderGiven = $false; continue
     }
-    Note "$Folder already has files in it. Setup will not change them."
-    $reply = (Read-Host '   Connect ADAM to it as it is? [Y/n]').Trim().ToLower()
+    Note "$Folder already has code. Setup will not change any existing file; it adds ADAM's files where they are missing (CLAUDE.md, .claude, project-bible\setup)."
+    if ($folderGiven) { break }
+    $reply = (Read-Host '   Go ahead? [Y/n]').Trim().ToLower()
     if ($reply -eq '' -or $reply -eq 'y' -or $reply -eq 'yes') { break }
     $Folder = ''
 }
 $scope = 'user'
 $where = ''
+$script:StarterCode = $false
 if ($Folder -ne 'all') {
-    if ($create) {
+    if ($create -and $asWorkspace) {
+        # ADAM's files and nothing else, and no git repository: the clones inside are the repositories.
+        New-Item -ItemType Directory -Force -Path $Folder | Out-Null
+        $added = Add-AdamFiles $Folder $Role $picked
+        if ($null -eq $added) {
+            Stop-Setup "The $Role starter is missing next to this script. Run setup.cmd from the unzipped folder, not from the installed copy."
+        }
+        Good "created the frontend workspace $Folder"
+        Good ("with ADAM's files only: " + ($added -join ', '))
+    } elseif ($create) {
         $codeName = New-ProjectFolder $Folder $Role $picked
         Good "created $Folder from $script:FolderFrom ($codeName)"
     }
     $scope = 'local'
     $where = Get-TrueCase $Folder
-    if (-not $create) { Good "$where (files left as they are)" }
+    if (-not $create) {
+        Good "$where (existing files left as they are)"
+        $added = Add-AdamFiles $where $Role $picked
+        Show-Added $added (Add-GitExcludes $where $added)
+    }
 } else {
+    # Every folder: connected only. Which folders would get ADAM's files is not setup's to guess.
     Good 'every folder'
 }
 
@@ -884,30 +1125,51 @@ if ($run -eq 'yes') {
 $password = $null
 
 Write-Host ''
+# A frontend workspace ends with its clone commands, which carry the GitLab username. Asked here,
+# before the summary; a run with no console to ask on prints a placeholder instead.
+$isWorkspace = $scope -eq 'local' -and $Role -eq 'frontend' -and -not $script:StarterCode -and
+    -not (Test-Path -LiteralPath (Join-Path $where '.git'))
+$cloneUser = $GitUser
+if ($isWorkspace -and -not $cloneUser) {
+    Write-Host ''
+    try { $cloneUser = (Read-Host '   Your GitLab username, for the clone commands (Enter to skip)').Trim() } catch { $cloneUser = '' }
+}
+
+Write-Host ''
 Write-Host 'Done.' -ForegroundColor White
 Write-Host ''
+# The numbered steps after the first one (or two, in a frontend workspace).
+$next = 2
 if ($scope -eq 'user') {
     Write-Host '  1. Restart Claude Code. Every folder can use ADAM.'
+} elseif ($isWorkspace) {
+    # A frontend workspace: the clones come next, and where to open Claude Code.
+    Show-CloneCommands $where $picked $cloneUser
+    $next = 3
+    Write-Host '     CLAUDE.md, .claude\ and project-bible\setup\ tell Claude how to work here.'
+    Write-Host '     Shortcuts in Claude Code:  /ticket 6046   /board   /done 6046' -ForegroundColor Gray
 } else {
     Write-Host '  1. Open that folder and start Claude Code there - in VS Code (File > Open Folder),'
     Write-Host '     or in a terminal:' -NoNewline
     Write-Host "  cd `"$where`"; claude" -ForegroundColor Gray
     Write-Host '     Claude Code sessions in any other folder, or in a subfolder of it, cannot use ADAM.'
-    if ($create -and $Role -eq 'backend') {
+    if ($Role -eq 'backend' -and $create) {
         Write-Host '     Build it once:' -NoNewline
         Write-Host '  dotnet test' -ForegroundColor Gray
-    } elseif ($create -and $Role -eq 'frontend') {
+    } elseif ($Role -eq 'frontend' -and $script:StarterCode) {
         Write-Host '     Install it once:' -NoNewline
         Write-Host '  pnpm install' -ForegroundColor Gray
+    } elseif ($Role -eq 'frontend') {
+        Write-Host '     Install and build it the way its README says; CLAUDE.md tells Claude to do the same.'
     }
-    if ($create) {
+    if (Test-Path -LiteralPath (Join-Path $where 'CLAUDE.md')) {
         Write-Host '     CLAUDE.md, .claude\ and project-bible\setup\ tell Claude how this project works.'
         Write-Host '     Shortcuts in Claude Code:  /ticket 6046   /board   /done 6046' -ForegroundColor Gray
     }
 }
-Write-Host "  2. Store your OpenProject token once, so Claude can see your tickets:"
+Write-Host "  $next. Store your OpenProject token once, so Claude can see your tickets:"
 Write-Host "     $ViewerUrl/settings.html#openproject"
-Write-Host '  3. Then ask Claude, for example:'
+Write-Host "  $($next + 1). Then ask Claude, for example:"
 Write-Host "       What's on my board?" -ForegroundColor Gray
 Write-Host '       Pull ticket 6046 into this folder and tell me what it touches.' -ForegroundColor Gray
 Write-Host '       I have finished 6046 - propose closing it with a comment.' -ForegroundColor Gray
