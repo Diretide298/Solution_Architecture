@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import base64
 import difflib
+import gzip
 import json
 import os
 import re
@@ -23,6 +24,8 @@ import threading
 import time
 import urllib.error
 import urllib.request
+import zlib
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 from typing import List, Optional
 
@@ -331,6 +334,15 @@ CHANGE_STATUS_LABEL = {
 @app.on_event("startup")
 def _startup() -> None:
     db.init()
+    # The project reads this process held when it last stopped, and the loop
+    # that keeps them fresh. See "the delivery overview" below.
+    _overview_restore()
+    _start_warm()
+
+
+@app.on_event("shutdown")
+def _shutdown() -> None:
+    _stop_warm()
 
 
 # ── shapes ───────────────────────────────────────────────────────────
@@ -2170,14 +2182,20 @@ def my_board(
     """
     scope = _pms_scope(account, project_id)
     endpoint, token = _pms_for(account["id"])
-    try:
-        items = openproject.mine(endpoint, token, project_id=scope["pmsId"])
+    # The two halves asked for side by side (13 October): they are independent
+    # reads, and one after the other they were the board's whole wait twice.
+    with ThreadPoolExecutor(max_workers=2) as both:
+        open_asked = both.submit(openproject.mine, endpoint, token, project_id=scope["pmsId"])
         # The other half of the same board. A list of only what is left reads
         # as a list of things you have not done; what somebody closed this week
         # is the part that says the week happened.
-        finished = openproject.mine_finished(endpoint, token, project_id=scope["pmsId"])
-    except (openproject.Blocked, openproject.Refused) as exc:
-        raise HTTPException(502, str(exc))
+        finished_asked = both.submit(openproject.mine_finished, endpoint, token,
+                                     project_id=scope["pmsId"])
+        try:
+            items = open_asked.result()
+            finished = finished_asked.result()
+        except (openproject.Blocked, openproject.Refused) as exc:
+            raise HTTPException(502, str(exc))
     # Checked again here, in case an instance ignores the filter: a board that
     # quietly shows other products' tickets is the thing this scope prevents.
     items = [item for item in items if item.get("projectId") == scope["pmsId"]]
@@ -2631,56 +2649,102 @@ def team_board(
 #
 # That cost is why this one is cached and the board is not. A board is read by
 # the person whose work it is, once, and a minute-old board is a wrong board. An
-# overview is a page several admins leave open, and the number it exists to show
+# overview is a page several people leave open, and the number it exists to show
 # — how the project is going — does not change between two reads a minute apart.
 # So: one read per project per five minutes, and a Refresh button for the
-# impatient, which is `refresh=1` and skips the cache.
+# impatient, which is `refresh=1` and starts a read without waiting for it.
 #
-# Admin-only, unlike the rest of the PMS routes. It carries every assignee's
-# workload, which is the one PMS shape that is nobody's business but the team's.
+# For the delivery team and not a client (`_team_scope`). It carries every
+# assignee's workload, which is the one PMS shape that is nobody's business but
+# the team's.
+#
+# **Nobody waits on OpenProject in normal use** (13 October). The live Tasks
+# page took 36 seconds to draw, 28 of them this read: the copy held here lived
+# only in memory, so every restart and every deploy emptied it, and a Refresh
+# waited for the new one. Now:
+#
+#   - the last good read is kept in the database (`overview_held`) and put back
+#     at startup with its real age, so a deploy starts warm;
+#   - one loop (`_keep_warm`) re-reads, every five minutes, each project somebody
+#     asked about in the last day, so what a person is handed is rarely older;
+#   - a Refresh, or a held read past its five minutes, is answered at once with
+#     what is held and `refreshing: true`, and the read runs behind it. The page
+#     asks again until `refreshing` drops and then draws the new one;
+#   - only a project with nothing held at all waits, and only for a few
+#     seconds. After that the answer is that the first read is under way and how
+#     far it has got, which the Tasks page shows over its skeleton.
 
 OVERVIEW_TTL_SECONDS = 300
 # A ceiling, not a working size: a release project is thousands of tickets
 # (TICVAI's r1 is 7,967), and a cut at 2,000 newest-first handed every page the
 # sub-tasks and none of the tasks above them.
 OVERVIEW_LIMIT = 20000
-# {(adam project, openproject id): {"at": monotonic, "asOf": stamp, "payload": {...}}}
+# {(adam project, openproject id): {"at": monotonic, "asOf": stamp, "payload": {...},
+#                                   "packed": see _overview_hold}}
 _overview_cache: dict = {}
-# **Read behind, never in the request.** A whole release project is minutes
+# **Read behind, never in the request.** A whole release project is a long read
 # against OpenProject 10 (TICVAI r1: 7,967 tickets, 171 s with three pages at a
-# time), past the proxy's 120 s. So the read always runs on its own thread, one
-# per project however many pages ask for it, and a request waits for it only so
-# long. The board, the overview, costing and the plan all share it.
-OVERVIEW_WAIT_SECONDS = 90
-# {(adam project, openproject id): {"done": Event, "error": HTTPException | None}}
+# time when this was first written; 28 s on 13 October), once past the proxy's
+# 120 s. So the read always runs on its own thread, one per project however many
+# pages ask for it. The board, the overview, costing and the plan all share it.
+#
+# A request waits for it only when there is nothing at all to answer with, and
+# then only this long: enough that a small project is simply answered, short
+# enough that a big one says what it is doing instead of hanging. It was 90
+# seconds, which is the 36-second page.
+OVERVIEW_FIRST_WAIT_SECONDS = 4
+# {(adam project, openproject id): {"done": Event, "error": HTTPException | None,
+#   "started": monotonic, "firstAt": monotonic | None, "first": int, "read": int,
+#   "total": int | None}} — the last four are how far a read has got, for the
+#   first read of a project, which is the one somebody is watching.
 _overview_reading: dict = {}
+# {(adam project, openproject id): {"at": monotonic, "detail": str}}: the last
+# read that failed, until one succeeds. A Refresh that went wrong behind the page
+# has nobody waiting on it, so this is how the page is told rather than left
+# saying "Refreshing…" for ever.
+_overview_failed: dict = {}
+# After a failed read, how long before a page view or the loop tries again on
+# its own. A Refresh is a person asking and always tries.
+OVERVIEW_RETRY_SECONDS = 60
 _overview_guard = threading.Lock()
 
 
 def _read_behind(account: dict, scope: dict, key: tuple) -> dict:
     """Start the project read unless one is running; return the running one.
 
-    A failure is kept on the read so the callers waiting on it can say what went
-    wrong; the cache keeps whatever it held, because a five-minute-old overview
-    is still the overview.
+    A failure is kept on the read, for a caller waiting on it, and in
+    `_overview_failed`, for the page asking whether its Refresh finished. The
+    cache keeps whatever it held, because a five-minute-old overview is still
+    the overview. A good read is put in the cache and kept in the database.
     """
     with _overview_guard:
         running = _overview_reading.get(key)
         if running:
             return running
-        running = {"done": threading.Event(), "error": None}
+        running = {"done": threading.Event(), "error": None, "started": time.monotonic(),
+                   "firstAt": None, "first": 0, "read": 0, "total": None}
         _overview_reading[key] = running
+
+    def told(read: int, total: Optional[int]) -> None:
+        if running["firstAt"] is None:
+            running["firstAt"], running["first"] = time.monotonic(), read
+        running["read"], running["total"] = read, total
 
     def run() -> None:
         try:
-            payload = _overview_payload(account, scope)
-            _overview_cache[key] = {"at": time.monotonic(), "asOf": security.stamp(),
-                                    "payload": payload}
+            payload = _overview_payload(account, scope, progress=told)
+            held = _overview_hold(payload, security.stamp())
+            _overview_cache[key] = held
+            _overview_failed.pop(key, None)
+            _overview_keep(key, held, account["id"])
         except HTTPException as exc:
             running["error"] = exc
         except Exception as exc:  # noqa: BLE001 — told to the waiting callers
             running["error"] = HTTPException(502, f"Could not read OpenProject: {exc}")
         finally:
+            if running["error"] is not None:
+                _overview_failed[key] = {"at": time.monotonic(),
+                                         "detail": str(running["error"].detail)}
             with _overview_guard:
                 _overview_reading.pop(key, None)
             running["done"].set()
@@ -2689,52 +2753,362 @@ def _read_behind(account: dict, scope: dict, key: tuple) -> dict:
     return running
 
 
-def _project_read(account: dict, scope: dict, refresh: bool = False) -> dict:
-    """The shared read of a whole project: {"at", "asOf", "payload"}.
+class _StillReading(HTTPException):
+    """Nothing held for this project yet, and the first read of it is under way.
 
-    A read older than the TTL is answered at once while a fresh one starts
-    behind it, so nobody waits because five minutes went by. The first read of a
-    project, and an explicit Refresh, wait up to OVERVIEW_WAIT_SECONDS for the
-    read; a Refresh that runs longer answers with what is held, and a first read
-    that runs longer is a 503 saying to come back — the read carries on, and the
-    page that asks again a minute later gets it.
+    A 503 with Retry-After to every route that has nothing better to say, which
+    the plan and costing pages already answer by asking again. The overview
+    route catches it and answers its page with a 202 and `progress()` instead,
+    because for the Tasks page this is not an error: it is the page's first
+    state on a project nobody has opened before.
+    """
+
+    def __init__(self, running: dict):
+        self.running = running
+        super().__init__(503, _reading_sentence(running), headers={"Retry-After": "10"})
+
+    def progress(self) -> dict:
+        running = self.running
+        return {
+            "reading": True,
+            "read": running["read"],
+            "total": running["total"],
+            "elapsedSeconds": int(time.monotonic() - running["started"]),
+            "etaSeconds": _reading_eta(running),
+            "detail": self.detail,
+        }
+
+
+def _reading_eta(running: dict) -> Optional[int]:
+    """Roughly how long the first read has left, or None before the first page.
+
+    The first page is read alone and the rest `EVERYTHING_WORKERS` at a time, so
+    one page's time on its own is a poor rate for the rest. Until a second page
+    lands the estimate is that page's time per round of pages; after that it is
+    the rate actually seen since the first page. Rounded up and only ever shown
+    as "about", because OpenProject's speed is not ours to promise.
+    """
+    total, read, first_at = running["total"], running["read"], running["firstAt"]
+    if not total or first_at is None:
+        return None
+    left = max(0, total - read)
+    if read <= running["first"]:
+        rounds = -(-left // openproject.EVERYTHING_PAGE) / openproject.EVERYTHING_WORKERS
+        return int((first_at - running["started"]) * rounds + 0.999) + 2
+    rate = (read - running["first"]) / max(0.1, time.monotonic() - first_at)
+    return int(left / rate) + 2 if rate > 0 else None
+
+
+def _reading_sentence(running: dict) -> str:
+    total, read = running["total"], running["read"]
+    if total:
+        return (f"Reading all {total:,} tickets from OpenProject for the first time "
+                f"({read:,} so far). It carries on without you; ask again in a few seconds.")
+    return ("Reading every ticket from OpenProject for the first time. It carries on "
+            "without you; ask again in a few seconds.")
+
+
+def _project_read(account: dict, scope: dict, refresh: bool = False) -> dict:
+    """The shared read of a whole project: {"at", "asOf", "payload", "packed"}.
+
+    **Never waits on OpenProject while there is something to answer with.** A
+    held read is answered at once, whatever its age. If it is past the TTL, or
+    the caller pressed Refresh, a fresh read starts behind it and
+    `_overview_state` says so, which is how a page knows to ask again. A read
+    that failed less than OVERVIEW_RETRY_SECONDS ago is not started again
+    without a Refresh, so a page open on a broken token does not ask OpenProject
+    for every ticket every few seconds.
+
+    Only a project with nothing held at all waits, for
+    OVERVIEW_FIRST_WAIT_SECONDS: a small one is answered inside that, and a big
+    one raises `_StillReading` — the read carries on without the caller, and is
+    there when they ask again.
+
+    Every call records who asked (`_overview_asked`), because the loop that
+    keeps the read fresh reads as the last person who wanted it.
     """
     key = (scope["project"], scope["pmsId"])
+    _overview_asked(key, account["id"])
     held = _overview_cache.get(key)
-    if held and not refresh:
-        if time.monotonic() - held["at"] >= OVERVIEW_TTL_SECONDS:
+    if held:
+        failed = _overview_failed.get(key)
+        resting = bool(failed) and time.monotonic() - failed["at"] < OVERVIEW_RETRY_SECONDS
+        if refresh or (time.monotonic() - held["at"] >= OVERVIEW_TTL_SECONDS and not resting):
             _read_behind(account, scope, key)
         return held
     running = _read_behind(account, scope, key)
-    finished = running["done"].wait(OVERVIEW_WAIT_SECONDS)
-    if finished and running["error"] and not held:
+    finished = running["done"].wait(OVERVIEW_FIRST_WAIT_SECONDS)
+    if finished and running["error"]:
         raise running["error"]
     fresh = _overview_cache.get(key)
     if fresh:
         return fresh
-    raise HTTPException(
-        503,
-        "Still reading every ticket from OpenProject — a project this size takes "
-        "two or three minutes. Try again in a minute.",
-        headers={"Retry-After": "30"})
+    raise _StillReading(running)
 
 
-def _overview_payload(account: dict, scope: dict) -> dict:
-    """One live read of a whole project, with the artefact links joined in."""
+def _overview_state(key: tuple, held: dict) -> dict:
+    """Whether a newer read is on its way, and whether the last one failed.
+
+    `refreshError` only for a failure after the read being shown: an old failure
+    that a later read has already replaced is not news.
+    """
+    failed = _overview_failed.get(key)
+    return {
+        "refreshing": key in _overview_reading,
+        "refreshError": failed["detail"] if failed and failed["at"] >= held["at"] else None,
+    }
+
+
+# ── the held read, packed once ───────────────────────────────────────
+#
+# **Serialised once per read, not once per request.** TICVAI's read is 8,000
+# tickets and 4.4 MB of JSON. Handing the dict to FastAPI walked every field of
+# every ticket on every request — a second and more of this process's time to
+# answer from memory — and sent all 4.4 MB to the proxy, because nothing on this
+# side compressed it. So each read is turned into bytes when it lands: the JSON
+# without its closing brace, and the same bytes gzipped, with the compressor
+# kept open. A request appends its own fields (the age, `refreshing`, ADAM's own
+# tables) to a copy of that compressor and finishes it, which costs the
+# compression of a few hundred bytes, and the answer is one ordinary gzip stream
+# of about 200 KB.
+
+
+def _overview_hold(payload: dict, as_of: str, age: float = 0.0) -> dict:
+    """A read as the cache holds it, `age` seconds old."""
+    head = json.dumps(payload, ensure_ascii=False, separators=(",", ":"),
+                      default=str).encode("utf-8")
+    # Every payload is an object with keys, so it ends in "}" and per-request
+    # fields can follow a comma in its place.
+    head = head[:-1]
+    squeeze = zlib.compressobj(6, zlib.DEFLATED, 31)  # 31: with a gzip wrapper
+    return {"at": time.monotonic() - age, "asOf": as_of, "payload": payload,
+            "packed": {"head": head, "gz": squeeze.compress(head), "squeeze": squeeze}}
+
+
+def _overview_bytes(held: dict, extra: dict, gzipped: bool) -> bytes:
+    """The held read with `extra`'s fields added, as JSON bytes, gzipped or not."""
+    tail = json.dumps(extra, ensure_ascii=False, separators=(",", ":"),
+                      default=str).encode("utf-8")
+    tail = b"," + tail[1:] if len(tail) > 2 else b"}"
+    packed = held["packed"]
+    if not gzipped:
+        return packed["head"] + tail
+    finish = packed["squeeze"].copy()
+    return packed["gz"] + finish.compress(tail) + finish.flush()
+
+
+def _overview_answer(request: Request, held: dict, extra: dict) -> Response:
+    gzipped = "gzip" in (request.headers.get("accept-encoding") or "").lower()
+    return Response(
+        content=_overview_bytes(held, extra, gzipped),
+        media_type="application/json",
+        headers={"Vary": "Accept-Encoding",
+                 **({"Content-Encoding": "gzip"} if gzipped else {})})
+
+
+def _overview_amend(account: dict, scope: dict, landed: list) -> None:
+    """After a write: what OpenProject answered goes into the held read, and the
+    rest of the project is read again behind it.
+
+    This used to drop the held read, so the page that had just shipped a plan
+    waited for every ticket in the project to be read again before it could
+    draw the bars it had just moved. Each ticket written comes back from
+    OpenProject whole — its new dates and its new lockVersion — so those
+    replace the held rows at once, and a parent whose dates OpenProject moved as
+    a consequence is put right by the read behind, which the page is told about
+    through `refreshing`. The age stays what it was: the rest of the read is no
+    newer for this.
+    """
+    key = (scope["project"], scope["pmsId"])
+    held = _overview_cache.get(key)
+    if held and landed:
+        by_key = {item["key"]: item for item in landed}
+        items = [{**item, **by_key[item["key"]]} if item["key"] in by_key else item
+                 for item in held["payload"]["items"]]
+        amended = _overview_hold({**held["payload"], "items": items}, held["asOf"])
+        amended["at"] = held["at"]
+        _overview_cache[key] = amended
+    _read_behind(account, scope, key)
+
+
+# ── kept across restarts ─────────────────────────────────────────────
+
+
+def _overview_keep(key: tuple, held: dict, account_id: int) -> None:
+    """Write a good read to `overview_held`, so a restart starts with it.
+
+    On a first write the reader is recorded as the one who asked, since they
+    did; after that `asked_by` and `asked_at` belong to `_overview_asked` and a
+    read leaves them alone. Never raises: the read is in memory and is being
+    served whatever happens to the copy on disk.
+    """
+    try:
+        whole = _overview_bytes(held, {}, gzipped=True)
+        db.write(
+            "INSERT INTO overview_held (project_id, pms_id, as_of, payload, asked_by, asked_at) "
+            "VALUES (?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(project_id, pms_id) DO UPDATE SET "
+            "as_of = excluded.as_of, payload = excluded.payload",
+            (key[0], key[1], held["asOf"], whole, account_id, security.stamp()))
+    except Exception:  # noqa: BLE001 — a cache that could not be saved is still a cache
+        pass
+
+
+def _overview_restore() -> None:
+    """Put every kept read back in memory, at its real age. Run at startup.
+
+    Only the read of the OpenProject project each ADAM project points at now;
+    a row left from before an admin re-pointed it is not served as the new one.
+    A row that will not decode is skipped — it is a cache, and the loop will
+    read the project again.
+    """
+    for row in db.all_rows(
+        "SELECT h.project_id, h.pms_id, h.as_of, h.payload FROM overview_held h "
+        "JOIN project p ON p.id = h.project_id AND p.pms_project_id = h.pms_id"
+    ):
+        try:
+            payload = json.loads(gzip.decompress(row["payload"]))
+            age = max(0.0, (security.now() - security.parse(row["as_of"])).total_seconds())
+        except Exception:  # noqa: BLE001 — see the docstring
+            continue
+        _overview_cache[(row["project_id"], row["pms_id"])] = _overview_hold(
+            payload, row["as_of"], age=age)
+
+
+# The last time each project's asker was written down, so a page polling every
+# ten seconds is not a database write every ten seconds.
+_overview_askers: dict = {}
+OVERVIEW_ASKED_EVERY_SECONDS = 60
+
+
+def _overview_asked(key: tuple, account_id: int) -> None:
+    """Note that this person wanted this project's read, for `_keep_warm`.
+
+    Written at most once a minute per project unless the person changes. There
+    may be no row yet — the first read has not finished — and then the write
+    that saves the read records them instead.
+    """
+    last = _overview_askers.get(key)
+    now = time.monotonic()
+    if last and last[0] == account_id and now - last[1] < OVERVIEW_ASKED_EVERY_SECONDS:
+        return
+    _overview_askers[key] = (account_id, now)
+    try:
+        db.change("UPDATE overview_held SET asked_by = ?, asked_at = ? "
+                  "WHERE project_id = ? AND pms_id = ?",
+                  (account_id, security.stamp(), key[0], key[1]))
+    except Exception:  # noqa: BLE001 — bookkeeping for the loop, never the request's problem
+        pass
+
+
+# ── kept warm ────────────────────────────────────────────────────────
+#
+# One loop, started with the service and stopped with it. Every
+# OVERVIEW_WARM_TICK_SECONDS it looks at each project somebody has asked about in
+# the last OVERVIEW_WARM_HOURS and starts a read of any whose held copy is past
+# the TTL, as the person who asked last. So the read a page gets is at most a
+# few minutes old even when nobody has looked for an hour, and the cost of
+# keeping it so falls on nobody's page load.
+#
+# **Whose token.** OpenProject is read as a person, never as a service account
+# (openproject.py says why). The loop holds no token: it holds an account id,
+# and asks `_pms_for` for that account's token each time, exactly as a request
+# would. An account that has been switched off, has dropped its token, or can no
+# longer open the project is skipped, and the read waits for somebody who can.
+#
+# The API runs as one process (deploy/deploy.sh), so one loop is one loop. The
+# guard below keeps a second startup in the same process from starting another.
+
+OVERVIEW_WARM_HOURS = 24
+OVERVIEW_WARM_TICK_SECONDS = 30
+_warm_stop = threading.Event()
+_warm_thread: Optional[threading.Thread] = None
+
+
+def _warm_once() -> None:
+    """One pass of the loop: start the reads that are due. Waits for none."""
+    since = security.stamp(security.now() - timedelta(hours=OVERVIEW_WARM_HOURS))
+    for row in db.all_rows(
+        "SELECT h.project_id, h.pms_id, h.asked_by FROM overview_held h "
+        "JOIN project p ON p.id = h.project_id AND p.pms_project_id = h.pms_id "
+        "WHERE p.active = 1 AND h.asked_by IS NOT NULL AND h.asked_at >= ?", (since,)
+    ):
+        key = (row["project_id"], row["pms_id"])
+        held = _overview_cache.get(key)
+        if key in _overview_reading or (
+                held and time.monotonic() - held["at"] < OVERVIEW_TTL_SECONDS):
+            continue
+        failed = _overview_failed.get(key)
+        if failed and time.monotonic() - failed["at"] < OVERVIEW_TTL_SECONDS:
+            continue
+        found = db.one("SELECT id, email, name, role, active FROM account WHERE id = ?",
+                       (row["asked_by"],))
+        if not found or not found["active"]:
+            continue
+        account = dict(found)
+        try:
+            # The same door a request goes through: may they open the project,
+            # and is it still pointed at this OpenProject project?
+            scope = _pms_scope(account, row["project_id"])
+            _pms_for(account["id"])
+        except HTTPException:
+            continue
+        if scope["pmsId"] != row["pms_id"]:
+            continue
+        _read_behind(account, scope, key)
+
+
+def _keep_warm() -> None:
+    while not _warm_stop.is_set():
+        try:
+            _warm_once()
+        except Exception:  # noqa: BLE001 — the loop outlives a bad pass; the next one tries again
+            pass
+        _warm_stop.wait(OVERVIEW_WARM_TICK_SECONDS)
+
+
+def _start_warm() -> None:
+    global _warm_thread
+    if _warm_thread and _warm_thread.is_alive():
+        return
+    _warm_stop.clear()
+    _warm_thread = threading.Thread(target=_keep_warm, name="overview-warm", daemon=True)
+    _warm_thread.start()
+
+
+def _stop_warm() -> None:
+    """Stop the loop. A read it already started is a daemon thread and is left
+    to finish or die with the process; it writes nothing that matters half-done."""
+    _warm_stop.set()
+    if _warm_thread:
+        _warm_thread.join(timeout=5)
+
+
+def _overview_payload(account: dict, scope: dict, progress=None) -> dict:
+    """One live read of a whole project, with the artefact links joined in.
+
+    The statuses and the versions are asked for beside the first page rather
+    than after the last one: they are two small calls, and waiting for 8,000
+    tickets before asking for them added their round trips to the read for
+    nothing.
+    """
     endpoint, token = _pms_for(account["id"])
-    try:
-        items = openproject.everything(
-            endpoint, token, scope["pmsId"], limit=OVERVIEW_LIMIT)
-        known = openproject.statuses(endpoint, token)
-    except (openproject.Blocked, openproject.Refused) as exc:
-        raise HTTPException(502, str(exc))
-    # The sprints' dates, which a ticket does not carry: it names its version
-    # and nothing more. Optional — a token that may not read versions still
-    # gets the overview, and the page falls back to the sprint calendar.
-    try:
-        sprints = openproject.versions(endpoint, token, scope["pmsId"])
-    except (openproject.Blocked, openproject.Refused):
-        sprints = []
+    with ThreadPoolExecutor(max_workers=2) as aside:
+        statuses_asked = aside.submit(openproject.statuses, endpoint, token)
+        versions_asked = aside.submit(openproject.versions, endpoint, token, scope["pmsId"])
+        try:
+            items = openproject.everything(
+                endpoint, token, scope["pmsId"], limit=OVERVIEW_LIMIT, progress=progress)
+            known = statuses_asked.result()
+        except (openproject.Blocked, openproject.Refused) as exc:
+            raise HTTPException(502, str(exc))
+        # The sprints' dates, which a ticket does not carry: it names its version
+        # and nothing more. Optional — a token that may not read versions still
+        # gets the overview, and the page falls back to the sprint calendar.
+        try:
+            sprints = versions_asked.result()
+        except (openproject.Blocked, openproject.Refused):
+            sprints = []
     # Same belt-and-braces as the board: an instance that ignores the project
     # filter must not turn an overview of one product into an overview of all.
     items = [item for item in items if item.get("projectId") == scope["pmsId"]]
@@ -2744,7 +3118,8 @@ def _overview_payload(account: dict, scope: dict) -> dict:
     # stalled ticket. One activities read per held ticket, capped, because a
     # hold is rare (three in TICVAI r1) and a project with hundreds of them
     # needs a conversation rather than a dashboard. A ticket whose comments
-    # cannot be read simply has no reason shown.
+    # cannot be read simply has no reason shown. Read a few at a time, after
+    # the pages: see `_held_reasons`.
     _held_reasons(endpoint, token, items)
 
     touching: dict = {}
@@ -2785,20 +3160,29 @@ def _overview_payload(account: dict, scope: dict) -> dict:
 # makes (tasks.js `STALLED`): OpenProject has no "blocked" flag, only a name.
 _HELD = re.compile(r"hold|block|wait|pend", re.I)
 HELD_REASON_LIMIT = 25
+# Read side by side, a few at a time. One after another, 25 of them were 25
+# round trips added to every project read; five at a time is five rounds, and
+# five is under the pages' own six, so this never asks more of OpenProject at
+# once than the read it follows just did.
+HELD_REASON_WORKERS = 5
 
 
 def _held_reasons(endpoint: str, token: str, items: list) -> None:
     """Attach `lastComment` {author, at, text} to each held ticket that has one."""
     held = [item for item in items if _HELD.search(item.get("status") or "")]
-    for item in held[:HELD_REASON_LIMIT]:
+
+    def reason(item: dict) -> None:
         try:
             said = openproject.comments(endpoint, token, item["key"])
         except Exception:  # noqa: BLE001 — a reason is extra; never fail the read for one
-            continue
+            return
         if said:
             last = said[-1]
             item["lastComment"] = {"author": last["author"], "at": last["at"],
                                    "text": last["text"][:400]}
+
+    with ThreadPoolExecutor(max_workers=HELD_REASON_WORKERS) as pool:
+        list(pool.map(reason, held[:HELD_REASON_LIMIT]))
 
 
 # ── where a ticket sits in the tree ──────────────────────────────────
@@ -2810,8 +3194,10 @@ def _held_reasons(endpoint: str, token: str, items: list) -> None:
 #
 # **The whole project, rather than a fetch per ticket.** Resolving twenty board
 # items one at a time is twenty round trips on every board, and the answer is
-# already sitting in `_overview_cache` most of the time. The cost of a miss is
-# one paged read, shared with the next caller for five minutes.
+# already sitting in `_overview_cache` — kept across restarts and kept fresh,
+# so in practice always. A project nobody has read yet waits a few seconds for
+# its first read and is then drawn without the tree; the board says so, and
+# the next one has it.
 
 
 def _project_tree(account: dict, scope: dict) -> tuple:
@@ -2878,23 +3264,38 @@ def _subtasks_of(key: str, kids: dict) -> list:
 
 @app.get("/api/board/overview")
 def delivery_overview(
+    request: Request,
     project_id: str = Query(default=""),
     refresh: int = Query(default=0),
     account: dict = Depends(require_account),
 ):
-    """Every ticket in the project's OpenProject project, cached for five minutes.
+    """Every ticket in the project's OpenProject project, read every five minutes.
 
     A reader's rather than an administrator's: this is the delivery, and a pm
-    who cannot see it is not overseeing anything. Note that it still runs on the
-    caller's own OpenProject token, so a pm sees what their own OpenProject
-    account can see — ADAM widens who may ask, and does not widen the answer.
+    who cannot see it is not overseeing anything. The project read is shared, so
+    what comes back is the last read of the project, made with the OpenProject
+    token of whoever asked for it last — ADAM widens who may ask, and the read is
+    the team's, not each person's.
+
+    Three shapes. **200** with the tickets, `ageSeconds` saying how old the read
+    is and `refreshing` saying a newer one is on its way, in which case the page
+    asks again in a few seconds. `refreshError` when the newer one failed.
+    **202** with `reading: true` and how far it has got, when nothing has ever
+    been read for this project: the read is under way, and the page shows its
+    skeleton and asks again. Errors as before (428 not connected, 403, 502).
     """
     scope = _team_scope(account, project_id)  # the delivery team, not a client (12 Oct: "let them see each others work")
-    held = _project_read(account, scope, refresh=bool(refresh))
+    key = (scope["project"], scope["pmsId"])
+    try:
+        held = _project_read(account, scope, refresh=bool(refresh))
+    except _StillReading as reading:
+        return JSONResponse(status_code=202, content=reading.progress(),
+                            headers={"Retry-After": "10"})
     age = int(time.monotonic() - held["at"])
-    return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,
-            "fromCache": age > 0, "cacheSeconds": OVERVIEW_TTL_SECONDS,
-            **_overview_local(scope["project"])}
+    return _overview_answer(request, held, {
+        "asOf": held["asOf"], "ageSeconds": age, "fromCache": age > 0,
+        "cacheSeconds": OVERVIEW_TTL_SECONDS, **_overview_state(key, held),
+        **_overview_local(scope["project"])})
 
 
 def _overview_local(project: str) -> dict:
@@ -3893,10 +4294,12 @@ def costing(project_id: str = Query(default=""), refresh: int = Query(default=0)
     Reuses the overview's cached read of the project — the same five minutes,
     the same one call — because costing and the overview are the same question
     about the same rows and reading OpenProject twice to ask both would double
-    the cost of a page somebody leaves open.
+    the cost of a page somebody leaves open. Like the overview, a Refresh does
+    not wait: the answer carries `refreshing` and the page asks again.
     """
     scope = _pms_scope(reader, project_id)
-    payload = _project_read(reader, scope, refresh=bool(refresh))["payload"]
+    held = _project_read(reader, scope, refresh=bool(refresh))
+    payload = held["payload"]
 
     rates = {r["person"].lower(): r for r in db.all_rows(
         "SELECT * FROM rate WHERE project_id = ?", (scope["project"],))}
@@ -3964,6 +4367,9 @@ def costing(project_id: str = Query(default=""), refresh: int = Query(default=0)
         "ticketsHoursUnreadable": unreadable,
         "peopleWithoutRate": sorted(set(unrated)),
         "truncated": payload.get("truncated", False),
+        "asOf": held["asOf"],
+        "ageSeconds": int(time.monotonic() - held["at"]),
+        **_overview_state((scope["project"], scope["pmsId"]), held),
     }
 
 
@@ -5781,7 +6187,8 @@ def read_plan(project_id: str = Query(default=""),
 
     Reads through the same five-minute cache the board uses, because it is the
     same read of the same project and two copies of it would disagree by up to
-    five minutes for no reason anybody could see.
+    five minutes for no reason anybody could see. A Refresh does not wait for
+    the new read: `refreshing` says one is coming, and the page asks again.
     """
     scope = _pms_scope(account, project_id)
     held = _project_read(account, scope, refresh=bool(refresh))
@@ -5815,6 +6222,7 @@ def read_plan(project_id: str = Query(default=""),
                             if k not in {m["key"] for m in modules}),
         "asOf": as_of,
         "ageSeconds": age,
+        **_overview_state((scope["project"], scope["pmsId"]), held),
         "note": None if modules else
                 "Nothing in this OpenProject project sits at the top of a tree yet, "
                 "so there are no modules to arrange.",
@@ -5983,12 +6391,12 @@ def apply_plan(proposal: str, body: PlanApplyIn,
         raise HTTPException(409, "That plan has already been sent.")
 
     endpoint, token = _pms_for(account["id"])
-    sent, failed = [], []
+    sent, failed, landed = [], [], []
     for bar in json.loads(row["payload"]):
         try:
-            openproject.update(
+            landed.append(openproject.update(
                 endpoint, token, bar["key"], bar["lockVersion"],
-                start_date=bar["start"], due_date=bar["due"])
+                start_date=bar["start"], due_date=bar["due"]))
         except openproject.Refused as exc:
             failed.append({"key": bar["key"], "subject": bar["subject"],
                            "why": _openproject_conflict(exc, bar["key"])})
@@ -6001,7 +6409,7 @@ def apply_plan(proposal: str, body: PlanApplyIn,
         db.change("DELETE FROM plan_draft WHERE account_id = ? AND project_id = ? "
                   "AND external_key = ?", (account["id"], scope["project"], bar["key"]))
 
-    _overview_cache.pop((scope["project"], scope["pmsId"]), None)
+    _overview_amend(account, scope, landed)
     return {
         "ok": not failed,
         "sent": sent,

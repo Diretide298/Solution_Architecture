@@ -18,7 +18,7 @@
 // connected browsers over SSE.
 
 import http from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import { watch } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
@@ -669,6 +669,12 @@ function sendCachedJson(res, req, cache, key, value) {
   // browser's behaviour. It is for a client that manages its own cache in
   // memory and asks the question out loud.
   //
+  // The viewer's own code is the other side of that line, and is cached (13
+  // October; see `sendStatic`): app.js says nothing about any project, so a
+  // browser keeping it costs nobody anything, and re-sending it on every page
+  // view was most of what a page view cost. The line is code against data, not
+  // big against small.
+  //
   // Weak or strong matters here: the ETag is of the *identity* body, and the
   // gzip and plain forms of one entry share it. That is correct for a
   // conditional request — `Vary: Accept-Encoding` already keeps the two
@@ -687,6 +693,196 @@ function sendCachedJson(res, req, cache, key, value) {
     ...(wants ? { 'Content-Encoding': 'gzip' } : {}),
   });
   res.end(wants ? entry.packed : entry.body);
+}
+
+// ---- the viewer's own files: versioned, kept, compressed once ---------------
+//
+// **Every page used to re-download all of its code on every view.** `send()`
+// answers `no-store`, which is right for data and was applied to everything, so
+// the Tasks page fetched app chrome, five modules and three stylesheets each
+// time it was opened, at one Cloudflare round trip apiece, and gzipped each of
+// them again on the way out. On the live site that was 2.4 s for app.js alone.
+//
+// Now the files in public/ are served three ways:
+//
+//   **HTML stays `no-store`.** It is the one file that names which version of
+//   everything else to load, so it must always be asked for, and the gate
+//   decides whether a stranger gets it.
+//
+//   **Anything an HTML page names is named with `?v=<stamp>`**, and a request
+//   carrying the current stamp is answered `private, max-age=31536000,
+//   immutable`: the browser keeps it and never asks again. `private` keeps it
+//   out of Cloudflare's shared cache, which is the right side of the gate for
+//   it to sit on. The stamp is a digest of every file in public/ — name, size
+//   and modification time — so any change to any of them, which is what a
+//   deploy is, makes every URL new and every kept copy irrelevant.
+//
+//   **Anything else** — a file asked for without the stamp, or with an old one
+//   from a page opened before a deploy — is `private, no-cache` with an ETag:
+//   kept, but asked about every time, and a 304 when nothing changed.
+//
+// **One stamp for the whole folder, not one per file.** The modules import each
+// other by path ('/validation.js', './core.js'), and a module is one instance
+// per URL: if the page loaded `/validation.js?v=1` and account-drawer.js loaded
+// `/validation.js`, there would be two copies of the session state, quietly
+// disagreeing. So every page carries an import map sending each module path to
+// its stamped URL, which the browser applies to static imports, to `import()`
+// of a literal and of a computed path alike. With one stamp there is no chain of
+// per-file hashes to keep straight: a change anywhere renames everything, which
+// costs one re-download per deploy and cannot serve a stale module beside a
+// fresh one.
+//
+// **And the module graph is announced up front.** A module's imports are only
+// found once it has arrived and been parsed, so tasks.js -> page-chrome.js ->
+// theme.js -> shortcuts.js was four round trips one after another before any
+// line of the page ran. The HTML now lists every module its entry points reach
+// as `<link rel="modulepreload">`, and the browser asks for all of them at once.
+//
+// Compression happens once per file per change, keyed by path, size and
+// modification time, not once per request.
+
+/** How long a computed stamp is trusted before the folder is looked at again.
+ *  Short, because on a workstation somebody edits a file and reloads. */
+const STAMP_FRESH_MS = 2000;
+let stampHeld = { value: '', modules: [], at: 0, pending: null };
+
+/** Every file under public/, as paths from the folder ('/app.js'). */
+async function walkPublic(dir = PUBLIC, into = []) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const abs = path.join(dir, entry.name);
+    if (entry.isDirectory()) await walkPublic(abs, into);
+    else if (entry.isFile()) into.push(abs);
+  }
+  return into;
+}
+
+/** `{ value, modules }`: the stamp, and every .js file a page may import. */
+async function publicStamp() {
+  if (stampHeld.value && Date.now() - stampHeld.at < STAMP_FRESH_MS) return stampHeld;
+  stampHeld.pending ??= (async () => {
+    const files = (await walkPublic()).sort();
+    const digest = createHash('sha1');
+    const modules = [];
+    for (const abs of files) {
+      const info = await stat(abs).catch(() => null);
+      if (!info) continue;
+      const rel = `/${path.relative(PUBLIC, abs).split(path.sep).join('/')}`;
+      digest.update(`${rel}\0${info.size}\0${info.mtimeMs}\n`);
+      if (/\.m?js$/i.test(rel)) modules.push(rel);
+    }
+    stampHeld = { value: digest.digest('base64url').slice(0, 12), modules, at: Date.now(), pending: null };
+    return stampHeld;
+  })().finally(() => { stampHeld.pending = null; });
+  return stampHeld.pending;
+}
+
+/** abs path -> { mtimeMs, size, body, gz, etag, type } — or, for a page, keyed
+ *  by path and stamp as well, because its bytes depend on the stamp. */
+const staticHeld = new Map();
+
+function heldEntry(key, info, type, body) {
+  const gz = body.length > GZIP_ABOVE && !COMPRESSED.test(type) ? gzipSync(body) : null;
+  const entry = {
+    mtimeMs: info.mtimeMs, size: info.size, body, gz, type,
+    etag: `"${createHash('sha1').update(body).digest('base64url')}"`,
+  };
+  staticHeld.set(key, entry);
+  return entry;
+}
+
+/** A file from public/, read and compressed once until it changes on disk.
+ *  `transform` turns the bytes on disk into the bytes served. */
+async function staticEntry(abs, info, transform = null) {
+  const hit = staticHeld.get(abs);
+  if (hit && hit.mtimeMs === info.mtimeMs && hit.size === info.size) return hit;
+  let body = await readFile(abs);
+  if (transform) body = Buffer.from(transform(body));
+  return heldEntry(abs, info, MIME[path.extname(abs).toLowerCase()] ?? 'application/octet-stream', body);
+}
+
+/** Answer with a held file: 304 if the caller already has it, gzip if asked.
+ *
+ *  `If-None-Match` is compared weakly, as the standard says it is: a proxy that
+ *  re-encodes a response (Cloudflare does, when it compresses) hands the browser
+ *  the tag as `W/"…"`, and the browser sends it back that way. */
+function sendStatic(res, req, entry, cacheControl) {
+  const headers = { 'Cache-Control': cacheControl, ETag: entry.etag, Vary: 'Accept-Encoding' };
+  const held = String(req.headers['if-none-match'] ?? '').split(',')
+    .map((tag) => tag.trim().replace(/^W\//, ''));
+  if (held.includes(entry.etag)) {
+    res.writeHead(304, headers);
+    return res.end();
+  }
+  const zipped = entry.gz && /\bgzip\b/.test(req.headers['accept-encoding'] ?? '');
+  res.writeHead(200, {
+    ...headers,
+    'Content-Type': entry.type,
+    ...(zipped ? { 'Content-Encoding': 'gzip' } : {}),
+  });
+  return res.end(zipped ? entry.gz : entry.body);
+}
+
+// What a page names that is ours to stamp: a root-relative path, not `//host`,
+// to a file of a kind this folder holds. `src` and `href` on the tags that load
+// things; an `<a href>` to another page is HTML and is left alone.
+const NAMED_ASSET = /(<(?:script|link|img|source|video)\b[^>]*?\s(?:src|href)=["'])(\/(?!\/)[^"'?#]+\.(?:m?js|css|png|jpe?g|gif|webp|svg|ico|woff2?|mp4))(["'])/gi;
+
+// The imports a module names, statically. Line-anchored so a comment showing
+// an import (` *   import '/page-chrome.js';`) is not taken for one; `import(`
+// is left out on purpose, because a module loaded on a click is exactly the
+// one that should not be fetched up front.
+const STATIC_IMPORT = /^\s*(?:import|export)\s+(?:[^'";]*?\sfrom\s+)?['"]([^'"]+)['"]/gm;
+
+/** The modules `entry` reaches by static import, itself included, as public paths. */
+async function moduleClosure(entry, known) {
+  const seen = new Set();
+  const queue = [entry];
+  while (queue.length) {
+    const at = queue.shift();
+    if (seen.has(at) || !known.has(at)) continue;
+    seen.add(at);
+    const abs = path.join(PUBLIC, at);
+    const info = await stat(abs).catch(() => null);
+    if (!info?.isFile()) continue;
+    const text = (await staticEntry(abs, info)).body.toString('utf8');
+    for (const [, spec] of text.matchAll(STATIC_IMPORT)) {
+      if (!/^\.{0,2}\//.test(spec) || spec.startsWith('//')) continue;
+      queue.push(path.posix.resolve(path.posix.dirname(at), spec));
+    }
+  }
+  return [...seen];
+}
+
+/**
+ * A page with every asset it names stamped, the import map, and the modules
+ * its entry points reach announced as `modulepreload`. Held per page and stamp.
+ *
+ * The map and the preloads go in straight after the charset declaration (or
+ * the `<head>` tag): an import map must be in place before the first module
+ * starts loading, and the inline scripts above it in some pages are classic
+ * scripts that load nothing.
+ */
+async function stampedPage(abs, info, html, { value: stamp, modules }) {
+  const key = `${abs}\0${stamp}`;
+  const hit = staticHeld.get(key);
+  if (hit && hit.mtimeMs === info.mtimeMs && hit.size === info.size) return hit;
+  const known = new Set(modules);
+  const at = (rel) => `${rel}?v=${stamp}`;
+  let page = html.replace(NAMED_ASSET, (whole, open, rel, close) => `${open}${at(rel)}${close}`);
+  const entries = [...html.matchAll(/<script\b[^>]*\btype=["']module["'][^>]*\bsrc=["'](\/[^"'?#]+)["']/gi)]
+    .map((m) => m[1]);
+  const preload = new Set();
+  for (const entry of entries) for (const rel of await moduleClosure(entry, known)) preload.add(rel);
+  const map = JSON.stringify({ imports: Object.fromEntries(modules.map((rel) => [rel, at(rel)])) });
+  // The copy for the stamp before this one is never asked for again.
+  for (const held of staticHeld.keys()) if (held.startsWith(`${abs}\0`)) staticHeld.delete(held);
+  const head = [
+    `<script type="importmap">${map}</script>`,
+    ...[...preload].map((rel) => `<link rel="modulepreload" href="${at(rel)}" />`),
+  ].join('\n    ');
+  const anchor = /<meta\s+charset=[^>]*>/i.test(page) ? /<meta\s+charset=[^>]*>/i : /<head(\s[^>]*)?>/i;
+  page = page.replace(anchor, (m) => `${m}\n    ${head}`);
+  return heldEntry(key, info, MIME['.html'], Buffer.from(page));
 }
 
 const server = http.createServer(async (req, res) => {
@@ -1527,34 +1723,46 @@ const server = http.createServer(async (req, res) => {
     const info = await stat(file).catch(() => null);
     if (!info?.isFile()) return send(res, 404, 'not found');
 
-    const body = await readFile(file);
-
-    // The one thing a page cannot know for itself: which address the accounts
-    // service answers on. Inserted high in <head> so it is in place long before
-    // the module scripts at the foot of the page read it, but after the charset
-    // declaration — that one has to stay inside the first 1024 bytes or the
-    // browser starts sniffing. Only html; every other file goes out untouched.
-    if (API_META && path.extname(file) === '.html') {
-      const html = body.toString('utf8');
-      const anchor = /<meta\s+charset=[^>]*>/i.test(html)
-        ? /<meta\s+charset=[^>]*>/i
-        : /<head(\s[^>]*)?>/i;
-      return send(res, 200, html.replace(anchor, (m) => `${m}\n    ${API_META}`), MIME['.html'], req);
+    // A page: `no-store`, as it always was, with its assets stamped (see
+    // `stampedPage`). The portfolio drop is HTML too and is served as it is: it
+    // is one self-contained 6.9 MB file that names nothing of ours, and
+    // rewriting it would be work for no change.
+    if (path.extname(file) === '.html') {
+      const body = await readFile(file);
+      let html = body.toString('utf8');
+      // The one thing a page cannot know for itself: which address the accounts
+      // service answers on. Inserted high in <head> so it is in place long before
+      // the module scripts at the foot of the page read it, but after the charset
+      // declaration — that one has to stay inside the first 1024 bytes or the
+      // browser starts sniffing.
+      if (API_META) {
+        const anchor = /<meta\s+charset=[^>]*>/i.test(html)
+          ? /<meta\s+charset=[^>]*>/i
+          : /<head(\s[^>]*)?>/i;
+        html = html.replace(anchor, (m) => `${m}\n    ${API_META}`);
+      }
+      if (rel === '/offline.html') return send(res, 200, html, MIME['.html'], req);
+      const page = await stampedPage(file, info, html, await publicStamp());
+      return sendStatic(res, req, page, 'no-store');
     }
 
-    // app.js alone is 270 KB of text, and the boards are larger still
     // The key-sequence loader carries a placeholder where the word's hash goes;
     // fill it in as the file is served, from the word this process was given. The
     // committed file has only the placeholder, so the word stays out of the
     // repository; an installation with no word substitutes an empty string and the
     // loader then matches nothing. Only this one file, only this token.
-    if (rel === '/shortcuts.js') {
-      const filled = body.toString('utf8').replace('__ADAM_DROP_HASH__', DROP_HASH);
-      return send(res, 200, filled, MIME['.js'], req);
-    }
-
-    // app.js alone is 270 KB of text, and the boards are larger still
-    return send(res, 200, body, MIME[path.extname(file)] ?? 'application/octet-stream', req);
+    const fill = rel === '/shortcuts.js'
+      ? (body) => body.toString('utf8').replace('__ADAM_DROP_HASH__', DROP_HASH)
+      : null;
+    const entry = await staticEntry(file, info, fill);
+    // Kept for a year only when asked for by the current stamp. An old stamp is
+    // a page from before a deploy asking for a file that has changed since, and
+    // it gets the new file on the same terms as an unstamped request.
+    const asked = url.searchParams.get('v');
+    const current = asked ? (await publicStamp()).value : '';
+    return sendStatic(res, req, entry, asked && asked === current
+      ? 'private, max-age=31536000, immutable'
+      : 'private, no-cache');
 
   } catch (err) {
     console.error(err);
