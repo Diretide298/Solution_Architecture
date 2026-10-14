@@ -1,0 +1,107 @@
+id: CHG-MKT-002
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'A saved item is a WishlistItem schema of its own, so marketing.wishlist_item is derived from the contract
+  (list_price numeric(18,4), not price text) with one row per variant and performance even with no performance; what
+  Catalogue knows (name, picture, current price, availability, the performance start) is asked of Catalogue''s new
+  declared query variantListingFacts by its service route, at the save and at every read; getWishlist is guests only.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml: Wishlist.items is $ref WishlistItem, newest first (addedAt desc, id);
+    WishlistItem carries x-ticvai-persistence marketing.wishlist_item (the tag used to sit on the items property, which
+    derive-schema never reads), subjectId (readOnly), x-ticvai-unique-together [subjectId, variantId, performanceId]
+    with x-ticvai-unique-nulls not-distinct, price as list_price Money (the amount, numeric(18,4), the currency from
+    the variant''s venue, ADR-0018; the stored value is the price at the save, for segmentation and as the fallback),
+    and descriptions saying each Catalogue field''s source. addToWishlist also asks variantListingFacts and stores its
+    answer, its idempotency is the unique index (a racing save reads the row and answers 200). getWishlist asks
+    variantListingFacts on every read (x-ticvai-read-via, service route), returns Catalogue''s current values and
+    isAvailable/unavailableReason, writes nothing (replica), falls back to the stored values when Catalogue cannot be
+    reached, and drops bearerAuth (BC-087). contracts/spine/catalogue.yaml x-ticvai-queries: variantListingFacts
+    (variantIds, channel, performanceIds -> per variant known, venueId, productName, imageAssetRef, listPrice,
+    sellable, reason; per performance startsAt, isCancelled, productId), served service, the price resolution the
+    guest listing''s own, Catalogue owner to confirm. tools/derive-ddl.py: x-ticvai-unique-nulls: not-distinct makes a
+    schema''s unique-together sets NULLS NOT DISTINCT. tools/derive-schema-history.py COLUMN_RENAMES
+    marketing.wishlist_item price -> list_price (text -> numeric(18,4)). tools/applied/guest-devices-wishlist-14-october.py:
+    addToWishlist and getWishlist read the Catalogue tables the query reads; removeFromWishlist reads and deletes
+    marketing.wishlist_item (it was recorded writing marketing.guest_profile). docs/active/breaking-changes.yaml
+    BC-087. tools/check-contract-storage.py ST-PROPERTY-PERSISTENCE and ST-STALE-COLUMN.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-087 (ticket 30705, with 30706; SVC-MARKETING-GUEST-1), audited 14 October 2026. TRUE: Wishlist.items[].price
+  was x-ticvai-column list_price, $ref Money, citing naming-and-style 5.1 (marketing-crm.yaml Wishlist), while the
+  schema reference and the frozen r1 DDL had price text (backend/tenant/010-marketing.sql:2318); no unique index backed
+  "idempotent on the variant and performance" (910-indexes.sql:1747, 3561, 3563); the 404 and the saved row''s
+  product_name, image_asset_ref, performance_starts_at, is_available and getWishlist''s current price are Catalogue''s
+  data across deployables (ADR-0055 rule 4); catalogue.variant has no price (catalogue.price.list_price after
+  CHG-R6-011). PARTLY: the "no source named" part was half settled the same morning by CHG-TEN-002 (addToWishlist asks
+  variantsSellableAt by Catalogue''s service route), which answers the 404 only, not the row''s facts or getWishlist.
+  Root cause the CR did not see: the persistence tag sat on the items property, which tools/derive-schema.py reads
+  only on a schema (persistence_of), so the table was never re-derived and kept an older run''s columns, past the
+  24 September money renames and CR-011/CR-014/CR-072 (CHG-R6-011, CHG-R6-018, CHG-DDL-006), and no check looked
+  because the wrapper schema is "none" (check-contract-storage walked persisted schemas only). The lead''s
+  instruction, 14 October: "pull all Crs and get them fixed".'
+keys_touched:
+  operations:
+  - addToWishlist
+  - getWishlist
+  - removeFromWishlist
+  schemas:
+  - Wishlist
+  - WishlistItem
+  tables:
+  - marketing.wishlist_item
+  - catalogue.variant
+  - catalogue.product
+  - catalogue.product_media
+  - catalogue.price
+  - catalogue.performance
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/derive-ddl.py
+  - tools/derive-schema-history.py
+  - tools/applied/guest-devices-wishlist-14-october.py
+  - handoff/api-data-lineage.json
+  - docs/active/breaking-changes.yaml
+  - tools/check-contract-storage.py
+  - handoff/audit-baseline.json
+  other:
+  - catalogue#variantListingFacts
+  - x-ticvai-unique-nulls
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started:
+  - SVC-MARKETING-GUEST-1 (#30705 addToWishlist, #30706 getWishlist; a comment for the agent, never a rewrite)
+  unstarted:
+  - SVC-MARKETING-GUEST-2 (removeFromWishlist)
+  - MIG-MARKETING (#27677, V0028__marketing.sql)
+  - APP-WEB-WEB-009
+  - APP-WEB-WEB-017
+  - APP-WEB-WEB-024
+  - APP-MOB-GST-020
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-087
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  MKT, branch cr/086-088-guest-devices from r6-integrate 594e51a2. Chosen where the CR left it (lead to confirm): the
+  table follows the contract (the CR''s A), with the amount alone as every Money column (no currency column: the
+  package''s rule, derive-schema resolve_type), and the Catalogue read by a declared query on Catalogue''s service
+  route (the CR''s B), because CHG-TEN-002 already routes addToWishlist''s check that way and no Catalogue event
+  carries a variant''s name, picture or price for a projection (the CR''s A would need new events; the lead may move
+  to it if getWishlist''s read rate makes the service call too dear). Catalogue''s published service operation for
+  variantListingFacts is not written yet, as for variantsSellableAt (a follow-up of CHG-TEN-002, now two queries).
+  The rule of the price (the guest listing''s own resolution) is the Catalogue owner''s to confirm. getWishlist
+  bearerAuth removed as the developer proposed (BC-087, lead to confirm). Migration effect (MIG-MARKETING #27677, not
+  started): price text -> list_price numeric(18,4) (a declared rename with a type change, listed in
+  handoff/migration-review.md for a person) and the unique index (subject_id, variant_id, performance_id) NULLS NOT
+  DISTINCT in the next V01nn forward migration (PostgreSQL 15+, the platform is on 16). Prevention:
+  ST-PROPERTY-PERSISTENCE and ST-STALE-COLUMN in check-contract-storage, run on the parent (594e51a2 contract and
+  schema reference with this branch''s check: fail on marketing-crm.Wishlist.items and on
+  marketing.wishlist_item.price, name and type) and passing on this branch, nothing baselined; the generator rule is
+  tools/derive-ddl.py::unique_nulls_not_distinct. The glossary entry marketing-crm.WishlistItem.variantId:variant is
+  baselined like every other variantId (the wire name is unchanged; the field moved into a named schema).'

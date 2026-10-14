@@ -89,6 +89,28 @@ TICVAI. The template location and the retention floor need the client's yes.**
 4. **Field-level:** identity-document numbers (Emirates ID, passport) and any field classed as sensitive are encrypted by the application: a data key per tenant, wrapped by an HSM-backed Key Vault key. Where lookup is needed, a keyed hash (blind index) sits beside the ciphertext. **Not `pgcrypto`**: its keys pass through SQL text and logs (it is installed but called nowhere today).
 5. **Secrets that sign rather than encrypt** (the Qdrant API key) are Key Vault secrets, read only by their issuer (ADR-0049).
 
+**Amended 14 October 2026 (Chinmay; ADAM CR-086, CHG-MKT-001): a secret held per guest is field-encrypted, never a
+Key Vault secret.** `registerGuestDevice` said the guest's push token was "a vault reference ... the same pattern as
+`PaymentProvider.credentialRef`", which would have written one Key Vault secret per guest phone, on a guest request,
+into a store that holds a few provider credentials per tenant; and the token's fingerprint was "a hash" with no
+algorithm. The rule, for this and every later secret of the same kind:
+
+- **A Key Vault secret is for a credential the tenant or we configure** (a provider's key, a signing secret): a few
+  per tenant, written by staff, the row holding its name (`x-ticvai-secret: vault-reference`).
+- **A secret that arrives per guest or per device is encrypted by the application under section 4**: AES-256-GCM
+  under the tenant's data key, which the tenant's HSM-backed Key Vault key wraps, stored in the row as one string that
+  names the key version (`x-ticvai-secret: field-encrypted`). Key Vault holds the key, never the value. The guest push
+  token is the first (`marketing.guest_device.token_ciphertext`); the push sender decrypts at send time.
+- **A lookup on such a value uses the blind index of section 4**: HMAC-SHA-256 under the tenant's blind-index key,
+  64 lowercase hex characters (`x-ticvai-secret: blind-index`; `marketing.guest_device.token_fingerprint`). A rotated
+  blind-index key is applied by decrypting and re-hashing, never by keeping two.
+- **A password or PIN is an Argon2id PHC string** (ADR-0071, `x-ticvai-secret: argon2id-phc`).
+
+The kernel component is action 6 below (KERNEL-FIELD-ENC): one Application abstraction that encrypts, decrypts and
+blind-indexes a value for the current tenant, so no module calls Key Vault itself. `check-contract-storage`
+ST-SECRET-FORM fails on a stored write-only token, secret, credential, password or PIN that does not say which of the
+four forms it takes; the 17 that predate the rule are baselined and listed there.
+
 ### Biometric templates
 
 6. **TICVAI never stores a template.** The biometric vendor's system holds it. `pii.subject_biometric` gains `vendor` and `vendor_template_ref`.

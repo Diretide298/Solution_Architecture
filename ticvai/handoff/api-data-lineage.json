@@ -6935,6 +6935,13 @@
   "verb": "GET",
   "path": "/guests/{subjectId}/wishlist",
   "reads": [
+   "catalogue.performance",
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.product_media",
+   "catalogue.variant",
    "marketing.wishlist_item"
   ],
   "writes": [],
@@ -6950,7 +6957,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route"
  },
  "addToWishlist": {
   "contract": "marketing-crm",
@@ -6958,7 +6966,12 @@
   "path": "/guests/{subjectId}/wishlist",
   "reads": [
    "cache:idempotency",
+   "catalogue.performance",
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
    "catalogue.product",
+   "catalogue.product_media",
    "catalogue.variant",
    "marketing.wishlist_item"
   ],
@@ -6980,7 +6993,7 @@
   "audience": [
    "guest"
   ],
-  "fixNote": "14 October 2026: reads catalogue.variant, catalogue.product (CHG-TEN-002: through Catalogue's variantsSellableAt (x-ticvai-read-via; ADAM CR-081), by Catalogue's service route)"
+  "fixNote": "14 October 2026: reads catalogue.variant, catalogue.product (CHG-TEN-002: through Catalogue's variantsSellableAt (x-ticvai-read-via; ADAM CR-081), by Catalogue's service route); 14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route"
  },
  "removeFromWishlist": {
   "contract": "marketing-crm",
@@ -6988,11 +7001,11 @@
   "path": "/guests/{subjectId}/wishlist/{itemId}",
   "reads": [
    "cache:idempotency",
-   "marketing.guest_profile"
+   "marketing.wishlist_item"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_profile"
+   "marketing.wishlist_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -7007,7 +7020,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-MKT-002: it deletes the guest's wishlist row, not the guest profile (ADAM CR-087)"
  },
  "listGuestDevices": {
   "contract": "marketing-crm",
@@ -7064,11 +7078,11 @@
   "path": "/guests/{subjectId}/devices/{deviceId}",
   "reads": [
    "cache:idempotency",
-   "marketing.guest_profile"
+   "marketing.guest_device"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_profile"
+   "marketing.guest_device"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7083,7 +7097,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-MKT-001: it revokes the device row and clears its token, not the guest profile (ADAM CR-086)"
  },
  "listSegments": {
   "contract": "marketing-crm",
