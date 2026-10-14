@@ -10754,6 +10754,8 @@ components:
       - inVenue
     UpsellRule:
       x-ticvai-persistence: promotions.upsell_rule
+      # CHG-GEN-005: owned at region, read at venue (audit R183).
+      x-ticvai-rls: read-beneath
       type: object
       required:
       - id
@@ -10773,6 +10775,12 @@ components:
             (decided 28 September, audit R183); set from the caller''s region scope on create.
 
             '
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the owning region''s path, set with `regionId` on create.
+            Row-level security reads the rule at and beneath it (`x-ticvai-rls: read-beneath`, CHG-GEN-005), so a
+            venue reads its region''s rules, and only the region or above writes them.'
         name:
           type: string
           maxLength: 200

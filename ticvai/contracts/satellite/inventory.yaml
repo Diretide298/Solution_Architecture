@@ -4798,6 +4798,8 @@ components:
           nullable: true
     Supplier:
       x-ticvai-persistence: inventory.supplier
+      # CHG-GEN-005: owned at tenant, read and quoted against at venue (audit R183).
+      x-ticvai-rls: read-beneath
       type: object
       required:
       - id

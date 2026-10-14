@@ -165,7 +165,10 @@ def collect_alters(files: list[Path]) -> None:
         # owned at its `scope_path` and shared with a second path -- a stock transfer, readable at
         # the destination. It is still a `scope_path` policy; the checker that knew only two
         # families called the table unprotected when derive-ddl had protected it more carefully.
-        for m in re.finditer(r"apply_(?:scope|venue|shared_scope)_rls\('([\w.\"]+)'", text):
+        # **And two more, since 14 October** (CHG-GEN-005): `apply_read_beneath_rls` and `apply_grant_holder_read_rls`
+        # protect a `scope_path` or `venue_id` table as the base rule does for writes and open its SELECT.
+        for m in re.finditer(r"apply_(?:scope|venue|shared_scope|read_beneath|grant_holder_read)_rls\('([\w.\"]+)'",
+                             text):
             RLS_APPLIED.add(m.group(1))
             RLS_APPLIED.add(m.group(1).replace('"', ""))
         for m in re.finditer(r"ALTER TABLE ([\w.]+) ENABLE ROW LEVEL SECURITY", text):
