@@ -1,0 +1,44 @@
+id: CHG-CRD-006
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: approvals.escalation holds the rows of ApprovalRequest.escalations[] (when, why, from and to level, automatic or
+  by whom, the approver added), as a declared child of approvals.request.
+decision:
+  what: 'approvals.yaml ApprovalRequest: x-ticvai-persistence approvals.request + approvals.escalation; escalations[] items
+    gain required [at, toLevel, wasAutomatic], escalatedByPrincipalId, addedApproverPrincipalId, a maxLength on reason,
+    and at is stored as escalated_at.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of ADAM CR-078 (14 October 2026): approvals.escalation held only id and request_id (D-STUB-TABLE baseline) while
+  escalateApprovalRequest wrote it and six reporting operations read it; 11.1.48 says who was asked, when, and why it moved
+  up.'
+keys_touched:
+  schemas:
+  - ApprovalRequest
+  tables:
+  - approvals.escalation
+  operations:
+  - escalateApprovalRequest
+  - getApprovalAnalytics
+  - listSlaEscalationBottleneck
+  files:
+  - contracts/spine/approvals.yaml
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078 (stub-table class, decided at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-stored-request-fields.py
+status: open
+notes: 'derive-lineage now adds approvals.escalation to the reads of every operation that returns ApprovalRequest (and to
+  the writes of createApprovalRequest, reopenApprovalRequest and resubmitApprovalRequest, whose bodies ref it); that is
+  its additive ref-following rule, committed as it derived. Verified with derive-schema and derive-ddl --apply in the worktree
+  (generated tables read in V0104 and handoff/migration-review.md, then restored): the new columns are additive in the next
+  forward migration; NOT NULL on new columns and the nullability changes on existing ones are listed in migration-review.md
+  for the lead''s gate. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: ''Release today as an exception''.'

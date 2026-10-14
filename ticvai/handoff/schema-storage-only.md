@@ -13,9 +13,9 @@ cannot appear there — and some tables should have no API representation.
 | `platform.venue_settings` | Venue configuration is read through `tenancy` operations that return a composed view, not this row |
 | `platform.sale_board_page`, `platform.sale_board_tile` | Child tables of `sale_board`, which the API returns as one nested object. The split is a storage decision |
 | `platform.device_heartbeat` | High-volume, short-lived. The API returns current status; the history is operational and trimmed |
-| `identity.principal_credential` | **Deliberately absent from every API.** A credential hash has no response it belongs in |
+| `identity.principal_credential`, `identity.principal_credential_history` | **Deliberately absent from every API.** A credential hash has no response it belongs in. Since 14 October 2026 (CHG-CRD-001, ADAM CR-078) its columns come from `PrincipalCredential`, a contract schema no operation returns (as `GuestCredential` does for `identity.guest_credential`): the table had been derived from nothing and held only `id` and `principal_id` |
 | `identity.role_permission` | Child of `role`, returned nested |
-| `identity.mfa_recovery_code` | Hashed and single-use. Returned once at enrolment and never retrievable — a recovery code that can be re-read is a second password |
+| `identity.mfa_recovery_code` | Hashed and single-use. Returned once at enrolment and never retrievable — a recovery code that can be re-read is a second password. Its columns come from `MfaRecoveryCode`, a schema no operation returns (CHG-CRD-005) |
 | `identity.refresh_token` | **A bearer credential, like `principal_credential`.** Returning a refresh token hash over any endpoint defeats rotation. Revocation is `forceLogout` and `guestLogout`, which end a session; the tokens behind them are an implementation of that, not a resource |
 | `identity.authz_audit` | Written by the platform, read through reporting. No direct API |
 | `orders.sales_order_unassigned`, `access.scan_event_unassigned` | **Default partitions.** Not tables in the modelling sense — they catch rows whose `venue_id` matches no configured partition, so a misconfiguration is loud rather than silently lossy |

@@ -1,0 +1,41 @@
+id: CHG-CRD-009
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'New check tools/check-stored-request-fields.py: a request field the contract says is stored reaches a column the
+  lineage writes (SR-STORED-NO-COLUMN), a write into a key-only table brings its fields a column (SR-STUB-WRITE), and a
+  credential is kept only as a hash (SR-SECRET-UNHASHED).'
+decision:
+  what: tools/check-stored-request-fields.py, registered in tools/run-checks.py; 22 pre-existing findings outside this batch
+    baselined in handoff/audit-baseline.json (none of the CR-078 items). x-ticvai-stored-as names the column a request field
+    is stored as when its name differs (initialCredential -> credential_hash).
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-078 audit, prevention: "a rule that a request field the description says is stored, or a lineage-written table,
+  reaches a column" (createPrincipal.mustChangeCredential / initialCredential is the r5 failing case). D-STUB-TABLE (made
+  unbaselinable for written stubs by batch GEN) sees the table; this sees the operation and the field.'
+keys_touched:
+  files:
+  - tools/check-stored-request-fields.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+root_class: A15 STORAGE-GAP
+tickets:
+  started:
+  - 27750
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-stored-request-fields.py
+status: open
+notes: 'tools/check-stored-request-fields.py was run on the parent commit 1eb1d063 (r5): it fails there with 20 new findings,
+  among them SR-STUB-WRITE createPrincipal (initialCredential, mustChangeCredential) and SR-SECRET-UNHASHED createPrincipal.initialCredential;
+  on this branch, after derive-schema, it passes (0 new, 22 known pre-existing findings baselined). Baselined (out of scope,
+  for their owners): createSaleBoard/updateSaleBoard into platform.sale_board_tile (batch TEN), identity.guest_session and
+  identity.authz_audit (key-only tables written by the guest sign-ins and evaluateAccess), fnb.delivery_location_outlet,
+  12 SR-STORED-NO-COLUMN (e.g. updateMyProfile dietary/accessibility, which CR-082''s request-only sweep covers) and setApprovalExternalProvider.outboundCredential.
+  Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: ''Release today as an exception''.'

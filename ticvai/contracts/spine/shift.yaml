@@ -625,6 +625,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `witnessStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).
       x-ticvai-step-up-carrier: body:witnessStepUp
       x-ticvai-scope-level: venue
@@ -950,6 +954,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: SHIFT_REOPEN
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: Reopening a counted shift is a reversal; a supervisor signs it in place (audit R144).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1191,6 +1199,10 @@ paths:
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
@@ -1296,6 +1308,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any till or the daily reconciliation since 2 October, CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1389,6 +1405,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue

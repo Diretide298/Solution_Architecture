@@ -1,0 +1,60 @@
+id: CHG-CRD-005
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'identity.mfa_challenge, identity.mfa_recovery_code and identity.otp_challenge get their columns from never-returned
+  schemas (MfaChallenge, MfaRecoveryCode, OtpChallenge): code hashes, expiry, attempts, consumption.'
+decision:
+  what: 'identity.yaml: MfaChallenge (principalId, methodId, action, sessionId, codeHash, status, failedAttempts, expiresAt,
+    verifiedAt, consumedAt, voidedAt), MfaRecoveryCode (principalId, codeHash, issuedAt, usedAt), OtpChallenge (subjectId
+    nullable, identifierHash, channel, purpose, codeHash, failedAttempts, attemptLimit, expiresAt, resendAfter, consumedAt,
+    invalidatedAt). Lineage: createMfaChallenge reads mfa_challenge and session, verifyMfaChallenge reads password_policy,
+    requestGuestOtp reads otp_challenge, verifyGuestOtp writes it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of ADAM CR-078 (14 October 2026): the stub tables written by createMfaChallenge/verifyMfaChallenge, enrolMfaMethod/verifyMfaChallenge
+  and requestGuestOtp/verifyGuestEmail held one key column each and were baselined under D-STUB-TABLE (check-ddl-conventions.py:349-350);
+  R126 (6) five wrong codes, R094 OTP attempt limit, CHG-RUL-020 single-use step-up had nowhere to be stored.'
+keys_touched:
+  schemas:
+  - MfaChallenge
+  - MfaRecoveryCode
+  - OtpChallenge
+  tables:
+  - identity.mfa_challenge
+  - identity.mfa_recovery_code
+  - identity.otp_challenge
+  operations:
+  - createMfaChallenge
+  - verifyMfaChallenge
+  - enrolMfaMethod
+  - requestGuestOtp
+  - verifyGuestOtp
+  - verifyGuestEmail
+  files:
+  - contracts/spine/identity.yaml
+  - handoff/schema-storage-only.md
+  - handoff/api-data-lineage.json
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started:
+  - 27750
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-stored-request-fields.py
+status: open
+notes: 'A guest''s second factor (rev 3 GAP-B1) is not stored here: identity.mfa_method has no subject column either, so
+  guest MFA storage stays an open gap (said in MfaChallenge''s description). otp_challenge.subject_id becomes nullable (a
+  register code has no subject yet); under the subject policy such a row is reachable only at the tenant root. Verified
+  with derive-schema and derive-ddl --apply in the worktree (generated tables read in V0104 and handoff/migration-review.md,
+  then restored): the new columns are additive in the next forward migration; NOT NULL on new columns and the nullability
+  changes on existing ones are listed in migration-review.md for the lead''s gate. tools/check-stored-request-fields.py
+  was run on the parent commit 1eb1d063 (r5): it fails there with 20 new findings, among them SR-STUB-WRITE createPrincipal
+  (initialCredential, mustChangeCredential) and SR-SECRET-UNHASHED createPrincipal.initialCredential; on this branch, after
+  derive-schema, it passes (0 new, 22 known pre-existing findings baselined). Released outside the Tue/Fri window by the
+  lead''s waiver, 14 Oct 2026: ''Release today as an exception''.'

@@ -1,0 +1,62 @@
+id: CHG-CRD-004
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Identity declares the rule question verifySupervisorStepUp in x-ticvai-queries (served in-process and as a serviceAuth
+  operation), and the nine PIN step-up operations name it in x-ticvai-read-via: in-process in commerce, service for recountStockCount
+  and closeTransferShort in operations.'
+decision:
+  what: 'identity.yaml: top-level x-ticvai-queries.verifySupervisorStepUp (inputs principalId, credential, permission, scopePath,
+    reversedPrincipalId; returns verified, refusal, lockedUntil; rule from common.yaml SupervisorStepUp; served [in-process,
+    service]); new operation POST /internal/step-up/verify verifySupervisorStepUp (serviceAuth, x-ticvai-auth service, problem
+    types on 401) with schemas SupervisorStepUpCheck and SupervisorStepUpVerdict; its lineage reads principal, principal_credential,
+    password_policy, delegated_access, role_permission and writes principal_credential (wrong-PIN count). x-ticvai-read-via
+    on reopenShift, closeShift, acceptShiftVariance, rejectShiftVariance, withdrawFromDepositBox, cancelPerformance, listActiveSessions
+    (in-process) and recountStockCount, closeTransferShort (service).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-078 audit: SupervisorStepUp says the server checks credential against principalId (common.yaml:303-305) but
+  nine step-up operations cannot read a PIN they do not own, and recountStockCount and closeTransferShort are in the operations
+  deployable (ADR-0055 rule 4). The cross-module query pattern of the r6 settlement (ADR-0055 amendment, batch GEN implements
+  the lineage and check support).'
+keys_touched:
+  operations:
+  - verifySupervisorStepUp
+  - reopenShift
+  - closeShift
+  - acceptShiftVariance
+  - rejectShiftVariance
+  - withdrawFromDepositBox
+  - cancelPerformance
+  - recountStockCount
+  - closeTransferShort
+  - listActiveSessions
+  schemas:
+  - SupervisorStepUpCheck
+  - SupervisorStepUpVerdict
+  - SupervisorStepUp
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/shared/common.yaml
+  - handoff/api-data-lineage.json
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - 27750
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: contracts/spine/identity.yaml::x-ticvai-queries
+status: open
+notes: 'The read-ownership check that makes an undeclared cross-module read fail is batch GEN''s (x-ticvai-queries / x-ticvai-read-via
+  support in derive-lineage and its check); this entry only writes the declarations. The new operation is not permission-gated
+  (x-ticvai-permission null, x-ticvai-auth service, like issueOrderEntitlements); the permission it checks is an input from
+  contracts/shared/permissions.yaml. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: ''Release today
+  as an exception''.'

@@ -4207,12 +4207,14 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.mfa_method",
+   "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
    "identity.role"
   ],
   "writes": [
    "cache:idempotency",
+   "identity.principal_credential",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -4232,7 +4234,8 @@
    "anonymous",
    "partner"
   ],
-  "lineageNote": "emits identity.loginRecorded on success and failure"
+  "lineageNote": "emits identity.loginRecorded on success and failure",
+  "fixNote": "14 October 2026 (CHG-CRD-001, ADAM CR-078): the credential's hash, its lockout counted against the tenant's policy (PrincipalCredential)"
  },
  "selectRole": {
   "contract": "identity",
@@ -4327,6 +4330,7 @@
   "reads": [
    "cache:idempotency",
    "identity.delegated_access",
+   "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
    "identity.session",
@@ -4334,6 +4338,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.principal_credential",
    "identity.session"
   ],
   "routing": "",
@@ -4350,7 +4355,7 @@
    "staff",
    "partner"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): the supervisor's PIN and SESSION_FORCE_LOGOUT at the till's venue"
+  "fixNote": "14 October 2026 (CHG-CRD-001, ADAM CR-078): a wrong supervisor PIN counts towards the PIN lockout"
  },
  "getCurrentSession": {
   "contract": "identity",
@@ -4421,6 +4426,7 @@
   "path": "/principals",
   "reads": [
    "cache:idempotency",
+   "identity.password_policy",
    "identity.principal"
   ],
   "writes": [
@@ -4442,7 +4448,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "14 October 2026 (CHG-CRD-001, ADAM CR-078): initialCredential is held to the policy before its hash is stored"
  },
  "getPrincipal": {
   "contract": "identity",
@@ -4747,6 +4754,7 @@
   "path": "/auth/guest/otp",
   "reads": [
    "cache:idempotency",
+   "identity.otp_challenge",
    "pii.subject_contact"
   ],
   "writes": [
@@ -4768,7 +4776,8 @@
   "audience": [
    "anonymous"
   ],
-  "lineageNote": "adds platform.outbox for purpose passwordReset (identity.credentialResetRequested)"
+  "lineageNote": "adds platform.outbox for purpose passwordReset (identity.credentialResetRequested)",
+  "fixNote": "14 October 2026 (CHG-CRD-005, ADAM CR-078): a newer code invalidates the older one for the identifier and purpose; resendAfter"
  },
  "verifyGuestOtp": {
   "contract": "identity",
@@ -4783,6 +4792,7 @@
   "writes": [
    "cache:idempotency",
    "identity.guest_session",
+   "identity.otp_challenge",
    "pii.subject_contact",
    "platform.outbox"
   ],
@@ -4800,7 +4810,8 @@
   "audience": [
    "anonymous"
   ],
-  "lineageNote": "emits identity.loginRecorded"
+  "lineageNote": "emits identity.loginRecorded",
+  "fixNote": "14 October 2026 (CHG-CRD-005, ADAM CR-078): wrong codes are counted and a correct one is consumed"
  },
  "guestSocialLogin": {
   "contract": "identity",
@@ -5225,7 +5236,9 @@
   "path": "/auth/mfa/challenge",
   "reads": [
    "cache:idempotency",
-   "identity.mfa_method"
+   "identity.mfa_challenge",
+   "identity.mfa_method",
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
@@ -5246,7 +5259,8 @@
    "staff",
    "partner",
    "guest"
-  ]
+  ],
+  "fixNote": "14 October 2026 (CHG-CRD-005, ADAM CR-078): an earlier pending challenge for the action is voided; the challenge is bound to the session"
  },
  "verifyMfaChallenge": {
   "contract": "identity",
@@ -5255,7 +5269,8 @@
   "reads": [
    "cache:idempotency",
    "identity.mfa_challenge",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "identity.password_policy"
   ],
   "writes": [
    "cache:idempotency",
@@ -5280,7 +5295,8 @@
    "partner",
    "guest"
   ],
-  "lineageNote": "emits identity.loginRecorded (action signIn)"
+  "lineageNote": "emits identity.loginRecorded (action signIn)",
+  "fixNote": "14 October 2026 (CHG-CRD-005, ADAM CR-078): five wrong codes lock step-up for the policy's lockout minutes"
  },
  "listActiveSessions": {
   "contract": "identity",
@@ -18629,6 +18645,7 @@
   "path": "/approval-requests",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [],
@@ -18654,6 +18671,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -18661,6 +18679,7 @@
    "identity.principal"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -18717,6 +18736,7 @@
   "path": "/approval-requests/{requestId}/decide",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -18773,6 +18793,7 @@
   "path": "/approval-requests/{requestId}/withdraw",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -18801,6 +18822,7 @@
   "path": "/approval-requests/{requestId}/escalate",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency"
@@ -18833,10 +18855,12 @@
   "path": "/approval-requests/{requestId}/resubmit",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -57095,11 +57119,14 @@
    "cache:idempotency",
    "identity.password_policy",
    "identity.principal",
-   "identity.principal_credential"
+   "identity.principal_credential",
+   "identity.principal_credential_history"
   ],
   "writes": [
    "cache:idempotency",
+   "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.session"
   ],
   "routing": null,
@@ -57116,7 +57143,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "14 October 2026 (CHG-CRD-001, ADAM CR-078): the reuse check reads the history; the replaced hash is kept there; mustChangeCredential is cleared on the principal"
  },
  "createGroupBooking": {
   "contract": "orders",
@@ -57209,12 +57237,15 @@
   "path": "/principals/{principalId}/credential-reset",
   "reads": [
    "cache:idempotency",
+   "identity.password_policy",
    "identity.principal",
    "identity.principal_credential"
   ],
   "writes": [
    "cache:idempotency",
+   "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.session",
    "platform.outbox"
   ],
@@ -57232,7 +57263,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "adds platform.outbox (identity.credentialResetRequested)"
+  "lineageNote": "adds platform.outbox (identity.credentialResetRequested)",
+  "fixNote": "14 October 2026 (CHG-CRD-001, ADAM CR-078): the PIN length and policy; the replaced hash is kept; mustChangeCredential is set"
  },
  "setDenominations": {
   "contract": "shift",
@@ -58805,6 +58837,7 @@
   "path": "/approval-requests/{requestId}/submit",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency"
@@ -70529,6 +70562,7 @@
   "path": "/approval-requests/{requestId}/external-decision",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.external_dispatch",
    "approvals.external_provider",
    "approvals.request",
@@ -74225,6 +74259,7 @@
   "path": "/approval-requests/{requestId}/assignment",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [
@@ -74298,6 +74333,7 @@
   "path": "/approval-requests/{requestId}/cancel",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [
@@ -75332,9 +75368,11 @@
   "path": "/approval-requests/{requestId}/reopen",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request"
   ],
   "routing": null,
@@ -76714,6 +76752,7 @@
   "path": "/approval-requests/{requestId}",
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [],
@@ -77524,5 +77563,35 @@
    "postgres",
    "redis"
   ]
+ },
+ "verifySupervisorStepUp": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/internal/step-up/verify",
+  "reads": [
+   "identity.delegated_access",
+   "identity.password_policy",
+   "identity.principal",
+   "identity.principal_credential",
+   "identity.role_permission"
+  ],
+  "writes": [
+   "identity.principal_credential"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Verify a supervisor's PIN step-up for another deployable",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "14 October 2026 (CHG-CRD-004, ADAM CR-078): the PIN against its hash and lockout, the permission through live grants; a wrong PIN is counted"
  }
 }

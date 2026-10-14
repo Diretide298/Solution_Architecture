@@ -1,0 +1,40 @@
+id: CHG-CRD-007
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'ai.index_entry gets its columns from a never-returned IndexEntry schema: source, the record key the erasure path
+  deletes by, the subject, content hash, chunk count, model, vector point ids, last job.'
+decision:
+  what: ai.yaml IndexEntry (x-ticvai-persistence ai.index_entry; unique [sourceId, recordKey]; sourceId, recordKey, subjectId
+    (plain value), contentHash, chunkCount, embeddingModel, pointIds, indexedAt, lastJobId).
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of ADAM CR-078 (14 October 2026): ai.index_entry held only id and source_id (D-STUB-TABLE baseline), so removeIndexEntry
+  had no column for its {entryId} and erasure (ADR-0047) could not find a subject''s entries; writers reindexSource and
+  removeIndexEntry.'
+keys_touched:
+  schemas:
+  - IndexEntry
+  tables:
+  - ai.index_entry
+  operations:
+  - reindexSource
+  - removeIndexEntry
+  files:
+  - contracts/satellite/ai.yaml
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078 (stub-table class, decided at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-stored-request-fields.py
+status: open
+notes: 'Verified with derive-schema and derive-ddl --apply in the worktree (generated tables read in V0104 and handoff/migration-review.md,
+  then restored): the new columns are additive in the next forward migration; NOT NULL on new columns and the nullability
+  changes on existing ones are listed in migration-review.md for the lead''s gate. Released outside the Tue/Fri window by
+  the lead''s waiver, 14 Oct 2026: ''Release today as an exception''.'

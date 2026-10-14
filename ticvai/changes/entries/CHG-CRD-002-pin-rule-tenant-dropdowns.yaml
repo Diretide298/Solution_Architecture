@@ -1,0 +1,79 @@
+id: CHG-CRD-002
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: The PIN rule is the tenant's choice from three drop-downs in its password policy (pinLength 4/6/8, pinReusePrevention
+  none/last3/last5, pinLockoutAfterAttempts 3/5/10); ADM-342 and ADM-422 render them as drop-downs, and the PIN keypads
+  (POS-000, EMP-001, SCN-001, the supervisor step-up) take the length from the policy through WorkstationContext.pinLength.
+decision:
+  what: 'identity.yaml PasswordPolicy gains pinLength (integer enum [4, 6, 8], default 4), pinReusePrevention (enum [none,
+    last3, last5], default last5) and pinLockoutAfterAttempts (integer enum [3, 5, 10], default 5); getPasswordPolicy and
+    setPasswordPolicy carry them; the R126 floor rules apply to passwords only. WorkstationContext.pinLength carries the
+    tenant''s length to a device; common.yaml SupervisorStepUp.credential says its length is the policy''s. Screens: P08
+    ADM-342 and P09 ADM-422 get three selectField drop-downs bound to the new fields; POS-000 (and its New PIN step), POS-001''s
+    open-shift precondition, EMP-001, SCN-001 take the length from the policy; the password doors (ADM-001, PTR-001, SUP-001)
+    show the new credential step on LoginResponse.mustChangeCredential. derive-schema: an enum property carrying x-ticvai-persistence-column
+    is typed by it (integer); derive-ddl: an integer enum gets its CHECK.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-078 (ticket 27750): PasswordPolicy.minLength default 12, floor 8 (identity.yaml:7702-7703; R126 (7)) while
+  POS-000 draws a 4-digit keypad; R132 asked reuse prevention for passwords and the screens extended it to PINs (EMP-001,
+  POS-000). Lead''s decision, Chinmay, 14 October 2026: "Give those as options that they select as a drop down. update the
+  wireframe settings".'
+keys_touched:
+  schemas:
+  - PasswordPolicy
+  - WorkstationContext
+  - SupervisorStepUp
+  operations:
+  - getPasswordPolicy
+  - setPasswordPolicy
+  - login
+  - changeOwnCredential
+  tables:
+  - identity.password_policy
+  screens:
+  - ADM-342
+  - ADM-422
+  - POS-000
+  - POS-001
+  - EMP-001
+  - SCN-001
+  - ADM-001
+  - PTR-001
+  - SUP-001
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/shared/common.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P06-staff-app.yaml
+  - screens/P07-staff-scanner.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P10-partner-reseller-portal.yaml
+  - screens/P12-support-agent-console.yaml
+  - tools/derive-schema.py
+  - tools/derive-ddl.py
+  other:
+  - 'design-r1 (gitignored, main checkout): COMMAND.md, the settings and PIN keypad screen sources'
+root_class: A26 BUSINESS-RULES
+tickets:
+  started:
+  - 27750
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::column_rules
+status: open
+notes: 'Defaults chosen as the package''s most consistent options: pinLength 4 (the client-approved POS prototype), pinReusePrevention
+  last5 (what the sign-in screens promised), pinLockoutAfterAttempts 5 (R126 (6) five wrong codes). Only the two new integer
+  enums carry x-ticvai-persistence-column, so the older integer enums (UrlRedirect.statusCode, AdmissionRule.formatVersion)
+  keep their text columns. The Claude Design sources (ticvai/design-r1, gitignored) were updated in the main checkout and
+  are not committed. Verified with derive-schema and derive-ddl --apply in the worktree (generated tables read in V0104
+  and handoff/migration-review.md, then restored): the new columns are additive in the next forward migration; NOT NULL
+  on new columns and the nullability changes on existing ones are listed in migration-review.md for the lead''s gate. Released
+  outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: ''Release today as an exception''.'
