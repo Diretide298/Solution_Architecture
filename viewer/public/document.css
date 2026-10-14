@@ -76,5 +76,8 @@
     background: none; color: #000; font-size: 10.5pt; opacity: 1 !important;
   }
   .doc-rendered .md-table-wrap { overflow: visible; }
-  .doc-rendered .md-table th, .doc-rendered .md-table td { border-color: #bbb; color: #000; }
+  /* Paper is white whatever the screen's theme: the night theme's light text
+     and dark fills would otherwise print as white on white. */
+  html, body { background: #fff !important; }
+  .doc-rendered * { color: #000 !important; background: none !important; border-color: #bbb !important; }
 }
