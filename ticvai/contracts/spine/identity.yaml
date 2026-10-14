@@ -7371,6 +7371,12 @@ components:
           type: string
           maxLength: 500
           nullable: true
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003). `recordBenefitUsage` is offline-capable, so
+            the client sets this from its own clock and keeps it on replay; `created_at` is when the server
+            heard of it. Omitted online, the server sets it to the time it received the call.'
     IdentityCustomerMembership:
       type: object
       x-ticvai-persistence: identity.customer_membership

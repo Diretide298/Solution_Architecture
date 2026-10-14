@@ -709,7 +709,7 @@ paths:
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -773,7 +773,7 @@ paths:
       tags: [work]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -895,7 +895,7 @@ paths:
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_VERIFY
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -1206,7 +1206,7 @@ paths:
       tags: [maintenance]
       x-ticvai-permission: MAINTENANCE_APPROVE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -2045,7 +2045,7 @@ paths:
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -2154,7 +2154,7 @@ paths:
       - assets.createUpload
       x-ticvai-permission: INCIDENT_REPORT
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -2288,7 +2288,7 @@ paths:
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'

@@ -1689,7 +1689,7 @@ paths:
       - transfer
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -1825,7 +1825,7 @@ paths:
       - transfer
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

@@ -1,0 +1,50 @@
+id: CHG-OFL-002
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Thirteen writes the client-approved staff-app, till and kitchen screens say they queue offline become
+  x-ticvai-offline-capable (work orders, incidents, cases, table close, kitchen notify and prioritise), and syncOrders
+  is marked as the outbox''s own replay call (x-ticvai-outbox-replay).'
+decision:
+  what: 'Under decision 2 of 14 October and the lead''s rule that approved screens are not changed, a write an approved
+    offline-app screen promises to queue is made offline-capable in its contract, keeping its Idempotency-Key and its
+    declared conflict policy: closeTableVisit (POS-028, EMP-059), cancelWorkOrder, closeWorkOrder, verifyWorkOrder,
+    recordWorkOrderParts (EMP-006), uploadIncidentMedia (EMP-026), escalateCase, reopenCase, updateCase (EMP-028,
+    EMP-029), recordAuthorityNotification, updateIncident (EMP-027, EMP-029, EMP-050), notifyServer (KIT-002),
+    prioritiseKitchenTicket (KIT-003). Writes that hold capacity, stock under a lease, configuration or a web app''s
+    queue stay online-only and their screens are keeps. syncOrders gets x-ticvai-outbox-replay: true and
+    check-screen-wiring stops asking a screen to call the replay disabled.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-screen-wiring/S-OFFLINE-QUEUED, 29 members before, 12 after (audit/ticvai/runs/audit-1014/classes.json;
+  CHG-SWP-004). Retail stays online (ADR-0013), so reserveMerchandise and collectShopAndDrop are not made offline.'
+keys_touched:
+  operations: [closeTableVisit, cancelWorkOrder, closeWorkOrder, verifyWorkOrder, recordWorkOrderParts,
+    uploadIncidentMedia, escalateCase, reopenCase, updateCase, recordAuthorityNotification, updateIncident,
+    notifyServer, prioritiseKitchenTicket, syncOrders]
+  screens: [POS-013, POS-028, EMP-006, EMP-026, EMP-028, EMP-029, KIT-002, KIT-003]
+  files: [contracts/satellite/fnb.yaml, contracts/satellite/maintenance.yaml, contracts/satellite/marketing-crm.yaml,
+    contracts/spine/orders.yaml, tools/check-screen-wiring.py]
+  other: [x-ticvai-outbox-replay, S-OFFLINE-QUEUED]
+root_class: A34 SCREEN-CONTEXT
+tickets:
+  started: []
+  unstarted: [27691, 27703, 27705, 27707, 27709, 28138, 28246, 28258, 28539, 28543, 28549, 28568, 28569, 28585, 28598,
+    28650, 28651, 28652, 28654, 28656, 28657, 28661, 28662, 28663, 28668, 28669, 28754, 28790, 28850, 28854, 28855,
+    28856, 28934]
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch OFL. Keeps (12, client-approved UI): BO-097 checkOutResource, checkInResource, authoriseStoredValue,
+  relinquishStoredValue, captureStoredValue (a web back office whose approved copy says "Queued locally"; decision 2
+  says a web app never queues, so only the approved copy can change); POS-012 reserveMerchandise, collectShopAndDrop
+  (retail stays online, ADR-0013); POS-016 configureWorkstation, setDeviceAssignment (configuration; setDeviceAssignment
+  also declares no x-ticvai-offline-capable at all); POS-021 addCartLine (the cart takes a capacity lease); POS-025
+  reopenShift (needs the server total); POS-028 createTableReservationForGuest (a table held offline is held twice).
+  The inline request bodies of the newly offline writes carry no recordedAt yet; their tables are not flagged by
+  ST-OFFLINE-RECORDED-AT because the bodies are not persisted schemas.'

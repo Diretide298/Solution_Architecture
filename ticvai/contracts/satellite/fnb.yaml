@@ -2057,7 +2057,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -3883,6 +3883,7 @@ paths:
       - guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P06]
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -5527,6 +5528,9 @@ paths:
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-refused-on: [POS-024]
+      x-ticvai-offline-condition: Queued where an item is 86'd during service (POS-021, KIT-008). Outlet Setup
+        (POS-024) refuses configuration offline, availability included (CHG-OFL-001).
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
@@ -6661,7 +6665,7 @@ paths:
       - bill
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6966,7 +6970,7 @@ paths:
       - kitchen
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
