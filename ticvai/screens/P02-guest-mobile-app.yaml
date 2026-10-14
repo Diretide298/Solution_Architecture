@@ -5992,7 +5992,8 @@ screens:
     trigger: onLoad
   - operationId: getParkingEntitlement
     contract: access
-    purpose: Load the parking entitlement being changed
+    purpose: 'Load the parking entitlement being changed. Only when signed in: a signed-out guest is
+      offered sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -6631,8 +6632,9 @@ screens:
     trigger: onAction
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened silently on the first message; the scope comes from the session, never a module the
-      guest picks
+    purpose: 'Opened silently on the first message; the scope comes from the session, never a module the
+      guest picks. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped
+      subject)'
     trigger: background
   - operationId: handoverToAgent
     contract: marketing-crm
@@ -6640,14 +6642,17 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s production
-      plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time
-      and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay,
-      3 October); until then the control shows ''Later''.'
+    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s
+      production plan; an itinerary is asked on the Plan tab); never a kind picker. Later
+      (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions
+      (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows
+      ''Later''. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped
+      subject)'
     trigger: background
   - operationId: listAiConversations
     contract: ai
-    purpose: The guest's own earlier conversations
+    purpose: 'The guest''s own earlier conversations. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
   - operationId: recordAnswerFeedback
     contract: ai
@@ -6660,9 +6665,10 @@ screens:
     trigger: onAction
   - operationId: getGuestConversation
     contract: marketing-crm
-    purpose: The agent's replies, the queue position and the wait after a handover, polled every 5 s while
-      the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October
-      2026, r1 additions; CHG-RONEC-003)
+    purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
+      while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the
+      guest''s own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -6875,9 +6881,10 @@ screens:
     trigger: onAction
   - operationId: getGuestConversation
     contract: marketing-crm
-    purpose: The agent's replies, the queue position and the wait after a handover, polled every 5 s while
-      the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October
-      2026, r1 additions; CHG-RONEC-003)
+    purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
+      while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the
+      guest''s own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -7107,7 +7114,8 @@ screens:
     trigger: onAction
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened silently on the first question; the scope comes from the session
+    purpose: 'Opened silently on the first question; the scope comes from the session. Only when signed
+      in: the conversation is the guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: handoverToAgent
     contract: marketing-crm
@@ -7119,7 +7127,8 @@ screens:
     trigger: onAction
   - operationId: listAiConversations
     contract: ai
-    purpose: Show the guest's earlier conversations with the assistant
+    purpose: 'Show the guest''s earlier conversations with the assistant. Only when signed in: a
+      signed-out guest is offered sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -7449,7 +7458,9 @@ screens:
     trigger: onAction
   - operationId: getForm
     contract: marketing-crm
-    purpose: A triggered survey opened from its link
+    purpose: 'A triggered survey opened from its link. Read once the guest is signed in (getForm needs
+      the guest session): a signed-out guest opening the link is offered sign-in and brought back
+      (GFIX-4)'
     trigger: onLoad
   - operationId: submitForm
     contract: marketing-crm
@@ -7457,7 +7468,8 @@ screens:
     trigger: onAction
   - operationId: listMyOrders
     contract: orders
-    purpose: The recent visits a review can be about
+    purpose: 'The recent visits a review can be about. Only when signed in: a signed-out guest is
+      offered sign-in and brought back here (GFIX-4)'
     trigger: onLoad
   wireframe:
     status: notStarted
@@ -8202,7 +8214,7 @@ screens:
   entryState:
     params:
     - name: subjectId
-      from: GST-001
+      from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: notStarted
@@ -9844,7 +9856,8 @@ screens:
     provenance: build, 29 September 2026
   - operationId: getCart
     contract: orders
-    purpose: Show the cart the suggestions are for
+    purpose: 'Show the cart the suggestions are for, with the guest session the device already holds:
+      signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:

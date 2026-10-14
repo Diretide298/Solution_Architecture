@@ -1227,11 +1227,14 @@ paths:
         GST-077 is opened on a departure (`departureId` from GST-076) and never read it: the r1 gate found
         the trip page showing a departure it had no read of. Published network data, as
         `getNextTransportDeparture` is. Returns what the write stores, in the write's own shape.
+        **Readable without a session** (Block A audit, 14 October 2026, CHG-SCG-006): GST-077 loads it before
+        the guest signs in, like `searchTransportDepartures` and `getTransportRoute`, whose audience it shares.
       x-ticvai-permission: null
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       security:
+        - {}
         - guestAuth: []
         - bearerAuth: []
       responses:
