@@ -429,7 +429,7 @@ screens:
     contract: white-label
     purpose: Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the
       session; bound on the home screen as the shell's entry)
-    trigger: onLoad
+    trigger: background
     provenance: build, 29 September 2026
   entryState:
     coldEntry: '**A cold arrival is the ordinary case.** **The venue comes from the device** (decided
